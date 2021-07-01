@@ -79,13 +79,13 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.',
                   '',
-                  'Usually these modules have no bootstapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.',
+                  'Usually these modules have no bootstrapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.',
                   '',
                   'In order to use these modules, make sure to observe the following:',
                   '',
                   '-  **Provide sufficient power to the module.** For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required. Using the power available from USB to Serial adapter is not recommended, these adapters typically do not supply enough current to run ESP8266 reliably in every situation. An external supply or regulator alongwith filtering capacitors is preferred.',
                   '',
-                  '-  **Connect bootstapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.',
+                  '-  **Connect bootstrapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.',
                   '',
                   '-  **Put ESP8266 into bootloader mode** before uploading code.',
                   '',
@@ -602,6 +602,25 @@ boards = collections.OrderedDict([
             ],
         'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
+    }),
+    ( 'd1_mini_clone', {
+        'name': 'LOLIN(WEMOS) D1 mini (clone)',
+        'opts': {
+            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.variant': 'd1_mini',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_menu',
+            'flashfreq_menu',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Clone variant of the LOLIN(WEMOS) D1 mini board,',
+                  'with enabled flash-mode menu, DOUT selected by default.',
+                  '',
+                  'Product page of the preferred official board: https://www.wemos.cc/',
+                  ],
     }),
     ( 'd1_mini_pro', {
         'name': 'LOLIN(WEMOS) D1 mini Pro',
@@ -1271,20 +1290,30 @@ def combn (lst):
         all += comb(i + 1, lst)
     return all
 
-def comb1 (lst):
+def comb1 (lst, lstplusone):
     all = []
     for i in range(0, len(lst)):
         all += [ [ lst[i] ] ]
-    all += [ lst ]
+    if len(lstplusone):
+        for i in range(0, len(lstplusone)):
+            all += [ [ lstplusone[i] ] ]
+        all += [ lst ]
+        for i in range(0, len(lstplusone)):
+            all += [ lst + [ lstplusone[i] ] ]
+    else:
+        all += [ lst ]
     return all
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
+    listplusone = [ 'HWDT', 'HWDT_NOEXTRA4K' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
-    options += comb1(listnocomb)
+    options += comb1(listnocomb, listplusone)
     options += [ listcomb + listnocomb ]
+    for i in range(0, len(listplusone)):
+        options += [ listcomb + listnocomb + [ listplusone[i] ] ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),
@@ -1592,6 +1621,7 @@ def all_boards ():
     # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
     print('menu.BoardModel=Model')
     print('menu.ESPModule=Module')
+    print('menu.UploadTool=Upload Tool')
     print('menu.led=Builtin Led')
     print('menu.baud=Upload Speed')
     print('menu.xtal=CPU Frequency')
@@ -1604,7 +1634,7 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
-    print('menu.exception=Exceptions')
+    print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
@@ -1695,7 +1725,7 @@ def package ():
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
-    # To get consistent indent/formatting read the JSON and write it out programattically
+    # To get consistent indent/formatting read the JSON and write it out programmatically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
             filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)

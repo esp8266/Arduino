@@ -31,8 +31,8 @@ example private hardware path
     Windows: C:\Users\[username]\AppData\Roaming\Arduino15\packages\esp8266\hardware
     Linux: /home/[username]/.arduino15/packages/esp8266/hardware
 
-Eclipse wont build
-~~~~~~~~~~~~~~~~~~
+Eclipse won't build
+~~~~~~~~~~~~~~~~~~~
 
 if eclipse dont find the path to the Compiler add to the platform.txt
 after:

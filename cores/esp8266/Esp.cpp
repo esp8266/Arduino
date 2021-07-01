@@ -525,7 +525,7 @@ bool EspClass::eraseConfig(void) {
     return true;
 }
 
-uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) const
+uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes)
 {
   /**
    * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
@@ -575,7 +575,7 @@ uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) co
   return resultArray;
 }
 
-uint32_t EspClass::random() const
+uint32_t EspClass::random()
 {
   union { uint32_t b32; uint8_t b8[4]; } result;
   random(result.b8, 4);

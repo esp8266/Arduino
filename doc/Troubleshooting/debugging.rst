@@ -44,8 +44,8 @@ Usage
 
 5. Check the Serial Output
 
-Informations
-------------
+Information
+-----------
 
 It work with every sketch that enables the Serial interface that is
 selected as debug port.
@@ -74,7 +74,7 @@ Debug Level
 All defines for the different levels starts with ``DEBUG_ESP_``
 
 a full list can be found here in the
-`boards.txt <https://github.com/esp8266/Arduino/blob/master/tools/boards.txt.py#L1045-L1047>`__
+`boards.txt <https://github.com/esp8266/Arduino/blob/04c2322721f6865efe0c518be57e795e8643c183/tools/boards.txt.py#L1308-L1309>`__
 
 Example for own debug messages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

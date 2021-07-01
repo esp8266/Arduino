@@ -25,7 +25,7 @@
 
 void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 {
-    // L2 / Euclidian norm of free block sizes.
+    // L2 / Euclidean norm of free block sizes.
     // Having getFreeHeap()=sum(hole-size), fragmentation is given by
     // 100 * (1 - sqrt(sum(hole-size²)) / sum(hole-size))
 

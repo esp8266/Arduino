@@ -386,7 +386,7 @@ void FloodingMesh::restoreDefaultResponseTransmittedHook()
  *
  * @param request The request string received from another node in the mesh
  * @param meshInstance The MeshBackendBase instance that called the function.
- * @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
+ * @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
  */
 String FloodingMesh::_defaultRequestHandler(const String &request, MeshBackendBase &meshInstance)
 {

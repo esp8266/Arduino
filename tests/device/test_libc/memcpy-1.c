@@ -96,7 +96,7 @@ void memcpy_main(void)
   /* Allocate buffers to read and write from.  */
   char src[BUFF_SIZE], dest[BUFF_SIZE], backup_src[BUFF_SIZE];
 
-  /* Fill the source buffer with non-null values, reproducable random data.  */
+  /* Fill the source buffer with non-null values, reproducible random data. */
   srand (rand_seed);
   int i, j;
   unsigned sa;

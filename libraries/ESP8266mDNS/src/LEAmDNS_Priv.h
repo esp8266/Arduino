@@ -122,7 +122,7 @@ namespace MDNSImplementation
 #define MDNS_SERVICE_TTL                4500
 
 /*
-    Compressed labels are flaged by the two topmost bits of the length byte being set
+    Compressed labels are flagged by the two topmost bits of the length byte being set
 */
 #define MDNS_DOMAIN_COMPRESS_MARK       0xC0
 /*
@@ -156,7 +156,7 @@ namespace MDNSImplementation
 
 /*
     Enable/disable the usage of the F() macro in debug trace printf calls.
-    There needs to be an PGM comptible printf function to use this.
+    There needs to be an PGM compatible printf function to use this.
 
     USE_PGM_PRINTF and F
 */

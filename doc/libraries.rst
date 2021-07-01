@@ -87,7 +87,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
 
-``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()``able block will be smaller due to memory manager overheads.
+``ESP.getMaxFreeBlockSize()`` returns the largest contiguous free RAM block in the heap, useful for checking heap fragmentation.  **NOTE:** Maximum ``malloc()`` -able block will be smaller due to memory manager overheads.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 
@@ -172,7 +172,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `RTC <https://github.com/Makuna/Rtc>`__ - Arduino Library for Ds1307 & Ds3231 compatible with ESP8266.
 -  `Souliss, Smart Home <https://github.com/souliss/souliss>`__ - Framework for Smart Home based on Arduino, Android and openHAB.
 -  `ST7735 <https://github.com/nzmichaelh/Adafruit-ST7735-Library>`__ - Adafruit's ST7735 library modified to be compatible with ESP8266. Just make sure to modify the pins in the examples as they are still AVR specific.
--  `Task <https://github.com/Makuna/Task>`__ - Arduino Nonpreemptive multitasking library. While similiar to the included Ticker library in the functionality provided, this library was meant for cross Arduino compatibility.
+-  `Task <https://github.com/Makuna/Task>`__ - Arduino Nonpreemptive multitasking library. While similar to the included Ticker library in the functionality provided, this library was meant for cross Arduino compatibility.
 -  `TickerScheduler <https://github.com/Toshik/TickerScheduler>`__ - Library provides simple scheduler for ``Ticker`` to avoid WDT reset
 -  `Teleinfo <https://github.com/hallard/LibTeleinfo>`__ - Generic French Power Meter library to read Teleinfo energy monitoring data such as consuption, contract, power, period, ... This library is cross platform, ESP8266, Arduino, Particle, and simple C++. French dedicated `post <https://hallard.me/libteleinfo/>`__ on author's blog and all related information about `Teleinfo <https://hallard.me/category/tinfo/>`__ also available.
 -  `UTFT-ESP8266 <https://github.com/gnulabis/UTFT-ESP8266>`__ - UTFT display library with support for ESP8266. Only serial interface (SPI) displays are supported for now (no 8-bit parallel mode, etc). Also includes support for the hardware SPI controller of the ESP8266.

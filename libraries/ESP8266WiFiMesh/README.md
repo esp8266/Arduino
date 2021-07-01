@@ -286,7 +286,7 @@ It is important to realize that there is no global message ID counter, only the 
 
 ### <a name="FAQStartupCrash"></a>My ESP8266 crashes on start-up when I use the library!
 
-This could be caused by incorrect arguments to the constructors of the library. Usually you would get a Serial Monitor print of the error in question, but if the constructor is called before you call `Serial.begin(115200)` then there will be nothing to print to. The solution is first to check so that all constructor arguments are valid, e.g. that the mesh password has the correct length and does not contain any forbidden characters. If everything checks out you can try to move all the library contructors you use into the `setup()` function of your sketch, after the position where `Serial.begin(115200)` is called. That should give you a proper error message in the Serial Monitor, so you can locate the problem.
+This could be caused by incorrect arguments to the constructors of the library. Usually you would get a Serial Monitor print of the error in question, but if the constructor is called before you call `Serial.begin(115200)` then there will be nothing to print to. The solution is first to check so that all constructor arguments are valid, e.g. that the mesh password has the correct length and does not contain any forbidden characters. If everything checks out you can try to move all the library constructors you use into the `setup()` function of your sketch, after the position where `Serial.begin(115200)` is called. That should give you a proper error message in the Serial Monitor, so you can locate the problem.
 
 ### <a name="FAQSSIDAmnesia"></a>The node does not remember the SSID I assign to it!
 

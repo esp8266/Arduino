@@ -245,7 +245,7 @@ bool MDNSResponder::_removeServiceQuery(MDNSResponder::stcMDNSServiceQuery* p_pS
             delete p_pServiceQuery;
             bResult = true;
         }
-        else    // No predecesor
+        else    // No predecessor
         {
             if (m_pServiceQueries == p_pServiceQuery)
             {
@@ -275,7 +275,7 @@ bool MDNSResponder::_removeLegacyServiceQuery(void)
 /*
     MDNSResponder::_findServiceQuery
 
-    'Convert' hMDNSServiceQuery to stcMDNSServiceQuery* (ensure existance)
+    'Convert' hMDNSServiceQuery to stcMDNSServiceQuery* (ensure existence)
 
 */
 MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findServiceQuery(MDNSResponder::hMDNSServiceQuery p_hServiceQuery)
@@ -458,7 +458,7 @@ bool MDNSResponder::_releaseService(MDNSResponder::stcMDNSService* p_pService)
             delete p_pService;
             bResult = true;
         }
-        else    // No predecesor
+        else    // No predecessor
         {
             if (m_pServices == p_pService)
             {

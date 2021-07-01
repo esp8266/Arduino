@@ -5,8 +5,8 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-name=ESP8266 Boards (3.0.0-dev)
-version=3.0.0-dev
+name=ESP8266 Boards (3.1.0-dev)
+version=3.1.0-dev
 
 # These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
@@ -21,11 +21,11 @@ runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
 runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
-compiler.warning_flags=-w
-compiler.warning_flags.none=-w
-compiler.warning_flags.default=
-compiler.warning_flags.more=-Wall
-compiler.warning_flags.all=-Wall -Wextra
+compiler.warning_flags=-w -Werror=return-type
+compiler.warning_flags.none=-w -Werror=return-type
+compiler.warning_flags.default=-Werror=return-type
+compiler.warning_flags.more=-Wall -Werror=return-type
+compiler.warning_flags.all=-Wall -Wextra -Werror=return-type
 
 build.lwip_lib=-llwip_gcc
 build.lwip_include=lwip/include
@@ -56,7 +56,7 @@ compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -free -fipa-pta -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
@@ -82,7 +82,7 @@ compiler.elf2hex.flags=
 
 compiler.size.cmd=xtensa-lx106-elf-size
 
-# This can be overriden in boards.txt
+# This can be overridden in boards.txt
 build.extra_flags=-DESP8266
 
 # These can be overridden in platform.local.txt
@@ -98,7 +98,7 @@ compiler.elf2hex.extra_flags=
 ## needs git
 recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
-recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
+recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkdir}" -p "{build.path}/ld_h/"
@@ -157,7 +157,7 @@ tools.esptool.upload.params.quiet=
 
 # First, potentially perform an erase or nothing
 # Next, do the binary upload
-# Combined in one rule because Arduino doesn't suport upload.1.pattern/upload.3.pattern
+# Combined in one rule because Arduino doesn't support upload.1.pattern/upload.3.pattern
 tools.esptool.upload.pattern="{cmd}" "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
 
 tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"

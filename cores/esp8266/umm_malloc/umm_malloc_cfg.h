@@ -564,7 +564,7 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  * direction of the beginning of the heap when possible.
  *
  * Status: TODO: These are new options introduced to optionally restore the
- * previous defrag propery of realloc. The issue has been raised in the upstream
+ * previous defrag property of realloc. The issue has been raised in the upstream
  * repo. No response at this time. Based on response, may propose for upstream.
  */
 /*
@@ -796,7 +796,7 @@ extern "C" {
 // Arduino.h recall us to redefine them
 #include <pgmspace.h>
 // Reuse pvPort* calls, since they already support passing location information.
-// Specificly the debug version (heap_...) that does not force DRAM heap.
+// Specifically the debug version (heap_...) that does not force DRAM heap.
 void* IRAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line);
 void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line);
 void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);

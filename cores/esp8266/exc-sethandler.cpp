@@ -47,7 +47,7 @@
  *   https://github.com/qca/open-ath9k-htc-firmware/blob/master/sboot/magpie_1_1/sboot/athos/src/xtos/exc-sethandler.c
  *
  * It has been revised to use Arduino ESP8266 core includes, types, and
- * formating.
+ * formatting.
 */
 
 /* exc-sethandler.c - register an exception handler in XTOS */

@@ -53,7 +53,7 @@ EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, 
 
    @param request The request string received from another node in the mesh
    @param meshInstance The MeshBackendBase instance that called the function.
-   @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
+   @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
 */
 String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
@@ -346,7 +346,7 @@ void loop() {
       espnowDelay(100); // Wait for responses (broadcasts can receive an unlimited number of responses, other transmissions can only receive one response).
 
       // If you have a data array containing null values it is possible to transmit the raw data by making the array into a multiString as shown below.
-      // You can use String::c_str() or String::begin() to retreive the data array later.
+      // You can use String::c_str() or String::begin() to retrieve the data array later.
       // Note that certain String methods such as String::substring use null values to determine String length, which means they will not work as normal with multiStrings.
       uint8_t dataArray[] = {0, '\'', 0, '\'', ' ', '(', 'n', 'u', 'l', 'l', ')', ' ', 'v', 'a', 'l', 'u', 'e'};
       String espnowMessage = TypeCast::uint8ArrayToMultiString(dataArray, sizeof dataArray) + F(" from ") + espnowNode.getMeshName() + espnowNode.getNodeID() + String('.');

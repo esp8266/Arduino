@@ -55,9 +55,9 @@ const char* ap_default_psk = APPSK; ///< Default PSK.
    @param pass String pointer for storing PSK.
    @return True or False.
 
-   The config file have to containt the WiFi SSID in the first line
+   The config file has to contain the WiFi SSID in the first line
    and the WiFi PSK in the second line.
-   Line seperator can be \r\n (CR LF) \r or \n.
+   Line separator can be \r\n (CR LF) \r or \n.
 */
 bool loadConfig(String *ssid, String *pass) {
   // open file for reading.
@@ -74,7 +74,7 @@ bool loadConfig(String *ssid, String *pass) {
 
   content.trim();
 
-  // Check if ther is a second line available.
+  // Check if there is a second line available.
   int8_t pos = content.indexOf("\r\n");
   uint8_t le = 2;
   // check for linux and mac line ending.

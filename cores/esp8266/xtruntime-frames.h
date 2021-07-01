@@ -54,7 +54,7 @@
  *  stack frame is limited to 128 bytes (currently at 64).
  */
 STRUCT_BEGIN
-STRUCT_FIELD (long,4,KEXC_,pc)		/* "parm" */
+STRUCT_FIELD (long,4,KEXC_,pc)		/* "param" */
 STRUCT_FIELD (long,4,KEXC_,ps)
 STRUCT_AFIELD(long,4,KEXC_,areg, 4)	/* a12 .. a15 */
 STRUCT_FIELD (long,4,KEXC_,sar)		/* "save" */

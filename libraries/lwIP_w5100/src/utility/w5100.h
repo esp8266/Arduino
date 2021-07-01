@@ -108,7 +108,7 @@ protected:
         @param buffer a pointer to a buffer to write the frame to
         @param framesize readFrameSize()'s result
         @return the length of the received frame
-               or 0 if a problem occured
+               or 0 if a problem occurred
     */
     uint16_t readFrameData(uint8_t *frame, uint16_t framesize);
 

@@ -260,7 +260,7 @@ IRAM_ATTR bool _stopPWM_weak(uint8_t pin) {
   return true;
 }
 static bool _stopPWM_bound(uint8_t pin) __attribute__((weakref("_stopPWM_weak")));
-bool _stopPWM(uint8_t pin) {
+IRAM_ATTR bool _stopPWM(uint8_t pin) {
   return _stopPWM_bound(pin);
 }
 
@@ -356,7 +356,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
   (void) phaseOffsetUS;
   (void) autoPwm;
 
-   if ((pin > 16) || isFlashInterfacePin(pin)) {
+   if ((pin > 16) || isFlashInterfacePin(pin) || (timeHighCycles == 0)) {
     return false;
   }
   Waveform *wave = &wvfState.waveform[pin];

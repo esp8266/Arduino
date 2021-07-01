@@ -182,7 +182,7 @@ public:
    * 
    * ########## WARNING! This an experimental feature. API may change at any time. Only use if you like it when things break. ##########
    * Will be very slow compared to unencrypted broadcasts. Probably works OK in a small mesh with a maximum of 2-3 new messages transmitted in the mesh every second.
-   * Because of the throughput difference, mixing encypted and unencrypted broadcasts is not recommended if there are frequent mesh broadcasts (multiple per second), 
+   * Because of the throughput difference, mixing encrypted and unencrypted broadcasts is not recommended if there are frequent mesh broadcasts (multiple per second), 
    * since a lot of unencrypted broadcasts can build up while a single encrypted broadcast is sent.
    * 
    * It is recommended that verboseMode is turned off if using this, to avoid slowdowns due to excessive Serial printing.
