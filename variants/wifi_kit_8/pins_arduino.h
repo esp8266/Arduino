@@ -4,6 +4,7 @@
 
   Copyright (c) 2007 David A. Mellis
   Modified for ESP8266 platform by Ivan Grokhotkov, 2014-2015.
+  Modified for Wifi Kit 8 by G,Neiß, 2021-07-002
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -35,7 +36,8 @@ static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 static const uint8_t OLED_RST = 16;
 
-#define LED_BUILTIN 0
+// Board doesen't have a builtin LED
+// #define LED_BUILTIN 0
 
 static const uint8_t D0   = 16;
 static const uint8_t D1   = 5;
