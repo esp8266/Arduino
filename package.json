@@ -1,6 +1,16 @@
 {
-    "name": "framework-arduinoespressif8266",
-    "description": "Arduino Wiring-based Framework (ESP8266 Core)",
-    "url": "https://github.com/esp8266/Arduino",
-    "version": "3.1.0-dev"
+  "name": "framework-arduinoespressif8266",
+  "version": "3.30001.210627",
+  "description": "Arduino Wiring-based Framework for Espressif ESP8266 microcontrollers",
+  "keywords": [
+    "framework",
+    "arduino",
+    "espressif",
+    "esp8266"
+  ],
+  "license": "LGPL-2.1-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esp8266/Arduino"
+  }
 }

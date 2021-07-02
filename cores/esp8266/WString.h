@@ -202,33 +202,18 @@ class String {
         const char *begin() const { return c_str(); }
         const char *end() const { return c_str() + length(); }
 
+        // search
+        // int indexOf(const char *str, unsigned int fromIndex = 0) const;
+        // int indexOf(const __FlashStringHelper *str, unsigned int fromIndex = 0) const {
+        //     return indexOf((const char*)str, fromIndex);
+        // }
+        // int lastIndexOf(char ch) const;
+        // int lastIndexOf(const String &str) const;
+        // int lastIndexOf(const String &str, unsigned int fromIndex) const;
         String substring(unsigned int beginIndex) const {
             return substring(beginIndex, len());
         }
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
-
-    public:
-
-        // bool equals(const String &s) const;
-        // bool equals(const char *cstr) const;
-        // bool equalsIgnoreCase(const String &s) const;
-
-    public:
-        // bool startsWith(const String &prefix) const;
-        // bool startsWith(const char *prefix) const {
-        //     return this->startsWith(String(prefix));
-        // }
-        // bool startsWith(const __FlashStringHelper *prefix) const {
-        //     return this->startsWith(String(prefix));
-        // }
-        // bool startsWith(const String &prefix, unsigned int offset) const;
-        // bool endsWith(const String &suffix) const;
-        // bool endsWith(const char *suffix) const {
-        //     return this->endsWith(String(suffix));
-        // }
-        // bool endsWith(const __FlashStringHelper *suffix) const {
-        //     return this->endsWith(String(suffix));
-        // }
 
     // additional equals methods with ignorecase and support for char, const char *, const __FlashStringHelper * and String
     public:
@@ -241,14 +226,14 @@ class String {
         // the terminating NUL byte is not considered part of the string
         // String.equals('\0') always returns false, even if String is empty
         // use length() == 0 to determine if a string is empty
-        unsigned char equals(char ch) const {
+        bool equals(char ch) const {
             if (length() != 1 || !ch) {
                 return false;
             }
             return buffer()[0] == ch;
         }
 
-        unsigned char equals(const String &str) const {
+        bool equals(const String &str) const {
             if (this == &str) {
                 return true;
             }
@@ -258,7 +243,7 @@ class String {
             return strcmp(buffer(), str.buffer()) == 0;
         }
 
-        unsigned char equals(const char *cStr) const {
+        bool equals(const char *cStr) const {
             if (!cStr) {
                 return false;
             }
@@ -268,7 +253,7 @@ class String {
             return strcmp(buffer(), cStr) == 0;
         }
 
-        unsigned char equals(const __FlashStringHelper *fStr) const {
+        bool equals(const __FlashStringHelper *fStr) const {
             if (!fStr) {
                 return false;
             }
@@ -696,13 +681,9 @@ class String {
     // additional indexOf methods with ignore case and support for char, const char *, const __FlashStringHelper * and String
     public:
         // search
-        int indexOf(char ch, unsigned int fromIndex) const;
+        int indexOf(char ch, unsigned int fromIndex = 0) const;
         int indexOf(const String &str) const;
         int indexOf(const String &str, unsigned int fromIndex) const;
-
-        int indexOf(char c) const {
-            return indexOf(c, 0);
-        }
 
         int indexOf(const char *str, unsigned int fromIndex = 0) const {
             return _indexOf(str, fromIndex, ~0U);
@@ -712,11 +693,7 @@ class String {
         }
 
 
-        int indexOfIgnoreCase(char c) const {
-            return indexOfIgnoreCase(c, 0);
-        }
-
-        int indexOfIgnoreCase(char ch, unsigned int fromIndex) const {
+        int indexOfIgnoreCase(char ch, unsigned int fromIndex = 0) const {
             if (fromIndex >= len())
                 return -1;
             const char *temp = strichr(buffer() + fromIndex, ch);
