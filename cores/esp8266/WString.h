@@ -34,7 +34,7 @@
 #include <type_traits>
 
 #ifdef _MSC_VER
-#include <misc_string.h>
+#include <misc_wstring.h>
 #else
 #include <stdlib.h>
 #include <string.h>
@@ -43,11 +43,15 @@
 #include "KFCBaseLibrary/include/misc_wstring.h"
 #endif
 
-// an abstract class used as a means to proide a unique pointer type
-// but really has no body
+ // an abstract class used as a means to proide a unique pointer type
+ // but really has no body
 class __FlashStringHelper;
+#ifndef FPSTR
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
+#endif
+#ifndef F
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
+#endif
 
 // support libraries that expect this name to be available
 // replace with `using StringSumHelper = String;` in case something wants this constructible
