@@ -1621,6 +1621,7 @@ def all_boards ():
     # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
     print('menu.BoardModel=Model')
     print('menu.ESPModule=Module')
+    print('menu.UploadTool=Upload Tool')
     print('menu.led=Builtin Led')
     print('menu.baud=Upload Speed')
     print('menu.xtal=CPU Frequency')
@@ -1633,7 +1634,7 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
-    print('menu.exception=Exceptions')
+    print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')

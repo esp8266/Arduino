@@ -59,24 +59,26 @@ public:
           _mounted(false) {
         memset(&_lfs, 0, sizeof(_lfs));
         memset(&_lfs_cfg, 0, sizeof(_lfs_cfg));
-        _lfs_cfg.context = (void*) this;
-        _lfs_cfg.read = lfs_flash_read;
-        _lfs_cfg.prog = lfs_flash_prog;
-        _lfs_cfg.erase = lfs_flash_erase;
-        _lfs_cfg.sync = lfs_flash_sync;
-        _lfs_cfg.read_size = 64;
-        _lfs_cfg.prog_size = 64;
-        _lfs_cfg.block_size =  _blockSize;
-        _lfs_cfg.block_count =_blockSize? _size / _blockSize: 0;
-        _lfs_cfg.block_cycles = 16; // TODO - need better explanation
-        _lfs_cfg.cache_size = 64;
-        _lfs_cfg.lookahead_size = 64;
-        _lfs_cfg.read_buffer = nullptr;
-        _lfs_cfg.prog_buffer = nullptr;
-        _lfs_cfg.lookahead_buffer = nullptr;
-        _lfs_cfg.name_max = 0;
-        _lfs_cfg.file_max = 0;
-        _lfs_cfg.attr_max = 0;
+        if (_size && _blockSize) {
+            _lfs_cfg.context = (void*) this;
+            _lfs_cfg.read = lfs_flash_read;
+            _lfs_cfg.prog = lfs_flash_prog;
+            _lfs_cfg.erase = lfs_flash_erase;
+            _lfs_cfg.sync = lfs_flash_sync;
+            _lfs_cfg.read_size = 64;
+            _lfs_cfg.prog_size = 64;
+            _lfs_cfg.block_size =  _blockSize;
+            _lfs_cfg.block_count = _size / _blockSize;
+            _lfs_cfg.block_cycles = 16; // TODO - need better explanation
+            _lfs_cfg.cache_size = 64;
+            _lfs_cfg.lookahead_size = 64;
+            _lfs_cfg.read_buffer = nullptr;
+            _lfs_cfg.prog_buffer = nullptr;
+            _lfs_cfg.lookahead_buffer = nullptr;
+            _lfs_cfg.name_max = 0;
+            _lfs_cfg.file_max = 0;
+            _lfs_cfg.attr_max = 0;
+        }
     }
 
     ~LittleFSImpl() {
@@ -181,7 +183,7 @@ public:
     }
 
     bool begin() override {
-        if (_size <= 0) {
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("LittleFS size is <= zero");
             return false;
         }
@@ -203,7 +205,7 @@ public:
     }
 
     bool format() override {
-        if (_size == 0) {
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("lfs size is zero\n");
             return false;
         }

@@ -5,8 +5,8 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-name=ESP8266 Boards (3.0.1-dev)
-version=3.0.1-dev
+name=ESP8266 Boards (3.1.0-dev)
+version=3.1.0-dev
 
 # These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
@@ -21,11 +21,11 @@ runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
 runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
-compiler.warning_flags=-w
-compiler.warning_flags.none=-w
-compiler.warning_flags.default=
-compiler.warning_flags.more=-Wall
-compiler.warning_flags.all=-Wall -Wextra
+compiler.warning_flags=-w -Werror=return-type
+compiler.warning_flags.none=-w -Werror=return-type
+compiler.warning_flags.default=-Werror=return-type
+compiler.warning_flags.more=-Wall -Werror=return-type
+compiler.warning_flags.all=-Wall -Wextra -Werror=return-type
 
 build.lwip_lib=-llwip_gcc
 build.lwip_include=lwip/include
@@ -56,7 +56,7 @@ compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -free -fipa-pta -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}

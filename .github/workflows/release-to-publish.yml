@@ -32,26 +32,10 @@ jobs:
   package:
     name: Update master JSON file
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-        fetch-depth: 0
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Set GIT tag name
-      run: |
-        echo "TRAVIS_TAG=$(git describe --exact-match --tags)" >> $GITHUB_ENV
     - name: Deploy updated JSON
-      env:
-        TRAVIS_BUILD_DIR: ${{ github.workspace }}
-        BUILD_TYPE: package
-        CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
-        GHCI_DEPLOY_KEY: ${{ secrets.GHCI_DEPLOY_KEY }}
       run: |
-           bash ./tests/ci/build_package.sh
-           # Only the regenerated JSON file will be used, but it's simpler
-           # than looking for it in a GH release.
            bash ./package/deploy_package_index.sh
-

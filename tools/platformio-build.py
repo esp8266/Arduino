@@ -22,6 +22,9 @@ kinds of creative coding, interactive objects, spaces or physical experiences.
 https://arduino.cc/en/Reference/HomePage
 """
 
+# For SCons documentation, see:
+# https://scons.org/doc/latest
+
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
 
 from os.path import isdir, join
@@ -58,6 +61,7 @@ if gzip_fw:
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
+    # General options that are passed to the C compiler (C only; not C++)
     CFLAGS=[
         "-std=gnu17",
         "-Wpointer-arith",
@@ -67,24 +71,29 @@ env.Append(
         "-nostdlib"
     ],
 
+    # General options that are passed to the C and C++ compilers
     CCFLAGS=[
         "-Os",  # optimize for size
         "-mlongcalls",
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
+        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
+        "-Werror=return-type",
         "-free",
         "-fipa-pta"
     ],
 
+    # General options that are passed to the C++ compiler
     CXXFLAGS=[
         "-fno-rtti",
         "-std=gnu++17"
     ],
 
+    # General user options passed to the linker
     LINKFLAGS=[
         "-Os",
         "-nostdlib",
@@ -103,6 +112,9 @@ env.Append(
         "-u", "_UserExceptionVector"
     ],
 
+    # A platform independent specification of C preprocessor definitions as either:
+    # - -DFLAG as "FLAG"
+    # - -DFLAG=VALUE as ("FLAG", "VALUE")
     CPPDEFINES=[
         ("F_CPU", "$BOARD_F_CPU"),
         "__ets__",
@@ -113,18 +125,21 @@ env.Append(
         "LWIP_OPEN_SRC"
     ],
 
+    # The list of directories that the C preprocessor will search for include directories
     CPPPATH=[
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
         join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
 
+    # The list of directories that will be searched for libraries
     LIBPATH=[
         join("$BUILD_DIR", "ld"),  # eagle.app.v6.common.ld
         join(FRAMEWORK_DIR, "tools", "sdk", "lib"),
         join(FRAMEWORK_DIR, "tools", "sdk", "ld")
     ],
 
+    # A list of one or more libraries that will be linked with any executable programs created by this environment
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
         "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
