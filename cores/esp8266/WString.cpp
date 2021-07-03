@@ -65,13 +65,15 @@ String::String(unsigned char value, unsigned char base) {
 
 String::String(int value, unsigned char base) {
     init();
-    char buf[2 + 8 * sizeof(int)];
     if (base == 10) {
+        char buf[std::numeric_limits<decltype(value)>::digits10 + 2];
         sprintf(buf, "%d", value);
+        *this = buf;
     } else {
+        char buf[2 + 8 * sizeof(value)];
         itoa(value, buf, base);
+        *this = buf;
     }
-    *this = buf;
 }
 
 String::String(unsigned int value, unsigned char base) {
@@ -83,13 +85,15 @@ String::String(unsigned int value, unsigned char base) {
 
 String::String(long value, unsigned char base) {
     init();
-    char buf[2 + 8 * sizeof(long)];
     if (base == 10) {
+        char buf[std::numeric_limits<decltype(value)>::digits10 + 2];
         sprintf(buf, "%ld", value);
+        *this = buf;
     } else {
+        char buf[2 + 8 * sizeof(value)];
         ltoa(value, buf, base);
+        *this = buf;
     }
-    *this = buf;
 }
 
 String::String(unsigned long value, unsigned char base) {
@@ -101,27 +105,27 @@ String::String(unsigned long value, unsigned char base) {
 
 String::String(long long value) {
     init();
-    char buf[2 + 8 * sizeof(long long)];
+    char buf[std::numeric_limits<decltype(value)>::digits10 + 2];
     sprintf(buf, "%lld", value);
     *this = buf;
 }
 
 String::String(unsigned long long value) {
     init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
+    char buf[std::numeric_limits<decltype(value)>::digits10 + 2];
     sprintf(buf, "%llu", value);
     *this = buf;
 }
 
 String::String(long long value, unsigned char base) {
     init();
-    char buf[2 + 8 * sizeof(long long)];
+    char buf[1 + 8 * sizeof(value)];
     *this = lltoa(value, buf, sizeof(buf), base);
 }
 
 String::String(unsigned long long value, unsigned char base) {
     init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
+    char buf[1 + 8 * sizeof(value)];
     *this = ulltoa(value, buf, sizeof(buf), base);
 }
 
@@ -606,11 +610,15 @@ String String::substring(unsigned int left, unsigned int right) const {
         return out;
     if (right > len())
         right = len();
+#if _MSC_VER
+    out.concat(buffer() + left, right - left + 1);
+#else
     char *writeTo = wbuffer();
     char tempchar = writeTo[right]; // save the replaced character
     writeTo[right] = '\0';
     out = writeTo + left; // pointer arithmetic
     writeTo[right] = tempchar; // restore character
+#endif
     return out;
 }
 

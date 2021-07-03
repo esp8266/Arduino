@@ -207,13 +207,6 @@ class String {
         const char *end() const { return c_str() + length(); }
 
         // search
-        // int indexOf(const char *str, unsigned int fromIndex = 0) const;
-        // int indexOf(const __FlashStringHelper *str, unsigned int fromIndex = 0) const {
-        //     return indexOf((const char*)str, fromIndex);
-        // }
-        // int lastIndexOf(char ch) const;
-        // int lastIndexOf(const String &str) const;
-        // int lastIndexOf(const String &str, unsigned int fromIndex) const;
         String substring(unsigned int beginIndex) const {
             return substring(beginIndex, len());
         }
@@ -551,7 +544,7 @@ class String {
             if (!find || !findLength || ((len = length()) == 0) || (findLength != ~0U && (fromIndex + findLength >= len))) {
                 return -1;
             }
-            auto ptr = wbuffer();
+            auto ptr = buffer();
             auto idxPtr = stristr(ptr + fromIndex, find);
             if (!idxPtr) {
                 return -1;
@@ -580,7 +573,7 @@ class String {
                 return -1;
             }
             auto ptr = buffer();
-            auto idxPtr = stristr_P(ptr + fromIndex, find, findLength);
+            auto idxPtr = stristr_P(const_cast<char *>(ptr) + fromIndex, find, findLength);
             if (!idxPtr) {
                 return -1;
             }
@@ -655,7 +648,7 @@ class String {
             else if (fromIndex < findLen || fromIndex > len) {
                 return -1;
             }
-            auto ptr = __strrstr_P(wbuffer(), fromIndex + findLen, find, findLen);
+            auto ptr = __strrstr_P(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
             if (!ptr) {
                 return -1;
             }
@@ -674,7 +667,7 @@ class String {
             else if (fromIndex < findLen || fromIndex > len) {
                 return -1;
             }
-            auto ptr = __strrstr(wbuffer(), fromIndex + findLen, find, findLen);
+            auto ptr = __strrstr(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
             if (!ptr) {
                 return -1;
             }
@@ -953,8 +946,16 @@ class String {
         void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
         void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
         // Buffer accessor functions
+#ifdef _MSC_VER
+        const char *buffer() const { return isSSO() ? sso.buff : ptr.buff; } // Writable version of buffer
+        const char *wbuffer() const {
+            return buffer();
+        }
+        char *wbuffer() { return isSSO() ? sso.buff : ptr.buff; } // Writable version of buffer
+#else
         const char *buffer() const { return wbuffer(); }
         char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
+#endif
 
         // concatenation is done via non-member functions
         // make sure we still have access to internal methods, since we optimize based on capacity of both sides and want to manipulate internal buffers directly
