@@ -1175,9 +1175,8 @@ void IRAM_ATTR app_entry_start(void) {
          */
         g_pcont = CONT_STACK;
     }
-#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
-    print_sanity_check_icache();
-#endif
+
+    hwdt_pre_sdk_init_icache();
     /*
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
