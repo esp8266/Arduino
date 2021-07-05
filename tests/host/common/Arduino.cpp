@@ -15,6 +15,7 @@
 
 #include <sys/time.h>
 #include "Arduino.h"
+#include <functional>
 
 #include <unistd.h>
 
@@ -57,6 +58,33 @@ extern "C" void esp_yield()
 {
 }
 
+extern "C" void esp_delay (unsigned long ms)
+{
+    usleep(ms * 1000);
+}
+
+using IsBlockedCB = std::function<bool()>;
+
+inline void esp_suspend() {
+    esp_yield();
+}
+
+inline void esp_suspend(const IsBlockedCB& blocked) {
+    (void)blocked;
+}
+
+void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms)
+{
+    (void)blocked;
+    (void)intvl_ms;
+    usleep(timeout_ms * 1000);
+}
+
+inline void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked)
+{
+    (void)blocked;
+    usleep(timeout_ms * 1000);
+}
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
     (void)file;
@@ -67,7 +95,7 @@ extern "C" void __panic_func(const char* file, int line, const char* func) {
 
 extern "C" void delay(unsigned long ms)
 {
-    usleep(ms * 1000);
+    esp_delay(ms);
 }
 
 extern "C" void delayMicroseconds(unsigned int us)
