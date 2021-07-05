@@ -50,7 +50,7 @@ void setup() {
       WiFi.mode(WIFI_OFF);
       Serial.println("Cannot connect!");
       Serial.flush();
-      ESP.deepSleep(10e6, RF_DISABLED);
+      ESP.deepSleep(10e6);
       return;
     }
   }
@@ -72,7 +72,7 @@ void setup() {
 
   Serial.println("Done.");
   Serial.flush();
-  ESP.deepSleep(10e6, RF_DISABLED);
+  ESP.deepSleep(10e6);
 }
 
 void loop() {

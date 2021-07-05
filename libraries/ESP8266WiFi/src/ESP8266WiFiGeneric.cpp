@@ -338,6 +338,18 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
     return ret;
 }
 
+bool ESP8266WiFiGenericClass::setSleep(bool enable) {
+    if (enable)
+    {
+        ESP.neverSleepOff();
+    }
+    else
+    {
+        ESP.neverSleep();
+    }
+    return true;
+}
+
 /**
  * get Sleep mode
  * @return sleep_type_t
@@ -415,10 +427,8 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
         return true;
     }
 
-    if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
-        // wifi starts asleep by default
-        wifi_fpm_do_wakeup();
-        wifi_fpm_close();
+    if (m != WIFI_OFF) {
+        ESP.forcedModemSleepOff();
     }
 
     bool ret = false;
@@ -512,26 +522,7 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
         DEBUG_WIFI("core: error with mode(WIFI_OFF)\n");
         return false;
     }
-
-    if(sleepUs == 0 || sleepUs > 0xFFFFFFF) {
-        sleepUs = 0xFFFFFFF;
-    }
-
-    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-    delay(0);
-    wifi_fpm_open();
-    delay(0);
-    auto ret = wifi_fpm_do_sleep(sleepUs);
-    if (ret != 0)
-    {
-        DEBUG_WIFI("core: error %d with wifi_fpm_do_sleep: (-1=sleep status error, -2=force sleep not enabled)\n", ret);
-        return false;
-    }
-    // fpm_is_open() is always 1 here, with or without delay
-    // wifi_fpm_set_wakeup_cb(cb): callback is never called
-    // no power reduction without this delay
-    delay(10);
-    return true;
+    return ESP.forcedModemSleep(sleepUs);
 }
 
 /**
@@ -539,12 +530,8 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
  * @return ok
  */
 bool ESP8266WiFiGenericClass::forceSleepWake() {
-    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
-        wifi_fpm_do_wakeup();
-        wifi_fpm_close();
-    }
-
     // restore last mode
+    ESP.forcedModemSleepOff();
     if(mode(_forceSleepLastMode)) {
         if((_forceSleepLastMode & WIFI_STA) != 0){
             wifi_station_connect();
@@ -784,10 +771,7 @@ bool ESP8266WiFiGenericClass::shutdown (WiFiState& state) {
 
 bool ESP8266WiFiGenericClass::resumeFromShutdown (WiFiState& state)
 {
-    if (wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
-        wifi_fpm_do_wakeup();
-        wifi_fpm_close();
-    }
+    ESP.forcedModemSleepOff();
 
     if (shutdownCRC(state) != state.crc)
     {

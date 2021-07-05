@@ -57,9 +57,6 @@ enum RFMode {
     RF_DISABLED = 4 // disable RF after deep-sleep wake up, just like modem sleep, there will be the smallest current.
 };
 
-#define RF_MODE(mode) int __get_rf_mode() { return mode; }
-#define RF_PRE_INIT() void __run_user_rf_pre_init()
-
 // compatibility definitions
 #define WakeMode RFMode
 #define WAKE_RF_DEFAULT  RF_DEFAULT
@@ -94,20 +91,45 @@ class EspClass {
         static void wdtDisable();
         static void wdtFeed();
 
-        static void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
-        static void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        static void deepSleep(uint64_t time_us);
+        static void deepSleepInstant(uint64_t time_us);
         static uint64_t deepSleepMax();
+
+        static bool forcedModemSleep(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before forcedModemSleep,
+        ///  it would have to be restored explicitly.
+        static void forcedModemSleepOff();
+
+        static bool forcedLightSleepBegin(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before forcedLightSleepBegin,
+        ///  it would have to be restored explicitly.
+        static void forcedLightSleepEnd(bool cancel = false);
+
+        static void autoModemSleep();
+        static void autoLightSleep();
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before auto{Modem,Light}Sleep,
+        ///  it would have to be restored explicitly.
+        static void autoSleepOff();
+
+        static void neverSleep();
+        /// Any prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before neverSleep,
+        ///  it would have to be restored explicitly.
+        static void neverSleepOff();
 
         static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
 
         static void reset();
         static void restart();
-	/**
-	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
-	 * the need of any external wiring. This is the same mode which can also be entered by
-	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
-	 */
+        /**
+         * @brief When calling this method the ESP8266 reboots into the UART download mode without
+         * the need of any external wiring. This is the same mode which can also be entered by
+         * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
+         */
         [[noreturn]] static void rebootIntoUartDownloadMode();
 
         static uint16_t getVcc();

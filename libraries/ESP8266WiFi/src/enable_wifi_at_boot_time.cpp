@@ -26,3 +26,15 @@ extern "C" void __disableWiFiAtBootTime()
     // (note: c++ ctors not called yet at this point)
     ESP8266WiFiClass::persistent(true);
 }
+
+extern "C" int __get_rf_disable_mode(void)
+{
+    // overrides the default __get_rf_disable_mode
+    return -1;  // mode not set
+}
+
+extern "C" int __get_rf_powerup_disable_mode(void)
+{
+    // overrides the default __get_rf__powerup_disable_mode
+    return -1;  // mode not set
+}

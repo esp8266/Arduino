@@ -71,11 +71,29 @@ An ESP8266 port of SoftwareSerial library done by Peter Lerup (@plerup) supports
 ESP-specific APIs
 -----------------
 
-Some ESP-specific APIs related to deep sleep, RTC and flash memories are available in the ``ESP`` object.
+Some ESP-specific APIs related to the deep, modem, and light sleep modes, RTC and flash memory are available in the ``ESP`` object.
 
 ``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds. If you implement deep sleep with ``WAKE_RF_DISABLED`` and require WiFi functionality on wake up, you will need to implement an additional ``WAKE_RF_DEFAULT`` before WiFi functionality is available.
 
 ``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
+
+``ESP.forcedModemSleep(microseconds, callback)`` immediately puts the chip into forced ``MODEM_SLEEP``. A microseconds duration after which the sleep mode returns to the automatic sleep mode that was effective before this call can be given, a value of 0 or 0xFFFFFFF turns off that timeout. The optional callback function will be invoked when the forced modem sleep ends.
+
+``ESP.forcedModemSleepOff()`` immediately returns the chip to the automatic sleep mode in effect before the preceeding call to ``ESP.forcedModemSleep``.
+
+``ESP.forcedLightSleepBegin(microseconds, callback)`` works in tandem with ``ESP.forcedLightSleepEnd(cancel)`` to put the chip into forced ``LIGHT_SLEEP``. A microseconds duration after which the sleep mode returns can be given, a value of 0 or 0xFFFFFFF turns off that timeout. The optional callback function will be invoked when the forced light sleep ends. Forced light sleep halts the CPU, in addition to the timeout, it can be awakened via GPIO input. Between the calls to ``ESP.forcedLightSleepBegin`` and ``ESP.forcedLightSleepEnd`` any GPIOs except GPIO16 to use for wakeup can be set up. Care must be taken not to allow the chip to enter the idle task before the call to ``ESP.forcedLightSleepEnd(cancel)``, so for instance no direct or indirect calls to ``delay()`` are possible. Otherwise the forced light sleep may engange too early, breaking the required logic of the tandem calls.
+
+``ESP.forcedLightSleepEnd(cancel)`` causes the chip to enter the forced light sleep mode that was prepared by the preceeding ``ESP.forcedLightSleepBegin``. The optional cancel argument, if true, prevents the sleep mode transition from occuring. This can be used, for instance, to return immediately if setting up the level-triggered GPIO interrupts for wakeup fails. Otherwise, it returns after waking up from forced light sleep. On return, the automatic sleep mode that was effective before the call to ``ESP.forcedLightSleepBegin`` is activated.
+
+``ESP.autoModemSleep()`` immediately puts the chip into automatic ``MODEM_SLEEP``.
+
+``ESP.autoLightSleep()`` immediately puts the chip into automatic ``LIGHT_SLEEP``.
+
+``ESP.autoSleepOff()`` returns the chip to the automatic sleep mode that was effective before the preceding call to either ``ESP.autoModemSleep`` or ``ESP.autoLightSleep``.
+
+``ESP.neverSleep()`` immediately puts the chip into ``NONE_SLEEP`` mode.
+
+``ESP.neverSleepOff()`` returns the chip to any automatic sleep mode that was effective before the preceding call to ``ESP.neverSleep``.
 
 ``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. ``offset`` is measured in blocks of 4 bytes and can range from 0 to 127 blocks (total size of RTC memory is 512 bytes). ``data`` should be 4-byte aligned. The stored data can be retained between deep sleep cycles, but might be lost after power cycling the chip. Data stored in the first 32 blocks will be lost after performing an OTA update, because they are used by the Core internals.
 

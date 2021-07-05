@@ -20,6 +20,10 @@ void disable_extra4k_at_link_time (void) __attribute__((noinline));
 bool sntp_set_timezone_in_seconds(int32_t timezone);
 void __disableWiFiAtBootTime (void) __attribute__((noinline));
 void __real_system_restart_local() __attribute__((noreturn));
+int __get_adc_mode();
+int __get_rf_mode();
+int __get_rf_powerup_mode();
+void __run_user_rf_pre_init();
 
 uint32_t sqrt32 (uint32_t n);
 uint32_t crc32 (const void* data, size_t length, uint32_t crc = 0xffffffff);
