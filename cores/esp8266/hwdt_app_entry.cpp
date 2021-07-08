@@ -1089,6 +1089,7 @@ asm  (
     ".literal .g_pcont, g_pcont\n\t"
     ".literal .pcont_stack, hwdt_app_entry__cont_stack\n\t"
     ".literal .sys_stack_first, sys_stack_first\n\t"
+    ".literal .umm_init, umm_init\n\t"
     ".literal .call_user_start, call_user_start\n\t"
     ".literal .get_noextra4k_g_pcont, get_noextra4k_g_pcont\n\t"
     ".align  4\n\t"
@@ -1147,6 +1148,15 @@ asm  (
     "movi     a3, 0x0b30\n\t"     // ROM BSS Size
     "call0    ets_bzero\n\t"
 
+    /*
+     * Up until this call, the heap at crash time has been available for
+     * analysis. This is needed for dumping the bearssl stack. Also, future
+     * improvements could possibly use hwdt_pre_sdk_init() to run other early
+     * diagnostic tools.
+     */
+    "l32r     a0, .umm_init\n\t"
+    "callx0   a0\n\t"
+
     "l32r     a3, .call_user_start\n\t"
     "movi     a0, 0x4000044c\n\t"
     "jx       a3\n\t"
@@ -1176,8 +1186,15 @@ void IRAM_ATTR app_entry_start(void) {
         g_pcont = CONT_STACK;
     }
 #if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
-    print_sanity_check_icache();
+    hwdt_pre_sdk_init();
 #endif
+    /*
+     * Up until this call, the heap at crash time has been available for
+     * analysis. This is needed for dumping the bearssl stack. Also, future
+     * improvements  could possibly use hwdt_pre_sdk_init() to run other early
+     * diagnostic tools.
+     */
+    umm_init();
     /*
      *  Use new calculated SYS stack from top.
      *  Call the entry point of the SDK code.
