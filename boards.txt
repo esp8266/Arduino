@@ -90,7 +90,7 @@ generic.menu.ResetMethod.nodtr_nosync=no dtr, no_sync
 generic.menu.ResetMethod.nodtr_nosync.upload.resetmethod=--before no_reset_no_sync --after soft_reset
 generic.menu.CrystalFreq.26=26 MHz
 generic.menu.CrystalFreq.40=40 MHz
-generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.80=80MHz
@@ -634,7 +634,7 @@ esp8285.menu.ResetMethod.nodtr_nosync=no dtr, no_sync
 esp8285.menu.ResetMethod.nodtr_nosync.upload.resetmethod=--before no_reset_no_sync --after soft_reset
 esp8285.menu.CrystalFreq.26=26 MHz
 esp8285.menu.CrystalFreq.40=40 MHz
-esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
 esp8285.build.flash_mode=dout
 esp8285.build.flash_flags=-DFLASHMODE_DOUT
 esp8285.build.flash_freq=40
@@ -1831,15 +1831,15 @@ arduino-esp8266.name=Arduino
 arduino-esp8266.build.board=ESP8266_ARDUINO
 arduino-esp8266.menu.BoardModel.primo=Primo
 arduino-esp8266.menu.BoardModel.primo.build.board=ESP8266_ARDUINO_PRIMO
-arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000
 arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
 arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
 arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
-arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000
 arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
 arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
 arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
-arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000
 arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
 arduino-esp8266.upload.tool=esptool
 arduino-esp8266.upload.maximum_data_size=81920
@@ -3696,7 +3696,6 @@ espresso_lite_v2.menu.eesz.autoflash.upload.maximum_size=1044464
 ##############################################################
 sonoff.name=ITEAD Sonoff
 sonoff.build.board=ESP8266_SONOFF_SV
-sonoff.build.extra_flags=-DESP8266
 sonoff.build.flash_size=1M
 sonoff.build.variant=itead
 sonoff.menu.BoardModel.sonoffBasic=ITEAD Sonoff Basic
@@ -8905,7 +8904,7 @@ cw01.menu.non32xfer.safe.build.non32xferflags=-DNON32XFER_HANDLER
 cw01.upload.resetmethod=--before default_reset --after hard_reset
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz
-cw01.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+cw01.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
 cw01.build.flash_mode=dio
 cw01.build.flash_flags=-DFLASHMODE_DIO
 cw01.build.flash_freq=40
