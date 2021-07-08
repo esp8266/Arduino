@@ -106,7 +106,7 @@ static inline void __wsr_vecbase(uint32_t vector_base) {
 	const uint32_t uart_no = 0;
 	uartAttach();
 	Uart_Init(uart_no);
-	ets_install_uart_printf(uart_no);
+	ets_install_uart_printf();
 
 	/* reverse engineered from boot_from_something() */
 	const uint16_t divlatch = uart_baudrate_detect(uart_no, 0);
@@ -148,4 +148,3 @@ static inline void __wsr_vecbase(uint32_t vector_base) {
 
 	esp8266UartDownloadMode();
 }
-
