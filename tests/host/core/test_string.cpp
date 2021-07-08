@@ -602,4 +602,5 @@ TEST_CASE("String concat OOB #8198", "[core][String]")
     String s = "abcd";
     s.concat(p, 16);
     REQUIRE(!strcmp(s.c_str(), "abcdxxxxxxxxxxxxxxxx"));
+    free(p);
 }
