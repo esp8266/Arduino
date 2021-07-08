@@ -774,15 +774,15 @@ boards = collections.OrderedDict([
             ( '.menu.BoardModel.primo', 'Primo' ),
             ( '.menu.BoardModel.primo.build.board', 'ESP8266_ARDUINO_PRIMO' ),
             ( '.menu.BoardModel.primo.build.variant', 'arduino_spi' ),
-            ( '.menu.BoardModel.primo.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+            ( '.menu.BoardModel.primo.build.extra_flags', '-DF_CRYSTAL=40000000' ),
             ( '.menu.BoardModel.unowifideved', 'Uno WiFi' ),
             ( '.menu.BoardModel.unowifideved.build.board', 'ESP8266_ARDUINO_UNOWIFI' ),
             ( '.menu.BoardModel.unowifideved.build.variant', 'arduino_uart' ),
-            ( '.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL', '40000000 -DESP8266' ),
+            ( '.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL', '40000000' ),
             ( '.menu.BoardModel.starottodeved', 'Star OTTO' ),
             ( '.menu.BoardModel.starottodeved.build.variant', 'arduino_uart' ),
             ( '.menu.BoardModel.starottodeved.build.board', 'ESP8266_ARDUINO_STAR_OTTO' ),
-            ( '.menu.BoardModel.starottodeved.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+            ( '.menu.BoardModel.starottodeved.build.extra_flags', '-DF_CRYSTAL=40000000' ),
         ]),
         'macro': [
             'resetmethod_ck',
@@ -931,7 +931,6 @@ boards = collections.OrderedDict([
         'opts': {
             '.build.board': 'ESP8266_SONOFF_SV',
             '.build.variant': 'itead',
-            '.build.extra_flags': '-DESP8266',
             '.build.flash_size': '1M',
             '.menu.BoardModel.sonoffSV': 'ITEAD Sonoff SV',
             '.menu.BoardModel.sonoffSV.build.board': 'ESP8266_SONOFF_SV',
@@ -1054,7 +1053,7 @@ macros = {
     'crystalfreq_menu': collections.OrderedDict([
         ( '.menu.CrystalFreq.26', '26 MHz' ),
         ( '.menu.CrystalFreq.40', '40 MHz' ),
-        ( '.menu.CrystalFreq.40.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+        ( '.menu.CrystalFreq.40.build.extra_flags', '-DF_CRYSTAL=40000000' ),
         ]),
 
     'flashfreq_menu': collections.OrderedDict([
