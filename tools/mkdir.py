@@ -13,7 +13,7 @@ def main():
     ns = parser.parse_args()
     for p in ns.dir:
         try:
-            pathlib.Path( p ).mkdir( parents = parents_ )
+            pathlib.Path(p).mkdir(parents=ns.parents)
         except FileExistsError:
             pass
     return 0
