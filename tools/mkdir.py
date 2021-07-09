@@ -17,6 +17,6 @@ def main():
         except FileExistsError:
             pass
     return 0
-    
+
 if __name__ == '__main__':
     sys.exit(main())
