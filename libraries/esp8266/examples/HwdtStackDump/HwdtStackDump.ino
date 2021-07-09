@@ -35,12 +35,12 @@ const char* password = STAPSK;
 // to show that it has not been zeroed out before HWDT stack dump
 // gets to runs.
 extern "C" {
-  #if CORE_MOCK
+#if CORE_MOCK
   int thunk_thk_printf1(const void *fmt) {
     return ets_uart_printf(fmt);
   }
 
-  #else
+#else
   int thunk_thk_printf1(const char *fmt);
   // Second stack thunked helper - this macro creates the global function thunk_thk_printf1
   make_stack_thunk(thk_printf1);
@@ -49,7 +49,7 @@ extern "C" {
   int thk_printf1(const char *fmt) {
     return ets_uart_printf(fmt);
   }
-  #endif
+#endif
 };
 ////////////////////////////////////////////////////////////////////
 
