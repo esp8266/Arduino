@@ -10,7 +10,7 @@
    speed defaults to 115200 bps. The HWDT stack dump will always print on port
    'Serial'.
 
-   To demonstrates this tool, this Sketch offers a few options for crashing the
+   To demonstrate this tool, this Sketch offers a few options for crashing the
    ESP8266 with and without a HWDT reset.
 
 */
@@ -20,6 +20,7 @@
 #include <Esp.h>
 #include <user_interface.h>
 #include <coredecls.h> // g_pcont - only needed for this debug demo
+#include <StackThunk.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -28,6 +29,29 @@
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
+
+////////////////////////////////////////////////////////////////////
+// This block is just for putting something on the BearSSL stack
+// to show that it has not been zeroed out before HWDT stack dump
+// gets to runs.
+extern "C" {
+  #if CORE_MOCK
+  int thunk_thk_printf1(const void *fmt) {
+    return ets_uart_printf(fmt);
+  }
+
+  #else
+  int thunk_thk_printf1(const char *fmt);
+  // Second stack thunked helper - this macro creates the global function thunk_thk_printf1
+  make_stack_thunk(thk_printf1);
+
+  // This function is called via thunk_thk_printf1 and will run with the BearSSL stack.
+  int thk_printf1(const char *fmt) {
+    return ets_uart_printf(fmt);
+  }
+  #endif
+};
+////////////////////////////////////////////////////////////////////
 
 void setup(void) {
   WiFi.persistent(false); // w/o this a flash write occurs at every boot
@@ -38,6 +62,10 @@ void setup(void) {
   Serial.println();
   Serial.println(F("The Hardware Watchdog Timer Demo is starting ..."));
   Serial.println();
+
+  // This allows us to test dumping a BearSSL stack after HWDT.
+  stack_thunk_add_ref();
+  thunk_thk_printf1("Using Thunk Stack to print this line.\n\n");
 
   // We don't need this for this example; however, starting WiFi uses a little
   // more of the SYS stack.
