@@ -212,7 +212,10 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint1
                     nbnsa.NBNSA_TIMETOLIVE = LWIP_PLATFORM_HTONL(300000UL);// Time to live (30000 sekund)
                     nbnsa.NBNSA_LENGTH = LWIP_PLATFORM_HTONS(6);
                     nbnsa.NBNSA_NODEFLAGS = LWIP_PLATFORM_HTONS(0);
-                    nbnsa.NBNSA_NODEADDRESS = WiFi.localIP(); // ulozime nasi IP adresu
+					if (WiFi.getMode()==WIFI_STA)
+						nbnsa.NBNSA_NODEADDRESS = WiFi.localIP(); // ulozime nasi IP adresu
+					else
+						nbnsa.NBNSA_NODEADDRESS = WiFi.softAPIP(); // ulozime nasi IP adresu
 
                     pbuf* pbt = pbuf_alloc(PBUF_TRANSPORT, sizeof(nbnsa), PBUF_RAM);
                     if(pbt != NULL) {
