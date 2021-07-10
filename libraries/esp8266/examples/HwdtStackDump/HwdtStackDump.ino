@@ -36,10 +36,10 @@ const char* password = STAPSK;
 // gets to runs.
 extern "C" {
 #if CORE_MOCK
-  #define thunk_ets_uart_printf ets_uart_printf
+#define thunk_ets_uart_printf ets_uart_printf
 
 #else
-  int thunk_ets_uart_printf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+  int thunk_ets_uart_printf(const char *format, ...) __attribute__((format (printf, 1, 2)));
   // Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
   make_stack_thunk(ets_uart_printf);
 #endif
