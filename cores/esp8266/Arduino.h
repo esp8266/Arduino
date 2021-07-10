@@ -21,6 +21,12 @@
 #define Arduino_h
 
 #ifdef __cplusplus
+#if __cplusplus >= 201703L
+#include <cstddef>                // std::byte
+#include <functional>             // std::byte
+#include <bits/cpp_type_traits.h> // std::byte
+#define byte arduino_byte
+#endif
 extern "C" {
 #endif
 
