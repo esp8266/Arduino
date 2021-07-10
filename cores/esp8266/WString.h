@@ -24,6 +24,11 @@
 #ifdef __cplusplus
 
 #include <pgmspace.h>
+#if defined(MMU_IRAM_HEAP)
+// Host test will fail with this include and build path.
+// It reports an error at link time for a missing pvPortMalloc.
+#include "umm_malloc/umm_malloc.h"
+#endif
 
 #include <cstdlib>
 #include <cstdint>
@@ -93,7 +98,60 @@ class String {
         bool isEmpty(void) const {
             return length() == 0;
         }
+#if defined(MMU_IRAM_HEAP)
+        /*
+          String Class - Heap Selection Control
 
+          Select one of these options to be used across all String class buffer
+          allocations.  The options are defined in `enum Heap`.
+            * Allow OOM recovery (OOM rollover) by trying a different Heap on fail.
+              * `IramDram` - Try to allocate from IRAM 1ST, then roll over to DRAM on fail.
+              * `DramIram` - Try to allocate from DRAM 1ST, then roll over to IRAM on fail.
+            * No OOM recovery. Use only the Heap specified.
+              * `IramOnly` - Allocate only from the IRAM Heap.
+              * `DramOnly` - Allocate only from the DRAM Heap.
+            * Use the current umm_malloc Heap selection for new allocations.
+              * `CurrentOnly` - Allocate only from the current Heap selected.
+            * Use the current umm_malloc Heap selection for new allocations. On
+              alloc failure, try the other Heap.
+              * `Current` - Try to allocate from the current Heap selected,
+                            then roll over to the other Heap.
+
+          Initialize the String class static member _preferredHeap with the
+          desired selection for Heap control in your main sketch file somewhere
+          before `setup();`.
+
+          Example of legacy behavior using option `CurrentOnly`:
+          const String::Heap String::_preferredHeap = String::Heap::CurrentOnly;
+
+          Example of maximizing available DRAM, by using IRAM 1st then DRAM:
+          const String::Heap String::_preferredHeap = String::Heap::IramDram;
+
+          When a Heap rollover occurs, the OOM counter for the failing Heap will
+          increment. If both Heaps fail, both OOM counters are incremented.
+        */
+        enum Heap {
+            IramDram        =  (1 + UMM_HEAP_IRAM),
+            DramIram        =  (1 + UMM_HEAP_DRAM),
+            Current         =  (1 + UMM_NUM_HEAPS),
+            IramOnly        = -(1 + UMM_HEAP_IRAM),
+            DramOnly        = -(1 + UMM_HEAP_DRAM),
+            CurrentOnly     = 0
+        };
+        inline Heap getHeap() {
+            return _preferredHeap;
+        }
+#else
+        enum Heap {
+            IramDram        = 0,
+            DramIram        = 0,
+            Current         = 0,
+            IramOnly        = 0,
+            DramOnly        = 0,
+            CurrentOnly     = 0
+        };
+        inline Heap getHeap() { return Heap::CurrentOnly; }
+#endif
         // creates a copy of the assigned value.  if the value is null or
         // invalid, or if the memory allocation fails, the string will be
         // marked as invalid ("if (s)" will be false).
@@ -258,6 +316,7 @@ class String {
             struct _ptr ptr;
             struct _sso sso;
         };
+
         // Accessor functions
         bool isSSO() const { return !sso.isHeap; }
         unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
@@ -283,6 +342,11 @@ class String {
         friend String operator +(char lhs, String &&rhs);
         friend String operator +(const char *lhs, String &&rhs);
         friend String operator +(const __FlashStringHelper *lhs, String &&rhs);
+
+    private:
+#if defined(MMU_IRAM_HEAP)
+        static const Heap _preferredHeap;
+#endif
 
     protected:
         void init(void) __attribute__((always_inline)) {
