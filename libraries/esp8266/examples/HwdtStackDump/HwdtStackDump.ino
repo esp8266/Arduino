@@ -36,19 +36,12 @@ const char* password = STAPSK;
 // gets to runs.
 extern "C" {
 #if CORE_MOCK
-  int thunk_thk_printf1(const void *fmt) {
-    return ets_uart_printf(fmt);
-  }
+  #define thunk_ets_uart_printf ets_uart_printf
 
 #else
-  int thunk_thk_printf1(const char *fmt);
-  // Second stack thunked helper - this macro creates the global function thunk_thk_printf1
-  make_stack_thunk(thk_printf1);
-
-  // This function is called via thunk_thk_printf1 and will run with the BearSSL stack.
-  int thk_printf1(const char *fmt) {
-    return ets_uart_printf(fmt);
-  }
+  int thunk_ets_uart_printf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+  // Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
+  make_stack_thunk(ets_uart_printf);
 #endif
 };
 ////////////////////////////////////////////////////////////////////
@@ -65,7 +58,7 @@ void setup(void) {
 
   // This allows us to test dumping a BearSSL stack after HWDT.
   stack_thunk_add_ref();
-  thunk_thk_printf1("Using Thunk Stack to print this line.\n\n");
+  thunk_ets_uart_printf("Using Thunk Stack to print this line.\n\n");
 
   // We don't need this for this example; however, starting WiFi uses a little
   // more of the SYS stack.
