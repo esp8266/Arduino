@@ -105,7 +105,7 @@ extern "C" {
   static ALWAYS_INLINE void __cyg_profile_func(void *this_fn, void *call_site, bool enter) __attribute__((no_instrument_function));
   void __cyg_profile_func(void *this_fn, void *call_site, bool enter)
   {
-    uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
+    uint32_t saved_ps = xt_rsil(15);
 
     size_t idx = wd_tracks.idx;
     // Not using the .noinit attribute on structure at this time; however,
