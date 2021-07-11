@@ -9,6 +9,7 @@
 #include <c_types.h>
 #include "cont.h"
 #include "coredecls.h"
+#include <umm_malloc/umm_malloc.h>
 
 void disable_extra4k_at_link_time (void)
 {
@@ -38,6 +39,7 @@ extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
 
+    umm_init();
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
