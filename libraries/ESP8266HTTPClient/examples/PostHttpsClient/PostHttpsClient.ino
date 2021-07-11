@@ -14,8 +14,8 @@ const uint8_t fingerprint[20] = {0xbb, 0x88, 0x7f, 0x7c, 0x77, 0xc2, 0x59, 0x97,
 const char* URL = "https://www.reseau-astuce.fr/fr/horaires-a-larret/28/StopTimeTable/NextDeparture";
 const char* REQUEST = "destinations=%7B%221%22%3A%22Technop%C3%B4le+SAINT-ETIENNE-DU-ROUVRAY%22%7D&stopId=102154&lineId=175&sens=1";
 
-const char* WIFI_SSID = "AirPort Extreme";
-const char* WIFI_PWD = "3saih3x8";
+const char* WIFI_SSID = "myWifiSSID";
+const char* WIFI_PWD = "myWifiPassword";
 
 ESP8266WiFiMulti WiFiMulti;
 
