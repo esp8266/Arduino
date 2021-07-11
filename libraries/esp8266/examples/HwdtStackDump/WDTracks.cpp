@@ -12,7 +12,7 @@
 
   To a build_opt.txt file in your sketch directory add the following build options:
     -finstrument-functions
-    -finstrument-functions-exclude-function-list=app_entry,stack_thunk_get_,ets_intr_,ets_post,Cache_Read_Enable
+    -finstrument-functions-exclude-function-list=app_entry,stack_thunk_get_,ets_intr_,ets_post,Cache_Read_Enable,non32xfer_exception_handler
     -finstrument-functions-exclude-file-list=umm_malloc,hwdt_app_entry,core_esp8266_postmortem,core_esp8266_app_entry_noextra4k
 
   Various efforts are under devlopment to handle build options for a sketch.
@@ -33,24 +33,24 @@
 #include <hwdt_app_entry.h>
 #include <user_interface.h>
 
+#ifndef ALWAYS_INLINE
+#define ALWAYS_INLINE inline __attribute__((always_inline))
+#endif
+
 extern "C" {
 
-  struct WDTracksLastCall {
-    struct {
-      void *this_fn;
-      void *call_site;
-      void *sp;
-    } enter;
-
-    struct {
-      void *this_fn;
-      void *call_site;
-      void *sp;
-    } exit;
-
-    bool in;
+  constexpr size_t kMaxTracks = 64;
+  struct WDTrackMark {
+    void *this_fn;
+    void *call_site;
+    void *sp;
+    bool enter;
   };
-  struct WDTracksLastCall wd_tracks;
+  struct WDTracksCBuf {
+    size_t idx;
+    struct WDTrackMark tracks[kMaxTracks];
+  };
+  struct WDTracksCBuf wd_tracks;
 
   IRAM_ATTR void __cyg_profile_func_enter(void *this_fn, void *call_site) __attribute__((no_instrument_function));
   IRAM_ATTR void __cyg_profile_func_exit(void *this_fn, void *call_site) __attribute__((no_instrument_function));
@@ -61,11 +61,12 @@ extern "C" {
   /*
    * Printing from hwdt_pre_sdk_init() requires special considerations. Normal
    * "C" runtime initialization has not run at the time it is called. For
-   * printing from this context, we use umm_info_safe_printf_P. It is capable of
-   * handling this situation and is a function included in umm_malloc.
+   * printing from this context, we use umm_info_safe_printf_P. It is capable
+   * of handling this situation and is a function included in umm_malloc.
    */
   int umm_info_safe_printf_P(const char *fmt, ...);
-  #define ETS_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#define ETS_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
+#define ETS_PRINTF_P(fmt, ...) umm_info_safe_printf_P(fmt, ##__VA_ARGS__)
 
 #if defined(DEBUG_ESP_HWDT) || defined(DEBUG_ESP_HWDT_NOEXTRA4K)
   void hwdt_pre_sdk_init(void) __attribute__((no_instrument_function));
@@ -94,21 +95,49 @@ extern "C" {
       print_wdtracks();
     }
   }
+  // Functions __cyg_profile_func_enter and __cyg_profile_func_exit are
+  // identical except for the "bool enter" value. These are a very high call
+  // frequency functions. Avoid using a common function to save code space. By
+  // forceing inline, we avoid the time to creating a new stack frame and
+  // register save event to make the call.
+  // Side note, needed to keep __attribute__((no_instrument_function)); on
+  // forced inline parts otherwise the resulting ASM was strange and larger.
+  static ALWAYS_INLINE void __cyg_profile_func(void *this_fn, void *call_site, bool enter) __attribute__((no_instrument_function));
+  void __cyg_profile_func(void *this_fn, void *call_site, bool enter)
+  {
+    uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
 
+    size_t idx = wd_tracks.idx;
+    // Not using the .noinit attribute on structure at this time; however,
+    // doing range check here makes an uninitialized structure safe!
+    if (kMaxTracks <= idx) {
+      idx = 0;
+    }
+
+    struct WDTrackMark *track = &wd_tracks.tracks[idx];
+    asm volatile (
+      "s32i a1, %[track], %[track_sp]\n\t"
+      : [track]"+a"(track)
+      : [track_sp]"I"(offsetof(struct WDTrackMark, sp))
+      :);
+    // Extended ASM note, If "track" is an input register the compiler assumes
+    // it has been overwriten by the ASM code and recalculates its prior value.
+    // As an output read/write register the compiler skips the recalculation.
+    // This saved two bytes.
+    track->this_fn = this_fn;       // The address of the function called
+    track->call_site = call_site;   // The saved return address "a0" of the callee
+    track->enter = enter;
+    wd_tracks.idx = ++idx;
+
+    xt_wsr_ps(saved_ps);
+  }
 
   /*
     Called at function entry after stackframe setup and registers are saved.
   */
   void __cyg_profile_func_enter(void *this_fn, void *call_site)
   {
-    wd_tracks.enter.this_fn = this_fn;       // The address of the function called
-    wd_tracks.enter.call_site = call_site;   // The saved return address "a0" of the callee
-    asm volatile (
-        "s32i a1, %[wd_tracks], %[enter_sp]\n\t"
-        : // No output constraints
-        : [wd_tracks]"a"(&wd_tracks), [enter_sp]"I"(offsetof(struct WDTracksLastCall, enter.sp))
-        :);
-    wd_tracks.in = true;
+    __cyg_profile_func(this_fn, call_site, true);
   }
 
 
@@ -118,58 +147,41 @@ extern "C" {
   */
   void __cyg_profile_func_exit(void *this_fn, void *call_site)
   {
-    wd_tracks.exit.this_fn = this_fn;      // The address of the function called
-    wd_tracks.exit.call_site = call_site;  // The saved return address "a0" of the callee
-    asm volatile (
-        "s32i a1, %[wd_tracks], %[exit_sp]\n\t"
-        : // No output constraints
-        : [wd_tracks]"a"(&wd_tracks), [exit_sp]"I"(offsetof(struct WDTracksLastCall, exit.sp))
-        :);
-    wd_tracks.in = false;
+    __cyg_profile_func(this_fn, call_site, false);
   }
 
   void print_wdtracks(void)
   {
-      if (NULL == wd_tracks.enter.this_fn)  {
-        // Compiler flags -finstrument-functions, etc. are most likely missing.
-        return;
+    // It is assumed we are called from a context that interrupts will not occur.
+
+    // Print as a fake stack dump with our WDTrack info so that the
+    // Exception decoder  will assit with a call trace printout.
+    size_t idx = wd_tracks.idx;
+    idx--;
+    if (kMaxTracks <= idx) {
+      idx = kMaxTracks - 1;
+    }
+    struct WDTrackMark *track = &wd_tracks.tracks[idx];
+    ETS_PRINTF("\nepc1=%p\n", track->this_fn);
+
+    uintptr_t fake_start =  (uintptr_t)track->sp - 0x10;
+    uintptr_t fake_end   =  fake_start + (uintptr_t)(kMaxTracks * sizeof(struct WDTrackMark));
+    ETS_PRINTF("\n>>>stack>>>\n\nctx: WDTracks\n");
+    ETS_PRINTF("sp: %08x end: %08x offset: %04x\n", fake_start, fake_end, 0);
+
+    // Print most recent first to stay consistent with how the stack dump/decode
+    // would normally appear.
+    for (size_t i = 0; i < kMaxTracks; i++) {
+      ETS_PRINTF("%08x:  %08x %08x %08x %08x\n", fake_start + i * 0x10u,
+                 track->this_fn, track->enter, track->sp, track->call_site);
+      idx--;
+      if (kMaxTracks <= idx) {
+        idx = kMaxTracks - 1;
       }
-      if (wd_tracks.in) {
-        ETS_PRINTF("\nepc1=%p\nepc1=%p\n",
-                   wd_tracks.enter.this_fn, wd_tracks.enter.call_site);
+      track = &wd_tracks.tracks[idx];
+    }
 
-        if (wd_tracks.exit.this_fn != wd_tracks.enter.this_fn &&
-            wd_tracks.exit.this_fn != wd_tracks.enter.call_site)
-          ETS_PRINTF("epc1=%p\n", wd_tracks.exit.this_fn);
-        if (wd_tracks.exit.call_site != wd_tracks.enter.this_fn &&
-            wd_tracks.exit.call_site != wd_tracks.enter.call_site)
-          ETS_PRINTF("epc1=%p\n",  wd_tracks.exit.call_site);
-
-      } else {
-        ETS_PRINTF("\nepc1=%p\nepc1=%p\n",
-                   wd_tracks.exit.this_fn, wd_tracks.exit.call_site);
-
-        if (wd_tracks.enter.this_fn != wd_tracks.exit.this_fn &&
-            wd_tracks.enter.this_fn != wd_tracks.exit.call_site)
-          ETS_PRINTF("epc1=%p\n", wd_tracks.enter.this_fn);
-        if (wd_tracks.enter.call_site != wd_tracks.exit.this_fn &&
-            wd_tracks.enter.call_site != wd_tracks.exit.call_site)
-          ETS_PRINTF("epc1=%p\n",  wd_tracks.enter.call_site);
-      }
-      ETS_PRINTF("\n--------- OR FOR WDT, CUT HERE FOR EXCEPTION DECODER ---------\n");
-
-      if (wd_tracks.in) {
-        ETS_PRINTF("\nLast function entered:\n"
-                   "  called function: %p\n"
-                   "  callee return:   %p\n"
-                   "  SP:              %p\n",
-                   wd_tracks.enter.this_fn, wd_tracks.enter.call_site, wd_tracks.enter.sp);
-      } else {
-        ETS_PRINTF("\nLast function exited:\n"
-                   "  called function: %p\n"
-                   "  callee return:   %p\n"
-                   "  SP:              %p\n",
-                   wd_tracks.exit.this_fn, wd_tracks.exit.call_site, wd_tracks.exit.sp);
-      }
+    ETS_PRINTF("<<<stack<<<\n");
+    ETS_PRINTF("\n--------- OR FOR WDT, CUT HERE FOR EXCEPTION DECODER ---------\n");
   }
 };
