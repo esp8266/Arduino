@@ -25,8 +25,6 @@ For reporting, we have two times that we can expand on the WDT reset reporting.
 
 Both of these callback functions are predefined as _weak_ allowing for simple override replacements without the need for registration calls.
 
-~After a WDT reset, two or more lines starting with "epc1=0x40..." will appear after the stack dump. When you copy-paste this block into the Exception Decoder, it will only process the first one in the list. The Exception Decoder result of the first "epc1=0x40..." will show as the 1st line of the decode starting with "PC: 0x40...". If the results are not meaningful, you can get the decoder to use the next line by deleting the first "epc1=0x40..." line and press return. The decode results will update. Repeat the process as needed.~
-
 After a WDT reset, a fake stack dump identifyed as `ctx: WDTracks` is generated. Copy-paste that block into the Exception Decoder for a backtrace of the functions called.
 
 ## Files Needed
@@ -59,3 +57,5 @@ recipe.hooks.prebuild.5.pattern=bash -c "if [ ! -f {custom.flags_txt.build.pathn
 
 ### `WDTracks.cpp`
 Copy `WDTracks.cpp` from this example to your sketch folder.
+
+Change the value of kMaxTracks to control the number of track marks saved.

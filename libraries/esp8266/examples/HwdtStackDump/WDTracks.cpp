@@ -39,17 +39,26 @@
 
 extern "C" {
 
-  constexpr size_t kMaxTracks = 64;
+  constexpr size_t kMaxTracks = 32; // Change to control the number of track marks saved.
+
   struct WDTrackMark {
-    void *this_fn;
-    void *call_site;
-    void *sp;
-    bool enter;
+    void *this_fn;    // The starting address if the function called
+    void *call_site;  // On return, the next address to execute in callee function.
+    void *sp;         // SP for "this_fn" not that of "call_site" (callee)
+    bool enter;       // True when recording a __cyg_profile_func_enter call
+                      // False when recording a __cyg_profile_func_exit call
   };
   struct WDTracksCBuf {
     size_t idx;
     struct WDTrackMark tracks[kMaxTracks];
   };
+  /*
+    If you need to debug a WDT that occurs before user_init() is called to
+    perform  "C"/"C++" runtime initialization, then add
+    "__attribute__((section(".noinit")))" to wd_tracks and do ets_memset from
+    hwdt_pre_sdk_init as shown below. And, build with "Debug Level: HWDT".
+    Otherwise, the data captured in wd_tracks starts after user_init().
+  */
   struct WDTracksCBuf wd_tracks;
 
   IRAM_ATTR void __cyg_profile_func_enter(void *this_fn, void *call_site) __attribute__((no_instrument_function));
@@ -59,11 +68,11 @@ extern "C" {
   void custom_crash_callback(struct rst_info * rst_info, uint32_t stack, uint32_t stack_end) __attribute__((no_instrument_function));
 
   /*
-   * Printing from hwdt_pre_sdk_init() requires special considerations. Normal
-   * "C" runtime initialization has not run at the time it is called. For
-   * printing from this context, we use umm_info_safe_printf_P. It is capable
-   * of handling this situation and is a function included in umm_malloc.
-   */
+    Printing from hwdt_pre_sdk_init() requires special considerations. Normal
+    "C" runtime initialization has not run at the time it is called. For
+    printing from this context, we use umm_info_safe_printf_P. It is capable
+    of handling this situation and is a function included in umm_malloc.
+  */
   int umm_info_safe_printf_P(const char *fmt, ...);
 #define ETS_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt), ##__VA_ARGS__)
 #define ETS_PRINTF_P(fmt, ...) umm_info_safe_printf_P(fmt, ##__VA_ARGS__)
@@ -77,12 +86,20 @@ extern "C" {
     if (REASON_WDT_RST == hwdt_info.reset_reason) {
       /*
         Note, we rely on the previous values of the wd_tracks structure, still
-        being set from before the crash. At the time we are called here, the SDK
-        has not been started. The "C" runtime code that will zero the structure
-        does not run until later when the SDK calls user_init().
+        set from before the crash. At the time we are called here, the SDK has
+        not started. The "C" runtime code that will zero the structure does not
+        run until later when the SDK calls user_init().
       */
       print_wdtracks();
     }
+    /*
+      You can skip direct initialization of wd_tracks without causing crashes.
+      After kMaxTracks calls, all uninitialized data is overwritten. In most
+      user-based WDT crashes, you can assume that a sufficient number
+      (kMaxTracks) of calls will fill the circular buffer before a crash
+      occurs.
+    */
+    ets_memset(&wd_tracks, 0, sizeof(wd_tracks));
   }
 #endif
 
@@ -95,35 +112,40 @@ extern "C" {
       print_wdtracks();
     }
   }
-  // Functions __cyg_profile_func_enter and __cyg_profile_func_exit are
-  // identical except for the "bool enter" value. These are a very high call
-  // frequency functions. Avoid using a common function to save code space. By
-  // forceing inline, we avoid the time to creating a new stack frame and
-  // register save event to make the call.
-  // Side note, needed to keep __attribute__((no_instrument_function)); on
-  // forced inline parts otherwise the resulting ASM was strange and larger.
+  /*
+    Functions __cyg_profile_func_enter and __cyg_profile_func_exit are
+    identical except for the "bool enter" value. These are very high call
+    frequency functions. Avoid using a common function to save code space. By
+    forcing inline, we avoid the time to creating a new stack frame and the
+    register save event for making a call.
+    Side note, needed to keep __attribute__((no_instrument_function)); on
+    forced inline parts otherwise the resulting ASM was strange and larger.
+  */
   static ALWAYS_INLINE void __cyg_profile_func(void *this_fn, void *call_site, bool enter) __attribute__((no_instrument_function));
   void __cyg_profile_func(void *this_fn, void *call_site, bool enter)
   {
     uint32_t saved_ps = xt_rsil(15);
 
     size_t idx = wd_tracks.idx;
-    // Not using the .noinit attribute on structure at this time; however,
-    // doing range check here makes an uninitialized structure safe!
+    // Doing range check here makes an uninitialized structure safe!
     if (kMaxTracks <= idx) {
       idx = 0;
     }
 
     struct WDTrackMark *track = &wd_tracks.tracks[idx];
+    /*
+      Extended ASM note, If "track" is an input register the compiler assumes
+      it has been overwriten by the ASM code and recalculates its prior value.
+      As an output read/write register the compiler skips the recalculation.
+      This saved two bytes. At this time, with GCC-10.2.0, the resulting code
+      generated by this Extended ASM, integrated into the "C" code ASM in an
+      optimum way.
+    */
     asm volatile (
       "s32i a1, %[track], %[track_sp]\n\t"
       : [track]"+a"(track)
       : [track_sp]"I"(offsetof(struct WDTrackMark, sp))
       :);
-    // Extended ASM note, If "track" is an input register the compiler assumes
-    // it has been overwriten by the ASM code and recalculates its prior value.
-    // As an output read/write register the compiler skips the recalculation.
-    // This saved two bytes.
     track->this_fn = this_fn;       // The address of the function called
     track->call_site = call_site;   // The saved return address "a0" of the callee
     track->enter = enter;
@@ -152,10 +174,14 @@ extern "C" {
 
   void print_wdtracks(void)
   {
-    // It is assumed we are called from a context that interrupts will not occur.
+    /*
+      Print as a fake stack dump with our WDTrack info so that the ESP Exception
+      Decoder will assist with a call trace printout by putting source code
+      location to the addresses presented in the stack dump.
 
-    // Print as a fake stack dump with our WDTrack info so that the
-    // Exception decoder  will assit with a call trace printout.
+      It is assumed we are called from a context that interrupts will not occur.
+      Also, all function called from here must not be "instrumented"
+    */
     size_t idx = wd_tracks.idx;
     idx--;
     if (kMaxTracks <= idx) {
@@ -164,10 +190,10 @@ extern "C" {
     struct WDTrackMark *track = &wd_tracks.tracks[idx];
     ETS_PRINTF("\nepc1=%p\n", track->this_fn);
 
-    uintptr_t fake_start =  (uintptr_t)track->sp - 0x10;
+    uintptr_t fake_start =  (uintptr_t)0x3FFFE000;  // Arbitrary value - using ending address of SYS stack space.
     uintptr_t fake_end   =  fake_start + (uintptr_t)(kMaxTracks * sizeof(struct WDTrackMark));
     ETS_PRINTF("\n>>>stack>>>\n\nctx: WDTracks\n");
-    ETS_PRINTF("sp: %08x end: %08x offset: %04x\n", fake_start, fake_end, 0);
+    ETS_PRINTF("sp: %08x end: %08x offset: 0000\n", fake_start, fake_end);
 
     // Print most recent first to stay consistent with how the stack dump/decode
     // would normally appear.
