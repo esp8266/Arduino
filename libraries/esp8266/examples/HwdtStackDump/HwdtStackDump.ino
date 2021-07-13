@@ -13,6 +13,9 @@
    To demonstrates this tool, this Sketch offers a few options for crashing the
    ESP8266 with and without a HWDT reset.
 
+   Supplimental - How to get an idea of where the sketch was last executing at
+   the time of the WDT. For this, review ReadMe.md in this example directory.
+
 */
 
 #include <Arduino.h>
