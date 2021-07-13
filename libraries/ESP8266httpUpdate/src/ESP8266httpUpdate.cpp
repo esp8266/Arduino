@@ -25,9 +25,7 @@
 
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
-
-extern "C" uint32_t _FS_start;
-extern "C" uint32_t _FS_end;
+#include <flash_hal.h>
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
         : _httpClientTimeout(8000)
@@ -228,7 +226,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         if(len > 0) {
             bool startUpdate = true;
             if(spiffs) {
-                size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+                size_t spiffsSize = ((size_t)FS_end - (size_t)FS_start);
                 if(len > (int) spiffsSize) {
                     DEBUG_HTTP_UPDATE("[httpUpdate] spiffsSize to low (%d) needed: %d\n", spiffsSize, len);
                     startUpdate = false;
@@ -286,6 +284,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     }
 
+// it makes no sense to check flash size in auto flash mode
+// (sketch size would have to be set in bin header, instead of flash size)
+#if !AUTOFLASHSIZE
                     if (buf[0] == 0xe9) {
                         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
@@ -297,6 +298,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                             return HTTP_UPDATE_FAILED;
                         }
                     }
+#endif
                 }
                 if(runUpdate(*tcp, len, http.header("x-MD5"), command)) {
                     ret = HTTP_UPDATE_OK;

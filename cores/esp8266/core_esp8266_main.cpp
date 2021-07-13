@@ -346,6 +346,16 @@ extern "C" void __disableWiFiAtBootTime (void)
     wifi_fpm_do_sleep(0xFFFFFFF);
 }
 
+#if AUTOFLASHSIZE
+#include "flash_hal.h"
+extern "C" void flashinit (void);
+uint32_t EEPROM_start;
+uint32_t FS_start;
+uint32_t FS_end;
+uint16_t FS_page;
+uint16_t FS_block;
+#endif
+
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
@@ -374,6 +384,9 @@ extern "C" void user_init(void) {
 
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
+#endif
+#if AUTOFLASHSIZE
+    flashinit();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi
