@@ -251,7 +251,7 @@ size_t NetdumpIP::printTo(Print& p)
             uint16_t bit = PP_NTOHS(reinterpret_cast<const uint16_t*>(rawip)[i]);
             if (bit || count0 < 0)
             {
-                n += p.printf("%x", bit);
+                n += p.printf_P(PSTR("%x"), bit);
                 if (count0 > 0)
                     // no more hiding 0
                 {

@@ -42,21 +42,21 @@ void Packet::printDetail(Print& out, const String& indent, const char* data, siz
         {
             end = size;
         }
-        out.printf("%s", indent.c_str());
+        out.printf_P(PSTR("%s"), indent.c_str());
         if (pd != PacketDetail::CHAR)
         {
             for (size_t i = start; i < end; i++)
             {
-                out.printf("%02x ", (unsigned char)data[i]);
+                out.printf_P(PSTR("%02x "), (unsigned char)data[i]);
             }
             for (size_t i = end; i < start + charCount; i++)
             {
-                out.print("   ");
+                out.printf_P(PSTR("   "));
             }
         }
         for (size_t i = start; i < end; i++)
         {
-            out.printf("%c", data[i] >= 32 && data[i] < 128 ? data[i] : '.');
+            out.printf_P(PSTR("%c"), data[i] >= 32 && data[i] < 128 ? data[i] : '.');
         }
         out.println();
 
@@ -253,7 +253,7 @@ void Packet::ICMPtoString(PacketDetail, StreamString& sstr) const
         default: sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType()); break;
         }
     }
-    sstr.printf("\r\n");
+    sstr.printf_P(PSTR("\r\n"));
 }
 
 void Packet::IGMPtoString(PacketDetail, StreamString& sstr) const
