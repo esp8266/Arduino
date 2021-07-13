@@ -294,7 +294,7 @@ void ArduinoOTAClass::_runUpdate() {
     int waited = 1000;
     while (!client.available() && waited--)
       delay(1);
-    if (!waited){
+    if (!client.available()){
 #ifdef OTA_DEBUG
       OTA_DEBUG.printf("Receive Failed\n");
 #endif
@@ -303,6 +303,7 @@ void ArduinoOTAClass::_runUpdate() {
         _error_callback(OTA_RECEIVE_ERROR);
       }
       _state = OTA_IDLE;
+      break;
     }
     written = Update.write(client);
     if (written > 0) {
