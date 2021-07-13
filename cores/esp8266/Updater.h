@@ -5,6 +5,7 @@
 #include <flash_utils.h>
 #include <MD5Builder.h>
 #include <functional>
+#include <erase_config.h>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -52,7 +53,7 @@ class UpdaterVerifyClass {
 class UpdaterClass {
   public:
     typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
-  
+
     UpdaterClass();
     ~UpdaterClass();
 
@@ -65,6 +66,13 @@ class UpdaterClass {
     */
     bool begin(size_t size, int command = U_FLASH, int ledPin = -1, uint8_t ledOn = LOW);
 
+#ifdef ERASE_CONFIG_H
+    /*
+    */
+    inline void setEraseConfigOption(ERASE_CONFIG_MASK_t eraseOption) {
+      _eraseConfigOption = eraseOption;
+    }
+#endif
     /*
       Run Updater from asynchronous callbacs
     */
@@ -181,7 +189,7 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
-    void _setError(int error);    
+    void _setError(int error);
 
     bool _async = false;
     uint8_t _error = 0;
@@ -199,6 +207,9 @@ class UpdaterClass {
     int _ledPin = -1;
     uint8_t _ledOn;
 
+#ifdef ERASE_CONFIG_H
+    uint32_t _eraseConfigOption = ERASE_CONFIG_BLANK_BIN;
+#endif
     // Optional signed binary verification
     UpdaterHashClass *_hash = nullptr;
     UpdaterVerifyClass *_verify = nullptr;
