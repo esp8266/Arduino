@@ -14,14 +14,21 @@ from cryptography.hazmat.primitives.serialization import pkcs7
 from cryptography.hazmat.primitives.serialization import Encoding
 from cryptography.hazmat.primitives.serialization import PublicFormat
 
-def printDer(der):
+def printData(data, showPub = True):
     try:
-        xcert = x509.load_der_x509_certificate(der)
+        xcert = x509.load_der_x509_certificate(data)
     except:
-        xcert = pkcs7.load_der_pkcs7_certificates(der)
-        if len(xcert) > 1:
-            print('// Warning: TODO: pkcs7 has {} entries'.format(len(xcert)))
-        xcert = xcert[0]
+        try:
+            xcert = x509.load_pem_x509_certificate(data)
+        except:
+            try:
+                xcert = pkcs7.load_der_pkcs7_certificates(data)
+            except:
+                xcert = pkcs7.load_pem_pkcs7_certificates(data)
+            if len(xcert) > 1:
+                print('// Warning: TODO: pkcs7 has {} entries'.format(len(xcert)))
+            xcert = xcert[0]
+
     cn = ''
     for dn in xcert.subject.rfc4514_string().split(','):
         keyval = dn.split('=')
@@ -29,14 +36,25 @@ def printDer(der):
             cn += keyval[1]
     name = re.sub('[^a-zA-Z0-9_]', '_', cn)
     print('// CN: {} => name: {}'.format(cn, name))
-    fingerprint = xcert.fingerprint(hashes.SHA1()).hex(':')
-    print('const char fingerprint_{} [] PROGMEM = "{}";'.format(name, fingerprint))
+
     print('// not valid before:', xcert.not_valid_before)
     print('// not valid after: ', xcert.not_valid_after)
-    pem = xcert.public_key().public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo).decode('utf-8')
-    print('const char pubkey_{} [] PROGMEM = R"PUBKEY('.format(name))
-    print(pem + ')PUBKEY";')
+
+    if showPub:
+
+        fingerprint = xcert.fingerprint(hashes.SHA1()).hex(':')
+        print('const char fingerprint_{} [] PROGMEM = "{}";'.format(name, fingerprint))
+
+        pem = xcert.public_key().public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo).decode('utf-8')
+        print('const char pubkey_{} [] PROGMEM = R"PUBKEY('.format(name))
+        print(pem + ')PUBKEY";')
     
+    else:
+
+        cert = xcert.public_bytes(Encoding.PEM).decode('utf-8')
+        print('const char cert_{} [] PROGMEM = R"CERT('.format(name))
+        print(cert + ')CERT";')
+
     cas = []
     for ext in xcert.extensions:
         if ext.oid == x509.ObjectIdentifier("1.3.6.1.5.5.7.1.1"):
@@ -47,7 +65,7 @@ def printDer(der):
         with urllib.request.urlopen(ca) as crt:
             print()
             print('// ' + ca)
-            printDer(crt.read())
+            printData(crt.read(), False)
         print()
 
 def get_certificate(hostname, port, name):
@@ -63,7 +81,7 @@ def get_certificate(hostname, port, name):
                 print('const char* {}_host = "{}";'.format(name, hostname));
                 print('const uint16_t {}_port = {};'.format(name, port));
                 print()
-            printDer(ssock.getpeercert(binary_form=True))
+            printData(ssock.getpeercert(binary_form=True))
             print('// end of certificate chain for {}:{}'.format(hostname, port))
             print('////////////////////////////////////////////////////////////')
             print()
