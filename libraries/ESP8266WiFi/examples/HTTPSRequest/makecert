@@ -1,0 +1,1 @@
+python3 ../../../../tools/cert.py -s api.github.com -n github > certs.h

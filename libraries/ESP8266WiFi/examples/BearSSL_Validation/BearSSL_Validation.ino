@@ -157,7 +157,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(pubkey_DigiCert_High_Assurance_EV_Root_CA);
+  BearSSL::X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, github_host, github_port, path);
