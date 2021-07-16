@@ -1,0 +1,2 @@
+cd ${0%/*} 2>/dev/null
+./certs-from-mozilla.py
