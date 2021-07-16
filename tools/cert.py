@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# Script to download/update certificates and public keys
+# and generate compilable source files for c++/Arduino.
+# released to public domain
+
 import urllib.request
 import re
 import ssl
