@@ -114,8 +114,8 @@ The following points assume work in a direct clone of the repository, and not in
    * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h): import the latest database with the following shell command:\
      `$ cd tools; sh TZupdate.sh`
 
-   * certificates and public keys
-     `$ cd tools; sh certsUpdate`
+   * Update SSL/TLS certificates and public keys in examples:\
+     `$ cd tools; sh certsUpdate.sh`
 
 5. Wait until the release notes have been checked by other maintainers
 
