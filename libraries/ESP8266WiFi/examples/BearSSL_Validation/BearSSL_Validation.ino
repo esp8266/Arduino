@@ -91,7 +91,7 @@ If there are no CAs or insecure options specified, BearSSL will not connect.
 Expect the following call to fail as none have been configured.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
 void fetchInsecure() {
@@ -102,7 +102,7 @@ which is subject to man-in-the-middle (MITM) attacks.
 )EOF");
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
 void fetchFingerprint() {
@@ -115,8 +115,8 @@ fingerprints will change if anything changes in the certificate chain
 the root authorities, etc.).
 )EOF");
   BearSSL::WiFiClientSecure client;
-  client.setFingerprint(fingerprint___github_com);
-  fetchURL(&client, github_host, github_port, path);
+  client.setFingerprint(fingerprint_gitlab_com);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
 void fetchSelfSigned() {
@@ -141,9 +141,9 @@ private and not shared.  A MITM without the private key would not be
 able to establish communications.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  BearSSL::PublicKey key(pubkey___github_com);
+  BearSSL::PublicKey key(pubkey_gitlab_com);
   client.setKnownKey(&key);
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
 void fetchCertAuthority() {
@@ -157,14 +157,14 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
+  BearSSL::X509List cert(cert_USERTrust_RSA_Certification_Authority);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 
   Serial.printf("Try again after setting NTP time (should pass)\n");
   setClock();
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
 void fetchFaster() {
@@ -177,18 +177,18 @@ may make sense
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
   uint32_t now = millis();
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
   uint32_t delta = millis() - now;
   client.setInsecure();
   client.setCiphersLessSecure();
   now = millis();
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
   uint32_t delta2 = millis() - now;
   std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
   client.setInsecure();
   client.setCiphers(myCustomList);
   now = millis();
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, gitlab_host, gitlab_port, path);
   uint32_t delta3 = millis() - now;
   Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
 }
