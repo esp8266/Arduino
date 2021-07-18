@@ -281,10 +281,19 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
  */
 void HTTPClient::setAuthorization(const char * auth)
 {
-    if(auth) {
-        _base64Authorization = auth;
-        _base64Authorization.replace(String('\n'), emptyString);
+    if (auth) {
+        setAuthorization(String(auth));
     }
+}
+
+/**
+ * set the Authorizatio for the http request
+ * @param auth String base64
+ */
+void HTTPClient::setAuthorization(String auth)
+{
+    _base64Authorization = std::move(auth);
+    _base64Authorization.replace(String('\n'), emptyString);
 }
 
 /**
