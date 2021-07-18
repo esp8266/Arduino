@@ -276,7 +276,7 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth const char * base64
  */
 void HTTPClient::setAuthorization(const char * auth)
@@ -287,7 +287,7 @@ void HTTPClient::setAuthorization(const char * auth)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth String base64
  */
 void HTTPClient::setAuthorization(String auth)
