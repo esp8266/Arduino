@@ -444,10 +444,6 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
       sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
     }
 
-    if (_eTagEnabled) {
-      // sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
-    }
-
     response += _responseHeaders;
     response += "\r\n";
     _responseHeaders = "";
