@@ -9,6 +9,25 @@
 
 namespace esp8266webserver {
 
+// calculate an eTag for a file in filesystem
+static String calcETag(FS &fs, const String path) {
+    String result;
+
+    // calculate eTag using md5 checksum
+    uint8_t md5_buf[16];
+    File f = fs.open(path, "r");
+    MD5Builder calcMD5;
+    calcMD5.begin();
+    calcMD5.addStream(f, f.size());
+    calcMD5.calculate();
+    calcMD5.getBytes(md5_buf);
+    f.close();
+    // create a minimal-length eTag using base64 byte[]->text encoding.
+    result = "\"" + base64::encode(md5_buf, 16, false) + "\"";
+    return(result);
+} // calcETag
+
+
 template<typename ServerType>
 class FunctionRequestHandler : public RequestHandler<ServerType> {
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
@@ -92,6 +111,7 @@ protected:
 };
 
 
+// serve all files within a given directory
 template<typename ServerType>
 class StaticDirectoryRequestHandler : public StaticRequestHandler<ServerType> {
 
@@ -117,6 +137,7 @@ public:
         DEBUGV("DirectoryRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), SRH::_uri.c_str());
 
         String path;
+        String eTagCode;
         path.reserve(SRH::_path.length() + requestUri.length() + 32);
         path = SRH::_path;
 
@@ -156,10 +177,28 @@ public:
             return false;
         }
 
+        if (server._eTagEnabled) {
+            if (server._eTagFunction) {
+                eTagCode = (server._eTagFunction)(SRH::_fs, path);
+            } else {
+                eTagCode = calcETag(SRH::_fs, path);
+            }
+
+            if (server.header("If-None-Match") == eTagCode) {
+                server.send(304);
+                return true;
+            }
+        }
+
         if (SRH::_cache_header.length() != 0)
             server.sendHeader("Cache-Control", SRH::_cache_header);
 
+        if ((server._eTagEnabled) && (eTagCode.length() > 0)) {
+            server.sendHeader("ETag", eTagCode);
+        }
+
         server.streamFile(f, contentType, requestMethod);
+
         return true;
     }
 
@@ -167,6 +206,8 @@ protected:
     size_t _baseUriLength;
 };
 
+
+// Serve a specific, single file
 template<typename ServerType>
 class StaticFileRequestHandler
     :
@@ -180,13 +221,6 @@ public:
         :
     StaticRequestHandler<ServerType>{fs, path, uri, cache_header}
     {
-        File f = SRH::_fs.open(path, "r");
-        MD5Builder calcMD5;
-        calcMD5.begin();
-        calcMD5.addStream(f, f.size());
-        calcMD5.calculate();
-        calcMD5.getBytes(_ETag_md5);
-        f.close();
     }
 
     bool canHandle(HTTPMethod requestMethod, const String& requestUri) override  {
@@ -197,11 +231,17 @@ public:
         if (!canHandle(requestMethod, requestUri))
             return false;
 
-        const String etag = "\"" + base64::encode(_ETag_md5, 16, false) + "\"";
+        if (server._eTagEnabled) {
+            if (server._eTagFunction) {
+                _eTagCode = (server._eTagFunction)(SRH::_fs, SRH::_path);
+            } else  if (_eTagCode.isEmpty()) {
+                _eTagCode = calcETag(SRH::_fs, SRH::_path);
+            }
 
-        if(server.header("If-None-Match") == etag){
-            server.send(304);
-            return true;
+            if (server.header("If-None-Match") == _eTagCode) {
+                server.send(304);
+                return true;
+            }
         }
 
         File f = SRH::_fs.open(SRH::_path, "r");
@@ -217,14 +257,16 @@ public:
         if (SRH::_cache_header.length() != 0)
             server.sendHeader("Cache-Control", SRH::_cache_header);
 
-        server.sendHeader("ETag", etag);
+        if ((server._eTagEnabled) && (_eTagCode.length() > 0)) {
+            server.sendHeader("ETag", _eTagCode);
+        }
 
         server.streamFile(f, mime::getContentType(SRH::_path), requestMethod);
         return true;
     }
 
 protected:
-    uint8_t _ETag_md5[16];       
+    String _eTagCode; // eTag as used in http header for this single file
 };
 
 } // namespace

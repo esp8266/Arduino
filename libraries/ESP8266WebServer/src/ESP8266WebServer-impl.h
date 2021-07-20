@@ -68,6 +68,13 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
   _corsEnabled = enable;
 }
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::enableETag(bool enable, ETagFunction fn) {
+  _eTagEnabled = enable;
+ _eTagFunction = fn;
+}
+
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {
   close();
@@ -264,10 +271,11 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
     file.close();
   }
 
-  if(is_file)
+  if(is_file) {
     _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
-  else
+  } else {
     _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
+  }
 }
 
 template <typename ServerType>
@@ -434,6 +442,10 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     sendHeader(String(F("Connection")), String(_keepAlive ? F("keep-alive") : F("close")));
     if (_keepAlive) {
       sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
+    }
+
+    if (_eTagEnabled) {
+      // sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
     }
 
     response += _responseHeaders;
