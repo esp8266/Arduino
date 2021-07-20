@@ -616,10 +616,12 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
-        // will resume on timeout or when wifi_dns_found_callback fires
+        // Will resume on timeout or when wifi_dns_found_callback fires.
+        // The final argument, intvl_ms, to esp_delay influences how frequently
+        // the scheduled recurrent functions (Schedule.h) are probed; here, to allow
+        // the ethernet driver perform work.
+        esp_delay(timeout_ms, []() { return _dns_lookup_pending; }, 1);
         _dns_lookup_pending = false;
-        // will return here when dns_found_callback fires
         if(aResult.isSet()) {
             err = ERR_OK;
         }
