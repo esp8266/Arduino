@@ -9,8 +9,9 @@
 
 namespace esp8266webserver {
 
-// calculate an eTag for a file in filesystem
-static String calcETag(FS &fs, const String path) {
+// calculate an ETag for a file in filesystem based on md5 checksum
+// that can be used in the http headers - include quotes.
+static String calcETag(FS &fs, const String &path) {
     String result;
 
     // calculate eTag using md5 checksum
@@ -266,7 +267,7 @@ public:
     }
 
 protected:
-    String _eTagCode; // eTag as used in http header for this single file
+    String _eTagCode; // ETag code calculated for this file as used in http header include quotes.
 };
 
 } // namespace
