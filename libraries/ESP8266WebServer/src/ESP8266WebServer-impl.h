@@ -72,7 +72,7 @@ void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::enableETag(bool enable, ETagFunction fn) {
   _eTagEnabled = enable;
- _eTagFunction = fn;
+  _eTagFunction = fn;
 }
 
 template <typename ServerType>
@@ -443,6 +443,7 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
     if (_keepAlive) {
       sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
     }
+
 
     response += _responseHeaders;
     response += "\r\n";

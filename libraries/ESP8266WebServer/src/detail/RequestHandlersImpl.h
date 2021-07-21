@@ -181,7 +181,7 @@ public:
             if (server._eTagFunction) {
                 eTagCode = (server._eTagFunction)(SRH::_fs, path);
             } else {
-                eTagCode = calcETag(SRH::_fs, path);
+                eTagCode = esp8266webserver::calcETag(SRH::_fs, path);
             }
 
             if (server.header("If-None-Match") == eTagCode) {
@@ -235,7 +235,7 @@ public:
             if (server._eTagFunction) {
                 _eTagCode = (server._eTagFunction)(SRH::_fs, SRH::_path);
             } else  if (_eTagCode.isEmpty()) {
-                _eTagCode = calcETag(SRH::_fs, SRH::_path);
+                _eTagCode = esp8266webserver::calcETag(SRH::_fs, SRH::_path);
             }
 
             if (server.header("If-None-Match") == _eTagCode) {
