@@ -16,7 +16,11 @@
 #include <FS.h>       // File System for Web Server Files
 #include <LittleFS.h> // This file system is used.
 
-#define TRACE(...) Serial.printf(__VA_ARGS__);
+// mark parameters not used in example
+#define UNUSED __attribute__((unused))
+
+// TRACE output simplified, can be deactivated here
+#define TRACE(...) Serial.printf(__VA_ARGS__)
 
 // name of the server. You reach it using http://webserver
 #define HOSTNAME "webserver"
@@ -46,7 +50,6 @@ void handleRedirect()
 
   server.sendHeader("Location", url, true);
   server.send(302);
-  server.client().stop();
 } // handleRedirect()
 
 
@@ -119,8 +122,9 @@ public:
     @param requestUri request ressource from the http request line.
     @return true when method can be handled.
   */
-  bool canHandle(HTTPMethod requestMethod, const String &_uri) override
+  bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override
   {
+    // can handle POST for uploads and DELETE.
     return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
   } // canHandle()
 
@@ -140,7 +144,6 @@ public:
       fName = "/" + fName;
     }
 
-    // LOGGER_RAW("File:handle(%s)", requestUri.c_str());
     if (requestMethod == HTTP_POST) {
       // all done in upload. no other forms.
 
@@ -155,7 +158,8 @@ public:
   } // handle()
 
 
-  void upload(ESP8266WebServer &_server, const String &_requestUri, HTTPUpload &upload) override
+  // uploading process
+  void upload(ESP8266WebServer UNUSED &server, const String UNUSED &_requestUri, HTTPUpload &upload) override
   {
     // ensure that filename starts with '/'
     String fName = upload.filename;
@@ -163,24 +167,20 @@ public:
       fName = "/" + fName;
     }
 
-    // LOGGER_TRACE("upload...<%s>", fName.c_str());
-    if (fName.indexOf('#') > 0) {
-      // LOGGER_TRACE("no #...");
-    } else if (fName.indexOf('$') > 0) {
-      // LOGGER_TRACE("no $...");
-
-    } else if (upload.status == UPLOAD_FILE_START) {
+    if (upload.status == UPLOAD_FILE_START) {
+      // Open the file
       if (LittleFS.exists(fName)) {
         LittleFS.remove(fName);
       } // if
       _fsUploadFile = LittleFS.open(fName, "w");
 
     } else if (upload.status == UPLOAD_FILE_WRITE) {
+      // Write received bytes
       if (_fsUploadFile)
         _fsUploadFile.write(upload.buf, upload.currentSize);
-      yield();
 
     } else if (upload.status == UPLOAD_FILE_END) {
+      // Close the file
       if (_fsUploadFile) {
         _fsUploadFile.close();
       }
@@ -197,7 +197,7 @@ protected:
  */
 void setup(void)
 {
-  delay(3000);
+  delay(3000); // wait for serial monitor to start completely.
 
   // Use Serial port for some trace information from the example
   Serial.begin(115200);
@@ -244,10 +244,8 @@ void setup(void)
   // register a redirect handler when only domain name is given.
   server.on("/", HTTP_GET, handleRedirect);
 
-  // register a REST service returning the list of files in the root folder
+  // register some REST services
   server.on("/$list", HTTP_GET, handleListFiles);
-
-  // register a REST service returning some more system level information
   server.on("/$sysinfo", HTTP_GET, handleSysInfo);
 
   // UPLOAD and DELETE of files in the file system using a request handler.
@@ -269,16 +267,14 @@ void setup(void)
   });
 
   server.begin();
-  TRACE("setup done.\n");
   TRACE("hostname=%s\n", WiFi.getHostname());
 } // setup
 
 
-// handle all give time to all Elements and active components.
+// run the server...
 void loop(void)
 {
   server.handleClient();
-  // MDNS.update();
 } // loop()
 
 // end.
