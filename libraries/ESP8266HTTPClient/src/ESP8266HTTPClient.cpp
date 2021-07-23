@@ -81,7 +81,7 @@ HTTPClient::HTTPClient(HTTPClient&& other): _client(std::move(other._client)),
 }
 
 
-HTTPClient::HTTPClient& operator=(HTTPClient&& other) {
+HTTPClient& HTTPClient::operator=(HTTPClient&& other) {
     _client = std::move(other._client);
     _host = std::move(other._host);
     _port = std::move(other._port);
