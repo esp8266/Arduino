@@ -82,6 +82,13 @@ public:
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
+  // hasClientData():
+  // returns the amount of data available from the first client
+  // or 0 if there is none
+  size_t hasClientData();
+  // hasMaxPendingClients():
+  // returns true if the queue of pending clients is full
+  bool hasMaxPendingClients();
   void begin();
   void begin(uint16_t port);
   void begin(uint16_t port, uint8_t backlog);

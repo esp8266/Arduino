@@ -335,11 +335,18 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
         } // switch _parseRequest()
       } else {
         // !_currentClient.available(): waiting for more data
-        if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
-          keepCurrentClient = true;
+        unsigned long timeSinceChange = millis() - _statusChange;
+        // Use faster connection drop timeout if any other client has data
+        // or the buffer of pending clients is full
+        if ((_server.hasClientData() || _server.hasMaxPendingClients())
+          && timeSinceChange > HTTP_MAX_DATA_AVAILABLE_WAIT)
+            DBGWS("webserver: closing since there's another connection to read from\n");
+        else {
+          if (timeSinceChange > HTTP_MAX_DATA_WAIT)
+            DBGWS("webserver: closing after read timeout\n");
+          else
+            keepCurrentClient = true;
         }
-        else
-          DBGWS("webserver: closing after read timeout\n");
         callYield = true;
       }
       break;
