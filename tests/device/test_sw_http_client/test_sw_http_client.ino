@@ -3,6 +3,7 @@
 #include <ESP8266HTTPClient.h>
 #include <BSTest.h>
 #include <pgmspace.h>
+#include <optional>
 
 BS_ENV_DECLARE();
 
@@ -209,6 +210,12 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
             }
         }
     }
+}
+
+TEST_CASE("Move constructible", "[HTTPClient]")
+{
+   std::optional<HTTPClient> maybe;
+   maybe = std::make_optional(HTTPClient());
 }
 
 void loop()
