@@ -39,8 +39,7 @@ ESP8266WebServer server(80);
 
 // This function is called when the WebServer was requested without giving a filename.
 // This will redirect to the file index.htm when it is existing otherwise to the built-in $upload.htm page
-void handleRedirect()
-{
+void handleRedirect() {
   TRACE("Redirect...");
   String url = "/index.htm";
 
@@ -55,15 +54,15 @@ void handleRedirect()
 
 // This function is called when the WebServer was requested to list all existing files in the filesystem.
 // a JSON array with file information is returned.
-void handleListFiles()
-{
+void handleListFiles() {
   Dir dir = LittleFS.openDir("/");
   String result;
 
   result += "[\n";
   while (dir.next()) {
-    if (result.length() > 4)
+    if (result.length() > 4) {
       result += ",";
+    }
     result += "  {";
     result += " \"name\": \"" + dir.fileName() + "\", ";
     result += " \"size\": " + String(dir.fileSize()) + ", ";
@@ -78,8 +77,7 @@ void handleListFiles()
 
 
 // This function is called when the sysInfo service was requested.
-void handleSysInfo()
-{
+void handleSysInfo() {
   String result;
 
   FSInfo fs_info;
@@ -100,18 +98,15 @@ void handleSysInfo()
 // ===== Request Handler class used to answer more complex requests =====
 
 // The FileServerHandler is registered to the web server to support DELETE and UPLOAD of files into the filesystem.
-class FileServerHandler : public RequestHandler
-{
+class FileServerHandler : public RequestHandler {
 public:
   /**
-   * @brief Construct a new File Server Handler object
-   * @param fs The file system to be used.
-   * @param path Path to the root folder in the file system that is used for
-   * Serving static data down and upload.
-   * @param cache_header Cache Header to be used in replies.
+    @brief Construct a new File Server Handler object
+    @param fs The file system to be used.
+    @param path Path to the root folder in the file system that is used for serving static data down and upload.
+    @param cache_header Cache Header to be used in replies.
    */
-  FileServerHandler()
-  {
+  FileServerHandler() {
     TRACE("FileServerHandler is registered\n");
   }
 
@@ -122,22 +117,19 @@ public:
     @param requestUri request ressource from the http request line.
     @return true when method can be handled.
   */
-  bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override
-  {
+  bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override {
     // can handle POST for uploads and DELETE.
     return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
   } // canHandle()
 
 
-  bool canUpload(const String &uri) override
-  {
+  bool canUpload(const String &uri) override {
     // only allow upload on root fs level.
     return (uri == "/");
   } // canUpload()
 
 
-  bool handle(ESP8266WebServer &server, HTTPMethod requestMethod, const String &requestUri) override
-  {
+  bool handle(ESP8266WebServer &server, HTTPMethod requestMethod, const String &requestUri) override {
     // ensure that filename starts with '/'
     String fName = requestUri;
     if (!fName.startsWith("/")) {
@@ -159,8 +151,7 @@ public:
 
 
   // uploading process
-  void upload(ESP8266WebServer UNUSED &server, const String UNUSED &_requestUri, HTTPUpload &upload) override
-  {
+  void upload(ESP8266WebServer UNUSED &server, const String UNUSED &_requestUri, HTTPUpload &upload) override {
     // ensure that filename starts with '/'
     String fName = upload.filename;
     if (!fName.startsWith("/")) {
@@ -195,8 +186,7 @@ protected:
 /**
  * Setup everything to make the webserver work.
  */
-void setup(void)
-{
+void setup(void) {
   delay(3000); // wait for serial monitor to start completely.
 
   // Use Serial port for some trace information from the example
@@ -272,8 +262,7 @@ void setup(void)
 
 
 // run the server...
-void loop(void)
-{
+void loop(void) {
   server.handleClient();
 } // loop()
 
