@@ -1,12 +1,10 @@
-/**
- * @file WebServer.ino
- * @brief Example implementation using the ESP8266 WebServer.
- * 
- * See also README.md for instructions and hints.
- * 
- * Changelog:
- * 21.07.2021 creation, first version
- */
+// @file WebServer.ino
+// @brief Example implementation using the ESP8266 WebServer.
+// 
+// See also README.md for instructions and hints.
+// 
+// Changelog:
+// 21.07.2021 creation, first version
 
 #include <Arduino.h>
 #include <ESP8266WebServer.h>
@@ -99,93 +97,86 @@ void handleSysInfo() {
 
 // The FileServerHandler is registered to the web server to support DELETE and UPLOAD of files into the filesystem.
 class FileServerHandler : public RequestHandler {
-public:
-  /**
-    @brief Construct a new File Server Handler object
-    @param fs The file system to be used.
-    @param path Path to the root folder in the file system that is used for serving static data down and upload.
-    @param cache_header Cache Header to be used in replies.
-   */
-  FileServerHandler() {
-    TRACE("FileServerHandler is registered\n");
-  }
-
-
-  /**
-    @brief check wether the request can be handled by this implementation.
-    @param requestMethod method of the http request line.
-    @param requestUri request ressource from the http request line.
-    @return true when method can be handled.
-  */
-  bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override {
-    // can handle POST for uploads and DELETE.
-    return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
-  } // canHandle()
-
-
-  bool canUpload(const String &uri) override {
-    // only allow upload on root fs level.
-    return (uri == "/");
-  } // canUpload()
-
-
-  bool handle(ESP8266WebServer &server, HTTPMethod requestMethod, const String &requestUri) override {
-    // ensure that filename starts with '/'
-    String fName = requestUri;
-    if (!fName.startsWith("/")) {
-      fName = "/" + fName;
+  public:
+    // @brief Construct a new File Server Handler object
+    // @param fs The file system to be used.
+    // @param path Path to the root folder in the file system that is used for serving static data down and upload.
+    // @param cache_header Cache Header to be used in replies.
+    FileServerHandler() {
+      TRACE("FileServerHandler is registered\n");
     }
 
-    if (requestMethod == HTTP_POST) {
-      // all done in upload. no other forms.
 
-    } else if (requestMethod == HTTP_DELETE) {
-      if (LittleFS.exists(fName)) {
-        LittleFS.remove(fName);
+    // @brief check incoming request. Can handle POST for uploads and DELETE.
+    // @param requestMethod method of the http request line.
+    // @param requestUri request ressource from the http request line.
+    // @return true when method can be handled.
+    bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override {
+      return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
+    } // canHandle()
+
+
+    bool canUpload(const String &uri) override {
+      // only allow upload on root fs level.
+      return (uri == "/");
+    } // canUpload()
+
+
+    bool handle(ESP8266WebServer &server, HTTPMethod requestMethod, const String &requestUri) override {
+      // ensure that filename starts with '/'
+      String fName = requestUri;
+      if (!fName.startsWith("/")) {
+        fName = "/" + fName;
       }
-    } // if
 
-    server.send(200); // all done.
-    return (true);
-  } // handle()
+      if (requestMethod == HTTP_POST) {
+        // all done in upload. no other forms.
 
-
-  // uploading process
-  void upload(ESP8266WebServer UNUSED &server, const String UNUSED &_requestUri, HTTPUpload &upload) override {
-    // ensure that filename starts with '/'
-    String fName = upload.filename;
-    if (!fName.startsWith("/")) {
-      fName = "/" + fName;
-    }
-
-    if (upload.status == UPLOAD_FILE_START) {
-      // Open the file
-      if (LittleFS.exists(fName)) {
-        LittleFS.remove(fName);
+      } else if (requestMethod == HTTP_DELETE) {
+        if (LittleFS.exists(fName)) {
+          LittleFS.remove(fName);
+        }
       } // if
-      _fsUploadFile = LittleFS.open(fName, "w");
 
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-      // Write received bytes
-      if (_fsUploadFile)
-        _fsUploadFile.write(upload.buf, upload.currentSize);
+      server.send(200); // all done.
+      return (true);
+    } // handle()
 
-    } else if (upload.status == UPLOAD_FILE_END) {
-      // Close the file
-      if (_fsUploadFile) {
-        _fsUploadFile.close();
+
+    // uploading process
+    void upload(ESP8266WebServer UNUSED &server, const String UNUSED &_requestUri, HTTPUpload &upload) override {
+      // ensure that filename starts with '/'
+      String fName = upload.filename;
+      if (!fName.startsWith("/")) {
+        fName = "/" + fName;
       }
-    } // if
-  }   // upload()
 
-protected:
-  File _fsUploadFile;
+      if (upload.status == UPLOAD_FILE_START) {
+        // Open the file
+        if (LittleFS.exists(fName)) {
+          LittleFS.remove(fName);
+        } // if
+        _fsUploadFile = LittleFS.open(fName, "w");
+
+      } else if (upload.status == UPLOAD_FILE_WRITE) {
+        // Write received bytes
+        if (_fsUploadFile)
+          _fsUploadFile.write(upload.buf, upload.currentSize);
+
+      } else if (upload.status == UPLOAD_FILE_END) {
+        // Close the file
+        if (_fsUploadFile) {
+          _fsUploadFile.close();
+        }
+      } // if
+    }   // upload()
+
+  protected:
+    File _fsUploadFile;
 };
 
 
-/**
- * Setup everything to make the webserver work.
- */
+// Setup everything to make the webserver work.
 void setup(void) {
   delay(3000); // wait for serial monitor to start completely.
 
