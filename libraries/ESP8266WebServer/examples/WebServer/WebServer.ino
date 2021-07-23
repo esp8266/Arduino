@@ -1,8 +1,8 @@
 // @file WebServer.ino
 // @brief Example implementation using the ESP8266 WebServer.
-// 
+//
 // See also README.md for instructions and hints.
-// 
+//
 // Changelog:
 // 21.07.2021 creation, first version
 
@@ -160,8 +160,9 @@ class FileServerHandler : public RequestHandler {
 
       } else if (upload.status == UPLOAD_FILE_WRITE) {
         // Write received bytes
-        if (_fsUploadFile)
+        if (_fsUploadFile) {
           _fsUploadFile.write(upload.buf, upload.currentSize);
+        }
 
       } else if (upload.status == UPLOAD_FILE_END) {
         // Close the file
