@@ -62,6 +62,54 @@ HTTPClient::~HTTPClient()
     }
 }
 
+
+HTTPClient::HTTPClient(HTTPClient&& other): _client(std::move(other._client)),
+    _host(std::move(other._host)), _port(std::move(other._port)), _reuse(std::move(other._reuse)),
+    _tcpTimeout(std::move(other._tcpTimeout)), _useHTTP10(std::move(other._useHTTP10)),
+    _uri(std::move(other._uri)), _protocol(std::move(other._protocol)),
+    _headers(std::move(other._headers)), _userAgent(std::move(other._userAgent)),
+    _base64Authorization(std::move(other._base64Authorization)),
+    _currentHeaders(std::move(other._currentHeaders)),
+    _headerKeysCount(std::move(other._headerKeysCount)),
+    _returnCode(std::move(other._returnCode)), _canReuse(std::move(other._canReuse)),
+    _followRedirects(std::move(other._followRedirects)),
+    _redirectLimit(std::move(other._redirectLimit)), _location(std::move(other._location)),
+    _transferEncoding(std::move(other._transferEncoding)), _payload(std::move(other._payload)) {
+    other._client = nullptr;
+    other._currentHeaders = nullptr;
+    other = HTTPClient();
+}
+
+
+HTTPClient::HTTPClient& operator=(HTTPClient&& other) {
+    _client = std::move(other._client);
+    _host = std::move(other._host);
+    _port = std::move(other._port);
+    _reuse = std::move(other._reuse);
+    _tcpTimeout = std::move(other._tcpTimeout);
+    _useHTTP10 = std::move(other._useHTTP10);
+    _uri = std::move(other._uri);
+    _protocol = std::move(other._protocol);
+    _headers = std::move(other._headers);
+    _userAgent = std::move(other._userAgent);
+    _base64Authorization = std::move(other._base64Authorization);
+    _currentHeaders = std::move(other._currentHeaders);
+    _headerKeysCount = std::move(other._headerKeysCount);
+    _returnCode = std::move(other._returnCode);
+    _canReuse = std::move(other._canReuse);
+    _followRedirects = std::move(other._followRedirects);
+    _redirectLimit = std::move(other._redirectLimit);
+    _location = std::move(other._location);
+    _transferEncoding = std::move(other._transferEncoding);
+    _payload = std::move(other._payload);
+
+    other._client = nullptr;
+    other._currentHeaders = nullptr;
+    other = HTTPClient();
+    return *this;
+}
+
+
 void HTTPClient::clear()
 {
     _returnCode = 0;

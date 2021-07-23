@@ -217,6 +217,9 @@ public:
     const String& getString(void);
     static String errorToString(int error);
 
+    HTTPClient(HTTPClient&& other);
+    HTTPClient& operator=(HTTPClient&& other);
+
 protected:
     struct RequestArgument {
         String key;
