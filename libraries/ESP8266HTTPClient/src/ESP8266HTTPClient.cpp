@@ -28,6 +28,11 @@
 #include <StreamDev.h>
 #include <base64.h>
 
+static_assert(std::is_default_constructible_v<HTTPClient>, "");
+static_assert(!std::is_copy_constructible_v<HTTPClient>, "");
+static_assert(std::is_move_constructible_v<HTTPClient>, "");
+static_assert(std::is_move_assignable_v<HTTPClient>, "");
+
 static int StreamReportToHttpClientReport (Stream::Report streamSendError)
 {
     switch (streamSendError)

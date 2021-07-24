@@ -212,17 +212,6 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
     }
 }
 
-TEST_CASE("Move constructible", "[HTTPClient]")
-{
-   {
-       std::optional<HTTPClient> maybe;
-       maybe = std::make_optional(HTTPClient());
-   }
-   {
-       HTTPClient http(std::move(HTTPClient()));
-   }
-}
-
 void loop()
 {
 }
