@@ -305,8 +305,10 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent;
     String _base64Authorization;
+
+    static const String defaultUserAgent;
+    String _userAgent = defaultUserAgent;
 
     /// Response handling
     std::unique_ptr<RequestArgument[]> _currentHeaders;

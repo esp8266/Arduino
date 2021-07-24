@@ -35,7 +35,8 @@ static_assert(!std::is_copy_constructible_v<HTTPClient>, "");
 static_assert(std::is_move_constructible_v<HTTPClient>, "");
 static_assert(std::is_move_assignable_v<HTTPClient>, "");
 
-static const char defaultUserAgent[] PROGMEM = "ESP8266HTTPClient";
+static const char defaultUserAgentPstr[] PROGMEM = "ESP8266HTTPClient";
+const String HTTPClient::defaultUserAgent = defaultUserAgentPstr;
 
 static int StreamReportToHttpClientReport (Stream::Report streamSendError)
 {
@@ -900,11 +901,7 @@ bool HTTPClient::sendHeader(const char * type)
         header += String(_port);
     }
     header += F("\r\nUser-Agent: ");
-    if (!_userAgent.length()) {
-        header += defaultUserAgent;
-    } else {
-        header += _userAgent;
-    }
+    header += _userAgent;
 
     if (!_useHTTP10) {
         header += F("\r\nAccept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
