@@ -26,10 +26,11 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#include <memory>
 #include <Arduino.h>
 #include <StreamString.h>
 #include <WiFiClient.h>
+
+#include <memory>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
@@ -151,8 +152,10 @@ typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 class HTTPClient
 {
 public:
-    HTTPClient();
-    ~HTTPClient();
+    HTTPClient() = default;
+    ~HTTPClient() = default;
+    HTTPClient(HTTPClient&&) = default;
+    HTTPClient& operator=(HTTPClient&&) = default;
 
 /*
  * Since both begin() functions take a reference to client as a parameter, you need to 
@@ -223,6 +226,64 @@ protected:
         String value;
     };
 
+    // TODO: the common pattern to use the class is to
+    // {
+    //     WiFiClient socket;
+    //     HTTPClient http;
+    //     http.begin(socket, "http://blahblah");
+    // }
+    // in case wificlient supports seamless ref() / unref() of the underlying connection
+    // for both wificlient and wificlientsecure, this may be removed in favour of that approach.
+
+    struct NonOwningClientPtr {
+        NonOwningClientPtr() = default;
+        NonOwningClientPtr(const NonOwningClientPtr&) = delete;
+        NonOwningClientPtr(NonOwningClientPtr&& other) noexcept {
+            *this = std::move(other);
+        }
+
+        ~NonOwningClientPtr() noexcept {
+            if (_ptr) {
+                _ptr->stop();
+            }
+        }
+
+        explicit NonOwningClientPtr(WiFiClient* ptr) noexcept :
+            _ptr(ptr)
+        {}
+
+        explicit operator bool() const {
+            return _ptr != nullptr;
+        }
+
+        WiFiClient* get() const noexcept {
+            return _ptr;
+        }
+
+        WiFiClient& operator*() const {
+            return *_ptr;
+        }
+
+        WiFiClient* operator->() const noexcept {
+            return _ptr;
+        }
+
+        NonOwningClientPtr& operator=(WiFiClient* ptr) noexcept {
+            _ptr = ptr;
+            return *this;
+        }
+
+        NonOwningClientPtr& operator=(const NonOwningClientPtr&) = delete;
+        NonOwningClientPtr& operator=(NonOwningClientPtr&& other) noexcept {
+            _ptr = other._ptr;
+            other._ptr = nullptr;
+            return *this;
+        }
+
+    private:
+        WiFiClient* _ptr = nullptr;
+    };
+
     bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
@@ -232,7 +293,7 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-    WiFiClient* _client;
+    NonOwningClientPtr _client;
 
     /// request handling
     String _host;
@@ -248,8 +309,8 @@ protected:
     String _base64Authorization;
 
     /// Response handling
-    RequestArgument* _currentHeaders = nullptr;
-    size_t           _headerKeysCount = 0;
+    std::unique_ptr<RequestArgument[]> _currentHeaders;
+    size_t _headerKeysCount = 0;
 
     int _returnCode = 0;
     int _size = -1;
@@ -260,7 +321,5 @@ protected:
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     std::unique_ptr<StreamString> _payload;
 };
-
-
 
 #endif /* ESP8266HTTPClient_H_ */
