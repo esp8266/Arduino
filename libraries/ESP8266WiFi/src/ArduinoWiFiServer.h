@@ -28,12 +28,12 @@
 #endif
 
 template <class TServer, class TClient>
-class ArduinoComptibleWiFiServerTemplate : public TServer {
+class ArduinoCompatibleWiFiServerTemplate : public TServer {
 public:
 
-  ArduinoComptibleWiFiServerTemplate(const IPAddress& addr, uint16_t port) : TServer(addr, port) {}
-  ArduinoComptibleWiFiServerTemplate(uint16_t port) : TServer(port) {}
-  virtual ~ArduinoComptibleWiFiServerTemplate() {}
+  ArduinoCompatibleWiFiServerTemplate(const IPAddress& addr, uint16_t port) : TServer(addr, port) {}
+  ArduinoCompatibleWiFiServerTemplate(uint16_t port) : TServer(port) {}
+  virtual ~ArduinoCompatibleWiFiServerTemplate() {}
 
   // https://www.arduino.cc/en/Reference/EthernetServerAccept
   TClient accept() {
@@ -138,7 +138,7 @@ private:
   }
 };
 
-typedef ArduinoComptibleWiFiServerTemplate<WiFiServer, WiFiClient> ArduinoWiFiServer;
-typedef ArduinoComptibleWiFiServerTemplate<WiFiServerSecure, WiFiClientSecure> ArduinoWiFiServerSecure;
+typedef ArduinoCompatibleWiFiServerTemplate<WiFiServer, WiFiClient> ArduinoWiFiServer;
+typedef ArduinoCompatibleWiFiServerTemplate<WiFiServerSecure, WiFiClientSecure> ArduinoWiFiServerSecure;
 
 #endif
