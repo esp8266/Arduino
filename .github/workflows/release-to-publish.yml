@@ -41,5 +41,10 @@ jobs:
         submodules: false
         fetch-depth: 0
     - name: Deploy updated JSON
+      env:
+        TRAVIS_BUILD_DIR: ${{ github.workspace }}
+        BUILD_TYPE: package
+        CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        GHCI_DEPLOY_KEY: ${{ secrets.GHCI_DEPLOY_KEY }}
       run: |
            bash ./package/deploy_package_index.sh
