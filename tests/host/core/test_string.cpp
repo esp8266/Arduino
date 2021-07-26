@@ -594,3 +594,13 @@ TEST_CASE("String chaining", "[core][String]")
     REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
   }
 }
+
+TEST_CASE("String concat OOB #8198", "[core][String]")
+{
+    char *p = (char*)malloc(16);
+    memset(p, 'x', 16);
+    String s = "abcd";
+    s.concat(p, 16);
+    REQUIRE(!strcmp(s.c_str(), "abcdxxxxxxxxxxxxxxxx"));
+    free(p);
+}
