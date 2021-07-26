@@ -1083,6 +1083,17 @@ bool WiFiClientSecureCtx::_installClientX509Validator() {
   return true;
 }
 
+std::shared_ptr<unsigned char> WiFiClientSecureCtx::_alloc_iobuf(size_t sz)
+{ // Allocate buffer with preference to IRAM
+  HeapSelectIram primary;
+  auto sptr = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[sz], std::default_delete<unsigned char[]>());
+  if (!sptr) {
+    HeapSelectDram alternate;
+    sptr = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[sz], std::default_delete<unsigned char[]>());
+  }
+  return sptr;
+}
+
 // Called by connect() to do the actual SSL setup and handshake.
 // Returns if the SSL handshake succeeded.
 bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
@@ -1099,17 +1110,12 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  //C This was borrowed from @earlephilhower PoC, to exemplify the use of IRAM.
-  //C Is this something we want to keep in the final release?
-  { // ESP.setIramHeap(); would be an alternative to using a class to set a scope for IRAM usage.
-    HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
-  } // ESP.resetHeap();
+  _iobuf_in = _alloc_iobuf(_iobuf_in_size);
+  _iobuf_out = _alloc_iobuf(_iobuf_out_size);
+  DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+  DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+  DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+  DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
 
   if (!_sc || !_iobuf_in || !_iobuf_out) {
     _freeSSL(); // Frees _sc, _iobuf*
@@ -1225,15 +1231,12 @@ bool WiFiClientSecureCtx::_connectSSLServerRSA(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  { // ESP.setIramHeap();
-    HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
-  }	// ESP.resetHeap();
+  _iobuf_in = _alloc_iobuf(_iobuf_in_size);
+  _iobuf_out = _alloc_iobuf(_iobuf_out_size);
+  DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+  DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+  DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+  DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
@@ -1272,15 +1275,12 @@ bool WiFiClientSecureCtx::_connectSSLServerEC(const X509List *chain,
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
   _eng = &_sc_svr->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
-  { // ESP.setIramHeap();
-    HeapSelectIram ephemeral;
-    _iobuf_in = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
-    _iobuf_out = std::shared_ptr<unsigned char>(new (std::nothrow) unsigned char[_iobuf_out_size], std::default_delete<unsigned char[]>());
-    DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
-    DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
-    DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
-    DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
-  }	// ESP.resetHeap();
+  _iobuf_in = _alloc_iobuf(_iobuf_in_size);
+  _iobuf_out = _alloc_iobuf(_iobuf_out_size);
+  DBG_MMU_PRINTF("\n_iobuf_in:       %p\n", _iobuf_in.get());
+  DBG_MMU_PRINTF(  "_iobuf_out:      %p\n", _iobuf_out.get());
+  DBG_MMU_PRINTF(  "_iobuf_in_size:  %u\n", _iobuf_in_size);
+  DBG_MMU_PRINTF(  "_iobuf_out_size: %u\n", _iobuf_out_size);
 
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
