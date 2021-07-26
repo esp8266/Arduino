@@ -16,7 +16,7 @@ pushd esp8266.github.io
 
 # Copy from published release, ensure JSON valid
 rm -f stable/package_esp8266com_index.json
-wget "https://github.com/esp8266/Arduino/releases/download/$tag/package_esp8266com_index.json" -O stable/package_esp8266com_index.json
+wget "https://github.com/esp8266/Arduino/releases/download/"$tag"/package_esp8266com_index.json" -O stable/package_esp8266com_index.json
 cat stable/package_esp8266com_index.json | jq empty
 
 git add stable/package_esp8266com_index.json
