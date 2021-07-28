@@ -28,7 +28,8 @@
 #include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
 #include <LwipIntf.h> // LwipIntf::stateUpCB()
-#include "lwip/igmp.h"
+#include <lwip/igmp.h>
+#include <lwip/prot/dns.h>
 
 namespace esp8266
 {
@@ -130,6 +131,7 @@ bool MDNSResponder::close(void)
         _announce(false, true);
         _resetProbeStatus(false);   // Stop probing
         _releaseServiceQueries();
+        _releaseServices();
         _releaseUDPContext();
         _releaseHostname();
 
@@ -1130,7 +1132,7 @@ bool MDNSResponder::hasAnswerTxts(const MDNSResponder::hMDNSServiceQuery p_hServ
     MDNSResponder::answerTxts
 
     Returns all TXT items for the given service as a ';'-separated string.
-    If not already existing; the string is alloced, filled and attached to the answer.
+    If not already existing; the string is allocated, filled and attached to the answer.
 
 */
 const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,
@@ -1163,7 +1165,7 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
 
     Set a global callback for probe results. The callback is called, when probing
     for the host domain (or a service domain, without specific probe result callback)
-    failes or succeedes.
+    fails or succeeds.
     In the case of failure, the domain name should be changed via 'setHostname' or 'setServiceName'.
     When succeeded, the host or service domain will be announced by the MDNS responder.
 
@@ -1189,7 +1191,7 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn)
     MDNSResponder::setServiceProbeResultCallback
 
     Set a service specific callback for probe results. The callback is called, when probing
-    for the service domain failes or succeedes.
+    for the service domain fails or succeeds.
     In the case of failure, the service name should be changed via 'setServiceName'.
     When succeeded, the service domain will be announced by the MDNS responder.
 
@@ -1304,7 +1306,7 @@ bool MDNSResponder::_joinMulticastGroups(void)
     {
         if (netif_is_up(pNetIf))
         {
-#ifdef MDNS_IPV4_SUPPORT
+#ifdef MDNS_IP4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
             if (!(pNetIf->flags & NETIF_FLAG_IGMP))
             {
@@ -1354,7 +1356,7 @@ bool MDNSResponder::_leaveMulticastGroups()
             bResult = true;
 
             // Leave multicast group(s)
-#ifdef MDNS_IPV4_SUPPORT
+#ifdef MDNS_IP4_SUPPORT
             ip_addr_t   multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
             if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
             {

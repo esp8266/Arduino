@@ -97,8 +97,8 @@ bool MDNSResponder::_process(bool p_bUserContext)
 bool MDNSResponder::_restart(void)
 {
 
-    return ((_resetProbeStatus(true)) &&         // Stop and restart probing
-            (_allocUDPContext()));               // Restart UDP
+    return ((_resetProbeStatus(true/*restart*/)) &&  // Stop and restart probing
+            (_allocUDPContext()));                   // Restart UDP
 }
 
 /**
@@ -395,7 +395,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                             IPAddress localIPAddress(m_pUDPContext->getInputNetif()->ip_addr);
                             if (((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress == localIPAddress)
                             {
-                                // SAME IP address -> We've received an old message from ourselfs (same IP)
+                                // SAME IP address -> We've received an old message from ourselves (same IP)
                                 DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Tiebreak (IP4) WON (was an old message)!\n")););
                                 m_HostProbeInformation.m_bTiebreakNeeded = false;
                             }
@@ -410,7 +410,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                                 }
                                 else    // WON tiebreak
                                 {
-                                    //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselfs -> Just ignore
+                                    //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselves -> Just ignore
                                     DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Tiebreak (IP4) WON (higher IP)!\n")););
                                     m_HostProbeInformation.m_bTiebreakNeeded = false;
                                 }
@@ -501,7 +501,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                                         (hostDomain == ((stcMDNS_RRAnswerSRV*)pKnownRRAnswer)->m_SRVDomain))    // Host domain match
                                 {
 
-                                    // We've received an old message from ourselfs (same SRV)
+                                    // We've received an old message from ourselves (same SRV)
                                     DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Tiebreak (SRV) won (was an old message)!\n")););
                                     pService->m_ProbeInformation.m_bTiebreakNeeded = false;
                                 }
@@ -516,7 +516,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                                     }
                                     else    // WON tiebreak
                                     {
-                                        //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselfs -> Just ignore
+                                        //TiebreakState = TiebreakState_Won;    // We received an 'old' message from ourselves -> Just ignore
                                         DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Tiebreak (SRV) won (higher)!\n")););
                                         pService->m_ProbeInformation.m_bTiebreakNeeded = false;
                                     }
@@ -1560,7 +1560,7 @@ bool MDNSResponder::_announce(bool p_bAnnounce,
 
         bResult = true;
 
-        sendParameter.m_bResponse = true;           // Announces are 'Unsolicited authorative responses'
+        sendParameter.m_bResponse = true;           // Announces are 'Unsolicited authoritative responses'
         sendParameter.m_bAuthorative = true;
         sendParameter.m_bUnannounce = !p_bAnnounce; // When unannouncing, the TTL is set to '0' while creating the answers
 
@@ -1612,7 +1612,7 @@ bool MDNSResponder::_announceService(stcMDNSService& p_rService,
     if (ProbingStatus_Done == p_rService.m_ProbeInformation.m_ProbingStatus)
     {
 
-        sendParameter.m_bResponse = true;           // Announces are 'Unsolicited authorative responses'
+        sendParameter.m_bResponse = true;           // Announces are 'Unsolicited authoritative responses'
         sendParameter.m_bAuthorative = true;
         sendParameter.m_bUnannounce = !p_bAnnounce; // When unannouncing, the TTL is set to '0' while creating the answers
 

@@ -79,13 +79,13 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
-      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta, _tls_min, _tls_max);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
       return result;
     } else if (_sk && _sk->isEC()) {
-      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta, _tls_min, _tls_max);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
@@ -99,6 +99,17 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   // Something weird, return a no-op object
   optimistic_yield(1000);
   return WiFiClientSecure();
+}
+
+bool WiFiServerSecure::setSSLVersion(uint32_t min, uint32_t max) {
+  if ( ((min != BR_TLS10) && (min != BR_TLS11) && (min != BR_TLS12)) ||
+       ((max != BR_TLS10) && (max != BR_TLS11) && (max != BR_TLS12)) ||
+       (max < min) ) {
+    return false; // Invalid options
+  }
+  _tls_min = min;
+  _tls_max = max;
+  return true;
 }
 
 };

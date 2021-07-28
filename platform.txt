@@ -5,8 +5,8 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-name=ESP8266 Boards (3.0.0-dev)
-version=3.0.0-dev
+name=ESP8266 Boards (3.1.0-dev)
+version=3.1.0-dev
 
 # These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
@@ -17,13 +17,15 @@ runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.sizes={runtime.platform.path}/tools/sizes.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
+runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
+runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
-compiler.warning_flags=-w
-compiler.warning_flags.none=-w
-compiler.warning_flags.default=
-compiler.warning_flags.more=-Wall
-compiler.warning_flags.all=-Wall -Wextra
+compiler.warning_flags=-w -Werror=return-type
+compiler.warning_flags.none=-w -Werror=return-type
+compiler.warning_flags.default=-Werror=return-type
+compiler.warning_flags.more=-Wall -Werror=return-type
+compiler.warning_flags.all=-Wall -Wextra -Werror=return-type
 
 build.lwip_lib=-llwip_gcc
 build.lwip_include=lwip/include
@@ -54,21 +56,21 @@ compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
-compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.waveform} {build.mmuflags} {build.non32xferflags}
+compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -free -fipa-pta -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
 
 compiler.S.cmd=xtensa-lx106-elf-gcc
-compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls -I{runtime.tools.xtensa-lx106-elf-gcc.path}/include/
+compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls "-I{runtime.tools.xtensa-lx106-elf-gcc.path}/include/"
 
-compiler.c.elf.flags=  -g {compiler.warning_flags} -Os -nostdlib -Wl,--no-check-sections -u app_entry {build.float} -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/lib/{build.sdk}" "-L{build.path}" "-L{compiler.libc.path}/lib" "-Tlocal.eagle.flash.ld" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,spi_flash_read
+compiler.c.elf.flags=-g {compiler.warning_flags} -Os -nostdlib -Wl,--no-check-sections -u app_entry {build.float} -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/lib/{build.sdk}" "-L{build.path}" "-L{compiler.libc.path}/lib" "-Tlocal.eagle.flash.ld" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,spi_flash_read
 
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lhal -lphy -lpp -lnet80211 {build.lwip_lib} -lwpa -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig -lairkiss -lwpa2 {build.stdcpp_lib} -lm -lc -lgcc
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c {compiler.warning_flags} {build.stacksmash_flags} -Os -g -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.waveform} {build.mmuflags} {build.non32xferflags}
+compiler.cpp.flags=-c {compiler.warning_flags} {build.stacksmash_flags} -Os -g -free -fipa-pta -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -80,7 +82,7 @@ compiler.elf2hex.flags=
 
 compiler.size.cmd=xtensa-lx106-elf-size
 
-# This can be overriden in boards.txt
+# This can be overridden in boards.txt
 build.extra_flags=-DESP8266
 
 # These can be overridden in platform.local.txt
@@ -94,17 +96,15 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs git
-recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
-recipe.hooks.prebuild.10.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
+recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 ## Build the app.ld linker file
-recipe.hooks.linking.prelink.11.pattern.windows=cmd /v:on /e:on /c "if not exist {build.path}/ld_h/ (mkdir {build.path}/ld_h/ )"
-recipe.hooks.linking.prelink.12.pattern.windows=copy "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
-recipe.hooks.linking.prelink.11.pattern=mkdir -p "{build.path}/ld_h/"
-recipe.hooks.linking.prelink.12.pattern=cp "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
-recipe.hooks.linking.prelink.13.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{build.path}/ld_h/local.eagle.flash.ld.h" -o "{build.path}/local.eagle.flash.ld"
-recipe.hooks.linking.prelink.14.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
+recipe.hooks.linking.prelink.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkdir}" -p "{build.path}/ld_h/"
+recipe.hooks.linking.prelink.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.cp}" "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
+recipe.hooks.linking.prelink.3.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{build.path}/ld_h/local.eagle.flash.ld.h" -o "{build.path}/local.eagle.flash.ld"
+recipe.hooks.linking.prelink.4.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
 
 ## Compile c files
 recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.c.flags} -D{build.sdk}=1 -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {build.flash_flags} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
@@ -119,15 +119,15 @@ recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.fla
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group  "-L{build.path}"
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group "-L{build.path}"
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
-recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
+recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
+recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -157,10 +157,9 @@ tools.esptool.upload.params.quiet=
 
 # First, potentially perform an erase or nothing
 # Next, do the binary upload
-# Combined in one rule because Arduino doesn't suport upload.1.pattern/upload.3.pattern
-tools.esptool.upload.pattern="{cmd}" "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
-
-tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
+# Combined in one rule because Arduino doesn't support upload.1.pattern/upload.3.pattern
+tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe

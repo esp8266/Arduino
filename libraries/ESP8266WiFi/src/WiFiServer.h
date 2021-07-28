@@ -23,7 +23,7 @@
 #define wifiserver_h
 
 extern "C" {
-  #include "include/wl_definitions.h"
+  #include "wl_definitions.h"
 
   struct tcp_pcb;
 }
@@ -34,7 +34,7 @@ extern "C" {
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
 // maximum number of incoming *pending clients*.  Default number of possibly
 // simultaneously pending clients is defined in WiFiServer.cpp
-// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can overide it at runtime from
+// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can override it at runtime from
 // sketch:
 //      WiFiServer::begin(port, max-simultaneous-pending-clients);
 //

@@ -68,7 +68,7 @@ void Netdump::reset()
 
 void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
-    out.printf("netDump starting\r\n");
+    out.printf_P(PSTR("netDump starting\r\n"));
     setCallback([&out, ndd, this](const Packet & ndp)
     {
         printDumpProcess(out, ndd, ndp);
@@ -84,12 +84,17 @@ void Netdump::fileDump(File& outfile, const Filter nf)
         fileDumpProcess(outfile, ndp);
     }, nf);
 }
-void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
+bool Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
 
     if (!packetBuffer)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
+
+        if (!packetBuffer)
+        {
+            return false;
+        }
     }
     bufferIndex = 0;
 
@@ -97,6 +102,7 @@ void Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
     {
         tcpDumpLoop(tcpDumpServer, nf);
     });
+    return true;
 }
 
 void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int success)
@@ -134,7 +140,7 @@ void Netdump::writePcapHeader(Stream& s) const
 
 void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const
 {
-    out.printf_P(PSTR("%8d %s"), np.getTime(), np.toString(ndd).c_str());
+    out.printf_P(PSTR("%8lld %s"), np.getTime(), np.toString(ndd).c_str());
 }
 
 void Netdump::fileDumpProcess(File& outfile, const Packet& np) const

@@ -15,6 +15,9 @@ jobs:
   build-linux:
     name: Build ${{ matrix.chunk }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -30,7 +33,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -47,6 +50,9 @@ jobs:
   build-debug-ipv6:
     name: Debug IPv6 ${{ matrix.chunk }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -62,7 +68,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketches
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -90,7 +96,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-windows-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -102,7 +108,7 @@ jobs:
       run: |
         # Windows has python3 already installed, but it's called "python".
         # Copy python.exe to the proper name so scripts "just work".
-        copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe")
+        try { Get-Command python3 } catch { copy (get-command python).source (get-command python).source.Replace("python.exe", "python3.exe") }
         bash ./tests/build.sh
 
 
@@ -110,6 +116,9 @@ jobs:
   build-mac:
     name: Mac
     runs-on: macOS-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -122,7 +131,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-mac-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build Sketch
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -139,6 +148,9 @@ jobs:
   build-pio:
     name: Build Platform.IO
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -163,6 +175,9 @@ jobs:
   host-tests:
     name: Host tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -184,6 +199,9 @@ jobs:
   documentation:
     name: Documentation
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -208,6 +226,9 @@ jobs:
   style-check:
     name: Style and formatting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -229,6 +250,9 @@ jobs:
   mock-check:
     name: Mock trivial test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -248,6 +272,9 @@ jobs:
   boards-check:
     name: Boards.txt check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -260,7 +287,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ./tools/dist
-        key: key-linux-toolchain
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Boards.txt diff
       env:
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
@@ -268,3 +295,22 @@ jobs:
       run: |
           bash ./tests/ci/build_boards.sh
           bash ./tests/ci/eboot_test.sh
+          bash ./tests/ci/pkgrefs_test.sh
+
+
+# Validate orthography
+  code-spell:
+    name: Check spelling
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Run codespell
+      uses: codespell-project/actions-codespell@master
+      with:
+        skip: ./libraries/ESP8266SdFat,./libraries/LittleFS/lib,./tools/pyserial,./tools/sdk,./tools/esptool,./libraries/SoftwareSerial,./libraries/Ethernet,./github/workflows,./libraries/ESP8266HTTPUpdateServer/examples/SecureBearSSLUpdater/SecureBearSSLUpdater.ino,./libraries/esp8266/examples/RTCUserMemory/RTCUserMemory.ino,./libraries/esp8266/examples/StreamString/StreamString.ino,./libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation.ino,./libraries/ESP8266WiFi/examples/BearSSL_Sessions/BearSSL_Sessions.ino,./libraries/ESP8266WebServer/examples/HelloServerBearSSL/HelloServerBearSSL.ino,./libraries/ESP8266WebServer/examples/HttpHashCredAuth/HttpHashCredAuth.ino,./cores/esp8266/spiffs,./tests/device/test_libc/libm_string.c, ./libraries/Netdump/examples/Netdump/Netdump.ino,./libraries/ESP8266WiFi/examples/BearSSL_Server,./cores/esp8266/LwipIntfDev.h
+        ignore_words_list: ESP8266,esp8266,esp,dout,DOUT,ser,ans

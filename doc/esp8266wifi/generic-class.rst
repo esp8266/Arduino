@@ -32,7 +32,7 @@ For the SoftAP interface, when the interface is brought up, any servers should b
 
 A detailed explanation of ``WiFiEventHandler`` can be found in the section with `examples :arrow\_right: <generic-examples.rst>`__ dedicated specifically to the Generic Class..
 
-Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available inside examples folder of the ESP8266WiFi library.
+Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available in the examples folder of the ESP8266WiFi library.
 
 
 persistent
@@ -42,30 +42,63 @@ persistent
 
     WiFi.persistent(persistent)
 
-ESP8266 is able to reconnect to the last used Wi-Fi network or establishes the same Access Point upon power up or reset.
+Starting from version 3 of this core, **persistence is disabled by default
+and WiFi does not start automatically at boot** (see PR `#7902 <https://github.com/esp8266/Arduino/pull/7902>`__).
+
+Previously, SDK was automatically starting WiFi at boot.  This was probably
+intended for the Espressif AT FW which is interactive and preserves WiFi
+state across reboots.  This behavior is generally irrelevant with the
+Arduino API because sketches start with ``WiFi.begin()`` or
+``WiFi.softAP()``.
+
+This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
+enable radio as usual.  It also smooths current spikes at boot and decreases
+DHCP stress.
+
+Legacy behavior can be restored by calling ``enableWiFiAtBootTime()`` from
+anywhere in the code (it is a weak void function intended to play with the
+linker).
+
+.. code:: cpp
+
+    #include <ESP8266WiFi.h>
+
+    void setup () {
+    #ifdef WIFI_IS_OFF_AT_BOOT
+        enableWiFiAtBootTime(); // can be called from anywhere with the same effect
+    #endif
+        ....
+    }
+
+When legacy behavior is restored thanks to this call,
+ESP8266 is able to reconnect to the last used WiFi network or establishes the same Access Point upon power up or reset.
 By default, these settings are written to specific sectors of flash memory every time they are changed in ``WiFi.begin(ssid, passphrase)`` or ``WiFi.softAP(ssid, passphrase, channel)``, and when ``WiFi.disconnect`` or ``WiFi.softAPdisconnect`` is invoked.
 Frequently calling these functions could cause wear on the flash memory (see issue `#1054 <https://github.com/esp8266/Arduino/issues/1054>`__).
 
-Once ``WiFi.persistent(false)`` is called, ``WiFi.begin``, ``WiFi.disconnect``, ``WiFi.softAP``, or ``WiFi.softAPdisconnect`` only changes the current in-memory Wi-Fi settings, and does not affect the Wi-Fi settings stored in flash memory.
+Once ``WiFi.persistent(false)`` is called, ``WiFi.begin``, ``WiFi.disconnect``, ``WiFi.softAP``, or ``WiFi.softAPdisconnect`` only changes the current in-memory WiFi settings, and does not affect the WiFi settings stored in flash memory.
 
 mode
 ~~~~
 
 .. code:: cpp
 
-    WiFi.mode(m)
+    bool mode(WiFiMode_t m)
 
--  ``WiFi.mode(m)``: set mode to ``WIFI_AP``, ``WIFI_STA``,
-   ``WIFI_AP_STA`` or ``WIFI_OFF``
+Switches to one of the regular WiFi modes, where ``m`` is one of:
+
+-  ``WIFI_OFF``: turn WiFi off.
+-  ``WIFI_STA``: switch to `Station (STA) <readme.rst#station>`__ mode.
+-  ``WIFI_AP``: switch to `Access Point (AP) <readme.rst#soft-access-point>`__ mode.
+-  ``WIFI_AP_STA``: enable both Station (STA) and Access Point (AP) mode.
 
 getMode
 ~~~~~~~
 
 .. code:: cpp
 
-    WiFiMode_t WiFi.getMode()
+    WiFiMode_t getMode()
 
--  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes above)
+Gets the current WiFi mode (one out of four regular modes above).
 
 WiFi power management, DTIM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,6 +177,41 @@ getPhyMode
 
 Gets the WiFi radio phy mode that is currently set.
 
+forceSleepBegin
+~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  forceSleepBegin (uint32 sleepUs=0)
+
+Saves the currently set WiFi mode and starts forced modem sleep for the specified time (us)
+
+forceSleepWake
+~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  forceSleepWake ()
+
+Called after `forceSleepBegin()`. Restores the previous WiFi mode and attempts reconnection when STA was active.
+
+shutdown and resumeFromShutdown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool  shutdown (WiFiState& state)
+    bool  shutdown (WiFiState& state, uint32 sleepUs)
+    bool  resumeFromShutdown (WiFiState& state)
+    bool  shutdownValidCRC (const WiFiState& state)
+
+Stores the STA interface IP configuration in the specified ``state`` struct and calls ``forceSleepBegin(sleepUs)``.
+Restores STA interface configuration from the ``state`` and calls ``forceSleepWake()``.
+
+These methods are intended to be used in low-power scenarios, e.g. where ESP.deepSleep is used between actions to preserve battery power. It is the user's responsibility to preserve the WiFiState between ``shutdown()`` and ``resumeFromShutdown()`` by storing it in the RTC user data and/or flash memory.
+
+See `WiFiShutdown.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiShutdown/WiFiShutdown.ino>`__ for an example of usage.
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -153,8 +221,6 @@ Other Function Calls
     WiFiSleepType_t  getSleepMode ()
     bool  enableSTA (bool enable)
     bool  enableAP (bool enable)
-    bool  forceSleepBegin (uint32 sleepUs=0)
-    bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
 
     appeared with SDK pre-V3:

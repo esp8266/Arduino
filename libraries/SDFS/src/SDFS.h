@@ -47,7 +47,7 @@ class SDFSConfig : public FSConfig
 public:
     static constexpr uint32_t FSId = 0x53444653;
 
-    SDFSConfig(uint8_t csPin = 4, SPISettings spi = SD_SCK_MHZ(10)) : FSConfig(FSId, false), _csPin(csPin), _part(0), _spiSettings(spi)  { }
+    SDFSConfig(uint8_t csPin = 4, uint32_t spi = SD_SCK_MHZ(10)) : FSConfig(FSId, false), _csPin(csPin), _part(0), _spiSettings(spi)  { }
 
     SDFSConfig setAutoFormat(bool val = true) {
         _autoFormat = val;
@@ -57,7 +57,7 @@ public:
         _csPin = pin;
         return *this;
     }
-    SDFSConfig setSPI(SPISettings spi) {
+    SDFSConfig setSPI(uint32_t spi) {
         _spiSettings = spi;
         return *this;
     }
@@ -67,9 +67,9 @@ public:
     }
 
     // Inherit _type and _autoFormat
-    uint8_t     _csPin;
-    uint8_t     _part;
-    SPISettings _spiSettings;
+    uint8_t   _csPin;
+    uint8_t   _part;
+    uint32_t  _spiSettings;
 };
 
 class SDFSImpl : public FSImpl
@@ -97,11 +97,11 @@ public:
             return false;
         }
         info.maxOpenFiles = 999; // TODO - not valid
-        info.blockSize = _fs.vol()->blocksPerCluster() * 512;
+        info.blockSize = _fs.vol()->sectorsPerCluster() * _fs.vol()->bytesPerSector();
         info.pageSize = 0; // TODO ?
         info.maxPathLength = 255; // TODO ?
-        info.totalBytes =_fs.vol()->volumeBlockCount() * 512LL;
-        info.usedBytes = info.totalBytes - (_fs.vol()->freeClusterCount() * _fs.vol()->blocksPerCluster() * 512LL);
+        info.totalBytes =_fs.vol()->clusterCount() * info.blockSize;
+        info.usedBytes = info.totalBytes - (_fs.vol()->freeClusterCount() * _fs.vol()->sectorsPerCluster() * _fs.vol()->bytesPerSector());
         return true;
     }
 
@@ -149,14 +149,14 @@ public:
 
     bool begin() override {
         if (_mounted) {
-            end();
+            return true;
         }
         _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         if (!_mounted && _cfg._autoFormat) {
             format();
             _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         }
-	sdfat::SdFile::dateTimeCallback(dateTimeCB);
+	sdfat::FsDateTime::setCallback(dateTimeCB);
         return _mounted;
     }
 
@@ -176,7 +176,7 @@ public:
         return _fs.vol()->fatType();
     }
     size_t blocksPerCluster() {
-        return _fs.vol()->blocksPerCluster();
+        return _fs.vol()->sectorsPerCluster();
     }
     size_t totalClusters() {
         return _fs.vol()->clusterCount();
@@ -185,7 +185,7 @@ public:
         return (totalClusters() / blocksPerCluster());
     }
     size_t clusterSize() {
-        return blocksPerCluster() * 512; // 512b block size
+        return blocksPerCluster() * _fs.vol()->bytesPerSector();
     }
     size_t size() {
         return (clusterSize() * totalClusters());
@@ -264,7 +264,7 @@ protected:
 class SDFSFileImpl : public FileImpl
 {
 public:
-    SDFSFileImpl(SDFSImpl *fs, std::shared_ptr<sdfat::File> fd, const char *name)
+    SDFSFileImpl(SDFSImpl *fs, std::shared_ptr<sdfat::File32> fd, const char *name)
         : _fs(fs), _fd(fd), _opened(true)
     {
         _name = std::shared_ptr<char>(new char[strlen(name) + 1], std::default_delete<char[]>());
@@ -279,7 +279,7 @@ public:
 
     int availableForWrite() override
     {
-        return _opened ? _fd->availableForWrite() : 0;
+        return _opened ? _fd->availableSpaceForWrite() : 0;
     }
 
     size_t write(const uint8_t *buf, size_t size) override
@@ -287,7 +287,7 @@ public:
         return _opened ? _fd->write(buf, size) : -1;
     }
 
-    size_t read(uint8_t* buf, size_t size) override
+    int read(uint8_t* buf, size_t size) override
     {
         return _opened ? _fd->read(buf, size) : -1;
     }
@@ -295,7 +295,6 @@ public:
     void flush() override
     {
         if (_opened) {
-            _fd->flush();
             _fd->sync();
         }
     }
@@ -375,15 +374,15 @@ public:
 
     bool isDirectory() const override
     {
-        return _opened ? _fd->isDirectory() : false;
+        return _opened ? _fd->isDir() : false;
     }
 
     time_t getLastWrite() override {
         time_t ftime = 0;
         if (_opened && _fd) {
-            sdfat::dir_t tmp;
+            sdfat::DirFat_t tmp;
             if (_fd.get()->dirEntry(&tmp)) {
-                ftime = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
+                ftime = SDFSImpl::FatToTimeT(*(uint16_t*)tmp.modifyDate, *(uint16_t*)tmp.modifyTime);
             }
         }
         return ftime;
@@ -392,19 +391,17 @@ public:
     time_t getCreationTime() override {
         time_t ftime = 0;
         if (_opened && _fd) {
-            sdfat::dir_t tmp;
+            sdfat::DirFat_t tmp;
             if (_fd.get()->dirEntry(&tmp)) {
-                ftime = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
+                ftime = SDFSImpl::FatToTimeT(*(uint16_t*)tmp.createDate, *(uint16_t*)tmp.createTime);
             }
         }
         return ftime;
     }
 
-
-
 protected:
     SDFSImpl*                     _fs;
-    std::shared_ptr<sdfat::File>  _fd;
+    std::shared_ptr<sdfat::File32>  _fd;
     std::shared_ptr<char>         _name;
     bool                          _opened;
 };
@@ -412,7 +409,7 @@ protected:
 class SDFSDirImpl : public DirImpl
 {
 public:
-    SDFSDirImpl(const String& pattern, SDFSImpl* fs, std::shared_ptr<sdfat::File> dir, const char *dirPath = nullptr)
+    SDFSDirImpl(const String& pattern, SDFSImpl* fs, std::shared_ptr<sdfat::File32> dir, const char *dirPath = nullptr)
         : _pattern(pattern), _fs(fs), _dir(dir), _valid(false), _dirPath(nullptr)
     {
         if (dirPath) {
@@ -487,17 +484,17 @@ public:
     {
         const int n = _pattern.length();
         do {
-            sdfat::File file;
+            sdfat::File32 file;
             file.openNext(_dir.get(), sdfat::O_READ);
             if (file) {
                 _valid = 1;
                 _size = file.fileSize();
                 _isFile = file.isFile();
-                _isDirectory = file.isDirectory();
-                sdfat::dir_t tmp;
+                _isDirectory = file.isDir();
+                sdfat::DirFat_t tmp;
                 if (file.dirEntry(&tmp)) {
-                    _time = SDFSImpl::FatToTimeT(tmp.lastWriteDate, tmp.lastWriteTime);
-                    _creation = SDFSImpl::FatToTimeT(tmp.creationDate, tmp.creationTime);
+                    _time = SDFSImpl::FatToTimeT(*(uint16_t*)tmp.modifyDate, *(uint16_t*)tmp.modifyTime);
+                    _creation = SDFSImpl::FatToTimeT(*(uint16_t*)tmp.createDate, *(uint16_t*)tmp.createTime);
 		} else {
                     _time = 0;
                     _creation = 0;
@@ -521,7 +518,7 @@ public:
 protected:
     String                       _pattern;
     SDFSImpl*                    _fs;
-    std::shared_ptr<sdfat::File> _dir;
+    std::shared_ptr<sdfat::File32> _dir;
     bool                         _valid;
     char                         _lfn[64];
     time_t                       _time;

@@ -39,12 +39,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifdef WAVEFORM_LOCKED_PHASE
-
-#include "core_esp8266_waveform_phase.h"
+#include "core_esp8266_waveform.h"
 #include <Arduino.h>
+#include "debug.h"
 #include "ets_sys.h"
 #include <atomic>
+
+
+extern "C" void enablePhaseLockedWaveform (void)
+{
+   // Does nothing, added to app to enable linking these versions
+   // of the waveform functions instead of the default.
+   DEBUGV("Enabling phase locked waveform generator\n");
+}
+
+// No-op calls to override the PWM implementation
+extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
+extern "C" IRAM_ATTR bool _stopPWM_weak(int pin) { (void) pin; return false; }
+extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
+
 
 // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
 constexpr bool ISCPUFREQ160MHZ = clockCyclesPerMicrosecond() == 160;
@@ -98,7 +111,7 @@ namespace {
 }
 
 // Interrupt on/off control
-static ICACHE_RAM_ATTR void timer1Interrupt();
+static IRAM_ATTR void timer1Interrupt();
 
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
@@ -112,7 +125,7 @@ static void initTimer() {
   timer1_write(IRQLATENCYCCYS); // Cause an interrupt post-haste
 }
 
-static void ICACHE_RAM_ATTR deinitTimer() {
+static void IRAM_ATTR deinitTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
   timer1_disable();
   timer1_isr_init();
@@ -122,7 +135,7 @@ static void ICACHE_RAM_ATTR deinitTimer() {
 extern "C" {
 
 // Set a callback.  Pass in NULL to stop it
-void setTimer1Callback(uint32_t (*fn)()) {
+void setTimer1Callback_weak(uint32_t (*fn)()) {
   waveform.timer1CB = fn;
   std::atomic_thread_fence(std::memory_order_acq_rel);
   if (!waveform.timer1Running && fn) {
@@ -132,17 +145,10 @@ void setTimer1Callback(uint32_t (*fn)()) {
   }
 }
 
-int startWaveform(uint8_t pin, uint32_t highUS, uint32_t lowUS,
-  uint32_t runTimeUS, int8_t alignPhase, uint32_t phaseOffsetUS, bool autoPwm) {
-  return startWaveformClockCycles(pin,
-    microsecondsToClockCycles(highUS), microsecondsToClockCycles(lowUS),
-    microsecondsToClockCycles(runTimeUS), alignPhase, microsecondsToClockCycles(phaseOffsetUS), autoPwm);
-}
-
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
-int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
+int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
   uint32_t runTimeCcys, int8_t alignPhase, uint32_t phaseOffsetCcys, bool autoPwm) {
   uint32_t periodCcys = highCcys + lowCcys;
   if (periodCcys < MAXIRQTICKSCCYS) {
@@ -212,7 +218,7 @@ int startWaveformClockCycles(uint8_t pin, uint32_t highCcys, uint32_t lowCcys,
 }
 
 // Stops a waveform on a pin
-int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
+IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!waveform.timer1Running) {
     return false;
@@ -246,7 +252,7 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
+static inline IRAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
   if (ISCPUFREQ160MHZ) {
     return isCPU2X ? ccys : (ccys >> 1);
   }
@@ -255,7 +261,7 @@ static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool i
   }
 }
 
-static ICACHE_RAM_ATTR void timer1Interrupt() {
+static IRAM_ATTR void timer1Interrupt() {
   const uint32_t isrStartCcy = ESP.getCycleCount();
   int32_t clockDrift = isrStartCcy - waveform.nextEventCcy;
   const bool isCPU2X = CPU2X & 1;
@@ -436,5 +442,3 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Register access is fast and edge IRQ was configured before.
   T1L = nextEventCcys;
 }
-
-#endif // WAVEFORM_LOCKED_PHASE

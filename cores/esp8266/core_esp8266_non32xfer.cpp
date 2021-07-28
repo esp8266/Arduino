@@ -18,10 +18,10 @@
  */
 
 /*
- * This exception handler, allows for byte or short accesses to iRAM or PROGMEM
- * to succeed without causing a crash. It is still preferred to use the xxx_P
- * macros whenever possible, since they are probably 30x faster than this
- * exception handler method.
+ * This exception handler handles EXCCAUSE_LOAD_STORE_ERROR. It allows for a
+ * byte or short access to iRAM or PROGMEM to succeed without causing a crash.
+ * When reading, it is still preferred to use the xxx_P macros when possible
+ * since they are probably 30x faster than this exception handler method.
  *
  * Code taken directly from @pvvx's public domain code in
  * https://github.com/pvvx/esp8266web/blob/master/app/sdklib/system/app_main.c
@@ -37,6 +37,16 @@
 #include <Schedule.h>
 #include <debug.h>
 
+// All of these optimization were tried and now work
+// These results were from irammem.ino using GCC 10.2
+// DRAM reference                    uint16    9 AVG cycles/transfer
+// #pragma GCC optimize("O0")     // uint16, 289 AVG cycles/transfer, IRAM: +180
+// #pragma GCC optimize("O1")     // uint16, 241 AVG cycles/transfer, IRAM: +16
+#pragma GCC optimize("O2")     // uint16, 230 AVG cycles/transfer, IRAM: +4
+// #pragma GCC optimize("O3")     // uint16, 230 AVG cycles/transfer, IRAM: +4
+// #pragma GCC optimize("Ofast")  // uint16, 230 AVG cycles/transfer, IRAM: +4
+// #pragma GCC optimize("Os")     // uint16, 233 AVG cycles/transfer, IRAM: 27556  +0
+
 extern "C" {
 
 #define LOAD_MASK   0x00f00fu
@@ -50,32 +60,14 @@ extern "C" {
 
 static fn_c_exception_handler_t old_c_handler = NULL;
 
-static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cause)
+static
+IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cause)
 {
   do {
-    /*
-       Had to split out some of the asm, compiler was reusing a register that it
-       needed later. A crash would come or go away with the slightest unrelated
-       changes elsewhere in the function.
+    uint32_t insn, excvaddr;
 
-       Register a15 was used for epc1, then clobbered for rsr. Maybe an
-       __asm("":::"memory") before starting the asm would help for these cases.
-       For this instance moved setting epc1 closer to where it was used.
-       Edit. "&" on output register would have resolved the problem.
-       Refactored to reduce and consolidate register usage.
-     */
-    uint32_t insn;
-    __asm(
-      "movi  %0, ~3\n\t"         /* prepare a mask for the EPC */
-      "and   %0, %0, %1\n\t"     /* apply mask for 32bit aligned base */
-      "ssa8l %1\n\t"             /* set up shift register for src op */
-      "l32i  %1, %0, 0\n\t"      /* load part 1 */
-      "l32i  %0, %0, 4\n\t"      /* load part 2 */
-      "src   %0, %0, %1\n\t"     /* right shift to get faulting instruction */
-      :"=&r"(insn)
-      :"r"(ef->epc)
-      :
-    );
+    /* Extract instruction and faulting data address */
+    __EXCEPTION_HANDLER_PREAMBLE(ef, excvaddr, insn);
 
     uint32_t what = insn & LOAD_MASK;
     uint32_t valmask = 0;
@@ -102,10 +94,6 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       --regno;               /* account for skipped a1 in exception_frame */
     }
 
-    uint32_t excvaddr;
-    /* read out the faulting address */
-    __asm("rsr %0, EXCVADDR;" :"=r"(excvaddr)::);
-
 #ifdef DEBUG_ESP_MMU
     /* debug option to validate address so we don't hide memory access bugs in APP */
     if (mmu_is_iram((void *)excvaddr) || (is_read && mmu_is_icache((void *)excvaddr))) {
@@ -114,31 +102,34 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
       continue;  /* fail */
     }
 #endif
+    {
+      uint32_t *pWord = (uint32_t *)(excvaddr & ~0x3);
+      uint32_t pos = (excvaddr & 0x3) * 8;
+      uint32_t mem_val = *pWord;
 
-    if (is_read) {
-      /* Load, shift and mask down to correct size */
-      uint32_t val = (*(uint32_t *)(excvaddr & ~0x3));
-      val >>= (excvaddr & 0x3) * 8;
-      val &= valmask;
+      if (is_read) {
+        /* shift and mask down to correct size */
+        mem_val >>= pos;
+        mem_val &= valmask;
 
-      /* Sign-extend for L16SI, if applicable */
-      if (what == L16SI_MATCH && (val & 0x8000)) {
-        val |= 0xffff0000;
+        /* Sign-extend for L16SI, if applicable */
+        if (what == L16SI_MATCH && (mem_val & 0x8000)) {
+          mem_val |= 0xffff0000;
+        }
+
+        ef->a_reg[regno] = mem_val;  /* carry out the load */
+
+      } else { /* is write */
+        uint32_t val = ef->a_reg[regno];  /* get value to store from register */
+        val <<= pos;
+        valmask <<= pos;
+        val &= valmask;
+
+        /* mask out field, and merge */
+        mem_val &= (~valmask);
+        mem_val |= val;
+        *pWord = mem_val; /* carry out the store */
       }
-
-      ef->a_reg[regno] = val;  /* carry out the load */
-
-    } else { /* is write */
-      uint32_t val = ef->a_reg[regno];  /* get value to store from register */
-      val <<= (excvaddr & 0x3) * 8;
-      valmask <<= (excvaddr & 0x3) * 8;
-      val &= valmask;
-
-      /* Load, mask out field, and merge */
-      uint32_t dst_val = (*(uint32_t *)(excvaddr & ~0x3));
-      dst_val &= (~valmask);
-      dst_val |= val;
-      (*(uint32_t *)(excvaddr & ~0x3)) = dst_val; /* carry out the store */
     }
 
     ef->epc += 3;            /* resume at following instruction */
@@ -168,49 +159,19 @@ static IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, 
 }
 
 /*
-  An issue, the Boot ROM "C" wrapper for exception handlers,
-  _xtos_c_wrapper_handler, turns interrupts back on. To address this issue we
-  use our replacement in file `exc-c-wrapper-handler.S`.
-
-  An overview, of an exception at entry: New interrupts are blocked by EXCM
-  being set. Once cleared, interrupts above the current INTLEVEL and exceptions
-  (w/o creating a DoubleException) can occur.
-
-  Using our replacement for _xtos_c_wrapper_handler, INTLEVEL is raised to 15
-  with EXCM cleared.
-
-  The original Boot ROM `_xtos_c_wrapper_handler` would set INTLEVEL to 1 with
-  EXCM cleared, saved registers, then do a `rsil 0`, and called the registered
-  "C" Exception handler with interrupts fully enabled! Our replacement keeps
-  INTLEVEL at 15. This is needed to support the Arduino model of interrupts
-  disabled while an ISR runs.
-
-  And we also need it for umm_malloc to work safely with an IRAM heap from an
-  ISR call. While malloc() will supply DRAM for all allocation from an ISR,
-  we want free() to safely operate from an ISR to avoid a leak potential.
-
-  This replacement "C" Wrapper is only applied to this exception handler.
+  To operate reliably, this module requires the new
+  `_xtos_set_exception_handler` from `exc-sethandler.cpp` and
+  `_xtos_c_wrapper_handler` from `exc-c-wrapper-handler.S`. See comment block in
+  `exc-sethandler.cpp` for details on issues with interrupts being enabled by
+  "C" wrapper.
  */
-
-#define ROM_xtos_c_wrapper_handler (reinterpret_cast<_xtos_handler>(0x40000598))
-
-static void _set_exception_handler_wrapper(int cause) {
-  _xtos_handler old_wrapper = _xtos_exc_handler_table[cause];
-  if (old_wrapper == ROM_xtos_c_wrapper_handler) {
-    _xtos_exc_handler_table[cause] = _xtos_c_wrapper_handler;
-  }
-}
-
+void install_non32xfer_exception_handler(void) __attribute__((weak));
 void install_non32xfer_exception_handler(void) {
   if (NULL == old_c_handler) {
     // Set the "C" exception handler the wrapper will call
     old_c_handler =
     _xtos_set_exception_handler(EXCCAUSE_LOAD_STORE_ERROR,
       non32xfer_exception_handler);
-
-    // Set the replacement ASM based exception "C" wrapper function which will
-    // be calling `non32xfer_exception_handler`.
-    _set_exception_handler_wrapper(EXCCAUSE_LOAD_STORE_ERROR);
   }
 }
 

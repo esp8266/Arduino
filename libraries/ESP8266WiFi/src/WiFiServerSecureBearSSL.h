@@ -42,6 +42,11 @@ class WiFiServerSecure : public WiFiServer {
       _iobuf_out_size = xmit;
     }
 
+    // Sets the server's cache to the given one.
+    void setCache(ServerSessions *cache) {
+      _cache = cache;
+    }
+
     // Set the server's RSA key and x509 certificate (required, pick one).
     // Caller needs to preserve the chain and key throughout the life of the server.
     void setRSACert(const X509List *chain, const PrivateKey *sk);
@@ -54,6 +59,10 @@ class WiFiServerSecure : public WiFiServer {
     void setClientTrustAnchor(const X509List *client_CA_ta) {
       _client_CA_ta = client_CA_ta;
     }
+
+    // Limit the TLS versions BearSSL will connect with.  Default is
+    // BR_TLS10...BR_TLS12
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
 
     // If awaiting connection available and authenticated (i.e. client cert), return it.
     WiFiClientSecure available(uint8_t* status = NULL);
@@ -69,7 +78,11 @@ class WiFiServerSecure : public WiFiServer {
     int _iobuf_in_size = BR_SSL_BUFSIZE_INPUT;
     int _iobuf_out_size = 837;
     const X509List *_client_CA_ta = nullptr;
+    ServerSessions *_cache = nullptr;
 
+    // TLS ciphers allowed
+    uint32_t _tls_min = BR_TLS10;
+    uint32_t _tls_max = BR_TLS12;
 };
 
 };

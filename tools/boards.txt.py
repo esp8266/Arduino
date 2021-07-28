@@ -79,13 +79,13 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.',
                   '',
-                  'Usually these modules have no bootstapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.',
+                  'Usually these modules have no bootstrapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.',
                   '',
                   'In order to use these modules, make sure to observe the following:',
                   '',
                   '-  **Provide sufficient power to the module.** For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required. Using the power available from USB to Serial adapter is not recommended, these adapters typically do not supply enough current to run ESP8266 reliably in every situation. An external supply or regulator alongwith filtering capacitors is preferred.',
                   '',
-                  '-  **Connect bootstapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.',
+                  '-  **Connect bootstrapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.',
                   '',
                   '-  **Put ESP8266 into bootloader mode** before uploading code.',
                   '',
@@ -295,6 +295,28 @@ boards = collections.OrderedDict([
                   'Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.',
                   ],
     }),
+    ( 'agruminolemon', {
+        'name': 'Lifely Agrumino Lemon v4',
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_AGRUMINO_LEMON_V4' ),
+            ( '.build.variant', 'agruminolemonv4' ),
+            ]),
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '2M',
+            ],
+        'desc': [ 'Procuct page https://www.lifely.cc',
+                  '',
+                  'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
+                  'Power',
+                  'Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin',
+                  'Libraries and examples',
+                  'Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/',
+                  'Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource',
+                  ],
+    }),
     ( 'espduino', {
         'name': 'ESPDuino (ESP-13 Module)',
         'opts': collections.OrderedDict([
@@ -320,7 +342,7 @@ boards = collections.OrderedDict([
     ( 'huzzah', {
         'name': 'Adafruit Feather HUZZAH ESP8266',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ADAFRUIT_HUZZAH',
             '.build.variant': 'adafruit',
             },
         'macro': [
@@ -334,10 +356,27 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'wifi_kit_8', {
+        'name': 'WiFi Kit 8',
+        'opts': {
+            '.build.board': 'wifi_kit_8',
+            '.build.variant': 'wifi_kit_8',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Heltec WiFi Kit 8 will automatically recharge a connected battery when USB power is available.',
+                  '',
+                  'Product page: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series'
+                  ],
+    }),
     ( 'inventone', {
         'name': 'Invent One',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_INVENT_ONE',
             '.build.variant': 'inventone',
             },
         'macro': [
@@ -354,7 +393,7 @@ boards = collections.OrderedDict([
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {
-            '.build.board': 'ESP8266_GENERIC',
+            '.build.board': 'ESP8266_XINABOX_CW01',
             '.build.variant': 'xinabox',
             },
         'macro': [
@@ -428,7 +467,7 @@ boards = collections.OrderedDict([
     ( 'nodemcu', {
         'name': 'NodeMCU 0.9 (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -462,7 +501,7 @@ boards = collections.OrderedDict([
     ( 'nodemcuv2', {
         'name': 'NodeMCU 1.0 (ESP-12E Module)',
         'opts': {
-            '.build.board': 'ESP8266_NODEMCU',
+            '.build.board': 'ESP8266_NODEMCU_ESP12E',
             '.build.variant': 'nodemcu',
             },
         'macro': [
@@ -581,6 +620,25 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
+    ( 'd1_mini_clone', {
+        'name': 'LOLIN(WEMOS) D1 mini (clone)',
+        'opts': {
+            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.variant': 'd1_mini',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_menu',
+            'flashfreq_menu',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Clone variant of the LOLIN(WEMOS) D1 mini board,',
+                  'with enabled flash-mode menu, DOUT selected by default.',
+                  '',
+                  'Product page of the preferred official board: https://www.wemos.cc/',
+                  ],
+    }),
     ( 'd1_mini_pro', {
         'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
@@ -652,7 +710,7 @@ boards = collections.OrderedDict([
     ( 'espino', {
         'name': 'ESPino (ESP-12 Module)',
         'opts': {
-            '.build.board': 'ESP8266_ESP12',
+            '.build.board': 'ESP8266_ESPINO_ESP12',
             '.build.variant': 'espino',
             },
         'macro': [
@@ -671,7 +729,7 @@ boards = collections.OrderedDict([
     ( 'espinotee', {
         'name': 'ThaiEasyElec\'s ESPino',
         'opts': {
-            '.build.board': 'ESP8266_ESP13',
+            '.build.board': 'ESP8266_ESPINO_ESP13',
             '.build.variant': 'espinotee',
             },
         'macro': [
@@ -1211,6 +1269,10 @@ macros = {
         ( '.menu.mmu.4816H.build.mmuflags', '-DMMU_IRAM_SIZE=0xC000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_IRAM_HEAP' ),
         ( '.menu.mmu.3216', '16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)' ),
         ( '.menu.mmu.3216.build.mmuflags', '-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000' ),
+        ( '.menu.mmu.ext128k', '128K External 23LC1024' ),
+        ( '.menu.mmu.ext128k.build.mmuflags', '-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
+        ( '.menu.mmu.ext1024k', '1M External 64 MBit PSRAM' ),
+        ( '.menu.mmu.ext1024k.build.mmuflags', '-DMMU_EXTERNAL_HEAP=256 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000' ),
         ]),
 
     ######################## Non 32-bit load/store exception handler
@@ -1245,20 +1307,30 @@ def combn (lst):
         all += comb(i + 1, lst)
     return all
 
-def comb1 (lst):
+def comb1 (lst, lstplusone):
     all = []
     for i in range(0, len(lst)):
         all += [ [ lst[i] ] ]
-    all += [ lst ]
+    if len(lstplusone):
+        for i in range(0, len(lstplusone)):
+            all += [ [ lstplusone[i] ] ]
+        all += [ lst ]
+        for i in range(0, len(lstplusone)):
+            all += [ lst + [ lstplusone[i] ] ]
+    else:
+        all += [ lst ]
     return all
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
+    listplusone = [ 'HWDT', 'HWDT_NOEXTRA4K' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
     options = combn(listcomb)
-    options += comb1(listnocomb)
+    options += comb1(listnocomb, listplusone)
     options += [ listcomb + listnocomb ]
+    for i in range(0, len(listplusone)):
+        options += [ listcomb + listnocomb + [ listplusone[i] ] ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),
@@ -1489,18 +1561,6 @@ def led (name, default, ledList):
     return { name: led }
 
 ################################################################
-# Waveform flavour
-
-def waveform ():
-    return { 'waveform': collections.OrderedDict([
-                        ('.menu.waveform.pwm', 'Locked PWM'),
-                        ('.menu.waveform.pwm.build.waveform', ''),
-                        ('.menu.waveform.phase', 'Locked Phase'),
-                        ('.menu.waveform.phase.build.waveform', '-DWAVEFORM_LOCKED_PHASE'),
-                    ])
-           }
-
-################################################################
 # sdk selection
 
 def sdk ():
@@ -1551,7 +1611,6 @@ def all_boards ():
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
-    macros.update(waveform())
 
     if boardfilteropt or excludeboards:
         print('#')
@@ -1579,6 +1638,7 @@ def all_boards ():
     # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
     print('menu.BoardModel=Model')
     print('menu.ESPModule=Module')
+    print('menu.UploadTool=Upload Tool')
     print('menu.led=Builtin Led')
     print('menu.baud=Upload Speed')
     print('menu.xtal=CPU Frequency')
@@ -1591,12 +1651,11 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
-    print('menu.exception=Exceptions')
+    print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
     print('menu.ssl=SSL Support')
-    print('menu.waveform=Waveform Flavour')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
     print('')
@@ -1619,7 +1678,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'waveform', 'mmu_menu', 'non32xfer_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
@@ -1683,7 +1742,7 @@ def package ():
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
-    # To get consistent indent/formatting read the JSON and write it out programattically
+    # To get consistent indent/formatting read the JSON and write it out programmatically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
             filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)

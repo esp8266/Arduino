@@ -32,7 +32,7 @@
 
 class SDClass {
 public:
-    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
+    boolean begin(uint8_t csPin, uint32_t cfg = SPI_HALF_SPEED) {
 	SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
@@ -66,6 +66,14 @@ public:
 
     boolean exists(const String &filepath) {
         return (boolean)SDFS.exists(filepath.c_str());
+    }
+
+    boolean rename(const char* filepathfrom, const char* filepathto) {
+        return (boolean)SDFS.rename(filepathfrom, filepathto);
+    }
+
+    boolean rename(const String &filepathfrom, const String &filepathto) {
+        return (boolean)rename(filepathfrom.c_str(), filepathto.c_str());
     }
 
     boolean mkdir(const char *filepath) {
@@ -175,7 +183,7 @@ private:
 };
 
 
-// Expose FatStructs.h helpers for MSDOS date/time for use with dateTimeCallback
+// Expose FatStructs.h helpers for MS-DOS date/time for use with dateTimeCallback
 static inline uint16_t FAT_DATE(uint16_t year, uint8_t month, uint8_t day) {
   return (year - 1980) << 9 | month << 5 | day;
 }

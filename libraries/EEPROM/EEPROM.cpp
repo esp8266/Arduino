@@ -110,7 +110,7 @@ void EEPROMClass::write(int const address, uint8_t const value) {
     return;
   }
   if(!_data) {
-    DEBUGV("EEPROMClass::read without ::begin\n");
+    DEBUGV("EEPROMClass::write without ::begin\n");
     return;
   }
 

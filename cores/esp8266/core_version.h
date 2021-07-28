@@ -6,6 +6,18 @@
 #define ARDUINO_ESP8266_GIT_DESC unspecified
 #endif
 
+#ifndef ARDUINO_ESP8266_MAJOR
+#define ARDUINO_ESP8266_MAJOR     0
+#endif
+
+#ifndef ARDUINO_ESP8266_MINOR
+#define ARDUINO_ESP8266_MINOR     0
+#endif
+
+#ifndef ARDUINO_ESP8266_REVISION
+#define ARDUINO_ESP8266_REVISION  0
+#endif
+
 // ARDUINO_ESP8266_RELEASE is defined for released versions as a string containing the version name, i.e. "2_3_0_RC1"
 // ARDUINO_ESP8266_RELEASE is used in the core internally. Please use ESP.getCoreVersion() function instead.
 

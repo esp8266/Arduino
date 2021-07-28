@@ -585,7 +585,7 @@ void umm_free( void *ptr ) {
     return;
   }
 
-  /* Free the memory withing a protected critical section */
+  /* Free the memory within a protected critical section */
 
   UMM_CRITICAL_ENTRY(id_free);
 
@@ -671,7 +671,7 @@ static void *umm_malloc_core( umm_heap_context_t *_context, size_t size ) {
      */
 
     if( blockSize == blocks ) {
-      /* It's an exact fit and we don't neet to split off a block. */
+      /* It's an exact fit and we don't need to split off a block. */
       DBGLOG_DEBUG( "Allocating %6d blocks starting at %6d - exact\n", blocks, cf );
 
       /* Disconnect this block from the FREE list */
@@ -755,7 +755,7 @@ void *umm_malloc( size_t size ) {
    * For allocating APIs `umm_heap_cur` is used to index and select a value for
    * `_context`. If an allocation is made from an ISR, this value is ignored and
    * the heap context for DRAM is loaded. For APIs that require operating on an
-   * existing allcation such as realloc and free, the heap context selected is
+   * existing allocation such as realloc and free, the heap context selected is
    * done by matching the allocation's address with that of one of the heap
    * address ranges.
    *
@@ -798,7 +798,7 @@ void *umm_malloc( size_t size ) {
     return( ptr );
   }
 
-  /* Allocate the memory withing a protected critical section */
+  /* Allocate the memory within a protected critical section */
 
   UMM_CRITICAL_ENTRY(id_malloc);
 
@@ -1038,7 +1038,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
@@ -1117,7 +1117,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
@@ -1142,7 +1142,7 @@ void *umm_realloc( void *ptr, size_t size ) {
         } else {
             DBGLOG_DEBUG( "realloc %d to a bigger block %d failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
-            STATS__OOM_UPDATE();
+            /* STATS__OOM_UPDATE() has already been called by umm_malloc_core - don't duplicate count */
         }
         /* This is not accurate for OOM case; however, it will work for
          * stopping a call to free before return.
