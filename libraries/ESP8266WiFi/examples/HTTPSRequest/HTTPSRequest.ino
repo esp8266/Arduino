@@ -13,6 +13,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+#include "certs.h"
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -22,42 +23,7 @@
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-const char* host = "api.github.com";
-const int httpsPort = 443;
-
-// DigiCert High Assurance EV Root CA
-const char trustRoot[] PROGMEM = R"EOF(
------BEGIN CERTIFICATE-----
-MIIE6zCCBHGgAwIBAgIQAtX25VXj+RoJlA3D2bWkgzAKBggqhkjOPQQDAzBWMQsw
-CQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMTAwLgYDVQQDEydEaWdp
-Q2VydCBUTFMgSHlicmlkIEVDQyBTSEEzODQgMjAyMCBDQTEwHhcNMjEwMzA0MDAw
-MDAwWhcNMjIwMzA5MjM1OTU5WjBoMQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2Fs
-aWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEVMBMGA1UEChMMR2l0SHVi
-LCBJbmMuMRUwEwYDVQQDDAwqLmdpdGh1Yi5jb20wWTATBgcqhkjOPQIBBggqhkjO
-PQMBBwNCAAQf8SePhtD7JeGm0YuTQ4HihyeENuvsNFdYPPIxIx6Lj9iOu2ECkgy4
-52UR+mhIF24OvPizDveyCFOqmG/MI7kwo4IDDTCCAwkwHwYDVR0jBBgwFoAUCrwI
-KReMpTlteg7OM8cus+37w3owHQYDVR0OBBYEFP5TUYtiCp+N3FISu3CqxMlJhdG1
-MCMGA1UdEQQcMBqCDCouZ2l0aHViLmNvbYIKZ2l0aHViLmNvbTAOBgNVHQ8BAf8E
-BAMCB4AwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMIGXBgNVHR8EgY8w
-gYwwRKBCoECGPmh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRMU0h5
-YnJpZEVDQ1NIQTM4NDIwMjBDQTEuY3JsMESgQqBAhj5odHRwOi8vY3JsNC5kaWdp
-Y2VydC5jb20vRGlnaUNlcnRUTFNIeWJyaWRFQ0NTSEEzODQyMDIwQ0ExLmNybDA+
-BgNVHSAENzA1MDMGBmeBDAECAjApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRp
-Z2ljZXJ0LmNvbS9DUFMwgYMGCCsGAQUFBwEBBHcwdTAkBggrBgEFBQcwAYYYaHR0
-cDovL29jc3AuZGlnaWNlcnQuY29tME0GCCsGAQUFBzAChkFodHRwOi8vY2FjZXJ0
-cy5kaWdpY2VydC5jb20vRGlnaUNlcnRUTFNIeWJyaWRFQ0NTSEEzODQyMDIwQ0Ex
-LmNydDAMBgNVHRMBAf8EAjAAMIIBAwYKKwYBBAHWeQIEAgSB9ASB8QDvAHUAKXm+
-8J45OSHwVnOfY6V35b5XfZxgCvj5TV0mXCVdx4QAAAF3/bWc4AAABAMARjBEAiBm
-IdofaKj+XfeISM/2tjap1nQY1afFSBAcdw/YtgjmSQIgMqWoDyfO66suyk2VFcld
-1C+WHUNGvXsCRPof5HG5QQgAdgAiRUUHWVUkVpY/oS/x922G4CMmY63AS39dxoNc
-buIPAgAAAXf9tZ0CAAAEAwBHMEUCIQCJzwZRfAvv0izotFx2KE0sgV8O+NfuHUpa
-1866RqKEtwIgc65P+xToSqPbp/J1gSFBJgySI/a1YoB+3p8xXTYaDsAwCgYIKoZI
-zj0EAwMDaAAwZQIxAL8fIlMNWdeKHalpm9z+ksCuYT4tSN1ubXeNvDywr56me+yT
-+fr42MnEcBdUtLOVOAIwPNC9fAJjyHHTL2vaRW1JRnrovLKDQVbZpZNIZnlY3WFu
-kmxiBWDOpyfJrG9vQ25K
------END CERTIFICATE-----
-)EOF";
-X509List cert(trustRoot);
+X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
 
 void setup() {
   Serial.begin(115200);
@@ -94,12 +60,12 @@ void setup() {
   // Use WiFiClientSecure class to create TLS connection
   WiFiClientSecure client;
   Serial.print("Connecting to ");
-  Serial.println(host);
+  Serial.println(github_host);
 
-  Serial.printf("Using certificate: %s\n", trustRoot);
+  Serial.printf("Using certificate: %s\n", cert_DigiCert_High_Assurance_EV_Root_CA);
   client.setTrustAnchors(&cert);
 
-  if (!client.connect(host, httpsPort)) {
+  if (!client.connect(github_host, github_port)) {
     Serial.println("Connection failed");
     return;
   }
@@ -109,7 +75,7 @@ void setup() {
   Serial.println(url);
 
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
+               "Host: " + github_host + "\r\n" +
                "User-Agent: BuildFailureDetectorESP8266\r\n" +
                "Connection: close\r\n\r\n");
 

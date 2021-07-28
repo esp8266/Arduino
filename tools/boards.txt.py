@@ -356,6 +356,23 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'wifi_kit_8', {
+        'name': 'WiFi Kit 8',
+        'opts': {
+            '.build.board': 'wifi_kit_8',
+            '.build.variant': 'wifi_kit_8',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Heltec WiFi Kit 8 will automatically recharge a connected battery when USB power is available.',
+                  '',
+                  'Product page: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series'
+                  ],
+    }),
     ( 'inventone', {
         'name': 'Invent One',
         'opts': {

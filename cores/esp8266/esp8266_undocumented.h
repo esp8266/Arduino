@@ -53,11 +53,21 @@ calls to ets_install_putc1().
 extern void uart_buff_switch(uint8_t);
 
 /*
+  ROM function, ets_install_uart_printf, is used to installs the internal ROM
+  putc1 driver used to print on UART0 or UART1. The installed driver is use by ets_printf.
+  Side note, ets_install_uart_printf just happens to return the address of the
+  internal putc1 driver installed.
+*/
+extern void ets_install_uart_printf(void);
+
+/*
  ROM function, ets_uart_printf(), prints on the UART selected by
  uart_buff_switch(). Supported format options are the same as vprintf(). Also
  has cooked newline behavior. No flash format/string support; however, ISR safe.
- Also, uses a static function in ROM to print characters which is only
- controlled by uart_buff_switch().
+ It also uses a static function in ROM to print characters. The UART selection
+ is handled by a prior call to uart_buff_switch(). An advantage over ets_printf,
+ this call is not affected by calls made to ets_install_putc1 or
+ ets_install_putc2.
  */
 extern int ets_uart_printf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
@@ -238,7 +248,6 @@ extern void Cache_Read_Disable();
 extern int32_t system_func1(uint32_t);
 extern void clockgate_watchdog(uint32_t);
 extern void pm_open_rf();
-extern void ets_install_uart_printf(uint32_t uart_no);
 extern void UartDwnLdProc(uint8_t* ram_addr, uint32_t size, void (**user_start_ptr)());
 extern int boot_from_flash();
 extern void ets_run() __attribute__((noreturn));
