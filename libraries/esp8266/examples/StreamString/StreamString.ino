@@ -38,7 +38,7 @@ void testStreamString() {
 
   // By default, reading a S2Stream(String) or a StreamString will consume the String.
   // It can be disabled by calling ::resetPointer(), (not default)
-  // and reenabled by calling ::setConsume(). (default)
+  // and re-enabled by calling ::setConsume(). (default)
   //
   // In default consume mode, reading a byte or a block will remove it from
   // the String.  Operations are O(n²).
@@ -110,7 +110,7 @@ void testStreamString() {
     result.clear();
     S2Stream input(inputString);
     // reading stream will consume the string
-    input.setConsume(); // can be ommitted, this is the default
+    input.setConsume(); // can be omitted, this is the default
 
     input.sendSize(result, 1);
     input.sendSize(result, 2);

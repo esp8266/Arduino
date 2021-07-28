@@ -2,6 +2,7 @@
 #include <flash_utils.h>
 #include <eboot_command.h>
 #include <spi_flash.h>
+#include <umm_malloc/umm_malloc.h>
 
 /*
 
@@ -342,6 +343,9 @@ extern "C" void IRAM_ATTR app_entry_redefinable(void) {
     ERASE_CFG__ETS_PRINTF("\n\ncall_user_start()\n");
     ERASE_CFG__ETS_FLUSH(0);
 
+    /* Doing umm_init just once before starting the SDK, allowed us to remove
+       test and init calls at each malloc API entry point, saving IRAM. */
+    umm_init();
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -449,6 +453,9 @@ extern "C" void IRAM_ATTR app_entry_redefinable(void) {
     ERASE_CFG__ETS_PRINTF("\n\ncall_user_start()\n");
     ERASE_CFG__ETS_FLUSH(0);
 
+    /* Doing umm_init just once before starting the SDK, allowed us to remove
+       test and init calls at each malloc API entry point, saving IRAM. */
+    umm_init();
     /* Call the entry point of the SDK code. */
     call_user_start();
 }

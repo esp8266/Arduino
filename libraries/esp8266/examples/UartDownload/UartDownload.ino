@@ -98,12 +98,6 @@ void proxyEspSync() {
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-void preinit() {
-  // (no C++ in function)
-  // disable wifi
-  ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup() {
   // For `proxyEspSync()` to work, the Serial.begin() speed needs to be
   // 115200bps. This is the data rate used by esptool.py. It expects the Boot

@@ -37,7 +37,7 @@ TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, net
 
    @param request The request string received from another node in the mesh
    @param meshInstance The MeshBackendBase instance that called the function.
-   @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
+   @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
 */
 String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)

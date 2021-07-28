@@ -134,7 +134,7 @@ bool handleFileRead(String path) {
 
 
 /*
-   The "Not Found" handler catches all URI not explicitely declared in code
+   The "Not Found" handler catches all URI not explicitly declared in code
    First try to find and return the requested file from the filesystem,
    and if it fails, return a 404 page with debug information
 */

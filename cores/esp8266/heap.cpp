@@ -42,7 +42,7 @@ extern "C" {
 #define UMM_REALLOC_FL(p,s,f,l) realloc(p,s)
 #define UMM_FREE_FL(p,f,l)      free(p)
 
-// STATIC_ALWAYS_INLINE only applys to the non-debug build path,
+// STATIC_ALWAYS_INLINE only applies to the non-debug build path,
 // it must not be enabled on the debug build path.
 #define STATIC_ALWAYS_INLINE static ALWAYS_INLINE
 #endif
@@ -175,8 +175,8 @@ void IRAM_ATTR print_loc(size_t size, const char* file, int line)
         if (inISR && (uint32_t)file >= 0x40200000) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
-            char buf[ets_strlen(file) + 1] __attribute__((aligned(4)));
-            ets_strcpy(buf, file);
+            char buf[strlen_P(file) + 1];
+            strcpy_P(buf, file);
             DEBUG_HEAP_PRINTF(buf);
         } else {
             DEBUG_HEAP_PRINTF(file);
@@ -226,10 +226,10 @@ void IRAM_ATTR print_oom_size(size_t size)
      b. Before, when the *alloc function creates a new, not modified, allocation.
 
      In a free() or realloc() call, the focus is on their allocation. It is
-     checked 1st and reported on 1ST if an error exists. Full Posion Check is
+     checked 1st and reported on 1ST if an error exists. Full Poison Check is
      done after.
 
-     For malloc(), calloc(), and zalloc() Full Posion Check is done 1st since
+     For malloc(), calloc(), and zalloc() Full Poison Check is done 1st since
      these functions do not modify an existing allocation.
 */
 void* IRAM_ATTR malloc(size_t size)

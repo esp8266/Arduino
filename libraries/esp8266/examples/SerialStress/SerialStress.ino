@@ -57,12 +57,6 @@ void error(const char* what) {
   }
 }
 
-void preinit() {
-  // (no C++ in function)
-  // disable wifi
-  ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 

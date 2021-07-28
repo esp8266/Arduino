@@ -55,7 +55,7 @@ extern "C" void enablePhaseLockedWaveform (void)
 
 // No-op calls to override the PWM implementation
 extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
-extern "C" bool _stopPWM_weak(int pin) { (void) pin; return false; }
+extern "C" IRAM_ATTR bool _stopPWM_weak(int pin) { (void) pin; return false; }
 extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
 
 

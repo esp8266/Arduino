@@ -173,10 +173,14 @@ void processKey(Print& out, int hotKey) {
         }
         break;
       }
-    case 'P':
+#ifdef DEBUG_ESP_PORT
+    // From this context stack_thunk_dump_stack() will only work when Serial
+    // debug is enabled.
+    case 'p':
       out.println(F("Calling stack_thunk_dump_stack();"));
       stack_thunk_dump_stack();
       break;
+#endif
     case 'R':
       out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
@@ -191,7 +195,9 @@ void processKey(Print& out, int hotKey) {
       out.println(F("  h    - Free Heap Report;"));
       out.println(F("  i    - iRAM umm_info(null, true);"));
       out.println(F("  d    - dRAM umm_info(null, true);"));
+#ifdef DEBUG_ESP_PORT
       out.println(F("  p    - call stack_thunk_dump_stack();"));
+#endif
       out.println(F("  R    - Restart, ESP.restart();"));
       out.println(F("  ?    - Print Help"));
       out.println();

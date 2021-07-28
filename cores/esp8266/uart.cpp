@@ -775,17 +775,14 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 15;
+                pinMode(uart->tx_pin, FUNCTION_4);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 13;
+                pinMode(uart->rx_pin, FUNCTION_4);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, FUNCTION_4);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(uart->rx_pin, FUNCTION_4);    //RX
 
             IOSWAP |= (1 << IOSWAPU0);
             return true;
@@ -796,17 +793,14 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = (tx_pin == 2)?2:1;
+                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 3;
+                pinMode(3, SPECIAL);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(3, SPECIAL);    //RX
 
             IOSWAP &= ~(1 << IOSWAPU0);
             return true;
@@ -832,18 +826,15 @@ uart_set_tx(uart_t* uart, int tx_pin)
     case UART0:
         if(uart->tx_enabled)
         {
-            if (uart->tx_pin == 1 && tx_pin == 2)
+            if (uart->tx_pin == tx_pin)
             {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
                 return true;
             }
-            else if (uart->tx_pin == 2 && tx_pin != 2)
+            else if (tx_pin == 1 || tx_pin == 2)
             {
                 pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
+                uart->tx_pin = tx_pin;
+                pinMode(uart->tx_pin, tx_pin == 1 ? SPECIAL : FUNCTION_4);
                 return true;
             }
         }

@@ -33,7 +33,7 @@ using namespace experimental::TypeConversion;
 
 namespace MeshTypeConversionFunctions 
 {
-  String uint64ToString(uint64_t number, const byte base)
+  String uint64ToString(uint64_t number, const uint8_t base)
   {
     assert(2 <= base && base <= 36);
     
@@ -59,7 +59,7 @@ namespace MeshTypeConversionFunctions
     return result;
   }
   
-  uint64_t stringToUint64(const String &string, const byte base)
+  uint64_t stringToUint64(const String &string, const uint8_t base)
   {
     assert(2 <= base && base <= 36);
     

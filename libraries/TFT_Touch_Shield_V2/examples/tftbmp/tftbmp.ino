@@ -22,7 +22,7 @@
 
 const int PIN_SD_CS = 4;                        // pin of sd card
 
-const int __Gnbmp_height = 320;                 // bmp hight
+const int __Gnbmp_height = 320;                 // bmp height
 const int __Gnbmp_width  = 240;                 // bmp width
 
 unsigned char __Gnbmp_image_offset  = 0;        // offset
@@ -66,7 +66,7 @@ void loop() {
   for (unsigned char i = 0; i < __Gnfile_num; i++) {
     bmpFile = SD.open(__Gsbmp_files[i]);
     if (! bmpFile) {
-      Serial.println("didnt find image");
+      Serial.println("didn't find image");
       while (1);
     }
 
@@ -86,7 +86,7 @@ void loop() {
 /*********************************************/
 // This procedure reads a bitmap and draws it to the screen
 // its sped up by reading many pixels worth of data at a time
-// instead of just one pixel at a time. increading the buffer takes
+// instead of just one pixel at a time. increasing the buffer takes
 // more RAM but makes the drawing a little faster. 20 pixels' worth
 // is probably a good place
 
