@@ -24,18 +24,16 @@ def main():
   
   if not ( os.path.isfile( srcBin ) and os.path.isfile( srcBinSigned ) ):
     sys.stderr.write( "Neither '%s' nor '%s' exist in Path '%s'\n" % ( srcBin, srcBinSigned, args.src ) )
-    return 1
+    return 0
 
   if not os.path.exists( args.dst ):
     os.makedirs( args.dst )
     
-  res = 0
   if os.path.isfile( srcBin ):
     try:
       shutil.copyfile( srcBin, dstBin )
       sys.stderr.write( "File '%s' copied to '%s'\n" % ( args.bin, args.dst ) )
     except:
-      res = 2
       sys.stderr.write( "Error while copying File '%s' to '%s'\n" % ( args.bin, args.dst ) )
 
   if os.path.isfile( srcBinSigned ):
@@ -43,10 +41,9 @@ def main():
       shutil.copyfile( srcBinSigned, dstBinSigned )
       sys.stderr.write( "File '%s' copied to '%s'\n" % ( args.binSigned, args.dst ) )
     except:
-      res = 2
       sys.stderr.write( "Error while copying File '%s' to '%s'\n" % ( args.binSigned, args.dst ) )
 
-  return res
+  return 0
 
 
 if __name__ == '__main__':
