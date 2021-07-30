@@ -183,6 +183,9 @@ public:
     }
 
     bool begin() override {
+        if (_mounted) {
+            return true;
+        }
         if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("LittleFS size is <= zero");
             return false;
