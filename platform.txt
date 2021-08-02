@@ -132,8 +132,10 @@ recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" -I "{runtime
 recipe.objcopy.hex.4.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.exportbinaries}" -src "{build.path}/" -dst "{build.source.path}/binaries/{build.board}/" -bin "{build.project_name}.bin" -binSigned "{build.project_name}.bin.signed"
 
 ## Save hex
-recipe.output.tmp_file={build.project_name}.bin
-recipe.output.save_file={build.project_name}.{build.variant}.bin
+recipe.output.tmp_file.1={build.project_name}.bin
+recipe.output.save_file.1={build.project_name}.{build.variant}.bin
+recipe.output.tmp_file.2={build.project_name}.bin.signed
+recipe.output.save_file.2={build.project_name}.{build.variant}.bin.signed
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
