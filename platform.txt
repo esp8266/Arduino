@@ -20,7 +20,6 @@ runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
 runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
-runtime.tools.exportbinaries={runtime.platform.path}/tools/exportbinaries.py
 
 compiler.warning_flags=-w -Werror=return-type
 compiler.warning_flags.none=-w -Werror=return-type
@@ -129,7 +128,6 @@ recipe.objcopy.eep.pattern=
 recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
 recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
 recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
-recipe.objcopy.hex.4.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.exportbinaries}" -src "{build.path}/" -dst "{build.source.path}/binaries/{build.board}/" -bin "{build.project_name}.bin" -binSigned "{build.project_name}.bin.signed"
 
 ## Save hex
 recipe.output.tmp_file.1={build.project_name}.bin
