@@ -1563,7 +1563,8 @@ bool MDNSResponder::_announce(bool p_bAnnounce,
         sendParameter.m_bResponse = true;           // Announces are 'Unsolicited authoritative responses'
         sendParameter.m_bAuthorative = true;
         sendParameter.m_bUnannounce = !p_bAnnounce; // When unannouncing, the TTL is set to '0' while creating the answers
-
+        sendParameter.m_bUnicast = false;
+        
         // Announce host
         sendParameter.m_u8HostReplyMask = 0;
 #ifdef MDNS_IP4_SUPPORT
