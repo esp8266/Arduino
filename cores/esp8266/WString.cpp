@@ -309,7 +309,7 @@ bool String::concat(const char *cstr, unsigned int length) {
         return true;
     if (!reserve(newlen))
         return false;
-    memmove_P(wbuffer() + len(), cstr, length + 1);
+    memmove_P(wbuffer() + len(), cstr, length);
     setLen(newlen);
     wbuffer()[newlen] = 0;
     return true;

@@ -233,12 +233,12 @@ protected:
     size_t _rx_size;
 };
 
-#ifdef HAVE_KFC_FIRMWARE_VERSION
-extern Stream &Serial;
-#else
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 extern HardwareSerial Serial;
 #endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 extern HardwareSerial Serial1;
+#endif
 
 extern void serialEventRun(void) __attribute__((weak));
 

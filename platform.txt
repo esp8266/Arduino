@@ -96,13 +96,13 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs git
-recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
-
+recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 ## Build the app.ld linker file
-recipe.hooks.linking.prelink.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkdir}" -p "{build.path}/ld_h/"
-recipe.hooks.linking.prelink.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.cp}" "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
+recipe.hooks.linking.prelink.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkdir}" -p "{build.path}/ld_h/"
+recipe.hooks.linking.prelink.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.cp}" "{runtime.platform.path}/tools/sdk/ld/{build.flash_ld}" "{build.path}/ld_h/local.eagle.flash.ld.h"
 recipe.hooks.linking.prelink.3.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{build.path}/ld_h/local.eagle.flash.ld.h" -o "{build.path}/local.eagle.flash.ld"
 recipe.hooks.linking.prelink.4.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} {build.mmuflags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
 
@@ -125,9 +125,9 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
-recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
+recipe.objcopy.hex.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed" --legacy "{build.path}/{build.project_name}.bin.legacy_sig"
+recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -158,9 +158,8 @@ tools.esptool.upload.params.quiet=
 # First, potentially perform an erase or nothing
 # Next, do the binary upload
 # Combined in one rule because Arduino doesn't support upload.1.pattern/upload.3.pattern
-tools.esptool.upload.pattern="{cmd}" "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
-
-tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
