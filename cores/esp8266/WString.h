@@ -212,6 +212,19 @@ class String {
         }
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
 
+        // Pass the biggest integer if the count is not specified.
+        // The remove method below will take care of truncating it at the end of the string.
+        void remove(unsigned int index, unsigned int count = (unsigned int)-1);
+
+        // added return type
+        String &toLowerCase(void);
+        String &toUpperCase(void);
+
+        // parsing/conversion
+        long toInt(void) const;
+        float toFloat(void) const;
+        double toDouble(void) const;
+
     // additional equals methods with ignorecase and support for char, const char *, const __FlashStringHelper * and String
     public:
         //
@@ -768,19 +781,6 @@ class String {
         inline  bool replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
             return _replace(reinterpret_cast<PGM_P>(find), strlen_P(reinterpret_cast<PGM_P>(find)), reinterpret_cast<PGM_P>(replace), strlen_P(reinterpret_cast<PGM_P>(replace)));
         }
-
-        // Pass the biggest integer if the count is not specified.
-        // The remove method below will take care of truncating it at the end of the string.
-        void remove(unsigned int index, unsigned int count = (unsigned int)-1);
-
-        // added return type
-        String &toLowerCase(void);
-        String &toUpperCase(void);
-
-        // parsing/conversion
-        long toInt(void) const;
-        float toFloat(void) const;
-        double toDouble(void) const;
 
     // new trim function internal methods
     // trim, rtrim, ltrim
