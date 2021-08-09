@@ -170,6 +170,19 @@ env.Append(
     )
 )
 
+# helper functions to place a library at a specific position in the linking 
+# order, either referenced by "n positions before the end" or "n positions after the start".
+def inject_lib_at_position_from_back(env, lib, position):
+    old_libs = env["LIBS"]
+    old_libs.insert(len(old_libs) - position, lib)
+    env["LIBS"] = old_libs
+
+
+def inject_lib_at_position_from_front(env, lib, position):
+    old_libs = env["LIBS"]
+    old_libs.insert(position, lib)
+    env["LIBS"] = old_libs
+
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
@@ -222,39 +235,41 @@ if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip6-536-feat"]
     )
+    inject_lib_at_position_from_front(env, "lwip6-536-feat", 4)
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip6-1460-feat"]
     )
+    inject_lib_at_position_from_front(env, "lwip6-1460-feat", 4)
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-1460-feat"]
     )
+    inject_lib_at_position_from_front(env, "lwip2-1460-feat", 4)
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-536"]
     )
+    inject_lib_at_position_from_front(env, "lwip2-536", 4)
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-1460"]
     )
+    inject_lib_at_position_from_front(env, "lwip2-1460", 4)
 # PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
 else:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536-feat"]
     )
+    inject_lib_at_position_from_front(env, "lwip2-536-feat", 4)
 
 #
 # Waveform
@@ -269,14 +284,16 @@ if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
 if "PIO_FRAMEWORK_ARDUINO_ENABLE_EXCEPTIONS" in flatten_cppdefines:
     env.Append(
         CXXFLAGS=["-fexceptions"],
-        LIBS=["stdc++-exc"]
     )
+    # we need to respect the original linking order of the libraries
+    # and cannot just append it to the end, but at the specific correct 
+    # position, offset from the back.
+    inject_lib_at_position_from_back(env, "stdc++-exc", 3)
 else:
     env.Append(
         CXXFLAGS=["-fno-exceptions"],
-        LIBS=["stdc++"]
     )
-
+    inject_lib_at_position_from_back(env, "stdc++", 3)
 #
 # VTables
 #
