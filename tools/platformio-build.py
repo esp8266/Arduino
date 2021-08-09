@@ -139,12 +139,8 @@ env.Append(
         join(FRAMEWORK_DIR, "tools", "sdk", "ld")
     ],
 
-    # A list of one or more libraries that will be linked with any executable programs created by this environment
-    LIBS=[
-        "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
-        "m", "c", "gcc"
-    ],
+    # LIBS is set at the bottom of the builder script
+    # where we know about all system libraries to be included
 
     LIBSOURCE_DIRS=[
         join(FRAMEWORK_DIR, "libraries")
@@ -169,19 +165,6 @@ env.Append(
         )
     )
 )
-
-# helper functions to place a library at a specific position in the linking 
-# order, either referenced by "n positions before the end" or "n positions after the start".
-def inject_lib_at_position_from_back(env, lib, position):
-    old_libs = env["LIBS"]
-    old_libs.insert(len(old_libs) - position, lib)
-    env["LIBS"] = old_libs
-
-
-def inject_lib_at_position_from_front(env, lib, position):
-    old_libs = env["LIBS"]
-    old_libs.insert(position, lib)
-    env["LIBS"] = old_libs
 
 # copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
@@ -231,43 +214,44 @@ else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_c
 #
 # lwIP
 #
+lwip_lib = None
 if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip6-536-feat", 4)
+    lwip_lib = "lwip6-536-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip6-1460-feat", 4)
+    lwip_lib = "lwip6-1460-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip2-1460-feat", 4)
+    lwip_lib = "lwip2-1460-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip2-536", 4)
+    lwip_lib = "lwip2-536"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip2-1460", 4)
+    lwip_lib = "lwip2-1460"
 # PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
 else:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
-    inject_lib_at_position_from_front(env, "lwip2-536-feat", 4)
+    lwip_lib = "lwip2-536-feat"
 
 #
 # Waveform
@@ -279,19 +263,17 @@ if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
 #
 # Exceptions
 #
+stdcpp_lib = None
 if "PIO_FRAMEWORK_ARDUINO_ENABLE_EXCEPTIONS" in flatten_cppdefines:
     env.Append(
         CXXFLAGS=["-fexceptions"],
     )
-    # we need to respect the original linking order of the libraries
-    # and cannot just append it to the end, but at the specific correct 
-    # position, offset from the back.
-    inject_lib_at_position_from_back(env, "stdc++-exc", 3)
+    stdcpp_lib = "stdc++-exc"
 else:
     env.Append(
         CXXFLAGS=["-fno-exceptions"],
     )
-    inject_lib_at_position_from_back(env, "stdc++", 3)
+    stdcpp_lib = "stdc++"
 #
 # VTables
 #
@@ -370,6 +352,15 @@ else:
 assert mmu_flags
 env.Append(CPPDEFINES=mmu_flags)
 
+# A list of one or more libraries that will be linked with any executable programs created by this environment
+# We do this at this point so that we can put the libraries in their correct order more easily
+env.Append(
+    LIBS=[
+        "hal", "phy", "pp", "net80211", lwip_lib, "wpa", "crypto", "main",
+        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
+        stdcpp_lib, "m", "c", "gcc"
+    ]
+)
 
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(
