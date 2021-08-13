@@ -96,7 +96,7 @@ def CreateFs( fsName, mkFsName ):
         raise ProcessError( "CreateFs: data dir is not a directory: %s" % dataDir )
     FilesInDir = CountFilesInDir( dataDir )
     if FilesInDir == 0:
-        if not ConfirmDialog( "%s Create" % fsName, "No files have been found in your data folder!\nAre you sure you want to create an empty %s image?" % fsName )
+        if not ConfirmDialog( "%s Create" % fsName, "No files have been found in your data folder!\nAre you sure you want to create an empty %s image?" % fsName ):
             raise ProcessError( "Canceled by user" )
     os.makedirs( DstDir, exist_ok = True )
     imageName = "%s.%s" % ( Args.name, fsName )
