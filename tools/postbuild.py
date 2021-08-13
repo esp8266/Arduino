@@ -7,7 +7,7 @@ ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) 
 sys.stderr.write( '\nDebug for failed check in Pull-Request:\n' )
 sys.stderr.write( '...ToolsDir: %s\n' % ToolsDir )
 sys.stderr.write( '...sys.path (before insert): %s\n' % ", ".join( sys.path ) )
-sys.stderr.write( '...os.path.exists( ToolsDir/utillities.py ): %s\n"' % ( "Yes" if os.path.exists( ToolsDir + "utillities.py" ) ) )
+sys.stderr.write( '...os.path.exists( ToolsDir/utillities.py ): %s\n"' % ( "Yes" if os.path.exists( ToolsDir + "utillities.py" ) else "No" ) )
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
     sys.stderr.write( '...sys.path (after insert): %s\n' % ", ".join( sys.path ) )
