@@ -9,8 +9,8 @@ ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) 
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
     from utillities import * # If this fails, we can't continue and will bomb below
-except Exception:
-    sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
+except Exception as e:
+    sys.stderr.write( '\nImport of utillities.py failed.\n...Is it not next to this %s tool?\n...Exception was: %s\n' % ( __file__, e )  )
     sys.exit( 2 )
 import tempfile
 from pathlib import Path

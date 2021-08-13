@@ -4,20 +4,12 @@
 import os
 import sys
 ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) + "/" # convert to UNIX format
-sys.stderr.write( '\nDebug for failed check in Pull-Request:\n' )
-sys.stderr.write( '...ToolsDir: %s\n' % ToolsDir )
-sys.stderr.write( '...sys.path (before insert): %s\n' % ", ".join( sys.path ) )
-sys.stderr.write( '...os.path.exists( ToolsDir/utillities.py ): %s\n"' % ( "Yes" if os.path.exists( ToolsDir + "utillities.py" ) else "No" ) )
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
-    sys.stderr.write( '...sys.path (after insert): %s\n' % ", ".join( sys.path ) )
     from utillities import * # If this fails, we can't continue and will bomb below
-except Exception:
-    try:
-        from .utillities import * # If this fails, we can't continue and will bomb below
-    except Exception:
-        sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
-        sys.exit( 2 )
+except Exception as e:
+    sys.stderr.write( '\nImport of utillities.py failed.\n...Is it not next to this %s tool?\n...Exception was: %s\n' % ( __file__, e )  )
+    sys.exit( 2 )
 
 def parse_args( argsIn ):
     parser = argparse.ArgumentParser( description = 'PostBuild for ESP8288' )

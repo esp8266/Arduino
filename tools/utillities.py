@@ -49,7 +49,7 @@ def Which( prg, dir = None ):
         Takes care of OS, on Windows searches for <prg>.exe instead of <prg>.
         if <dir> is given prefers prg inside this dir over others"""
     if platform.system() == "Windows":
-      prg = "%s.exe" % prg
+        prg = "%s.exe" % prg
     res = None
     if dir is not None:
         res = Which_Chdir_( prg, dir )
@@ -62,22 +62,13 @@ def CopyToDir( name, ext, dstDir ):
     fileName = "%s.%s" % ( name, ext )
     srcPath = os.path.abspath( fileName )
     if not os.path.exists( srcPath ):
-      return []
+        return []
     shutil.copyfile( srcPath, os.path.join( dstDir, fileName ) )
     return [ fileName ]
 
 def IntValFromStr( strVal ):
     """ Convert string into integer, can be used with decimal value '123' or hex '0xabc'. """
     return int( strVal.strip(), 0 )
-
-def CountFilesInDir( dataDir ):
-    fileCount = 0
-    for root, dir, files in os.walk( dataDir ):
-        for file in files:
-            #!? Why Ony count files without '.' ??
-            if file[ 0 ] != ".":
-                fileCount += 1
-    return fileCount
 
 def RemoveIno( path ):
     """ Returns the given path with extension ".ino" removed (if exist) """
@@ -87,10 +78,10 @@ def RemoveIno( path ):
     
 def ConfirmDialog( title, text ):
     try:
-      import tkinter
-      from tkinter import messagebox
+        import tkinter
+        from tkinter import messagebox
     except:
-        raise ProcessError( "tkinter not available.\nPlease install it with:\npip3 install tkinter\n" ))
+        raise ProcessError( "tkinter not available.\nPlease install it with:\npip3 install tkinter\n" )
     rootWin = tkinter.Tk() # Create the object
     rootWin.overrideredirect( 1 ) # Avoid it appearing and then disappearing quickly
     #rootWin.iconbitmap("PythonIcon.ico") # Set an icon (this is optional - must be in a .ico format)
