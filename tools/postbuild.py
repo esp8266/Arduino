@@ -16,8 +16,8 @@ except Exception:
     try:
         from .utillities import * # If this fails, we can't continue and will bomb below
     except Exception:
-    sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
-    sys.exit( 2 )
+        sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
+        sys.exit( 2 )
 
 def parse_args( argsIn ):
     parser = argparse.ArgumentParser( description = 'PostBuild for ESP8288' )
