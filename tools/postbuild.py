@@ -7,12 +7,15 @@ ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) 
 sys.stderr.write( '\nDebug for failed check in Pull-Request:\n' )
 sys.stderr.write( '...ToolsDir: %s\n' % ToolsDir )
 sys.stderr.write( '...sys.path (before insert): %s\n' % ", ".join( sys.path ) )
-
+sys.stderr.write( '...os.path.exists( ToolsDir/utillities.py ): %s\n"' % ( "Yes" if os.path.exists( ToolsDir + "utillities.py" ) ) )
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
     sys.stderr.write( '...sys.path (after insert): %s\n' % ", ".join( sys.path ) )
     from utillities import * # If this fails, we can't continue and will bomb below
 except Exception:
+    try:
+        from .utillities import * # If this fails, we can't continue and will bomb below
+    except Exception:
     sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
     sys.exit( 2 )
 
