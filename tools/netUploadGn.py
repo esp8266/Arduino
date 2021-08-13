@@ -8,9 +8,9 @@ import sys
 ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) + "/" # convert to UNIX format
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
-    from Utillities import * # If this fails, we can't continue and will bomb below
+    from utillities import * # If this fails, we can't continue and will bomb below
 except Exception:
-    sys.stderr.write( '\nUtillities.py not found next to this %s tool.\n' % __file__  )
+    sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
     sys.exit( 2 )
 
 try:

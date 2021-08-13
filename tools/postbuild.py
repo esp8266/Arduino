@@ -4,11 +4,16 @@
 import os
 import sys
 ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) + "/" # convert to UNIX format
+sys.stderr.write( '\nDebug for failed check in Pull-Request:\n' )
+sys.stderr.write( '...ToolsDir: %s\n' % ToolsDir )
+sys.stderr.write( '...sys.path (before insert): %s\n' % ", ".join( sys.path ) )
+
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
-    from Utillities import * # If this fails, we can't continue and will bomb below
+    sys.stderr.write( '...sys.path (after insert): %s\n' % ", ".join( sys.path ) )
+    from utillities import * # If this fails, we can't continue and will bomb below
 except Exception:
-    sys.stderr.write( '\nUtillities.py not found next to this %s tool.\n' % __file__  )
+    sys.stderr.write( '\nutillities.py not found next to this %s tool.\n' % __file__  )
     sys.exit( 2 )
 
 def parse_args( argsIn ):
