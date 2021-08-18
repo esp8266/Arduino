@@ -77,14 +77,15 @@ def RemoveIno( path ):
     return path
     
 def ConfirmDialog( title, text ):
+    """ return -1 if tkinter not installed, 0 if aswer was no, 1 if answer was yes """
     try:
         import tkinter
         from tkinter import messagebox
     except:
-        raise ProcessError( "tkinter not available.\nPlease install it with:\npip3 install tkinter\n" )
+        return -1
     rootWin = tkinter.Tk() # Create the object
     rootWin.overrideredirect( 1 ) # Avoid it appearing and then disappearing quickly
     #rootWin.iconbitmap("PythonIcon.ico") # Set an icon (this is optional - must be in a .ico format)
     rootWin.withdraw() # Hide the window as we do not want to see this one
-    return messagebox.askyesno( title, text, parent = rootWin )
+    return 1 if messagebox.askyesno( title, text, parent = rootWin ) else 0
 
