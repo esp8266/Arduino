@@ -1032,6 +1032,24 @@ macros = {
         ( '.build.spiffs_pagesize', '256' ),
         ( '.build.debug_port', '' ),
         ( '.build.debug_level', '' ),
+
+        ( '.menu.Filesystem.Off', 'Off' ),
+        ( '.menu.Filesystem.Off.build.Filesystem', '0' ),
+        ( '.menu.Filesystem.LitteFsCreateUpload', 'LitteFs: Create & Upload' ),
+        ( '.menu.Filesystem.LitteFsCreateUpload.build.Filesystem', '1' ),
+        ( '.menu.Filesystem.LitteFsCreateExport', 'LitteFs: Create only' ),
+        ( '.menu.Filesystem.LitteFsCreateExport.build.Filesystem', '2' ),
+        ( '.menu.Filesystem.SPIFFSCreateUpload', 'SPIFFS: Create & Upload' ),
+        ( '.menu.Filesystem.SPIFFSCreateUpload.build.Filesystem', '3' ),
+        ( '.menu.Filesystem.SPIFFSCreateExport', 'SPIFFS: Create only' ),
+        ( '.menu.Filesystem.SPIFFSCreateExport.build.Filesystem', '4' ),
+
+        ( '.menu.Binaries.Off', 'Off' ),
+        ( '.menu.Binaries.Off.build.Binaries', '0' ),
+        ( '.menu.Binaries.Binaries', 'Export (.bin & .bin.signed)' ),
+        ( '.menu.Binaries.Binaries.build.Binaries', '1' ),
+        ( '.menu.Binaries.PackedBinaries', 'Create & Export gzipped Binaries too' ),
+        ( '.menu.Binaries.PackedBinaries.build.Binaries', '2' ),
         ]),
 
     #######################
@@ -1658,6 +1676,8 @@ def all_boards ():
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
+    print('menu.Filesystem=Filesystem')
+    print('menu.Binaries=Binaries')
     print('')
 
     missingboards = []
