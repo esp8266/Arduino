@@ -3,6 +3,8 @@
 
 import os
 import sys
+import gzip
+import shutil
 ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) + "/" # convert to UNIX format
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
@@ -35,24 +37,14 @@ def CountFilesInDir( dataDir ):
                 fileCount += 1
     return fileCount
 
-GzipStatus = 0 # 0: Not checked, 1: found, 2: not found & Msg given
-GzipPath = None
 def CreateGzFile( dir, name ):
     """ gzip the file 'dir/name' and save the compressed file to 'dir/name.gz'. Return name of generated file as list. """
-    global GzipStatus, GzipPath
-    if GzipStatus == 2:
-        return []
-    if GzipStatus == 0:
-        GzipPath = Which( "gzip", ToolsDir )
-        if GzipPath is None:
-            GzipStatus = 2
-            raise FatalError( "'Create & Export gzipped Binaries too' selected, but 'gzip' not in path. Creating canceled" )
-        GzipStatus = 1
     outName = "%s.gz" % name
     outPath = os.path.join( dir, outName )
-    cmd = '%s -9 -k -f "%s" >%s' % ( GzipPath, os.path.join( dir, name ), outPath )
-    if os.system( cmd ) != 0:
-        raise FatalError( "Error excuting gzip cmd: %s" % cmd ) 
+    inPath = os.path.join( dir, name )
+    with open( inPath, 'rb' ) as inFile:
+        with gzip.open( outPath, 'wb' ) as outFile:
+            shutil.copyfileobj( inFile, outFile )
     if not os.path.exists( outPath ):
         raise FatalError( "gzip: file '%s' not created" % outName )
     return [ outName ]
