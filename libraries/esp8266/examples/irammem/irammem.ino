@@ -14,6 +14,204 @@
 #define ETS_PRINTF ets_uart_printf
 #endif
 
+/*
+  Verify mmu_get_uint16()'s compliance with strict-aliasing rules under
+  different optimizations.
+*/
+
+#pragma GCC push_options
+// reference
+#pragma GCC optimize("O0")   // We expect -O0 to generate the correct results
+__attribute__((noinline))
+void aliasTestReference(uint16_t *x) {
+  // Without adhearance to strict-aliasing, this sequence of code would fail
+  // when optimized by GCC Version 10.3
+  size_t len = 3;
+	for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+		for (size_t v = 0; v < len; v++) {
+      x[v] = mmu_get_uint16(&x[v]) + x1;
+		}
+	}
+}
+// Tests
+#pragma GCC optimize("Os")
+__attribute__((noinline))
+void aliasTestOs(uint16_t *x) {
+  size_t len = 3;
+	for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+		for (size_t v = 0; v < len; v++) {
+      x[v] = mmu_get_uint16(&x[v]) + x1;
+		}
+	}
+}
+#pragma GCC optimize("O2")
+__attribute__((noinline))
+void aliasTestO2(uint16_t *x) {
+  size_t len = 3;
+	for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+		for (size_t v = 0; v < len; v++) {
+      x[v] = mmu_get_uint16(&x[v]) + x1;
+		}
+	}
+}
+#pragma GCC optimize("O3")
+__attribute__((noinline))
+void aliasTestO3(uint16_t *x) {
+  size_t len = 3;
+	for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+		for (size_t v = 0; v < len; v++) {
+      x[v] = mmu_get_uint16(&x[v]) + x1;
+		}
+	}
+}
+
+// Evaluate if optomizer may have changed 32-bit access to 8-bit.
+// 8-bit access will take longer as it will be processed thought
+// the exception handler. For this case the -O0 version will appear faster.
+#pragma GCC optimize("O0")
+__attribute__((noinline)) IRAM_ATTR
+uint32_t timedRead_Reference(uint8_t *res) {
+  // This test case was verified with GCC 10.3
+  // There is a code case that can result in 32-bit wide IRAM load from memory
+  // being optimized down to an 8-bit memory access. In this test case we need
+  // to supply a constant IRAM address that is not 0 when anded with 3u.
+  // This section verifies that the workaround implimented by the inline
+  // function mmu_get_uint8() is preventing this. See comments for function
+  // mmu_get_uint8(() in mmu_iram.h for more details.
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("Os")
+__attribute__((noinline)) IRAM_ATTR
+uint32_t timedRead_Os(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("O2")
+__attribute__((noinline)) IRAM_ATTR
+uint32_t timedRead_O2(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("O3")
+__attribute__((noinline)) IRAM_ATTR
+uint32_t timedRead_O3(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC pop_options
+
+bool test4_32bit_loads() {
+  bool result = true;
+  uint8_t res;
+  uint32_t cycle_count_ref, cycle_count;
+  Serial.printf("\r\nFor mmu_get_uint8, verify that 32-bit wide IRAM access is preserved across different optimizations:\r\n");
+  cycle_count_ref = timedRead_Reference(&res);
+  /*
+    If the optimizer (for options -Os, -O2, and -O3) replaces the 32-bit wide
+    IRAM access with an 8-bit, the exception handler will get invoked on memory
+    reads. The total execution time will show a significant increase when
+    compared to the reference (option -O0).
+  */
+  Serial.printf("  Option -O0, cycle count %5u - reference\r\n", cycle_count_ref);
+  cycle_count = timedRead_Os(&res);
+  Serial.printf("  Option -Os, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  cycle_count = timedRead_O2(&res);
+  Serial.printf("  Option -O2, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  cycle_count = timedRead_O3(&res);
+  Serial.printf("  Option -O3, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  return result;
+}
+
+void printPunFail(uint16_t *ref, uint16_t *x, size_t sz) {
+  Serial.printf("    Expected:");
+  for (size_t i = 0; i < sz; i++) {
+    Serial.printf(" %3u", ref[i]);
+  }
+  Serial.printf("\r\n    Got:     ");
+  for (size_t i = 0; i < sz; i++) {
+    Serial.printf(" %3u", x[i]);
+  }
+  Serial.printf("\r\n");
+}
+
+bool testPunning() {
+  bool result = true;
+  // Get reference result for verifing test
+  alignas(alignof(uint32_t)) uint16_t x_ref[] = {1, 2, 3, 0};
+  aliasTestReference(x_ref);  // -O0
+  Serial.printf("mmu_get_uint16() strict-aliasing tests with different optimizations:\r\n");
+
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    aliasTestOs(x);
+    Serial.printf("  Option -Os ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+    }
+  }
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    aliasTestO2(x);
+    Serial.printf("  Option -O2 ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+    }
+  }
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    aliasTestO3(x);
+    Serial.printf("  Option -O3 ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+    }
+  }
+  return result;
+}
+
+
 uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
@@ -94,8 +292,10 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
   return ESP.getCycleCount() - b;
 }
 
+/*
+  Option "no-strict-aliasing" is required when using mmu_get... or mmu_set_...
+ */
 // Compare with Inline
-
 uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
@@ -158,6 +358,7 @@ uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
   }
   return ESP.getCycleCount() - b;
 }
+
 
 bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
   uint32_t res, verify_res;
@@ -317,7 +518,7 @@ void setup() {
   Serial.println();
 
 
-  if (perfTest_nK(1, mem, imem)) {
+  if (perfTest_nK(1, mem, imem) && testPunning() && test4_32bit_loads()) {
     Serial.println();
   } else {
     Serial.println("\r\n*******************************");
