@@ -417,12 +417,23 @@ void set_flashchip_and_check_erase_config(void) {
     PRINT_FLASHCHIP();
     /* Since Flash code has been mapped for execution, we can just address the
        flash image header located at the beginning of flash as iCACHE like memory. */
-    /* the tool chain update is optomizing out my 32-bit access to an 8-bit
-       unless I use volatile */
-    const uint32_t imghdr_4bytes = *((const uint32_t volatile *)0x40200000);
-    const image_header_t *partial_imghdr = (const image_header_t *)&imghdr_4bytes;
+    const uint32_t *icache_flash = (const uint32_t *)0x40200000u;
+    union {               // to comply with strict-aliasing rules
+      image_header_t hdr; // total size 8 bytes
+      uint32_t u32;       // we only need the 1st 4 bytets
+    } imghdr_4bytes;
+    // read first 4 byte (magic byte + flash config)
+    imghdr_4bytes.u32 = *icache_flash;
     uint32_t old_flash_size = flashchip->chip_size;
-    flashchip->chip_size = esp_c_magic_flash_chip_size((partial_imghdr->flash_size_freq >> 4) & 0x0F);
+    /*
+       ICACHE memory read requires aligned word transfers.  Because
+       imghdr_4bytes.hdr.flash_size_freq is a byte value, the GCC 10.3 compiler
+       tends to optimize out our 32-bit access for 8-bit access. If we reference
+       the 32-bit word from Extended ASM, this persuades the compiler to keep the
+       32-bit register load and extract the 8-bit value later.
+     */
+    asm volatile("# imghdr_4bytes.u32 => %0" ::"r"(imghdr_4bytes.u32));
+    flashchip->chip_size = esp_c_magic_flash_chip_size(imghdr_4bytes.hdr.flash_size_freq >> 4);
     PRINT_FLASHCHIP();
     if (flashchip->chip_size) {
         check_and_erase_config();
