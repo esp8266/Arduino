@@ -1033,23 +1033,26 @@ macros = {
         ( '.build.debug_port', '' ),
         ( '.build.debug_level', '' ),
 
+        ( '.menu.Upload.Sketch', 'Sketch' ),
+        ( '.menu.Upload.Sketch.build.Upload', '1' ),
+        ( '.menu.Upload.Filesystem', 'Filesystem' ),
+        ( '.menu.Upload.Filesystem.build.Upload', '2' ),
+        ( '.menu.Upload.Both', 'Both' ),
+        ( '.menu.Upload.Both.build.Upload', '3' ),
+
         ( '.menu.Filesystem.Off', 'Off' ),
         ( '.menu.Filesystem.Off.build.Filesystem', '0' ),
-        ( '.menu.Filesystem.LitteFsCreateUpload', 'LitteFs: Create & Upload' ),
-        ( '.menu.Filesystem.LitteFsCreateUpload.build.Filesystem', '1' ),
-        ( '.menu.Filesystem.LitteFsCreateExport', 'LitteFs: Create only' ),
-        ( '.menu.Filesystem.LitteFsCreateExport.build.Filesystem', '2' ),
-        ( '.menu.Filesystem.SPIFFSCreateUpload', 'SPIFFS: Create & Upload' ),
-        ( '.menu.Filesystem.SPIFFSCreateUpload.build.Filesystem', '3' ),
-        ( '.menu.Filesystem.SPIFFSCreateExport', 'SPIFFS: Create only' ),
-        ( '.menu.Filesystem.SPIFFSCreateExport.build.Filesystem', '4' ),
+        ( '.menu.Filesystem.LitteFs', 'LitteFs' ),
+        ( '.menu.Filesystem.LitteFs.build.Filesystem', '1' ),
+        ( '.menu.Filesystem.SPIFFS', 'SPIFFS' ),
+        ( '.menu.Filesystem.SPIFFS.build.Filesystem', '2' ),
 
-        ( '.menu.Binaries.Off', 'Off' ),
-        ( '.menu.Binaries.Off.build.Binaries', '0' ),
-        ( '.menu.Binaries.Binaries', 'Export (.bin & .bin.signed)' ),
-        ( '.menu.Binaries.Binaries.build.Binaries', '1' ),
-        ( '.menu.Binaries.PackedBinaries', 'Create & Export gzipped Binaries too' ),
-        ( '.menu.Binaries.PackedBinaries.build.Binaries', '2' ),
+        ( '.menu.Export.Off', 'Off' ),
+        ( '.menu.Export.Off.build.Export', '0' ),
+        ( '.menu.Export.Binaries', '.bin & .bin.signed' ),
+        ( '.menu.Export.Binaries.build.Export', '1' ),
+        ( '.menu.Export.GzBinaries', 'Create & Export gzipped Binaries too' ),
+        ( '.menu.Export.GzBinaries.build.Export', '2' ),
         ]),
 
     #######################
@@ -1676,8 +1679,9 @@ def all_boards ():
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
+    print('menu.Upload=Upload')
     print('menu.Filesystem=Filesystem')
-    print('menu.Binaries=Binaries')
+    print('menu.Export=Export')
     print('')
 
     missingboards = []

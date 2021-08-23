@@ -37,7 +37,8 @@ except Exception:
 #Args: (new)
 #  As defined in 'platform.txt' for 'tools.esptool.upload.pattern'  possible values
 #  |                                                                |
-#  -fi "{build.Filesystem}"                                         0-4
+#  -up "{build.Upload}"                                             1-3
+#  -fi "{build.Filesystem}"                                         0-2
 #  --port "{serial.port}"                                           e.g.: /dev/ttyUSB0
 #  --baud "{upload.speed}"                                          e.g.: 115200
 #  {upload.resetmethod}                                             --before { default_reset | no_reset | no_reset_no_sync } --after { hard_reset | soft_reset }
@@ -50,7 +51,8 @@ except Exception:
 
 def parse_args( argsIn ):
     parser = argparse.ArgumentParser( description = 'Upload-Wrapper for Arduino esp8266' )
-    parser.add_argument( '-fi', '--Filesystem', type = int, default = 0, help = '0: Off, 1: LitteFs: Create & Upload, 2: LitteFs: Create only, 3: SPIFFS: Create & Upload, 4: SPIFFS: Create only' )
+    parser.add_argument( '-up', '--Upload', type = int, default = 1, help = '1: Sketch, 2: Filesystem, 3: Both' )
+    parser.add_argument( '-fi', '--Filesystem', type = int, default = 0, help = '0: Off, 1: LitteFs, 3: SPIFFS' )
     parser.add_argument( '--port', type = str, required = True, help = 'path to serial device' )
     parser.add_argument( '--baud', type = str, required = True, help = 'baudrate' )
     parser.add_argument( '--before', type = str, required = True, help = 'before (default_reset/no_reset/no_reset_no_sync)' )
@@ -87,27 +89,29 @@ def main( argsIn = None ):
         esptoolArgs += [ '--trace' ]
     esptoolArgs += [ 'write_flash' ]
 
-    if len( Args.erase_cmd ) and Args.erase_cmd[ 0 ] == "erase_flash":
-        esptoolArgs += [ '--erase-all' ]
-    esptoolArgs += [ '--flash_size', 'detect', Args.sk[ 0 ], Args.sk[ 1 ] ]
-    
     EraseFilePath = ''
+    filesUploaded = []
     try:
-        if len( Args.erase_cmd ) and Args.erase_cmd[ 0 ] == "erase_region":
-            # Generate temporary empty (0xff) file
-            f, EraseFilePath = tempfile.mkstemp()
-            os.write( f, bytearray( [ 255 ] * int( Args.erase_cmd[ 2 ], 0 ) ) )
-            os.close( f )
-            esptoolArgs += [ Args.erase_cmd[ 1 ], EraseFilePath ]
+        if ( Args.Upload & 1 ) == 1:
+            if len( Args.erase_cmd ) and Args.erase_cmd[ 0 ] == "erase_flash":
+                esptoolArgs += [ '--erase-all' ]
+            esptoolArgs += [ '--flash_size', 'detect', Args.sk[ 0 ], Args.sk[ 1 ] ]
 
-        filesUploaded = [ Path( Args.sk[ 1 ] ).name ]
-        if Args.Filesystem == 1:
-            esptoolArgs += [ Args.fs[ 0 ], "%s.littlefs" % Args.fs[ 1 ] ]
-            filesUploaded += [ Path( Args.fs[ 1 ] ).name ]
-        elif Args.Filesystem == 3:
-            esptoolArgs += [ Args.fs[ 0 ], "%s.spiffs" % Args.fs[ 1 ] ]
-            filesUploaded += [ Path( Args.fs[ 1 ] ).name ]
-    
+            if len( Args.erase_cmd ) and Args.erase_cmd[ 0 ] == "erase_region":
+                # Generate temporary empty (0xff) file
+                f, EraseFilePath = tempfile.mkstemp()
+                os.write( f, bytearray( [ 255 ] * int( Args.erase_cmd[ 2 ], 0 ) ) )
+                os.close( f )
+                esptoolArgs += [ Args.erase_cmd[ 1 ], EraseFilePath ]
+
+            filesUploaded += [ Path( Args.sk[ 1 ] ).name ]
+
+        if ( Args.Upload & 2 ) == 2:
+            fsName = "%s.%s" % ( Args.fs[ 1 ], "littlefs" if Args.Filesystem == 1 else "spiffs" )
+            if os.path.exists( fsName ):
+                esptoolArgs += [ Args.fs[ 0 ], fsName ]
+                filesUploaded += [ Path( fsName ).name ]
+
         Msg( "Uploading Binaries..." )
         #Debug( str( esptoolArgs ) )
         esptool.main( esptoolArgs )

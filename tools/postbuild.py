@@ -15,8 +15,8 @@ except Exception as e:
 
 def parse_args( argsIn ):
     parser = argparse.ArgumentParser( description = 'PostBuild for ESP8288' )
-    parser.add_argument( '-fi', '--Filesystem', type = int, default = 0, help = '0: Off, 1: LitteFs: Create & Upload, 2: LitteFs: Create only, 3: SPIFFS: Create & Upload, 4: SPIFFS: Create only' )
-    parser.add_argument( '-bi', '--Binaries', type = int, default = 0, help = '0: Off, 1: Export (.bin & .bin.signed), 2: Create & Export gzipped Binaries too' )
+    parser.add_argument( '-fi', '--Filesystem', type = int, default = 0, help = '0: Off, 1: LitteFs, 3: SPIFFS' )
+    parser.add_argument( '-ex', '--Export', type = int, default = 0, help = '0: Off, 1: .bin & .bin.signed, 2: Create & Export gzipped Binaries too' )
     parser.add_argument( '-na', '--name', type = str, required = True, help = 'Name of sketch (without extension)' )
     parser.add_argument( '-bp', '--buildPath', type = str, required = True, help = 'Path to temporary dir where sketch was build' )
     parser.add_argument( '-so', '--source', type = str, required = True, help = 'Path to sketch' )
@@ -71,11 +71,21 @@ def CreateSignedFile( dir, name ):
         raise FatalError( "Exception while signing '%s': %s" % ( name, e ) )
     return []
 
+def RemoveFs( fsName ):
+    """ Removes the (possible existing from prev. builds) given fs from {build.path}
+        This enshures, that (at upload-stage) we don't use the wrong fs created formerly.
+        fsName = "littlefs" "spiffs"           used for naming the binary to remove. """
+    imageName = "./%s.%s" % ( Args.name, fsName )
+    if os.path.exists( imageName ):
+        os.remove( imageName )
+
 def CreateFs( fsName, mkFsName ):
     """ Creates the given fs from all files inside subdir 'data' of the sketch. 
         fsName = "littlefs" "spiffs"           used for naming the generated binary.
         mkFsName = "mklittlefs" | "mkspiffs"   the name of the programm that generates the fs """
     mkFsPath = Which( mkFsName, os.path.join( ToolsDir, mkFsName ) )
+    if mkFsPath is None:
+        mkFsPath = Which( "%s.exe" % mkFsName, os.path.join( ToolsDir, mkFsName ) )
     res = []
     dataDir = "%s/data" % ( Args.source )
     if len( Args.spiffs_start ) == 0 or len( Args.spiffs_end ) == 0:
@@ -107,7 +117,7 @@ def CreateFs( fsName, mkFsName ):
     signing = Signing and os.path.exists( os.path.abspath( Args.name + ".bin.signed" ) )
     if signing:
         res += CreateSignedFile( DstDir, imageName )
-    if Args.Binaries == 2:
+    if Args.Export == 2:
         res += CreateGzFile( DstDir, imageName )
         if signing:
             res += CreateSignedFile( DstDir, "%s.%s.gz" % ( Args.name, fsName ) )
@@ -116,18 +126,20 @@ def CreateFs( fsName, mkFsName ):
 def ProcessFilesystem_():
     if Args.spiffs_start is None or Args.spiffs_end is None:
         raise ProcessError( "'spiffs_start' and/or 'spiffs_end' missing" )
-    if Args.Filesystem == 1 or Args.Filesystem == 2:
+    if Args.Filesystem == 1:
+        RemoveFs( "spiffs" )
         return CreateFs( "littlefs", "mklittlefs" )
-    elif Args.Filesystem == 3 or Args.Filesystem == 4:
+    elif Args.Filesystem == 2:
+        RemoveFs( "littlefs" )
         return CreateFs( "spiffs", "mkspiffs" )
 
-def ProcessBinaries_():
+def ProcessExport_():
     res = []
     os.makedirs( DstDir, exist_ok = True )
     # Copy Binaries
     res += CopyToDir( Args.name, "bin", DstDir )
     res += CopyToDir( Args.name, "bin.signed", DstDir )
-    if Args.Binaries == 2:
+    if Args.Export == 2:
         # Create & Export gzipped Binaries too
         res += CreateGzFile( DstDir, "%s.bin" % Args.name )
         if os.path.exists( os.path.abspath( os.path.join( DstDir, "%s.bin.signed" % Args.name ) ) ):
@@ -141,10 +153,14 @@ def ProcessFilesystem():
         Msg( '...files generated: %s' % ", ".join( filesCreated ) )
     except ProcessError as e:
         Msg( '...aborted: %s' % e )
+        try:
+            WarningDialog( "Filesystem Create aborted", e )
+        except ProcessError:
+            pass
 
-def ProcessBinaries():
+def ProcessExport():
     Msg( "Exporting Binaries..." )
-    filesExported = ProcessBinaries_()
+    filesExported = ProcessExport_()
     Msg( '...files exported: %s' % ", ".join( filesExported ) )
 
 def main( argsIn = None ):
@@ -157,7 +173,7 @@ def main( argsIn = None ):
 
     #Debug( "Python-Path: %s" % sys.executable ) 
     parse_args( argsIn )
-    #Debug( "Args: %s" % ", "join( sys.argv[ 1: ] ) )
+    #Debug( "Posbuild: Args: %s" % ", ".join( sys.argv[ 1: ] ) )
     
     #!! For unknown reason using/concatinig Args.buildPath with "/" (or enything else) will result in an empthy string ???
     #if You uncomment the following two lines You will see something like:
@@ -169,6 +185,7 @@ def main( argsIn = None ):
     # Workaround: cd to the build/temp path
     cwd = os.getcwd()
     os.chdir( Args.buildPath )
+    Msg( 'Build-Dir: %s\n' % Args.buildPath )
 
     #!	 Even this will not give the correct path !
     #Debug( "abspath: %s" % os.path.abspath( "./" ) )
@@ -179,10 +196,13 @@ def main( argsIn = None ):
         SigningPrivKeyPath = os.path.abspath( "%s/private.key" % Args.source )
         Signing = os.path.isfile( SigningPrivKeyPath )
         DstDir = os.path.join( Args.source, "bin", Args.variant )
-        if Args.Filesystem != 0:
+        if Args.Filesystem == 0:
+            RemoveFs( "littlefs" )
+            RemoveFs( "spiffs" )
+        else:
             ProcessFilesystem()
-        if Args.Binaries != 0:
-            ProcessBinaries()
+        if Args.Export != 0:
+            ProcessExport()
     finally:
         # restore working dir    
         os.chdir( cwd )

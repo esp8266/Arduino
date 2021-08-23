@@ -131,7 +131,7 @@ recipe.objcopy.hex.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime
 recipe.objcopy.hex.3.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.sizes}" --elf "{build.path}/{build.project_name}.elf" --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --mmu "{build.mmuflags}"
 
 # Post-Build: Handle new Menu-Enties: Filesystem & Binaries
-recipe.hooks.objcopy.postobjcopy.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.postbuild}" -fi "{build.Filesystem}" -bi "{build.Binaries}" -na "{build.project_name}" -bp "{build.path}" -so "{build.source.path}" -va "{build.variant}" -ss "{build.spiffs_start}" -se "{build.spiffs_end}" -sp "{build.spiffs_pagesize}" -sl "{build.spiffs_blocksize}"
+recipe.hooks.objcopy.postobjcopy.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.postbuild}" -fi "{build.Filesystem}" -ex "{build.Export}" -na "{build.project_name}" -bp "{build.path}" -so "{build.source.path}" -va "{build.variant}" -ss "{build.spiffs_start}" -se "{build.spiffs_end}" -sp "{build.spiffs_pagesize}" -sl "{build.spiffs_blocksize}"
 
 ## Save hex
 recipe.output.tmp_file.1={build.project_name}.bin
@@ -163,9 +163,9 @@ tools.esptool.upload.params.quiet=
 
 # Old behaviour (without integrated handling of filesystem & gzipd Binaries) can be (re)enabled by commenting in/out the following 2x2 entries
 #tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/uploadGn.py" -fi "{build.Filesystem}" --port "{serial.port}" --baud "{upload.speed}" {upload.resetmethod} --sk 0x0 "{build.path}/{build.project_name}.bin" --fs {build.spiffs_start} "{build.path}/{build.project_name}" {upload.erase_cmd} "{upload.verbose}"
+tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/uploadGn.py" -fi "{build.Filesystem}" -up "{build.Upload}" --port "{serial.port}" --baud "{upload.speed}" {upload.resetmethod} --sk 0x0 "{build.path}/{build.project_name}.bin" --fs {build.spiffs_start} "{build.path}/{build.project_name}" {upload.erase_cmd} "{upload.verbose}"
 #tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/netUploadGn.py" -fi "{build.Filesystem}" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" --sk "{build.path}/{build.project_name}.bin" --fs "{build.path}/{build.project_name}"
+tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/netUploadGn.py" -fi "{build.Filesystem}" -up "{build.Upload}" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" --sk "{build.path}/{build.project_name}.bin" --fs "{build.path}/{build.project_name}"
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe

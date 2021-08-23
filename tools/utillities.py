@@ -75,8 +75,8 @@ def RemoveIno( path ):
     if path[ -4: ] == ".ino":
         path = name[ 0:-4 ]
     return path
-    
-def ConfirmDialog( title, text ):
+
+def TkDialog( title, text, mbName ):
     try:
         import tkinter
         from tkinter import messagebox
@@ -86,5 +86,24 @@ def ConfirmDialog( title, text ):
     rootWin.overrideredirect( 1 ) # Avoid it appearing and then disappearing quickly
     #rootWin.iconbitmap("PythonIcon.ico") # Set an icon (this is optional - must be in a .ico format)
     rootWin.withdraw() # Hide the window as we do not want to see this one
-    return messagebox.askyesno( title, text, parent = rootWin )
+    mbFunc = getattr( messagebox, mbName ) 
+    return mbFunc( title, text, parent = rootWin )
+def InfoDialog( title, text ):
+    return TkDialog( title, text, 'showinfo' )
+def WarningDialog( title, text ):
+    return TkDialog( title, text, 'showwarning' )
+def ErrorDialog( title, text ):
+    return TkDialog( title, text, 'showerror' )
+def QuestionDialog( title, text ):
+    return TkDialog( title, text, 'askquestion' )
+def OkCancelDialog( title, text ):
+    return TkDialog( title, text, 'askokcancel' )
+def RetryCancelDialog( title, text ):
+    return TkDialog( title, text, 'askretrycancel' )
+def YesNoDialog( title, text ):
+    return TkDialog( title, text, 'askyesno' )
+def ConfirmDialog( title, text ):
+    return TkDialog( title, text, 'askyesno' )
+def YesNoCancelDialog( title, text ):
+    return TkDialog( title, text, 'askyesnocancel' )
 
