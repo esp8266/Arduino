@@ -27,46 +27,46 @@ void aliasTestReference(uint16_t *x) {
   // Without adhearance to strict-aliasing, this sequence of code would fail
   // when optimized by GCC Version 10.3
   size_t len = 3;
-	for (size_t u = 0; u < len; u++) {
+  for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
-		for (size_t v = 0; v < len; v++) {
+    for (size_t v = 0; v < len; v++) {
       x[v] = mmu_get_uint16(&x[v]) + x1;
-		}
-	}
+    }
+  }
 }
 // Tests
 #pragma GCC optimize("Os")
 __attribute__((noinline))
 void aliasTestOs(uint16_t *x) {
   size_t len = 3;
-	for (size_t u = 0; u < len; u++) {
+  for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
-		for (size_t v = 0; v < len; v++) {
+    for (size_t v = 0; v < len; v++) {
       x[v] = mmu_get_uint16(&x[v]) + x1;
-		}
-	}
+    }
+  }
 }
 #pragma GCC optimize("O2")
 __attribute__((noinline))
 void aliasTestO2(uint16_t *x) {
   size_t len = 3;
-	for (size_t u = 0; u < len; u++) {
+  for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
-		for (size_t v = 0; v < len; v++) {
+    for (size_t v = 0; v < len; v++) {
       x[v] = mmu_get_uint16(&x[v]) + x1;
-		}
-	}
+    }
+  }
 }
 #pragma GCC optimize("O3")
 __attribute__((noinline))
 void aliasTestO3(uint16_t *x) {
   size_t len = 3;
-	for (size_t u = 0; u < len; u++) {
+  for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
-		for (size_t v = 0; v < len; v++) {
+    for (size_t v = 0; v < len; v++) {
       x[v] = mmu_get_uint16(&x[v]) + x1;
-		}
-	}
+    }
+  }
 }
 
 // Evaluate if optomizer may have changed 32-bit access to 8-bit.
@@ -181,7 +181,7 @@ bool testPunning() {
     } else {
       result = false;
       Serial.printf("- failed\r\n");
-      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
     }
   }
   {
@@ -193,7 +193,7 @@ bool testPunning() {
     } else {
       result = false;
       Serial.printf("- failed\r\n");
-      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
     }
   }
   {
@@ -205,7 +205,7 @@ bool testPunning() {
     } else {
       result = false;
       Serial.printf("- failed\r\n");
-      printPunFail(x_ref, x, sizeof(x_ref)/sizeof(uint16_t));
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
     }
   }
   return result;
@@ -294,7 +294,7 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
 
 /*
   Option "no-strict-aliasing" is required when using mmu_get... or mmu_set_...
- */
+*/
 // Compare with Inline
 uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();

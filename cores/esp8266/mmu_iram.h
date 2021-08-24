@@ -146,7 +146,7 @@ uint8_t mmu_get_uint8(const void *p8) {
   // output register will stop the the compiler from reloading the value later
   // as 8-bit load from IRAM.
   asm volatile ("" :"+r"(val)); // inject 32-bit dependency
-  uint32_t pos = ((uint32_t)p8 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p8 & 3u) * 8u;
   val >>= pos;
   return (uint8_t)val;
 }
@@ -158,7 +158,7 @@ uint16_t mmu_get_uint16(const uint16_t *p16) {
   uint32_t val;
   __builtin_memcpy(&val, v32, sizeof(uint32_t));
   asm volatile ("" :"+r"(val));
-  uint32_t pos = ((uint32_t)p16 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p16 & 3u) * 8u;
   val >>= pos;
   return (uint16_t)val;
 }
@@ -170,7 +170,7 @@ int16_t mmu_get_int16(const int16_t *p16) {
   uint32_t val;
   __builtin_memcpy(&val, v32, sizeof(uint32_t));
   asm volatile ("" :"+r"(val));
-  uint32_t pos = ((uint32_t)p16 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p16 & 3u) * 8u;
   val >>= pos;
   return (int16_t)val;
 }
@@ -178,7 +178,7 @@ int16_t mmu_get_int16(const int16_t *p16) {
 static inline __attribute__((always_inline))
 uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
   ASSERT_RANGE_TEST_WRITE(p8);
-  uint32_t pos = ((uint32_t)p8 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p8 & 3u) * 8u;
   uint32_t sval = val << pos;
   uint32_t valmask =  0x0FFu << pos;
 
@@ -202,7 +202,7 @@ uint8_t mmu_set_uint8(void *p8, const uint8_t val) {
 static inline __attribute__((always_inline))
 uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
-  uint32_t pos = ((uint32_t)p16 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p16 & 3u) * 8u;
   uint32_t sval = val << pos;
   uint32_t valmask =  0x0FFFFu << pos;
 
@@ -222,7 +222,7 @@ static inline __attribute__((always_inline))
 int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
   ASSERT_RANGE_TEST_WRITE(p16);
   uint32_t sval = (uint16_t)val;
-  uint32_t pos = ((uint32_t)p16 & 3u) * 8u;
+  uint32_t pos = ((uintptr_t)p16 & 3u) * 8u;
   sval <<= pos;
   uint32_t valmask =  0x0FFFFu << pos;
 
