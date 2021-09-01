@@ -173,7 +173,8 @@ The following points assume work in a direct clone of the repository, and not in
 
    * [platform.txt](https://github.com/esp8266/Arduino/blob/master/platform.txt)
    * [package.json](https://github.com/esp8266/Arduino/blob/master/package.json)
-   * [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) (<= `cd tools; ./TZupdate.sh`)
+   * [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) (<= `cd tools; sh ./TZupdate.sh`)
+   * Certificates (<= `cd tools; sh certsUpdate.sh`)
 
 - [ ] 5. Wait until the release notes have been checked by other maintainers (can be changed afterwards anyway)
 

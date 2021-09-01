@@ -69,7 +69,7 @@ static uint32_t s_cycles_at_yield_start;
  */
 #define ETS_INTR_LOCK_NEST_MAX 7
 static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
-static byte     ets_intr_lock_stack_ptr=0;
+static uint8_t  ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
@@ -318,6 +318,9 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
+    /* Doing umm_init just once before starting the SDK, allowed us to remove
+       test and init calls at each malloc API entry point, saving IRAM. */
+    umm_init();
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -325,7 +328,6 @@ static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinabl
 
 extern "C" void app_entry (void)
 {
-    umm_init();
     return app_entry_custom();
 }
 
@@ -367,7 +369,7 @@ extern "C" void user_init(void) {
 #if defined(UMM_HEAP_EXTERNAL)
     install_vm_exception_handler();
 #endif
-  
+
 #if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif

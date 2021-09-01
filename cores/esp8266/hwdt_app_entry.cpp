@@ -1048,6 +1048,22 @@ static void printSanityCheck() {
 }
 #endif //DEBUG_ESP_HWDT_DEV_DEBUG
 
+/*
+   hwdt_pre_sdk_init() is the result of a hook for development diagnotics which
+   evolved and was generlized to run any optional diagnostic code supplied at
+   link time.
+
+   Summary of the hwdt_pre_sdk_init() runtime environment:
+    * The code can run from flash and use PROGMEM strings.
+    * All functions must be extern "C" type
+    * C/C++ runtime has not started. Structures have not been initialized and
+      should have the values prior to reboot. With the exception of hwdt_info,
+      which was updated before this call.
+    * You can reference hwdt_info.reset_reason to control the action of the diagnostic.
+    * The stack is on the SYS stack. You have about 3K available before you
+      overwrite ROM Data area.
+    * Printing will work best with ets_uart_printf and umm_info_safe_printf_P.
+ */
 void hwdt_pre_sdk_init(void) __attribute__((weak));
 void hwdt_pre_sdk_init(void) {
 #if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
@@ -1072,14 +1088,12 @@ void hwdt_pre_sdk_init_icache(void) {
   Cache_Read_Disable();
 }
 
-
-#if 1
 /*
-  An asm function alternative to the function with inline asm at the #else. I
-  find the inline asm requires constant inspection to verify that the compiler
-  optimizer does not clobber needed registers, after small changes in code or
-  compiler updates. Hints to the compiler don't always work for me. Last I
-  checked, the inline version below was working.
+  For app_entry_redefinable, use Basic ASM instead of "C" with Extended ASM. The
+  (inline) Extended ASM approach required constant inspection to verify that the
+  compiler's optimizer did not clobber needed registers or do something weird
+  after minor changes in code or compiler updates. Also, I think Basic ASM is
+  the safer route when changing the stack pointer multiple times.
 */
 cont_t *hwdt_app_entry__cont_stack __attribute__((used)) = CONT_STACK;
 
@@ -1089,6 +1103,7 @@ asm  (
     ".literal .g_pcont, g_pcont\n\t"
     ".literal .pcont_stack, hwdt_app_entry__cont_stack\n\t"
     ".literal .sys_stack_first, sys_stack_first\n\t"
+    ".literal .umm_init, umm_init\n\t"
     ".literal .call_user_start, call_user_start\n\t"
     ".literal .get_noextra4k_g_pcont, get_noextra4k_g_pcont\n\t"
     ".align  4\n\t"
@@ -1135,89 +1150,38 @@ asm  (
     "l32r    a13, .pcont_stack\n\t"
     "l32r     a0, .get_noextra4k_g_pcont\n\t"
     "l32r    a14, .g_pcont\n\t"
+    // We now switch to the SYS stack the SDK will use
     "l32i.n   a1,  a2, 0\n\t"          // delayed load for pipeline
     "l32i.n  a13, a13, 0\n\t"
     "callx0   a0\n\t"
     "moveqz   a2, a13, a2\n\t"
     "s32i.n   a2, a14, 0\n\t"
 
+    /*
+     * Allow for running additional diagnotics supplied at link time.
+     */
     "call0    hwdt_pre_sdk_init_icache\n\t"
 
+    // In case somebody cares, leave things as we found them
+    // - Restore ROM BSS zeros.
     "movi     a2, 0x3FFFE000\n\t" // ROM BSS Area
     "movi     a3, 0x0b30\n\t"     // ROM BSS Size
     "call0    ets_bzero\n\t"
+
+    /*
+     * Up until this call, the heap at crash time has been available for
+     * analysis. This is needed for dumping the bearssl stack. Also, future
+     * improvements could possibly use hwdt_pre_sdk_init() to run other early
+     * diagnostic tools.
+     */
+    "l32r     a0, .umm_init\n\t"
+    "callx0   a0\n\t"
 
     "l32r     a3, .call_user_start\n\t"
     "movi     a0, 0x4000044c\n\t"
     "jx       a3\n\t"
     ".size app_entry_redefinable, .-app_entry_redefinable\n\t"
 );
-
-#else
-void IRAM_ATTR app_entry_start(void) {
-
-#ifdef USE_IRAM
-    handle_hwdt();
-#else
-    handle_hwdt_icache();
-#endif
-
-    /*
-     *  Continuation context is in BSS.
-     */
-    g_pcont = get_noextra4k_g_pcont();
-
-    if (!g_pcont) {
-        /*
-         *  The continuation context is on the stack just after the reserved
-         *  space for the ROM/eboot stack and before the SYS stack begins. All
-         *  computations were done at top, save pointer to it now.
-         */
-        g_pcont = CONT_STACK;
-    }
-#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
-    print_sanity_check_icache();
-#endif
-    /*
-     *  Use new calculated SYS stack from top.
-     *  Call the entry point of the SDK code.
-     */
-    asm volatile ("mov.n a1, %0\n\t"
-                  "movi a0, 0x4000044c\n\t"     /* Should never return; however, set return to Boot ROM Breakpoint */
-                  "jx %1\n\t" ::
-                  "r" (sys_stack_first), "r" (call_user_start):
-                  "a0", "memory");
-
-    __builtin_unreachable();
-}
-
-void IRAM_ATTR app_entry_redefinable(void) {
-    /*
-     * There are 4 sections of code that share the stack starting near
-     * 0x40000000.
-     *   1) The Boot ROM (uses around 640 bytes)
-     *   2) The Bootloader, eboot.elf (last seen using 720 bytes.)
-     *   3) `app_entry_redefinable()` just before it starts the SDK.
-     *   4) The NONOS SDK, optionally the Core when the extra 4K option is
-     *      selected.
-     *
-     * Use the ROM BSS zeroed out memory as the home for our temporary stack.
-     * This way no additional information will be lost. That will remove this
-     * tool from the list of possible concerns for stack overwrite.
-     *
-     */
-
-    asm volatile ("movi a1, 0x3fffeb30\n\t"
-                  "j app_entry_start" ::: "memory");
-
-    /*
-     * Keep this function with just asm seems to help avoid a stack frame being
-     * created for this function and things getting really confused.
-     */
-
-    __builtin_unreachable();
-}
-#endif
 
 #if defined(DEBUG_ESP_HWDT_INFO) || defined(ROM_STACK_DUMP)
 void debug_hwdt_init(void) {
