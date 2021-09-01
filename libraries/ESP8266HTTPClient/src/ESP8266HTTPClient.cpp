@@ -363,6 +363,14 @@ int HTTPClient::GET()
 {
     return sendRequest("GET");
 }
+/**
+ * send a DELETE request
+ * @return http code
+ */
+int HTTPClient::DELETE()
+{
+    return sendRequest("DELETE");
+}
 
 /**
  * sends a post request to the server

@@ -188,6 +188,7 @@ public:
 
     /// request handling
     int GET();
+    int DELETE();
     int POST(const uint8_t* payload, size_t size);
     int POST(const String& payload);
     int PUT(const uint8_t* payload, size_t size);
