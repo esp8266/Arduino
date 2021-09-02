@@ -292,9 +292,6 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
   return ESP.getCycleCount() - b;
 }
 
-/*
-  Option "no-strict-aliasing" is required when using mmu_get... or mmu_set_...
-*/
 // Compare with Inline
 uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
