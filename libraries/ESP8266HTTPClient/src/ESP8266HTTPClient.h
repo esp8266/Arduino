@@ -176,6 +176,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setAuthorization(String auth);
     void setTimeout(uint16_t timeout);
 
     // Redirections
