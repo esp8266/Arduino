@@ -31,7 +31,6 @@ extern "C" {
 
 #if AUTOFLASHSIZE
 
-//#warning auto flash size
 extern uint32_t EEPROM_start;
 extern uint32_t FS_start;
 extern uint32_t FS_end;
@@ -41,8 +40,9 @@ extern uint16_t FS_block;
 #include <FlashMap.h>
 extern void flashinit(void);
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
-#define FLASHMAPCONFIG(conf) \
-  extern void flashinit (void); \
+#define FLASHMAPCONFIG(conf) FLASHMAPCONFIGATTR(,conf)
+#define FLASHMAPCONFIGATTR(attr, conf...) \
+  void flashinit (void) attr; \
   void flashinit (void) \
   { \
     static const flash_map_s flashdesc[] PROGMEM = conf; \
@@ -62,7 +62,6 @@ extern uint32_t spi_flash_get_id (void); // <user_interface.h>
 
 #else // !AUTOFLASHSIZE
 
-//#warning no auto flash size
 extern uint32_t _FS_start;
 extern uint32_t _FS_end;
 extern uint32_t _FS_page;
