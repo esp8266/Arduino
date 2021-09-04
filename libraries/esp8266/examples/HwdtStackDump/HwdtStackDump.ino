@@ -10,7 +10,7 @@
    speed defaults to 115200 bps. The HWDT stack dump will always print on port
    'Serial'.
 
-   To demonstrates this tool, this Sketch offers a few options for crashing the
+   To demonstrate this tool, this Sketch offers a few options for crashing the
    ESP8266 with and without a HWDT reset.
 
 */
@@ -20,6 +20,7 @@
 #include <Esp.h>
 #include <user_interface.h>
 #include <coredecls.h> // g_pcont - only needed for this debug demo
+#include <StackThunk.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -28,6 +29,22 @@
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
+
+////////////////////////////////////////////////////////////////////
+// This block is just for putting something on the BearSSL stack
+// to show that it has not been zeroed out before HWDT stack dump
+// gets to runs.
+extern "C" {
+#if CORE_MOCK
+#define thunk_ets_uart_printf ets_uart_printf
+
+#else
+  int thunk_ets_uart_printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
+  // Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
+  make_stack_thunk(ets_uart_printf);
+#endif
+};
+////////////////////////////////////////////////////////////////////
 
 void setup(void) {
   WiFi.persistent(false); // w/o this a flash write occurs at every boot
@@ -39,11 +56,15 @@ void setup(void) {
   Serial.println(F("The Hardware Watchdog Timer Demo is starting ..."));
   Serial.println();
 
+  // This allows us to test dumping a BearSSL stack after HWDT.
+  stack_thunk_add_ref();
+  thunk_ets_uart_printf("Using Thunk Stack to print this line.\n\n");
+
   // We don't need this for this example; however, starting WiFi uses a little
   // more of the SYS stack.
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println(F("A WiFi connection attmpt has been started."));
+  Serial.println(F("A WiFi connection attempt has been started."));
   Serial.println();
 
   // #define DEMO_NOEXTRA4K

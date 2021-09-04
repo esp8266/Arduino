@@ -126,7 +126,7 @@ later.
 The result is that a block of memory on the free list uses just 8 bytes
 instead of 16.
 
-In fact, we go even one step futher when we realize that the free block
+In fact, we go even one step further when we realize that the free block
 index values are available to store data when the block is allocated.
 
 The overhead of an allocated block is therefore just 4 bytes.
@@ -205,7 +205,7 @@ described.
 allocated for use by the upper block.
 
 While we're talking about "upper" and "lower" blocks, we should make
-a comment about adresses. In the diagrams, a block higher up in the
+a comment about addresses. In the diagrams, a block higher up in the
 picture is at a lower address. And the blocks grow downwards their
 block index increases as does their physical address.
 
@@ -347,7 +347,7 @@ nf |*?? | ?? | ?? | cf |           nf | ?? | ?? | ?? | pf |
 ```
 
 This one is prety easy too, except we don't need to mess with the
-free list indexes at all becasue we'll allocate the new block at the
+free list indexes at all because we'll allocate the new block at the
 end of the current free block. We do, however have to adjust the
 indexes in cf, c, and n.
 
@@ -539,5 +539,5 @@ BEFORE                             AFTER
    +----+----+----+----+              +----+----+----+----+
 ```
 
-Then we call free() with the adress of the data portion of the new
+Then we call free() with the address of the data portion of the new
 block (s) which adds it to the free list.

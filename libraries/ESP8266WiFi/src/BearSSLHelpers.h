@@ -161,7 +161,7 @@ class ServerSessions {
     ServerSessions(ServerSession *sessions, uint32_t size) : ServerSessions(sessions, size, false) {}
 
     // Dynamically allocates a cache for the given number of sessions and initializes it.
-    // If the allocation of the buffer wasn't successfull, the value
+    // If the allocation of the buffer wasn't successful, the value
     // returned by size() will be 0.
     ServerSessions(uint32_t size) : ServerSessions(size > 0 ? new ServerSession[size] : nullptr, size, true) {}
 
@@ -178,7 +178,7 @@ class ServerSessions {
 
     // Size of the store in sessions.
     uint32_t _size;
-    // Store where the informations for the sessions are stored.
+    // Store where the information for the sessions are stored.
     ServerSession *_store;
     // Whether the store is dynamically allocated.
     // If this is true, the store needs to be freed in the destructor.

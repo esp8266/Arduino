@@ -1132,7 +1132,7 @@ bool MDNSResponder::hasAnswerTxts(const MDNSResponder::hMDNSServiceQuery p_hServ
     MDNSResponder::answerTxts
 
     Returns all TXT items for the given service as a ';'-separated string.
-    If not already existing; the string is alloced, filled and attached to the answer.
+    If not already existing; the string is allocated, filled and attached to the answer.
 
 */
 const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,
@@ -1165,7 +1165,7 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
 
     Set a global callback for probe results. The callback is called, when probing
     for the host domain (or a service domain, without specific probe result callback)
-    failes or succeedes.
+    fails or succeeds.
     In the case of failure, the domain name should be changed via 'setHostname' or 'setServiceName'.
     When succeeded, the host or service domain will be announced by the MDNS responder.
 
@@ -1191,7 +1191,7 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn)
     MDNSResponder::setServiceProbeResultCallback
 
     Set a service specific callback for probe results. The callback is called, when probing
-    for the service domain failes or succeedes.
+    for the service domain fails or succeeds.
     In the case of failure, the service name should be changed via 'setServiceName'.
     When succeeded, the service domain will be announced by the MDNS responder.
 

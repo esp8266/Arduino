@@ -1,5 +1,5 @@
 /*
- *  empty wrappers to play with linker and reenable wifi at boot time
+ *  empty wrappers to play with linker and re-enable wifi at boot time
  */
 
 #include "coredecls.h"
@@ -21,7 +21,7 @@ extern "C" void __disableWiFiAtBootTime()
     // Does (almost) nothing: WiFi is enabled by default in nonos-sdk
 
     // ... but restores legacy WiFi credentials persistence to true at boot time
-    // (can be still overriden by user before setting up WiFi, like before)
+    // (can be still overrisden by user before setting up WiFi, like before)
 
     // (note: c++ ctors not called yet at this point)
     ESP8266WiFiClass::persistent(true);

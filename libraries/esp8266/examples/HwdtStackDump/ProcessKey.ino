@@ -70,7 +70,7 @@ void processKey(Print& out, int hotKey) {
       out.println(F("This line will not be printable w/o running GDB"));
       break;
     case '0':
-      out.println(F("Crashing at an embeded 'break 1, 15' instruction that was generated"));
+      out.println(F("Crashing at an embedded 'break 1, 15' instruction that was generated"));
       out.println(F("by the compiler after detecting a divide by zero."));
       out.printf_P(PSTR("This should not print %d\n"), divideA_B_bp(1, 0));
       break;

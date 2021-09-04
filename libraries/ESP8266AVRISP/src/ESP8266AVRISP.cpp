@@ -189,7 +189,7 @@ void ESP8266AVRISP::get_parameter(uint8_t c) {
 }
 
 void ESP8266AVRISP::set_parameters() {
-    // call this after reading paramter packet into buff[]
+    // call this after reading parameter packet into buff[]
     param.devicecode = buff[0];
     param.revision   = buff[1];
     param.progtype   = buff[2];

@@ -132,7 +132,7 @@ public:
 
     int peek(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_peek_char(_uart);
     }
 
@@ -162,7 +162,7 @@ public:
 
     int read(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
@@ -233,8 +233,12 @@ protected:
     size_t _rx_size;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 extern HardwareSerial Serial;
+#endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 extern HardwareSerial Serial1;
+#endif
 
 extern void serialEventRun(void) __attribute__((weak));
 

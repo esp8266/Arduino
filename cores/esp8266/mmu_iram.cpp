@@ -80,7 +80,7 @@ extern "C" {
  *
  * "Cache_Read_Enable" is underdocumented. Main sources of information were from
  * rboot, zboot, https://richard.burtons.org/2015/06/12/esp8266-cache_read_enable/,
- * and other places. And some additional expermentation.
+ * and other places. And some additional experimentation.
  *
  * Searching through the NONOS SDK shows nothing on this API; however, some
  * clues on what the NONOS SDK might be doing with ICACHE related calls can be

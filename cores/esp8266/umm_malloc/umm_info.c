@@ -197,7 +197,7 @@ size_t umm_max_block_size( void ) {
 
 /*
   Without build option UMM_INLINE_METRICS, calls to umm_usage_metric() or
-  umm_fragmentation_metric() must to be preceeded by a call to umm_info(NULL, false)
+  umm_fragmentation_metric() must to be preceded by a call to umm_info(NULL, false)
   for updated results.
 */
 int umm_usage_metric_core( umm_heap_context_t *_context ) {

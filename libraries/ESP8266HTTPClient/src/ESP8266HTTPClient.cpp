@@ -90,6 +90,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     String protocol = url.substring(0, index);
+    protocol.toLowerCase();
     if(protocol != "http" && protocol != "https") {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
         return false;
@@ -137,6 +138,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     }
 
     _protocol = url.substring(0, index);
+    _protocol.toLowerCase();
     url.remove(0, (index + 3)); // remove http:// or https://
 
     if (_protocol == "http") {
@@ -274,15 +276,24 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth const char * base64
  */
 void HTTPClient::setAuthorization(const char * auth)
 {
-    if(auth) {
-        _base64Authorization = auth;
-        _base64Authorization.replace(String('\n'), emptyString);
+    if (auth) {
+        setAuthorization(String(auth));
     }
+}
+
+/**
+ * set the Authorization for the http request
+ * @param auth String base64
+ */
+void HTTPClient::setAuthorization(String auth)
+{
+    _base64Authorization = std::move(auth);
+    _base64Authorization.replace(String('\n'), emptyString);
 }
 
 /**
@@ -321,7 +332,7 @@ bool HTTPClient::setURL(const String& url)
 }
 
 /**
- * set redirect follow mode. See `followRedirects_t` enum for avaliable modes.
+ * set redirect follow mode. See `followRedirects_t` enum for available modes.
  * @param follow
  */
 void HTTPClient::setFollowRedirects(followRedirects_t follow)
@@ -351,6 +362,14 @@ void HTTPClient::useHTTP10(bool useHTTP10)
 int HTTPClient::GET()
 {
     return sendRequest("GET");
+}
+/**
+ * send a DELETE request
+ * @return http code
+ */
+int HTTPClient::DELETE()
+{
+    return sendRequest("DELETE");
 }
 
 /**
@@ -481,7 +500,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                             // no redirection
                             break;
                         }
-                        // redirect using the same request method and payload, diffrent URL
+                        // redirect using the same request method and payload, different URL
                         redirect = true;
                     }
                     break;
@@ -713,7 +732,7 @@ const String& HTTPClient::getString(void)
     _payload.reset(new StreamString());
 
     if(_size > 0) {
-        // try to reserve needed memmory
+        // try to reserve needed memory
         if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
             return *_payload;
@@ -857,6 +876,10 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
+
+#if defined(NO_GLOBAL_INSTANCES) || defined(NO_GLOBAL_STREAMDEV)
+        StreamNull devnull;
+#endif
         _client->sendAvailable(devnull); // clear _client's output (all of it, no timeout)
         return true;
     }

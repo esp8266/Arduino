@@ -410,7 +410,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
     left -= toBuff;
     if(!_async) yield();
   }
-  //lets see whats left
+  //lets see what's left
   memcpy(_buffer + _bufferLen, data + (len - left), left);
   _bufferLen += left;
   if(_bufferLen == remaining()){

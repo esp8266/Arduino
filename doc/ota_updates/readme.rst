@@ -50,7 +50,7 @@ Signed updates are updates whose compiled binaries are signed with a private key
 
 Cryptographic signing only protects against tampering with binaries delivered via OTA.  If someone has physical access, they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not protect code inside the device: if a user has physical access they can read out your program.
 
-**Securing your private key is paramount.  The same private/public keypair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
+**Securing your private key is paramount.  The same private/public key pair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
 
 Signed Binary Format
 ^^^^^^^^^^^^^^^^^^^^
@@ -68,7 +68,7 @@ Signed Binary Prerequisites
 
 OpenSSL is required to run the standard signing steps, and should be available on any UNIX-like or Windows system.  As usual, the latest stable version of OpenSSL is recommended.
 
-Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following shell commands will generate a new public/private keypair.  Run them in the sketch directory:
+Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following shell commands will generate a new public/private key pair.  Run them in the sketch directory:
 
 .. code:: bash
 
@@ -530,7 +530,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
-    ESPhttpUpdate.update("192.168.0.2", 80, "/arduino.bin");
+    WiFiClient client;
+    ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
 Advanced updater
 ^^^^^^^^^^^^^^^^
@@ -541,7 +542,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update("192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
+    WiFiClient client;
+    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
         case HTTP_UPDATE_FAILED:
             Serial.println("[update] Update failed.");
@@ -553,6 +555,11 @@ The server-side script can respond as follows: - response code 200, and send the
             Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
             break;
     }
+
+TLS updater
+^^^^^^^^^^^
+
+Please read and try the examples provided with the library.
 
 Server request handling
 ~~~~~~~~~~~~~~~~~~~~~~~
