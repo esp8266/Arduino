@@ -276,15 +276,24 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth const char * base64
  */
 void HTTPClient::setAuthorization(const char * auth)
 {
-    if(auth) {
-        _base64Authorization = auth;
-        _base64Authorization.replace(String('\n'), emptyString);
+    if (auth) {
+        setAuthorization(String(auth));
     }
+}
+
+/**
+ * set the Authorization for the http request
+ * @param auth String base64
+ */
+void HTTPClient::setAuthorization(String auth)
+{
+    _base64Authorization = std::move(auth);
+    _base64Authorization.replace(String('\n'), emptyString);
 }
 
 /**
@@ -353,6 +362,14 @@ void HTTPClient::useHTTP10(bool useHTTP10)
 int HTTPClient::GET()
 {
     return sendRequest("GET");
+}
+/**
+ * send a DELETE request
+ * @return http code
+ */
+int HTTPClient::DELETE()
+{
+    return sendRequest("DELETE");
 }
 
 /**
@@ -849,6 +866,10 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
+
+#if defined(NO_GLOBAL_INSTANCES) || defined(NO_GLOBAL_STREAMDEV)
+        StreamNull devnull;
+#endif
         _client->sendAvailable(devnull); // clear _client's output (all of it, no timeout)
         return true;
     }

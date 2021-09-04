@@ -149,7 +149,7 @@ public:
 
     bool begin() override {
         if (_mounted) {
-            end();
+            return true;
         }
         _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         if (!_mounted && _cfg._autoFormat) {

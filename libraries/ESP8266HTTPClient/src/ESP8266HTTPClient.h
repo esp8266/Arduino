@@ -176,6 +176,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setAuthorization(String auth);
     void setTimeout(uint16_t timeout);
 
     // Redirections
@@ -187,6 +188,7 @@ public:
 
     /// request handling
     int GET();
+    int DELETE();
     int POST(const uint8_t* payload, size_t size);
     int POST(const String& payload);
     int PUT(const uint8_t* payload, size_t size);
