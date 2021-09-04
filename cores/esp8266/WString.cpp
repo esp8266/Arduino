@@ -182,7 +182,7 @@ bool String::changeBuffer(unsigned int maxStrLen) {
 #ifdef DEBUG_ESP_OOM
     if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
-        DEBUGV("[offending String op %d->%d ('%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s')]\n",
+        DEBUGV("[String] Reallocating large String(%d -> %d bytes) '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s'\n",
             len(), maxStrLen, c_str(),
             len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
     }
@@ -312,7 +312,7 @@ bool String::concat(const char *cstr, unsigned int length) {
         return true;
     if (!reserve(newlen))
         return false;
-    memmove_P(wbuffer() + len(), cstr, length + 1);
+    memmove_P(wbuffer() + len(), cstr, length);
     setLen(newlen);
     wbuffer()[newlen] = 0;
     return true;

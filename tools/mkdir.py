@@ -12,7 +12,10 @@ def main():
     parser.add_argument('dir', action='store', nargs='+')
     ns = parser.parse_args()
     for p in ns.dir:
-        pathlib.Path(p).mkdir(parents=ns.parents, exist_ok=True)
+        try:
+            pathlib.Path(p).mkdir(parents=ns.parents)
+        except FileExistsError:
+            pass
     return 0
 
 if __name__ == '__main__':

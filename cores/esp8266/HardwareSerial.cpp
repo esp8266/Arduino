@@ -35,9 +35,6 @@
 
 // SerialEvent functions are weak, so when the user doesn't define them,
 // the linker just sets their address to 0 (which is checked below).
-// The Serialx_available is just a wrapper around Serialx.available(),
-// but we can refer to it weakly so we don't pull in the entire
-// HardwareSerial instance if the user doesn't also refer to it.
 void serialEvent() __attribute__((weak));
 
 HardwareSerial::HardwareSerial(int uart_nr)

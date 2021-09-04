@@ -4,3 +4,7 @@ sphinx
 sphinx-rtd-theme
 breathe
 nbsphinx
+docutils<0.17
+testresources
+#at the time of writing, requirement is pygments<3,>=2.4.1
+pygments>=2.4.1

@@ -28,7 +28,7 @@
 */
 
 #include <ESP8266WiFi.h>
-#include <i2s.h>
+#include <I2S.h>
 
 void setup() {
   Serial.begin(115200);

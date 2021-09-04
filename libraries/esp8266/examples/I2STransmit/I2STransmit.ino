@@ -10,7 +10,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#include <i2s.h>
+#include <I2S.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -64,7 +64,7 @@ void setup() {
 }
 
 void loop() {
-  static int cnt = 0;
+  static uint32_t cnt = 0;
   // Each loop will send 100 raw samples (400 bytes)
   // UDP needs to be < TCP_MSS which can be 500 bytes in LWIP2
   for (int i = 0; i < 100; i++) {
@@ -75,6 +75,6 @@ void loop() {
   udp.endPacket();
   cnt++;
   if ((cnt % 100) == 0) {
-    Serial.printf("%d\n", cnt);
+    Serial.printf("%" PRIu32 "\n", cnt);
   }
 }

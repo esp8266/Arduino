@@ -22,6 +22,9 @@ kinds of creative coding, interactive objects, spaces or physical experiences.
 https://arduino.cc/en/Reference/HomePage
 """
 
+# For SCons documentation, see:
+# https://scons.org/doc/latest
+
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
 
 from os.path import isdir, join
@@ -58,6 +61,7 @@ if gzip_fw:
 env.Append(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
+    # General options that are passed to the C compiler (C only; not C++)
     CFLAGS=[
         "-std=gnu17",
         "-Wpointer-arith",
@@ -67,24 +71,29 @@ env.Append(
         "-nostdlib"
     ],
 
+    # General options that are passed to the C and C++ compilers
     CCFLAGS=[
         "-Os",  # optimize for size
         "-mlongcalls",
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
+        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
+        "-Werror=return-type",
         "-free",
         "-fipa-pta"
     ],
 
+    # General options that are passed to the C++ compiler
     CXXFLAGS=[
         "-fno-rtti",
         "-std=gnu++17"
     ],
 
+    # General user options passed to the linker
     LINKFLAGS=[
         "-Os",
         "-nostdlib",
@@ -103,6 +112,9 @@ env.Append(
         "-u", "_UserExceptionVector"
     ],
 
+    # A platform independent specification of C preprocessor definitions as either:
+    # - -DFLAG as "FLAG"
+    # - -DFLAG=VALUE as ("FLAG", "VALUE")
     CPPDEFINES=[
         ("F_CPU", "$BOARD_F_CPU"),
         "__ets__",
@@ -113,26 +125,22 @@ env.Append(
         "LWIP_OPEN_SRC"
     ],
 
+    # The list of directories that the C preprocessor will search for include directories
     CPPPATH=[
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc",
-             "xtensa-lx106-elf", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core")),
         join(platform.get_package_dir("toolchain-xtensa"), "include")
     ],
 
+    # The list of directories that will be searched for libraries
     LIBPATH=[
         join("$BUILD_DIR", "ld"),  # eagle.app.v6.common.ld
         join(FRAMEWORK_DIR, "tools", "sdk", "lib"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "ld"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
+        join(FRAMEWORK_DIR, "tools", "sdk", "ld")
     ],
 
-    LIBS=[
-        "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
-        "m", "c", "gcc"
-    ],
+    # LIBS is set at the bottom of the builder script
+    # where we know about all system libraries to be included
 
     LIBSOURCE_DIRS=[
         join(FRAMEWORK_DIR, "libraries")
@@ -206,43 +214,44 @@ else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_c
 #
 # lwIP
 #
+lwip_lib = None
 if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip6-536-feat"]
     )
+    lwip_lib = "lwip6-536-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip6-1460-feat"]
     )
+    lwip_lib = "lwip6-1460-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-1460-feat"]
     )
+    lwip_lib = "lwip2-1460-feat"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536"]
     )
+    lwip_lib = "lwip2-536"
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-1460"]
     )
+    lwip_lib = "lwip2-1460"
 # PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
 else:
     env.Append(
         CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536-feat"]
     )
+    lwip_lib = "lwip2-536-feat"
 
 #
 # Waveform
@@ -254,17 +263,17 @@ if "PIO_FRAMEWORK_ARDUINO_WAVEFORM_LOCKED_PHASE" in flatten_cppdefines:
 #
 # Exceptions
 #
+stdcpp_lib = None
 if "PIO_FRAMEWORK_ARDUINO_ENABLE_EXCEPTIONS" in flatten_cppdefines:
     env.Append(
         CXXFLAGS=["-fexceptions"],
-        LIBS=["stdc++-exc"]
     )
+    stdcpp_lib = "stdc++-exc"
 else:
     env.Append(
         CXXFLAGS=["-fno-exceptions"],
-        LIBS=["stdc++"]
     )
-
+    stdcpp_lib = "stdc++"
 #
 # VTables
 #
@@ -343,6 +352,15 @@ else:
 assert mmu_flags
 env.Append(CPPDEFINES=mmu_flags)
 
+# A list of one or more libraries that will be linked with any executable programs created by this environment
+# We do this at this point so that we can put the libraries in their correct order more easily
+env.Append(
+    LIBS=[
+        "hal", "phy", "pp", "net80211", lwip_lib, "wpa", "crypto", "main",
+        "wps", "bearssl", "espnow", "smartconfig", "airkiss", "wpa2",
+        stdcpp_lib, "m", "c", "gcc"
+    ]
+)
 
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(

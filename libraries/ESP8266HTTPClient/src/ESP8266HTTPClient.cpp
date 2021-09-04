@@ -90,6 +90,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     String protocol = url.substring(0, index);
+    protocol.toLowerCase();
     if(protocol != "http" && protocol != "https") {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
         return false;
@@ -137,6 +138,7 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     }
 
     _protocol = url.substring(0, index);
+    _protocol.toLowerCase();
     url.remove(0, (index + 3)); // remove http:// or https://
 
     if (_protocol == "http") {
@@ -274,15 +276,24 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 }
 
 /**
- * set the Authorizatio for the http request
+ * set the Authorization for the http request
  * @param auth const char * base64
  */
 void HTTPClient::setAuthorization(const char * auth)
 {
-    if(auth) {
-        _base64Authorization = auth;
-        _base64Authorization.replace(String('\n'), emptyString);
+    if (auth) {
+        setAuthorization(String(auth));
     }
+}
+
+/**
+ * set the Authorization for the http request
+ * @param auth String base64
+ */
+void HTTPClient::setAuthorization(String auth)
+{
+    _base64Authorization = std::move(auth);
+    _base64Authorization.replace(String('\n'), emptyString);
 }
 
 /**
@@ -351,6 +362,14 @@ void HTTPClient::useHTTP10(bool useHTTP10)
 int HTTPClient::GET()
 {
     return sendRequest("GET");
+}
+/**
+ * send a DELETE request
+ * @return http code
+ */
+int HTTPClient::DELETE()
+{
+    return sendRequest("DELETE");
 }
 
 /**
@@ -608,8 +627,18 @@ WiFiClient* HTTPClient::getStreamPtr(void)
  */
 int HTTPClient::writeToStream(Stream * stream)
 {
+    return writeToPrint(stream);
+}
 
-    if(!stream) {
+/**
+ * write all  message body / payload to Print
+ * @param print Print *
+ * @return bytes written ( negative values are error codes )
+ */
+int HTTPClient::writeToPrint(Print * print)
+{
+
+    if(!print) {
         return returnError(HTTPC_ERROR_NO_STREAM);
     }
 
@@ -626,7 +655,7 @@ int HTTPClient::writeToStream(Stream * stream)
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
         // len < 0: transfer all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->sendSize(stream, len);
+        ret = _client->sendSize(print, len);
 
         // do we have an error?
         if(_client->getLastSendReport() != Stream::Report::Success) {
@@ -654,7 +683,7 @@ int HTTPClient::writeToStream(Stream * stream)
             // data left?
             if(len > 0) {
                 // read len bytes with timeout
-                int r = _client->sendSize(stream, len);
+                int r = _client->sendSize(print, len);
                 if (_client->getLastSendReport() != Stream::Report::Success)
                     // not all data transferred
                     return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
@@ -847,6 +876,10 @@ bool HTTPClient::connect(void)
 {
     if(_reuse && _canReuse && connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: already connected, reusing connection\n");
+
+#if defined(NO_GLOBAL_INSTANCES) || defined(NO_GLOBAL_STREAMDEV)
+        StreamNull devnull;
+#endif
         _client->sendAvailable(devnull); // clear _client's output (all of it, no timeout)
         return true;
     }
