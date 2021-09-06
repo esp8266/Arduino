@@ -69,8 +69,6 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, const String& url) {
-    _client = &client;
-
     // check for : (http: or https:)
     int index = url.indexOf(':');
     if(index < 0) {
@@ -86,6 +84,8 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     _port = (protocol == "https" ? 443 : 80);
+    _client = std::make_unique<WiFiClient>(client);
+
     return beginInternal(url, protocol.c_str());
 }
 
@@ -101,7 +101,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
-    _client = &client;
+    _client = std::make_unique<WiFiClient>(client);
 
      clear();
     _host = host;

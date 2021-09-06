@@ -157,10 +157,7 @@ public:
     HTTPClient(HTTPClient&&) = default;
     HTTPClient& operator=(HTTPClient&&) = default;
 
-/*
- * Since both begin() functions take a reference to client as a parameter, you need to 
- * ensure the client object lives the entire time of the HTTPClient
- */
+    // Note that WiFiClient instance *will* be captured by the internal handler.
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
@@ -235,55 +232,6 @@ protected:
     // in case wificlient supports seamless ref() / unref() of the underlying connection
     // for both wificlient and wificlientsecure, this may be removed in favour of that approach.
 
-    struct NonOwningClientPtr {
-        NonOwningClientPtr() = default;
-        NonOwningClientPtr(const NonOwningClientPtr&) = delete;
-        NonOwningClientPtr(NonOwningClientPtr&& other) noexcept {
-            *this = std::move(other);
-        }
-
-        ~NonOwningClientPtr() noexcept {
-            if (_ptr) {
-                _ptr->stop();
-            }
-        }
-
-        explicit NonOwningClientPtr(WiFiClient* ptr) noexcept :
-            _ptr(ptr)
-        {}
-
-        explicit operator bool() const {
-            return _ptr != nullptr;
-        }
-
-        WiFiClient* get() const noexcept {
-            return _ptr;
-        }
-
-        WiFiClient& operator*() const {
-            return *_ptr;
-        }
-
-        WiFiClient* operator->() const noexcept {
-            return _ptr;
-        }
-
-        NonOwningClientPtr& operator=(WiFiClient* ptr) noexcept {
-            _ptr = ptr;
-            return *this;
-        }
-
-        NonOwningClientPtr& operator=(const NonOwningClientPtr&) = delete;
-        NonOwningClientPtr& operator=(NonOwningClientPtr&& other) noexcept {
-            _ptr = other._ptr;
-            other._ptr = nullptr;
-            return *this;
-        }
-
-    private:
-        WiFiClient* _ptr = nullptr;
-    };
-
     bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
@@ -293,7 +241,7 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-    NonOwningClientPtr _client;
+    std::unique_ptr<WiFiClient> _client;
 
     /// request handling
     String _host;
