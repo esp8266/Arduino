@@ -84,7 +84,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     _port = (protocol == "https" ? 443 : 80);
-    _client = std::make_unique<WiFiClient>(client);
+    _client = client.clone();
 
     return beginInternal(url, protocol.c_str());
 }
@@ -101,7 +101,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
-    _client = std::make_unique<WiFiClient>(client);
+    _client = client.clone();
 
      clear();
     _host = host;

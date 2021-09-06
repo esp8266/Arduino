@@ -52,6 +52,12 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
+  // b/c wificlient is both a real class and the virtual base for secure client,
+  // make sure there's a safe way to clone the object without accidentally 'slicing' it
+  // (...which will happen when using normal copy ctor with the dereferenced pointer...)
+  // TODO: but, actually, implement secure handlers in the ClientContext instead, so normal copy works
+  virtual std::unique_ptr<WiFiClient> clone() const;
+
   virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;

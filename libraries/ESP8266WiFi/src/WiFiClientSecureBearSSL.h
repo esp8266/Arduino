@@ -39,6 +39,12 @@ class WiFiClientSecureCtx : public WiFiClient {
 
     WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
 
+    // TODO: usage is invalid invalid, but this will trigger an error only when
+    // it is actually used by something and `=delete`ed ctor above is accessed
+    std::unique_ptr<WiFiClient> clone() const override {
+        return std::unique_ptr<WiFiClient>(new WiFiClientSecureCtx(*this));
+    }
+
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
@@ -238,6 +244,8 @@ class WiFiClientSecure : public WiFiClient {
     ~WiFiClientSecure() override { _ctx = nullptr; }
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+
+    std::unique_ptr<WiFiClient> clone() const override { return std::unique_ptr<WiFiClient>(new WiFiClientSecure(*this)); }
 
     uint8_t status() override { return _ctx->status(); }
     int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }

@@ -101,6 +101,10 @@ WiFiClient::~WiFiClient()
         _client->unref();
 }
 
+std::unique_ptr<WiFiClient> WiFiClient::clone() const {
+    return std::make_unique<WiFiClient>(*this);
+}
+
 WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
