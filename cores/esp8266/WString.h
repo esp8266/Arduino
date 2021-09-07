@@ -934,7 +934,9 @@ class String {
         // Accessor functions
         bool isSSO() const { return !sso.isHeap; }
         unsigned int len() const { return isSSO() ? sso.len : ptr.len; }
+    public:
         unsigned int capacity() const { return isSSO() ? (unsigned int)SSOSIZE - 1 : ptr.cap; } // Size of max string not including terminal NUL
+    protected:
         void setSSO(bool set) { sso.isHeap = !set; }
         void setLen(int len) {
             if (isSSO()) {
