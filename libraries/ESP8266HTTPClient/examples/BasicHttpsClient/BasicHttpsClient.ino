@@ -9,12 +9,15 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-
 #include <ESP8266HTTPClient.h>
-
 #include <WiFiClientSecureBearSSL.h>
-// Fingerprint for demo URL, expires on June 2, 2021, needs to be updated well before this date
-const uint8_t fingerprint[20] = {0x40, 0xaf, 0x00, 0x6b, 0xec, 0x90, 0x22, 0x41, 0x8e, 0xa3, 0xad, 0xfa, 0x1a, 0xe8, 0x25, 0x41, 0x1d, 0x1a, 0x54, 0xb3};
+
+#include "certs.h"
+
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -27,14 +30,9 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  for (uint8_t t = 4; t > 0; t--) {
-    Serial.printf("[SETUP] WAIT %d...\n", t);
-    Serial.flush();
-    delay(1000);
-  }
-
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFiMulti.addAP(STASSID, STAPSK);
+  Serial.println("setup() done connecting to ssid '" STASSID "'");
 }
 
 void loop() {
@@ -43,14 +41,14 @@ void loop() {
 
     std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
 
-    client->setFingerprint(fingerprint);
+    client->setFingerprint(fingerprint___w3_org);
     // Or, if you happy to ignore the SSL certificate, then use the following line instead:
     // client->setInsecure();
 
     HTTPClient https;
 
     Serial.print("[HTTPS] begin...\n");
-    if (https.begin(*client, "https://jigsaw.w3.org/HTTP/connection.html")) {  // HTTPS
+    if (https.begin(*client, jigsaw_host, jigsaw_port)) {  // HTTPS
 
       Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
