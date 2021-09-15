@@ -192,31 +192,29 @@ in the specific subdirectory.  This mimics the POSIX behavior for
 directory traversal most C programmers are used to.
 
 
-Uploading files to file system (new)
-------------------------------------
+Uploading files to file system (combined firmware and filesystem)
+-----------------------------------------------------------------
 
 Since PullRequest #8266 Filsystem generation is integrated into the
 “compile and/or upload” action of Arduino.
 There is no need to download any additional tool.
 
-This integration is done by adding 3 entries (“Upload”, "Filesystem" and “Export”)
-to the tools-menu. These entries are presented just like any other options
-for esp8266 (“Upload speed” ... “Non-32-Bit Access”) and placed right after
-the last.
+Its configuration has 3 entries (“Upload”, "Filesystem" and "Export") in
+the IDE's "Tools" menu, and is described as follows:
 
-Menu-Entry “Upload” let You choose between:
+Menu-Entry “Upload” lets You choose between:
 - Sketch
 - Filesystem
 - Both
-This Menu controls which parts are uploaded when You choose "Sketch->Upload"
-(Ctrl-U) from the Arduino Menu.
+This Menu controls which parts are uploaded when "Sketch->Upload" (Ctrl-U)
+is selected from the Arduino Menu.
 
-Menu-Entry “Filesystem” let You choose between:
+Menu-Entry “Filesystem” lets You choose between:
 - Off
 - LitteFs
 - SPIFFS
-This Menu controls which Fs will be created when You choose "Sketch->Compile"
-(Ctrl-R) from the Arduino Menu. The Fs will always be created inside the
+This Menu controls which Fs will be created when "Sketch->Compile" (Ctrl-R)
+is selected from the Arduino Menu. The Fs will always be created inside the
 "export" dir (see below). 
 
 Menu-Entry “Export” let You choose between:

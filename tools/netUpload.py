@@ -8,16 +8,16 @@ import sys
 ToolsDir = os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\', '/' ) + "/" # convert to UNIX format
 try:
     sys.path.insert( 0, ToolsDir ) # ToolsDir
-    from utillities import * # If this fails, we can't continue and will bomb below
+    from utilities import * # If this fails, we can't continue and will bomb below
 except Exception as e:
-    sys.stderr.write( '\nImport of utillities.py failed.\n...Is it not next to this %s tool?\n...Exception was: %s\n' % ( __file__, e )  )
+    sys.stderr.write( '\nImport of utilities.py failed.\n...Is it not next to this %s tool?\n...Exception was: %s\n' % ( __file__, e )  )
     sys.exit( 2 )
 
 try:
     sys.path.insert( 0, ToolsDir ) # Add this dir to search path
     import espota # If this fails, we can't continue and will bomb below
 except Exception:
-    Msg( '\nespota not found next to this netUploadGn.py tool.' )
+    Msg( '\nespota not found next to this netUpload.py tool.' )
     sys.exit( 2 )
 
 #Args: (original)
@@ -51,7 +51,7 @@ def parse_args( argsIn ):
 
 def main( argsIn = None ):
     """
-    Main function for netUploadGn
+    Main function for netUpload
 
     argsIn - Optional override for default arguments parsing (that uses sys.argv), can be a list of custom arguments.
     Arguments and their values need to be added as individual items to the list e.g. "-b 115200" thus becomes ['-b', '115200'].

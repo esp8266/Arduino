@@ -161,11 +161,8 @@ tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=
 tools.esptool.upload.params.quiet=
 
-# Old behaviour (without integrated handling of filesystem & gzipd Binaries) can be (re)enabled by commenting in/out the following 2x2 entries
-#tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/upload.py" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" {upload.erase_cmd} {upload.resetmethod} write_flash 0x0 "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/uploadGn.py" -fi "{build.Filesystem}" -up "{build.Upload}" --port "{serial.port}" --baud "{upload.speed}" {upload.resetmethod} --sk 0x0 "{build.path}/{build.project_name}.bin" --fs {build.spiffs_start} "{build.path}/{build.project_name}" {upload.erase_cmd} "{upload.verbose}"
-#tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/netUploadGn.py" -fi "{build.Filesystem}" -up "{build.Upload}" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" --sk "{build.path}/{build.project_name}.bin" --fs "{build.path}/{build.project_name}"
+tools.esptool.upload.pattern="{cmd}" -I "{runtime.platform.path}/tools/upload.py" -fi "{build.Filesystem}" -up "{build.Upload}" --port "{serial.port}" --baud "{upload.speed}" {upload.resetmethod} --sk 0x0 "{build.path}/{build.project_name}.bin" --fs {build.spiffs_start} "{build.path}/{build.project_name}" {upload.erase_cmd} "{upload.verbose}"
+tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}/tools/netUpload.py" -fi "{build.Filesystem}" -up "{build.Upload}" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" --sk "{build.path}/{build.project_name}.bin" --fs "{build.path}/{build.project_name}"
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe

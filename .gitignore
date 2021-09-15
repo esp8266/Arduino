@@ -36,5 +36,6 @@ tools/sdk/ld/backup/*
 tools/Gui.py
 tools/Replace2SpceWith4.txt
 *(Kopie)*
+platform.local.txt
 
 
