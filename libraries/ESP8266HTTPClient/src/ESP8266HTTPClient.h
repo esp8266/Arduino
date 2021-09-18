@@ -157,7 +157,7 @@ public:
     HTTPClient(HTTPClient&&) = default;
     HTTPClient& operator=(HTTPClient&&) = default;
 
-    // Note that WiFiClient instance *will* be captured by the internal handler.
+    // Note that WiFiClient's underlying connection *will* be captured
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
@@ -226,15 +226,6 @@ protected:
         String value;
     };
 
-    // TODO: the common pattern to use the class is to
-    // {
-    //     WiFiClient socket;
-    //     HTTPClient http;
-    //     http.begin(socket, "http://blahblah");
-    // }
-    // in case wificlient supports seamless ref() / unref() of the underlying connection
-    // for both wificlient and wificlientsecure, this may be removed in favour of that approach.
-
     bool beginInternal(const String& url, const char* expectedProtocol);
     void disconnect(bool preserveClient = false);
     void clear();
@@ -243,6 +234,14 @@ protected:
     bool sendHeader(const char * type);
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
+
+    // The common pattern to use the class is to
+    // {
+    //     WiFiClient socket;
+    //     HTTPClient http;
+    //     http.begin(socket, "http://blahblah");
+    // }
+    // Make sure it's not possible to break things in an opposite direction
 
     std::unique_ptr<WiFiClient> _client;
 

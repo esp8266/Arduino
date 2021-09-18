@@ -52,10 +52,16 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
-  // b/c wificlient is both a real class and the virtual base for secure client,
-  // make sure there's a safe way to clone the object without accidentally 'slicing' it
-  // (...which will happen when using normal copy ctor with the dereferenced pointer...)
-  // TODO: but, actually, implement secure handlers in the ClientContext instead, so normal copy works
+  // b/c this is both a real class and a virtual parent of the secure client, make sure
+  // there's a safe way to copy from the pointer without 'slicing' it; i.e. only the base
+  // portion of a derived object will be copied, and the polymorphic behavior will be corrupted. 
+  //
+  // this class still implements the copy and assignment though, so this is not yet enforced
+  // (but, *should* be inside the Core itself, see httpclient & server)
+  //
+  // ref.
+  // - https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rc-copy-virtual
+  // - https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rh-copy
   virtual std::unique_ptr<WiFiClient> clone() const;
 
   virtual uint8_t status();
