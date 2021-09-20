@@ -249,3 +249,15 @@ void run_scheduled_recurrent_functions()
 
     fence = false;
 }
+
+
+bool yieldUntil (std::function<bool()> until, uint32_t maxMs) {
+    esp8266::polledTimeout::oneShotFastMs timeOut(maxMs);
+    while (true) {
+        if (until())
+            return true;
+        if (timeOut)
+            return false;
+        yield();
+    }
+}

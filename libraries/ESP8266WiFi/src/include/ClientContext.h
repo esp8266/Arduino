@@ -31,6 +31,7 @@ extern "C" void esp_schedule();
 
 #include <assert.h>
 #include <esp_priv.h>
+#include <Schedule.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -144,12 +145,8 @@ public:
             return 0;
         }
         _connect_pending = true;
-        _op_start_time = millis();
-        for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-               // will resume on timeout or when _connected or _notify_error fires
-        }
+        // will resume on timeout or when _connected or _notify_error fires
+        yieldUntil([pWaiting = &_connect_pending]() { return !*pWaiting; }, _timeout_ms);
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -487,11 +484,8 @@ protected:
             }
 
             _send_waiting = true;
-            for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-               // will resume on timeout or when _write_some_from_cb or _notify_error fires
-            }
+            // will resume on timeout or when _write_some_from_cb or _notify_error fires
+            yieldUntil([pWaiting = &_send_waiting]() { return !*pWaiting; }, _timeout_ms);
             _send_waiting = false;
         } while(true);
 
