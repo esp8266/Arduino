@@ -146,7 +146,7 @@ public:
         }
         _connect_pending = true;
         // will resume on timeout or when _connected or _notify_error fires
-        yieldUntil([pWaiting = &_connect_pending]() { return !*pWaiting; }, _timeout_ms);
+        yieldUntil([this]() { return !_connect_pending; }, _timeout_ms);
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -485,7 +485,7 @@ protected:
 
             _send_waiting = true;
             // will resume on timeout or when _write_some_from_cb or _notify_error fires
-            yieldUntil([pWaiting = &_send_waiting]() { return !*pWaiting; }, _timeout_ms);
+            yieldUntil([this]() { return !_send_waiting; }, _timeout_ms);
             _send_waiting = false;
         } while(true);
 
