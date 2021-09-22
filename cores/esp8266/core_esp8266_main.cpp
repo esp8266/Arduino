@@ -69,7 +69,7 @@ static uint32_t s_cycles_at_yield_start;
  */
 #define ETS_INTR_LOCK_NEST_MAX 7
 static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
-static byte     ets_intr_lock_stack_ptr=0;
+static uint8_t  ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
