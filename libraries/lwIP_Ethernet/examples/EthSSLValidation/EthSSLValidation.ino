@@ -9,7 +9,7 @@
 
 #include <LwipEthernet.h>
 
-Wiznet5500lwIP eth(D0);     // <== adapt to your hardware
+Wiznet5500lwIP eth(/*SS*/16);     // <== adapt to your hardware
 
 #include <WiFiClientSecure.h>
 #include <StackThunk.h>

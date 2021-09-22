@@ -13,7 +13,7 @@
 #define LOCAL_MASK 255,255,255,0
 #define DNS        8,8,8,8
 
-Wiznet5500lwIP eth(D0);            // <== adapt to your hardware
+Wiznet5500lwIP eth(/*SS*/16);      // <== adapt to your hardware
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
