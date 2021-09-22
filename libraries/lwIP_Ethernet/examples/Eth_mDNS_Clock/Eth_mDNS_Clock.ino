@@ -217,17 +217,18 @@ void setup(void) {
 
   if (!ethInitDHCP(eth)) {
     Serial.printf("no hardware found\n");
-    while (1)
+    while (1) {
       delay(1000);
+    }
   }
-  
+
   while (!eth.connected()) {
     Serial.printf(".");
     delay(1000);
   }
-  
+
   Serial.printf("Ethernet: IP Address: %s\n",
-    eth.localIP().toString().c_str());
+                eth.localIP().toString().c_str());
 
   // Sync clock
   setClock();

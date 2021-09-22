@@ -1,9 +1,9 @@
 /*
     This sketch establishes a TCP connection to a "quote of the day" service.
     It sends a "hello" message, and then prints received data.
-    
+
     This is Ethernet version of:
-    https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino 
+    https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino
 */
 
 #include <LwipEthernet.h>
@@ -25,12 +25,13 @@ void setup() {
 
   if (!ethInitStatic(eth, IPAddress(LOCAL_IP), IPAddress(LOCAL_GW), IPAddress(LOCAL_MASK), IPAddress(DNS))) {
     Serial.printf("no hardware found\n");
-    while (1)
+    while (1) {
       delay(1000);
+    }
   }
-  
+
   Serial.printf("Ethernet: IP Address: %s\n",
-    eth.localIP().toString().c_str());
+                eth.localIP().toString().c_str());
 }
 
 void loop() {
