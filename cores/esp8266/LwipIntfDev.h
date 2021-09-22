@@ -36,7 +36,7 @@ public:
         _mtu(DEFAULT_MTU),
         _intrPin(intr),
         _started(false),
-        _default(false)
+        _default(true)
     {
         memset(&_netif, 0, sizeof(_netif));
     }
@@ -64,7 +64,7 @@ public:
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
     }
 
-    void setDefault();
+    void setDefault(bool deflt = true);
 
     bool connected()
     {
@@ -187,10 +187,10 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
         return false;
     }
 
-    _netif.flags |= NETIF_FLAG_UP;
-
     if (localIP().v4() == 0)
     {
+        // IP not set, starting DHCP
+        _netif.flags |= NETIF_FLAG_UP;
         switch (dhcp_start(&_netif))
         {
         case ERR_OK:
@@ -203,6 +203,12 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
             netif_remove(&_netif);
             return false;
         }
+    }
+    else
+    {
+        // IP is set, static config
+        netif_set_link_up(&_netif);
+        netif_set_up(&_netif);
     }
 
     _started = true;
@@ -386,9 +392,9 @@ err_t LwipIntfDev<RawDev>::handlePackets()
 }
 
 template <class RawDev>
-void LwipIntfDev<RawDev>::setDefault()
+void LwipIntfDev<RawDev>::setDefault(bool deflt)
 {
-    _default = true;
+    _default = deflt;
     if (connected())
     {
         netif_set_default(&_netif);
