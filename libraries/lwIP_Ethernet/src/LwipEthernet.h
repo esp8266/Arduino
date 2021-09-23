@@ -1,13 +1,14 @@
 
 #include <ESP8266WiFi.h>    // tcp API
 #include <SPI.h>
+#include <debug.h>
 
 #include <W5100lwIP.h>
 #include <W5500lwIP.h>
 #include <ENC28J60lwIP.h>
 
 // One of them is to be declared in the main sketch
-// and passed to ethInitDHCP():
+// and passed to ethInitDHCP() or ethInitStatic():
 //Wiznet5500lwIP eth(CSPIN);
 //Wiznet5100lwIP eth(CSPIN);
 //ENC28J60lwIP eth(CSPIN);
@@ -20,8 +21,9 @@ bool ethInitDHCP(EthImpl& eth)
     SPI4EthInit();
 
     if (!eth.begin())
-        // hardware not responding
     {
+        // hardware not responding
+        DEBUGV("ethInitDHCP: hardware not responding\n");
         return false;
     }
 
@@ -34,14 +36,16 @@ bool ethInitStatic(EthImpl& eth, IPAddress IP, IPAddress gateway, IPAddress netm
     SPI4EthInit();
 
     if (!eth.config(IP, gateway, netmask, dns1, dns2))
-        // invalid arguments
     {
+        // invalid arguments
+        DEBUGV("ethInitStatic: invalid arguments\n");
         return false;
     }
 
     if (!eth.begin())
-        // hardware not responding
     {
+        // hardware not responding
+        DEBUGV("ethInitStatic: hardware not responding\n");
         return false;
     }
 
