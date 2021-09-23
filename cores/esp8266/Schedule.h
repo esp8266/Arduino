@@ -88,8 +88,4 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 void run_scheduled_recurrent_functions();
 
-// Let a chance for recurrent scheduled functions to run during a waiting delay
-
-bool yieldUntil (std::function<bool()> until, uint32_t maxMs);
-
 #endif // ESP_SCHEDULE_H

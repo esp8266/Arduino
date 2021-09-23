@@ -31,7 +31,7 @@ extern "C" void esp_schedule();
 
 #include <assert.h>
 #include <esp_priv.h>
-#include <Schedule.h>
+#include <yieldUntil.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -146,7 +146,7 @@ public:
         }
         _connect_pending = true;
         // will resume on timeout or when _connected or _notify_error fires
-        yieldUntil([this]() { return !_connect_pending; }, _timeout_ms);
+        esp8266::utils::yieldUntil([this]() { return !_connect_pending; }, _timeout_ms);
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -485,7 +485,7 @@ protected:
 
             _send_waiting = true;
             // will resume on timeout or when _write_some_from_cb or _notify_error fires
-            yieldUntil([this]() { return !_send_waiting; }, _timeout_ms);
+            esp8266::utils::yieldUntil([this]() { return !_send_waiting; }, _timeout_ms);
             _send_waiting = false;
         } while(true);
 

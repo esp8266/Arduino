@@ -26,7 +26,7 @@
 #include <string.h>
 #include <coredecls.h>
 #include <PolledTimeout.h>
-#include <Schedule.h>
+#include <yieldUntil.h>
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 
@@ -622,7 +622,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        if (yieldUntil([&](){ return aResult.isSet(); }, timeout_ms))
+        if (esp8266::utils::yieldUntil([&](){ return aResult.isSet(); }, timeout_ms))
             err = ERR_OK;
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires (or timeout)
@@ -669,7 +669,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
-        if (yieldUntil([&](){ return aResult.isSet(); }, timeout_ms))
+        if (esp8266::utils::yieldUntil([&](){ return aResult.isSet(); }, timeout_ms))
             err = ERR_OK;
         // will resume on timeout or when wifi_dns_found_callback fires
         _dns_lookup_pending = false;
