@@ -168,7 +168,7 @@ void printPunFail(uint16_t *ref, uint16_t *x, size_t sz) {
 bool testPunning() {
   bool result = true;
   // Get reference result for verifing test
-  alignas(alignof(uint32_t)) uint16_t x_ref[] = {1, 2, 3, 0};
+  alignas(uint32_t) uint16_t x_ref[] = {1, 2, 3, 0};
   aliasTestReference(x_ref);  // -O0
   Serial.printf("mmu_get_uint16() strict-aliasing tests with different optimizations:\r\n");
 

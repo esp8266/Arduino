@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-//C This turns on range checking. Is this the value you want to trigger it?
+// This turns on range checking.
 #ifdef DEBUG_ESP_CORE
 #define DEBUG_ESP_MMU
 #endif
@@ -47,6 +47,13 @@ extern "C" {
 
 #if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 #include <esp8266_peri.h>
+#include <sys/config.h> // For config/core-isa.h
+/*
+  Cautiously use XCHAL_..._VADDR values where possible.
+  While XCHAL_..._VADDR values in core-isa.h may define the Xtensa processor
+  CONFIG options, they are not always an indication of DRAM, IRAM, or ROM
+  size or position in the address space.
+*/
 
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
@@ -71,32 +78,34 @@ DBG_MMU_FLUSH(0)
 
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {
-  #define IRAM_START 0x40100000UL
+  const uintptr_t iram_start = (uintptr_t)XCHAL_INSTRAM1_VADDR;
 #ifndef MMU_IRAM_SIZE
 #if defined(__GNUC__) && !defined(CORE_MOCK)
   #warning "MMU_IRAM_SIZE was undefined, setting to 0x8000UL!"
 #endif
-  #define MMU_IRAM_SIZE 0x8000UL
+  #define MMU_IRAM_SIZE 0x8000ul
 #endif
-  #define IRAM_END (IRAM_START + MMU_IRAM_SIZE)
+  const uintptr_t iram_end = iram_start + MMU_IRAM_SIZE;
 
-  return (IRAM_START <= (uintptr_t)addr && IRAM_END > (uintptr_t)addr);
+  return (iram_start <= (uintptr_t)addr && iram_end > (uintptr_t)addr);
 }
 
 static inline __attribute__((always_inline))
 bool mmu_is_dram(const void *addr) {
-  #define DRAM_START 0x3FF80000UL
-  #define DRAM_END 0x40000000UL
+  const uintptr_t dram_start = 0x3FFE8000ul;
+  // The start of the Boot ROM sits at the end of DRAM. 0x40000000ul;
+  const uintptr_t dram_end = (uintptr_t)XCHAL_INSTRAM0_VADDR;
 
-  return (DRAM_START <= (uintptr_t)addr && DRAM_END > (uintptr_t)addr);
+  return (dram_start <= (uintptr_t)addr && dram_end > (uintptr_t)addr);
 }
 
 static inline __attribute__((always_inline))
 bool mmu_is_icache(const void *addr) {
-  #define ICACHE_START 0x40200000UL
-  #define ICACHE_END (ICACHE_START + 0x100000UL)
+  extern void _irom0_text_end(void);
+  const uintptr_t icache_start = (uintptr_t)XCHAL_INSTROM0_VADDR;
+  const uintptr_t icache_end = (uintptr_t)_irom0_text_end;
 
-  return (ICACHE_START <= (uintptr_t)addr && ICACHE_END > (uintptr_t)addr);
+  return (icache_start <= (uintptr_t)addr && icache_end > (uintptr_t)addr);
 }
 
 #ifdef DEBUG_ESP_MMU
@@ -239,19 +248,19 @@ int16_t mmu_set_int16(int16_t *p16, const int16_t val) {
 }
 
 #if (MMU_IRAM_SIZE > 32*1024) && !defined(MMU_SEC_HEAP)
-extern void _text_end(void);
 #define MMU_SEC_HEAP mmu_sec_heap()
 #define MMU_SEC_HEAP_SIZE mmu_sec_heap_size()
 
 static inline __attribute__((always_inline))
 void *mmu_sec_heap(void) {
+  extern void _text_end(void);
   uintptr_t sec_heap = (uintptr_t)_text_end + (uintptr_t)32u;
   return (void *)(sec_heap &= ~(uintptr_t)7u);
 }
 
 static inline __attribute__((always_inline))
 size_t mmu_sec_heap_size(void) {
-  return (size_t)0xC000ul - ((uintptr_t)mmu_sec_heap() - (uintptr_t)0x40100000ul);
+  return (size_t)0xC000ul - ((uintptr_t)mmu_sec_heap() - (uintptr_t)XCHAL_INSTRAM1_VADDR);
 }
 #endif
 
