@@ -33,6 +33,17 @@ extern "C" {
 
 #if defined(CORE_MOCK)
 #define ets_uart_printf(...) do {} while(false)
+#define XCHAL_INSTRAM0_VADDR		0x40000000
+#define XCHAL_INSTRAM1_VADDR		0x40100000
+#define XCHAL_INSTROM0_VADDR		0x40200000
+#else
+#include <sys/config.h> // For config/core-isa.h
+/*
+  Cautiously use XCHAL_..._VADDR values where possible.
+  While XCHAL_..._VADDR values in core-isa.h may define the Xtensa processor
+  CONFIG options, they are not always an indication of DRAM, IRAM, or ROM
+  size or position in the address space.
+*/
 #endif
 
 /*
@@ -47,13 +58,6 @@ extern "C" {
 
 #if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 #include <esp8266_peri.h>
-#include <sys/config.h> // For config/core-isa.h
-/*
-  Cautiously use XCHAL_..._VADDR values where possible.
-  While XCHAL_..._VADDR values in core-isa.h may define the Xtensa processor
-  CONFIG options, they are not always an indication of DRAM, IRAM, or ROM
-  size or position in the address space.
-*/
 
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
