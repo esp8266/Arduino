@@ -36,7 +36,7 @@ public:
         _mtu(DEFAULT_MTU),
         _intrPin(intr),
         _started(false),
-        _default(true)
+        _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
     }

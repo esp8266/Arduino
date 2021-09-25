@@ -215,6 +215,7 @@ void setup(void) {
 
   Serial.println("\nEthernet\n");
 
+  eth.setDefault(true); // default route set through this interface
   if (!ethInitDHCP(eth)) {
     Serial.printf("no hardware found\n");
     while (1) {

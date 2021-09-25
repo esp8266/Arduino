@@ -23,6 +23,7 @@ void setup() {
 
   Serial.println("\nEthernet\n");
 
+  eth.setDefault(true); // default route set through this interface
   if (!ethInitStatic(eth, LOCAL_IP, LOCAL_GW, LOCAL_MASK, DNS)) {
     // enabling debug message will show the real cause
     Serial.printf("no hardware found or bad network configuration\n");
