@@ -136,7 +136,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     int passphraseLen = passphrase == nullptr ? 0 : strlen(passphrase);
     if(passphraseLen > 64) {
         // fail passphrase too long!
-        return WL_CONNECT_FAILED;
+        return WL_WRONG_PASSWORD;
     }
 
     struct station_config conf;
