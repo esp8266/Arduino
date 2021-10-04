@@ -16,7 +16,17 @@ Methods documented for `Client <https://www.arduino.cc/en/Reference/WiFiClientCo
 9.  `flush() <https://www.arduino.cc/en/Reference/WiFiClientFlush>`__
 10. `stop() <https://www.arduino.cc/en/Reference/WiFIClientStop>`__
 
-Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
+Methods and properties described further down below are specific to ESP8266. Some of them behave differently from the reference `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ , or are only implemented for this Core.
+
+connected
+~~~~~~~~~
+
+Unlike the reference implementation, ``connected()`` means that the client is available for both reads and writes. Please use ``status()`` for only the connection information, and ``available()`` if you mean to check whether there's unread data.
+
+status
+~~~~~~
+
+Current implementation returns ``0`` (``CLOSED``) when the client is disconnected and ``4`` (``ESTABLISHED``) when connected. At the time of writing these refer to the ``enum tcp_state`` values that can be found at the `lwip/tcpbase.h <https://github.com/esp8266/Arduino/blob/master/tools/sdk/lwip2/include/lwip/tcpbase.h>`
 
 flush and stop
 ~~~~~~~~~~~~~~
@@ -92,7 +102,6 @@ Other Function Calls
 
 .. code:: cpp
 
-    uint8_t  status () 
     virtual size_t  write (const uint8_t *buf, size_t size) 
     size_t  write_P (PGM_P buf, size_t size) 
     size_t  write (Stream &stream) 
