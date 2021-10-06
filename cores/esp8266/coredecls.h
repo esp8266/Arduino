@@ -42,14 +42,23 @@ void settimeofday_cb (const TrivialCB& cb);
 
 using IsBlockedCB = std::function<bool()>;
 
+// This overload of esp_suspend() performs the blocked callback whenever it is resumed,
+// and if that returns true, it immediately suspends again.
 inline void esp_suspend(const IsBlockedCB& blocked) {
     do {
         esp_suspend();
     } while (blocked());
 }
 
+// This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
+// Whenever it is resumed, as well as every intvl_ms millisconds, it performs
+// the blocked callback, and if that returns true, it keeps delaying for the remainder
+// of the original timeout_ms period.
 void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked, const uint32_t intvl_ms);
 
+// This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
+// Whenever it is resumed, it performs the blocked callback, and if that returns true,
+// it keeps delaying for the remainder of the original timeout_ms period.
 inline void esp_delay(const uint32_t timeout_ms, const IsBlockedCB& blocked) {
     esp_delay(timeout_ms, blocked, timeout_ms);
 }
