@@ -265,7 +265,7 @@ uint8_t WiFiClientSecureCtx::connected() {
     return false;
   }
 
-  return (available() || _engineConnected());
+  return (_updateRecvBuffer() || _engineConnected());
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
@@ -353,7 +353,8 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
   }
 
   // will either check the internal buffer, or try to wait for some data
-  int avail = available();
+  // *may* attempt to write some pending ::write() data b/c of _run_until
+  int avail = _updateRecvBuffer();
 
   // internal buffer might still be available for some time
   bool engine = _engineConnected();
@@ -457,7 +458,7 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   }
 
   _startMillis = millis();
-  while ((available() < (int) length) && ((millis() - _startMillis) < 5000)) {
+  while ((_updateRecvBuffer() < (int) length) && ((millis() - _startMillis) < 5000)) {
     yield();
   }
 
