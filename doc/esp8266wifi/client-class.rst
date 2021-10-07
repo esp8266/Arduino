@@ -23,7 +23,7 @@ connected
 
 Unlike the reference implementation, ``connected()`` means that the client is available for both reads and writes. It will return ``true`` when the client is ``status() == ESTABLISHED`` or ``available() == true``, but will return ``false`` when the ``status() == CLOSED``. Please use ``status()`` for the connection information, ``availableForWrite()`` to check whether it is possible to write, and ``available()`` if you mean to check whether there's unread data.
 
-When the remote side closes the connection e.g. we receive a fairly small payload through HTTP with ``Connection: close``, it is possible to have ``connected() == false`` while the ``available() > 0``. Attempting to ``write()`` to such connection will not be possible, so it is expected from the sketch to also check for ``availableForWrite() > 0`` first.
+When the remote side closes the connection e.g. we receive a fairly small payload through HTTP with ``Connection: close``, client will return ``connected() == false`` while the ``available() > 0``. Attempting to ``write()`` to such connection will not be possible, so it is expected from the sketch to check first for the ``availableForWrite() > 0``.
 
 This change was introduced with `#4626 <https://github.com/esp8266/Arduino/pull/4626>`__, part of the Core release `2.4.2 <https://github.com/esp8266/Arduino/releases/tag/2.4.2>`__
 
