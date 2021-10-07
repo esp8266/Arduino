@@ -185,10 +185,14 @@ class WiFiClientSecureCtx : public WiFiClient {
     uint32_t _tls_min;
     uint32_t _tls_max;
 
+    // Pending received data buffer, used internally & as available()
+    int _updateRecvBuffer();
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
 
     bool _clientConnected(); // Is the underlying socket alive?
+    bool _engineConnected(); // Are both socket and the bearssl engine alive?
+
     std::shared_ptr<unsigned char> _alloc_iobuf(size_t sz);
     void _freeSSL();
     int _run_until(unsigned target, bool blocking = true);

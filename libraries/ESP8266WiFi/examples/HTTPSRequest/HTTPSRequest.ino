@@ -80,7 +80,7 @@ void setup() {
                "Connection: close\r\n\r\n");
 
   Serial.println("Request sent");
-  while (client.connected()) {
+  while (client.available()) {
     String line = client.readStringUntil('\n');
     if (line == "\r") {
       Serial.println("Headers received");

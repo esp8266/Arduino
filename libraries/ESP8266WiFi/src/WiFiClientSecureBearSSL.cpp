@@ -253,19 +253,24 @@ void WiFiClientSecureCtx::_freeSSL() {
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
-  return (_client && _client->state() == ESTABLISHED);
+  return _client && (_client->state() == ESTABLISHED);
+}
+
+bool WiFiClientSecureCtx::_engineConnected() {
+  return _clientConnected() && _handshake_done && _eng && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED);
 }
 
 uint8_t WiFiClientSecureCtx::connected() {
-  if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
-    return true;
+  if (!_clientConnected()) {
+    return false;
   }
-  return false;
+
+  return (available() || _engineConnected());
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
-  // code taken from ::_write()
-  if (!connected() || !_handshake_done) {
+  // Can't write things when there's no connection or br_ssl engine is closed
+  if (!_engineConnected()) {
     return 0;
   }
   // Get BearSSL to a state where we can send
@@ -287,7 +292,7 @@ int WiFiClientSecureCtx::availableForWrite () {
 size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   size_t sent_bytes = 0;
 
-  if (!connected() || !size || !_handshake_done) {
+  if (!size || !_engineConnected()) {
     return 0;
   }
 
@@ -334,10 +339,11 @@ size_t WiFiClientSecureCtx::write_P(PGM_P buf, size_t size) {
 }
 
 size_t WiFiClientSecureCtx::write(Stream& stream) {
-  if (!connected() || !_handshake_done) {
-    DEBUG_BSSL("write: Connect/handshake not completed yet\n");
+  if (!_engineConnected()) {
+    DEBUG_BSSL("write: no br_ssl engine to work with\n");
     return 0;
   }
+
   return stream.sendAll(this);
 }
 
@@ -346,12 +352,19 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
     return -1;
   }
 
+  // will either check the internal buffer, or try to wait for some data
   int avail = available();
-  bool conn = connected();
-  if (!avail && conn) {
-    return 0;  // We're still connected, but nothing to read
+
+  // internal buffer might still be available for some time
+  bool engine = _engineConnected();
+
+  // we're still connected, but nothing to read
+  if (!avail && engine) {
+    return 0;
   }
-  if (!avail && !conn) {
+
+  // or, available failed to assign the internal buffer and we are already disconnected
+  if (!avail && !engine) {
     DEBUG_BSSL("read: Not connected, none left available\n");
     return -1;
   }
@@ -366,10 +379,11 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
     return to_copy;
   }
 
-  if (!conn) {
+  if (!engine) {
     DEBUG_BSSL("read: Not connected\n");
     return -1;
   }
+
   return 0; // If we're connected, no error but no read.
 }
 
@@ -398,7 +412,7 @@ int WiFiClientSecureCtx::read() {
   return -1;
 }
 
-int WiFiClientSecureCtx::available() {
+int WiFiClientSecureCtx::_updateRecvBuffer() {
   if (_recvapp_buf) {
     return _recvapp_len;  // Anything from last call?
   }
@@ -419,8 +433,12 @@ int WiFiClientSecureCtx::available() {
   return 0;
 }
 
+int WiFiClientSecureCtx::available() {
+  return _updateRecvBuffer();
+}
+
 int WiFiClientSecureCtx::peek() {
-  if (!ctx_present() || !available()) {
+  if (!ctx_present() || !_updateRecvBuffer()) {
     DEBUG_BSSL("peek: Not connected, none left available\n");
     return -1;
   }
