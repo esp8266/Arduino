@@ -21,12 +21,16 @@ Methods and properties described further down below are specific to ESP8266. Som
 connected
 ~~~~~~~~~
 
-Unlike the reference implementation, ``connected()`` means that the client is available for both reads and writes. Please use ``status()`` for only the connection information, and ``available()`` if you mean to check whether there's unread data.
+Unlike the reference implementation, ``connected()`` means that the client is available for both reads and writes. It will return ``true`` when the client is ``status() == ESTABLISHED`` or ``available() == true``, but will return ``false`` when the ``status() == CLOSED``. Please use ``status()`` for the connection information, ``availableForWrite()`` to check whether it is possible to write, and ``available()`` if you mean to check whether there's unread data.
+
+When the remote side closes the connection e.g. we receive a fairly small payload through HTTP with ``Connection: close``, it is possible to have ``connected() == false`` while the ``available() > 0``. Attempting to ``write()`` to such connection will not be possible, so it is expected from the sketch to also check for ``availableForWrite() > 0`` first.
+
+This change was introduced with `#4626 <https://github.com/esp8266/Arduino/pull/4626>`__, part of the Core release `2.4.2 <https://github.com/esp8266/Arduino/releases/tag/2.4.2>`__
 
 status
 ~~~~~~
 
-Current implementation returns ``0`` (``CLOSED``) when the client is disconnected and ``4`` (``ESTABLISHED``) when connected. At the time of writing these refer to the ``enum tcp_state`` values that can be found at the `lwip/tcpbase.h <https://github.com/esp8266/Arduino/blob/master/tools/sdk/lwip2/include/lwip/tcpbase.h>`
+Current implementation returns ``0`` / ``CLOSED`` when the client is disconnected and ``4`` / ``ESTABLISHED`` when connected. At the time of writing these refer to the ``enum tcp_state`` values that can be found at the `lwip/tcpbase.h <https://github.com/esp8266/Arduino/blob/master/tools/sdk/lwip2/include/lwip/tcpbase.h>`__
 
 flush and stop
 ~~~~~~~~~~~~~~
