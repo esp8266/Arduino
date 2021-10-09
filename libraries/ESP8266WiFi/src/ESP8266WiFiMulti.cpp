@@ -83,7 +83,7 @@ static void printWiFiStatus(wl_status_t status)
  */
 static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
 {
-    wl_status_t status;
+    wl_status_t status = WL_CONNECT_FAILED;
     // The final argument, intvl_ms, to esp_delay influences how frequently
     // the scheduled recurrent functions (Schedule.h) are probed.
     esp_delay(connectTimeoutMs,
