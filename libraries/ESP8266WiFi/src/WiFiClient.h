@@ -84,7 +84,7 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  virtual void flush() override { (void)flush(0); }
+  virtual void flush() override { (void)flush(0); } // wait for all outgoing characters to be sent, output buffer should be empty after this call
   virtual void stop() override { (void)stop(0); }
   bool flush(unsigned int maxWaitMs);
   bool stop(unsigned int maxWaitMs);
