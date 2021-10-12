@@ -83,7 +83,7 @@ class UpdaterClass {
       Should be equal to the remaining bytes when called
       Usable for slow streams like Serial
     */
-    size_t writeStream(Stream &data);
+    size_t writeStream(Stream &data, uint16_t streamTimeout = 60000);
 
     /*
       If all bytes are written
@@ -108,12 +108,12 @@ class UpdaterClass {
     bool setMD5(const char * expected_md5);
 
     /*
-      returns the MD5 String of the sucessfully ended firmware
+      returns the MD5 String of the successfully ended firmware
     */
     String md5String(void){ return _md5.toString(); }
 
     /*
-      populated the result with the md5 bytes of the sucessfully ended firmware
+      populated the result with the md5 bytes of the successfully ended firmware
     */
     void md5(uint8_t * result){ return _md5.getBytes(result); }
 

@@ -1,5 +1,5 @@
 /*
-  stdlib_noniso.h - nonstandard (but usefull) conversion functions
+  stdlib_noniso.h - nonstandard (but useful) conversion functions
 
   Copyright (c) 2021 David Gauchard. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.

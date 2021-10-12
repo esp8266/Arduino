@@ -101,49 +101,78 @@ public:
         return uart_get_rx_buffer_size(_uart);
     }
 
-    void swap()
+    bool swap()
     {
-        swap(1);
+        return swap(1);
     }
-    void swap(uint8_t tx_pin)    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    bool swap(uint8_t tx_pin)    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
     {
-        uart_swap(_uart, tx_pin);
+        return uart_swap(_uart, tx_pin);
     }
 
     /*
      * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
      * Note: UART 1 can't be used if GPIO2 is used with UART 0!
      */
-    void set_tx(uint8_t tx_pin)
+    bool set_tx(uint8_t tx_pin)
     {
-        uart_set_tx(_uart, tx_pin);
+        return uart_set_tx(_uart, tx_pin);
     }
 
     /*
      * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
      * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
      */
-    void pins(uint8_t tx, uint8_t rx)
+    bool pins(uint8_t tx, uint8_t rx)
     {
-        uart_set_pins(_uart, tx, rx);
+        return uart_set_pins(_uart, tx, rx);
     }
 
     int available(void) override;
 
     int peek(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_peek_char(_uart);
     }
+
+    virtual bool hasPeekBufferAPI () const override
+    {
+        return true;
+    }
+
+    // return a pointer to available data buffer (size = available())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer () override
+    {
+        return uart_peek_buffer(_uart);
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t peekAvailable () override
+    {
+        return uart_peek_available(_uart);
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume) override
+    {
+        return uart_peek_consume(_uart, consume);
+    }
+
     int read(void) override
     {
-        // return -1 when data is unvailable (arduino api)
+        // return -1 when data is unavailable (arduino api)
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size)
+    int read(char* buffer, size_t size)
     {
         return uart_read(_uart, buffer, size);
+    }
+    int read(uint8_t* buffer, size_t size) override
+    {
+        return uart_read(_uart, (char*)buffer, size);
     }
     size_t readBytes(char* buffer, size_t size) override;
     size_t readBytes(uint8_t* buffer, size_t size) override
@@ -154,7 +183,7 @@ public:
     {
         return static_cast<int>(uart_tx_free(_uart));
     }
-    void flush(void) override;
+    void flush(void) override; // wait for all outgoing characters to be sent, output buffer is empty after this call
     size_t write(uint8_t c) override
     {
         return uart_write_char(_uart, c);
@@ -204,8 +233,12 @@ protected:
     size_t _rx_size;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 extern HardwareSerial Serial;
+#endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 extern HardwareSerial Serial1;
+#endif
 
 extern void serialEventRun(void) __attribute__((weak));
 

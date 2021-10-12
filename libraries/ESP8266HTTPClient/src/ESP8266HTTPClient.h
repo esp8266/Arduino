@@ -28,7 +28,7 @@
 
 #include <memory>
 #include <Arduino.h>
-
+#include <StreamString.h>
 #include <WiFiClient.h>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
@@ -148,8 +148,6 @@ typedef enum {
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
-class StreamString;
-
 class HTTPClient
 {
 public:
@@ -163,7 +161,7 @@ public:
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-    // old API is now explicitely forbidden
+    // old API is now explicitly forbidden
     bool begin(String url)  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, url)")));
     bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, host, port, uri)")));
     bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
@@ -178,6 +176,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setAuthorization(String auth);
     void setTimeout(uint16_t timeout);
 
     // Redirections
@@ -189,6 +188,7 @@ public:
 
     /// request handling
     int GET();
+    int DELETE();
     int POST(const uint8_t* payload, size_t size);
     int POST(const String& payload);
     int PUT(const uint8_t* payload, size_t size);
@@ -215,6 +215,7 @@ public:
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
+	int writeToPrint(Print* print);
     int writeToStream(Stream* stream);
     const String& getString(void);
     static String errorToString(int error);

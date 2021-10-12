@@ -122,7 +122,7 @@ bool mmu_is_icache(const void *addr) {
 /*
  * Some inlines to allow faster random access to non32bit access of iRAM or
  * iCACHE data elements. These remove the extra time and stack space that would
- * have occured by relying on exception processing.
+ * have occurred by relying on exception processing.
  */
 static inline __attribute__((always_inline))
 uint8_t mmu_get_uint8(const void *p8) {

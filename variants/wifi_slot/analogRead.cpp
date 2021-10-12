@@ -39,7 +39,7 @@ extern "C" int analogRead(uint8_t pin) {
 void initVariant() {
   // we need to reset analog mux. When ANALOG_INPUT_SELECTOR_PIN is high
   // on ~0.4 ms, mux channel is becoming 0.
-  // Mux channel is swithing on back \_ front. But there is no switching
+  // Mux channel is switching on back \_ front. But there is no switching
   // - rc reset is still high when ANALOG_INPUT_SELECTOR_PIN became low
   uint16_t resetDelay = 777;
   pinMode(ANALOG_INPUT_SELECTOR_PIN, OUTPUT);

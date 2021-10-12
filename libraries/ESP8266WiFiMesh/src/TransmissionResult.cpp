@@ -23,6 +23,29 @@
  * THE SOFTWARE.
  */
 
+
+
+
+
+
+
+/********************************************************************************************
+* NOTE!
+*
+* This class is deprecated and will be removed in core version 3.0.0.
+* If you are still using this class, please consider migrating to the new API shown in 
+* the EspnowNetworkInfo.h or TcpIpNetworkInfo.h source files.
+*
+* TODO: delete this file.
+********************************************************************************************/
+
+
+
+
+
+
+
+
 #include "TransmissionResult.h"
 
 TransmissionResult::TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill) : 

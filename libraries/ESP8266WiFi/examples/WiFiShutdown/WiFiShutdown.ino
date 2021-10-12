@@ -1,5 +1,5 @@
 
-// Demonstrate the use of WiFi.mode(WIFI_SHUTDOWN)/WiFi.mode(WIFI_RESUME)
+// Demonstrate the use of WiFi.shutdown() and WiFi.resumeFromShutdown()
 // Released to public domain
 
 // Current on WEMOS D1 mini (including: LDO, usbserial chip):
@@ -24,11 +24,6 @@ WiFiState state;
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-void preinit(void) {
-  // Make sure, wifi stays off after boot.
-  ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup() {
   Serial.begin(74880);
   //Serial.setDebugOutput(true);  // If you need debug output
@@ -44,7 +39,7 @@ void setup() {
   ESP.rtcUserMemoryRead(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
   unsigned long start = millis();
 
-  if (!WiFi.mode(WIFI_RESUME, &state)
+  if (!WiFi.resumeFromShutdown(state)
       || (WiFi.waitForConnectResult(10000) != WL_CONNECTED)) {
     Serial.println("Cannot resume WiFi connection, connecting via begin...");
     WiFi.persistent(false);
@@ -68,7 +63,7 @@ void setup() {
   // Here you can do whatever you need to do that needs a WiFi connection.
   // ---
 
-  WiFi.mode(WIFI_SHUTDOWN, &state);
+  WiFi.shutdown(state);
   ESP.rtcUserMemoryWrite(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
 
   // ---

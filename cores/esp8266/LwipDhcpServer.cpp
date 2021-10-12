@@ -195,7 +195,7 @@ DhcpServer::DhcpServer(netif* netif): _netif(netif)
             { 0 }           // gateway 0.0.0.0
         };
         begin(&ip);
-        fw_has_started_softap_dhcps = 2; // not 1, ending intial boot sequence
+        fw_has_started_softap_dhcps = 2; // not 1, ending initial boot sequence
     }
 };
 
@@ -454,10 +454,10 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     *optptr++ = 1;
     *optptr++ = 0x00;
 
-#if 0 // vendor specific unititialized (??)
+#if 0 // vendor specific uninitialized (??)
     *optptr++ = 43; // vendor specific
     *optptr++ = 6;
-    // unitialized ?
+    // uninitialized ?
 #endif
 
 #if 0 // already set (DHCP_OPTION_SUBNET_MASK==1) (??)
@@ -1140,16 +1140,9 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
         // logic below is subject for improvement
         // - is wrong
         // - limited to /24 address plans
-#if 1
-        softap_ip = ip_2_ip4(&_netif->ip_addr)->addr;
-#else
-        struct ip_info info;
-        bzero(&info, sizeof(struct ip_info));
-        wifi_get_ip_info(SOFTAP_IF, &info);
-        softap_ip = htonl(info.ip.addr);
+        softap_ip = htonl(ip_2_ip4(&_netif->ip_addr)->addr);
         start_ip = htonl(please->start_ip.addr);
         end_ip = htonl(please->end_ip.addr);
-#endif
         /*config ip information can't contain local ip*/
         if ((start_ip <= softap_ip) && (softap_ip <= end_ip))
         {

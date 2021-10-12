@@ -72,11 +72,6 @@
 extern "C" {
 #endif
 
-// Call this function in your setup() to cause the phase locked version of the generator to
-// be linked in automatically.  Otherwise, the default PWM locked version will be used.
-void enablePhaseLockedWaveform(void);
-
-
 // Start or change a waveform of the specified high and low times on specific pin.
 // If runtimeUS > 0 then automatically stop it after that many usecs, relative to the next
 // full period.
@@ -112,7 +107,7 @@ int stopWaveform(uint8_t pin);
 // to determine whether or not to perform an operation.
 // Pass in NULL to disable the callback and, if no other waveforms being
 // generated, stop the timer as well.
-// Make sure the CB function has the ICACHE_RAM_ATTR decorator.
+// Make sure the CB function has the IRAM_ATTR decorator.
 void setTimer1Callback(uint32_t (*fn)());
 
 

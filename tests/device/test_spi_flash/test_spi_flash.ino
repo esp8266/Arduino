@@ -3,12 +3,6 @@
 
 BS_ENV_DECLARE();
 
-void preinit() {
-    // (no C++ in function)
-    // disable wifi
-    ESP8266WiFiClass::preinitWiFiOff();
-}
-
 void setup()
 {
     Serial.begin(115200);

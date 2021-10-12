@@ -24,8 +24,11 @@ chmod go-w  ~/.ssh/config
 git clone git@github.com:esp8266/esp8266.github.io.git
 pushd esp8266.github.io
 
-# Update the package index
-cp ../versions/*/package_esp8266com_index.json stable/package_esp8266com_index.json
+# Copy from published release, ensure JSON valid
+rm -f stable/package_esp8266com_index.json
+wget https://github.com/esp8266/Arduino/releases/download/$tag/package_esp8266com_index.json -O stable/package_esp8266com_index.json
+cat stable/package_esp8266com_index.json | jq empty
+
 git add stable/package_esp8266com_index.json
 
 # Commit and push the changes

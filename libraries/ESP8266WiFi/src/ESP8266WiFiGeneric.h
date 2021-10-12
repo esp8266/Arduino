@@ -77,6 +77,39 @@ class ESP8266WiFiGenericClass {
         uint8_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+        /**
+         * Set modem sleep mode (ESP32 compatibility)
+         * @param enable true to enable
+         * @return true if succeeded
+         */
+        bool setSleep(bool enable)
+        {
+            if (enable)
+            {
+                return setSleepMode(WIFI_MODEM_SLEEP);
+            }
+            else
+            {
+                return setSleepMode(WIFI_NONE_SLEEP);
+            }
+        }
+        /**
+         * Set sleep mode (ESP32 compatibility)
+         * @param mode wifi_ps_type_t
+         * @return true if succeeded
+         */
+        bool setSleep(wifi_ps_type_t mode)
+        {
+            return setSleepMode((WiFiSleepType_t)mode);
+        }
+        /**
+         * Get current sleep state (ESP32 compatibility)
+         * @return true if modem sleep is enabled
+         */
+        bool getSleep()
+        {
+            return getSleepMode() == WIFI_MODEM_SLEEP;
+        }
 
         WiFiSleepType_t getSleepMode();
         uint8_t getListenInterval ();
@@ -87,9 +120,9 @@ class ESP8266WiFiGenericClass {
 
         void setOutputPower(float dBm);
 
-        void persistent(bool persistent);
+        static void persistent(bool persistent);
 
-        bool mode(WiFiMode_t, WiFiState* state = nullptr);
+        bool mode(WiFiMode_t);
         WiFiMode_t getMode();
 
         bool enableSTA(bool enable);
@@ -98,21 +131,23 @@ class ESP8266WiFiGenericClass {
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
-        static uint32_t shutdownCRC (const WiFiState* state);
-        static bool shutdownValidCRC (const WiFiState* state);
-        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
+        // wrappers around mode() and forceSleepBegin/Wake
+        // - sleepUs is WiFi.forceSleepBegin() parameter, 0 means forever
+        // - saveState is the user's state to hold configuration on restore
+        bool shutdown(WiFiState& stateSave);
+        bool shutdown(WiFiState& stateSave, uint32 sleepUs);
+        bool resumeFromShutdown(WiFiState& savedState);
+
+        static bool shutdownValidCRC (const WiFiState& state);
+        static void preinitWiFiOff () __attribute__((deprecated("WiFi is off by default at boot, use enableWiFiAtBoot() for legacy behavior")));
 
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
 
-        static void _eventCallback(void *event);
+        static uint32_t shutdownCRC (const WiFiState& state);
 
-        // called by WiFi.mode(SHUTDOWN/RESTORE, state)
-        // - sleepUs is WiFi.forceSleepBegin() parameter, 0 = forever
-        // - saveState is the user's state to hold configuration on restore
-        bool shutdown (uint32 sleepUs = 0, WiFiState* stateSave = nullptr);
-        bool resumeFromShutdown (WiFiState* savedState = nullptr);
+        static void _eventCallback(void *event);
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------

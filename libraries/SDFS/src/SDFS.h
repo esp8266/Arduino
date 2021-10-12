@@ -149,7 +149,7 @@ public:
 
     bool begin() override {
         if (_mounted) {
-            end();
+            return true;
         }
         _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         if (!_mounted && _cfg._autoFormat) {
@@ -287,7 +287,7 @@ public:
         return _opened ? _fd->write(buf, size) : -1;
     }
 
-    size_t read(uint8_t* buf, size_t size) override
+    int read(uint8_t* buf, size_t size) override
     {
         return _opened ? _fd->read(buf, size) : -1;
     }
