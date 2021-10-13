@@ -55,7 +55,7 @@ inline void esp_suspend(T&& blocked) {
 // is asynchronously resumed before the timeout is reached.
 // Also returns false if intvl_ms have expired during the active call.
 // Otherwise return true to indicate the timeout_ms have completely expired.
-bool try_esp_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
+bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
 
 // This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
 // Whenever it is resumed, as well as every intvl_ms millisconds, it performs
@@ -64,7 +64,7 @@ bool try_esp_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
 template <typename T>
 inline void esp_delay(const uint32_t timeout_ms, T&& blocked, const uint32_t intvl_ms) {
     const auto start_ms = millis();
-    while (!try_esp_delay(start_ms, timeout_ms, intvl_ms) && blocked()) {
+    while (!esp_try_delay(start_ms, timeout_ms, intvl_ms) && blocked()) {
     }
 }
 
