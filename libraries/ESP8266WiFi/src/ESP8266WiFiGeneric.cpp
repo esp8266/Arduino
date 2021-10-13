@@ -630,10 +630,10 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     if(err == ERR_OK) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
         return 1;
-    } else {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-        return 0;
     }
+    
+    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n", aHostname, lwip_strerr(err), (int)err);
+    return 0;
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
@@ -680,10 +680,10 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     if(err == ERR_OK) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
         return 1;
-    } else {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-        return 0;
     }
+
+    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
+    return 0;
 }
 #endif
 
