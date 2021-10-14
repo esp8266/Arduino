@@ -51,10 +51,11 @@ inline void esp_suspend(T&& blocked) {
     } while (blocked());
 }
 
-// Try to delay for timeout_ms relative to start_ms. Returns false if the delayed task
-// is asynchronously resumed before the timeout is reached.
-// Also returns false if intvl_ms have expired during the active call.
-// Otherwise return true to indicate the timeout_ms have completely expired.
+// Try to delay until timeout_ms has expired since start_ms.
+// Returns true if timeout_ms has completely expired on entry.
+// Otherwise returns false after delaying for the relative
+// remainder of timeout_ms, or an absolute intvl_ms, whichever is shorter.
+// The delay may be asynchronously cancelled, before that timeout is reached.
 bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
 
 // This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
