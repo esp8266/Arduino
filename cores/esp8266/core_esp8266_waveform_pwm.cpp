@@ -373,8 +373,8 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
   if (wvfState.waveformEnabled & mask) {
     // Make sure no waveform changes are waiting to be applied
     while (wvfState.waveformToChange) {
-      yield(); // Wait for waveform to update
-      // No mem barrier here, the call to a global function implies global state updated
+      esp_yield(); // Wait for waveform to update
+      MEMBARRIER();
     }
     wvfState.waveformNewHigh = timeHighCycles;
     wvfState.waveformNewLow = timeLowCycles;
@@ -393,8 +393,8 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t timeHighCycles, uint32_t
     initTimer();
     forceTimerInterrupt();
     while (wvfState.waveformToEnable) {
-      yield(); // Wait for waveform to update
-      // No mem barrier here, the call to a global function implies global state updated
+      esp_yield(); // Wait for waveform to update
+      MEMBARRIER();
     }
   }
 
