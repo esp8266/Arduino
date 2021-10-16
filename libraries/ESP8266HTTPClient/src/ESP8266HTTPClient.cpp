@@ -29,6 +29,16 @@
 #include <StreamDev.h>
 #include <base64.h>
 
+// per https://github.com/esp8266/Arduino/issues/8231
+// make sure HTTPClient can be utilized as a movable class member
+static_assert(std::is_default_constructible_v<HTTPClient>, "");
+static_assert(!std::is_copy_constructible_v<HTTPClient>, "");
+static_assert(std::is_move_constructible_v<HTTPClient>, "");
+static_assert(std::is_move_assignable_v<HTTPClient>, "");
+
+static const char defaultUserAgentPstr[] PROGMEM = "ESP8266HTTPClient";
+const String HTTPClient::defaultUserAgent = defaultUserAgentPstr;
+
 static int StreamReportToHttpClientReport (Stream::Report streamSendError)
 {
     switch (streamSendError)
@@ -40,27 +50,6 @@ static int StreamReportToHttpClientReport (Stream::Report streamSendError)
     case Stream::Report::Success: return 0;
     }
     return 0; // never reached, keep gcc quiet
-}
-
-/**
- * constructor
- */
-HTTPClient::HTTPClient()
-    : _client(nullptr), _userAgent(F("ESP8266HTTPClient"))
-{
-}
-
-/**
- * destructor
- */
-HTTPClient::~HTTPClient()
-{
-    if(_client) {
-        _client->stop();
-    }
-    if(_currentHeaders) {
-        delete[] _currentHeaders;
-    }
 }
 
 void HTTPClient::clear()
@@ -81,8 +70,6 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, const String& url) {
-    _client = &client;
-
     // check for : (http: or https:)
     int index = url.indexOf(':');
     if(index < 0) {
@@ -98,6 +85,8 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
     }
 
     _port = (protocol == "https" ? 443 : 80);
+    _client = client.clone();
+
     return beginInternal(url, protocol.c_str());
 }
 
@@ -113,7 +102,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
-    _client = &client;
+    _client = client.clone();
 
      clear();
     _host = host;
@@ -463,7 +452,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         }
 
         // transfer all of it, with send-timeout
-        if (size && StreamConstPtr(payload, size).sendAll(_client) != size)
+        if (size && StreamConstPtr(payload, size).sendAll(_client.get()) != size)
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
 
         // handle Server Response (Header)
@@ -564,7 +553,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     }
 
     // transfer all of it, with timeout
-    size_t transferred = stream->sendSize(_client, size);
+    size_t transferred = stream->sendSize(_client.get(), size);
     if (transferred != size)
     {
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\n", size, transferred);
@@ -615,7 +604,7 @@ WiFiClient& HTTPClient::getStream(void)
 WiFiClient* HTTPClient::getStreamPtr(void)
 {
     if(connected()) {
-        return _client;
+        return _client.get();
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
@@ -820,10 +809,7 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
 void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount)
 {
     _headerKeysCount = headerKeysCount;
-    if(_currentHeaders) {
-        delete[] _currentHeaders;
-    }
-    _currentHeaders = new RequestArgument[_headerKeysCount];
+    _currentHeaders = std::make_unique<RequestArgument[]>(_headerKeysCount);
     for(size_t i = 0; i < _headerKeysCount; i++) {
         _currentHeaders[i].key = headerKeys[i];
     }
@@ -965,7 +951,7 @@ bool HTTPClient::sendHeader(const char * type)
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     // transfer all of it, with timeout
-    return StreamConstPtr(header).sendAll(_client) == header.length();
+    return StreamConstPtr(header).sendAll(_client.get()) == header.length();
 }
 
 /**
