@@ -28,6 +28,8 @@
 #include "PolledTimeout.h"
 #include "LwipIntf.h"
 
+#include <coredecls.h>
+
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -43,9 +45,6 @@ extern "C" {
 }
 
 #include "debug.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
