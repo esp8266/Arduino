@@ -2,8 +2,6 @@
 #ifndef __COREDECLS_H
 #define __COREDECLS_H
 
-#define HAVE_ESP_SUSPEND 1
-
 #include "core_esp8266_features.h"
 
 #ifdef __cplusplus
