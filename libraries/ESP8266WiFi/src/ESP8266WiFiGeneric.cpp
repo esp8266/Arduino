@@ -203,7 +203,10 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::
 WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
 {
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
-        WiFiEventModeChange& dst = *reinterpret_cast<WiFiEventModeChange*>(&e->event_info);
+        auto& src = e->event_info.opmode_changed;
+        WiFiEventModeChange dst;
+        dst.oldMode = (WiFiMode_t)src.old_opmode;
+        dst.newMode = (WiFiMode_t)src.new_opmode;
         f(dst);
     });
     sCbEventList.push_back(handler);
