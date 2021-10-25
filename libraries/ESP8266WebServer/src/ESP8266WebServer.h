@@ -115,6 +115,8 @@ public:
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
+  typedef std::function<String(FS &fs, const String &fName)> ETagFunction;
+
   void on(const Uri &uri, THandlerFunction handler);
   void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
   void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
@@ -123,6 +125,7 @@ public:
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
   void enableCORS(bool enable);
+  void enableETag(bool enable, ETagFunction fn = nullptr);
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
@@ -271,6 +274,9 @@ public:
       _hook = hook;
     }
   }
+
+  bool             _eTagEnabled = false;
+  ETagFunction     _eTagFunction = nullptr;
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
