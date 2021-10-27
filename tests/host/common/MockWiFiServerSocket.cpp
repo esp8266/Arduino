@@ -99,7 +99,7 @@ void WiFiServer::begin ()
 		exit(EXIT_FAILURE);
 	}
 
-    	server.sin_family = AF_INET;
+	server.sin_family = AF_INET;
 	server.sin_port = htons(mockport);
 	server.sin_addr.s_addr = htonl(global_source_address);
 	if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
@@ -149,4 +149,24 @@ void WiFiServer::close ()
 void WiFiServer::stop ()
 {
     close();
+}
+
+size_t WiFiServer::hasClientData ()
+{
+    // Trivial Mocking:
+    // There is no waiting list of clients in this trivial mocking code,
+    // so the code has to act as if the tcp backlog list is full,
+    // and nothing is known about potential further clients.
+    // It could be implemented by accepting new clients and store their data until the current one is closed.
+    return 0;
+}
+
+bool WiFiServer::hasMaxPendingClients ()
+{
+    // Mocking code does not consider the waiting client list,
+    // so it will return ::hasClient() here meaning:
+    // - our waiting client list does not exist
+    // - we consider pending number is max if a new client is waiting
+    //   or not max if there's no new client.
+    return hasClient();
 }

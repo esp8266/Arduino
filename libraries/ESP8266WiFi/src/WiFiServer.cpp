@@ -109,6 +109,25 @@ bool WiFiServer::hasClient() {
     return false;
 }
 
+size_t WiFiServer::hasClientData() {
+    ClientContext *next = _unclaimed;
+    while (next) {
+        size_t s = next->getSize();
+        // return the amount of data available from the first connection that has any
+        if (s) return s;
+        next = next->next();
+    }
+    return 0;
+}
+
+bool WiFiServer::hasMaxPendingClients() {
+#if TCP_LISTEN_BACKLOG
+    return ((struct tcp_pcb_listen *)_listen_pcb)->accepts_pending >= MAX_PENDING_CLIENTS_PER_PORT;
+#else
+    return false;
+#endif
+}
+
 WiFiClient WiFiServer::available(byte* status) {
     (void) status;
     if (_unclaimed) {
