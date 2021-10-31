@@ -44,15 +44,20 @@ def get_elf_entry(elf, path):
     raise Exception('Unable to find entry point in file "' + elf + '"')
 
 def get_segment_size_addr(elf, segment, path):
-    p = subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, universal_newlines=True )
-    lines = p.stdout.readlines()
-    for line in lines:
-        if segment in line:
-            words = re.split('\s+', line)
-            size = int(words[3], 16)
-            addr = int(words[4], 16)
-            return [ size, addr ]
-    raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
+    attempts = 0
+    maxAttempts = 5
+    while (attempts < maxAttempts): 
+        attempts = attempts + 1
+        with subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, universal_newlines=True ) as p:
+            lines = p.stdout.readlines()
+            if (len(lines) > 0): 
+                for line in lines:
+                    if segment in line:
+                        words = re.split('\s+', line)
+                        size = int(words[3], 16)
+                        addr = int(words[4], 16)
+                        return [ size, addr ]
+                raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '" path "' + path + '"')
 
 def read_segment(elf, segment, path):
     fd, tmpfile = tempfile.mkstemp()
