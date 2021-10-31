@@ -328,7 +328,7 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
 
             // Check SSID
             if (ssid == entry.ssid) {
-                DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid);
+                DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid.c_str());
 
                 // Connect to WiFi
                 WiFi.begin(ssid, entry.passphrase, channel, bssid);

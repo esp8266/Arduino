@@ -117,7 +117,7 @@ public:
 #ifdef DEBUG_ESP_PORT
         if (i.totalBytes > (uint64_t)SIZE_MAX) {
             // This catches both total and used cases, since used must always be < total.
-            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use info64().\n"), i.totalBytes);
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (" PRIu64 " >= 4GB).  Please update source to use info64().\n"), i.totalBytes);
         }
 #endif
         info.totalBytes    = (size_t)i.totalBytes;
