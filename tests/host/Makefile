@@ -109,7 +109,6 @@ CORE_CPP_FILES := \
 		common/FmtNumber.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
-		common/PrintBasic.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
