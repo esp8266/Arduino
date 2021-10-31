@@ -57,7 +57,7 @@ def get_segment_size_addr(elf, segment, path):
                         size = int(words[3], 16)
                         addr = int(words[4], 16)
                         return [ size, addr ]
-                raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '" path "' + path + '"')
+    raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '" path "' + path + '"')
 
 def read_segment(elf, segment, path):
     fd, tmpfile = tempfile.mkstemp()
