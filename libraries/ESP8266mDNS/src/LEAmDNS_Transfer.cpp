@@ -532,7 +532,7 @@ bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer
                 if (pTxts)
                 {
                     ((stcMDNS_RRAnswerTXT*&)p_rpRRAnswer)->m_Txts.c_str(pTxts);
-                    DEBUG_OUTPUT.printf_P(PSTR("TXT(%u) %s"), stTxtLength, pTxts);
+                    DEBUG_OUTPUT.printf_P(PSTR("TXT(%u) %s"), (unsigned int)stTxtLength, pTxts);
                     delete[] pTxts;
                 }
                 break;

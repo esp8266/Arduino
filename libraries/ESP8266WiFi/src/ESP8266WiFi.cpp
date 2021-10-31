@@ -75,12 +75,12 @@ void ESP8266WiFiClass::printDiag(Print& p) {
     char ssid[33]; //ssid can be up to 32chars, => plus null term
     memcpy(ssid, conf.ssid, sizeof(conf.ssid));
     ssid[32] = 0; //nullterm in case of 32 char ssid
-    p.printf_P(PSTR("SSID (%d): %s\n"), strlen(ssid), ssid);
+    p.printf_P(PSTR("SSID (%u): %s\n"), (unsigned int)strlen(ssid), ssid);
 
     char passphrase[65];
     memcpy(passphrase, conf.password, sizeof(conf.password));
     passphrase[64] = 0;
-    p.printf_P(PSTR("Passphrase (%d): %s\n"), strlen(passphrase), passphrase);
+    p.printf_P(PSTR("Passphrase (%u): %s\n"), (unsigned int)strlen(passphrase), passphrase);
 
     p.print(F("BSSID set: "));
     p.println(conf.bssid_set);
