@@ -104,9 +104,11 @@ CORE_CPP_FILES := \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
 		FatLib/FatFormatter.cpp \
+		FatLib/FatName.cpp \
 		FatLib/FatVolume.cpp \
 		FatLib/FatPartition.cpp \
 		common/FmtNumber.cpp \
+		common/FsCache.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
 	) \

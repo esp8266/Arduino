@@ -21,6 +21,7 @@ function skip_ino()
 /TeensySdioDemo/
 /UserChipSelectFunction/
 /UserSPIDriver/
+/examples.donotuse/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))
