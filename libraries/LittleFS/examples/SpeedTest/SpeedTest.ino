@@ -14,6 +14,25 @@
 // How large of a file to test
 #define TESTSIZEKB 512
 
+// Format speed in bytes/second.  Static buffer so not re-entrant safe
+const char *rate(unsigned long start, unsigned long stop, unsigned long bytes) {
+  static char buff[64];
+  if (stop == start) {
+    strcpy_P(buff, PSTR("Inf b/s"));
+  } else {
+    unsigned long delta = stop - start;
+    float r = 1000.0 * (float)bytes / (float)delta;
+    if (r >= 1000000.0) {
+      sprintf_P(buff, PSTR("%0.2f MB/s"), r / 1000000.0);
+    } else if (r >= 1000.0) {
+      sprintf_P(buff, PSTR("%0.2f KB/s"), r / 1000.0);
+    } else {
+      sprintf_P(buff, PSTR("%d bytes/s"), (int)r);
+    }
+  }
+  return buff;
+}
+
 void DoTest(FS *fs) {
   if (!fs->format()) {
     Serial.printf("Unable to format(), aborting\n");
@@ -30,7 +49,7 @@ void DoTest(FS *fs) {
   }
 
   Serial.printf("Creating %dKB file, may take a while...\n", TESTSIZEKB);
-  long start = millis();
+  unsigned long start = millis();
   File f = fs->open("/testwrite.bin", "w");
   if (!f) {
     Serial.printf("Unable to open file for writing, aborting\n");
@@ -42,8 +61,8 @@ void DoTest(FS *fs) {
     }
   }
   f.close();
-  long stop = millis();
-  Serial.printf("==> Time to write %dKB in 256b chunks = %ld milliseconds\n", TESTSIZEKB, stop - start);
+  unsigned long stop = millis();
+  Serial.printf("==> Time to write %dKB in 256b chunks = %lu milliseconds\n", TESTSIZEKB, stop - start);
 
   f = fs->open("/testwrite.bin", "r");
   Serial.printf("==> Created file size = %d\n", f.size());
@@ -59,7 +78,7 @@ void DoTest(FS *fs) {
   }
   f.close();
   stop = millis();
-  Serial.printf("==> Time to read %dKB sequentially in 256b chunks = %ld milliseconds = %ld bytes/s\n", TESTSIZEKB, stop - start, TESTSIZEKB * 1024 / (stop - start) * 1000);
+  Serial.printf("==> Time to read %dKB sequentially in 256b chunks = %lu milliseconds = %s\n", TESTSIZEKB, stop - start, rate(start, stop, TESTSIZEKB * 1024));
 
   Serial.printf("Reading %dKB file MISALIGNED in flash and RAM sequentially in 256b chunks\n", TESTSIZEKB);
   start = millis();
@@ -72,8 +91,7 @@ void DoTest(FS *fs) {
   }
   f.close();
   stop = millis();
-  Serial.printf("==> Time to read %dKB sequentially MISALIGNED in flash and RAM in 256b chunks = %ld milliseconds = %ld bytes/s\n", TESTSIZEKB, stop - start, TESTSIZEKB * 1024 / (stop - start) * 1000);
-
+  Serial.printf("==> Time to read %dKB sequentially MISALIGNED in flash and RAM in 256b chunks = %lu milliseconds = %s\n", TESTSIZEKB, stop - start, rate(start, stop, TESTSIZEKB * 1024));
 
   Serial.printf("Reading %dKB file in reverse by 256b chunks\n", TESTSIZEKB);
   start = millis();
@@ -92,8 +110,7 @@ void DoTest(FS *fs) {
   }
   f.close();
   stop = millis();
-  Serial.printf("==> Time to read %dKB in reverse in 256b chunks = %ld milliseconds = %ld bytes/s\n", TESTSIZEKB, stop - start, TESTSIZEKB * 1024 / (stop - start) * 1000);
-
+  Serial.printf("==> Time to read %dKB in reverse in 256b chunks = %lu milliseconds = %s\n", TESTSIZEKB, stop - start, rate(start, stop, TESTSIZEKB * 1024));
 
   Serial.printf("Writing 64K file in 1-byte chunks\n");
   start = millis();
@@ -103,7 +120,7 @@ void DoTest(FS *fs) {
   }
   f.close();
   stop = millis();
-  Serial.printf("==> Time to write 64KB in 1b chunks = %ld milliseconds = %ld bytes/s\n", stop - start, 65536 / (stop - start) * 1000);
+  Serial.printf("==> Time to write 64KB in 1b chunks = %lu milliseconds = %s\n", stop - start, rate(start, stop, 65536));
 
   Serial.printf("Reading 64K file in 1-byte chunks\n");
   start = millis();
@@ -114,9 +131,7 @@ void DoTest(FS *fs) {
   }
   f.close();
   stop = millis();
-  Serial.printf("==> Time to read 64KB in 1b chunks = %ld milliseconds = %ld bytes/s\n", stop - start, 65536 / (stop - start) * 1000);
-
-
+  Serial.printf("==> Time to read 64KB in 1b chunks = %lu milliseconds = %s\n", stop - start, rate(start, stop, 65536));
 }
 
 void setup() {
