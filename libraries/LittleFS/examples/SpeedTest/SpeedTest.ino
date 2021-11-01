@@ -65,7 +65,7 @@ void DoTest(FS *fs) {
   Serial.printf("==> Time to write %dKB in 256b chunks = %lu milliseconds\n", TESTSIZEKB, stop - start);
 
   f = fs->open("/testwrite.bin", "r");
-  Serial.printf("==> Created file size = %lu\n", (unsigned long)f.size());
+  Serial.printf("==> Created file size = %zu\n", f.size());
   f.close();
 
   Serial.printf("Reading %dKB file sequentially in 256b chunks\n", TESTSIZEKB);

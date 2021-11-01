@@ -115,9 +115,9 @@ public:
         info.maxOpenFiles  = i.maxOpenFiles;
         info.maxPathLength = i.maxPathLength;
 #ifdef DEBUG_ESP_PORT
-        if (i.totalBytes > (uint64_t)SIZE_MAX) {
+        if (i.totalBytes > std::numeric_limits<uint32_t>::max()) {
             // This catches both total and used cases, since used must always be < total.
-            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use info64().\n"), (long long)i.totalBytes);
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld >= 4GB).  Please update source to use info64().\n"), (long long)i.totalBytes);
         }
 #endif
         info.totalBytes    = (size_t)i.totalBytes;

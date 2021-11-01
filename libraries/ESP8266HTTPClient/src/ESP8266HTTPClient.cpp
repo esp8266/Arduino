@@ -556,7 +556,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
     size_t transferred = stream->sendSize(_client.get(), size);
     if (transferred != size)
     {
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %u but got %u failed.\n", (unsigned int)size, (unsigned int)transferred);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write, asked for %zu but got %zu failed.\n", size, transferred);
         esp_yield();
         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
     }

@@ -104,13 +104,13 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
 
     size_t ssid_len = ssid ? strlen(ssid) : 0;
     if(ssid_len == 0 || ssid_len > 32) {
-        DEBUG_WIFI("[AP] SSID length %u, too long or missing!\n", (unsigned int)ssid_len);
+        DEBUG_WIFI("[AP] SSID length %zu, too long or missing!\n", ssid_len);
         return false;
     }
 
     size_t psk_len = psk ? strlen(psk) : 0;
     if(psk_len > 0 && (psk_len > 64 || psk_len < 8)) {
-        DEBUG_WIFI("[AP] fail psk length %u, too long or short!\n", (unsigned int)psk_len);
+        DEBUG_WIFI("[AP] fail psk length %zu, too long or short!\n", psk_len);
         return false;
     }
 
