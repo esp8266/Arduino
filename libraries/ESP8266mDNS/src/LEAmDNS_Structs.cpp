@@ -1666,19 +1666,19 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel(vo
 unsigned long MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout(void) const
 {
 
-    uint32_t    u32Timeout = esp8266::polledTimeout::oneShotMs::neverExpires;
+    unsigned long   timeout = esp8266::polledTimeout::oneShotMs::neverExpires;
 
     if (TIMEOUTLEVEL_BASE == m_timeoutLevel)            // 80%
     {
-        u32Timeout = (m_u32TTL * 800);                  // to milliseconds
+        timeout = (m_u32TTL * 800L);                  // to milliseconds
     }
     else if ((TIMEOUTLEVEL_BASE < m_timeoutLevel) &&    // >80% AND
              (TIMEOUTLEVEL_FINAL >= m_timeoutLevel))    // <= 100%
     {
 
-        u32Timeout = (m_u32TTL * 50);
+        timeout = (m_u32TTL * 50L);
     }   // else: invalid
-    return u32Timeout;
+    return timeout;
 }
 
 

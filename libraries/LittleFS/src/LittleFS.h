@@ -467,14 +467,14 @@ public:
                 if (_creation) {
                     int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
                     if (rc < 0) {
-                        DEBUGV("Unable to set creation time on '%s' to %d\n", _name.get(), _creation);
+                        DEBUGV("Unable to set creation time on '%s' to %ld\n", _name.get(), (long)_creation);
                     }
                 }
                 // Add metadata with last write time
                 time_t now = _timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
                 if (rc < 0) {
-                    DEBUGV("Unable to set last write time on '%s' to %d\n", _name.get(), now);
+                    DEBUGV("Unable to set last write time on '%s' to %ld\n", _name.get(), (long)now);
                 }
             }
         }
