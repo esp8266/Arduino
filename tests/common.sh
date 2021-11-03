@@ -10,18 +10,26 @@ function skip_ino()
 /#attic/
 /AvrAdcLogger/
 /BackwardCompatibility/
+/bench/
+/BufferedPrint/
+/DirectoryFunctions/
 /examplesV1/
-/ExFatFormatter/
 /ExFatLogger/
-/ExFatUnicodeTest/
+/MinimumSizeSdReader/
+/OpenNext/
+/QuickStart/
+/ReadCsvFile/
+/rename/
 /RtcTimestampTest/
+/SdErrorCodes/
 /SoftwareSpi/
-/STM32Test/
+/TeensyDmaAdcLogger/
 /TeensyRtcTimestamp/
 /TeensySdioDemo/
+/TeensySdioLogger/
+/UnicodeFilenames/
 /UserChipSelectFunction/
 /UserSPIDriver/
-/examples.donotuse/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))

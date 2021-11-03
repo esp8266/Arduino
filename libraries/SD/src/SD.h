@@ -25,9 +25,9 @@
 #include <SDFS.h>
 
 #undef FILE_READ
-#define FILE_READ sdfat::O_READ
+#define FILE_READ ((uint8_t)O_READ)
 #undef FILE_WRITE
-#define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT | sdfat::O_APPEND)
+#define FILE_WRITE ((uint8_t)(O_READ | O_WRITE | O_CREAT | O_APPEND))
 
 
 class SDClass {
@@ -159,9 +159,9 @@ public:
 
 private:
     const char *getMode(uint8_t mode) {
-        bool read = (mode & sdfat::O_READ) ? true : false;
-        bool write = (mode & sdfat::O_WRITE) ? true : false;
-        bool append = (mode & sdfat::O_APPEND) ? true : false;
+        bool read = (mode & O_READ) ? true : false;
+        bool write = (mode & O_WRITE) ? true : false;
+        bool append = (mode & O_APPEND) ? true : false;
         if      (  read & !write )           { return "r";  }
         else if ( !read &  write & !append ) { return "w+"; }
         else if ( !read &  write &  append ) { return "a";  }
@@ -183,10 +183,6 @@ private:
 };
 
 
-// Expose FatStructs.h helpers for MS-DOS date/time for use with dateTimeCallback
-static inline uint16_t FAT_DATE(uint16_t year, uint8_t month, uint8_t day) {
-  return (year - 1980) << 9 | month << 5 | day;
-}
 static inline uint16_t FAT_YEAR(uint16_t fatDate) {
   return 1980 + (fatDate >> 9);
 }
@@ -195,9 +191,6 @@ static inline uint8_t FAT_MONTH(uint16_t fatDate) {
 }
 static inline uint8_t FAT_DAY(uint16_t fatDate) {
   return fatDate & 0X1F;
-}
-static inline uint16_t FAT_TIME(uint8_t hour, uint8_t minute, uint8_t second) {
-  return hour << 11 | minute << 5 | second >> 1;
 }
 static inline uint8_t FAT_HOUR(uint16_t fatTime) {
   return fatTime >> 11;

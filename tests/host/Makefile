@@ -111,6 +111,9 @@ CORE_CPP_FILES := \
 		common/FsCache.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
+		common/FsUtf.cpp \
+		common/FsName.cpp \
+		common/upcase.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
