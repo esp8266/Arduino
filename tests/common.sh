@@ -9,25 +9,13 @@ function skip_ino()
     read -d '' skiplist << EOL || true
 /#attic/
 /AvrAdcLogger/
-/BackwardCompatibility/
-/bench/
-/BufferedPrint/
-/DirectoryFunctions/
 /examplesV1/
-/ExFatLogger/
-/MinimumSizeSdReader/
-/OpenNext/
-/QuickStart/
-/ReadCsvFile/
-/rename/
 /RtcTimestampTest/
-/SdErrorCodes/
 /SoftwareSpi/
 /TeensyDmaAdcLogger/
 /TeensyRtcTimestamp/
 /TeensySdioDemo/
 /TeensySdioLogger/
-/UnicodeFilenames/
 /UserChipSelectFunction/
 /UserSPIDriver/
 EOL
