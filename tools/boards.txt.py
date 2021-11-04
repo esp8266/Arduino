@@ -531,8 +531,9 @@ boards = collections.OrderedDict([
             '.build.variant': 'modwifi',
             },
         'macro': [
-            'resetmethod_ck',
-            'flashmode_qio',
+            'resetmethod_menu',
+            'resetmethod_menu_extra',
+            'flashmode_menu',
             'flashfreq_40',
             '2M',
             ],
