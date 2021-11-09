@@ -24,6 +24,7 @@
 #define __STREAMSTRING_H
 
 #include <limits>
+#include <algorithm>
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
