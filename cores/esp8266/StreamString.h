@@ -25,6 +25,7 @@
 
 #include <limits>
 #include <algorithm>
+#include "Stream.h"
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
