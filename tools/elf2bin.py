@@ -48,15 +48,18 @@ def get_segment_size_addr(elf, segment, path):
     maxAttempts = 5
     while (attempts < maxAttempts): 
         attempts = attempts + 1
-        with subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, universal_newlines=True ) as p:
+        with subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, stderr = subprocess.PIPE, universal_newlines=True ) as p:
             lines = p.stdout.readlines()
-            if (len(lines) > 0): 
-                for line in lines:
-                    if segment in line:
-                        words = re.split('\s+', line)
-                        size = int(words[3], 16)
-                        addr = int(words[4], 16)
-                        return [ size, addr ]
+            if (len(lines) == 0):
+                errLines = p.stderr.readlines()
+                print("\t!!!Segment: {}. Attempt: {}/{} STDERR: {} STDOUT: {}".format(segment, attempts, maxAttempts, errLines, lines))
+                continue
+            for line in lines:
+                if segment in line:
+                    words = re.split('\s+', line)
+                    size = int(words[3], 16)
+                    addr = int(words[4], 16)
+                    return [ size, addr ]
     raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '" path "' + path + '"')
 
 def read_segment(elf, segment, path):
