@@ -15,8 +15,8 @@
     - Dynamic queries for DNS-SD services with cached and updated answers and user notifications
     - Support for multi-homed client host domains
 
-    See 'LEAmDNS.h' for more implementation details and usage information.
-    See 'examples/LEAmDNS/mDNS_Clock' and 'examples/LEAmDNS/mDNS_ServiceMonitor' for implementation examples of the advanced features.
+    See 'src/LEAmDNS.h' for implementation details, configuration and usage information.
+    See 'examples/LEAmDNS/' for examples of the new features.
 
     LEAmDNS is expected to be compatible with the original ESP8266mDNS implementation, and it can be
     used as a drop-in replacement in existing projects.
