@@ -18,8 +18,8 @@
     See 'LEAmDNS.h' for more implementation details and usage information.
     See 'examples/LEAmDNS/mDNS_Clock' and 'examples/LEAmDNS/mDNS_ServiceMonitor' for implementation examples of the advanced features.
 
-    LEAmDNS is (mostly) client source code compatible to 'Legacy' ESP8266mDNS implementation, so it could be
-    use as a 'drop-in' replacement in existing projects.
+    LEAmDNS is expected to be compatible with the original ESP8266mDNS implementation, and it can be
+    used as a drop-in replacement in existing projects.
 
 
     This library is free software; you can redistribute it and/or
