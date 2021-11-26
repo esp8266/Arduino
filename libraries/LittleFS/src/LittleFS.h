@@ -373,17 +373,20 @@ public:
     }
 
     int availableForWrite () override {
+        if (!_opened || !_fd) {
+            return 0;
+        }
+
         const auto f = _getFD();
         const auto fs = _fs->getFS();
 
         // check for remaining size in current block
-        // ignore inline feature
-        // (per code in lfs_file_rawwrite())
+        // ignore inline feature (per code in lfs_file_rawwrite())
         auto afw = fs->cfg->block_size - f->off;
 
         if (afw == 0) {
             // current block is full
-            // check for filesystem full per code in lfs_alloc()
+            // check for filesystem full (per code in lfs_alloc())
             if (!(fs->free.i == fs->free.size && fs->free.ack == 0)) {
                 // fs is not full, return a full sector as free space
                 afw = fs->cfg->block_size;
