@@ -248,9 +248,9 @@ bool Twi::write_start(void)
     }
     busywait(twi_dcount);
     SDA_LOW(twi_sda);
-    busywait(twi_dcount / 2);
+    busywait(twi_dcount);
     SCL_LOW(twi_scl);
-    busywait((twi_dcount / 2) + (twi_dcount % 2));
+    busywait(twi_dcount);
     return true;
 }
 
