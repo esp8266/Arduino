@@ -25,11 +25,12 @@
 #define TwoWire_h
 
 /*
-    If you need multiple TwoWire instnaces for multiple I2C master interfaces,
+    If you need multiple TwoWire instances for multiple I2C master interfaces,
     define TWOWIRE_MASTER_ONLY (and optionally NO_GLOBAL_TWOWIRE). Then, you can
     freely instantiate the TwoWire class. If you do NOT define TWOWIRE_MASTER_ONLY,
-    all TwoWire instances will share the same Master-or-Slave core TWI
-    implementation -> any call to begin(...) will change pins used for all instances.
+    all the class called TwoWire will behave like singleton-like (existing behaviour)
+    and all instances will share the same Master-or-Slave core TWI implementation 
+     -> any call to begin(...) will change pins used for all instances.
 
     You can use different configuration in separate compilation units, e.g., use
     TWOWIRE_MASTER_ONLY in most of the code, and don't use it only in the
