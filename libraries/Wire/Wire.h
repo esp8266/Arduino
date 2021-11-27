@@ -28,8 +28,11 @@
 #include "Stream.h"
 
 
-
+#ifndef ARDUINO_WIRE_BUFFER_LENGTH
 #define BUFFER_LENGTH 128
+#else
+#define BUFFER_LENGTH ARDUINO_WIRE_BUFFER_LENGTH
+#endif
 
 class TwoWire : public Stream
 {
