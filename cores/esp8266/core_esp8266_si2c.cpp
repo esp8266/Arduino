@@ -99,16 +99,16 @@ private:
     ETSTimer timer;
 
     // Event/IRQ callbacks, so they can't use "this" and need to be static
-    static void ICACHE_RAM_ATTR onSclChange(void);
-    static void ICACHE_RAM_ATTR onSdaChange(void);
+    static void IRAM_ATTR onSclChange(void);
+    static void IRAM_ATTR onSdaChange(void);
     static void eventTask(ETSEvent *e);
-    static void ICACHE_RAM_ATTR onTimer(void *unused);
+    static void IRAM_ATTR onTimer(void *unused);
 
     // Allow not linking in the slave code if there is no call to enableSlave
     bool _slaveEnabled = false;
 
     // Internal use functions
-    void ICACHE_RAM_ATTR onTwipEvent(uint8_t status);
+    void IRAM_ATTR onTwipEvent(uint8_t status);
 
 public:
     // custom version
@@ -118,8 +118,8 @@ public:
     uint8_t transmit(const uint8_t* data, uint8_t length);
     void attachSlaveRxEvent(void (*function)(uint8_t*, size_t, void*));
     void attachSlaveTxEvent(void (*function)(void*));
-    void ICACHE_RAM_ATTR reply(uint8_t ack);
-    void ICACHE_RAM_ATTR releaseBus(void);
+    void IRAM_ATTR reply(uint8_t ack);
+    void IRAM_ATTR releaseBus(void);
     void enableSlave(void* targetObject);
 };
 
@@ -223,7 +223,7 @@ void TwiMasterOrSlave::enableSlave(void* targetObject)
     }
 }
 
-void ICACHE_RAM_ATTR TwiMaster::busywait(unsigned int v)
+void IRAM_ATTR TwiMaster::busywait(unsigned int v)
 {
     unsigned int i;
     for (i = 0; i < v; i++)  // loop time is 5 machine cycles: 31.25ns @ 160MHz, 62.5ns @ 80MHz
@@ -466,9 +466,9 @@ void TwiMasterOrSlave::attachSlaveTxEvent(void (*function)(void*))
 }
 
 // DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function breakup into
-// parts and the ICACHE_RAM_ATTR isn't propagated correctly to all parts, which of course causes crashes.
+// parts and the IRAM_ATTR isn't propagated correctly to all parts, which of course causes crashes.
 // TODO: test with gcc 9.x and if it still fails, disable optimization with -fdisable-ipa-fnsplit
-void ICACHE_RAM_ATTR TwiMasterOrSlave::reply(uint8_t ack)
+void IRAM_ATTR TwiMasterOrSlave::reply(uint8_t ack)
 {
     // transmit master read ready signal, with or without ack
     if (ack)
@@ -486,7 +486,7 @@ void ICACHE_RAM_ATTR TwiMasterOrSlave::reply(uint8_t ack)
 }
 
 
-void ICACHE_RAM_ATTR TwiMasterOrSlave::releaseBus(void)
+void IRAM_ATTR TwiMasterOrSlave::releaseBus(void)
 {
     // release bus
     //TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
@@ -499,7 +499,7 @@ void ICACHE_RAM_ATTR TwiMasterOrSlave::releaseBus(void)
 }
 
 
-void ICACHE_RAM_ATTR TwiMasterOrSlave::onTwipEvent(uint8_t status)
+void IRAM_ATTR TwiMasterOrSlave::onTwipEvent(uint8_t status)
 {
     twip_status = status;
     switch (status)
@@ -606,7 +606,7 @@ void ICACHE_RAM_ATTR TwiMasterOrSlave::onTwipEvent(uint8_t status)
     }
 }
 
-void ICACHE_RAM_ATTR TwiMasterOrSlave::onTimer(void *unused)
+void IRAM_ATTR TwiMasterOrSlave::onTimer(void *unused)
 {
     (void)unused;
     twi.releaseBus();
@@ -656,7 +656,7 @@ void TwiMasterOrSlave::eventTask(ETSEvent *e)
 // Shorthand for if the state is any of the or'd bitmask x
 #define IFSTATE(x) if (twip_state_mask & (x))
 
-void ICACHE_RAM_ATTR TwiMasterOrSlave::onSclChange(void)
+void IRAM_ATTR TwiMasterOrSlave::onSclChange(void)
 {
     unsigned int sda;
     unsigned int scl;
@@ -854,7 +854,7 @@ void ICACHE_RAM_ATTR TwiMasterOrSlave::onSclChange(void)
     }
 }
 
-void ICACHE_RAM_ATTR TwiMasterOrSlave::onSdaChange(void)
+void IRAM_ATTR TwiMasterOrSlave::onSdaChange(void)
 {
     unsigned int sda;
     unsigned int scl;
