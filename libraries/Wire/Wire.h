@@ -35,6 +35,9 @@
     You can use different configuration in separate compilation units, e.g., use
     TWOWIRE_MASTER_ONLY in most of the code, and don't use it only in the
     compilation unit where you need I2C slave capabilities.
+
+    You can also explicitely define TwoWireMaster instances and cast them to TwoWire
+    when e.g. passing them to libarires using only master features. 
 */
 
 #include <inttypes.h>
@@ -120,6 +123,10 @@ public:
 // this is expected to be used with multiple instances for different pins
 class TwoWireMaster : public TwoWireBase
 {
+protected:
+    // forwards to base
+    // uses existing TwiMaster ptr (usefull for MasterOrSlave implementaion) and existing buffers
+    TwoWireMaster(TwiMaster* twiPtr, uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t* rxBuffer, uint8_t* txBuffer);
 public:
     TwoWireMaster(uint8_t rxBufferSize = I2C_BUFFER_LENGTH, uint8_t txBufferSize = I2C_BUFFER_LENGTH);
     // singleton global instance constructor
@@ -127,7 +134,7 @@ public:
 };
 
 // this is expected to be used a singleton, it uses the singleton instance of TwiMaster, twiMasterSingleton, from twi.h
-class TwoWireMasterOrSlave : public TwoWireBase
+class TwoWireMasterOrSlave : public TwoWireMaster
 {
 private:
     void (*user_onRequest)(void);

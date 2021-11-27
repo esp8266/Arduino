@@ -263,7 +263,7 @@ TwoWireMaster::TwoWireMaster(uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t
 // Master-or-Slave Constructors ////////////////////////////////////////////////
 
 TwoWireMasterOrSlave::TwoWireMasterOrSlave(uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t* rxBuffer, uint8_t* txBuffer)
-    : TwoWireBase(&twiMasterSingleton, rxBufferSize, txBufferSize, rxBuffer, txBuffer)
+    : TwoWireMaster(&twiMasterSingleton, rxBufferSize, txBufferSize, rxBuffer, txBuffer)
 {}
 
 TwoWireMasterOrSlave::~TwoWireMasterOrSlave()
@@ -379,7 +379,7 @@ TwoWireMasterOrSlave::TwoWireMasterOrSlave()
 #else
 
 TwoWireMasterOrSlave::TwoWireMasterOrSlave()
-    : TwoWireBase(&twiMasterSingleton, I2C_BUFFER_LENGTH, I2C_BUFFER_LENGTH, new uint8_t[I2C_BUFFER_LENGTH], new uint8_t[I2C_BUFFER_LENGTH])
+    : TwoWireMaster(&twiMasterSingleton, I2C_BUFFER_LENGTH, I2C_BUFFER_LENGTH, new uint8_t[I2C_BUFFER_LENGTH], new uint8_t[I2C_BUFFER_LENGTH])
 {}
 
 #endif
