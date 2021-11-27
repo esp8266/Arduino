@@ -33,7 +33,7 @@ struct DNSHeader
   uint16_t ID;               // identification number
   unsigned char RD : 1;      // recursion desired
   unsigned char TC : 1;      // truncated message
-  unsigned char AA : 1;      // authoritive answer
+  unsigned char AA : 1;      // authoritative answer
   unsigned char OPCode : 4;  // message_type
   unsigned char QR : 1;      // query/response flag
   unsigned char RCode : 4;   // response code

@@ -6,6 +6,7 @@ Welcome to ESP8266 Arduino Core's documentation!
    :caption: Contents:
 
    Installing <installing>
+   Arduino IDE options <ideoptions>
    Reference <reference>
    Libraries <libraries>
    File system <filesystem>

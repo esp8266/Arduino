@@ -40,14 +40,14 @@
  *
 */
 
-#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP) || defined(NEW_EXC_C_WRAPPER)
+#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP) || defined(NEW_EXC_C_WRAPPER) || defined(MMU_EXTERNAL_HEAP)
 
 /*
  * The original module source code came from:
  *   https://github.com/qca/open-ath9k-htc-firmware/blob/master/sboot/magpie_1_1/sboot/athos/src/xtos/exc-sethandler.c
  *
  * It has been revised to use Arduino ESP8266 core includes, types, and
- * formating.
+ * formatting.
 */
 
 /* exc-sethandler.c - register an exception handler in XTOS */

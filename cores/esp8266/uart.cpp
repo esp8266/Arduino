@@ -41,6 +41,7 @@
  *
  */
 #include "Arduino.h"
+#include "coredecls.h"
 #include <pgmspace.h>
 #include "gdb_hooks.h"
 #include "uart.h"
@@ -115,7 +116,7 @@ struct uart_
 
 
 // called by ISR
-inline size_t ICACHE_RAM_ATTR
+inline size_t IRAM_ATTR
 uart_rx_fifo_available(const int uart_nr)
 {
     return (USS(uart_nr) >> USRXC) & 0xFF;
@@ -144,7 +145,7 @@ uart_rx_available_unsafe(uart_t* uart)
 
 // Copy all the rx fifo bytes that fit into the rx buffer
 // called by ISR
-inline void ICACHE_RAM_ATTR
+inline void IRAM_ATTR
 uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart)
 {
     struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
@@ -240,6 +241,41 @@ uart_peek_char(uart_t* uart)
     return ret;
 }
 
+// return number of byte accessible by uart_peek_buffer()
+size_t uart_peek_available (uart_t* uart)
+{
+    // path for further optimization:
+    // - return already copied buffer pointer (= older data)
+    // - or return fifo when buffer is empty but then any move from fifo to
+    //   buffer should be blocked until peek_consume is called
+
+    ETS_UART_INTR_DISABLE();
+    uart_rx_copy_fifo_to_buffer_unsafe(uart);
+    auto rpos = uart->rx_buffer->rpos;
+    auto wpos = uart->rx_buffer->wpos;
+    ETS_UART_INTR_ENABLE();
+    if(wpos < rpos)
+        return uart->rx_buffer->size - rpos;
+    return wpos - rpos;
+}
+
+// return a pointer to available data buffer (size = available())
+// semantic forbids any kind of read() between peekBuffer() and peekConsume()
+const char* uart_peek_buffer (uart_t* uart)
+{
+    return (const char*)&uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+}
+
+// consume bytes after use (see uart_peek_buffer)
+void uart_peek_consume (uart_t* uart, size_t consume)
+{
+    ETS_UART_INTR_DISABLE();
+    uart->rx_buffer->rpos += consume;
+    if (uart->rx_buffer->rpos >= uart->rx_buffer->size)
+        uart->rx_buffer->rpos -= uart->rx_buffer->size;
+    ETS_UART_INTR_ENABLE();
+}
+
 int
 uart_read_char(uart_t* uart)
 {
@@ -289,7 +325,7 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 // instead of the uart_isr...uart_rx_copy_fifo_to_buffer_unsafe()
 // Since we've already read the bytes from the FIFO, can't use that
 // function directly and need to implement it bytewise here
-static void ICACHE_RAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
+static void IRAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
 {
     uart_t* uart = (uart_t*)arg;
     if(uart == NULL || !uart->rx_enabled) {
@@ -370,7 +406,7 @@ uart_get_rx_buffer_size(uart_t* uart)
 }
 
 // The default ISR handler called when GDB is not enabled
-void ICACHE_RAM_ATTR
+void IRAM_ATTR
 uart_isr(void * arg, void * frame)
 {
     (void) frame;
@@ -458,13 +494,13 @@ uart_stop_isr(uart_t* uart)
   -tools/sdk/uart_register.h
   -cores/esp8266/esp8266_peri.h
   */
-inline size_t
+inline __attribute__((always_inline)) size_t
 uart_tx_fifo_available(const int uart_nr)
 {
     return (USS(uart_nr) >> USTXC) & 0xff;
 }
 
-inline bool
+inline __attribute__((always_inline)) bool
 uart_tx_fifo_full(const int uart_nr)
 {
     return uart_tx_fifo_available(uart_nr) >= 0x7f;
@@ -531,7 +567,7 @@ uart_wait_tx_empty(uart_t* uart)
         return;
 
     while(uart_tx_fifo_available(uart->uart_nr) > 0)
-        delay(0);
+        esp_yield();
 
 }
 
@@ -725,11 +761,11 @@ uart_uninit(uart_t* uart)
     free(uart);
 }
 
-void
+bool
 uart_swap(uart_t* uart, int tx_pin)
 {
     if(uart == NULL)
-        return;
+        return false;
 
     switch(uart->uart_nr)
     {
@@ -740,19 +776,17 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 15;
+                pinMode(uart->tx_pin, FUNCTION_4);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 13;
+                pinMode(uart->rx_pin, FUNCTION_4);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, FUNCTION_4);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(uart->rx_pin, FUNCTION_4);    //RX
 
             IOSWAP |= (1 << IOSWAPU0);
+            return true;
         }
         else
         {
@@ -760,19 +794,17 @@ uart_swap(uart_t* uart, int tx_pin)
             {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = (tx_pin == 2)?2:1;
+                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);
             }
             if(uart->rx_enabled) //RX
             {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 3;
+                pinMode(3, SPECIAL);
             }
-            if(uart->tx_enabled)
-                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-
-            if(uart->rx_enabled)
-                pinMode(3, SPECIAL);    //RX
 
             IOSWAP &= ~(1 << IOSWAPU0);
+            return true;
         }
         break;
     case UART1:
@@ -781,30 +813,30 @@ uart_swap(uart_t* uart, int tx_pin)
     default:
         break;
     }
+    return false;
 }
 
-void
+bool
 uart_set_tx(uart_t* uart, int tx_pin)
 {
     if(uart == NULL)
-        return;
+        return false;
 
     switch(uart->uart_nr)
     {
     case UART0:
         if(uart->tx_enabled)
         {
-            if (uart->tx_pin == 1 && tx_pin == 2)
+            if (uart->tx_pin == tx_pin)
             {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
+                return true;
             }
-            else if (uart->tx_pin == 2 && tx_pin != 2)
+            else if (tx_pin == 1 || tx_pin == 2)
             {
                 pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
+                uart->tx_pin = tx_pin;
+                pinMode(uart->tx_pin, tx_pin == 1 ? SPECIAL : FUNCTION_4);
+                return true;
             }
         }
 
@@ -815,33 +847,54 @@ uart_set_tx(uart_t* uart, int tx_pin)
     default:
         break;
     }
+    return false;
 }
 
-void
+bool
 uart_set_pins(uart_t* uart, int tx, int rx)
 {
     if(uart == NULL)
-        return;
+        return false;
 
-    if(uart->uart_nr == UART0) // Only UART0 allows pin changes
+    if(uart->uart_nr != UART0) // Only UART0 allows pin changes
+        return false;
+
+    if(uart->tx_enabled && uart->tx_pin != tx)
     {
-        if(uart->tx_enabled && uart->tx_pin != tx)
+        if( rx == 13 && tx == 15)
         {
-            if( rx == 13 && tx == 15)
+            if (!uart_swap(uart, 15))
+                return false;
+        }
+        else if (rx == 3 && (tx == 1 || tx == 2))
+        {
+            if (uart->rx_pin != rx)
             {
-                uart_swap(uart, 15);
+                if (!uart_swap(uart, tx))
+                    return false;
             }
-            else if (rx == 3 && (tx == 1 || tx == 2))
+            else
             {
-                if (uart->rx_pin != rx)
-                    uart_swap(uart, tx);
-                else
-                    uart_set_tx(uart, tx);
+                if (!uart_set_tx(uart, tx))
+                    return false;
             }
         }
-        if(uart->rx_enabled && uart->rx_pin != rx && rx == 13 && tx == 15)
-            uart_swap(uart, 15);
+        else
+            return false;
     }
+
+    if (uart->rx_enabled && uart->rx_pin != rx)
+    {
+        if (rx == 13 && tx == 15)
+        {
+            if (!uart_swap(uart, 15))
+                return false;
+        }
+        else
+            return false;
+    }
+
+    return true;
 }
 
 
@@ -891,23 +944,23 @@ uart_ignore_char(char c)
     (void) c;
 }
 
-inline void
+inline __attribute__((always_inline)) void
 uart_write_char_delay(const int uart_nr, char c)
 {
     while(uart_tx_fifo_full(uart_nr))
-        delay(0);
+        esp_yield();
 
     USF(uart_nr) = c;
 
 }
 
-static void
+static void IRAM_ATTR
 uart0_write_char(char c)
 {
     uart_write_char_delay(0, c);
 }
 
-static void
+static void IRAM_ATTR
 uart1_write_char(char c)
 {
     uart_write_char_delay(1, c);

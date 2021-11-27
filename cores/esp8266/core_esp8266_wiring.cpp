@@ -23,37 +23,18 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
-#include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 
-extern void ets_delay_us(uint32_t us);
-extern void esp_schedule();
-extern void esp_yield();
-
-static os_timer_t delay_timer;
 static os_timer_t micros_overflow_timer;
 static uint32_t micros_at_last_overflow_tick = 0;
 static uint32_t micros_overflow_count = 0;
 #define ONCE 0
 #define REPEAT 1
 
-void delay_end(void* arg) {
-    (void) arg;
-    esp_schedule();
-}
-
 void __delay(unsigned long ms) {
-    if(ms) {
-        os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
-        os_timer_arm(&delay_timer, ms, ONCE);
-    } else {
-        esp_schedule();
-    }
-    esp_yield();
-    if(ms) {
-        os_timer_disarm(&delay_timer);
-    }
+    esp_delay(ms);
 }
 
 void delay(unsigned long ms) __attribute__ ((weak, alias("__delay"))); 
@@ -69,8 +50,8 @@ void micros_overflow_tick(void* arg) {
 //---------------------------------------------------------------------------
 // millis() 'magic multiplier' approximation
 //
-// This function corrects the cumlative (296us / usec overflow) drift
-// seen in the orignal 'millis()' function.
+// This function corrects the cumulative (296us / usec overflow) drift
+// seen in the original 'millis()' function.
 //
 // Input:
 //    'm' - 32-bit usec counter,           0 <= m <= 0xFFFFFFFF
@@ -149,7 +130,7 @@ void micros_overflow_tick(void* arg) {
 //
 //   Reference function: corrected millis(), 64-bit arithmetic,
 //                       truncated to 32-bits by return
-//   unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
+//   unsigned long IRAM_ATTR millis_corr_DEBUG( void )
 //   {
 //     // Get usec system time, usec overflow conter
 //     ......
@@ -163,7 +144,7 @@ void micros_overflow_tick(void* arg) {
 #define  MAGIC_1E3_wLO  0x4bc6a7f0    // LS part
 #define  MAGIC_1E3_wHI  0x00418937    // MS part, magic multiplier
 
-unsigned long ICACHE_RAM_ATTR millis()
+unsigned long IRAM_ATTR millis()
 {
   union {
      uint64_t  q;     // Accumulator, 64-bit, little endian
@@ -194,18 +175,18 @@ unsigned long ICACHE_RAM_ATTR millis()
 
 } //millis
 
-unsigned long ICACHE_RAM_ATTR micros() {
+unsigned long IRAM_ATTR micros() {
     return system_get_time();
 }
 
-uint64_t ICACHE_RAM_ATTR micros64() {
+uint64_t IRAM_ATTR micros64() {
     uint32_t low32_us = system_get_time();
     uint32_t high32_us = micros_overflow_count + ((low32_us < micros_at_last_overflow_tick) ? 1 : 0);
     uint64_t duration64_us = (uint64_t)high32_us << 32 | low32_us;
     return duration64_us;
 }
 
-void ICACHE_RAM_ATTR delayMicroseconds(unsigned int us) {
+void IRAM_ATTR delayMicroseconds(unsigned int us) {
     os_delay_us(us);
 }
 

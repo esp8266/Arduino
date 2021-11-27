@@ -23,7 +23,6 @@
   Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
 */
 
-#include <core_esp8266_waveform.h>
 #include <PolledTimeout.h>
 
 esp8266::polledTimeout::periodicFastUs stepPeriod(50000);
@@ -33,8 +32,8 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
 
-  // This next line will call will cause the code to use the Phase-Locked waveform generator
-  // instead of the default one.  Comment it out to try the default version.
+  // This next line will cause the code to use the Phase-Locked waveform generator
+  // instead of the default PWM-Locked one.  Comment it out to try the default version.
   // For more information on choosing between the two options, see the following pull requests:
   // Phase-Locked generator: https://github.com/esp8266/Arduino/pull/7022
   // PWM-Locked generator:   https://github.com/esp8266/Arduino/pull/7231

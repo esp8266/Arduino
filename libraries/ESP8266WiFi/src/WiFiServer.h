@@ -34,7 +34,7 @@ extern "C" {
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
 // maximum number of incoming *pending clients*.  Default number of possibly
 // simultaneously pending clients is defined in WiFiServer.cpp
-// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can overide it at runtime from
+// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can override it at runtime from
 // sketch:
 //      WiFiServer::begin(port, max-simultaneous-pending-clients);
 //
@@ -82,6 +82,13 @@ public:
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
+  // hasClientData():
+  // returns the amount of data available from the first client
+  // or 0 if there is none
+  size_t hasClientData();
+  // hasMaxPendingClients():
+  // returns true if the queue of pending clients is full
+  bool hasMaxPendingClients();
   void begin();
   void begin(uint16_t port);
   void begin(uint16_t port, uint8_t backlog);

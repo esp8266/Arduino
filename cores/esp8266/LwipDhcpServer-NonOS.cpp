@@ -51,7 +51,7 @@ extern "C"
         //                  trying to change legacy behavor
         // `fw_has_started_softap_dhcps` will be read in DhcpServer::DhcpServer
         // which is called when c++ ctors are initialized, specifically
-        // dhcpSoftAP intialized with AP interface number above.
+        // dhcpSoftAP initialized with AP interface number above.
         fw_has_started_softap_dhcps = 1;
 #endif
     }

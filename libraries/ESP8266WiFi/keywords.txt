@@ -56,6 +56,8 @@ enableSTA	KEYWORD2
 enableAP	KEYWORD2
 forceSleepBegin	KEYWORD2
 forceSleepWake	KEYWORD2
+shutdown	KEYWORD2
+resumeFromShutdown	KEYWORD2
 
 #ESP8266WiFi
 printDiag	KEYWORD2
@@ -156,6 +158,7 @@ loadCertificate	KEYWORD2
 loadPrivateKey	KEYWORD2
 loadCACert	KEYWORD2
 allowSelfSignedCerts	KEYWORD2
+setSSLVersion	KEYWORD2
 
 #WiFiServer
 hasClient	KEYWORD2

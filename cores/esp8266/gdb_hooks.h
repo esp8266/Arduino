@@ -27,7 +27,7 @@ extern "C" {
  * @brief Initialize GDB stub, if present
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and does necessary initialization of that library.
+ * this function is overridden and does necessary initialization of that library.
  * Called early at startup.
  */
 void gdb_init(void);
@@ -36,7 +36,7 @@ void gdb_init(void);
  * @brief Break into GDB, if present
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and triggers entry into the debugger, which
+ * this function is overridden and triggers entry into the debugger, which
  * looks like a breakpoint hit.
  */
 void gdb_do_break(void);
@@ -45,7 +45,7 @@ void gdb_do_break(void);
  * @brief Check if GDB stub is present.
  * 
  * By default, this function returns false. When GDBStub library is linked,
- * this function is overriden and returns true. Can be used to check whether
+ * this function is overridden and returns true. Can be used to check whether
  * GDB is used.
  * 
  * @return true if GDB stub is present
@@ -58,7 +58,7 @@ bool gdb_present(void);
  * @brief Check if GDB is installing a putc1 callback.
  * 
  * By default, this function returns false. When GDBStub library is linked,
- * this function is overriden and returns true.
+ * this function is overridden and returns true.
  * 
  * @return true if GDB is installing a putc1 callback
  */
@@ -69,7 +69,7 @@ bool gdbstub_has_putc1_control(void);
  * @param func function GDB will proxy putc1 data to
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and sets GDB stub's secondary putc1 callback to
+ * this function is overridden and sets GDB stub's secondary putc1 callback to
  * func. When GDB stub is linked, but a GDB session is not current attached,
  * then GDB stub will pass putc1 chars directly to this function.
  */
@@ -79,7 +79,7 @@ void gdbstub_set_putc1_callback(void (*func)(char));
  * @brief Check if GDB is installing a uart0 isr callback.
  * 
  * By default, this function returns false. When GDBStub library is linked,
- * this function is overriden and returns true.
+ * this function is overridden and returns true.
  * 
  * @return true if GDB is installing a uart0 isr callback
  */
@@ -90,7 +90,7 @@ bool gdbstub_has_uart_isr_control(void);
  * @param func function GDB will proxy uart0 isr data to
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and sets GDB stub's secondary uart0 isr callback
+ * this function is overridden and sets GDB stub's secondary uart0 isr callback
  * to func. When GDB stub is linked, but a GDB session is not current attached,
  * then GDB stub will pass uart0 isr data back to this function.
  */
@@ -101,7 +101,7 @@ void gdbstub_set_uart_isr_callback(void (*func)(void*, uint8_t), void* arg);
  * @param c character to write
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and writes a char to either the GDB session on
+ * this function is overridden and writes a char to either the GDB session on
  * uart0 or directly to uart0 if not GDB session is attached.
  */
 void gdbstub_write_char(char c);
@@ -112,7 +112,7 @@ void gdbstub_write_char(char c);
  * @param size length of buffer
  * 
  * By default, this function is a no-op. When GDBStub library is linked,
- * this function is overriden and writes a buffer to either the GDB session on
+ * this function is overridden and writes a buffer to either the GDB session on
  * uart0 or directly to uart0 if not GDB session is attached.
  */
 void gdbstub_write(const char* buf, size_t size);

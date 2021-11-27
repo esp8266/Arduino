@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <coredecls.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
@@ -72,7 +73,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         ESP.restart();
       }
     },[&](){
-      // handler for the file upload, get's the sketch bytes, and writes
+      // handler for the file upload, gets the sketch bytes, and writes
       // them through the Update object
       HTTPUpload& upload = _server->upload();
 
@@ -119,7 +120,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         Update.end();
         if (_serial_output) Serial.println("Update was aborted");
       }
-      delay(0);
+      esp_yield();
     });
 }
 

@@ -3,6 +3,12 @@
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>
 
+#if defined(CORE_MOCK)
+#define XCHAL_INSTRAM1_VADDR		0x40100000
+#else
+#include <sys/config.h> // For config/core-isa.h
+#endif
+
 uint32_t timed_byte_read(char *pc, uint32_t * o);
 uint32_t timed_byte_read2(char *pc, uint32_t * o);
 int divideA_B(int a, int b);
@@ -102,7 +108,7 @@ void print_mmu_status(Print& oStream) {
 #ifdef MMU_IRAM_SIZE
   oStream.printf_P(PSTR("  IRAM Size:               %u"), MMU_IRAM_SIZE);
   oStream.println();
-  const uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - 0x40100000UL);
+  const uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - (uintptr_t)XCHAL_INSTRAM1_VADDR);
   oStream.printf_P(PSTR("  IRAM free:               %u"), iram_free);
   oStream.println();
 #endif

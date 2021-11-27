@@ -55,7 +55,7 @@ extern "C" void enablePhaseLockedWaveform (void)
 
 // No-op calls to override the PWM implementation
 extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
-extern "C" bool _stopPWM_weak(int pin) { (void) pin; return false; }
+extern "C" IRAM_ATTR bool _stopPWM_weak(int pin) { (void) pin; return false; }
 extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
 
 
@@ -111,7 +111,7 @@ namespace {
 }
 
 // Interrupt on/off control
-static ICACHE_RAM_ATTR void timer1Interrupt();
+static IRAM_ATTR void timer1Interrupt();
 
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
@@ -125,7 +125,7 @@ static void initTimer() {
   timer1_write(IRQLATENCYCCYS); // Cause an interrupt post-haste
 }
 
-static void ICACHE_RAM_ATTR deinitTimer() {
+static void IRAM_ATTR deinitTimer() {
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
   timer1_disable();
   timer1_isr_init();
@@ -211,14 +211,14 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCc
   }
   std::atomic_thread_fence(std::memory_order_acq_rel);
   while (waveform.toSetBits) {
-    delay(0); // Wait for waveform to update
+    esp_yield(); // Wait for waveform to update
     std::atomic_thread_fence(std::memory_order_acquire);
   }
   return true;
 }
 
 // Stops a waveform on a pin
-ICACHE_RAM_ATTR int stopWaveform_weak(uint8_t pin) {
+IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!waveform.timer1Running) {
     return false;
@@ -252,7 +252,7 @@ ICACHE_RAM_ATTR int stopWaveform_weak(uint8_t pin) {
 
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
+static inline IRAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
   if (ISCPUFREQ160MHZ) {
     return isCPU2X ? ccys : (ccys >> 1);
   }
@@ -261,7 +261,7 @@ static inline ICACHE_RAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool i
   }
 }
 
-static ICACHE_RAM_ATTR void timer1Interrupt() {
+static IRAM_ATTR void timer1Interrupt() {
   const uint32_t isrStartCcy = ESP.getCycleCount();
   int32_t clockDrift = isrStartCcy - waveform.nextEventCcy;
   const bool isCPU2X = CPU2X & 1;

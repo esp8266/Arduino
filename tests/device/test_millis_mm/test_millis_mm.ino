@@ -30,7 +30,7 @@ static bool        fixed_systime = false;  // Testing vars
 static bool        debugf = false;
 static uint32_t    us_systime = 0;
 static float       nsf = 0;                // Normalization factor
-static uint32_t    cntref = 0;             // Ref. comparision count
+static uint32_t    cntref = 0;             // Ref. comparison count
 
 //---------------------------------------------------------------------------
 // Interrupt code lifted directly from "cores/core_esp8266_wiring.c",
@@ -95,7 +95,7 @@ void viewhex( uint16_t *p, uint8_t n )
 
 //---------------------------------------------------------------------------
 // Support routine for 'millis_test_DEBUG()'
-// Print accumulator value along interm summed into it
+// Print accumulator value along interim summed into it
 void view_accsum ( const char *desc, uint16_t *acc, uint16_t *itrm )
 {
    Serial.print( "acc:  " );
@@ -109,7 +109,7 @@ void view_accsum ( const char *desc, uint16_t *acc, uint16_t *itrm )
 //---------------------------------------------------------------------------
 // FOR BENCHTEST
 // Original millis() function
-unsigned long ICACHE_RAM_ATTR millis_orig ( void )
+unsigned long IRAM_ATTR millis_orig ( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_time();
@@ -123,7 +123,7 @@ unsigned long ICACHE_RAM_ATTR millis_orig ( void )
 // FOR DEBUG
 // Corrected millis(), 64-bit arithmetic gold standard
 // truncated to 32-bits by return
-unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
+unsigned long IRAM_ATTR millis_corr_DEBUG( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_timeA();   // DEBUG
@@ -135,7 +135,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
 
 //---------------------------------------------------------------------------
 // FOR BENCHMARK
-unsigned long ICACHE_RAM_ATTR millis_corr ( void )
+unsigned long IRAM_ATTR millis_corr ( void )
 {
   // Get usec system time, usec overflow conter
   uint32_t  m = system_get_time();
@@ -149,8 +149,8 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 // FOR DEBUG
 // millis() 'magic multiplier' approximation
 //
-// This function corrects the cumlative (296us / usec overflow) drift
-// seen in the orignal 'millis()' function.
+// This function corrects the cumulative (296us / usec overflow) drift
+// seen in the original 'millis()' function.
 //
 // Input:
 //    'm' - 32-bit usec counter,           0 <= m <= 0xFFFFFFFF
@@ -229,7 +229,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 //
 //   Reference function: corrected millis(), 64-bit arithmetic,
 //                       truncated to 32-bits by return
-//   unsigned long ICACHE_RAM_ATTR millis_corr_DEBUG( void )
+//   unsigned long IRAM_ATTR millis_corr_DEBUG( void )
 //   {
 //     // Get usec system time, usec overflow conter
 //     ......
@@ -246,7 +246,7 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 #define  MAGIC_1E3_wLO  0x4bc6a7f0    // LS part
 #define  MAGIC_1E3_wHI  0x00418937    // MS part, magic multiplier
 
-unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
+unsigned long IRAM_ATTR millis_test_DEBUG ( void )
 {
   union {
     uint64_t  q;     // Accumulator, 64-bit, little endian
@@ -254,7 +254,7 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
   } acc;
   acc.a[1] = 0;      // Zero high-acc
   
-  uint64_t  prd;     // Interm product
+  uint64_t  prd;     // Interim product
   
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_timeA();
@@ -269,28 +269,28 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 
   acc.q  = ( (prd = (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO )) >> 32 );
 
-  // DEBUG: Show both accumulator and interm product
+  // DEBUG: Show both accumulator and interim product
   if( debugf )
      view_accsum( "m kl", (uint16_t *)&acc.q, (uint16_t *)&prd );
 
   // (b) Offset sum, low-acc
   acc.q += ( prd = ( m * (uint64_t)MAGIC_1E3_wHI ) );
 
-  // DEBUG: Show both accumulator and interm product
+  // DEBUG: Show both accumulator and interim product
   if( debugf )
      view_accsum( "m kh", (uint16_t *)&acc.q, (uint16_t *)&prd );
 
   // (c) Offset sum, low-acc
   acc.q += ( prd = ( c * (uint64_t)MAGIC_1E3_wLO ) );
 
-  // DEBUG: Show both accumulator and interm product
+  // DEBUG: Show both accumulator and interim product
   if( debugf )
      view_accsum( "c kl", (uint16_t *)&acc.q, (uint16_t *)&prd );
   
   // (d) Truncated sum, high-acc
   acc.a[1] += (uint32_t)( prd = ( c * (uint64_t)MAGIC_1E3_wHI ) );
 
-  // DEBUG: Show both accumulator and interm product
+  // DEBUG: Show both accumulator and interim product
   if( debugf )
      view_accsum( "c kh", (uint16_t *)&acc.q, (uint16_t *)&prd );
 
@@ -300,7 +300,7 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 
 //---------------------------------------------------------------------------
 // FOR BENCHTEST
-unsigned long ICACHE_RAM_ATTR millis_test ( void )
+unsigned long IRAM_ATTR millis_test ( void )
 {
   union {
     uint64_t  q;     // Accumulator, 64-bit, little endian

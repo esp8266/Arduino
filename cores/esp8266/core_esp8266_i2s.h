@@ -18,8 +18,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#ifndef I2S_h
-#define I2S_h
+#ifndef CORE_ESP8266_I2S_H
+#define CORE_ESP8266_I2S_H
 
 #define I2S_HAS_BEGIN_RXTX_DRIVE_CLOCKS 1
 
@@ -69,10 +69,10 @@ void i2s_rx_set_callback(void (*callback) (void));
 
 // writes a buffer of frames into the DMA memory, returns the amount of frames written
 // A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
-uint16_t i2s_write_buffer_mono(int16_t *frames, uint16_t frame_count);
-uint16_t i2s_write_buffer_mono_nb(int16_t *frames, uint16_t frame_count);
-uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count);
-uint16_t i2s_write_buffer_nb(int16_t *frames, uint16_t frame_count); 
+uint16_t i2s_write_buffer_mono(const int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer_mono_nb(const int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer(const int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer_nb(const int16_t *frames, uint16_t frame_count);
 
 #ifdef __cplusplus
 }

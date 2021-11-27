@@ -76,7 +76,7 @@ $(shell mkdir -p $(BINDIR))
 CORE_CPP_FILES := \
 	$(addprefix $(abspath $(CORE_PATH))/,\
 		debug.cpp \
-		StreamString.cpp \
+		StreamSend.cpp \
 		Stream.cpp \
 		WString.cpp \
 		Print.cpp \
@@ -104,12 +104,16 @@ CORE_CPP_FILES := \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
 		FatLib/FatFormatter.cpp \
+		FatLib/FatName.cpp \
 		FatLib/FatVolume.cpp \
 		FatLib/FatPartition.cpp \
 		common/FmtNumber.cpp \
+		common/FsCache.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
-		common/PrintBasic.cpp \
+		common/FsUtf.cpp \
+		common/FsName.cpp \
+		common/upcase.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
