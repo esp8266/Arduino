@@ -93,6 +93,7 @@ compiler.cpp.extra_flags=
 compiler.ar.extra_flags=
 compiler.objcopy.eep.extra_flags=
 compiler.elf2hex.extra_flags=
+compiler.libraries.ldflags=
 
 ## generate file with git version number
 ## needs git
