@@ -29,7 +29,11 @@
 
 
 
-#define BUFFER_LENGTH 128
+#ifndef I2C_BUFFER_LENGTH
+    #define BUFFER_LENGTH 128
+#else
+    #define BUFFER_LENGTH I2C_BUFFER_LENGTH
+#endif
 
 class TwoWire : public Stream
 {
