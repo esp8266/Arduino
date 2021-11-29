@@ -247,7 +247,11 @@ bool Twi::write_start(void)
         return false;
     }
     busywait(twi_dcount);
+    // A high-to-low transition on the SDA line while the SCL is high defines a START condition.
     SDA_LOW(twi_sda);
+    busywait(twi_dcount);
+    // An additional delay between the SCL line high-to-low transition and setting up the SDA line to prevent a STOP condition execute.
+    SCL_LOW(twi_scl);
     busywait(twi_dcount);
     return true;
 }
@@ -260,6 +264,7 @@ bool Twi::write_stop(void)
     SCL_HIGH(twi_scl);
     WAIT_CLOCK_STRETCH();
     busywait(twi_dcount);
+    // A low-to-high transition on the SDA line while the SCL is high defines a STOP condition.
     SDA_HIGH(twi_sda);
     busywait(twi_dcount);
     return true;
