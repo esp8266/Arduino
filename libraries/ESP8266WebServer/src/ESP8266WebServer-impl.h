@@ -68,6 +68,13 @@ template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::enableCORS(bool enable) {
   _corsEnabled = enable;
 }
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::enableETag(bool enable, ETagFunction fn) {
+  _eTagEnabled = enable;
+  _eTagFunction = fn;
+}
+
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::begin() {
   close();
@@ -264,10 +271,11 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
     file.close();
   }
 
-  if(is_file)
+  if(is_file) {
     _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
-  else
+  } else {
     _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
+  }
 }
 
 template <typename ServerType>
@@ -335,11 +343,18 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
         } // switch _parseRequest()
       } else {
         // !_currentClient.available(): waiting for more data
-        if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
-          keepCurrentClient = true;
+        unsigned long timeSinceChange = millis() - _statusChange;
+        // Use faster connection drop timeout if any other client has data
+        // or the buffer of pending clients is full
+        if ((_server.hasClientData() || _server.hasMaxPendingClients())
+          && timeSinceChange > HTTP_MAX_DATA_AVAILABLE_WAIT)
+            DBGWS("webserver: closing since there's another connection to read from\n");
+        else {
+          if (timeSinceChange > HTTP_MAX_DATA_WAIT)
+            DBGWS("webserver: closing after read timeout\n");
+          else
+            keepCurrentClient = true;
         }
-        else
-          DBGWS("webserver: closing after read timeout\n");
         callYield = true;
       }
       break;
@@ -436,6 +451,7 @@ void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int 
       sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
     }
 
+
     response += _responseHeaders;
     response += "\r\n";
     _responseHeaders = "";
@@ -499,7 +515,7 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(Stream* content, ssize_t 
   ssize_t sent = content->sendSize(&_currentClient, content_length);
   if (sent != content_length)
   {
-    DBGWS("HTTPServer: error: short send after timeout (%d<%d)\n", sent, content_length);
+    DBGWS("HTTPServer: error: short send after timeout (%zu < %zu)\n", sent, content_length);
   }
   if(_chunked) {
     _currentClient.printf_P(PSTR("\r\n"));

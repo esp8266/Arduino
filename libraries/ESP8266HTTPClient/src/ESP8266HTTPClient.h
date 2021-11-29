@@ -26,10 +26,11 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#include <memory>
 #include <Arduino.h>
 #include <StreamString.h>
 #include <WiFiClient.h>
+
+#include <memory>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
@@ -151,13 +152,12 @@ typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 class HTTPClient
 {
 public:
-    HTTPClient();
-    ~HTTPClient();
+    HTTPClient() = default;
+    ~HTTPClient() = default;
+    HTTPClient(HTTPClient&&) = default;
+    HTTPClient& operator=(HTTPClient&&) = default;
 
-/*
- * Since both begin() functions take a reference to client as a parameter, you need to 
- * ensure the client object lives the entire time of the HTTPClient
- */
+    // Note that WiFiClient's underlying connection *will* be captured
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
@@ -235,7 +235,15 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-    WiFiClient* _client;
+    // The common pattern to use the class is to
+    // {
+    //     WiFiClient socket;
+    //     HTTPClient http;
+    //     http.begin(socket, "http://blahblah");
+    // }
+    // Make sure it's not possible to break things in an opposite direction
+
+    std::unique_ptr<WiFiClient> _client;
 
     /// request handling
     String _host;
@@ -247,12 +255,14 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent;
     String _base64Authorization;
 
+    static const String defaultUserAgent;
+    String _userAgent = defaultUserAgent;
+
     /// Response handling
-    RequestArgument* _currentHeaders = nullptr;
-    size_t           _headerKeysCount = 0;
+    std::unique_ptr<RequestArgument[]> _currentHeaders;
+    size_t _headerKeysCount = 0;
 
     int _returnCode = 0;
     int _size = -1;
@@ -263,7 +273,5 @@ protected:
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     std::unique_ptr<StreamString> _payload;
 };
-
-
 
 #endif /* ESP8266HTTPClient_H_ */

@@ -49,7 +49,7 @@ void loop() {
                     (encryptionType == ENC_TYPE_NONE) ? ' ' : '*',
                     hidden ? 'H' : 'V',
                     ssid.c_str());
-      delay(0);
+      yield();
     }
   } else {
     Serial.printf(PSTR("WiFi scan error %d"), scanResult);

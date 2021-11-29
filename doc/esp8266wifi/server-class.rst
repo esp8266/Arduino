@@ -49,6 +49,8 @@ Other Function Calls
 .. code:: cpp
 
     bool  hasClient () 
+    size_t  hasClientData () 
+    bool  hasMaxPendingClients ()
     bool  getNoDelay () 
     virtual size_t  write (const uint8_t *buf, size_t size) 
     uint8_t  status () 
