@@ -48,16 +48,76 @@ uint8_t twi_status();
 
 uint8_t twi_transmit(const uint8_t*, uint8_t);
 
-void twi_attachSlaveRxEvent(void (*)(uint8_t*, size_t));
-void twi_attachSlaveTxEvent(void (*)(void));
+void twi_attachSlaveRxEventWithTarget(void (*)(uint8_t*, size_t, void*));
+void twi_attachSlaveTxEventWithTarget(void (*)(void*));
 void twi_reply(uint8_t);
 //void twi_stop(void);
 void twi_releaseBus(void);
 
-void twi_enableSlaveMode(void);
+void twi_enableSlaveModeWithTarget(void* targetObject);
+
+inline void twi_attachSlaveRxEvent(void (*cb)(uint8_t*, size_t))
+{   // force cast to the previous version of the callback
+    // the ESP8266 convention should be fine with that:
+    // http://naberius.de/2015/05/14/esp8266-gpio-output-performance/
+    // https://boredpentester.com/reversing-esp8266-firmware-part-5/
+    twi_attachSlaveRxEventWithTarget((void (*)(uint8_t*, size_t, void*))(void*)cb);
+}
+inline void twi_attachSlaveTxEvent(void (*cb)(void))
+{   // force cast to the previous version of the callback
+    // the ESP8266 convention should be fine with that:
+    // http://naberius.de/2015/05/14/esp8266-gpio-output-performance/
+    // https://boredpentester.com/reversing-esp8266-firmware-part-5/
+    twi_attachSlaveTxEventWithTarget((void (*)(void*))(void*)cb);
+}
+inline void twi_enableSlaveMode(void)
+{
+    twi_enableSlaveModeWithTarget(NULL);
+}
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+
+// this is a C++ class, so declare it only in C++ context
+
+class TwiMaster
+{
+protected:
+    unsigned int preferred_si2c_clock = 100000;
+    uint32_t twi_dcount = 18;
+    unsigned char twi_sda = 0;
+    unsigned char twi_scl = 0;
+    uint32_t twi_clockStretchLimit = 0;
+
+    // Internal use functions
+    void IRAM_ATTR busywait(unsigned int v);
+    bool write_start(void);
+    bool write_stop(void);
+    bool write_bit(bool bit);
+    bool read_bit(void);
+    bool write_byte(unsigned char byte);
+    unsigned char read_byte(bool nack);
+
+    // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
+    inline void WAIT_CLOCK_STRETCH();
+
+    // Generate a clock "valley" (at the end of a segment, just before a repeated start)
+    void twi_scl_valley(void);
+
+public:
+    void setClock(unsigned int freq);
+    void setClockStretchLimit(uint32_t limit);
+    void init(unsigned char sda, unsigned char scl);
+    unsigned char writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
+    unsigned char readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop);
+    uint8_t status();
+};
+
+extern TwiMaster& twiMasterSingleton;
+
 #endif
 
 #endif
