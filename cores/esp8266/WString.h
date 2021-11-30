@@ -101,11 +101,7 @@ class String {
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
         String &operator =(String &&rval) noexcept;
-        String &operator =(char c) {
-            char buffer[2] { c, '\0' };
-            *this = buffer;
-            return *this;
-        }
+        String &operator =(char c);
 
         // concatenate (works w/ built-in types)
 
@@ -142,11 +138,15 @@ class String {
         int compareTo(const String &s) const;
         bool equals(const String &s) const;
         bool equals(const char *cstr) const;
+        bool equals(const __FlashStringHelper *s) const;
         bool operator ==(const String &rhs) const {
             return equals(rhs);
         }
         bool operator ==(const char *cstr) const {
             return equals(cstr);
+        }
+        bool operator ==(const __FlashStringHelper *rhs) const {
+            return equals(rhs);
         }
         bool operator !=(const String &rhs) const {
             return !equals(rhs);
@@ -154,27 +154,24 @@ class String {
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
         }
+        bool operator !=(const __FlashStringHelper *rhs) const {
+            return !equals(rhs);
+        }
         bool operator <(const String &rhs) const;
         bool operator >(const String &rhs) const;
         bool operator <=(const String &rhs) const;
         bool operator >=(const String &rhs) const;
         bool equalsIgnoreCase(const String &s) const;
+        bool equalsIgnoreCase(const __FlashStringHelper *s) const;
         unsigned char equalsConstantTime(const String &s) const;
         bool startsWith(const String &prefix) const;
-        bool startsWith(const char *prefix) const {
-            return this->startsWith(String(prefix));
-        }
-        bool startsWith(const __FlashStringHelper *prefix) const {
-            return this->startsWith(String(prefix));
-        }
+        bool startsWith(const char *prefix) const;
+        bool startsWith(const __FlashStringHelper *prefix) const;
         bool startsWith(const String &prefix, unsigned int offset) const;
+        bool startsWith(const __FlashStringHelper *prefix, unsigned int offset) const;
         bool endsWith(const String &suffix) const;
-        bool endsWith(const char *suffix) const {
-            return this->endsWith(String(suffix));
-        }
-        bool endsWith(const __FlashStringHelper *suffix) const {
-            return this->endsWith(String(suffix));
-        }
+        bool endsWith(const char *suffix) const;
+        bool endsWith(const __FlashStringHelper *suffix) const;
 
         // character access
         char charAt(unsigned int index) const {
@@ -204,6 +201,8 @@ class String {
         int lastIndexOf(char ch, unsigned int fromIndex) const;
         int lastIndexOf(const String &str) const;
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
+        int lastIndexOf(const __FlashStringHelper *str) const;
+        int lastIndexOf(const __FlashStringHelper *str, unsigned int fromIndex) const;
         String substring(unsigned int beginIndex) const {
             return substring(beginIndex, len());
         }
@@ -212,21 +211,12 @@ class String {
         // modification
         void replace(char find, char replace);
         void replace(const String &find, const String &replace);
-        void replace(const char *find, const String &replace) {
-            this->replace(String(find), replace);
-        }
-        void replace(const __FlashStringHelper *find, const String &replace) {
-            this->replace(String(find), replace);
-        }
-        void replace(const char *find, const char *replace) {
-            this->replace(String(find), String(replace));
-        }
-        void replace(const __FlashStringHelper *find, const char *replace) {
-            this->replace(String(find), String(replace));
-        }
-        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
-            this->replace(String(find), String(replace));
-        }
+        void replace(const char *find, const String &replace);
+        void replace(const __FlashStringHelper *find, const String &replace);
+        void replace(const char *find, const char *replace);
+        void replace(const __FlashStringHelper *find, const char *replace);
+        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace);
+
         // Pass the biggest integer if the count is not specified.
         // The remove method below will take care of truncating it at the end of the string.
         void remove(unsigned int index, unsigned int count = (unsigned int)-1);

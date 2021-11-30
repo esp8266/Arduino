@@ -5,6 +5,7 @@
 
 #include <ESP8266WiFi.h>
 #include <time.h>
+#include "certs.h"
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -14,8 +15,6 @@
 const char *ssid = STASSID;
 const char *pass = STAPSK;
 
-const char *   host = "api.github.com";
-const uint16_t port = 443;
 const char *   path = "/";
 
 void setup() {
@@ -97,39 +96,14 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
 
 
 void loop() {
-  static const char digicert[] PROGMEM = R"EOF(
------BEGIN CERTIFICATE-----
-MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs
-MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
-d3cuZGlnaWNlcnQuY29tMSswKQYDVQQDEyJEaWdpQ2VydCBIaWdoIEFzc3VyYW5j
-ZSBFViBSb290IENBMB4XDTA2MTExMDAwMDAwMFoXDTMxMTExMDAwMDAwMFowbDEL
-MAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3
-LmRpZ2ljZXJ0LmNvbTErMCkGA1UEAxMiRGlnaUNlcnQgSGlnaCBBc3N1cmFuY2Ug
-RVYgUm9vdCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMbM5XPm
-+9S75S0tMqbf5YE/yc0lSbZxKsPVlDRnogocsF9ppkCxxLeyj9CYpKlBWTrT3JTW
-PNt0OKRKzE0lgvdKpVMSOO7zSW1xkX5jtqumX8OkhPhPYlG++MXs2ziS4wblCJEM
-xChBVfvLWokVfnHoNb9Ncgk9vjo4UFt3MRuNs8ckRZqnrG0AFFoEt7oT61EKmEFB
-Ik5lYYeBQVCmeVyJ3hlKV9Uu5l0cUyx+mM0aBhakaHPQNAQTXKFx01p8VdteZOE3
-hzBWBOURtCmAEvF5OYiiAhF8J2a3iLd48soKqDirCmTCv2ZdlYTBoSUeh10aUAsg
-EsxBu24LUTi4S8sCAwEAAaNjMGEwDgYDVR0PAQH/BAQDAgGGMA8GA1UdEwEB/wQF
-MAMBAf8wHQYDVR0OBBYEFLE+w2kD+L9HAdSYJhoIAu9jZCvDMB8GA1UdIwQYMBaA
-FLE+w2kD+L9HAdSYJhoIAu9jZCvDMA0GCSqGSIb3DQEBBQUAA4IBAQAcGgaX3Nec
-nzyIZgYIVyHbIUf4KmeqvxgydkAQV8GK83rZEWWONfqe/EW1ntlMMUu4kehDLI6z
-eM7b41N5cdblIZQB2lWHmiRk9opmzN6cN82oNLFpmyPInngiK3BD41VHMWEZ71jF
-hS9OMPagMRYjyOfiZRYzy78aG6A9+MpeizGLYAiJLQwGXFK3xPkKmNEVX58Svnw2
-Yzi9RKR/5CYrCsSXaQ3pjOLAEFe4yHYSkVXySGnYvCoCWw9E1CAx2/S6cCZdkGCe
-vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
-+OkuE6N36B9K
------END CERTIFICATE-----
-)EOF";
   uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(digicert);
+  BearSSL::X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
 
   Serial.printf("Connecting without sessions...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, host, port, path);
+  fetchURL(&client, github_host, github_port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
@@ -138,21 +112,21 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
   Serial.printf("Connecting with an uninitialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, host, port, path);
+  fetchURL(&client, github_host, github_port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting with the just initialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, host, port, path);
+  fetchURL(&client, github_host, github_port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting again with the initialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, host, port, path);
+  fetchURL(&client, github_host, github_port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
