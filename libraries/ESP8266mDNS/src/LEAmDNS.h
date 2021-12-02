@@ -1030,6 +1030,8 @@ protected:
                 esp8266::polledTimeout::oneShotMs m_TTLTimeout;
                 timeoutLevel_t                    m_timeoutLevel;
 
+                using timeoutBase = decltype(m_TTLTimeout);
+
                 stcTTL(void);
                 bool set(uint32_t p_u32TTL);
 
@@ -1039,7 +1041,7 @@ protected:
                 bool prepareDeletion(void);
                 bool finalTimeoutLevel(void) const;
 
-                unsigned long timeout(void) const;
+                timeoutBase::timeType timeout(void) const;
             };
 #ifdef MDNS_IP4_SUPPORT
             /**
