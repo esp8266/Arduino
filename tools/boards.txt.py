@@ -1418,17 +1418,17 @@ def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
         ( menub + 'flash_size', strsize ),
         #( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
-        #( menub + 'spiffs_pagesize', '256' ),
+        ( menub + 'spiffs_pagesize', '256' ),
         #( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
 
-    #if fs_kb > 0:
-    #    d.update(collections.OrderedDict([
-    #        ( menub + 'spiffs_start', "0x%05X" % fs_start ),
-    #        ( menub + 'spiffs_end', "0x%05X" % fs_end ),
-    #        ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
-    #        ]))
+    if fs_kb > 0:
+        d.update(collections.OrderedDict([
+            ( menub + 'spiffs_start', "0x%05X" % fs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % fs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
+            ]))
 
     #d.update(collections.OrderedDict([
     #    ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
