@@ -349,6 +349,18 @@ void ArduinoOTAClass::_runUpdate() {
   }
 }
 
+void ArduinoOTAClass::end() {
+    _initialized = false;
+    _udp_ota->unref();
+    _udp_ota = 0;
+    if(_useMDNS){
+        MDNS.end();
+    }
+    _state = OTA_IDLE;
+    #ifdef OTA_DEBUG
+    OTA_DEBUG.printf("OTA server stopped.\n");
+    #endif    
+}
 //this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {
