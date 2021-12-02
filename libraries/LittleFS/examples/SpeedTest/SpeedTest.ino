@@ -132,6 +132,16 @@ void DoTest(FS *fs) {
   f.close();
   stop = millis();
   Serial.printf("==> Time to read 64KB in 1b chunks = %lu milliseconds = %s\n", stop - start, rate(start, stop, 65536));
+
+
+  start = millis();
+  auto dest = fs->open("/test1bw.bin", "w");
+  f = fs->open("/test1b.bin", "r");
+  auto copysize = f.sendAll(dest);
+  dest.close();
+  stop = millis();
+  Serial.printf("==> Time to copy %d = %zd bytes = %lu milliseconds = %s\n", f.size(), copysize, stop - start, rate(start, stop, f.size()));
+  f.close();
 }
 
 void setup() {
@@ -139,6 +149,7 @@ void setup() {
   Serial.printf("Beginning test\n");
   Serial.flush();
   DoTest(&TESTFS);
+  Serial.println("done");
 }
 
 void loop() {
