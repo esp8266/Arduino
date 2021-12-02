@@ -396,11 +396,7 @@ extern "C" void __disableWiFiAtBootTime (void)
 #if AUTOFLASHSIZE
 #include "flash_hal.h"
 extern "C" void flashinit (void);
-uint32_t EEPROM_start;
-uint32_t FS_start;
-uint32_t FS_end;
-uint16_t FS_page;
-uint16_t FS_block;
+uint32_t __flashindex;
 #endif
 
 extern "C" void user_init(void) {

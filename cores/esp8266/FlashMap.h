@@ -12,9 +12,9 @@ typedef struct
     uint32_t eeprom_start;
     uint32_t fs_start;
     uint32_t fs_end;
-    uint16_t fs_block_size;
-    uint16_t fs_page_size;
-    uint16_t flash_size_kb;
+    uint32_t fs_block_size;
+    uint32_t fs_page_size;
+    uint32_t flash_size_kb;
 } flash_map_s;
 
 /*
@@ -27,32 +27,32 @@ typedef struct
 
 #define FLASH_MAP_OTA_FS \
     { \
-        { 0x402fb000, 0x402eb000, 0x402fb000, 0x1000, 0x100, 1024 }, \
-        { 0x403fb000, 0x403c0000, 0x403fb000, 0x1000, 0x100, 2048 }, \
-        { 0x405fb000, 0x40400000, 0x405fa000, 0x2000, 0x100, 4096 }, \
-        { 0x409fb000, 0x40400000, 0x409fa000, 0x2000, 0x100, 8192 }, \
-        { 0x411fb000, 0x40400000, 0x411fa000, 0x2000, 0x100, 16384 }, \
-        { 0x4027b000, 0x40273000, 0x4027b000, 0x1000, 0x100, 512 }, \
+        { .eeprom_start = 0x402fb000, .fs_start = 0x402eb000, .fs_end = 0x402fb000, .fs_block_size = 0x1000, .fs_page_size = 0x100, .flash_size_kb = 1024 }, \
+        { .eeprom_start = 0x403fb000, .fs_start = 0x403c0000, .fs_end = 0x403fb000, .fs_block_size = 0x1000, .fs_page_size = 0x100, .flash_size_kb = 2048 }, \
+        { .eeprom_start = 0x405fb000, .fs_start = 0x40400000, .fs_end = 0x405fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 4096 }, \
+        { .eeprom_start = 0x409fb000, .fs_start = 0x40400000, .fs_end = 0x409fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 8192 }, \
+        { .eeprom_start = 0x411fb000, .fs_start = 0x40400000, .fs_end = 0x411fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 16384 }, \
+        { .eeprom_start = 0x4027b000, .fs_start = 0x40273000, .fs_end = 0x4027b000, .fs_block_size = 0x1000, .fs_page_size = 0x100, .flash_size_kb = 512 }, \
     }
 
 #define FLASH_MAP_MAX_FS \
     { \
-        { 0x402fb000, 0x4027b000, 0x402fb000, 0x2000, 0x100, 1024 }, \
-        { 0x403fb000, 0x40300000, 0x403fa000, 0x2000, 0x100, 2048 }, \
-        { 0x405fb000, 0x40300000, 0x405fa000, 0x2000, 0x100, 4096 }, \
-        { 0x409fb000, 0x40300000, 0x409fa000, 0x2000, 0x100, 8192 }, \
-        { 0x411fb000, 0x40300000, 0x411fa000, 0x2000, 0x100, 16384 }, \
-        { 0x4027b000, 0x4025b000, 0x4027b000, 0x1000, 0x100, 512 }, \
+        { .eeprom_start = 0x402fb000, .fs_start = 0x4027b000, .fs_end = 0x402fb000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 1024 }, \
+        { .eeprom_start = 0x403fb000, .fs_start = 0x40300000, .fs_end = 0x403fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 2048 }, \
+        { .eeprom_start = 0x405fb000, .fs_start = 0x40300000, .fs_end = 0x405fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 4096 }, \
+        { .eeprom_start = 0x409fb000, .fs_start = 0x40300000, .fs_end = 0x409fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 8192 }, \
+        { .eeprom_start = 0x411fb000, .fs_start = 0x40300000, .fs_end = 0x411fa000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 16384 }, \
+        { .eeprom_start = 0x4027b000, .fs_start = 0x4025b000, .fs_end = 0x4027b000, .fs_block_size = 0x1000, .fs_page_size = 0x100, .flash_size_kb = 512 }, \
     }
 
 #define FLASH_MAP_NO_FS \
     { \
-        { 0x402fb000, 0x402fb000, 0x402fb000, 0x0, 0x0, 1024 }, \
-        { 0x403fb000, 0x403fb000, 0x403fb000, 0x0, 0x0, 2048 }, \
-        { 0x405fb000, 0x405fb000, 0x405fb000, 0x0, 0x0, 4096 }, \
-        { 0x409fb000, 0x409fb000, 0x409fb000, 0x0, 0x0, 8192 }, \
-        { 0x411fb000, 0x411fb000, 0x411fb000, 0x0, 0x0, 16384 }, \
-        { 0x4027b000, 0x4027b000, 0x4027b000, 0x0, 0x0, 512 }, \
+        { .eeprom_start = 0x402fb000, .fs_start = 0x402fb000, .fs_end = 0x402fb000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 1024 }, \
+        { .eeprom_start = 0x403fb000, .fs_start = 0x403fb000, .fs_end = 0x403fb000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 2048 }, \
+        { .eeprom_start = 0x405fb000, .fs_start = 0x405fb000, .fs_end = 0x405fb000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 4096 }, \
+        { .eeprom_start = 0x409fb000, .fs_start = 0x409fb000, .fs_end = 0x409fb000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 8192 }, \
+        { .eeprom_start = 0x411fb000, .fs_start = 0x411fb000, .fs_end = 0x411fb000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 16384 }, \
+        { .eeprom_start = 0x4027b000, .fs_start = 0x4027b000, .fs_end = 0x4027b000, .fs_block_size = 0x0, .fs_page_size = 0x0, .flash_size_kb = 512 }, \
     }
 
 #endif // __FLASH_MAP_H

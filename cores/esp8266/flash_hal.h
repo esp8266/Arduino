@@ -30,35 +30,31 @@ extern "C" {
 #endif
 
 #if AUTOFLASHSIZE
-
-extern uint32_t EEPROM_start;
-extern uint32_t FS_start;
-extern uint32_t FS_end;
-extern uint16_t FS_page;
-extern uint16_t FS_block;
-
 #include <FlashMap.h>
-extern void flashinit(void);
+
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
+extern void flashinit(void);
+extern uint32_t __flashindex;
+extern const flash_map_s __flashdesc[];
+
 #define FLASHMAPCONFIG(conf) FLASHMAPCONFIGATTR(,conf)
 #define FLASHMAPCONFIGATTR(attr, conf...) \
+  const flash_map_s __flashdesc[] PROGMEM = conf; \
   void flashinit (void) attr; \
   void flashinit (void) \
   { \
-    static const flash_map_s flashdesc[] PROGMEM = conf; \
     uint32_t flash_chip_size_kb = 1 << (((spi_flash_get_id() >> 16) & 0xff) - 10); \
-    for (size_t i = 0; i < sizeof(flashdesc) / sizeof(flashdesc[0]); i++) \
-      if (pgm_read_word(&flashdesc[i].flash_size_kb) == flash_chip_size_kb) \
-      { \
-        EEPROM_start = (uint32_t)pgm_read_dword(&flashdesc[i].eeprom_start); \
-        FS_start = (uint32_t)pgm_read_dword(&flashdesc[i].fs_start); \
-        FS_end = (uint32_t)pgm_read_dword(&flashdesc[i].fs_end); \
-        FS_block = pgm_read_word(&flashdesc[i].fs_block_size); \
-        FS_page = pgm_read_word(&flashdesc[i].fs_page_size); \
+    for (__flashindex = 0; __flashindex < sizeof(__flashdesc) / sizeof(__flashdesc[0]); __flashindex++) \
+      if (__flashdesc[__flashindex].flash_size_kb == flash_chip_size_kb) \
         return; \
-      } \
     panic(); /* configuration not found */ \
   }
+
+#define EEPROM_start (__flashdesc[__flashindex].eeprom_start)
+#define FS_start     (__flashdesc[__flashindex].fs_start)
+#define FS_end       (__flashdesc[__flashindex].fs_end)
+#define FS_block     (__flashdesc[__flashindex].fs_block_size)
+#define FS_page      (__flashdesc[__flashindex].fs_page_size)
 
 #else // !AUTOFLASHSIZE
 

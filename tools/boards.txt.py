@@ -1458,11 +1458,11 @@ def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
             if not conf_name in c_flash_map:
                 c_flash_map[conf_name] = collections.OrderedDict([])
             c_flash_map[conf_name][flashsize_kb] = \
-                  hex(spi + eeprom_start) + ', ' \
-                + hex(spi + fs_start) + ', ' \
-                + hex(spi + fs_end) + ', ' \
-                + hex(fs_blocksize)+ ', ' \
-                + hex(page) + ', ' \
+                  '.eeprom_start = ' + hex(spi + eeprom_start) + ', ' \
+                + '.fs_start = ' + hex(spi + fs_start) + ', ' \
+                + '.fs_end = ' + hex(spi + fs_end) + ', ' \
+                + '.fs_block_size = ' + hex(fs_blocksize)+ ', ' \
+                + '.fs_page_size = ' + hex(page) + ', ' \
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
@@ -1573,9 +1573,9 @@ def all_flash_map ():
         define += '    uint32_t eeprom_start;\n'
         define += '    uint32_t fs_start;\n'
         define += '    uint32_t fs_end;\n'
-        define += '    uint16_t fs_block_size;\n'
-        define += '    uint16_t fs_page_size;\n'
-        define += '    uint16_t flash_size_kb;\n'
+        define += '    uint32_t fs_block_size;\n'
+        define += '    uint32_t fs_page_size;\n'
+        define += '    uint32_t flash_size_kb;\n'
         define += '} flash_map_s;\n'
         define += '\n'
         define += '/*\n'
@@ -1588,7 +1588,7 @@ def all_flash_map ():
         for i in c_flash_map:
             define += '\n#define FLASH_MAP_' + i + ' \\\n    { \\\n'
             for d in c_flash_map[i]:
-                define += '        { ' + c_flash_map[i][d] + str(d) + ' }, \\\n'
+                define += '        { ' + c_flash_map[i][d] + '.flash_size_kb = ' + str(d) + ' }, \\\n'
             define += '    }\n'
         define += '\n#endif // __FLASH_MAP_H\n'
 
