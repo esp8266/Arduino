@@ -41,13 +41,13 @@ extern "C" {
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[I2C_BUFFER_LENGTH];
-uint8_t TwoWire::rxBufferIndex = 0;
-uint8_t TwoWire::rxBufferLength = 0;
+size_t TwoWire::rxBufferIndex = 0;
+size_t TwoWire::rxBufferLength = 0;
 
 uint8_t TwoWire::txAddress = 0;
 uint8_t TwoWire::txBuffer[I2C_BUFFER_LENGTH];
-uint8_t TwoWire::txBufferIndex = 0;
-uint8_t TwoWire::txBufferLength = 0;
+size_t TwoWire::txBufferIndex = 0;
+size_t TwoWire::txBufferLength = 0;
 
 uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);

@@ -38,13 +38,13 @@ class TwoWire : public Stream
 {
 private:
     static uint8_t rxBuffer[];
-    static uint8_t rxBufferIndex;
-    static uint8_t rxBufferLength;
+    static size_t rxBufferIndex;
+    static size_t rxBufferLength;
 
     static uint8_t txAddress;
     static uint8_t txBuffer[];
-    static uint8_t txBufferIndex;
-    static uint8_t txBufferLength;
+    static size_t txBufferIndex;
+    static size_t txBufferLength;
 
     static uint8_t transmitting;
     static void (*user_onRequest)(void);
