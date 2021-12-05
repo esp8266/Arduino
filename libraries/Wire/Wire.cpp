@@ -40,12 +40,12 @@ extern "C" {
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
-uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
+uint8_t TwoWire::rxBuffer[I2C_BUFFER_LENGTH];
 uint8_t TwoWire::rxBufferIndex = 0;
 uint8_t TwoWire::rxBufferLength = 0;
 
 uint8_t TwoWire::txAddress = 0;
-uint8_t TwoWire::txBuffer[BUFFER_LENGTH];
+uint8_t TwoWire::txBuffer[I2C_BUFFER_LENGTH];
 uint8_t TwoWire::txBufferIndex = 0;
 uint8_t TwoWire::txBufferLength = 0;
 
@@ -122,9 +122,9 @@ void TwoWire::setClockStretchLimit(uint32_t limit)
 
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
 {
-    if (size > BUFFER_LENGTH)
+    if (size > I2C_BUFFER_LENGTH)
     {
-        size = BUFFER_LENGTH;
+        size = I2C_BUFFER_LENGTH;
     }
     size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0) ? size : 0;
     rxBufferIndex = 0;
@@ -183,7 +183,7 @@ size_t TwoWire::write(uint8_t data)
 {
     if (transmitting)
     {
-        if (txBufferLength >= BUFFER_LENGTH)
+        if (txBufferLength >= I2C_BUFFER_LENGTH)
         {
             setWriteError();
             return 0;

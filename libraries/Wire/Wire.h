@@ -28,11 +28,10 @@
 #include "Stream.h"
 
 
-
 #ifndef I2C_BUFFER_LENGTH
+// DEPRECATED: Do not use BUFFER_LENGTH, prefer I2C_BUFFER_LENGTH
 #define BUFFER_LENGTH 128
-#else
-#define BUFFER_LENGTH I2C_BUFFER_LENGTH
+#define I2C_BUFFER_LENGTH BUFFER_LENGTH
 #endif
 
 class TwoWire : public Stream
