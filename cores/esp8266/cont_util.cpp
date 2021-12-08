@@ -62,9 +62,9 @@ int cont_get_free_stack(cont_t* cont) {
     return freeWords * 4;
 }
 
-bool IRAM_ATTR cont_can_yield(cont_t* cont) {
+bool IRAM_ATTR cont_can_suspend(cont_t* cont) {
     return !ETS_INTR_WITHINISR() &&
-           cont->pc_ret != 0 && cont->pc_yield == 0;
+           cont->pc_ret != 0 && cont->pc_suspend == 0;
 }
 
 // No need for this to be in IRAM, not expected to be IRQ called

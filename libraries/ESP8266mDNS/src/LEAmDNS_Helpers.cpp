@@ -768,7 +768,7 @@ bool MDNSResponder::_printRRAnswer(const MDNSResponder::stcMDNS_RRAnswer& p_RRAn
         if (pTxts)
         {
             ((/*const c_str()!!*/stcMDNS_RRAnswerTXT*)&p_RRAnswer)->m_Txts.c_str(pTxts);
-            DEBUG_OUTPUT.printf_P(PSTR("TXT(%u) %s"), stTxtLength, pTxts);
+            DEBUG_OUTPUT.printf_P(PSTR("TXT(%zu) %s"), stTxtLength, pTxts);
             delete[] pTxts;
         }
         break;
