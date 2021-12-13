@@ -39,6 +39,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <Schedule.h>
+
 #define MOCK_PORT_SHIFTER 9000
 
 bool user_exit = false;
@@ -309,6 +311,8 @@ int main (int argc, char* const argv [])
 			usleep(1000); // not 100% cpu, ~1000 loops per second
 		loop();
 		check_incoming_udp();
+		run_scheduled_functions();
+		run_scheduled_recurrent_functions();
 
 		if (run_once)
 			user_exit = true;
