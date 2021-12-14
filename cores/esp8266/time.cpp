@@ -187,8 +187,8 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     sntp_init();
 }
 
-void setTZ(const char* tz){
-	
+void setTZ(const char* tz)
+{
     char tzram[strlen_P(tz) + 1];
     memcpy_P(tzram, tz, sizeof(tzram));
     setenv("TZ", tzram, 1/*overwrite*/);
@@ -198,13 +198,31 @@ void setTZ(const char* tz){
 void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
 {
     sntp_stop();
-
     setServer(0, server1);
     setServer(1, server2);
     setServer(2, server3);
-	setTZ(tz);
-	
+    setTZ(tz);
     sntp_init();
+}
+
+/*
+ * Backported from ESP32 Arduino
+ */
+bool getLocalTime(struct tm * info, uint32_t ms)
+{
+    uint32_t start = millis();
+    time_t now;
+    while ((millis()-start) <= ms)
+    {
+      time(&now);
+      localtime_r(&now, info);
+      if (info->tm_year > (2016 - 1900))
+      {
+        return true;
+      }
+      delay(10);
+    }
+    return false;
 }
 
 static BoolCB _settimeofday_cb;
@@ -258,3 +276,4 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
 }
 
 };
+
