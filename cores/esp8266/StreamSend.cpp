@@ -341,7 +341,7 @@ Stream& operator << (Stream& out, Stream& stream)
 
 Stream& operator << (Stream& out, const char* text)
 {
-    StreamConstPtr(text, strlen(text)).sendAll(out);
+    StreamConstPtr(text, strlen_P(text)).sendAll(out);
     return out;
 }
 
