@@ -44,6 +44,11 @@ extern "C" unsigned long micros()
 
 extern "C" void yield()
 {
+    run_scheduled_recurrent_functions();
+}
+
+extern "C" void loop_end()
+{
     run_scheduled_functions();
     run_scheduled_recurrent_functions();
 }
