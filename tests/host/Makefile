@@ -97,6 +97,7 @@ CORE_CPP_FILES := \
 		HardwareSerial.cpp \
 		crc32.cpp \
 		Updater.cpp \
+		timehelper.cpp \
 	) \
 	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
