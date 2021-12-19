@@ -130,6 +130,10 @@ bool WiFiServer::hasMaxPendingClients() {
 
 WiFiClient WiFiServer::available(byte* status) {
     (void) status;
+    return accept();
+}
+
+WiFiClient WiFiServer::accept() {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
 
