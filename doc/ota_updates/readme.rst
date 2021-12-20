@@ -226,13 +226,6 @@ Instructions below show configuration of OTA on a NodeMCU 1.0 (ESP-12E Module) b
    -  esp8266/Arduino platform package 2.0.0 or newer - for instructions
       follow
       https://github.com/esp8266/Arduino#installing-with-boards-manager
-   -  Python 3.x - https://www.python.org/
-
-      **Note:** Windows users should select “Add python.exe to Path”
-      (see below – this option is not selected by default).
-
-      .. figure:: a-ota-python-configuration.png
-         :alt: Python installation set up
 
 2. Now prepare the sketch and configuration for upload via a serial port.
 
