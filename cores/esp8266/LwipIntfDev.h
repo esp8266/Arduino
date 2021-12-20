@@ -305,7 +305,7 @@ void LwipIntfDev<RawDev>::netif_status_callback()
 {
     if (connected())
     {
-        if (_default || (netif_default == nullptr && !ip_addr_islinklocal(_netif.ip_addr)))
+        if (_default || (netif_default == nullptr && !ip_addr_islinklocal(&_netif.ip_addr)))
         {
             netif_set_default(&_netif);
         }
