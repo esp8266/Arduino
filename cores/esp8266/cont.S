@@ -21,9 +21,9 @@
     .section .irom0.text
     .align    4
     .literal_position
-    .global   cont_yield
-    .type     cont_yield, @function
-cont_yield:
+    .global   cont_suspend
+    .type     cont_suspend, @function
+cont_suspend:
     /* a1: sp */
     /* a2: void* cont_ctx */
     /* adjust stack and save registers */
@@ -35,10 +35,10 @@ cont_yield:
     s32i    a0,  a1, 16
     s32i    a2,  a1, 20
 
-    /* &cont_continue -> cont_ctx.pc_yield */
+    /* &cont_continue -> cont_ctx.pc_suspend */
     movi    a3, cont_continue
     s32i    a3, a2, 8
-    /* sp -> cont_ctx.sp_yield */
+    /* sp -> cont_ctx.sp_suspend */
     s32i    a1, a2, 12
 
     /* a0 <- cont_ctx.pc_ret */
@@ -56,7 +56,7 @@ cont_continue:
     l32i    a2,  a1, 20
     addi    a1,  a1, 24
     ret
-    .size    cont_yield, . - cont_yield
+    .size    cont_suspend, . - cont_suspend
 
 ////////////////////////////////////////////////////
 
@@ -108,7 +108,7 @@ cont_run:
     /* sp -> cont_ctx.sp_ret */
     s32i    a1, a2, 4
 
-    /* if cont_ctx.pc_yield != 0, goto cont_resume */
+    /* if cont_ctx.pc_suspend != 0, goto cont_resume */
     l32i    a4, a2, 8
     bnez    a4, cont_resume
     /* else */
@@ -119,12 +119,12 @@ cont_run:
     jx      a2
 
 cont_resume:
-    /* a1 <- cont_ctx.sp_yield */
+    /* a1 <- cont_ctx.sp_suspend */
     l32i    a1, a2, 12
-    /* reset yield flag, 0 -> cont_ctx.pc_yield */
+    /* reset yield flag, 0 -> cont_ctx.pc_suspend */
     movi    a3, 0
     s32i    a3, a2, 8
-    /* jump to saved cont_ctx.pc_yield */
+    /* jump to saved cont_ctx.pc_suspend */
     movi    a0, cont_ret
     jx       a4
 

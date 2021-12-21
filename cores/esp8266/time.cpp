@@ -214,6 +214,11 @@ void settimeofday_cb (const TrivialCB& cb)
     _settimeofday_cb = [cb](bool sntp) { (void)sntp; cb(); };
 }
 
+void settimeofday_cb (BoolCB&& cb)
+{
+    _settimeofday_cb = std::move(cb);
+}
+
 void settimeofday_cb (const BoolCB& cb)
 {
     _settimeofday_cb = cb;

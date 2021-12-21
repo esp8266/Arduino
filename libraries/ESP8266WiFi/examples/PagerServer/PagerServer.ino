@@ -2,7 +2,7 @@
   Pager Server
 
   The ESP8266WiFi library's WiFiServer and WiFiServerSecure
-  work differently then WiFiServer and EthernetSever
+  work differently than WiFiServer and EthernetSever
   in Arduino networking libraries.
   This example demonstrates the ArduinoWiFiServer,
   which enhances the WiFiServer.
