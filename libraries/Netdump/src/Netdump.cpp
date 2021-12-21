@@ -193,7 +193,7 @@ void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
 {
     if (tcpDumpServer.hasClient())
     {
-        tcpDumpClient = tcpDumpServer.available();
+        tcpDumpClient = tcpDumpServer.accept();
         tcpDumpClient.setNoDelay(true);
 
         bufferIndex = 0;
