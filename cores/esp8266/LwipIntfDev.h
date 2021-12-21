@@ -305,8 +305,10 @@ void LwipIntfDev<RawDev>::netif_status_callback()
 {
     if (connected())
     {
-        if (_default || (netif_default == nullptr && !ip_addr_islinklocal(&_netif.ip_addr)))
+        if (_default || (netif_default == nullptr && !ip_addr_isany(&_netif.gw)))
         {
+            // on user request,
+            // or if there is no current default interface, but a gateway is known
             netif_set_default(&_netif);
         }
         sntp_stop();
