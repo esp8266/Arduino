@@ -66,6 +66,7 @@ public:
 
     void setDefault();
 
+    // true if interface has a valid IPv4 address
     bool connected()
     {
         return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
@@ -308,7 +309,7 @@ void LwipIntfDev<RawDev>::netif_status_callback()
         if (_default || (netif_default == nullptr && !ip_addr_isany(&_netif.gw)))
         {
             // on user request,
-            // or if there is no current default interface, but a gateway is known
+            // or if there is no current default interface, but a gateway is valid
             netif_set_default(&_netif);
         }
         sntp_stop();
