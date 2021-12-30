@@ -192,13 +192,13 @@ extern char _heap_start[];
 /* -------------------------------------------------------------------------- */
 
 #ifdef UMM_BEST_FIT
-  #ifdef  UMM_FIRST_FIT
-    #error Both UMM_BEST_FIT and UMM_FIRST_FIT are defined - pick one!
-  #endif
+#ifdef  UMM_FIRST_FIT
+#error Both UMM_BEST_FIT and UMM_FIRST_FIT are defined - pick one!
+#endif
 #else /* UMM_BEST_FIT is not defined */
-  #ifndef UMM_FIRST_FIT
+#ifndef UMM_FIRST_FIT
     #define UMM_BEST_FIT
-  #endif
+#endif
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -207,9 +207,9 @@ extern char _heap_start[];
   #define UMM_FRAGMENTATION_METRIC_INIT() umm_fragmentation_metric_init(_context)
   #define UMM_FRAGMENTATION_METRIC_ADD(c) umm_fragmentation_metric_add(_context, c)
   #define UMM_FRAGMENTATION_METRIC_REMOVE(c) umm_fragmentation_metric_remove(_context, c)
-  #ifndef UMM_INFO
+#ifndef UMM_INFO
   #define UMM_INFO
-  #endif
+#endif
 #else
   #define UMM_FRAGMENTATION_METRIC_INIT()
   #define UMM_FRAGMENTATION_METRIC_ADD(c)
@@ -229,7 +229,7 @@ extern char _heap_start[];
 // #define UMM_INFO
 
 #ifdef UMM_INFO
-  typedef struct UMM_HEAP_INFO_t {
+typedef struct UMM_HEAP_INFO_t {
     unsigned int totalEntries;
     unsigned int usedEntries;
     unsigned int freeEntries;
@@ -238,33 +238,33 @@ extern char _heap_start[];
     unsigned int usedBlocks;
     unsigned int freeBlocks;
     unsigned int freeBlocksSquared;
-#ifdef UMM_INLINE_METRICS
+    #ifdef UMM_INLINE_METRICS
     size_t oom_count;
     #define UMM_OOM_COUNT info.oom_count
     #define UMM_FREE_BLOCKS info.freeBlocks
-#endif
+    #endif
     unsigned int maxFreeContiguousBlocks;
-  }
-  UMM_HEAP_INFO;
+}
+UMM_HEAP_INFO;
 
-  // extern UMM_HEAP_INFO ummHeapInfo;
+// extern UMM_HEAP_INFO ummHeapInfo;
 struct UMM_HEAP_CONTEXT;
 typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 
-  extern ICACHE_FLASH_ATTR void *umm_info( void *ptr, bool force );
+extern ICACHE_FLASH_ATTR void *umm_info(void *ptr, bool force);
 #ifdef UMM_INLINE_METRICS
-  extern size_t umm_free_heap_size( void );
+extern size_t umm_free_heap_size(void);
 #else
-  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size( void );
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size(void);
 #endif
-  // umm_max_block_size changed to umm_max_free_block_size in upstream.
-  extern ICACHE_FLASH_ATTR size_t umm_max_block_size( void );
-  extern ICACHE_FLASH_ATTR int umm_usage_metric( void );
-  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric( void );
-  extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core( umm_heap_context_t *_context );
-  extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core( umm_heap_context_t *_context );
-  extern ICACHE_FLASH_ATTR int umm_usage_metric_core( umm_heap_context_t *_context );
-  extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core( umm_heap_context_t *_context );
+// umm_max_block_size changed to umm_max_free_block_size in upstream.
+extern ICACHE_FLASH_ATTR size_t umm_max_block_size(void);
+extern ICACHE_FLASH_ATTR int umm_usage_metric(void);
+extern ICACHE_FLASH_ATTR int umm_fragmentation_metric(void);
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core(umm_heap_context_t *_context);
+extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core(umm_heap_context_t *_context);
+extern ICACHE_FLASH_ATTR int umm_usage_metric_core(umm_heap_context_t *_context);
+extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core(umm_heap_context_t *_context);
 #else
   #define umm_info(p,b)
   #define umm_free_heap_size() (0)
@@ -312,27 +312,27 @@ typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 
 typedef struct UMM_STATISTICS_t {
-#ifndef UMM_INLINE_METRICS
+    #ifndef UMM_INLINE_METRICS
 // If we are doing UMM_INLINE_METRICS, we can move oom_count and free_blocks to
 // umm_info's structure and save a little DRAM and IRAM.
 // Otherwise it is defined here.
-  size_t free_blocks;
-  size_t oom_count;
+    size_t free_blocks;
+    size_t oom_count;
   #define UMM_OOM_COUNT stats.oom_count
   #define UMM_FREE_BLOCKS stats.free_blocks
-#endif
-#ifdef UMM_STATS_FULL
-  size_t free_blocks_min;
-  size_t free_blocks_isr_min;
-  size_t alloc_max_size;
-  size_t last_alloc_size;
-  size_t id_malloc_count;
-  size_t id_malloc_zero_count;
-  size_t id_realloc_count;
-  size_t id_realloc_zero_count;
-  size_t id_free_count;
-  size_t id_free_null_count;
-#endif
+    #endif
+    #ifdef UMM_STATS_FULL
+    size_t free_blocks_min;
+    size_t free_blocks_isr_min;
+    size_t alloc_max_size;
+    size_t last_alloc_size;
+    size_t id_malloc_count;
+    size_t id_malloc_zero_count;
+    size_t id_realloc_count;
+    size_t id_realloc_zero_count;
+    size_t id_free_count;
+    size_t id_free_null_count;
+    #endif
 }
 UMM_STATISTICS;
 
@@ -344,8 +344,8 @@ UMM_STATISTICS;
 
 #define STATS__OOM_UPDATE() _context->UMM_OOM_COUNT += 1
 
-extern size_t umm_free_heap_size_lw( void );
-extern size_t umm_get_oom_count( void );
+extern size_t umm_free_heap_size_lw(void);
+extern size_t umm_get_oom_count(void);
 
 #else  // not UMM_STATS or UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_UPDATE(s) (void)(s)
@@ -353,59 +353,62 @@ extern size_t umm_get_oom_count( void );
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
-size_t ICACHE_FLASH_ATTR umm_block_size( void );
+size_t ICACHE_FLASH_ATTR umm_block_size(void);
 #endif
 
 #ifdef UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN() \
-do { \
-    if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_min) \
-        _context->stats.free_blocks_min = _context->UMM_FREE_BLOCKS; \
-} while(false)
+    do { \
+        if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_min) { \
+            _context->stats.free_blocks_min = _context->UMM_FREE_BLOCKS;  \
+        } \
+    } while (false)
 
 #define STATS__FREE_BLOCKS_ISR_MIN() \
-do { \
-    if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_isr_min) \
-        _context->stats.free_blocks_isr_min = _context->UMM_FREE_BLOCKS; \
-} while(false)
+    do { \
+        if (_context->UMM_FREE_BLOCKS < _context->stats.free_blocks_isr_min) { \
+            _context->stats.free_blocks_isr_min = _context->UMM_FREE_BLOCKS; \
+        } \
+    } while (false)
 
 #define STATS__ALLOC_REQUEST(tag, s)  \
-do { \
-    _context->stats.tag##_count += 1; \
-    _context->stats.last_alloc_size = s; \
-    if (_context->stats.alloc_max_size < s) \
-        _context->stats.alloc_max_size = s; \
-} while(false)
+    do { \
+        _context->stats.tag##_count += 1; \
+        _context->stats.last_alloc_size = s; \
+        if (_context->stats.alloc_max_size < s) { \
+            _context->stats.alloc_max_size = s; \
+        } \
+    } while (false)
 
 #define STATS__ZERO_ALLOC_REQUEST(tag, s)  \
-do { \
-    _context->stats.tag##_zero_count += 1; \
-} while(false)
+    do { \
+        _context->stats.tag##_zero_count += 1; \
+    } while (false)
 
 #define STATS__NULL_FREE_REQUEST(tag)  \
-do { \
-    umm_heap_context_t *_context = umm_get_current_heap(); \
-    _context->stats.tag##_null_count += 1; \
-} while(false)
+    do { \
+        umm_heap_context_t *_context = umm_get_current_heap(); \
+        _context->stats.tag##_null_count += 1; \
+    } while (false)
 
 #define STATS__FREE_REQUEST(tag)  \
-do { \
-    _context->stats.tag##_count += 1; \
-} while(false)
+    do { \
+        _context->stats.tag##_count += 1; \
+    } while (false)
 
 
-size_t umm_free_heap_size_lw_min( void );
-size_t umm_free_heap_size_min_reset( void );
-size_t umm_free_heap_size_min( void );
-size_t umm_free_heap_size_isr_min( void );
-size_t umm_get_max_alloc_size( void );
-size_t umm_get_last_alloc_size( void );
-size_t umm_get_malloc_count( void );
-size_t umm_get_malloc_zero_count( void );
-size_t umm_get_realloc_count( void );
-size_t umm_get_realloc_zero_count( void );
-size_t umm_get_free_count( void );
-size_t umm_get_free_null_count( void );
+size_t umm_free_heap_size_lw_min(void);
+size_t umm_free_heap_size_min_reset(void);
+size_t umm_free_heap_size_min(void);
+size_t umm_free_heap_size_isr_min(void);
+size_t umm_get_max_alloc_size(void);
+size_t umm_get_last_alloc_size(void);
+size_t umm_get_malloc_count(void);
+size_t umm_get_malloc_zero_count(void);
+size_t umm_get_realloc_count(void);
+size_t umm_get_realloc_zero_count(void);
+size_t umm_get_free_count(void);
+size_t umm_get_free_null_count(void);
 
 #else // Not UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN()          (void)0
@@ -448,10 +451,10 @@ size_t umm_get_free_null_count( void );
 // This option adds support for gathering time locked data
 
 typedef struct UMM_TIME_STAT_t {
-  uint32_t min;
-  uint32_t max;
-  uint32_t start;
-  uint32_t intlevel;
+    uint32_t min;
+    uint32_t max;
+    uint32_t start;
+    uint32_t intlevel;
 }
 UMM_TIME_STAT;
 
@@ -462,23 +465,25 @@ extern UMM_TIME_STATS time_stats;
 bool get_umm_get_perf_data(UMM_TIME_STATS *p, size_t size);
 
 static inline void _critical_entry(UMM_TIME_STAT *p, uint32_t *saved_ps) {
-  *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
-  if (0U != (*saved_ps & 0x0FU)) {
-      p->intlevel += 1U;
-  }
+    *saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
+    if (0U != (*saved_ps & 0x0FU)) {
+        p->intlevel += 1U;
+    }
 
-  p->start = esp_get_cycle_count();
+    p->start = esp_get_cycle_count();
 }
 
 static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
-  uint32_t elapse = esp_get_cycle_count() - p->start;
-  if (elapse < p->min)
-      p->min = elapse;
+    uint32_t elapse = esp_get_cycle_count() - p->start;
+    if (elapse < p->min) {
+        p->min = elapse;
+    }
 
-  if (elapse > p->max)
-      p->max = elapse;
+    if (elapse > p->max) {
+        p->max = elapse;
+    }
 
-  xt_wsr_ps(*saved_ps);
+    xt_wsr_ps(*saved_ps);
 }
 #endif
 //////////////////////////////////////////////////////////////////////////////////////
@@ -495,33 +500,33 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  */
 
 #ifdef UMM_TEST_BUILD
-    extern int umm_critical_depth;
-    extern int umm_max_critical_depth;
-    #define UMM_CRITICAL_ENTRY() {\
-          ++umm_critical_depth; \
-          if (umm_critical_depth > umm_max_critical_depth) { \
-              umm_max_critical_depth = umm_critical_depth; \
-          } \
-    }
+extern int umm_critical_depth;
+extern int umm_max_critical_depth;
+    #define UMM_CRITICAL_ENTRY() { \
+        ++umm_critical_depth; \
+        if (umm_critical_depth > umm_max_critical_depth) { \
+            umm_max_critical_depth = umm_critical_depth; \
+        } \
+}
     #define UMM_CRITICAL_EXIT()  (umm_critical_depth--)
 #else
-    #if defined(UMM_CRITICAL_METRICS)
+#if defined(UMM_CRITICAL_METRICS)
         #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
         #define UMM_CRITICAL_ENTRY(tag)_critical_entry(&time_stats.tag, &_saved_ps_##tag)
         #define UMM_CRITICAL_EXIT(tag) _critical_exit(&time_stats.tag, &_saved_ps_##tag)
         #define UMM_CRITICAL_WITHINISR(tag) (0 != (_saved_ps_##tag & 0x0F))
 
-    #else  // ! UMM_CRITICAL_METRICS
-        // This method preserves the intlevel on entry and restores the
-        // original intlevel at exit.
+#else      // ! UMM_CRITICAL_METRICS
+// This method preserves the intlevel on entry and restores the
+// original intlevel at exit.
         #define UMM_CRITICAL_DECL(tag) uint32_t _saved_ps_##tag
         #define UMM_CRITICAL_ENTRY(tag) _saved_ps_##tag = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL)
         #define UMM_CRITICAL_EXIT(tag) xt_wsr_ps(_saved_ps_##tag)
         #define UMM_CRITICAL_WITHINISR(tag) (0 != (_saved_ps_##tag & 0x0F))
-    #endif
+#endif
 #endif
 
- /*
+/*
   * -D UMM_LIGHTWEIGHT_CPU
   *
   * The use of this macro is hardware/application specific.
@@ -550,8 +555,8 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #define UMM_CRITICAL_SUSPEND(tag) UMM_CRITICAL_EXIT(tag)
 #define UMM_CRITICAL_RESUME(tag) UMM_CRITICAL_ENTRY(tag)
 #else
-#define UMM_CRITICAL_SUSPEND(tag) do {} while(0)
-#define UMM_CRITICAL_RESUME(tag) do {} while(0)
+#define UMM_CRITICAL_SUSPEND(tag) do {} while (0)
+#define UMM_CRITICAL_RESUME(tag) do {} while (0)
 #endif
 
 /*
@@ -594,12 +599,12 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  */
 
 #ifdef UMM_INTEGRITY_CHECK
-   extern bool umm_integrity_check( void );
-#  define INTEGRITY_CHECK() umm_integrity_check()
-   extern void umm_corruption(void);
-#  define UMM_HEAP_CORRUPTION_CB() DBGLOG_FUNCTION( "Heap Corruption!" )
+extern bool umm_integrity_check(void);
+#define INTEGRITY_CHECK() umm_integrity_check()
+extern void umm_corruption(void);
+#define UMM_HEAP_CORRUPTION_CB() DBGLOG_FUNCTION("Heap Corruption!")
 #else
-#  define INTEGRITY_CHECK() (1)
+#define INTEGRITY_CHECK() (1)
 #endif
 
 /////////////////////////////////////////////////
@@ -669,33 +674,33 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #define UMM_POISONED_BLOCK_LEN_TYPE uint32_t
 
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-   extern void *umm_poison_malloc( size_t size );
-   extern void *umm_poison_calloc( size_t num, size_t size );
-   extern void *umm_poison_realloc( void *ptr, size_t size );
-   extern void  umm_poison_free( void *ptr );
-   extern bool  umm_poison_check( void );
-   // Local Additions to better report location in code of the caller.
-   void *umm_poison_realloc_fl( void *ptr, size_t size, const char* file, int line );
-   void  umm_poison_free_fl( void *ptr, const char* file, int line );
-   #if defined(UMM_POISON_CHECK_LITE)
-   /*
+extern void *umm_poison_malloc(size_t size);
+extern void *umm_poison_calloc(size_t num, size_t size);
+extern void *umm_poison_realloc(void *ptr, size_t size);
+extern void  umm_poison_free(void *ptr);
+extern bool  umm_poison_check(void);
+// Local Additions to better report location in code of the caller.
+void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line);
+void  umm_poison_free_fl(void *ptr, const char *file, int line);
+#if defined(UMM_POISON_CHECK_LITE)
+/*
     * We can safely do individual poison checks at free and realloc and stay
     * under 10us or close.
     */
-   #  define POISON_CHECK() 1
-   #  define POISON_CHECK_NEIGHBORS(c) \
-     do {\
-       if(!check_poison_neighbors(_context, c)) \
-         panic();\
-     } while(false)
-   #else
-   /* Not normally enabled. A full heap poison check may exceed 10us. */
-   #  define POISON_CHECK() umm_poison_check()
-   #  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
-   #endif
+   #define POISON_CHECK() 1
+   #define POISON_CHECK_NEIGHBORS(c) \
+    do { \
+        if (!check_poison_neighbors(_context, c)) \
+        panic(); \
+    } while (false)
 #else
-#  define POISON_CHECK() 1
-#  define POISON_CHECK_NEIGHBORS(c) do{}while(false)
+/* Not normally enabled. A full heap poison check may exceed 10us. */
+   #define POISON_CHECK() umm_poison_check()
+   #define POISON_CHECK_NEIGHBORS(c) do {} while (false)
+#endif
+#else
+#define POISON_CHECK() 1
+#define POISON_CHECK_NEIGHBORS(c) do {} while (false)
 #endif
 
 
@@ -705,13 +710,13 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
  * that can actually be allocated.
  */
 #define UMM_OVERHEAD_ADJUST ( \
-  umm_block_size()/2 + \
-  UMM_POISON_SIZE_BEFORE + \
-  UMM_POISON_SIZE_AFTER + \
-  sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
+    umm_block_size() / 2 + \
+    UMM_POISON_SIZE_BEFORE + \
+    UMM_POISON_SIZE_AFTER + \
+    sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
 
 #else
-#define UMM_OVERHEAD_ADJUST  (umm_block_size()/2)
+#define UMM_OVERHEAD_ADJUST  (umm_block_size() / 2)
 #endif
 
 
@@ -722,9 +727,9 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 #if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_OOM) || \
     defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || \
     defined(UMM_INTEGRITY_CHECK)
-#define DBGLOG_FUNCTION(fmt, ...) ets_uart_printf(fmt, ##__VA_ARGS__)
+#define DBGLOG_FUNCTION(fmt, ...) ets_uart_printf(fmt,##__VA_ARGS__)
 #else
-#define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while(false)
+#define DBGLOG_FUNCTION(fmt, ...)   do { (void)fmt; } while (false)
 #endif
 
 /////////////////////////////////////////////////
@@ -739,19 +744,19 @@ static inline void _critical_exit(UMM_TIME_STAT *p, uint32_t *saved_ps) {
 
 #if defined(UMM_CRITICAL_METRICS)
 struct UMM_TIME_STATS_t {
-  UMM_TIME_STAT id_malloc;
-  UMM_TIME_STAT id_realloc;
-  UMM_TIME_STAT id_free;
-#ifdef UMM_INFO
-  UMM_TIME_STAT id_info;
-#endif
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-  UMM_TIME_STAT id_poison;
-#endif
-#ifdef UMM_INTEGRITY_CHECK
-  UMM_TIME_STAT id_integrity;
-#endif
-  UMM_TIME_STAT id_no_tag;
+    UMM_TIME_STAT id_malloc;
+    UMM_TIME_STAT id_realloc;
+    UMM_TIME_STAT id_free;
+    #ifdef UMM_INFO
+    UMM_TIME_STAT id_info;
+    #endif
+    #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+    UMM_TIME_STAT id_poison;
+    #endif
+    #ifdef UMM_INTEGRITY_CHECK
+    UMM_TIME_STAT id_integrity;
+    #endif
+    UMM_TIME_STAT id_no_tag;
 };
 #endif
 /////////////////////////////////////////////////
@@ -764,17 +769,17 @@ struct UMM_TIME_STATS_t {
 
 #define umm_zalloc(s) umm_calloc(1,s)
 
-void* malloc_loc (size_t s, const char* file, int line);
-void* calloc_loc (size_t n, size_t s, const char* file, int line);
-void* realloc_loc (void* p, size_t s, const char* file, int line);
+void *malloc_loc(size_t s, const char *file, int line);
+void *calloc_loc(size_t n, size_t s, const char *file, int line);
+void *realloc_loc(void *p, size_t s, const char *file, int line);
 // *alloc are macro calling *alloc_loc calling+checking umm_*alloc()
 // they are defined at the bottom of this file
 
 /////////////////////////////////////////////////
 
 #elif defined(UMM_POISON_CHECK)
-void* realloc_loc (void* p, size_t s, const char* file, int line);
-void  free_loc (void* p, const char* file, int line);
+void *realloc_loc(void *p, size_t s, const char *file, int line);
+void  free_loc(void *p, const char *file, int line);
 #else // !defined(ESP_DEBUG_OOM)
 #endif
 
@@ -797,11 +802,11 @@ extern "C" {
 #include <pgmspace.h>
 // Reuse pvPort* calls, since they already support passing location information.
 // Specifically the debug version (heap_...) that does not force DRAM heap.
-void* IRAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line);
-void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line);
-void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
-void* IRAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line);
-void  IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
+void *IRAM_ATTR heap_pvPortMalloc(size_t size, const char *file, int line);
+void *IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char *file, int line);
+void *IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char *file, int line);
+void *IRAM_ATTR heap_pvPortZalloc(size_t size, const char *file, int line);
+void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
 
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortCalloc(n, s, mem_debug_file, __LINE__); })
@@ -815,11 +820,11 @@ void  IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
 
 #elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 #include <pgmspace.h>
-void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line);
+void *IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char *file, int line);
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
 
-void  IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line);
-//C - to be discussed
+void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
+// C - to be discussed
 /*
   Problem, I would like to report the file and line number with the umm poison
   event as close as possible to the event. The #define method works for malloc,
