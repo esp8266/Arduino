@@ -127,18 +127,6 @@ bool WiFiServer::hasClient ()
 	return poll(&p, 1, 0) && p.revents == POLLIN;
 }
 
-size_t WiFiServer::write (uint8_t c)
-{
-	return write(&c, 1);
-}
-
-size_t WiFiServer::write (const uint8_t *buf, size_t size)
-{
-	fprintf(stderr, MOCK "todo: WiFiServer::write(%p, %zd)\n", buf, size);
-	exit(EXIT_FAILURE);
-	return 0;
-}
-
 void WiFiServer::close ()
 {
 	if (pcb2int(_listen_pcb) >= 0)
