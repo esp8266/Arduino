@@ -35,11 +35,6 @@ public:
   ArduinoCompatibleWiFiServerTemplate(uint16_t port) : TServer(port) {}
   virtual ~ArduinoCompatibleWiFiServerTemplate() {}
 
-  // https://www.arduino.cc/en/Reference/EthernetServerAccept
-  TClient accept() {
-    return TServer::available();
-  }
-
   // https://www.arduino.cc/en/Reference/WiFiServerAvailable
   TClient available() {
 
@@ -132,7 +127,7 @@ private:
   void acceptClients() {
     for (uint8_t i = 0; i < MAX_MONITORED_CLIENTS; i++) {
       if (!connectedClients[i]) {
-        connectedClients[i] = accept();
+        connectedClients[i] = TServer::accept();
       }
     }
   }

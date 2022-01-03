@@ -77,7 +77,7 @@ void loop() {
 
   //check if there are any new clients
   if (server.hasClient()) {
-    client = server.available();
+    client = server.accept();
     Serial.println("New client");
   }
 

@@ -130,7 +130,7 @@ void loop() {
     int i;
     for (i = 0; i < MAX_SRV_CLIENTS; i++)
       if (!serverClients[i]) { // equivalent to !serverClients[i].connected()
-        serverClients[i] = server.available();
+        serverClients[i] = server.accept();
         logger->print("New client: index ");
         logger->print(i);
         break;
@@ -138,8 +138,8 @@ void loop() {
 
     //no free/disconnected spot so reject
     if (i == MAX_SRV_CLIENTS) {
-      server.available().println("busy");
-      // hints: server.available() is a WiFiClient with short-term scope
+      server.accept().println("busy");
+      // hints: server.accept() is a WiFiClient with short-term scope
       // when out of scope, a WiFiClient will
       // - flush() - all data will be sent
       // - stop() - automatically too
