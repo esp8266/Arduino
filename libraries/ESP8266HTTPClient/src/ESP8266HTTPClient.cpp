@@ -929,8 +929,10 @@ bool HTTPClient::sendHeader(const char * type)
         header += ':';
         header += String(_port);
     }
-    header += F("\r\nUser-Agent: ");
-    header += _userAgent;
+    if (_userAgent.length()) {
+        header += F("\r\nUser-Agent: ");
+        header += _userAgent;
+    }
 
     if (!_useHTTP10) {
         header += F("\r\nAccept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
