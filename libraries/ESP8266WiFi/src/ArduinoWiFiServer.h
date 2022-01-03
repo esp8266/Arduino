@@ -28,7 +28,7 @@
 #endif
 
 template <class TServer, class TClient>
-class ArduinoCompatibleWiFiServerTemplate : public TServer {
+class ArduinoCompatibleWiFiServerTemplate : public TServer, public Print {
 public:
 
   ArduinoCompatibleWiFiServerTemplate(const IPAddress& addr, uint16_t port) : TServer(addr, port) {}
