@@ -65,7 +65,7 @@ extern "C" {
 class ClientContext;
 class WiFiClient;
 
-class WiFiServer : public Server {
+class WiFiServer {
   // Secure server needs access to all the private entries here
 protected:
   uint16_t _port;
@@ -95,14 +95,11 @@ public:
   void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
   uint8_t status();
   uint16_t port() const;
   void close();
   void stop();
 
-  using Print::write;
   using ClientType = WiFiClient;
 
 protected:
