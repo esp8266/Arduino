@@ -345,6 +345,7 @@ OPT_ARDUINO_LIBS ?= \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+		Hash/src/Hash.cpp \
 	)
 
 MOCK_ARDUINO_LIBS := \

@@ -72,7 +72,7 @@ AVRISPState_t ESP8266AVRISP::update() {
     switch (_state) {
         case AVRISP_STATE_IDLE: {
             if (_server.hasClient()) {
-                _client = _server.available();
+                _client = _server.accept();
                 _client.setNoDelay(true);
                 AVRISP_DEBUG("client connect %s:%d", _client.remoteIP().toString().c_str(), _client.remotePort());
                 _client.setTimeout(100); // for getch()
@@ -121,7 +121,7 @@ AVRISPState_t ESP8266AVRISP::serve() {
 }
 
 inline void ESP8266AVRISP::_reject_incoming(void) {
-    while (_server.hasClient()) _server.available().stop();
+    while (_server.hasClient()) _server.accept().stop();
 }
 
 uint8_t ESP8266AVRISP::getch() {

@@ -76,7 +76,7 @@ void loop(void) {
   MDNS.update();
 
   // Check if a client has connected
-  WiFiClient client = server.available();
+  WiFiClient client = server.accept();
   if (!client) {
     return;
   }

@@ -65,7 +65,8 @@ class WiFiServerSecure : public WiFiServer {
     bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12);
 
     // If awaiting connection available and authenticated (i.e. client cert), return it.
-    WiFiClientSecure available(uint8_t* status = NULL);
+    WiFiClientSecure accept(); // https://www.arduino.cc/en/Reference/EthernetServerAccept
+    WiFiClientSecure available(uint8_t* status = NULL) __attribute__((deprecated("Renamed to accept().")));
 
     WiFiServerSecure& operator=(const WiFiServerSecure&) = default;
 
