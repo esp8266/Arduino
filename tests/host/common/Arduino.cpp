@@ -14,10 +14,12 @@
 */
 
 #include <sys/time.h>
-#include "Arduino.h"
+#include <unistd.h>
+
 #include <functional>
 
-#include <unistd.h>
+#include <Arduino.h>
+#include <Schedule.h>
 
 static struct timeval gtod0 = { 0, 0 };
 
@@ -42,6 +44,13 @@ extern "C" unsigned long micros()
 
 extern "C" void yield()
 {
+    run_scheduled_recurrent_functions();
+}
+
+extern "C" void loop_end()
+{
+    run_scheduled_functions();
+    run_scheduled_recurrent_functions();
 }
 
 extern "C" bool can_yield()

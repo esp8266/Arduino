@@ -20,6 +20,28 @@
  * synchronisation of the two through timeshift64
  */
 
+#include <Arduino.h>
+
+// https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-time.c
+
+bool getLocalTime(struct tm * info, uint32_t ms)
+{
+    uint32_t start = millis();
+    time_t now;
+    while((millis()-start) <= ms) {
+        time(&now);
+        localtime_r(&now, info);
+        if(info->tm_year > (2016 - 1900)){
+            return true;
+        }
+        delay(10);
+    }
+    return false;
+}
+
+
+#if !defined(CORE_MOCK)
+
 #include <stdlib.h>
 #include <../include/time.h> // See issue #6714
 #include <sys/time.h>
@@ -33,7 +55,6 @@ extern "C" {
 #include <coredecls.h>
 #include <Schedule.h>
 
-#include <Arduino.h> // configTime()
 
 extern "C" {
 
@@ -257,4 +278,6 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
     return 0;
 }
 
-};
+}; // extern "C"
+
+#endif // !defined(CORE_MOCK)

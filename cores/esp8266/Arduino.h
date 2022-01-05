@@ -282,6 +282,8 @@ inline void configTzTime(const char* tz, const char* server1,
     configTime(tz, server1, server2, server3);
 }
 
+bool getLocalTime(struct tm * info, uint32_t ms = 5000);
+
 // Everything we expect to be implicitly loaded for the sketch
 #include <pgmspace.h>
 

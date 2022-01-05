@@ -19,29 +19,6 @@ long timezone = 2;
 byte daysavetime = 1;
 
 
-bool getLocalTime(struct tm * info, uint32_t ms) {
-  uint32_t count = ms / 10;
-  time_t now;
-
-  time(&now);
-  localtime_r(&now, info);
-
-  if (info->tm_year > (2016 - 1900)) {
-    return true;
-  }
-
-  while (count--) {
-    delay(10);
-    time(&now);
-    localtime_r(&now, info);
-    if (info->tm_year > (2016 - 1900)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
 void listDir(const char * dirname) {
   Serial.printf("Listing directory: %s\n", dirname);
 

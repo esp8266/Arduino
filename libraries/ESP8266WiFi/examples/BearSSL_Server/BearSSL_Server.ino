@@ -207,7 +207,7 @@ static const char *HTTP_RES =
 
 void loop() {
   static int cnt;
-  BearSSL::WiFiClientSecure incoming = server.available();
+  BearSSL::WiFiClientSecure incoming = server.accept();
   if (!incoming) {
     return;
   }
