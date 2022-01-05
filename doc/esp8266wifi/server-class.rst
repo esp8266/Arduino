@@ -12,13 +12,29 @@ Methods documented for the `Server Class <https://www.arduino.cc/en/Reference/Wi
 5. `print() <https://www.arduino.cc/en/Reference/WiFiServerPrint>`__
 6. `println() <https://www.arduino.cc/en/Reference/WiFiServerPrintln>`__
 
+In ESP8266WiFi library the ``ArduinoWiFiServer`` class implements ``available`` and the write-to-all-clients functionality as described in the Arduino WiFi library reference. The PageServer example shows how ``available`` and the write-to-all-clients works. 
+
+For most use cases the basic WiFiServer class of the ESP8266WiFi library is suitable.
+
 Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
+
+accept
+~~~~~~
+
+Method ``accept()`` returns a waiting client connection. `accept() is documented <https://www.arduino.cc/en/Reference/EthernetServerAccept>`__ for the Arduino Ethernet library.
+
+available
+~~~~~~~~~
+.. deprecated:: 3.1.0
+  see ``accept``
+
+``available`` in the ESP8266WiFi library's WiFiServer class doesn't work as documented for the Arduino WiFi library. It works the same way as ``accept``.
 
 write (write to all clients) not supported
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please note that the ``write`` method on the ``WiFiServer`` object is not implemented and returns failure always.  Use the returned
-``WiFiClient`` object from the ``WiFiServer::available()`` method to communicate with individual clients.  If you need to send
+``WiFiClient`` object from the ``WiFiServer::accept()`` method to communicate with individual clients.  If you need to send
 the exact same packets to a series of clients, your application must maintain a list of connected clients and iterate over them manually.
 
 setNoDelay

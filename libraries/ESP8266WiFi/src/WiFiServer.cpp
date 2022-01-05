@@ -130,6 +130,10 @@ bool WiFiServer::hasMaxPendingClients() {
 
 WiFiClient WiFiServer::available(byte* status) {
     (void) status;
+    return accept();
+}
+
+WiFiClient WiFiServer::accept() {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
 
@@ -169,18 +173,6 @@ void WiFiServer::close() {
 
 void WiFiServer::stop() {
     close();
-}
-
-size_t WiFiServer::write(uint8_t b) {
-    return write(&b, 1);
-}
-
-size_t WiFiServer::write(const uint8_t *buffer, size_t size) {
-    // write to all clients
-    // not implemented
-    (void) buffer;
-    (void) size;
-    return 0;
 }
 
 template<typename T>

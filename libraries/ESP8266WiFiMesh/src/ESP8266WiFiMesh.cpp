@@ -624,7 +624,7 @@ void ESP8266WiFiMesh::acceptRequest()
   if(_handler != NULL)
   {
     while (true) {
-      _client = _server.available();
+      _client = _server.accept();
       if (!_client)
         break;
 
@@ -647,7 +647,7 @@ void ESP8266WiFiMesh::acceptRequest()
   {
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
     while (true) {
-      WiFiClient _client = _server.available();
+      WiFiClient _client = _server.accept();
       
       if (!_client)
         break;

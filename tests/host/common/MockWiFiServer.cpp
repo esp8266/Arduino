@@ -58,6 +58,11 @@ WiFiServer::WiFiServer (uint16_t port)
 WiFiClient WiFiServer::available (uint8_t* status)
 {
 	(void)status;
+	return accept();
+}
+
+WiFiClient WiFiServer::accept ()
+{
 	if (hasClient())
 		return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
 	return WiFiClient();

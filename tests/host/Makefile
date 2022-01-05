@@ -97,6 +97,7 @@ CORE_CPP_FILES := \
 		HardwareSerial.cpp \
 		crc32.cpp \
 		Updater.cpp \
+		time.cpp \
 	) \
 	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
@@ -345,6 +346,7 @@ OPT_ARDUINO_LIBS ?= \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+		Hash/src/Hash.cpp \
 	)
 
 MOCK_ARDUINO_LIBS := \

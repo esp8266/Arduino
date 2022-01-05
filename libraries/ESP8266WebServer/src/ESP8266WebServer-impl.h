@@ -281,7 +281,7 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::handleClient() {
   if (_currentStatus == HC_NONE) {
-    ClientType client = _server.available();
+    ClientType client = _server.accept();
     if (!client) {
       return;
     }

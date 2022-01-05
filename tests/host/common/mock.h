@@ -116,6 +116,8 @@ extern uint32_t global_source_address; // 0 = INADDR_ANY by default
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 
+void loop_end();
+
 #ifdef __cplusplus
 }
 #endif

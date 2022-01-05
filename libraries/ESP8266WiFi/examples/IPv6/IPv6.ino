@@ -175,7 +175,7 @@ unsigned long statusTimeMs = 0;
 void loop() {
 
   if (statusServer.hasClient()) {
-    WiFiClient cli = statusServer.available();
+    WiFiClient cli = statusServer.accept();
     status(cli);
   }
 

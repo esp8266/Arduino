@@ -160,6 +160,7 @@ protected:
     size_t _peekPointer = 0;
 
 public:
+    StreamConstPtr(const String&& string) = delete; // prevents passing String temporary, use ctor(buffer,size) if you know what you are doing
     StreamConstPtr(const String& string): _buffer(string.c_str()), _size(string.length()), _byteAddressable(true) { }
     StreamConstPtr(const char* buffer, size_t size): _buffer(buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
     StreamConstPtr(const uint8_t* buffer, size_t size): _buffer((const char*)buffer), _size(size), _byteAddressable(__byteAddressable(buffer)) { }
