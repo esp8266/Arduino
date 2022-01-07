@@ -56,7 +56,7 @@
  * Higher density PSRAM (ESP-PSRAM64H/etc.) works as well, but may be too
    large to effectively use with UMM.  Only 256K is available vial malloc,
    but addresses above 256K do work and can be used for fixed buffers.
- 
+
 */
 
 #ifdef MMU_EXTERNAL_HEAP
@@ -70,6 +70,8 @@
 
 
 extern "C" {
+
+#define VM_OFFSET_MASK  0x007fffffu
 
 #define SHORT_MASK  0x000008u
 #define LOAD_MASK   0x00f00fu
@@ -324,21 +326,21 @@ static IRAM_ATTR void loadstore_exception_handler(struct __exception_frame *ef, 
     uint32_t val = ef->a_reg[regno];
     uint32_t what = insn & STORE_MASK;
     if (what == S8I_MATCH) {
-       spi_ramwrite(spi1, excvaddr & 0x1ffff, 8-1, val);
+       spi_ramwrite(spi1, excvaddr & VM_OFFSET_MASK, 8-1, val);
     } else if (what == S16I_MATCH) {
-      spi_ramwrite(spi1, excvaddr & 0x1ffff, 16-1, val);
+      spi_ramwrite(spi1, excvaddr & VM_OFFSET_MASK, 16-1, val);
     } else {
-      spi_ramwrite(spi1, excvaddr & 0x1ffff, 32-1, val);
+      spi_ramwrite(spi1, excvaddr & VM_OFFSET_MASK, 32-1, val);
     }
   } else {
     if (insn & L32_MASK) {
-      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & 0x1ffff, 32-1);
+      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & VM_OFFSET_MASK, 32-1);
     } else if (insn & L16_MASK) {
-      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & 0x1ffff, 16-1);
+      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & VM_OFFSET_MASK, 16-1);
       if ((insn & SIGNED_MASK ) && (ef->a_reg[regno] & 0x8000))
         ef->a_reg[regno] |= 0xffff0000;
     } else {
-      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & 0x1ffff, 8-1);
+      ef->a_reg[regno] = spi_ramread(spi1, excvaddr & VM_OFFSET_MASK, 8-1);
     }
   }
 }
