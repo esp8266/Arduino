@@ -122,7 +122,7 @@ void loop() {
   if ((out_idx += local_written_size) == BUFFER_SIZE) {
     out_idx = 0;
   }
-  delay(0);
+  yield();
 
   DEBUG(logger->printf("----------\n"));
 

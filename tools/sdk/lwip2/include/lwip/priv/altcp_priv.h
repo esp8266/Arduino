@@ -85,6 +85,11 @@ typedef err_t (*altcp_get_tcp_addrinfo_fn)(struct altcp_pcb *conn, int local, ip
 typedef ip_addr_t *(*altcp_get_ip_fn)(struct altcp_pcb *conn, int local);
 typedef u16_t (*altcp_get_port_fn)(struct altcp_pcb *conn, int local);
 
+#if LWIP_TCP_KEEPALIVE
+typedef void  (*altcp_keepalive_disable_fn)(struct altcp_pcb *conn);
+typedef void  (*altcp_keepalive_enable_fn)(struct altcp_pcb *conn, u32_t idle, u32_t intvl, u32_t count);
+#endif
+
 #ifdef LWIP_DEBUG
 typedef enum tcp_state (*altcp_dbg_get_tcp_state_fn)(struct altcp_pcb *conn);
 #endif
@@ -111,6 +116,10 @@ struct altcp_functions {
   altcp_get_tcp_addrinfo_fn   addrinfo;
   altcp_get_ip_fn             getip;
   altcp_get_port_fn           getport;
+#if LWIP_TCP_KEEPALIVE
+  altcp_keepalive_disable_fn  keepalive_disable;
+  altcp_keepalive_enable_fn   keepalive_enable;
+#endif
 #ifdef LWIP_DEBUG
   altcp_dbg_get_tcp_state_fn  dbg_get_tcp_state;
 #endif
@@ -133,6 +142,10 @@ void  altcp_default_dealloc(struct altcp_pcb *conn);
 err_t altcp_default_get_tcp_addrinfo(struct altcp_pcb *conn, int local, ip_addr_t *addr, u16_t *port);
 ip_addr_t *altcp_default_get_ip(struct altcp_pcb *conn, int local);
 u16_t altcp_default_get_port(struct altcp_pcb *conn, int local);
+#if LWIP_TCP_KEEPALIVE
+void  altcp_default_keepalive_disable(struct altcp_pcb *conn);
+void  altcp_default_keepalive_enable(struct altcp_pcb *conn, u32_t idle, u32_t intvl, u32_t count);
+#endif
 #ifdef LWIP_DEBUG
 enum tcp_state altcp_default_dbg_get_tcp_state(struct altcp_pcb *conn);
 #endif

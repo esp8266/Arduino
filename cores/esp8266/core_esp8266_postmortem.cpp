@@ -245,12 +245,12 @@ static void print_stack(uint32_t start, uint32_t end) {
     }
 }
 
-static void uart_write_char_d(char c) {
+static void IRAM_ATTR uart_write_char_d(char c) {
     uart0_write_char_d(c);
     uart1_write_char_d(c);
 }
 
-static void uart0_write_char_d(char c) {
+static void IRAM_ATTR uart0_write_char_d(char c) {
     while (((USS(0) >> USTXC) & 0xff)) { }
 
     if (c == '\n') {
@@ -259,7 +259,7 @@ static void uart0_write_char_d(char c) {
     USF(0) = c;
 }
 
-static void uart1_write_char_d(char c) {
+static void IRAM_ATTR uart1_write_char_d(char c) {
     while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
 
     if (c == '\n') {

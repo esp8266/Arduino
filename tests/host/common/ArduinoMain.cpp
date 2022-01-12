@@ -308,6 +308,7 @@ int main (int argc, char* const argv [])
 		if (!fast)
 			usleep(1000); // not 100% cpu, ~1000 loops per second
 		loop();
+		loop_end();
 		check_incoming_udp();
 
 		if (run_once)

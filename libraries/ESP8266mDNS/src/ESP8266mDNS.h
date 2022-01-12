@@ -2,11 +2,7 @@
     ESP8266mDNS.h - mDNSResponder for ESP8266 family
     This file is part of the esp8266 core for Arduino environment.
 
-    Legacy_ESP8266mDNS:
-    The well known, thoroughly tested (yet no flawless) default mDNS library for the ESP8266 family
-
-    LEA_ESP8266mDNS:
-    An (currently) experimental mDNS implementation, that supports a lot more of mDNS features than Legacy_ESP8266mDNS, like:
+    mDNS implementation, that supports many mDNS features like:
     - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
     - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
     - Probing host and service domains for uniqueness in the local network
@@ -19,11 +15,11 @@
     - Dynamic queries for DNS-SD services with cached and updated answers and user notifications
     - Support for multi-homed client host domains
 
-    See 'LEA_ESP8266mDNS/EPS8266mDNS.h' for more implementation details and usage information.
-    See 'examples/mDNS_Clock' and 'examples/mDNS_ServiceMonitor' for implementation examples of the advanced features.
+    See 'src/LEAmDNS.h' for implementation details, configuration and usage information.
+    See 'examples/LEAmDNS/' for examples of the new features.
 
-    LEA_ESP8266mDNS is (mostly) client source code compatible to 'Legacy_ESP8266mDNS', so it could be
-    use as a 'drop-in' replacement in existing projects.
+    LEAmDNS is expected to be compatible with the original ESP8266mDNS implementation, and it can be
+    used as a drop-in replacement in existing projects.
 
 
     This library is free software; you can redistribute it and/or

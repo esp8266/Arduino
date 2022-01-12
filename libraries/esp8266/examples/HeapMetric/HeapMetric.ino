@@ -10,11 +10,11 @@ void stats(const char* what) {
   // we could use getFreeHeap() getMaxFreeBlockSize() and getHeapFragmentation()
   // or all at once:
   uint32_t free;
-  uint16_t max;
+  uint32_t max;
   uint8_t frag;
   ESP.getHeapStats(&free, &max, &frag);
 
-  Serial.printf("free: %5d - max: %5d - frag: %3d%% <- ", free, max, frag);
+  Serial.printf("free: %7u - max: %7u - frag: %3d%% <- ", free, max, frag);
   // %s requires a malloc that could fail, using println instead:
   Serial.println(what);
 }
@@ -109,6 +109,7 @@ void tryit(int blocksize) {
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_OFF);
+  delay(50);
 
   Serial.printf("\r\nDemo Heap Metrics for DRAM\r\n");
   tryit(8000);
@@ -124,6 +125,26 @@ void setup() {
   {
     HeapSelectIram ephemeral;
     Serial.printf("\r\nDemo Heap Metrics for IRAM\r\n");
+    tryit(8000);
+    tryit(4000);
+    tryit(2000);
+    tryit(1000);
+    tryit(500);
+    tryit(200);
+    tryit(100);
+    tryit(50);
+    tryit(15);
+  }
+#endif
+#ifdef MMU_EXTERNAL_HEAP
+  {
+    HeapSelect ephemeral = HeapSelect(UMM_HEAP_EXTERNAL);
+    Serial.printf("\r\nDemo Heap Metrics for External RAM\r\n");
+#if (MMU_EXTERNAL_HEAP > 64)
+    tryit(64000);
+    tryit(32000);
+#endif
+    tryit(16000);
     tryit(8000);
     tryit(4000);
     tryit(2000);

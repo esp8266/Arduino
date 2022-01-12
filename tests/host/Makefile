@@ -97,6 +97,7 @@ CORE_CPP_FILES := \
 		HardwareSerial.cpp \
 		crc32.cpp \
 		Updater.cpp \
+		time.cpp \
 	) \
 	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
@@ -104,12 +105,16 @@ CORE_CPP_FILES := \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
 		FatLib/FatFormatter.cpp \
+		FatLib/FatName.cpp \
 		FatLib/FatVolume.cpp \
 		FatLib/FatPartition.cpp \
 		common/FmtNumber.cpp \
+		common/FsCache.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
-		common/PrintBasic.cpp \
+		common/FsUtf.cpp \
+		common/FsName.cpp \
+		common/upcase.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
@@ -341,6 +346,7 @@ OPT_ARDUINO_LIBS ?= \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+		Hash/src/Hash.cpp \
 	)
 
 MOCK_ARDUINO_LIBS := \
