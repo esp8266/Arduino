@@ -252,6 +252,11 @@ void TwoWireBase::flush(void)
 
 // Master-only Constructors ////////////////////////////////////////////////////
 
+// protected, for use with TwoWireMasterOrSlave
+TwoWireMaster::TwoWireMaster(TwiMaster* twiPtr, uint8_t rxBufferSize, uint8_t txBufferSize, uint8_t* rxBuffer, uint8_t* txBuffer)
+    : TwoWireBase(twiPtr, rxBufferSize, txBufferSize, rxBuffer, txBuffer)
+{}
+
 TwoWireMaster::TwoWireMaster(uint8_t rxBufferSize, uint8_t txBufferSize)
     : TwoWireBase(rxBufferSize, txBufferSize)
 {}
