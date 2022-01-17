@@ -367,6 +367,20 @@ uint8_t* DhcpServer::add_msg_type(uint8_t *optptr, uint8_t type)
     *optptr++ = type;
     return optptr;
 }
+
+extern "C" uint8_t* __add_custom_offer_options(uint8_t *optptr){
+    /* Example showing how to add Captive Portal Option to DHCP Server
+    *optptr++ = 114;
+    *optptr++ = 19;
+    char captive_uri[] = "http://192.168.4.1/";
+    for(int i = 0; i<19; i++){
+    *optptr++ = captive_uri[i];
+    }
+    */
+    return optptr; //do nothing by default. Libraries can then redefine this weak function in order to hook into DHCP server options
+}
+extern "C" uint8_t* add_custom_offer_options(uint8_t *optptr) __attribute__ ((weak, alias("__add_custom_offer_options")));
+
 ///////////////////////////////////////////////////////////////////////////////////
 /*
     DHCP msg offer
@@ -469,6 +483,8 @@ uint8_t* DhcpServer::add_offer_options(uint8_t *optptr)
     *optptr++ = 2;
 #endif
 
+    optptr = add_custom_offer_options(optptr); //this allows external code to redefine this weak function and hook into DHCP Offer.
+    
     return optptr;
 
 #undef ipadd
