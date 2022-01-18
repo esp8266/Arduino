@@ -136,6 +136,7 @@ MOCK_CPP_FILES_COMMON := \
 		MockUART.cpp \
 		MockTools.cpp \
 		MocklwIP.cpp \
+		HostWiring.cpp \
 	)
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) \
@@ -355,7 +356,6 @@ MOCK_ARDUINO_LIBS := \
 		MockWiFiServerSocket.cpp \
 		MockWiFiServer.cpp \
 		UdpContextSocket.cpp \
-		HostWiring.cpp \
 		MockEsp.cpp \
 		MockEEPROM.cpp \
 		MockSPI.cpp \

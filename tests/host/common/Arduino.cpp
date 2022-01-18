@@ -22,6 +22,7 @@
 #include <Schedule.h>
 
 static struct timeval gtod0 = { 0, 0 };
+bool mockdebug = false;
 
 extern "C" unsigned long millis()
 {
@@ -110,4 +111,10 @@ extern "C" void delayMicroseconds(unsigned int us)
 cont_t* g_pcont = NULL;
 extern "C" void cont_suspend(cont_t*)
 {
+}
+
+int mockverbose (const char* fmt, ...) { va_list ap; va_start(ap, fmt); if
+	(mockdebug)
+		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
+	return 0;
 }
