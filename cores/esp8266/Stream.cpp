@@ -274,7 +274,7 @@ int Stream::read (uint8_t* buffer, size_t maxLen)
         int c = read();
         if (c == -1)
             break;
-        buffer[nbread++] = read();
+        buffer[nbread++] = c;
     }
     return nbread;
 }
