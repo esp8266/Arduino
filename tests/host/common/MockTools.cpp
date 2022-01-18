@@ -78,3 +78,12 @@ void configTime(int timezone, int daylightOffset_sec,
 
 	mockverbose("configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", timezone, daylightOffset_sec);
 }
+
+void configTime(const char* tz, const char* server1, const char* server2, const char* server3)
+{
+	(void)server1;
+	(void)server2;
+	(void)server3;
+
+	mockverbose("configTime: TODO (tz='%s') (time will be host's)\n", tz);
+}

@@ -263,3 +263,8 @@ void EspClass::setExternalHeap()
 void EspClass::resetHeap()
 {
 }
+
+void EspClass::reset ()
+{
+    abort();
+}

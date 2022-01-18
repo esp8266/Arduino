@@ -136,7 +136,6 @@ MOCK_CPP_FILES_COMMON := \
 		MockUART.cpp \
 		MockTools.cpp \
 		MocklwIP.cpp \
-		MockDigital.cpp \
 	)
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) \
