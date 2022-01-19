@@ -28,7 +28,8 @@ public:
     TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
         : m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
     {
-        if (prev) {
+        if (prev)
+        {
             prev->m_next = this;
         }
     }
@@ -60,7 +61,7 @@ public:
 
     const char* desc() const
     {
-        return (m_desc)?m_desc:"";
+        return (m_desc) ? m_desc : "";
     }
 
 protected:
@@ -72,11 +73,13 @@ protected:
     const char* m_desc;
 };
 
-struct Registry {
+struct Registry
+{
     void add(test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
     {
         TestCase* tc = new TestCase(m_last, func, file, line, name, desc);
-        if (!m_first) {
+        if (!m_first)
+        {
             m_first = tc;
         }
         m_last = tc;
@@ -85,7 +88,8 @@ struct Registry {
     TestCase* m_last = nullptr;
 };
 
-struct Env {
+struct Env
+{
     std::function<void(void)> m_check_pass;
     std::function<void(size_t)> m_check_fail;
     std::function<void(size_t)> m_fail;
@@ -115,8 +119,9 @@ public:
 
     void run()
     {
-        do {
-        } while(do_menu());
+        do
+        {
+        } while (do_menu());
     }
 
     void check_pass()
@@ -141,22 +146,27 @@ protected:
     {
         protocol::output_menu_begin(m_io);
         int id = 1;
-        for (TestCase* tc = g_env.m_registry.m_first; tc; tc = tc->next(), ++id) {
+        for (TestCase* tc = g_env.m_registry.m_first; tc; tc = tc->next(), ++id)
+        {
             protocol::output_menu_item(m_io, id, tc->name(), tc->desc());
         }
         protocol::output_menu_end(m_io);
-        while(true) {
+        while (true)
+        {
             int id;
             char line_buf[BS_LINE_BUF_SIZE];
-            if (!protocol::input_handle(m_io, line_buf, sizeof(line_buf), id)) {
+            if (!protocol::input_handle(m_io, line_buf, sizeof(line_buf), id))
+            {
                 continue;
             }
-            if (id < 0) {
+            if (id < 0)
+            {
                 return true;
             }
             TestCase* tc = g_env.m_registry.m_first;
             for (int i = 0; i != id - 1 && tc; ++i, tc = tc->next());
-            if (!tc) {
+            if (!tc)
+            {
                 bs::fatal();
             }
             m_check_pass_count = 0;
@@ -185,19 +195,25 @@ public:
 
 inline void check(bool condition, size_t line)
 {
-    if (!condition) {
+    if (!condition)
+    {
         g_env.m_check_fail(line);
-    } else {
+    }
+    else
+    {
         g_env.m_check_pass();
     }
 }
 
 inline void require(bool condition, size_t line)
 {
-    if (!condition) {
+    if (!condition)
+    {
         g_env.m_check_fail(line);
         g_env.m_fail(line);
-    } else {
+    }
+    else
+    {
         g_env.m_check_pass();
     }
 }

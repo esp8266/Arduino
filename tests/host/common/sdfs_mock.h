@@ -1,16 +1,16 @@
 /*
- sdfs.h - SDFS mock for host side testing
- Copyright (c) 2019 Earle F. Philhower, III
+    sdfs.h - SDFS mock for host side testing
+    Copyright (c) 2019 Earle F. Philhower, III
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
 */
 
 #ifndef sdfs_mock_hpp
@@ -21,9 +21,16 @@
 #include <vector>
 #include <FS.h>
 
-class SDFSMock {
+class SDFSMock
+{
 public:
-    SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString) { (void)fs_size; (void)fs_block; (void)fs_page; (void)storage; }
+    SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString)
+    {
+        (void)fs_size;
+        (void)fs_block;
+        (void)fs_page;
+        (void)storage;
+    }
     void reset() { }
     ~SDFSMock() { }
 };

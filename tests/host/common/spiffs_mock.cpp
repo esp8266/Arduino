@@ -1,16 +1,16 @@
 /*
- spiffs_mock.cpp - SPIFFS HAL mock for host side testing
- Copyright © 2016 Ivan Grokhotkov
+    spiffs_mock.cpp - SPIFFS HAL mock for host side testing
+    Copyright © 2016 Ivan Grokhotkov
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
 */
 
 
@@ -41,7 +41,9 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
 {
     m_storage = storage;
     if ((m_overwrite = (fs_size < 0)))
+    {
         fs_size = -fs_size;
+    }
 
     fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
 
@@ -72,26 +74,28 @@ SpiffsMock::~SpiffsMock()
     SPIFFS = FS(FSImplPtr(nullptr));
 }
 
-void SpiffsMock::load ()
+void SpiffsMock::load()
 {
     if (!m_fs.size() || !m_storage.length())
+    {
         return;
-    
+    }
+
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
     {
         fprintf(stderr, "SPIFFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
-    
+
     off_t flen = lseek(fs, 0, SEEK_END);
-    if (flen == (off_t)-1)
+    if (flen == (off_t) -1)
     {
         fprintf(stderr, "SPIFFS: checking size of '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
     lseek(fs, 0, SEEK_SET);
-    
+
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
@@ -107,15 +111,19 @@ void SpiffsMock::load ()
         fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
         ssize_t r = ::read(fs, m_fs.data(), m_fs.size());
         if (r != (ssize_t)m_fs.size())
+        {
             fprintf(stderr, "SPIFFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
+        }
     }
     ::close(fs);
 }
 
-void SpiffsMock::save ()
+void SpiffsMock::save()
 {
     if (!m_fs.size() || !m_storage.length())
+    {
         return;
+    }
 
     int fs = ::open(m_storage.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if (fs == -1)
@@ -126,9 +134,13 @@ void SpiffsMock::save ()
     fprintf(stderr, "SPIFFS: saving %zi bytes to '%s'\n", m_fs.size(), m_storage.c_str());
 
     if (::write(fs, m_fs.data(), m_fs.size()) != (ssize_t)m_fs.size())
+    {
         fprintf(stderr, "SPIFFS: writing %zi bytes: %s\n", m_fs.size(), strerror(errno));
+    }
     if (::close(fs) == -1)
+    {
         fprintf(stderr, "SPIFFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
+    }
 }
 
 #pragma GCC diagnostic pop

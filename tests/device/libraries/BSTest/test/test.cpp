@@ -6,11 +6,15 @@ BS_ENV_DECLARE();
 
 int main()
 {
-    while(true) {
-        try{
+    while (true)
+    {
+        try
+        {
             BS_RUN();
             return 0;
-        }catch(...) {
+        }
+        catch (...)
+        {
             printf("Exception\n\n");
         }
     }

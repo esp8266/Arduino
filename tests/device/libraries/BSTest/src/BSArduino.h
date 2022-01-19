@@ -19,9 +19,11 @@ public:
         char* buffer = temp;
         size_t len = vsnprintf(temp, sizeof(temp), format, arg);
         va_end(arg);
-        if (len > sizeof(temp) - 1) {
+        if (len > sizeof(temp) - 1)
+        {
             buffer = new char[len + 1];
-            if (!buffer) {
+            if (!buffer)
+            {
                 return 0;
             }
             va_start(arg, format);
@@ -29,7 +31,8 @@ public:
             va_end(arg);
         }
         len = m_stream.write((const uint8_t*) buffer, len);
-        if (buffer != temp) {
+        if (buffer != temp)
+        {
             delete[] buffer;
         }
         return len;
@@ -40,16 +43,20 @@ public:
         size_t len = 0;
         // Can't use Stream::readBytesUntil here because it can't tell the
         // difference between timing out and receiving the terminator.
-        while (len < dest_size - 1) {
+        while (len < dest_size - 1)
+        {
             int c = m_stream.read();
-            if (c < 0) {
+            if (c < 0)
+            {
                 delay(1);
                 continue;
             }
-            if (c == '\r') {
+            if (c == '\r')
+            {
                 continue;
             }
-            if (c == '\n') {
+            if (c == '\n')
+            {
                 dest[len] = 0;
                 break;
             }
@@ -64,7 +71,8 @@ protected:
 
 typedef ArduinoIOHelper IOHelper;
 
-inline void fatal() {
+inline void fatal()
+{
     ESP.restart();
 }
 

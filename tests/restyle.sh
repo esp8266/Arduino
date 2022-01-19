@@ -20,6 +20,7 @@ cores/esp8266/core_esp8266_si2c.cpp
 cores/esp8266/StreamString.*
 cores/esp8266/StreamSend.*
 libraries/Netdump
+tests
 "
 
 # core

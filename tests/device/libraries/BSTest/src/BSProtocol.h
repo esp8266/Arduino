@@ -24,7 +24,7 @@ void output_check_failure(IO& io, size_t line)
 }
 
 template<typename IO>
-void output_test_end(IO& io, bool success, size_t checks, size_t failed_checks, size_t line=0)
+void output_test_end(IO& io, bool success, size_t checks, size_t failed_checks, size_t line = 0)
 {
     io.printf(BS_LINE_PREFIX "end line=%d result=%d checks=%d failed_checks=%d\n", line, success, checks, failed_checks);
 }
@@ -63,23 +63,27 @@ void output_getenv_result(IO& io, const char* key, const char* value)
 template<typename IO>
 void output_pretest_result(IO& io, bool res)
 {
-    io.printf(BS_LINE_PREFIX "pretest result=%d\n", res?1:0);
+    io.printf(BS_LINE_PREFIX "pretest result=%d\n", res ? 1 : 0);
 }
 
 template<typename IO>
 bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
 {
     int cb_read = io.read_line(line_buf, line_buf_size);
-    if (cb_read == 0 || line_buf[0] == '\n') {
+    if (cb_read == 0 || line_buf[0] == '\n')
+    {
         return false;
     }
     char* argv[4];
-    size_t argc = split_args(line_buf, argv, sizeof(argv)/sizeof(argv[0]));
-    if (argc == 0) {
+    size_t argc = split_args(line_buf, argv, sizeof(argv) / sizeof(argv[0]));
+    if (argc == 0)
+    {
         return false;
     }
-    if (strcmp(argv[0], "setenv") == 0) {
-        if (argc != 3) {
+    if (strcmp(argv[0], "setenv") == 0)
+    {
+        if (argc != 3)
+        {
             return false;
         }
         setenv(argv[1], argv[2], 1);
@@ -87,16 +91,20 @@ bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
         test_num = -1;
         return false;   /* we didn't get the test number yet, so return false */
     }
-    if (strcmp(argv[0], "getenv") == 0) {
-        if (argc != 2) {
+    if (strcmp(argv[0], "getenv") == 0)
+    {
+        if (argc != 2)
+        {
             return false;
         }
         const char* value = getenv(argv[1]);
         output_getenv_result(io, argv[1], (value != NULL) ? value : "");
         return false;
     }
-    if (strcmp(argv[0], "pretest") == 0) {
-        if (argc != 1) {
+    if (strcmp(argv[0], "pretest") == 0)
+    {
+        if (argc != 1)
+        {
             return false;
         }
         bool res = ::pretest();
@@ -106,7 +114,8 @@ bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
     /* not one of the commands, try to parse as test number */
     char* endptr;
     test_num = (int) strtol(argv[0], &endptr, 10);
-    if (endptr != argv[0] + strlen(argv[0])) {
+    if (endptr != argv[0] + strlen(argv[0]))
+    {
         return false;
     }
     return true;

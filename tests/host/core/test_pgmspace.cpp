@@ -1,17 +1,17 @@
 /*
- test_pgmspace.cpp - pgmspace tests
- Copyright © 2016 Ivan Grokhotkov
+    test_pgmspace.cpp - pgmspace tests
+    Copyright © 2016 Ivan Grokhotkov
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
- */
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+*/
 
 #include <catch.hpp>
 #include <string.h>
@@ -19,7 +19,8 @@
 
 TEST_CASE("strstr_P works as strstr", "[core][pgmspace]")
 {
-    auto t = [](const char* h, const char* n) {
+    auto t = [](const char* h, const char* n)
+    {
         const char* strstr_P_result = strstr_P(h, n);
         const char* strstr_result = strstr(h, n);
         REQUIRE(strstr_P_result == strstr_result);
@@ -27,7 +28,7 @@ TEST_CASE("strstr_P works as strstr", "[core][pgmspace]")
 
     // Test case data is from avr-libc, original copyright (c) 2007  Dmitry Xmelkov
     // See avr-libc/tests/simulate/pmstring/strstr_P.c
-    t ("", "");
+    t("", "");
     t("12345", "");
     t("ababac", "abac");
     t("", "a");

@@ -62,22 +62,22 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
     return false;
 }
 
-void DhcpServer::end ()
+void DhcpServer::end()
 {
 }
 
-bool DhcpServer::begin (struct ip_info *info)
+bool DhcpServer::begin(struct ip_info *info)
 {
     (void)info;
     return false;
 }
 
-DhcpServer::DhcpServer (netif* netif)
+DhcpServer::DhcpServer(netif* netif)
 {
     (void)netif;
 }
 
-DhcpServer::~DhcpServer ()
+DhcpServer::~DhcpServer()
 {
     end();
 }
@@ -126,7 +126,9 @@ extern "C"
         strcpy((char*)config->password, "emulated-ssid-password");
         config->bssid_set = 0;
         for (int i = 0; i < 6; i++)
+        {
             config->bssid[i] = i;
+        }
         config->threshold.rssi = 1;
         config->threshold.authmode = AUTH_WPA_PSK;
 #ifdef NONOSDK3V0
@@ -181,7 +183,9 @@ extern "C"
         }
 
         if (host_interface)
+        {
             mockverbose("host: looking for interface '%s':\n", host_interface);
+        }
 
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
@@ -194,7 +198,9 @@ extern "C"
                 mockverbose(" IPV4 (0x%08lx)", test_ipv4);
                 if ((test_ipv4 & 0xff000000) == 0x7f000000)
                     // 127./8
+                {
                     mockverbose(" (local, ignored)");
+                }
                 else
                 {
                     if (!host_interface || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
@@ -204,7 +210,9 @@ extern "C"
                         mask = *(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
                         mockverbose(" (selected)\n");
                         if (host_interface)
+                        {
                             global_source_address = ntohl(ipv4);
+                        }
                         break;
                     }
                 }
@@ -213,14 +221,18 @@ extern "C"
         }
 
         if (ifAddrStruct != NULL)
+        {
             freeifaddrs(ifAddrStruct);
+        }
 
         (void)if_index;
         //if (if_index != STATION_IF)
         //	fprintf(stderr, "we are not AP");
 
         if (global_ipv4_netfmt == NO_GLOBAL_BINDING)
+        {
             global_ipv4_netfmt = ipv4;
+        }
 
         if (info)
         {
