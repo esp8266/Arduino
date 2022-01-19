@@ -13,12 +13,12 @@
     all copies or substantial portions of the Software.
 */
 
-#include <catch.hpp>
-#include <string.h>
 #include <FS.h>
 #include <LittleFS.h>
-#include "../common/littlefs_mock.h"
 #include <spiffs/spiffs.h>
+#include <string.h>
+#include <catch.hpp>
+#include "../common/littlefs_mock.h"
 
 // Use a LittleFS file because we can't instantiate a virtual class like Print
 TEST_CASE("Print::write overrides all compile properly", "[core][Print]")
@@ -27,18 +27,18 @@ TEST_CASE("Print::write overrides all compile properly", "[core][Print]")
     REQUIRE(LittleFS.begin());
     auto p = LittleFS.open("test.bin", "w");
     REQUIRE(p);
-    uint8_t    uint8 = 1;
-    uint16_t  uint16 = 2;
-    uint32_t  uint32 = 3;
-    size_t      size = 4;
-    int8_t      int8 = 1;
-    int16_t    int16 = 2;
-    int32_t    int32 = 3;
-    char           c = 'h';
-    int            i = 10;
-    long           l = 11;
+    uint8_t uint8 = 1;
+    uint16_t uint16 = 2;
+    uint32_t uint32 = 3;
+    size_t size = 4;
+    int8_t int8 = 1;
+    int16_t int16 = 2;
+    int32_t int32 = 3;
+    char c = 'h';
+    int i = 10;
+    long l = 11;
     unsigned char uc = 20;
-    unsigned int  ui = 21;
+    unsigned int ui = 21;
     unsigned long ul = 22;
     p.write(uint8);
     p.write(uint16);

@@ -7,15 +7,14 @@
 #ifndef BS_ARGS_H
 #define BS_ARGS_H
 
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
 
 namespace bs
 {
 namespace protocol
 {
-
 #define SS_FLAG_ESCAPE 0x8
 
 typedef enum
@@ -33,12 +32,13 @@ typedef enum
 } split_state_t;
 
 /* helper macro, called when done with an argument */
-#define END_ARG() do { \
-        char_out = 0;   \
-        argv[argc++] = next_arg_start;  \
-        state = SS_SPACE;   \
-    } while(0);
-
+#define END_ARG()                      \
+    do                                 \
+    {                                  \
+        char_out = 0;                  \
+        argv[argc++] = next_arg_start; \
+        state = SS_SPACE;              \
+    } while (0);
 
 /**
     @brief Split command line into arguments in place
@@ -64,18 +64,18 @@ typedef enum
     @param argv_size number of elements in argv_array (max. number of arguments will be argv_size - 1)
     @return number of arguments found (argc)
 */
-inline size_t split_args(char *line, char **argv, size_t argv_size)
+inline size_t split_args(char* line, char** argv, size_t argv_size)
 {
     const int QUOTE = '"';
     const int ESCAPE = '\\';
     const int SPACE = ' ';
     split_state_t state = SS_SPACE;
     size_t argc = 0;
-    char *next_arg_start = line;
-    char *out_ptr = line;
-    for (char *in_ptr = line; argc < argv_size - 1; ++in_ptr)
+    char* next_arg_start = line;
+    char* out_ptr = line;
+    for (char* in_ptr = line; argc < argv_size - 1; ++in_ptr)
     {
-        int char_in = (unsigned char) * in_ptr;
+        int char_in = (unsigned char)*in_ptr;
         if (char_in == 0)
         {
             break;
@@ -84,71 +84,71 @@ inline size_t split_args(char *line, char **argv, size_t argv_size)
 
         switch (state)
         {
-        case SS_SPACE:
-            if (char_in == SPACE)
-            {
-                /* skip space */
-            }
-            else if (char_in == QUOTE)
-            {
-                next_arg_start = out_ptr;
-                state = SS_QUOTED_ARG;
-            }
-            else if (char_in == ESCAPE)
-            {
-                next_arg_start = out_ptr;
-                state = SS_ARG_ESCAPED;
-            }
-            else
-            {
-                next_arg_start = out_ptr;
-                state = SS_ARG;
-                char_out = char_in;
-            }
-            break;
+            case SS_SPACE:
+                if (char_in == SPACE)
+                {
+                    /* skip space */
+                }
+                else if (char_in == QUOTE)
+                {
+                    next_arg_start = out_ptr;
+                    state = SS_QUOTED_ARG;
+                }
+                else if (char_in == ESCAPE)
+                {
+                    next_arg_start = out_ptr;
+                    state = SS_ARG_ESCAPED;
+                }
+                else
+                {
+                    next_arg_start = out_ptr;
+                    state = SS_ARG;
+                    char_out = char_in;
+                }
+                break;
 
-        case SS_QUOTED_ARG:
-            if (char_in == QUOTE)
-            {
-                END_ARG();
-            }
-            else if (char_in == ESCAPE)
-            {
-                state = SS_QUOTED_ARG_ESCAPED;
-            }
-            else
-            {
-                char_out = char_in;
-            }
-            break;
+            case SS_QUOTED_ARG:
+                if (char_in == QUOTE)
+                {
+                    END_ARG();
+                }
+                else if (char_in == ESCAPE)
+                {
+                    state = SS_QUOTED_ARG_ESCAPED;
+                }
+                else
+                {
+                    char_out = char_in;
+                }
+                break;
 
-        case SS_ARG_ESCAPED:
-        case SS_QUOTED_ARG_ESCAPED:
-            if (char_in == ESCAPE || char_in == QUOTE || char_in == SPACE)
-            {
-                char_out = char_in;
-            }
-            else
-            {
-                /* unrecognized escape character, skip */
-            }
-            state = (split_state_t)(state & (~SS_FLAG_ESCAPE));
-            break;
+            case SS_ARG_ESCAPED:
+            case SS_QUOTED_ARG_ESCAPED:
+                if (char_in == ESCAPE || char_in == QUOTE || char_in == SPACE)
+                {
+                    char_out = char_in;
+                }
+                else
+                {
+                    /* unrecognized escape character, skip */
+                }
+                state = (split_state_t)(state & (~SS_FLAG_ESCAPE));
+                break;
 
-        case SS_ARG:
-            if (char_in == SPACE)
-            {
-                END_ARG();
-            }
-            else if (char_in == ESCAPE)
-            {
-                state = SS_ARG_ESCAPED;
-            }
-            else
-            {
-                char_out = char_in;
-            }
-            break;
+            case SS_ARG:
+                if (char_in == SPACE)
+                {
+                    END_ARG();
+                }
+                else if (char_in == ESCAPE)
+                {
+                    state = SS_ARG_ESCAPED;
+                }
+                else
+                {
+                    char_out = char_in;
+                }
+                break;
         }
         /* need to output anything? */
         if (char_out >= 0)
@@ -170,8 +170,8 @@ inline size_t split_args(char *line, char **argv, size_t argv_size)
     return argc;
 }
 
-} // namespace bs
+}  // namespace protocol
 
-} // namespace protocol
+}  // namespace bs
 
-#endif //BS_ARGS_H
+#endif  //BS_ARGS_H

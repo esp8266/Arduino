@@ -1,19 +1,20 @@
 
-extern "C" {
-#include "lwip/err.h"
-#include "lwip/ip_addr.h"
-#include "lwip/dns.h"
+extern "C"
+{
 #include "lwip/dhcp.h"
-#include "lwip/init.h" // LWIP_VERSION_
+#include "lwip/dns.h"
+#include "lwip/err.h"
+#include "lwip/init.h"  // LWIP_VERSION_
+#include "lwip/ip_addr.h"
 #if LWIP_IPV6
-#include "lwip/netif.h" // struct netif
+#include "lwip/netif.h"  // struct netif
 #endif
 
 #include <user_interface.h>
 }
 
-#include "debug.h"
 #include "LwipIntf.h"
+#include "debug.h"
 
 // args      | esp order    arduino order
 // ----      + ---------    -------------
@@ -24,8 +25,7 @@ extern "C" {
 //
 // result stored into gateway/netmask/dns1
 
-bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
-                                IPAddress& gateway, IPAddress& netmask, IPAddress& dns1)
+bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, IPAddress& gateway, IPAddress& netmask, IPAddress& dns1)
 {
     //To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
     gateway = arg1;
@@ -36,7 +36,7 @@ bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1
     {
         //octet is not 255 => interpret as Arduino order
         gateway = arg2;
-        netmask = arg3[0] == 0 ? IPAddress(255, 255, 255, 0) : arg3; //arg order is arduino and 4th arg not given => assign it arduino default
+        netmask = arg3[0] == 0 ? IPAddress(255, 255, 255, 0) : arg3;  //arg order is arduino and 4th arg not given => assign it arduino default
         dns1 = arg1;
     }
 
@@ -143,7 +143,6 @@ bool LwipIntf::hostname(const char* aHostname)
     // harmless for AP, also compatible with ethernet adapters (to come)
     for (netif* intf = netif_list; intf; intf = intf->next)
     {
-
         // unconditionally update all known interfaces
         intf->hostname = wifi_station_get_hostname();
 
@@ -162,4 +161,3 @@ bool LwipIntf::hostname(const char* aHostname)
 
     return ret && compliant;
 }
-

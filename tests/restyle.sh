@@ -29,14 +29,11 @@ for d in $all; do
     if [ -d "$d" ]; then
         echo "-------- directory $d:"
         for e in c cpp h; do
-            find $d -name "*.$e" -exec \
-                astyle \
-                    --suffix=none \
-                    --options=${org}/astyle_core.conf {} \;
+            find $d -name "*.$e" -exec clang-format -i {} \;
         done
     else
         echo "-------- file $d:"
-        astyle --suffix=none --options=${org}/astyle_core.conf "$d"
+        clang-format -i ${d}
     fi
 done
 

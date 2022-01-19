@@ -8,12 +8,12 @@ namespace bs
 {
 class StdIOHelper
 {
-public:
+   public:
     StdIOHelper()
     {
     }
 
-    size_t printf(const char *format, ...)
+    size_t printf(const char* format, ...)
     {
         va_list arg;
         va_start(arg, format);
@@ -46,6 +46,6 @@ inline void fatal()
     throw std::runtime_error("fatal error");
 }
 
-} // namespace bs
+}  // namespace bs
 
-#endif //BS_STDIO_H
+#endif  //BS_STDIO_H

@@ -16,4 +16,3 @@ void mock_stop_littlefs()
     }
     littlefs_mock = nullptr;
 }
-

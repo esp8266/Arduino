@@ -13,9 +13,9 @@
     all copies or substantial portions of the Software.
 */
 
-#include <catch.hpp>
-#include <string.h>
 #include <pgmspace.h>
+#include <string.h>
+#include <catch.hpp>
 
 TEST_CASE("strstr_P works as strstr", "[core][pgmspace]")
 {

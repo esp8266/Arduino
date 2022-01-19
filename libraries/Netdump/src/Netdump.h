@@ -22,23 +22,21 @@
 #ifndef __NETDUMP_H
 #define __NETDUMP_H
 
-#include <Print.h>
-#include <functional>
-#include <lwipopts.h>
-#include <FS.h>
-#include "NetdumpPacket.h"
 #include <ESP8266WiFi.h>
+#include <FS.h>
+#include <Print.h>
+#include <lwipopts.h>
+#include <functional>
 #include "CallBackList.h"
+#include "NetdumpPacket.h"
 
 namespace NetCapture
 {
-
 using namespace experimental::CBListImplentation;
 
 class Netdump
 {
-public:
-
+   public:
     using Filter = std::function<bool(const Packet&)>;
     using Callback = std::function<void(const Packet&)>;
     using LwipCallback = std::function<void(int, const char*, int, int, int)>;
@@ -53,12 +51,11 @@ public:
 
     void printDump(Print& out, Packet::PacketDetail ndd, const Filter nf = nullptr);
     void fileDump(File& outfile, const Filter nf = nullptr);
-    bool tcpDump(WiFiServer &tcpDumpServer, const Filter nf = nullptr);
+    bool tcpDump(WiFiServer& tcpDumpServer, const Filter nf = nullptr);
 
-
-private:
+   private:
     Callback netDumpCallback = nullptr;
-    Filter   netDumpFilter   = nullptr;
+    Filter netDumpFilter = nullptr;
 
     static void capture(int netif_idx, const char* data, size_t len, int out, int success);
     static CallBackList<LwipCallback> lwipCallback;
@@ -69,7 +66,7 @@ private:
     void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
     void fileDumpProcess(File& outfile, const Packet& np) const;
     void tcpDumpProcess(const Packet& np);
-    void tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf);
+    void tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf);
 
     void writePcapHeader(Stream& s) const;
 
@@ -82,6 +79,6 @@ private:
     static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
 };
 
-} // namespace NetCapture
+}  // namespace NetCapture
 
 #endif /* __NETDUMP_H */

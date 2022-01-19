@@ -16,4 +16,3 @@ void mock_stop_spiffs()
     }
     spiffs_mock = nullptr;
 }
-

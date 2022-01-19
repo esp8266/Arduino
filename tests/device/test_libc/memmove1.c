@@ -55,19 +55,17 @@
 #define TOO_MANY_ERRORS 11
 int errors = 0;
 
-#define DEBUGP					\
- if (errors == TOO_MANY_ERRORS)			\
-   printf ("Further errors omitted\n");		\
- else if (errors < TOO_MANY_ERRORS)		\
-   printf
+#define DEBUGP                              \
+    if (errors == TOO_MANY_ERRORS)          \
+        printf("Further errors omitted\n"); \
+    else if (errors < TOO_MANY_ERRORS)      \
+    printf
 
 /* A safe target-independent memmove.  */
 
-void
-mymemmove(unsigned char *dest, unsigned char *src, size_t n)
+void mymemmove(unsigned char* dest, unsigned char* src, size_t n)
 {
-    if ((src <= dest && src + n <= dest)
-            || src >= dest)
+    if ((src <= dest && src + n <= dest) || src >= dest)
         while (n-- > 0)
         {
             *dest++ = *src++;
@@ -85,14 +83,12 @@ mymemmove(unsigned char *dest, unsigned char *src, size_t n)
 
 /*  It's either the noinline attribute or forcing the test framework to
     pass -fno-builtin-memmove.  */
-void
-xmemmove(unsigned char *dest, unsigned char *src, size_t n)
-__attribute__((__noinline__));
+void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
+    __attribute__((__noinline__));
 
-void
-xmemmove(unsigned char *dest, unsigned char *src, size_t n)
+void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
 {
-    void *retp;
+    void* retp;
     retp = memmove(dest, src, n);
 
     if (retp != dest)
@@ -103,12 +99,10 @@ xmemmove(unsigned char *dest, unsigned char *src, size_t n)
     }
 }
 
-
 /*  Fill the array with something we can associate with a position, but
     not exactly the same as the position index.  */
 
-void
-fill(unsigned char dest[MAX * 3])
+void fill(unsigned char dest[MAX * 3])
 {
     size_t i;
     for (i = 0; i < MAX * 3; i++)
@@ -165,9 +159,10 @@ void memmove_main(void)
             if (memcmp(to_known, to_test, sizeof(to_known)) != 0)
             {
                 errors++;
-                DEBUGP("memmove failed for %d bytes,"
-                       " with src %d bytes before dest\n",
-                       i, j);
+                DEBUGP(
+                    "memmove failed for %d bytes,"
+                    " with src %d bytes before dest\n",
+                    i, j);
             }
         }
     }
@@ -187,9 +182,10 @@ void memmove_main(void)
             if (memcmp(to_known, to_test, sizeof(to_known)) != 0)
             {
                 errors++;
-                DEBUGP("memmove failed when moving %d bytes,"
-                       " with src %d bytes after dest\n",
-                       i, j);
+                DEBUGP(
+                    "memmove failed when moving %d bytes,"
+                    " with src %d bytes after dest\n",
+                    i, j);
             }
         }
     }

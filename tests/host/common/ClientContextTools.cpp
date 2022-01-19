@@ -29,15 +29,15 @@
     DEALINGS WITH THE SOFTWARE.
 */
 
-#include <lwip/def.h>
-#include <lwip/tcp.h>
-#include <lwip/dns.h>
 #include <WiFiClient.h>
 #include <include/ClientContext.h>
+#include <lwip/def.h>
+#include <lwip/dns.h>
+#include <lwip/tcp.h>
 
-#include <netdb.h> // gethostbyname
+#include <netdb.h>  // gethostbyname
 
-err_t dns_gethostbyname(const char *hostname, ip_addr_t *addr, dns_found_callback found, void *callback_arg)
+err_t dns_gethostbyname(const char* hostname, ip_addr_t* addr, dns_found_callback found, void* callback_arg)
 {
     (void)callback_arg;
     (void)found;

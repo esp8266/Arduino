@@ -19,17 +19,17 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #define ARDUINO_MAIN
-#include "wiring_private.h"
-#include "pins_arduino.h"
 #include "c_types.h"
+#include "core_esp8266_waveform.h"
 #include "eagle_soc.h"
 #include "ets_sys.h"
-#include "user_interface.h"
-#include "core_esp8266_waveform.h"
 #include "interrupts.h"
+#include "pins_arduino.h"
+#include "user_interface.h"
+#include "wiring_private.h"
 
-extern "C" {
-
+extern "C"
+{
     static uint8_t _mode[17];
     static uint8_t _gpio[17];
 
@@ -60,5 +60,4 @@ extern "C" {
             return 0;
         }
     }
-
 };

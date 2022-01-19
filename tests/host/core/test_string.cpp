@@ -13,11 +13,11 @@
     all copies or substantial portions of the Software.
 */
 
-#include <catch.hpp>
-#include <string.h>
+#include <StreamString.h>
 #include <WString.h>
 #include <limits.h>
-#include <StreamString.h>
+#include <string.h>
+#include <catch.hpp>
 
 TEST_CASE("String::move", "[core][String]")
 {
@@ -78,12 +78,12 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(ib == "3e7");
     String lb((unsigned long)3000000000, 8);
     REQUIRE(lb == "26264057000");
-    String sl1((long) -2000000000, 10);
+    String sl1((long)-2000000000, 10);
     REQUIRE(sl1 == "-2000000000");
     String s1("abcd");
     String s2(s1);
     REQUIRE(s1 == s2);
-    String *s3 = new String("manos");
+    String* s3 = new String("manos");
     s2 = *s3;
     delete s3;
     REQUIRE(s2 == "manos");
@@ -124,11 +124,11 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "abcdeabcde9872147483647-214748364869");
     str += (unsigned int)1969;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969");
-    str += (long) -123;
+    str += (long)-123;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123");
     str += (unsigned long)321;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321");
-    str += (float) -1.01;
+    str += (float)-1.01;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.01");
     str += (double)1.01;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01");
@@ -146,24 +146,24 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
     // non-decimal negative #s should be as if they were unsigned
-    str = String((int) -100, 16);
+    str = String((int)-100, 16);
     REQUIRE(str == "ffffff9c");
-    str = String((long) -101, 16);
+    str = String((long)-101, 16);
     REQUIRE(str == "ffffff9b");
-    str = String((int) -100, 10);
+    str = String((int)-100, 10);
     REQUIRE(str == "-100");
-    str = String((long) -100, 10);
+    str = String((long)-100, 10);
     REQUIRE(str == "-100");
     // Non-zero-terminated array concatenation
     const char buff[] = "abcdefg";
     String n;
-    n = "1234567890"; // Make it a SSO string, fill with non-0 data
-    n = "1"; // Overwrite [1] with 0, but leave old junk in SSO space still
+    n = "1234567890";  // Make it a SSO string, fill with non-0 data
+    n = "1";           // Overwrite [1] with 0, but leave old junk in SSO space still
     n.concat(buff, 3);
-    REQUIRE(n == "1abc"); // Ensure the trailing 0 is always present even w/this funky concat
+    REQUIRE(n == "1abc");  // Ensure the trailing 0 is always present even w/this funky concat
     for (int i = 0; i < 20; i++)
     {
-        n.concat(buff, 1);    // Add 20 'a's to go from SSO to normal string
+        n.concat(buff, 1);  // Add 20 'a's to go from SSO to normal string
     }
     REQUIRE(n == "1abcaaaaaaaaaaaaaaaaaaaa");
     n = "";
@@ -172,7 +172,7 @@ TEST_CASE("String concantenation", "[core][String]")
         n.concat(buff, i);
     }
     REQUIRE(n == "aababcabcdabcde");
-    n.concat(buff, 0); // And check no add'n
+    n.concat(buff, 0);  // And check no add'n
     REQUIRE(n == "aababcabcdabcde");
 }
 
@@ -330,7 +330,7 @@ TEST_CASE("String SSO works", "[core][String]")
     s += "0";
     REQUIRE(s == "0");
     REQUIRE(s.length() == 1);
-    const char *savesso = s.c_str();
+    const char* savesso = s.c_str();
     s += 1;
     REQUIRE(s.c_str() == savesso);
     REQUIRE(s == "01");
@@ -433,13 +433,12 @@ void repl(const String& key, const String& val, String& s, boolean useURLencode)
     s.replace(key, val);
 }
 
-
 TEST_CASE("String SSO handles junk in memory", "[core][String]")
 {
     // We fill the SSO space with garbage then construct an object in it and check consistency
     // This is NOT how you want to use Strings outside of this testing!
     unsigned char space[64];
-    String *s = (String*)space;
+    String* s = (String*)space;
     memset(space, 0xff, 64);
     new (s) String;
     REQUIRE(*s == "");
@@ -447,8 +446,8 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
 
     // Tests from #5883
     bool useURLencode = false;
-    const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0}; // Unicode euro symbol
-    const char yen[3]   = {(char)0xc2, (char)0xa5, 0}; // Unicode yen symbol
+    const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0};  // Unicode euro symbol
+    const char yen[3] = {(char)0xc2, (char)0xa5, 0};               // Unicode yen symbol
 
     memset(space, 0xff, 64);
     new (s) String("%ssid%");
@@ -484,7 +483,6 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
     s->~String();
 }
 
-
 TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
 {
     String blah = "blah";
@@ -495,7 +493,6 @@ TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
     blah.replace(blah, blah);
     REQUIRE(blah == "blah");
 }
-
 
 TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
 {
@@ -513,19 +510,19 @@ TEST_CASE("Strings with NULs", "[core][String]")
     // Fits in SSO...
     String str("01234567");
     REQUIRE(str.length() == 8);
-    char *ptr = (char *)str.c_str();
+    char* ptr = (char*)str.c_str();
     ptr[3] = 0;
     String str2;
     str2 = str;
     REQUIRE(str2.length() == 8);
     // Needs a buffer pointer
     str = "0123456789012345678901234567890123456789";
-    ptr = (char *)str.c_str();
+    ptr = (char*)str.c_str();
     ptr[3] = 0;
     str2 = str;
     REQUIRE(str2.length() == 40);
     String str3("a");
-    ptr = (char *)str3.c_str();
+    ptr = (char*)str3.c_str();
     *ptr = 0;
     REQUIRE(str3.length() == 1);
     str3 += str3;
@@ -541,7 +538,7 @@ TEST_CASE("Strings with NULs", "[core][String]")
     str3 += str3;
     REQUIRE(str3.length() == 64);
     static char zeros[64] = {0};
-    const char *p = str3.c_str();
+    const char* p = str3.c_str();
     REQUIRE(!memcmp(p, zeros, 64));
 }
 
@@ -550,7 +547,7 @@ TEST_CASE("Replace and string expansion", "[core][String]")
     String s, l;
     // Make these large enough to span SSO and non SSO
     String whole = "#123456789012345678901234567890";
-    const char *res = "abcde123456789012345678901234567890";
+    const char* res = "abcde123456789012345678901234567890";
     for (size_t i = 1; i < whole.length(); i++)
     {
         s = whole.substring(0, i);
@@ -566,13 +563,11 @@ TEST_CASE("Replace and string expansion", "[core][String]")
 
 TEST_CASE("String chaining", "[core][String]")
 {
-    const char* chunks[]
-    {
+    const char* chunks[]{
         "~12345",
         "67890",
         "qwertyuiopasdfghjkl",
-        "zxcvbnm"
-    };
+        "zxcvbnm"};
 
     String all;
     for (auto* chunk : chunks)
@@ -607,7 +602,7 @@ TEST_CASE("String chaining", "[core][String]")
 
 TEST_CASE("String concat OOB #8198", "[core][String]")
 {
-    char *p = (char*)malloc(16);
+    char* p = (char*)malloc(16);
     memset(p, 'x', 16);
     String s = "abcd";
     s.concat(p, 16);

@@ -26,11 +26,10 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define memcmp memcmp_P
 #define memcpy memcpy_P
@@ -121,15 +120,16 @@ void memcpy_main(void)
                     dest[j] = 0;
                 }
 
-                void *ret = memcpy(dest + START_COPY + da, src + sa, n);
+                void* ret = memcpy(dest + START_COPY + da, src + sa, n);
 
                 /* Check return value.  */
                 if (ret != (dest + START_COPY + da))
-                    print_error("\nFailed: wrong return value in memcpy of %u bytes "
-                                "with src_align %u and dst_align %u. "
-                                "Return value and dest should be the same"
-                                "(ret is %p, dest is %p)\n",
-                                n, sa, da, ret, dest + START_COPY + da);
+                    print_error(
+                        "\nFailed: wrong return value in memcpy of %u bytes "
+                        "with src_align %u and dst_align %u. "
+                        "Return value and dest should be the same"
+                        "(ret is %p, dest is %p)\n",
+                        n, sa, da, ret, dest + START_COPY + da);
 
                 /*  Check that content of the destination buffer
                     is the same as the source buffer, and
@@ -138,35 +138,39 @@ void memcpy_main(void)
                     if ((unsigned)j < START_COPY + da)
                     {
                         if (dest[j] != 0)
-                            print_error("\nFailed: after memcpy of %u bytes "
-                                        "with src_align %u and dst_align %u, "
-                                        "byte %u before the start of dest is not 0.\n",
-                                        n, sa, da, START_COPY - j);
+                            print_error(
+                                "\nFailed: after memcpy of %u bytes "
+                                "with src_align %u and dst_align %u, "
+                                "byte %u before the start of dest is not 0.\n",
+                                n, sa, da, START_COPY - j);
                     }
                     else if ((unsigned)j < START_COPY + da + n)
                     {
                         i = j - START_COPY - da;
                         if (dest[j] != (src + sa)[i])
-                            print_error("\nFailed: after memcpy of %u bytes "
-                                        "with src_align %u and dst_align %u, "
-                                        "byte %u in dest and src are not the same.\n",
-                                        n, sa, da, i);
+                            print_error(
+                                "\nFailed: after memcpy of %u bytes "
+                                "with src_align %u and dst_align %u, "
+                                "byte %u in dest and src are not the same.\n",
+                                n, sa, da, i);
                     }
                     else if (dest[j] != 0)
                     {
-                        print_error("\nFailed: after memcpy of %u bytes "
-                                    "with src_align %u and dst_align %u, "
-                                    "byte %u after the end of dest is not 0.\n",
-                                    n, sa, da, j - START_COPY - da - n);
+                        print_error(
+                            "\nFailed: after memcpy of %u bytes "
+                            "with src_align %u and dst_align %u, "
+                            "byte %u after the end of dest is not 0.\n",
+                            n, sa, da, j - START_COPY - da - n);
                     }
 
                 /* Check src is not modified.  */
                 for (j = 0; j < BUFF_SIZE; j++)
                     if (src[i] != backup_src[i])
-                        print_error("\nFailed: after memcpy of %u bytes "
-                                    "with src_align %u and dst_align %u, "
-                                    "byte %u of src is modified.\n",
-                                    n, sa, da, j);
+                        print_error(
+                            "\nFailed: after memcpy of %u bytes "
+                            "with src_align %u and dst_align %u, "
+                            "byte %u of src is modified.\n",
+                            n, sa, da, j);
             }
 
     if (errors != 0)

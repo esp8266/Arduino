@@ -23,9 +23,10 @@
     $Id$
 */
 
-extern "C" {
-#include <stdlib.h>
+extern "C"
+{
 #include <stdint.h>
+#include <stdlib.h>
 }
 
 void randomSeed(unsigned long seed)

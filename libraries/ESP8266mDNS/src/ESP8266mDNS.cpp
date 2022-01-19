@@ -30,4 +30,3 @@
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 MDNSResponder MDNS;
 #endif
-

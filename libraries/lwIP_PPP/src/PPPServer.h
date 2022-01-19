@@ -27,7 +27,6 @@
 
 */
 
-
 #ifndef __PPPSERVER_H
 #define __PPPSERVER_H
 
@@ -39,8 +38,7 @@
 
 class PPPServer
 {
-public:
-
+   public:
     PPPServer(Stream* sio);
 
     bool begin(const IPAddress& ourAddress, const IPAddress& peer = IPAddress(172, 31, 255, 254));
@@ -55,8 +53,7 @@ public:
         return &_netif.gw;
     }
 
-protected:
-
+   protected:
     static constexpr size_t _bufsize = 128;
     Stream* _sio;
     ppp_pcb* _ppp;
@@ -71,7 +68,6 @@ protected:
     static u32_t output_cb_s(ppp_pcb* pcb, u8_t* data, u32_t len, void* ctx);
     static void link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx);
     static void netif_status_cb_s(netif* nif);
-
 };
 
-#endif // __PPPSERVER_H
+#endif  // __PPPSERVER_H

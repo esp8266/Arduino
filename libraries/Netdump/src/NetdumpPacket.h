@@ -22,21 +22,20 @@
 #ifndef __NETDUMP_PACKET_H
 #define __NETDUMP_PACKET_H
 
-#include <lwipopts.h>
 #include <IPAddress.h>
 #include <StreamString.h>
+#include <lwipopts.h>
+#include <vector>
 #include "NetdumpIP.h"
 #include "PacketType.h"
-#include <vector>
 
 namespace NetCapture
 {
-
 int constexpr ETH_HDR_LEN = 14;
 
 class Packet
 {
-public:
+   public:
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
         : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {
@@ -75,7 +74,7 @@ public:
     {
         return ntoh16(idx + 2) | (((uint32_t)ntoh16(idx)) << 16);
     };
-    uint8_t  byteData(uint16_t idx) const
+    uint8_t byteData(uint16_t idx) const
     {
         return data[idx];
     }
@@ -87,17 +86,17 @@ public:
     {
         return ntoh16(12);
     };
-    uint8_t  ipType() const
+    uint8_t ipType() const
     {
         return isIP() ? isIPv4() ? data[ETH_HDR_LEN + 9] : data[ETH_HDR_LEN + 6] : 0;
     };
     uint16_t getIpHdrLen() const
     {
-        return isIPv4() ? (((unsigned char)data[ETH_HDR_LEN]) & 0x0f) << 2 : 40 ;   // IPv6 is fixed length
+        return isIPv4() ? (((unsigned char)data[ETH_HDR_LEN]) & 0x0f) << 2 : 40;  // IPv6 is fixed length
     }
     uint16_t getIpTotalLen() const
     {
-        return isIP() ? isIPv4() ? ntoh16(ETH_HDR_LEN + 2) : (packetLength - ETH_HDR_LEN)   :  0;
+        return isIP() ? isIPv4() ? ntoh16(ETH_HDR_LEN + 2) : (packetLength - ETH_HDR_LEN) : 0;
     }
     uint32_t getTcpSeq() const
     {
@@ -115,20 +114,20 @@ public:
     {
         return isTCP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 14) : 0;
     }
-    uint8_t  getTcpHdrLen() const
+    uint8_t getTcpHdrLen() const
     {
         return isTCP() ? (data[ETH_HDR_LEN + getIpHdrLen() + 12] >> 4) * 4 : 0;
-    };//Header len is in multiple of 4 bytes
+    };  //Header len is in multiple of 4 bytes
     uint16_t getTcpLen() const
     {
-        return isTCP() ? getIpTotalLen() - getIpHdrLen() - getTcpHdrLen() : 0 ;
+        return isTCP() ? getIpTotalLen() - getIpHdrLen() - getTcpHdrLen() : 0;
     };
 
-    uint8_t  getIcmpType() const
+    uint8_t getIcmpType() const
     {
         return isICMP() ? data[ETH_HDR_LEN + getIpHdrLen() + 0] : 0;
     }
-    uint8_t  getIgmpType() const
+    uint8_t getIgmpType() const
     {
         return isIGMP() ? data[ETH_HDR_LEN + getIpHdrLen() + 0] : 0;
     }
@@ -136,11 +135,11 @@ public:
     {
         return isARP() ? data[ETH_HDR_LEN + 7] : 0;
     }
-    bool    is_ARP_who() const
+    bool is_ARP_who() const
     {
         return (getARPType() == 1);
     }
-    bool    is_ARP_is() const
+    bool is_ARP_is() const
     {
         return (getARPType() == 2);
     }
@@ -244,7 +243,7 @@ public:
         return ip;
     };
 
-    bool      hasIP(NetdumpIP ip) const
+    bool hasIP(NetdumpIP ip) const
     {
         return (isIP() && ((ip == sourceIP()) || (ip == destIP())));
     }
@@ -270,7 +269,7 @@ public:
     {
         return isIP() ? ntoh16(ETH_HDR_LEN + getIpHdrLen() + 2) : 0;
     }
-    bool     hasPort(uint16_t p) const
+    bool hasPort(uint16_t p) const
     {
         return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
@@ -282,9 +281,7 @@ public:
     const PacketType packetType() const;
     const std::vector<PacketType>& allPacketTypes() const;
 
-
-private:
-
+   private:
     void setPacketType(PacketType);
     void setPacketTypes();
 
@@ -298,7 +295,6 @@ private:
     void IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
     void UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
 
-
     time_t packetTime;
     int netif_idx;
     const char* data;
@@ -309,6 +305,6 @@ private:
     std::vector<PacketType> thisAllPacketTypes;
 };
 
-} // namespace NetCapture
+}  // namespace NetCapture
 
 #endif /* __NETDUMP_PACKET_H */

@@ -6,12 +6,13 @@ namespace bs
 {
 class ArduinoIOHelper
 {
-public:
-    ArduinoIOHelper(Stream& stream) : m_stream(stream)
+   public:
+    ArduinoIOHelper(Stream& stream)
+        : m_stream(stream)
     {
     }
 
-    size_t printf(const char *format, ...)
+    size_t printf(const char* format, ...)
     {
         va_list arg;
         va_start(arg, format);
@@ -30,7 +31,7 @@ public:
             ets_vsnprintf(buffer, len + 1, format, arg);
             va_end(arg);
         }
-        len = m_stream.write((const uint8_t*) buffer, len);
+        len = m_stream.write((const uint8_t*)buffer, len);
         if (buffer != temp)
         {
             delete[] buffer;
@@ -65,7 +66,7 @@ public:
         return len;
     }
 
-protected:
+   protected:
     Stream& m_stream;
 };
 
@@ -76,6 +77,6 @@ inline void fatal()
     ESP.restart();
 }
 
-} // namespace bs
+}  // namespace bs
 
-#endif //BS_ARDUINO_H
+#endif  //BS_ARDUINO_H

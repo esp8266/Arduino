@@ -23,8 +23,8 @@
 #ifndef __STREAMSTRING_H
 #define __STREAMSTRING_H
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 #include "Stream.h"
 #include "WString.h"
 
@@ -32,17 +32,16 @@
 // S2Stream points to a String and makes it a Stream
 // (it is also the helper for StreamString)
 
-class S2Stream: public Stream
+class S2Stream : public Stream
 {
-public:
-
-    S2Stream(String& string, int peekPointer = -1):
-        string(&string), peekPointer(peekPointer)
+   public:
+    S2Stream(String& string, int peekPointer = -1)
+        : string(&string), peekPointer(peekPointer)
     {
     }
 
-    S2Stream(String* string, int peekPointer = -1):
-        string(string), peekPointer(peekPointer)
+    S2Stream(String* string, int peekPointer = -1)
+        : string(string), peekPointer(peekPointer)
     {
     }
 
@@ -206,19 +205,16 @@ public:
         peekPointer = pointer;
     }
 
-protected:
-
+   protected:
     String* string;
-    int peekPointer; // -1:String is consumed / >=0:resettable pointer
+    int peekPointer;  // -1:String is consumed / >=0:resettable pointer
 };
-
 
 // StreamString is a S2Stream holding the String
 
-class StreamString: public String, public S2Stream
+class StreamString : public String, public S2Stream
 {
-protected:
-
+   protected:
     void resetpp()
     {
         if (peekPointer > 0)
@@ -227,56 +223,69 @@ protected:
         }
     }
 
-public:
-
-    StreamString(StreamString&& bro): String(bro), S2Stream(this) { }
-    StreamString(const StreamString& bro): String(bro), S2Stream(this) { }
+   public:
+    StreamString(StreamString&& bro)
+        : String(bro), S2Stream(this) {}
+    StreamString(const StreamString& bro)
+        : String(bro), S2Stream(this) {}
 
     // duplicate String constructors and operator=:
 
-    StreamString(const char* text = nullptr): String(text), S2Stream(this) { }
-    StreamString(const String& string): String(string), S2Stream(this) { }
-    StreamString(const __FlashStringHelper *str): String(str), S2Stream(this) { }
-    StreamString(String&& string): String(string), S2Stream(this) { }
+    StreamString(const char* text = nullptr)
+        : String(text), S2Stream(this) {}
+    StreamString(const String& string)
+        : String(string), S2Stream(this) {}
+    StreamString(const __FlashStringHelper* str)
+        : String(str), S2Stream(this) {}
+    StreamString(String&& string)
+        : String(string), S2Stream(this) {}
 
-    explicit StreamString(char c): String(c), S2Stream(this) { }
-    explicit StreamString(unsigned char c, unsigned char base = 10): String(c, base), S2Stream(this) { }
-    explicit StreamString(int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
-    explicit StreamString(unsigned int i, unsigned char base = 10): String(i, base), S2Stream(this) { }
-    explicit StreamString(long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
-    explicit StreamString(unsigned long l, unsigned char base = 10): String(l, base), S2Stream(this) { }
-    explicit StreamString(float f, unsigned char decimalPlaces = 2): String(f, decimalPlaces), S2Stream(this) { }
-    explicit StreamString(double d, unsigned char decimalPlaces = 2): String(d, decimalPlaces), S2Stream(this) { }
+    explicit StreamString(char c)
+        : String(c), S2Stream(this) {}
+    explicit StreamString(unsigned char c, unsigned char base = 10)
+        : String(c, base), S2Stream(this) {}
+    explicit StreamString(int i, unsigned char base = 10)
+        : String(i, base), S2Stream(this) {}
+    explicit StreamString(unsigned int i, unsigned char base = 10)
+        : String(i, base), S2Stream(this) {}
+    explicit StreamString(long l, unsigned char base = 10)
+        : String(l, base), S2Stream(this) {}
+    explicit StreamString(unsigned long l, unsigned char base = 10)
+        : String(l, base), S2Stream(this) {}
+    explicit StreamString(float f, unsigned char decimalPlaces = 2)
+        : String(f, decimalPlaces), S2Stream(this) {}
+    explicit StreamString(double d, unsigned char decimalPlaces = 2)
+        : String(d, decimalPlaces), S2Stream(this) {}
 
-    StreamString& operator= (const StreamString& rhs)
+    StreamString& operator=(const StreamString& rhs)
     {
         String::operator=(rhs);
         resetpp();
         return *this;
     }
 
-    StreamString& operator= (const String& rhs)
+    StreamString& operator=(const String& rhs)
     {
         String::operator=(rhs);
         resetpp();
         return *this;
     }
 
-    StreamString& operator= (const char* cstr)
+    StreamString& operator=(const char* cstr)
     {
         String::operator=(cstr);
         resetpp();
         return *this;
     }
 
-    StreamString& operator= (const __FlashStringHelper* str)
+    StreamString& operator=(const __FlashStringHelper* str)
     {
         String::operator=(str);
         resetpp();
         return *this;
     }
 
-    StreamString& operator= (String&& rval)
+    StreamString& operator=(String&& rval)
     {
         String::operator=(rval);
         resetpp();
@@ -284,4 +293,4 @@ public:
     }
 };
 
-#endif // __STREAMSTRING_H
+#endif  // __STREAMSTRING_H

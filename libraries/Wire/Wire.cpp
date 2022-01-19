@@ -22,15 +22,15 @@
     Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
 */
 
-extern "C" {
+extern "C"
+{
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 }
 
-#include "twi.h"
 #include "Wire.h"
-
+#include "twi.h"
 
 //Some boards don't have these pins available, and hence don't support Wire.
 //Check here for compile-time error.
@@ -199,7 +199,7 @@ size_t TwoWire::write(uint8_t data)
     return 1;
 }
 
-size_t TwoWire::write(const uint8_t *data, size_t quantity)
+size_t TwoWire::write(const uint8_t* data, size_t quantity)
 {
     if (transmitting)
     {
@@ -312,7 +312,7 @@ void TwoWire::onReceive(void (*function)(int))
     // arduino api compatibility fixer:
     // really hope size parameter will not exceed 2^31 :)
     static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
-    user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
+    user_onReceive = reinterpret_cast<void (*)(size_t)>(function);
 }
 
 void TwoWire::onReceive(void (*function)(size_t))

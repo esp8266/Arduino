@@ -31,13 +31,13 @@
 */
 // separated from lwIP to avoid type conflicts
 
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <poll.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 int mockSockSetup(int sock)
 {
@@ -135,7 +135,7 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
         }
 
         if (usersize == 0 && ccinbufsize)
-            // peekAvailable
+        // peekAvailable
         {
             return ccinbufsize;
         }
@@ -178,7 +178,6 @@ ssize_t mockWrite(int sock, const uint8_t* data, size_t size, int timeout_ms)
     size_t sent = 0;
     while (sent < size)
     {
-
         struct pollfd p;
         p.fd = sock;
         p.events = POLLOUT;

@@ -41,13 +41,13 @@
 #ifndef __ESP8266MDNS_H
 #define __ESP8266MDNS_H
 
-#include "LEAmDNS.h"            // LEA
+#include "LEAmDNS.h"  // LEA
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 // Maps the implementation to use to the global namespace type
-using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;                // LEA
+using MDNSResponder = esp8266::MDNSImplementation::MDNSResponder;  // LEA
 
 extern MDNSResponder MDNS;
 #endif
 
-#endif // __ESP8266MDNS_H
+#endif  // __ESP8266MDNS_H

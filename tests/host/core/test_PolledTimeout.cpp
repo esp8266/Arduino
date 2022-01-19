@@ -2,10 +2,10 @@
 #include "PolledTimeout.h"
 
 #define mockverbose printf
-#include "common/MockEsp.cpp" // getCycleCount
+#include "common/MockEsp.cpp"  // getCycleCount
 
 //This won't work for
-template<typename argT>
+template <typename argT>
 inline bool
 fuzzycomp(argT a, argT b)
 {
@@ -33,7 +33,6 @@ TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
     Serial.printf("delta = %u\n", delta);
 
     REQUIRE(fuzzycomp(delta / 1000, (timeType)500));
-
 
     Serial.print("reset\n");
 
@@ -72,7 +71,6 @@ TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
 
     REQUIRE(fuzzycomp(delta / 1000, (timeType)3000));
 
-
     Serial.print("reset\n");
 
     timeout.reset();
@@ -110,7 +108,6 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 
     REQUIRE(fuzzycomp(delta, (timeType)3000));
 
-
     Serial.print("reset\n");
 
     timeout.reset();
@@ -147,7 +144,6 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
     Serial.printf("delta = %lu\n", delta);
 
     REQUIRE(fuzzycomp(delta, (timeType)3000));
-
 
     Serial.print("reset\n");
 
@@ -241,10 +237,10 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout
 
     Serial.println("OneShot Timeout 3000ms");
 
-
     oneShotMsYield timeout(3000);
     before = millis();
-    while (!timeout.expired());
+    while (!timeout.expired())
+        ;
     after = millis();
 
     delta = after - before;
@@ -252,12 +248,12 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout
 
     REQUIRE(fuzzycomp(delta, (timeType)3000));
 
-
     Serial.print("reset\n");
 
     timeout.reset(1000);
     before = millis();
-    while (!timeout);
+    while (!timeout)
+        ;
     after = millis();
 
     delta = after - before;
@@ -265,4 +261,3 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout
 
     REQUIRE(fuzzycomp(delta, (timeType)1000));
 }
-

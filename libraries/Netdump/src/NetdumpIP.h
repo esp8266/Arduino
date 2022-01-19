@@ -8,21 +8,20 @@
 #ifndef LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_NETDUMPIP_H_
 #define LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_NETDUMPIP_H_
 
-#include <stdint.h>
-#include <lwip/init.h>
-#include <StreamString.h>
 #include <IPAddress.h>
+#include <StreamString.h>
+#include <lwip/init.h>
+#include <stdint.h>
 
 namespace NetCapture
 {
-
 class NetdumpIP
 {
-public:
+   public:
     NetdumpIP();
 
     NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
-    NetdumpIP(const uint8_t *address, bool V4 = true);
+    NetdumpIP(const uint8_t* address, bool V4 = true);
     NetdumpIP(const IPAddress& ip);
     NetdumpIP(const String& ip);
 
@@ -31,12 +30,17 @@ public:
         return rawip[index];
     }
 
-    bool fromString(const char *address);
+    bool fromString(const char* address);
 
     String toString();
 
-private:
-    enum class IPversion {UNSET, IPV4, IPV6};
+   private:
+    enum class IPversion
+    {
+        UNSET,
+        IPV4,
+        IPV6
+    };
     IPversion ipv = IPversion::UNSET;
 
     uint8_t rawip[16] = {0};
@@ -70,15 +74,16 @@ private:
         return (ipv != IPversion::UNSET);
     };
 
-    bool compareRaw(IPversion v, const uint8_t* a,  const uint8_t* b) const;
+    bool compareRaw(IPversion v, const uint8_t* a, const uint8_t* b) const;
     bool compareIP(const IPAddress& ip) const;
     bool compareIP(const NetdumpIP& nip) const;
 
-    bool fromString4(const char *address);
-    bool fromString6(const char *address);
+    bool fromString4(const char* address);
+    bool fromString6(const char* address);
 
     size_t printTo(Print& p);
-public:
+
+   public:
     bool operator==(const IPAddress& addr) const
     {
         return compareIP(addr);
@@ -95,9 +100,8 @@ public:
     {
         return !compareIP(addr);
     };
-
 };
 
-} // namespace NetCapture
+}  // namespace NetCapture
 
 #endif /* LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_NETDUMPIP_H_ */

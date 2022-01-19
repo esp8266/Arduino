@@ -20,11 +20,11 @@
 
 namespace bs
 {
-typedef void(*test_case_func_t)();
+typedef void (*test_case_func_t)();
 
 class TestCase
 {
-public:
+   public:
     TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
         : m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
     {
@@ -64,7 +64,7 @@ public:
         return (m_desc) ? m_desc : "";
     }
 
-protected:
+   protected:
     TestCase* m_next = nullptr;
     test_case_func_t m_func;
     const char* m_file;
@@ -98,12 +98,14 @@ struct Env
 
 extern Env g_env;
 
-template<typename IO>
+template <typename IO>
 class Runner
 {
     typedef Runner<IO> Tself;
-public:
-    Runner(IO& io) : m_io(io)
+
+   public:
+    Runner(IO& io)
+        : m_io(io)
     {
         g_env.m_check_pass = std::bind(&Tself::check_pass, this);
         g_env.m_check_fail = std::bind(&Tself::check_fail, this, std::placeholders::_1);
@@ -141,7 +143,7 @@ public:
         bs::fatal();
     }
 
-protected:
+   protected:
     bool do_menu()
     {
         protocol::output_menu_begin(m_io);
@@ -164,7 +166,8 @@ protected:
                 return true;
             }
             TestCase* tc = g_env.m_registry.m_first;
-            for (int i = 0; i != id - 1 && tc; ++i, tc = tc->next());
+            for (int i = 0; i != id - 1 && tc; ++i, tc = tc->next())
+                ;
             if (!tc)
             {
                 bs::fatal();
@@ -178,7 +181,7 @@ protected:
         }
     }
 
-protected:
+   protected:
     IO& m_io;
     size_t m_check_pass_count;
     size_t m_check_fail_count;
@@ -186,7 +189,7 @@ protected:
 
 class AutoReg
 {
-public:
+   public:
     AutoReg(test_case_func_t func, const char* file, size_t line, const char* name, const char* desc = nullptr)
     {
         g_env.m_registry.add(func, file, line, name, desc);
@@ -218,22 +221,35 @@ inline void require(bool condition, size_t line)
     }
 }
 
-} // ::bs
+}  // namespace bs
 
-#define BS_NAME_LINE2( name, line ) name##line
-#define BS_NAME_LINE( name, line ) BS_NAME_LINE2( name, line )
-#define BS_UNIQUE_NAME( name ) BS_NAME_LINE( name, __LINE__ )
+#define BS_NAME_LINE2(name, line) name##line
+#define BS_NAME_LINE(name, line) BS_NAME_LINE2(name, line)
+#define BS_UNIQUE_NAME(name) BS_NAME_LINE(name, __LINE__)
 
-#define TEST_CASE( ... ) \
-    static void BS_UNIQUE_NAME( TEST_FUNC__ )(); \
-    namespace{ bs::AutoReg BS_UNIQUE_NAME( test_autoreg__ )( &BS_UNIQUE_NAME( TEST_FUNC__ ), __FILE__, __LINE__, __VA_ARGS__ ); }\
-    static void BS_UNIQUE_NAME(  TEST_FUNC__ )()
+#define TEST_CASE(...)                                                                                         \
+    static void BS_UNIQUE_NAME(TEST_FUNC__)();                                                                 \
+    namespace                                                                                                  \
+    {                                                                                                          \
+    bs::AutoReg BS_UNIQUE_NAME(test_autoreg__)(&BS_UNIQUE_NAME(TEST_FUNC__), __FILE__, __LINE__, __VA_ARGS__); \
+    }                                                                                                          \
+    static void BS_UNIQUE_NAME(TEST_FUNC__)()
 
 #define CHECK(condition) bs::check((condition), __LINE__)
 #define REQUIRE(condition) bs::require((condition), __LINE__)
 #define FAIL() bs::g_env.m_fail(__LINE__)
 
-#define BS_ENV_DECLARE() namespace bs { Env g_env; }
-#define BS_RUN(...) do { bs::IOHelper helper = bs::IOHelper(__VA_ARGS__); bs::Runner<bs::IOHelper> runner(helper); runner.run(); } while(0);
+#define BS_ENV_DECLARE() \
+    namespace bs         \
+    {                    \
+    Env g_env;           \
+    }
+#define BS_RUN(...)                                      \
+    do                                                   \
+    {                                                    \
+        bs::IOHelper helper = bs::IOHelper(__VA_ARGS__); \
+        bs::Runner<bs::IOHelper> runner(helper);         \
+        runner.run();                                    \
+    } while (0);
 
-#endif //BSTEST_H
+#endif  //BSTEST_H

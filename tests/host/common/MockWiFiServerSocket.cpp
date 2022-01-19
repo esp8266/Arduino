@@ -32,12 +32,12 @@
 #include <WiFiServer.h>
 
 #include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <poll.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
 #define pcb2int(x) ((int)(intptr_t)(x))
@@ -117,7 +117,6 @@ void WiFiServer::begin()
         perror(MOCK "listen()");
         exit(EXIT_FAILURE);
     }
-
 
     // store int into pointer
     _listen_pcb = int2pcb(sock);

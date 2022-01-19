@@ -14,7 +14,6 @@
 */
 
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
 #include <sys/time.h>
+#include <catch.hpp>
 #include "Arduino.h"
-

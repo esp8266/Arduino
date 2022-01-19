@@ -16,22 +16,22 @@
 #ifndef spiffs_mock_hpp
 #define spiffs_mock_hpp
 
-#include <stdint.h>
-#include <stddef.h>
-#include <vector>
 #include <FS.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <vector>
 #include "flash_hal_mock.h"
 
 #define DEFAULT_SPIFFS_FILE_NAME "spiffs.bin"
 
 class SpiffsMock
 {
-public:
+   public:
     SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~SpiffsMock();
 
-protected:
+   protected:
     void load();
     void save();
 

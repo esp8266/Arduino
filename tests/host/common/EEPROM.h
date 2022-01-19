@@ -34,7 +34,7 @@
 
 class EEPROMClass
 {
-public:
+   public:
     EEPROMClass(uint32_t sector);
     EEPROMClass(void);
     ~EEPROMClass();
@@ -45,7 +45,7 @@ public:
     bool commit();
     void end();
 
-    template<typename T>
+    template <typename T>
     T& get(int const address, T& t)
     {
         if (address < 0 || address + sizeof(T) > _size)
@@ -59,7 +59,7 @@ public:
         return t;
     }
 
-    template<typename T>
+    template <typename T>
     const T& put(int const address, const T& t)
     {
         if (address < 0 || address + sizeof(T) > _size)
@@ -84,7 +84,7 @@ public:
         return read(address);
     }
 
-protected:
+   protected:
     size_t _size = 0;
     int _fd = -1;
 };

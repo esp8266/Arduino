@@ -32,9 +32,8 @@
 
 // original sources: https://github.com/njh/W5100MacRaw
 
-#include <SPI.h>
 #include "w5100.h"
-
+#include <SPI.h>
 
 uint8_t Wiznet5100::wizchip_read(uint16_t address)
 {
@@ -42,8 +41,8 @@ uint8_t Wiznet5100::wizchip_read(uint16_t address)
 
     wizchip_cs_select();
     _spi.transfer(0x0F);
-    _spi.transfer((address & 0xFF00) >>  8);
-    _spi.transfer((address & 0x00FF) >>  0);
+    _spi.transfer((address & 0xFF00) >> 8);
+    _spi.transfer((address & 0x00FF) >> 0);
     ret = _spi.transfer(0);
     wizchip_cs_deselect();
 
@@ -54,7 +53,6 @@ uint16_t Wiznet5100::wizchip_read_word(uint16_t address)
 {
     return ((uint16_t)wizchip_read(address) << 8) + wizchip_read(address + 1);
 }
-
 
 void Wiznet5100::wizchip_read_buf(uint16_t address, uint8_t* pBuf, uint16_t len)
 {
@@ -68,16 +66,16 @@ void Wiznet5100::wizchip_write(uint16_t address, uint8_t wb)
 {
     wizchip_cs_select();
     _spi.transfer(0xF0);
-    _spi.transfer((address & 0xFF00) >>  8);
-    _spi.transfer((address & 0x00FF) >>  0);
-    _spi.transfer(wb);    // Data write (write 1byte data)
+    _spi.transfer((address & 0xFF00) >> 8);
+    _spi.transfer((address & 0x00FF) >> 0);
+    _spi.transfer(wb);  // Data write (write 1byte data)
     wizchip_cs_deselect();
 }
 
 void Wiznet5100::wizchip_write_word(uint16_t address, uint16_t word)
 {
     wizchip_write(address, (uint8_t)(word >> 8));
-    wizchip_write(address + 1, (uint8_t) word);
+    wizchip_write(address + 1, (uint8_t)word);
 }
 
 void Wiznet5100::wizchip_write_buf(uint16_t address, const uint8_t* pBuf, uint16_t len)
@@ -94,7 +92,8 @@ void Wiznet5100::setSn_CR(uint8_t cr)
     wizchip_write(Sn_CR, cr);
 
     // Now wait for the command to complete
-    while (wizchip_read(Sn_CR));
+    while (wizchip_read(Sn_CR))
+        ;
 }
 
 uint16_t Wiznet5100::getSn_TX_FSR()
@@ -111,7 +110,6 @@ uint16_t Wiznet5100::getSn_TX_FSR()
     return val;
 }
 
-
 uint16_t Wiznet5100::getSn_RX_RSR()
 {
     uint16_t val = 0, val1 = 0;
@@ -126,7 +124,7 @@ uint16_t Wiznet5100::getSn_RX_RSR()
     return val;
 }
 
-void Wiznet5100::wizchip_send_data(const uint8_t *wizdata, uint16_t len)
+void Wiznet5100::wizchip_send_data(const uint8_t* wizdata, uint16_t len)
 {
     uint16_t ptr;
     uint16_t size;
@@ -157,7 +155,7 @@ void Wiznet5100::wizchip_send_data(const uint8_t *wizdata, uint16_t len)
     setSn_TX_WR(ptr);
 }
 
-void Wiznet5100::wizchip_recv_data(uint8_t *wizdata, uint16_t len)
+void Wiznet5100::wizchip_recv_data(uint8_t* wizdata, uint16_t len)
 {
     uint16_t ptr;
     uint16_t size;
@@ -168,7 +166,6 @@ void Wiznet5100::wizchip_recv_data(uint8_t *wizdata, uint16_t len)
 
     src_mask = ptr & RxBufferMask;
     src_ptr = RxBufferAddress + src_mask;
-
 
     if ((src_mask + len) > RxBufferLength)
     {
@@ -201,19 +198,18 @@ void Wiznet5100::wizchip_recv_ignore(uint16_t len)
 void Wiznet5100::wizchip_sw_reset()
 {
     setMR(MR_RST);
-    getMR(); // for delay
+    getMR();  // for delay
 
     setSHAR(_mac_address);
 }
 
-
-Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr):
-    _spi(spi), _cs(cs)
+Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr)
+    : _spi(spi), _cs(cs)
 {
     (void)intr;
 }
 
-boolean Wiznet5100::begin(const uint8_t *mac_address)
+boolean Wiznet5100::begin(const uint8_t* mac_address)
 {
     memcpy(_mac_address, mac_address, 6);
 
@@ -257,10 +253,11 @@ void Wiznet5100::end()
     setSn_IR(0xFF);
 
     // Wait for socket to change to closed
-    while (getSn_SR() != SOCK_CLOSED);
+    while (getSn_SR() != SOCK_CLOSED)
+        ;
 }
 
-uint16_t Wiznet5100::readFrame(uint8_t *buffer, uint16_t bufsize)
+uint16_t Wiznet5100::readFrame(uint8_t* buffer, uint16_t bufsize)
 {
     uint16_t data_len = readFrameSize();
 
@@ -307,7 +304,7 @@ void Wiznet5100::discardFrame(uint16_t framesize)
     setSn_CR(Sn_CR_RECV);
 }
 
-uint16_t Wiznet5100::readFrameData(uint8_t *buffer, uint16_t framesize)
+uint16_t Wiznet5100::readFrameData(uint8_t* buffer, uint16_t framesize)
 {
     wizchip_recv_data(buffer, framesize);
     setSn_CR(Sn_CR_RECV);
@@ -329,7 +326,7 @@ uint16_t Wiznet5100::readFrameData(uint8_t *buffer, uint16_t framesize)
 #endif
 }
 
-uint16_t Wiznet5100::sendFrame(const uint8_t *buf, uint16_t len)
+uint16_t Wiznet5100::sendFrame(const uint8_t* buf, uint16_t len)
 {
     // Wait for space in the transmit buffer
     while (1)

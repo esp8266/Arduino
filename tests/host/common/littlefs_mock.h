@@ -19,22 +19,22 @@
 #ifndef littlefs_mock_hpp
 #define littlefs_mock_hpp
 
-#include <stdint.h>
-#include <stddef.h>
-#include <vector>
 #include <FS.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <vector>
 #include "flash_hal_mock.h"
 
 #define DEFAULT_LITTLEFS_FILE_NAME "littlefs.bin"
 
 class LittleFSMock
 {
-public:
+   public:
     LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~LittleFSMock();
 
-protected:
+   protected:
     void load();
     void save();
 

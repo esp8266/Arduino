@@ -7,12 +7,11 @@ esp8266::AddressListImplementation::AddressList addrList;
 
 extern "C"
 {
-
     extern netif netif0;
 
     netif* netif_list = &netif0;
 
-    err_t dhcp_renew(struct netif *netif)
+    err_t dhcp_renew(struct netif* netif)
     {
         (void)netif;
         return ERR_OK;
@@ -27,7 +26,7 @@ extern "C"
         return IP_ADDR_ANY;
     }
 
-    err_t etharp_request(struct netif *netif, const ip4_addr_t *ipaddr)
+    err_t etharp_request(struct netif* netif, const ip4_addr_t* ipaddr)
     {
         (void)netif;
         (void)ipaddr;
@@ -40,14 +39,14 @@ extern "C"
         return ERR_OK;
     }
 
-    err_t igmp_joingroup_netif(struct netif *netif, const ip4_addr_t *groupaddr)
+    err_t igmp_joingroup_netif(struct netif* netif, const ip4_addr_t* groupaddr)
     {
         (void)netif;
         (void)groupaddr;
         return ERR_OK;
     }
 
-    err_t igmp_leavegroup_netif(struct netif *netif, const ip4_addr_t *groupaddr)
+    err_t igmp_leavegroup_netif(struct netif* netif, const ip4_addr_t* groupaddr)
     {
         (void)netif;
         (void)groupaddr;
@@ -60,5 +59,4 @@ extern "C"
         return &netif0;
     }
 
-
-} // extern "C"
+}  // extern "C"

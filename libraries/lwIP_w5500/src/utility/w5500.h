@@ -35,22 +35,18 @@
 #ifndef W5500_H
 #define W5500_H
 
-#include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
-
-
+#include <stdint.h>
 
 class Wiznet5500
 {
-
-public:
+   public:
     /**
         Constructor that uses the default hardware SPI pins
         @param cs the Arduino Chip Select / Slave Select pin (default 10)
     */
     Wiznet5500(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1);
-
 
     /**
         Initialise the Ethernet controller
@@ -59,7 +55,7 @@ public:
         @param address the local MAC address for the Ethernet interface
         @return Returns true if setting up the Ethernet interface was successful
     */
-    boolean begin(const uint8_t *address);
+    boolean begin(const uint8_t* address);
 
     /**
         Shut down the Ethernet controlled
@@ -72,7 +68,7 @@ public:
         @param datalen the length of the data in the packet
         @return the number of bytes transmitted
     */
-    uint16_t sendFrame(const uint8_t *data, uint16_t datalen);
+    uint16_t sendFrame(const uint8_t* data, uint16_t datalen);
 
     /**
         Read an Ethernet frame
@@ -81,10 +77,9 @@ public:
         @return the length of the received packet
                or 0 if no packet was received
     */
-    uint16_t readFrame(uint8_t *buffer, uint16_t bufsize);
+    uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
-protected:
-
+   protected:
     static constexpr bool interruptIsPossible()
     {
         return false;
@@ -112,11 +107,9 @@ protected:
         @return the length of the received frame
                or 0 if a problem occurred
     */
-    uint16_t readFrameData(uint8_t *frame, uint16_t framesize);
+    uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
-
-private:
-
+   private:
     //< SPI interface Read operation in Control Phase
     static const uint8_t AccessModeRead = (0x00 << 2);
 
@@ -134,8 +127,6 @@ private:
 
     //< Socket 0 Rx buffer address block
     static const uint8_t BlockSelectRxBuf = (0x03 << 3);
-
-
 
     SPIClass& _spi;
     int8_t _cs;
@@ -180,7 +171,6 @@ private:
     {
         _spi.transfer(wb);
     }
-
 
     /**
         Read a 1 byte value from a register.
@@ -240,7 +230,6 @@ private:
     */
     uint16_t getSn_RX_RSR();
 
-
     /**
         Reset WIZCHIP by softly.
     */
@@ -279,7 +268,7 @@ private:
         @param len Data length
         @sa wizchip_recv_data()
     */
-    void wizchip_send_data(const uint8_t *wizdata, uint16_t len);
+    void wizchip_send_data(const uint8_t* wizdata, uint16_t len);
 
     /**
         It copies data to your buffer from internal RX memory
@@ -293,7 +282,7 @@ private:
         @param len Data length
         @sa wizchip_send_data()
     */
-    void wizchip_recv_data(uint8_t *wizdata, uint16_t len);
+    void wizchip_recv_data(uint8_t* wizdata, uint16_t len);
 
     /**
         It discard the received data in RX memory.
@@ -301,8 +290,6 @@ private:
         @param len Data length
     */
     void wizchip_recv_ignore(uint16_t len);
-
-
 
     /** Common registers */
     enum
@@ -371,40 +358,40 @@ private:
     /* Interrupt Mask Register values */
     enum
     {
-        IM_IR7 = 0x80,   ///< IP Conflict Interrupt Mask
-        IM_IR6 = 0x40,   ///< Destination unreachable Interrupt Mask
-        IM_IR5 = 0x20,   ///< PPPoE Close Interrupt Mask
-        IM_IR4 = 0x10,   ///< Magic Packet Interrupt Mask
+        IM_IR7 = 0x80,  ///< IP Conflict Interrupt Mask
+        IM_IR6 = 0x40,  ///< Destination unreachable Interrupt Mask
+        IM_IR5 = 0x20,  ///< PPPoE Close Interrupt Mask
+        IM_IR4 = 0x10,  ///< Magic Packet Interrupt Mask
     };
 
     /** Socket Mode Register values @ref Sn_MR */
     enum
     {
-        Sn_MR_CLOSE = 0x00,  ///< Unused socket
-        Sn_MR_TCP = 0x01,    ///< TCP
-        Sn_MR_UDP = 0x02,    ///< UDP
-        Sn_MR_MACRAW = 0x04, ///< MAC LAYER RAW SOCK
-        Sn_MR_UCASTB = 0x10, ///< Unicast Block in UDP Multicasting
-        Sn_MR_ND = 0x20,     ///< No Delayed Ack(TCP), Multicast flag
-        Sn_MR_BCASTB = 0x40, ///< Broadcast block in UDP Multicasting
-        Sn_MR_MULTI = 0x80,  ///< Support UDP Multicasting
-        Sn_MR_MIP6B = 0x10,  ///< IPv6 packet Blocking in @ref Sn_MR_MACRAW mode
-        Sn_MR_MMB = 0x20,    ///< Multicast Blocking in @ref Sn_MR_MACRAW mode
-        Sn_MR_MFEN = 0x80,   ///< MAC filter enable in @ref Sn_MR_MACRAW mode
+        Sn_MR_CLOSE = 0x00,   ///< Unused socket
+        Sn_MR_TCP = 0x01,     ///< TCP
+        Sn_MR_UDP = 0x02,     ///< UDP
+        Sn_MR_MACRAW = 0x04,  ///< MAC LAYER RAW SOCK
+        Sn_MR_UCASTB = 0x10,  ///< Unicast Block in UDP Multicasting
+        Sn_MR_ND = 0x20,      ///< No Delayed Ack(TCP), Multicast flag
+        Sn_MR_BCASTB = 0x40,  ///< Broadcast block in UDP Multicasting
+        Sn_MR_MULTI = 0x80,   ///< Support UDP Multicasting
+        Sn_MR_MIP6B = 0x10,   ///< IPv6 packet Blocking in @ref Sn_MR_MACRAW mode
+        Sn_MR_MMB = 0x20,     ///< Multicast Blocking in @ref Sn_MR_MACRAW mode
+        Sn_MR_MFEN = 0x80,    ///< MAC filter enable in @ref Sn_MR_MACRAW mode
     };
 
     /** Socket Command Register values */
     enum
     {
-        Sn_CR_OPEN = 0x01,      ///< Initialise or open socket
-        Sn_CR_LISTEN = 0x02,    ///< Wait connection request in TCP mode (Server mode)
-        Sn_CR_CONNECT = 0x04,   ///< Send connection request in TCP mode (Client mode)
-        Sn_CR_DISCON = 0x08,    ///< Send closing request in TCP mode
-        Sn_CR_CLOSE = 0x10,     ///< Close socket
-        Sn_CR_SEND = 0x20,      ///< Update TX buffer pointer and send data
-        Sn_CR_SEND_MAC = 0x21,  ///< Send data with MAC address, so without ARP process
-        Sn_CR_SEND_KEEP = 0x22, ///< Send keep alive message
-        Sn_CR_RECV = 0x40,      ///< Update RX buffer pointer and receive data
+        Sn_CR_OPEN = 0x01,       ///< Initialise or open socket
+        Sn_CR_LISTEN = 0x02,     ///< Wait connection request in TCP mode (Server mode)
+        Sn_CR_CONNECT = 0x04,    ///< Send connection request in TCP mode (Client mode)
+        Sn_CR_DISCON = 0x08,     ///< Send closing request in TCP mode
+        Sn_CR_CLOSE = 0x10,      ///< Close socket
+        Sn_CR_SEND = 0x20,       ///< Update TX buffer pointer and send data
+        Sn_CR_SEND_MAC = 0x21,   ///< Send data with MAC address, so without ARP process
+        Sn_CR_SEND_KEEP = 0x22,  ///< Send keep alive message
+        Sn_CR_RECV = 0x40,       ///< Update RX buffer pointer and receive data
     };
 
     /** Socket Interrupt register values */
@@ -420,27 +407,26 @@ private:
     /** Socket Status Register values */
     enum
     {
-        SOCK_CLOSED = 0x00,      ///< Closed
-        SOCK_INIT = 0x13,        ///< Initiate state
-        SOCK_LISTEN = 0x14,      ///< Listen state
-        SOCK_SYNSENT = 0x15,     ///< Connection state
-        SOCK_SYNRECV = 0x16,     ///< Connection state
-        SOCK_ESTABLISHED = 0x17, ///< Success to connect
-        SOCK_FIN_WAIT = 0x18,    ///< Closing state
-        SOCK_CLOSING = 0x1A,     ///< Closing state
-        SOCK_TIME_WAIT = 0x1B,   ///< Closing state
-        SOCK_CLOSE_WAIT = 0x1C,  ///< Closing state
-        SOCK_LAST_ACK = 0x1D,    ///< Closing state
-        SOCK_UDP = 0x22,         ///< UDP socket
-        SOCK_MACRAW = 0x42,      ///< MAC raw mode socket
+        SOCK_CLOSED = 0x00,       ///< Closed
+        SOCK_INIT = 0x13,         ///< Initiate state
+        SOCK_LISTEN = 0x14,       ///< Listen state
+        SOCK_SYNSENT = 0x15,      ///< Connection state
+        SOCK_SYNRECV = 0x16,      ///< Connection state
+        SOCK_ESTABLISHED = 0x17,  ///< Success to connect
+        SOCK_FIN_WAIT = 0x18,     ///< Closing state
+        SOCK_CLOSING = 0x1A,      ///< Closing state
+        SOCK_TIME_WAIT = 0x1B,    ///< Closing state
+        SOCK_CLOSE_WAIT = 0x1C,   ///< Closing state
+        SOCK_LAST_ACK = 0x1D,     ///< Closing state
+        SOCK_UDP = 0x22,          ///< UDP socket
+        SOCK_MACRAW = 0x42,       ///< MAC raw mode socket
     };
-
 
     /* PHYCFGR register value */
     enum
     {
-        PHYCFGR_RST = ~(1 << 7), //< For PHY reset, must operate AND mask.
-        PHYCFGR_OPMD = (1 << 6), // Configre PHY with OPMDC value
+        PHYCFGR_RST = ~(1 << 7),  //< For PHY reset, must operate AND mask.
+        PHYCFGR_OPMD = (1 << 6),  // Configre PHY with OPMDC value
         PHYCFGR_OPMDC_ALLA = (7 << 3),
         PHYCFGR_OPMDC_PDOWN = (6 << 3),
         PHYCFGR_OPMDC_NA = (5 << 3),
@@ -468,7 +454,6 @@ private:
         PHY_POWER_NORM = 0,   ///< PHY power normal mode
         PHY_POWER_DOWN = 1,   ///< PHY power down mode
     };
-
 
     /**
         Set Mode Register
@@ -764,4 +749,4 @@ private:
     }
 };
 
-#endif // W5500_H
+#endif  // W5500_H

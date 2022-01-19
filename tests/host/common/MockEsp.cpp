@@ -103,7 +103,7 @@ uint32_t EspClass::getChipId()
 
 bool EspClass::checkFlashConfig(bool needsEquals)
 {
-    (void) needsEquals;
+    (void)needsEquals;
     return true;
 }
 
@@ -132,7 +132,7 @@ uint32_t EspClass::getFreeSketchSpace()
     return 4 * 1024 * 1024;
 }
 
-const char *EspClass::getSdkVersion()
+const char* EspClass::getSdkVersion()
 {
     return "2.5.0";
 }
@@ -163,7 +163,7 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 
 bool EspClass::flashEraseSector(uint32_t sector)
 {
-    (void) sector;
+    (void)sector;
     return true;
 }
 
@@ -174,11 +174,11 @@ FlashMode_t EspClass::getFlashChipMode()
 
 FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 {
-    (void) byte;
+    (void)byte;
     return FM_DOUT;
 }
 
-bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size)
+bool EspClass::flashWrite(uint32_t offset, const uint32_t* data, size_t size)
 {
     (void)offset;
     (void)data;
@@ -186,7 +186,7 @@ bool EspClass::flashWrite(uint32_t offset, const uint32_t *data, size_t size)
     return true;
 }
 
-bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size)
+bool EspClass::flashWrite(uint32_t offset, const uint8_t* data, size_t size)
 {
     (void)offset;
     (void)data;
@@ -194,7 +194,7 @@ bool EspClass::flashWrite(uint32_t offset, const uint8_t *data, size_t size)
     return true;
 }
 
-bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size)
+bool EspClass::flashRead(uint32_t offset, uint32_t* data, size_t size)
 {
     (void)offset;
     (void)data;
@@ -202,7 +202,7 @@ bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size)
     return true;
 }
 
-bool EspClass::flashRead(uint32_t offset, uint8_t *data, size_t size)
+bool EspClass::flashRead(uint32_t offset, uint8_t* data, size_t size)
 {
     (void)offset;
     (void)data;
@@ -214,22 +214,22 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte)
 {
     switch (byte & 0x0F)
     {
-    case 0x0: // 4 Mbit (512KB)
-        return (512_kB);
-    case 0x1: // 2 MBit (256KB)
-        return (256_kB);
-    case 0x2: // 8 MBit (1MB)
-        return (1_MB);
-    case 0x3: // 16 MBit (2MB)
-        return (2_MB);
-    case 0x4: // 32 MBit (4MB)
-        return (4_MB);
-    case 0x8: // 64 MBit (8MB)
-        return (8_MB);
-    case 0x9: // 128 MBit (16MB)
-        return (16_MB);
-    default: // fail?
-        return 0;
+        case 0x0:  // 4 Mbit (512KB)
+            return (512_kB);
+        case 0x1:  // 2 MBit (256KB)
+            return (256_kB);
+        case 0x2:  // 8 MBit (1MB)
+            return (1_MB);
+        case 0x3:  // 16 MBit (2MB)
+            return (2_MB);
+        case 0x4:  // 32 MBit (4MB)
+            return (4_MB);
+        case 0x8:  // 64 MBit (8MB)
+            return (8_MB);
+        case 0x9:  // 128 MBit (16MB)
+            return (16_MB);
+        default:  // fail?
+            return 0;
     }
 }
 

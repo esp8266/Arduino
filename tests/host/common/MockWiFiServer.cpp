@@ -74,4 +74,3 @@ WiFiClient WiFiServer::accept()
 
 #include <include/UdpContext.h>
 uint32_t UdpContext::staticMCastAddr = 0;
-

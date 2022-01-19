@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include <Schedule.h>
 
-static struct timeval gtod0 = { 0, 0 };
+static struct timeval gtod0 = {0, 0};
 
 extern "C" unsigned long millis()
 {
@@ -44,7 +44,6 @@ extern "C" unsigned long micros()
     }
     return ((time.tv_sec - gtod0.tv_sec) * 1000000) + time.tv_usec - gtod0.tv_usec;
 }
-
 
 extern "C" void yield()
 {

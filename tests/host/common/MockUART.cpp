@@ -28,29 +28,29 @@
     is responsible for feeding the RX FIFO new data by calling uart_new_data().
 */
 
-#include <unistd.h> // write
-#include <sys/time.h> // gettimeofday
-#include <time.h> // localtime
+#include <sys/time.h>  // gettimeofday
+#include <time.h>      // localtime
+#include <unistd.h>    // write
 
 #include "Arduino.h"
 #include "uart.h"
 
 //#define UART_DISCARD_NEWEST
 
-extern "C" {
-
-    bool blocking_uart = true; // system default
+extern "C"
+{
+    bool blocking_uart = true;  // system default
 
     static int s_uart_debug_nr = UART1;
 
-    static uart_t *UART[2] = { NULL, NULL };
+    static uart_t* UART[2] = {NULL, NULL};
 
     struct uart_rx_buffer_
     {
         size_t size;
         size_t rpos;
         size_t wpos;
-        uint8_t * buffer;
+        uint8_t* buffer;
     };
 
     struct uart_
@@ -60,7 +60,7 @@ extern "C" {
         bool rx_enabled;
         bool tx_enabled;
         bool rx_overrun;
-        struct uart_rx_buffer_ * rx_buffer;
+        struct uart_rx_buffer_* rx_buffer;
     };
 
     bool serial_timestamp = false;
@@ -101,7 +101,7 @@ extern "C" {
     static void
     uart_handle_data(uart_t* uart, uint8_t data)
     {
-        struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
+        struct uart_rx_buffer_* rx_buffer = uart->rx_buffer;
 
         size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
         if (nextPos == rx_buffer->rpos)
@@ -135,7 +135,7 @@ extern "C" {
     }
 
     static size_t
-    uart_rx_available_unsafe(const struct uart_rx_buffer_ * rx_buffer)
+    uart_rx_available_unsafe(const struct uart_rx_buffer_* rx_buffer)
     {
         size_t ret = rx_buffer->wpos - rx_buffer->rpos;
 
@@ -222,9 +222,7 @@ extern "C" {
         {
             // pour sw buffer to user's buffer
             // get largest linear length from sw buffer
-            size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos ?
-                           uart->rx_buffer->wpos - uart->rx_buffer->rpos :
-                           uart->rx_buffer->size - uart->rx_buffer->rpos;
+            size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos ? uart->rx_buffer->wpos - uart->rx_buffer->rpos : uart->rx_buffer->size - uart->rx_buffer->rpos;
             if (ret + chunk > usersize)
             {
                 chunk = usersize - ret;
@@ -249,7 +247,7 @@ extern "C" {
             return uart->rx_buffer->size;
         }
 
-        uint8_t * new_buf = (uint8_t*)malloc(new_size);
+        uint8_t* new_buf = (uint8_t*)malloc(new_size);
         if (!new_buf)
         {
             return uart->rx_buffer->size;
@@ -266,7 +264,7 @@ extern "C" {
             new_wpos = 0;
         }
 
-        uint8_t * old_buf = uart->rx_buffer->buffer;
+        uint8_t* old_buf = uart->rx_buffer->buffer;
         uart->rx_buffer->rpos = 0;
         uart->rx_buffer->wpos = new_wpos;
         uart->rx_buffer->size = new_size;
@@ -326,7 +324,7 @@ extern "C" {
     void
     uart_wait_tx_empty(uart_t* uart)
     {
-        (void) uart;
+        (void)uart;
     }
 
     void
@@ -378,10 +376,10 @@ extern "C" {
     uart_t*
     uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
     {
-        (void) config;
-        (void) tx_pin;
-        (void) invert;
-        uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
+        (void)config;
+        (void)tx_pin;
+        (void)invert;
+        uart_t* uart = (uart_t*)malloc(sizeof(uart_t));
         if (uart == NULL)
         {
             return NULL;
@@ -392,42 +390,42 @@ extern "C" {
 
         switch (uart->uart_nr)
         {
-        case UART0:
-            uart->rx_enabled = (mode != UART_TX_ONLY);
-            uart->tx_enabled = (mode != UART_RX_ONLY);
-            if (uart->rx_enabled)
-            {
-                struct uart_rx_buffer_ * rx_buffer = (struct uart_rx_buffer_ *)malloc(sizeof(struct uart_rx_buffer_));
-                if (rx_buffer == NULL)
+            case UART0:
+                uart->rx_enabled = (mode != UART_TX_ONLY);
+                uart->tx_enabled = (mode != UART_RX_ONLY);
+                if (uart->rx_enabled)
                 {
-                    free(uart);
-                    return NULL;
+                    struct uart_rx_buffer_* rx_buffer = (struct uart_rx_buffer_*)malloc(sizeof(struct uart_rx_buffer_));
+                    if (rx_buffer == NULL)
+                    {
+                        free(uart);
+                        return NULL;
+                    }
+                    rx_buffer->size = rx_size;  //var this
+                    rx_buffer->rpos = 0;
+                    rx_buffer->wpos = 0;
+                    rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
+                    if (rx_buffer->buffer == NULL)
+                    {
+                        free(rx_buffer);
+                        free(uart);
+                        return NULL;
+                    }
+                    uart->rx_buffer = rx_buffer;
                 }
-                rx_buffer->size = rx_size;//var this
-                rx_buffer->rpos = 0;
-                rx_buffer->wpos = 0;
-                rx_buffer->buffer = (uint8_t *)malloc(rx_buffer->size);
-                if (rx_buffer->buffer == NULL)
-                {
-                    free(rx_buffer);
-                    free(uart);
-                    return NULL;
-                }
-                uart->rx_buffer = rx_buffer;
-            }
-            break;
+                break;
 
-        case UART1:
-            // Note: uart_interrupt_handler does not support RX on UART 1.
-            uart->rx_enabled = false;
-            uart->tx_enabled = (mode != UART_RX_ONLY);
-            break;
+            case UART1:
+                // Note: uart_interrupt_handler does not support RX on UART 1.
+                uart->rx_enabled = false;
+                uart->tx_enabled = (mode != UART_RX_ONLY);
+                break;
 
-        case UART_NO:
-        default:
-            // big fail!
-            free(uart);
-            return NULL;
+            case UART_NO:
+            default:
+                // big fail!
+                free(uart);
+                return NULL;
         }
 
         uart_set_baudrate(uart, baudrate);
@@ -456,25 +454,25 @@ extern "C" {
     bool
     uart_swap(uart_t* uart, int tx_pin)
     {
-        (void) uart;
-        (void) tx_pin;
+        (void)uart;
+        (void)tx_pin;
         return true;
     }
 
     bool
     uart_set_tx(uart_t* uart, int tx_pin)
     {
-        (void) uart;
-        (void) tx_pin;
+        (void)uart;
+        (void)tx_pin;
         return true;
     }
 
     bool
     uart_set_pins(uart_t* uart, int tx, int rx)
     {
-        (void) uart;
-        (void) tx;
-        (void) rx;
+        (void)uart;
+        (void)tx;
+        (void)rx;
         return true;
     }
 
@@ -516,7 +514,7 @@ extern "C" {
     bool
     uart_has_rx_error(uart_t* uart)
     {
-        (void) uart;
+        (void)uart;
         return false;
     }
 
@@ -535,18 +533,16 @@ extern "C" {
     void
     uart_start_detect_baudrate(int uart_nr)
     {
-        (void) uart_nr;
+        (void)uart_nr;
     }
 
     int
     uart_detect_baudrate(int uart_nr)
     {
-        (void) uart_nr;
+        (void)uart_nr;
         return 115200;
     }
-
 };
-
 
 size_t uart_peek_available(uart_t* uart)
 {
@@ -561,4 +557,3 @@ void uart_peek_consume(uart_t* uart, size_t consume)
     (void)uart;
     (void)consume;
 }
-

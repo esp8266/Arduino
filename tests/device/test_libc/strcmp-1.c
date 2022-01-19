@@ -26,10 +26,10 @@
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define memcmp memcmp_P
 #define memcpy memcpy_P
@@ -45,7 +45,6 @@
 #define strncmp strncmp_P
 
 #define BUFF_SIZE 256
-
 
 /*  The macro LONG_TEST controls whether a short or a more comprehensive test
     of strcmp should be performed.  */
@@ -106,11 +105,10 @@
 #error "Buffer overrun: MAX_OFFSET + MAX_BLOCK_SIZE + MAX_DIFF + MAX_LEN + MAX_ZEROS >= BUFF_SIZE."
 #endif
 
-
 #define TOO_MANY_ERRORS 11
 static int errors = 0;
 
-const char *testname = "strcmp";
+const char* testname = "strcmp";
 
 static void
 print_error(char const* msg, ...)
@@ -133,7 +131,6 @@ print_error(char const* msg, ...)
     }
 }
 
-
 extern int rand_seed;
 void strcmp_main(void)
 {
@@ -146,7 +143,7 @@ void strcmp_main(void)
     unsigned sa;
     unsigned da;
     unsigned n, m, len;
-    char *p;
+    char* p;
     int ret;
 
     /*  Make calls to strcmp with block sizes ranging between 1 and
@@ -155,7 +152,7 @@ void strcmp_main(void)
         for (da = 0; da <= MAX_OFFSET; da++)
             for (n = 1; n <= MAX_BLOCK_SIZE; n++)
             {
-                for (m = 1;  m < n + MAX_DIFF; m++)
+                for (m = 1; m < n + MAX_DIFF; m++)
                     for (len = 0; len < MAX_LEN; len++)
                         for (zeros = 1; zeros < MAX_ZEROS; zeros++)
                         {
@@ -197,53 +194,58 @@ void strcmp_main(void)
                                 {
                                     if (ret != 0)
                                     {
-                                        print_error("\nFailed: after %s of %u bytes "
-                                                    "with src_align %u and dst_align %u, "
-                                                    "dest after %d bytes is modified for %d bytes, "
-                                                    "return value is %d, expected 0.\n",
-                                                    testname, n, sa, da, m, len, ret);
+                                        print_error(
+                                            "\nFailed: after %s of %u bytes "
+                                            "with src_align %u and dst_align %u, "
+                                            "dest after %d bytes is modified for %d bytes, "
+                                            "return value is %d, expected 0.\n",
+                                            testname, n, sa, da, m, len, ret);
                                     }
                                 }
                                 else
                                 {
                                     if (ret >= 0)
-                                        print_error("\nFailed: after %s of %u bytes "
-                                                    "with src_align %u and dst_align %u, "
-                                                    "dest after %d bytes is modified for %d bytes, "
-                                                    "return value is %d, expected negative.\n",
-                                                    testname, n, sa, da, m, len, ret);
+                                        print_error(
+                                            "\nFailed: after %s of %u bytes "
+                                            "with src_align %u and dst_align %u, "
+                                            "dest after %d bytes is modified for %d bytes, "
+                                            "return value is %d, expected negative.\n",
+                                            testname, n, sa, da, m, len, ret);
                                 }
                             }
                             else if (m > n)
                             {
                                 if (ret >= 0)
                                 {
-                                    print_error("\nFailed: after %s of %u bytes "
-                                                "with src_align %u and dst_align %u, "
-                                                "dest after %d bytes is modified for %d bytes, "
-                                                "return value is %d, expected negative.\n",
-                                                testname, n, sa, da, m, len, ret);
+                                    print_error(
+                                        "\nFailed: after %s of %u bytes "
+                                        "with src_align %u and dst_align %u, "
+                                        "dest after %d bytes is modified for %d bytes, "
+                                        "return value is %d, expected negative.\n",
+                                        testname, n, sa, da, m, len, ret);
                                 }
                             }
-                            else  /* m < n */
+                            else /* m < n */
                             {
                                 if (len == 0)
                                 {
                                     if (ret <= 0)
-                                        print_error("\nFailed: after %s of %u bytes "
-                                                    "with src_align %u and dst_align %u, "
-                                                    "dest after %d bytes is modified for %d bytes, "
-                                                    "return value is %d, expected positive.\n",
-                                                    testname, n, sa, da, m, len, ret);
+                                        print_error(
+                                            "\nFailed: after %s of %u bytes "
+                                            "with src_align %u and dst_align %u, "
+                                            "dest after %d bytes is modified for %d bytes, "
+                                            "return value is %d, expected positive.\n",
+                                            testname, n, sa, da, m, len, ret);
                                 }
                                 else
                                 {
                                     if (ret >= 0)
-                                        print_error("\nFailed: after %s of %u bytes "
-                                                    "with src_align %u and dst_align %u, "
-                                                    "dest after %d bytes is modified for %d bytes, "
-                                                    "return value is %d, expected negative.\n",
-                                                    testname, n, sa, da, m, len, ret);
+                                        print_error(
+                                            "\nFailed: after %s of %u bytes "
+                                            "with src_align %u and dst_align %u, "
+                                            "dest after %d bytes is modified for %d bytes, "
+                                            "return value is %d, expected negative.\n",
+                                            testname, n, sa, da, m, len, ret);
                                 }
                             }
                         }

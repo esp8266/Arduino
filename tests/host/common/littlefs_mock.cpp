@@ -16,20 +16,19 @@
     all copies or substantial portions of the Software.
 */
 
-
 #include "littlefs_mock.h"
-#include "spiffs_mock.h"
-#include "spiffs/spiffs.h"
-#include "debug.h"
+#include <LittleFS.h>
 #include <flash_utils.h>
 #include <stdlib.h>
-#include <LittleFS.h>
+#include "debug.h"
+#include "spiffs/spiffs.h"
+#include "spiffs_mock.h"
 
 #include <spiffs_api.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <cerrno>
 #include "flash_hal_mock.h"
@@ -49,11 +48,11 @@ LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, con
     fprintf(stderr, "LittleFS: %zd bytes\n", fs_size);
 
     m_fs.resize(fs_size, 0xff);
-    s_phys_addr  = 0;
-    s_phys_size  = static_cast<uint32_t>(fs_size);
-    s_phys_page  = static_cast<uint32_t>(fs_page);
+    s_phys_addr = 0;
+    s_phys_size = static_cast<uint32_t>(fs_size);
+    s_phys_page = static_cast<uint32_t>(fs_page);
     s_phys_block = static_cast<uint32_t>(fs_block);
-    s_phys_data  = m_fs.data();
+    s_phys_data = m_fs.data();
     reset();
 }
 
@@ -66,11 +65,11 @@ void LittleFSMock::reset()
 LittleFSMock::~LittleFSMock()
 {
     save();
-    s_phys_addr  = 0;
-    s_phys_size  = 0;
-    s_phys_page  = 0;
+    s_phys_addr = 0;
+    s_phys_size = 0;
+    s_phys_page = 0;
     s_phys_block = 0;
-    s_phys_data  = nullptr;
+    s_phys_data = nullptr;
     m_fs.resize(0);
     LittleFS = FS(FSImplPtr(nullptr));
 }
@@ -90,7 +89,7 @@ void LittleFSMock::load()
     }
 
     off_t flen = lseek(fs, 0, SEEK_END);
-    if (flen == (off_t) -1)
+    if (flen == (off_t)-1)
     {
         fprintf(stderr, "LittleFS: checking size of '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;

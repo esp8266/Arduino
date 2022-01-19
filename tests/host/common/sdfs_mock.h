@@ -16,14 +16,14 @@
 #ifndef sdfs_mock_hpp
 #define sdfs_mock_hpp
 
-#include <stdint.h>
-#include <stddef.h>
-#include <vector>
 #include <FS.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <vector>
 
 class SDFSMock
 {
-public:
+   public:
     SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString)
     {
         (void)fs_size;
@@ -31,19 +31,22 @@ public:
         (void)fs_page;
         (void)storage;
     }
-    void reset() { }
-    ~SDFSMock() { }
+    void reset() {}
+    ~SDFSMock() {}
 };
 
 extern uint64_t _sdCardSizeB;
-extern uint8_t *_sdCard;
+extern uint8_t* _sdCard;
 
-#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) \
-    SDFS.end(); \
-    SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage); free(_sdCard); \
-    _sdCardSizeB = size_kb ? 16 * 1024 * 1024 : 0; \
-    if (_sdCardSizeB) _sdCard = (uint8_t*)calloc(_sdCardSizeB, 1); \
-    else _sdCard = nullptr; \
+#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage)             \
+    SDFS.end();                                                           \
+    SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage); \
+    free(_sdCard);                                                        \
+    _sdCardSizeB = size_kb ? 16 * 1024 * 1024 : 0;                        \
+    if (_sdCardSizeB)                                                     \
+        _sdCard = (uint8_t*)calloc(_sdCardSizeB, 1);                      \
+    else                                                                  \
+        _sdCard = nullptr;                                                \
     SDFS.setConfig(SDFSConfig().setAutoFormat(true));
 #define SDFS_MOCK_RESET() sdfs_mock.reset()
 

@@ -13,19 +13,17 @@
     all copies or substantial portions of the Software.
 */
 
-
-#include <stdlib.h>
-#include <string.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 #include "stdlib_noniso.h"
-
 
 void reverse(char* begin, char* end)
 {
-    char *is = begin;
-    char *ie = end - 1;
+    char* is = begin;
+    char* ie = end - 1;
     while (is < ie)
     {
         char tmp = *ie;
@@ -96,18 +94,17 @@ char* itoa(int value, char* result, int base)
 
 int atoi(const char* s)
 {
-    return (int) atol(s);
+    return (int)atol(s);
 }
 
 long atol(const char* s)
 {
-    char * tmp;
+    char* tmp;
     return strtol(s, &tmp, 10);
 }
 
 double atof(const char* s)
 {
-    char * tmp;
+    char* tmp;
     return strtod(s, &tmp);
 }
-

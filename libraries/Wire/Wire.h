@@ -27,7 +27,6 @@
 #include <inttypes.h>
 #include "Stream.h"
 
-
 #ifndef I2C_BUFFER_LENGTH
 // DEPRECATED: Do not use BUFFER_LENGTH, prefer I2C_BUFFER_LENGTH
 #define BUFFER_LENGTH 128
@@ -36,7 +35,7 @@
 
 class TwoWire : public Stream
 {
-private:
+   private:
     static uint8_t rxBuffer[];
     static size_t rxBufferIndex;
     static size_t rxBufferLength;
@@ -51,11 +50,12 @@ private:
     static void (*user_onReceive)(size_t);
     static void onRequestService(void);
     static void onReceiveService(uint8_t*, size_t);
-public:
+
+   public:
     TwoWire();
     void begin(int sda, int scl);
     void begin(int sda, int scl, uint8_t address);
-    void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
+    void pins(int sda, int scl) __attribute__((deprecated));  // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
     void begin(int);
@@ -74,13 +74,13 @@ public:
     uint8_t requestFrom(int, int, int);
 
     virtual size_t write(uint8_t);
-    virtual size_t write(const uint8_t *, size_t);
+    virtual size_t write(const uint8_t*, size_t);
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive(void (*)(int));      // arduino api
-    void onReceive(void (*)(size_t));   // legacy esp8266 backward compatibility
+    void onReceive(void (*)(int));     // arduino api
+    void onReceive(void (*)(size_t));  // legacy esp8266 backward compatibility
     void onRequest(void (*)(void));
 
     using Print::write;
@@ -91,4 +91,3 @@ extern TwoWire Wire;
 #endif
 
 #endif
-

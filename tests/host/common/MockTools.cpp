@@ -34,7 +34,6 @@
 
 extern "C"
 {
-
     uint32_t lwip_htonl(uint32_t hostlong)
     {
         return htonl(hostlong);
@@ -74,9 +73,9 @@ extern "C"
         return len;
     }
 
-    void stack_thunk_add_ref() { }
-    void stack_thunk_del_ref() { }
-    void stack_thunk_repaint() { }
+    void stack_thunk_add_ref() {}
+    void stack_thunk_del_ref() {}
+    void stack_thunk_repaint() {}
 
     uint32_t stack_thunk_get_refcnt()
     {
@@ -98,15 +97,13 @@ extern "C"
     {
         return 0;
     }
-    void stack_thunk_dump_stack() { }
+    void stack_thunk_dump_stack() {}
 
     // Thunking macro
 #define make_stack_thunk(fcnToThunk)
-
 };
 
-void configTime(int timezone, int daylightOffset_sec,
-                const char* server1, const char* server2, const char* server3)
+void configTime(int timezone, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
     (void)server1;
     (void)server2;

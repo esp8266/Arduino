@@ -32,17 +32,15 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 
 class ClientContext
 {
-public:
-    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
-        _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
-        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(-1)
+   public:
+    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg)
+        : _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _sync(::getDefaultPrivateGlobalSyncValue()), _sock(-1)
     {
         (void)pcb;
     }
 
-    ClientContext(int sock) :
-        _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr),
-        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
+    ClientContext(int sock)
+        : _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr), _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
     {
     }
 
@@ -199,7 +197,7 @@ public:
         return peekBytes(&c, 1) ? c : -1;
     }
 
-    size_t peekBytes(char *dst, size_t size)
+    size_t peekBytes(char* dst, size_t size)
     {
         ssize_t ret = mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
         if (ret < 0)
@@ -223,7 +221,7 @@ public:
 
     uint8_t state()
     {
-        (void)getSize(); // read on socket to force detect closed peer
+        (void)getSize();  // read on socket to force detect closed peer
         return _sock >= 0 ? ESTABLISHED : CLOSED;
     }
 
@@ -240,9 +238,9 @@ public:
 
     void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
-        (void) idle_sec;
-        (void) intv_sec;
-        (void) count;
+        (void)idle_sec;
+        (void)intv_sec;
+        (void)count;
         mockverbose("TODO ClientContext::keepAlive()\n");
     }
 
@@ -309,8 +307,7 @@ public:
         _inbufsize -= consume;
     }
 
-private:
-
+   private:
     discard_cb_t _discard_cb = nullptr;
     void* _discard_cb_arg = nullptr;
 
@@ -324,8 +321,8 @@ private:
     int _sock = -1;
     int _timeout_ms = 5000;
 
-    char _inbuf [CCBUFSIZE];
+    char _inbuf[CCBUFSIZE];
     size_t _inbufsize = 0;
 };
 
-#endif //CLIENTCONTEXT_H
+#endif  //CLIENTCONTEXT_H

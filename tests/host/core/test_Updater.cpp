@@ -13,14 +13,13 @@
     all copies or substantial portions of the Software.
 */
 
-#include <catch.hpp>
 #include <Updater.h>
-
+#include <catch.hpp>
 
 // Use a SPIFFS file because we can't instantiate a virtual class like Print
 TEST_CASE("Updater fails when writes overflow requested size", "[core][Updater]")
 {
-    UpdaterClass *u;
+    UpdaterClass* u;
     uint8_t buff[6000];
     memset(buff, 0, sizeof(buff));
     u = new UpdaterClass();
