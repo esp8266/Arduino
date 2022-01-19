@@ -26,8 +26,7 @@ int32_t flash_hal_write(uint32_t addr, uint32_t size, const uint8_t* src)
 
 int32_t flash_hal_erase(uint32_t addr, uint32_t size)
 {
-    if ((size & (FLASH_SECTOR_SIZE - 1)) != 0 ||
-        (addr & (FLASH_SECTOR_SIZE - 1)) != 0)
+    if ((size & (FLASH_SECTOR_SIZE - 1)) != 0 || (addr & (FLASH_SECTOR_SIZE - 1)) != 0)
     {
         abort();
     }

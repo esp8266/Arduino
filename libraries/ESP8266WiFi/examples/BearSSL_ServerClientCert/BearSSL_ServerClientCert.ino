@@ -67,11 +67,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
 // The server which will require a client cert signed by the trusted CA
 BearSSL::WiFiServerSecure server(443);
@@ -160,8 +160,7 @@ seoK24dHmt6tWmn/sbxX7Aa6TL/4mVlFoOgcaTJyVaY/BrY=
 // head of the app.
 
 // Set time via NTP, as required for x.509 validation
-void setClock()
-{
+void setClock() {
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   Serial.print("Waiting for NTP time sync: ");
@@ -202,29 +201,28 @@ void setup() {
   setClock(); // Required for X.509 validation
 
   // Attach the server private cert/key combo
-  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
-  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
+  BearSSL::X509List* serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey* serverPrivKey = new BearSSL::PrivateKey(server_private_key);
   server.setRSACert(serverCertList, serverPrivKey);
 
   // Require a certificate validated by the trusted CA
-  BearSSL::X509List *serverTrustedCA = new BearSSL::X509List(ca_cert);
+  BearSSL::X509List* serverTrustedCA = new BearSSL::X509List(ca_cert);
   server.setClientTrustAnchor(serverTrustedCA);
 
   // Actually start accepting connections
   server.begin();
 }
 
-static const char *HTTP_RES =
-        "HTTP/1.0 200 OK\r\n"
-        "Connection: close\r\n"
-        "Content-Length: 59\r\n"
-        "Content-Type: text/html; charset=iso-8859-1\r\n"
-        "\r\n"
-        "<html>\r\n"
-        "<body>\r\n"
-        "<p>Hello my friend!</p>\r\n"
-        "</body>\r\n"
-        "</html>\r\n";
+static const char* HTTP_RES = "HTTP/1.0 200 OK\r\n"
+                              "Connection: close\r\n"
+                              "Content-Length: 59\r\n"
+                              "Content-Type: text/html; charset=iso-8859-1\r\n"
+                              "\r\n"
+                              "<html>\r\n"
+                              "<body>\r\n"
+                              "<p>Hello my friend!</p>\r\n"
+                              "</body>\r\n"
+                              "</html>\r\n";
 
 void loop() {
   BearSSL::WiFiClientSecure incoming = server.accept();
@@ -232,12 +230,12 @@ void loop() {
     return;
   }
   Serial.println("Incoming connection...\n");
-  
+
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
-  uint32_t timeout=millis() + 1000;
+  uint32_t timeout = millis() + 1000;
   int lcwn = 0;
   for (;;) {
-    unsigned char x=0;
+    unsigned char x = 0;
     if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
       incoming.stop();
       Serial.printf("Connection error, closed\n");

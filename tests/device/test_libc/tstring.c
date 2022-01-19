@@ -30,10 +30,10 @@ void eprintf(int line, char* result, char* expected, int size)
 {
     if (size != 0)
         printf("Failure at line %d, result is <%.*s>, should be <%s> of size %d\n",
-               line, size, result, expected, size);
+            line, size, result, expected, size);
     else
         printf("Failure at line %d, result is <%s>, should be <%s>\n",
-               line, result, expected);
+            line, result, expected);
 }
 
 void mycopy(char* target, char* source, int size)
@@ -87,113 +87,77 @@ void tstring_main(void)
     tmp2[0] = 'Z';
     tmp2[1] = '\0';
 
-    if (memset(target, 'X', 0) != target ||
-        memcpy(target, "Y", 0) != target ||
-        memmove(target, "K", 0) != target ||
-        strncpy(tmp2, "4", 0) != tmp2 ||
-        strncat(tmp2, "123", 0) != tmp2 ||
-        strcat(target, "") != target)
+    if (memset(target, 'X', 0) != target || memcpy(target, "Y", 0) != target || memmove(target, "K", 0) != target || strncpy(tmp2, "4", 0) != tmp2 || strncat(tmp2, "123", 0) != tmp2 || strcat(target, "") != target)
     {
         eprintf(__LINE__, target, "A", 0);
         test_failed = 1;
     }
 
-    if (strcmp(target, "A") || strlen(target) != 1 || memchr(target, 'A', 0) != NULL || memcmp(target, "J", 0) || strncmp(target, "A", 1) || strncmp(target, "J", 0) ||
-        tmp2[0] != 'Z' || tmp2[1] != '\0')
+    if (strcmp(target, "A") || strlen(target) != 1 || memchr(target, 'A', 0) != NULL || memcmp(target, "J", 0) || strncmp(target, "A", 1) || strncmp(target, "J", 0) || tmp2[0] != 'Z' || tmp2[1] != '\0')
     {
         eprintf(__LINE__, target, "A", 0);
         test_failed = 1;
     }
 
     tmp2[2] = 'A';
-    if (strcpy(target, "") != target ||
-        strncpy(tmp2, "", 4) != tmp2 ||
-        strcat(target, "") != target)
+    if (strcpy(target, "") != target || strncpy(tmp2, "", 4) != tmp2 || strcat(target, "") != target)
     {
         eprintf(__LINE__, target, "", 0);
         test_failed = 1;
     }
 
-    if (target[0] != '\0' || strncmp(target, "", 1) ||
-        memcmp(tmp2, "\0\0\0\0", 4))
+    if (target[0] != '\0' || strncmp(target, "", 1) || memcmp(tmp2, "\0\0\0\0", 4))
     {
         eprintf(__LINE__, target, "", 0);
         test_failed = 1;
     }
 
     tmp2[2] = 'A';
-    if (strncat(tmp2, "1", 3) != tmp2 ||
-        memcmp(tmp2, "1\0A", 3))
+    if (strncat(tmp2, "1", 3) != tmp2 || memcmp(tmp2, "1\0A", 3))
     {
         eprintf(__LINE__, tmp2, "1\0A", 3);
         test_failed = 1;
     }
 
-    if (strcpy(tmp3, target) != tmp3 ||
-        strcat(tmp3, "X") != tmp3 ||
-        strncpy(tmp2, "X", 2) != tmp2 ||
-        memset(target, tmp2[0], 1) != target)
+    if (strcpy(tmp3, target) != tmp3 || strcat(tmp3, "X") != tmp3 || strncpy(tmp2, "X", 2) != tmp2 || memset(target, tmp2[0], 1) != target)
     {
         eprintf(__LINE__, target, "X", 0);
         test_failed = 1;
     }
 
-    if (strcmp(target, "X") || strlen(target) != 1 ||
-        memchr(target, 'X', 2) != target ||
-        strchr(target, 'X') != target ||
-        memchr(target, 'Y', 2) != NULL ||
-        strchr(target, 'Y') != NULL ||
-        strcmp(tmp3, target) ||
-        strncmp(tmp3, target, 2) ||
-        memcmp(target, "K", 0) ||
-        strncmp(target, tmp3, 3))
+    if (strcmp(target, "X") || strlen(target) != 1 || memchr(target, 'X', 2) != target || strchr(target, 'X') != target || memchr(target, 'Y', 2) != NULL || strchr(target, 'Y') != NULL || strcmp(tmp3, target) || strncmp(tmp3, target, 2) || memcmp(target, "K", 0) || strncmp(target, tmp3, 3))
     {
         eprintf(__LINE__, target, "X", 0);
         test_failed = 1;
     }
 
-    if (strcpy(tmp3, "Y") != tmp3 ||
-        strcat(tmp3, "Y") != tmp3 ||
-        memset(target, 'Y', 2) != target)
+    if (strcpy(tmp3, "Y") != tmp3 || strcat(tmp3, "Y") != tmp3 || memset(target, 'Y', 2) != target)
     {
         eprintf(__LINE__, target, "Y", 0);
         test_failed = 1;
     }
 
     target[2] = '\0';
-    if (memcmp(target, "YY", 2) || strcmp(target, "YY") ||
-        strlen(target) != 2 || memchr(target, 'Y', 2) != target ||
-        strcmp(tmp3, target) ||
-        strncmp(target, tmp3, 3) ||
-        strncmp(target, tmp3, 4) ||
-        strncmp(target, tmp3, 2) ||
-        strchr(target, 'Y') != target)
+    if (memcmp(target, "YY", 2) || strcmp(target, "YY") || strlen(target) != 2 || memchr(target, 'Y', 2) != target || strcmp(tmp3, target) || strncmp(target, tmp3, 3) || strncmp(target, tmp3, 4) || strncmp(target, tmp3, 2) || strchr(target, 'Y') != target)
     {
         eprintf(__LINE__, target, "YY", 2);
         test_failed = 1;
     }
 
     strcpy(target, "WW");
-    if (memcmp(target, "WW", 2) || strcmp(target, "WW") ||
-        strlen(target) != 2 || memchr(target, 'W', 2) != target ||
-        strchr(target, 'W') != target)
+    if (memcmp(target, "WW", 2) || strcmp(target, "WW") || strlen(target) != 2 || memchr(target, 'W', 2) != target || strchr(target, 'W') != target)
     {
         eprintf(__LINE__, target, "WW", 2);
         test_failed = 1;
     }
 
-    if (strncpy(target, "XX", 16) != target ||
-        memcmp(target, "XX\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16))
+    if (strncpy(target, "XX", 16) != target || memcmp(target, "XX\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16))
     {
         eprintf(__LINE__, target, "XX\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16);
         test_failed = 1;
     }
 
-    if (strcpy(tmp3, "ZZ") != tmp3 ||
-        strcat(tmp3, "Z") != tmp3 ||
-        memcpy(tmp4, "Z", 2) != tmp4 ||
-        strcat(tmp4, "ZZ") != tmp4 ||
-        memset(target, 'Z', 3) != target)
+    if (strcpy(tmp3, "ZZ") != tmp3 || strcat(tmp3, "Z") != tmp3 || memcpy(tmp4, "Z", 2) != tmp4 || strcat(tmp4, "ZZ") != tmp4 || memset(target, 'Z', 3) != target)
     {
         eprintf(__LINE__, target, "ZZZ", 3);
         test_failed = 1;
@@ -202,32 +166,21 @@ void tstring_main(void)
     target[3] = '\0';
     tmp5[0] = '\0';
     strncat(tmp5, "123", 2);
-    if (memcmp(target, "ZZZ", 3) || strcmp(target, "ZZZ") ||
-        strcmp(tmp3, target) || strcmp(tmp4, target) ||
-        strncmp(target, "ZZZ", 4) || strncmp(target, "ZZY", 3) <= 0 ||
-        strncmp("ZZY", target, 4) >= 0 ||
-        memcmp(tmp5, "12", 3) ||
-        strlen(target) != 3)
+    if (memcmp(target, "ZZZ", 3) || strcmp(target, "ZZZ") || strcmp(tmp3, target) || strcmp(tmp4, target) || strncmp(target, "ZZZ", 4) || strncmp(target, "ZZY", 3) <= 0 || strncmp("ZZY", target, 4) >= 0 || memcmp(tmp5, "12", 3) || strlen(target) != 3)
     {
         eprintf(__LINE__, target, "ZZZ", 3);
         test_failed = 1;
     }
 
     target[2] = 'K';
-    if (memcmp(target, "ZZZ", 2) || strcmp(target, "ZZZ") >= 0 ||
-        memcmp(target, "ZZZ", 3) >= 0 || strlen(target) != 3 ||
-        memchr(target, 'K', 3) != target + 2 ||
-        strncmp(target, "ZZZ", 2) || strncmp(target, "ZZZ", 4) >= 0 ||
-        strchr(target, 'K') != target + 2)
+    if (memcmp(target, "ZZZ", 2) || strcmp(target, "ZZZ") >= 0 || memcmp(target, "ZZZ", 3) >= 0 || strlen(target) != 3 || memchr(target, 'K', 3) != target + 2 || strncmp(target, "ZZZ", 2) || strncmp(target, "ZZZ", 4) >= 0 || strchr(target, 'K') != target + 2)
     {
         eprintf(__LINE__, target, "ZZK", 3);
         test_failed = 1;
     }
 
     strcpy(target, "AAA");
-    if (memcmp(target, "AAA", 3) || strcmp(target, "AAA") ||
-        strncmp(target, "AAA", 3) ||
-        strlen(target) != 3)
+    if (memcmp(target, "AAA", 3) || strcmp(target, "AAA") || strncmp(target, "AAA", 3) || strlen(target) != 3)
     {
         eprintf(__LINE__, target, "AAA", 3);
         test_failed = 1;
@@ -281,8 +234,7 @@ void tstring_main(void)
                     test_failed = 1;
                 }
                 tmp2[i - z] = first_char + 1;
-                if (memmove(tmp2 + z + 1, tmp2 + z, i - z - 1) != tmp2 + z + 1 ||
-                    memset(tmp3, first_char, i) != tmp3)
+                if (memmove(tmp2 + z + 1, tmp2 + z, i - z - 1) != tmp2 + z + 1 || memset(tmp3, first_char, i) != tmp3)
                 {
                     printf("error at line %d\n", __LINE__);
                     test_failed = 1;
@@ -290,8 +242,7 @@ void tstring_main(void)
 
                 myset(tmp4, first_char, i);
                 tmp5[0] = '\0';
-                if (strncpy(tmp5, tmp1, i + 1) != tmp5 ||
-                    strcat(tmp5, tmp1) != tmp5)
+                if (strncpy(tmp5, tmp1, i + 1) != tmp5 || strcat(tmp5, tmp1) != tmp5)
                 {
                     printf("error at line %d\n", __LINE__);
                     test_failed = 1;
@@ -304,19 +255,7 @@ void tstring_main(void)
 
                 (void)strchr(tmp1, second_char);
 
-                if (memcmp(tmp1, expected, i) || strcmp(tmp1, expected) ||
-                    strncmp(tmp1, expected, i) ||
-                    strncmp(tmp1, expected, i + 1) ||
-                    strcmp(tmp1, tmp2) >= 0 || memcmp(tmp1, tmp2, i) >= 0 ||
-                    strncmp(tmp1, tmp2, i + 1) >= 0 ||
-                    (int)strlen(tmp1) != i || memchr(tmp1, first_char, i) != tmp1 ||
-                    strchr(tmp1, first_char) != tmp1 ||
-                    memchr(tmp1, second_char, i) != tmp1 + z ||
-                    strchr(tmp1, second_char) != tmp1 + z ||
-                    strcmp(tmp5, tmp6) ||
-                    strncat(tmp7, tmp1, i + 2) != tmp7 ||
-                    strcmp(tmp7, tmp6) ||
-                    tmp7[2 * i + z] != second_char)
+                if (memcmp(tmp1, expected, i) || strcmp(tmp1, expected) || strncmp(tmp1, expected, i) || strncmp(tmp1, expected, i + 1) || strcmp(tmp1, tmp2) >= 0 || memcmp(tmp1, tmp2, i) >= 0 || strncmp(tmp1, tmp2, i + 1) >= 0 || (int)strlen(tmp1) != i || memchr(tmp1, first_char, i) != tmp1 || strchr(tmp1, first_char) != tmp1 || memchr(tmp1, second_char, i) != tmp1 + z || strchr(tmp1, second_char) != tmp1 + z || strcmp(tmp5, tmp6) || strncat(tmp7, tmp1, i + 2) != tmp7 || strcmp(tmp7, tmp6) || tmp7[2 * i + z] != second_char)
                 {
                     eprintf(__LINE__, tmp1, expected, 0);
                     printf("x is %d\n", x);
@@ -329,21 +268,17 @@ void tstring_main(void)
 
                 for (k = 1; k <= align_test_iterations && k <= i; ++k)
                 {
-                    if (memcmp(tmp3, tmp4, i - k + 1) != 0 ||
-                        strncmp(tmp3, tmp4, i - k + 1) != 0)
+                    if (memcmp(tmp3, tmp4, i - k + 1) != 0 || strncmp(tmp3, tmp4, i - k + 1) != 0)
                     {
                         printf("Failure at line %d, comparing %.*s with %.*s\n",
-                               __LINE__, i, tmp3, i, tmp4);
+                            __LINE__, i, tmp3, i, tmp4);
                         test_failed = 1;
                     }
                     tmp4[i - k] = first_char + 1;
-                    if (memcmp(tmp3, tmp4, i) >= 0 ||
-                        strncmp(tmp3, tmp4, i) >= 0 ||
-                        memcmp(tmp4, tmp3, i) <= 0 ||
-                        strncmp(tmp4, tmp3, i) <= 0)
+                    if (memcmp(tmp3, tmp4, i) >= 0 || strncmp(tmp3, tmp4, i) >= 0 || memcmp(tmp4, tmp3, i) <= 0 || strncmp(tmp4, tmp3, i) <= 0)
                     {
                         printf("Failure at line %d, comparing %.*s with %.*s\n",
-                               __LINE__, i, tmp3, i, tmp4);
+                            __LINE__, i, tmp3, i, tmp4);
                         test_failed = 1;
                     }
                     tmp4[i - k] = first_char;

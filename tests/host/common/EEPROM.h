@@ -34,7 +34,7 @@
 
 class EEPROMClass
 {
-   public:
+public:
     EEPROMClass(uint32_t sector);
     EEPROMClass(void);
     ~EEPROMClass();
@@ -70,7 +70,7 @@ class EEPROMClass
     //uint8_t& operator[](int const address) { return read(address); }
     uint8_t operator[](int address) { return read(address); }
 
-   protected:
+protected:
     size_t _size = 0;
     int _fd = -1;
 };

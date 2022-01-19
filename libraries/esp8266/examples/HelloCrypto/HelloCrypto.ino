@@ -47,7 +47,6 @@ void loop() {
 
   static uint32_t encryptionCounter = 0;
 
-
   // Generate the salt to use for HKDF
   uint8_t hkdfSalt[16] { 0 };
   getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
@@ -61,13 +60,11 @@ void loop() {
   Serial.println(String(F("\nThis is the SHA256 hash of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
   Serial.println(String(F("This is the SHA256 hash of our example data, in HEX format, using String output:\n")) + SHA256::hash(exampleData));
 
-
   // HMAC
   // Note that HMAC output length is limited
   SHA256::hmac(exampleData.c_str(), exampleData.length(), derivedKey, sizeof derivedKey, resultArray, sizeof resultArray);
   Serial.println(String(F("\nThis is the SHA256 HMAC of our example data, in HEX format:\n")) + TypeCast::uint8ArrayToHexString(resultArray, sizeof resultArray));
   Serial.println(String(F("This is the SHA256 HMAC of our example data, in HEX format, using String output:\n")) + SHA256::hmac(exampleData, derivedKey, sizeof derivedKey, SHA256::NATURAL_LENGTH));
-
 
   // Authenticated Encryption with Associated Data (AEAD)
   String dataToEncrypt = F("This data is not encrypted.");
@@ -90,7 +87,6 @@ void loop() {
   }
 
   Serial.println(dataToEncrypt);
-
 
   Serial.println(F("\n##########################################################################################################\n"));
 

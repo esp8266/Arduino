@@ -35,7 +35,7 @@
 
 class DhcpServer
 {
-   public:
+public:
     DhcpServer(netif* netif);
     ~DhcpServer();
 
@@ -63,7 +63,7 @@ class DhcpServer
 
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
 
-   protected:
+protected:
     // legacy C structure and API to eventually turn into C++
 
     typedef struct _list_node
@@ -84,10 +84,10 @@ class DhcpServer
     uint8_t parse_options(uint8_t* optptr, sint16_t len);
     sint16_t parse_msg(struct dhcps_msg* m, u16_t len);
     static void S_handle_dhcp(void* arg,
-                              struct udp_pcb* pcb,
-                              struct pbuf* p,
-                              const ip_addr_t* addr,
-                              uint16_t port);
+        struct udp_pcb* pcb,
+        struct pbuf* p,
+        const ip_addr_t* addr,
+        uint16_t port);
     void handle_dhcp(
         struct udp_pcb* pcb,
         struct pbuf* p,

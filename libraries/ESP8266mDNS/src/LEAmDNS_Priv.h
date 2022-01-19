@@ -35,7 +35,7 @@ namespace MDNSImplementation
 {
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
-//#define DEBUG_ESP_MDNS_RESPONDER
+    //#define DEBUG_ESP_MDNS_RESPONDER
 
 #if !defined(DEBUG_ESP_MDNS_RESPONDER) && defined(DEBUG_ESP_MDNS)
 #define DEBUG_ESP_MDNS_RESPONDER

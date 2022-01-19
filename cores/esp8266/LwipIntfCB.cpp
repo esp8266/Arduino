@@ -34,9 +34,9 @@ bool LwipIntf::stateChangeSysCB(LwipIntf::CBType&& cb)
 bool LwipIntf::stateUpCB(LwipIntf::CBType&& cb)
 {
     return stateChangeSysCB([cb](netif* nif)
-                            {
-                                if (netif_is_up(nif))
-                                    schedule_function([cb, nif]()
-                                                      { cb(nif); });
-                            });
+        {
+            if (netif_is_up(nif))
+                schedule_function([cb, nif]()
+                    { cb(nif); });
+        });
 }

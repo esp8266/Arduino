@@ -17,7 +17,7 @@ namespace NetCapture
 {
 class NetdumpIP
 {
-   public:
+public:
     NetdumpIP();
 
     NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
@@ -34,7 +34,7 @@ class NetdumpIP
 
     String toString();
 
-   private:
+private:
     enum class IPversion
     {
         UNSET,
@@ -43,7 +43,7 @@ class NetdumpIP
     };
     IPversion ipv = IPversion::UNSET;
 
-    uint8_t rawip[16] = {0};
+    uint8_t rawip[16] = { 0 };
 
     void setV4()
     {
@@ -83,7 +83,7 @@ class NetdumpIP
 
     size_t printTo(Print& p);
 
-   public:
+public:
     bool operator==(const IPAddress& addr) const
     {
         return compareIP(addr);

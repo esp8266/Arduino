@@ -67,12 +67,11 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
 
-
 #define DBG_OUTPUT_PORT Serial
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -135,7 +134,6 @@ String checkForUnsupportedPath(String filename) {
 }
 #endif
 
-
 ////////////////////////////////
 // Request handlers
 
@@ -167,7 +165,6 @@ void handleStatus() {
 
   server.send(200, "application/json", json);
 }
-
 
 /*
    Return the list of files in the directory specified by the "dir" query string parameter.
@@ -242,7 +239,6 @@ void handleFileList() {
   server.chunkedResponseFinalize();
 }
 
-
 /*
    Read the given file from the filesystem and stream it back to the client
 */
@@ -280,7 +276,6 @@ bool handleFileRead(String path) {
   return false;
 }
 
-
 /*
    As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed,
    return the path of the closest parent still existing
@@ -290,7 +285,7 @@ String lastExistingParent(String path) {
     if (path.lastIndexOf('/') > 0) {
       path = path.substring(0, path.lastIndexOf('/'));
     } else {
-      path = String();  // No slash => the top folder does not exist
+      path = String(); // No slash => the top folder does not exist
     }
   }
   DBG_OUTPUT_PORT.println(String("Last existing parent: ") + path);
@@ -345,7 +340,7 @@ void handleFileCreate() {
       // Create a file
       File file = fileSystem->open(path, "w");
       if (file) {
-        file.write((const char *)0);
+        file.write((const char*)0);
         file.close();
       } else {
         return replyServerError(F("CREATE FAILED"));
@@ -379,7 +374,6 @@ void handleFileCreate() {
   }
 }
 
-
 /*
    Delete the file or folder designed by the given path.
    If it's a file, delete it.
@@ -410,7 +404,6 @@ void deleteRecursive(String path) {
   // Then delete the folder itself
   fileSystem->rmdir(path);
 }
-
 
 /*
    Handle a file deletion request
@@ -477,7 +470,6 @@ void handleFileUpload() {
   }
 }
 
-
 /*
    The "Not Found" handler catches all URI not explicitly declared in code
    First try to find and return the requested file from the filesystem,
@@ -536,7 +528,6 @@ void handleGetEdit() {
 #else
   replyNotFound(FPSTR(FILE_NOT_FOUND));
 #endif
-
 }
 
 void setup(void) {
@@ -609,15 +600,15 @@ void setup(void) {
   server.on("/edit", HTTP_GET, handleGetEdit);
 
   // Create file
-  server.on("/edit",  HTTP_PUT, handleFileCreate);
+  server.on("/edit", HTTP_PUT, handleFileCreate);
 
   // Delete file
-  server.on("/edit",  HTTP_DELETE, handleFileDelete);
+  server.on("/edit", HTTP_DELETE, handleFileDelete);
 
   // Upload file
   // - first callback is called after the request has ended with all parsed arguments
   // - second callback handles file upload at that location
-  server.on("/edit",  HTTP_POST, replyOK, handleFileUpload);
+  server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem
@@ -627,7 +618,6 @@ void setup(void) {
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
 }
-
 
 void loop(void) {
   server.handleClient();

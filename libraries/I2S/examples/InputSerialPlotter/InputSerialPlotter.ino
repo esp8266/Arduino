@@ -21,7 +21,8 @@ void setup() {
   // start I2S at 8 kHz with 24-bits per sample
   if (!I2S.begin(I2S_PHILIPS_MODE, 8000, 24)) {
     Serial.println("Failed to initialize I2S!");
-    while (1); // do nothing
+    while (1)
+      ; // do nothing
   }
 }
 

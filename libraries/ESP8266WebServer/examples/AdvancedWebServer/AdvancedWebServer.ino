@@ -35,11 +35,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *password = STAPSK;
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
@@ -54,7 +54,7 @@ void handleRoot() {
 
   snprintf(temp, 400,
 
-           "<html>\
+      "<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
     <title>ESP8266 Demo</title>\
@@ -69,8 +69,7 @@ void handleRoot() {
   </body>\
 </html>",
 
-           hr, min % 60, sec % 60
-          );
+      hr, min % 60, sec % 60);
   server.send(200, "text/html", temp);
   digitalWrite(led, 0);
 }
@@ -151,4 +150,3 @@ void loop(void) {
   server.handleClient();
   MDNS.update();
 }
-

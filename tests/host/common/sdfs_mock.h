@@ -23,7 +23,7 @@
 
 class SDFSMock
 {
-   public:
+public:
     SDFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString)
     {
         (void)fs_size;
@@ -31,8 +31,8 @@ class SDFSMock
         (void)fs_page;
         (void)storage;
     }
-    void reset() {}
-    ~SDFSMock() {}
+    void reset() { }
+    ~SDFSMock() { }
 };
 
 extern uint64_t _sdCardSizeB;

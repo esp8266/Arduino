@@ -15,14 +15,13 @@
 
 */
 
-
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -121,4 +120,3 @@ void loop(void) {
 
   Serial.println("Done with client");
 }
-

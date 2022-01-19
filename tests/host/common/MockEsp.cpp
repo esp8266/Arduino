@@ -208,22 +208,22 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte)
 {
     switch (byte & 0x0F)
     {
-        case 0x0:  // 4 Mbit (512KB)
-            return (512_kB);
-        case 0x1:  // 2 MBit (256KB)
-            return (256_kB);
-        case 0x2:  // 8 MBit (1MB)
-            return (1_MB);
-        case 0x3:  // 16 MBit (2MB)
-            return (2_MB);
-        case 0x4:  // 32 MBit (4MB)
-            return (4_MB);
-        case 0x8:  // 64 MBit (8MB)
-            return (8_MB);
-        case 0x9:  // 128 MBit (16MB)
-            return (16_MB);
-        default:  // fail?
-            return 0;
+    case 0x0:  // 4 Mbit (512KB)
+        return (512_kB);
+    case 0x1:  // 2 MBit (256KB)
+        return (256_kB);
+    case 0x2:  // 8 MBit (1MB)
+        return (1_MB);
+    case 0x3:  // 16 MBit (2MB)
+        return (2_MB);
+    case 0x4:  // 32 MBit (4MB)
+        return (4_MB);
+    case 0x8:  // 64 MBit (8MB)
+        return (8_MB);
+    case 0x9:  // 128 MBit (16MB)
+        return (16_MB);
+    default:  // fail?
+        return 0;
     }
 }
 

@@ -5,8 +5,8 @@
 #include <SPI.h>
 
 int ColorPaletteHigh = 30;
-int color = WHITE;  //Paint brush color
-unsigned int colors[8] = {BLACK, RED, GREEN, BLUE, CYAN, YELLOW, WHITE, GRAY1};
+int color = WHITE; //Paint brush color
+unsigned int colors[8] = { BLACK, RED, GREEN, BLUE, CYAN, YELLOW, WHITE, GRAY1 };
 
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
@@ -15,7 +15,7 @@ unsigned int colors[8] = {BLACK, RED, GREEN, BLUE, CYAN, YELLOW, WHITE, GRAY1};
 TouchScreen ts = TouchScreen(XP, YP, XM, YM); //init TouchScreen port pins
 
 void setup() {
-  Tft.TFTinit();  //init TFT library
+  Tft.TFTinit(); //init TFT library
   Serial.begin(115200);
   //Draw the pallet
   for (int i = 0; i < 8; i++) {

@@ -25,7 +25,7 @@ void setup() {
   uint32_t sector = ((((uint32_t)ptr - 0x40200000) / SPI_FLASH_SEC_SIZE));
 
   // Create a sector with 1 bit set (i.e. fake corruption)
-  uint32_t *space = (uint32_t*)calloc(SPI_FLASH_SEC_SIZE, 1);
+  uint32_t* space = (uint32_t*)calloc(SPI_FLASH_SEC_SIZE, 1);
   space[42] = 64;
 
   // Write it into flash at the spot in question
@@ -39,7 +39,6 @@ void setup() {
   spi_flash_write(sector * SPI_FLASH_SEC_SIZE, (uint32_t*)space, SPI_FLASH_SEC_SIZE);
   Serial.printf("CRC check: %s\n", ESP.checkFlashCRC() ? "OK" : "ERROR");
 }
-
 
 void loop() {
 }

@@ -8,7 +8,7 @@ namespace bs
 {
 class StdIOHelper
 {
-   public:
+public:
     StdIOHelper()
     {
     }

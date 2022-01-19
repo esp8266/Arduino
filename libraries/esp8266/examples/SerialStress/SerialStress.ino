@@ -11,18 +11,18 @@
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
 
-#define SSBAUD          115200  // logger on console for humans
-#define BAUD            3000000 // hardware serial stress test
-#define BUFFER_SIZE     4096    // may be useless to use more than 2*SERIAL_SIZE_RX
-#define SERIAL_SIZE_RX  1024    // Serial.setRxBufferSize()
+#define SSBAUD 115200 // logger on console for humans
+#define BAUD 3000000 // hardware serial stress test
+#define BUFFER_SIZE 4096 // may be useless to use more than 2*SERIAL_SIZE_RX
+#define SERIAL_SIZE_RX 1024 // Serial.setRxBufferSize()
 
 #define FAKE_INCREASED_AVAILABLE 100 // test readBytes's timeout
 
 #define TIMEOUT 5000
 #define DEBUG(x...) //x
 
-uint8_t buf [BUFFER_SIZE];
-uint8_t temp [BUFFER_SIZE];
+uint8_t buf[BUFFER_SIZE];
+uint8_t temp[BUFFER_SIZE];
 bool reading = true;
 size_t testReadBytesTimeout = 0;
 
@@ -38,7 +38,7 @@ Stream* logger;
 
 void error(const char* what) {
   logger->printf("\nerror: %s after %ld minutes\nread idx:  %d\nwrite idx: %d\ntotal:     %ld\nlast read: %d\nmaxavail:  %d\n",
-                 what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total, (int)local_receive_size, maxavail);
+      what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total, (int)local_receive_size, maxavail);
   if (Serial.hasOverrun()) {
     logger->printf("overrun!\n");
   }
@@ -76,7 +76,7 @@ void setup() {
   int baud = Serial.baudRate();
   logger->printf(ESP.getFullVersion().c_str());
   logger->printf("\n\nBAUD: %d - CoreRxBuffer: %d bytes - TestBuffer: %d bytes\n",
-                 baud, SERIAL_SIZE_RX, BUFFER_SIZE);
+      baud, SERIAL_SIZE_RX, BUFFER_SIZE);
 
   size_for_1sec = baud / 10; // 8n1=10baudFor8bits
   logger->printf("led changes state every %zd bytes (= 1 second)\n", size_for_1sec);
@@ -91,7 +91,8 @@ void setup() {
   // bind RX and TX
   USC0(0) |= (1 << UCLBE);
 
-  while (Serial.read() == -1);
+  while (Serial.read() == -1)
+    ;
   if (Serial.hasOverrun()) {
     logger->print("overrun?\n");
   }
@@ -107,9 +108,7 @@ void loop() {
     maxlen = BUFFER_SIZE - out_idx;
   }
   // check if not cycling more than buffer size relatively to input
-  size_t in_out = out_idx == in_idx ?
-                  BUFFER_SIZE :
-                  (in_idx + BUFFER_SIZE - out_idx - 1) % BUFFER_SIZE;
+  size_t in_out = out_idx == in_idx ? BUFFER_SIZE : (in_idx + BUFFER_SIZE - out_idx - 1) % BUFFER_SIZE;
   if (maxlen > in_out) {
     maxlen = in_out;
   }
@@ -172,7 +171,7 @@ void loop() {
 
     unsigned long now_ms = millis();
     int bwkbps_avg = ((((uint64_t)in_total) * 8000) / (now_ms - start_ms)) >> 10;
-    int bwkbps_now = (((in_total - in_prev) * 8000) / (now_ms - last_ms)) >> 10 ;
+    int bwkbps_now = (((in_total - in_prev) * 8000) / (now_ms - last_ms)) >> 10;
     logger->printf("bwavg=%d bwnow=%d kbps maxavail=%i\n", bwkbps_avg, bwkbps_now, maxavail);
 
     in_prev = in_total;

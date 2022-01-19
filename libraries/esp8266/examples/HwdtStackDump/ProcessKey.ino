@@ -1,5 +1,5 @@
 #include <esp8266_undocumented.h>
-void crashMeIfYouCan(void)__attribute__((weak));
+void crashMeIfYouCan(void) __attribute__((weak));
 int divideA_B(int a, int b);
 
 int* nullPointer = NULL;
@@ -15,16 +15,15 @@ void processKey(Print& out, int hotKey) {
       ESP.restart();
       break;
     case 's': {
-        uint32_t startTime = millis();
-        out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds.\r\n"));
-        ets_install_putc1(ets_putc);
-        while (true) {
-          ets_printf("%9lu\r", (millis() - startTime));
-          ets_delay_us(250000);
-          // stay in an loop blocking other system activity.
-        }
+      uint32_t startTime = millis();
+      out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds.\r\n"));
+      ets_install_putc1(ets_putc);
+      while (true) {
+        ets_printf("%9lu\r", (millis() - startTime));
+        ets_delay_us(250000);
+        // stay in an loop blocking other system activity.
       }
-      break;
+    } break;
     case 'h':
       out.printf_P(PSTR("Now crashing with Hardware WDT. This will take about 6 seconds.\r\n"));
       asm volatile("mov.n a2, %0\n\t"
@@ -32,7 +31,9 @@ void processKey(Print& out, int hotKey) {
                    "mov.n a4, %2\n\t"
                    "mov.n a5, %3\n\t"
                    "mov.n a6, %4\n\t"
-                   : : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa) : "memory");
+                   :
+                   : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa)
+                   : "memory");
       // Could not find these in the stack dump, unless interrupts were enabled.
       {
         uint32_t startTime = millis();

@@ -68,16 +68,16 @@ void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
     out.printf_P(PSTR("netDump starting\r\n"));
     setCallback([&out, ndd, this](const Packet& ndp)
-                { printDumpProcess(out, ndd, ndp); },
-                nf);
+        { printDumpProcess(out, ndd, ndp); },
+        nf);
 }
 
 void Netdump::fileDump(File& outfile, const Filter nf)
 {
     writePcapHeader(outfile);
     setCallback([&outfile, this](const Packet& ndp)
-                { fileDumpProcess(outfile, ndp); },
-                nf);
+        { fileDumpProcess(outfile, ndp); },
+        nf);
 }
 bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
 {
@@ -93,7 +93,7 @@ bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
     bufferIndex = 0;
 
     schedule_function([&tcpDumpServer, this, nf]()
-                      { tcpDumpLoop(tcpDumpServer, nf); });
+        { tcpDumpLoop(tcpDumpServer, nf); });
     return true;
 }
 
@@ -192,8 +192,8 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
         writePcapHeader(tcpDumpClient);
 
         setCallback([this](const Packet& ndp)
-                    { tcpDumpProcess(ndp); },
-                    nf);
+            { tcpDumpProcess(ndp); },
+            nf);
     }
     if (!tcpDumpClient || !tcpDumpClient.connected())
     {
@@ -208,7 +208,7 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
     if (tcpDumpServer.status() != CLOSED)
     {
         schedule_function([&tcpDumpServer, this, nf]()
-                          { tcpDumpLoop(tcpDumpServer, nf); });
+            { tcpDumpLoop(tcpDumpServer, nf); });
     }
 }
 

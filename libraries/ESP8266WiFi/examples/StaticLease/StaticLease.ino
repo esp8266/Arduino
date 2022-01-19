@@ -7,8 +7,8 @@
 #include <LwipDhcpServer.h>
 
 /* Set these to your desired credentials. */
-const char *ssid = "ESPap";
-const char *password = "thereisnospoon";
+const char* ssid = "ESPap";
+const char* password = "thereisnospoon";
 
 ESP8266WebServer server(80);
 
@@ -20,7 +20,7 @@ void handleRoot() {
   String result;
   char wifiClientMac[18];
   unsigned char number_client;
-  struct station_info *stat_info;
+  struct station_info* stat_info;
 
   int i = 1;
 
@@ -76,8 +76,8 @@ void setup() {
      ...
      any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
   */
-  dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
-  dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
+  dhcpSoftAP.add_dhcps_lease(mac_CAM); // always 192.168.0.100
+  dhcpSoftAP.add_dhcps_lease(mac_PC); // always 192.168.0.101
   /* Start Access Point. You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");

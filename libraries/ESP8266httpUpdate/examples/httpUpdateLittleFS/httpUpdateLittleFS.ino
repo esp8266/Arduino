@@ -17,7 +17,7 @@ ESP8266WiFiMulti WiFiMulti;
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK  "APPSK"
+#define APPSK "APPSK"
 #endif
 
 void setup() {
@@ -37,7 +37,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
-
 }
 
 void loop() {
@@ -77,4 +76,3 @@ void loop() {
     }
   }
 }
-

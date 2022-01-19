@@ -25,6 +25,7 @@ tests
 
 # core
 
+cp tests/clang-format-core .clang-format
 for d in $all; do
     if [ -d "$d" ]; then
         echo "-------- directory $d:"
@@ -39,10 +40,8 @@ done
 
 # examples
 
+cp tests/clang-format-arduino .clang-format
 for d in libraries; do
     echo "-------- examples in $d:"
-    find $d -name "*.ino" -exec \
-        astyle \
-            --suffix=none \
-            --options=${org}/astyle_examples.conf {} \;
+    find $d -name "*.ino" -exec clang-format-12 -i {} \;
 done

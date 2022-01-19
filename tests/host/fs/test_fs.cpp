@@ -144,7 +144,7 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
     f.write(65);
     f.write("bbcc");
     f.write("theend", 6);
-    char block[3] = {'x', 'y', 'z'};
+    char block[3] = { 'x', 'y', 'z' };
     f.write(block, 3);
     uint32_t bigone = 0x40404040;
     f.write((const uint8_t*)&bigone, 4);

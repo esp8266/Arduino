@@ -157,21 +157,20 @@
 
 #define SLIST_NEXT(elm, field) ((elm)->field.sle_next)
 
-#define SLIST_REMOVE(head, elm, type, field)                  \
-    do                                                        \
-    {                                                         \
-        if (SLIST_FIRST((head)) == (elm))                     \
-        {                                                     \
-            SLIST_REMOVE_HEAD((head), field);                 \
-        }                                                     \
-        else                                                  \
-        {                                                     \
-            struct type* curelm = SLIST_FIRST((head));        \
-            while (SLIST_NEXT(curelm, field) != (elm))        \
-                curelm = SLIST_NEXT(curelm, field);           \
-            SLIST_NEXT(curelm, field) =                       \
-                SLIST_NEXT(SLIST_NEXT(curelm, field), field); \
-        }                                                     \
+#define SLIST_REMOVE(head, elm, type, field)                                          \
+    do                                                                                \
+    {                                                                                 \
+        if (SLIST_FIRST((head)) == (elm))                                             \
+        {                                                                             \
+            SLIST_REMOVE_HEAD((head), field);                                         \
+        }                                                                             \
+        else                                                                          \
+        {                                                                             \
+            struct type* curelm = SLIST_FIRST((head));                                \
+            while (SLIST_NEXT(curelm, field) != (elm))                                \
+                curelm = SLIST_NEXT(curelm, field);                                   \
+            SLIST_NEXT(curelm, field) = SLIST_NEXT(SLIST_NEXT(curelm, field), field); \
+        }                                                                             \
     } while (0)
 
 #define SLIST_REMOVE_HEAD(head, field)                                \
@@ -260,30 +259,28 @@
 
 #define STAILQ_NEXT(elm, field) ((elm)->field.stqe_next)
 
-#define STAILQ_REMOVE(head, elm, type, field)                                 \
-    do                                                                        \
-    {                                                                         \
-        if (STAILQ_FIRST((head)) == (elm))                                    \
-        {                                                                     \
-            STAILQ_REMOVE_HEAD((head), field);                                \
-        }                                                                     \
-        else                                                                  \
-        {                                                                     \
-            struct type* curelm = STAILQ_FIRST((head));                       \
-            while (STAILQ_NEXT(curelm, field) != (elm))                       \
-                curelm = STAILQ_NEXT(curelm, field);                          \
-            if ((STAILQ_NEXT(curelm, field) =                                 \
-                     STAILQ_NEXT(STAILQ_NEXT(curelm, field), field)) == NULL) \
-                (head)->stqh_last = &STAILQ_NEXT((curelm), field);            \
-        }                                                                     \
+#define STAILQ_REMOVE(head, elm, type, field)                                                          \
+    do                                                                                                 \
+    {                                                                                                  \
+        if (STAILQ_FIRST((head)) == (elm))                                                             \
+        {                                                                                              \
+            STAILQ_REMOVE_HEAD((head), field);                                                         \
+        }                                                                                              \
+        else                                                                                           \
+        {                                                                                              \
+            struct type* curelm = STAILQ_FIRST((head));                                                \
+            while (STAILQ_NEXT(curelm, field) != (elm))                                                \
+                curelm = STAILQ_NEXT(curelm, field);                                                   \
+            if ((STAILQ_NEXT(curelm, field) = STAILQ_NEXT(STAILQ_NEXT(curelm, field), field)) == NULL) \
+                (head)->stqh_last = &STAILQ_NEXT((curelm), field);                                     \
+        }                                                                                              \
     } while (0)
 
-#define STAILQ_REMOVE_HEAD(head, field)                             \
-    do                                                              \
-    {                                                               \
-        if ((STAILQ_FIRST((head)) =                                 \
-                 STAILQ_NEXT(STAILQ_FIRST((head)), field)) == NULL) \
-            (head)->stqh_last = &STAILQ_FIRST((head));              \
+#define STAILQ_REMOVE_HEAD(head, field)                                                \
+    do                                                                                 \
+    {                                                                                  \
+        if ((STAILQ_FIRST((head)) = STAILQ_NEXT(STAILQ_FIRST((head)), field)) == NULL) \
+            (head)->stqh_last = &STAILQ_FIRST((head));                                 \
     } while (0)
 
 #define STAILQ_REMOVE_HEAD_UNTIL(head, elm, field)                      \
@@ -333,14 +330,13 @@
         LIST_FIRST((head)) = NULL; \
     } while (0)
 
-#define LIST_INSERT_AFTER(listelm, elm, field)                               \
-    do                                                                       \
-    {                                                                        \
-        if ((LIST_NEXT((elm), field) = LIST_NEXT((listelm), field)) != NULL) \
-            LIST_NEXT((listelm), field)->field.le_prev =                     \
-                &LIST_NEXT((elm), field);                                    \
-        LIST_NEXT((listelm), field) = (elm);                                 \
-        (elm)->field.le_prev = &LIST_NEXT((listelm), field);                 \
+#define LIST_INSERT_AFTER(listelm, elm, field)                                     \
+    do                                                                             \
+    {                                                                              \
+        if ((LIST_NEXT((elm), field) = LIST_NEXT((listelm), field)) != NULL)       \
+            LIST_NEXT((listelm), field)->field.le_prev = &LIST_NEXT((elm), field); \
+        LIST_NEXT((listelm), field) = (elm);                                       \
+        (elm)->field.le_prev = &LIST_NEXT((listelm), field);                       \
     } while (0)
 
 #define LIST_INSERT_BEFORE(listelm, elm, field)              \
@@ -363,13 +359,12 @@
 
 #define LIST_NEXT(elm, field) ((elm)->field.le_next)
 
-#define LIST_REMOVE(elm, field)                          \
-    do                                                   \
-    {                                                    \
-        if (LIST_NEXT((elm), field) != NULL)             \
-            LIST_NEXT((elm), field)->field.le_prev =     \
-                (elm)->field.le_prev;                    \
-        *(elm)->field.le_prev = LIST_NEXT((elm), field); \
+#define LIST_REMOVE(elm, field)                                            \
+    do                                                                     \
+    {                                                                      \
+        if (LIST_NEXT((elm), field) != NULL)                               \
+            LIST_NEXT((elm), field)->field.le_prev = (elm)->field.le_prev; \
+        *(elm)->field.le_prev = LIST_NEXT((elm), field);                   \
     } while (0)
 
 /*
@@ -430,16 +425,15 @@
         (head)->tqh_last = &TAILQ_FIRST((head)); \
     } while (0)
 
-#define TAILQ_INSERT_AFTER(head, listelm, elm, field)                          \
-    do                                                                         \
-    {                                                                          \
-        if ((TAILQ_NEXT((elm), field) = TAILQ_NEXT((listelm), field)) != NULL) \
-            TAILQ_NEXT((elm), field)->field.tqe_prev =                         \
-                &TAILQ_NEXT((elm), field);                                     \
-        else                                                                   \
-            (head)->tqh_last = &TAILQ_NEXT((elm), field);                      \
-        TAILQ_NEXT((listelm), field) = (elm);                                  \
-        (elm)->field.tqe_prev = &TAILQ_NEXT((listelm), field);                 \
+#define TAILQ_INSERT_AFTER(head, listelm, elm, field)                             \
+    do                                                                            \
+    {                                                                             \
+        if ((TAILQ_NEXT((elm), field) = TAILQ_NEXT((listelm), field)) != NULL)    \
+            TAILQ_NEXT((elm), field)->field.tqe_prev = &TAILQ_NEXT((elm), field); \
+        else                                                                      \
+            (head)->tqh_last = &TAILQ_NEXT((elm), field);                         \
+        TAILQ_NEXT((listelm), field) = (elm);                                     \
+        (elm)->field.tqe_prev = &TAILQ_NEXT((listelm), field);                    \
     } while (0)
 
 #define TAILQ_INSERT_BEFORE(listelm, elm, field)               \
@@ -451,16 +445,15 @@
         (listelm)->field.tqe_prev = &TAILQ_NEXT((elm), field); \
     } while (0)
 
-#define TAILQ_INSERT_HEAD(head, elm, field)                           \
-    do                                                                \
-    {                                                                 \
-        if ((TAILQ_NEXT((elm), field) = TAILQ_FIRST((head))) != NULL) \
-            TAILQ_FIRST((head))->field.tqe_prev =                     \
-                &TAILQ_NEXT((elm), field);                            \
-        else                                                          \
-            (head)->tqh_last = &TAILQ_NEXT((elm), field);             \
-        TAILQ_FIRST((head)) = (elm);                                  \
-        (elm)->field.tqe_prev = &TAILQ_FIRST((head));                 \
+#define TAILQ_INSERT_HEAD(head, elm, field)                                  \
+    do                                                                       \
+    {                                                                        \
+        if ((TAILQ_NEXT((elm), field) = TAILQ_FIRST((head))) != NULL)        \
+            TAILQ_FIRST((head))->field.tqe_prev = &TAILQ_NEXT((elm), field); \
+        else                                                                 \
+            (head)->tqh_last = &TAILQ_NEXT((elm), field);                    \
+        TAILQ_FIRST((head)) = (elm);                                         \
+        (elm)->field.tqe_prev = &TAILQ_FIRST((head));                        \
     } while (0)
 
 #define TAILQ_INSERT_TAIL(head, elm, field)           \
@@ -480,15 +473,14 @@
 #define TAILQ_PREV(elm, headname, field) \
     (*(((struct headname*)((elm)->field.tqe_prev))->tqh_last))
 
-#define TAILQ_REMOVE(head, elm, field)                     \
-    do                                                     \
-    {                                                      \
-        if ((TAILQ_NEXT((elm), field)) != NULL)            \
-            TAILQ_NEXT((elm), field)->field.tqe_prev =     \
-                (elm)->field.tqe_prev;                     \
-        else                                               \
-            (head)->tqh_last = (elm)->field.tqe_prev;      \
-        *(elm)->field.tqe_prev = TAILQ_NEXT((elm), field); \
+#define TAILQ_REMOVE(head, elm, field)                                        \
+    do                                                                        \
+    {                                                                         \
+        if ((TAILQ_NEXT((elm), field)) != NULL)                               \
+            TAILQ_NEXT((elm), field)->field.tqe_prev = (elm)->field.tqe_prev; \
+        else                                                                  \
+            (head)->tqh_last = (elm)->field.tqe_prev;                         \
+        *(elm)->field.tqe_prev = TAILQ_NEXT((elm), field);                    \
     } while (0)
 
 #ifdef _KERNEL

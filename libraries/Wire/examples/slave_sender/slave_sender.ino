@@ -8,7 +8,6 @@
 
 // This example code is in the public domain.
 
-
 #include <Wire.h>
 
 #define SDA_PIN 4
@@ -17,7 +16,7 @@ const int16_t I2C_MASTER = 0x42;
 const int16_t I2C_SLAVE = 0x08;
 
 void setup() {
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE);                // join i2c bus with address #8
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // join i2c bus with address #8
   Wire.onRequest(requestEvent); // register event
 }
 

@@ -1,0 +1,5 @@
+BasedOnStyle: WebKit
+IndentWidth: 2
+SortIncludes: false
+BreakBeforeBraces: Attach
+IndentCaseLabels: true

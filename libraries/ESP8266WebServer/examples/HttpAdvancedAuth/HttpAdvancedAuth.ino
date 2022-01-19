@@ -11,7 +11,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -39,13 +39,13 @@ void setup() {
 
   server.on("/", []() {
     if (!server.authenticate(www_username, www_password))
-      //Basic Auth Method with Custom realm and Failure Response
-      //return server.requestAuthentication(BASIC_AUTH, www_realm, authFailResponse);
-      //Digest Auth Method with realm="Login Required" and empty Failure Response
-      //return server.requestAuthentication(DIGEST_AUTH);
-      //Digest Auth Method with Custom realm and empty Failure Response
-      //return server.requestAuthentication(DIGEST_AUTH, www_realm);
-      //Digest Auth Method with Custom realm and Failure Response
+    //Basic Auth Method with Custom realm and Failure Response
+    //return server.requestAuthentication(BASIC_AUTH, www_realm, authFailResponse);
+    //Digest Auth Method with realm="Login Required" and empty Failure Response
+    //return server.requestAuthentication(DIGEST_AUTH);
+    //Digest Auth Method with Custom realm and empty Failure Response
+    //return server.requestAuthentication(DIGEST_AUTH, www_realm);
+    //Digest Auth Method with Custom realm and Failure Response
     {
       return server.requestAuthentication(DIGEST_AUTH, www_realm, authFailResponse);
     }

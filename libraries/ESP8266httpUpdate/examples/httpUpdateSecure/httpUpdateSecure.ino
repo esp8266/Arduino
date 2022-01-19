@@ -18,7 +18,7 @@
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK  "APPSK"
+#define APPSK "APPSK"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -31,7 +31,7 @@ BearSSL::CertStore certStore;
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");  // UTC
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov"); // UTC
 
   Serial.print(F("Waiting for NTP time sync: "));
   time_t now = time(nullptr);
@@ -85,7 +85,7 @@ void loop() {
     setClock();
 
     BearSSL::WiFiClientSecure client;
-    bool mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
+    bool mfln = client.probeMaxFragmentLength("server", 443, 1024); // server must be the same as in ESPhttpUpdate.update()
     Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
       client.setBufferSizes(1024, 1024);
@@ -103,7 +103,6 @@ void loop() {
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
     // Or:
     //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
-
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:

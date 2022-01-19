@@ -294,39 +294,39 @@ bool NetdumpIP::compareIP(const IPAddress& ip) const
 {
     switch (ipv)
     {
-        case IPversion::UNSET:
-            if (ip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-            break;
-        case IPversion::IPV4:
-            if (ip.isV6() || !ip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return compareRaw(IPversion::IPV4, rawip, reinterpret_cast<const uint8_t*>(&ip.v4()));
-            }
-            break;
-        case IPversion::IPV6:
-            if (ip.isV4() || !ip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return compareRaw(IPversion::IPV6, rawip, reinterpret_cast<const uint8_t*>(ip.raw6()));
-            }
-            break;
-        default:
+    case IPversion::UNSET:
+        if (ip.isSet())
+        {
             return false;
-            break;
+        }
+        else
+        {
+            return true;
+        }
+        break;
+    case IPversion::IPV4:
+        if (ip.isV6() || !ip.isSet())
+        {
+            return false;
+        }
+        else
+        {
+            return compareRaw(IPversion::IPV4, rawip, reinterpret_cast<const uint8_t*>(&ip.v4()));
+        }
+        break;
+    case IPversion::IPV6:
+        if (ip.isV4() || !ip.isSet())
+        {
+            return false;
+        }
+        else
+        {
+            return compareRaw(IPversion::IPV6, rawip, reinterpret_cast<const uint8_t*>(ip.raw6()));
+        }
+        break;
+    default:
+        return false;
+        break;
     }
 }
 
@@ -334,39 +334,39 @@ bool NetdumpIP::compareIP(const NetdumpIP& nip) const
 {
     switch (ipv)
     {
-        case IPversion::UNSET:
-            if (nip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-            break;
-        case IPversion::IPV4:
-            if (nip.isV6() || !nip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return compareRaw(IPversion::IPV4, rawip, nip.rawip);
-            }
-            break;
-        case IPversion::IPV6:
-            if (nip.isV4() || !nip.isSet())
-            {
-                return false;
-            }
-            else
-            {
-                return compareRaw(IPversion::IPV6, rawip, nip.rawip);
-            }
-            break;
-        default:
+    case IPversion::UNSET:
+        if (nip.isSet())
+        {
             return false;
-            break;
+        }
+        else
+        {
+            return true;
+        }
+        break;
+    case IPversion::IPV4:
+        if (nip.isV6() || !nip.isSet())
+        {
+            return false;
+        }
+        else
+        {
+            return compareRaw(IPversion::IPV4, rawip, nip.rawip);
+        }
+        break;
+    case IPversion::IPV6:
+        if (nip.isV4() || !nip.isSet())
+        {
+            return false;
+        }
+        else
+        {
+            return compareRaw(IPversion::IPV6, rawip, nip.rawip);
+        }
+        break;
+    default:
+        return false;
+        break;
     }
 }
 

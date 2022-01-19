@@ -9,17 +9,16 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
 long timezone = 2;
 byte daysavetime = 1;
 
-
-void listDir(const char * dirname) {
+void listDir(const char* dirname) {
   Serial.printf("Listing directory: %s\n", dirname);
 
   Dir root = LittleFS.openDir(dirname);
@@ -33,15 +32,14 @@ void listDir(const char * dirname) {
     time_t cr = file.getCreationTime();
     time_t lw = file.getLastWrite();
     file.close();
-    struct tm * tmstruct = localtime(&cr);
+    struct tm* tmstruct = localtime(&cr);
     Serial.printf("    CREATION: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
     tmstruct = localtime(&lw);
     Serial.printf("  LAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
   }
 }
 
-
-void readFile(const char * path) {
+void readFile(const char* path) {
   Serial.printf("Reading file: %s\n", path);
 
   File file = LittleFS.open(path, "r");
@@ -57,7 +55,7 @@ void readFile(const char * path) {
   file.close();
 }
 
-void writeFile(const char * path, const char * message) {
+void writeFile(const char* path, const char* message) {
   Serial.printf("Writing file: %s\n", path);
 
   File file = LittleFS.open(path, "w");
@@ -74,7 +72,7 @@ void writeFile(const char * path, const char * message) {
   file.close();
 }
 
-void appendFile(const char * path, const char * message) {
+void appendFile(const char* path, const char* message) {
   Serial.printf("Appending to file: %s\n", path);
 
   File file = LittleFS.open(path, "a");
@@ -90,7 +88,7 @@ void appendFile(const char * path, const char * message) {
   file.close();
 }
 
-void renameFile(const char * path1, const char * path2) {
+void renameFile(const char* path1, const char* path2) {
   Serial.printf("Renaming file %s to %s\n", path1, path2);
   if (LittleFS.rename(path1, path2)) {
     Serial.println("File renamed");
@@ -99,7 +97,7 @@ void renameFile(const char * path1, const char * path2) {
   }
 }
 
-void deleteFile(const char * path) {
+void deleteFile(const char* path) {
   Serial.printf("Deleting file: %s\n", path);
   if (LittleFS.remove(path)) {
     Serial.println("File deleted");
@@ -127,7 +125,7 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.println("Contacting Time Server");
   configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
-  struct tm tmstruct ;
+  struct tm tmstruct;
   delay(2000);
   tmstruct.tm_year = 0;
   getLocalTime(&tmstruct, 5000);
@@ -158,9 +156,6 @@ void setup() {
   }
   readFile("/hello.txt");
   listDir("/");
-
-
 }
 
 void loop() { }
-

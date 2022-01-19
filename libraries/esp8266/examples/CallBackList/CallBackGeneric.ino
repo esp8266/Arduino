@@ -6,24 +6,24 @@ using namespace experimental::CBListImplentation;
 
 class exampleClass {
   public:
-    exampleClass() {};
+  exampleClass() {};
 
-    using exCallBack = std::function<void(int)>;
-    using exHandler  = CallBackList<exCallBack>::CallBackHandler;
+  using exCallBack = std::function<void(int)>;
+  using exHandler = CallBackList<exCallBack>::CallBackHandler;
 
-    CallBackList<exCallBack> myHandlers;
+  CallBackList<exCallBack> myHandlers;
 
-    exHandler setHandler(exCallBack cb) {
-      return myHandlers.add(cb);
-    }
+  exHandler setHandler(exCallBack cb) {
+    return myHandlers.add(cb);
+  }
 
-    void removeHandler(exHandler hnd) {
-      myHandlers.remove(hnd);
-    }
+  void removeHandler(exHandler hnd) {
+    myHandlers.remove(hnd);
+  }
 
-    void trigger(int t) {
-      myHandlers.execute(t);
-    }
+  void trigger(int t) {
+    myHandlers.execute(t);
+  }
 };
 
 exampleClass myExample;

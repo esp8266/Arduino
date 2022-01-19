@@ -33,7 +33,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
-
 }
 
 void loop() {
@@ -45,8 +44,7 @@ void loop() {
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
-    if (http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html")) {  // HTTP
-
+    if (http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html")) { // HTTP
 
       Serial.print("[HTTP] GET...\n");
       // start connection and send HTTP header

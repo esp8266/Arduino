@@ -35,9 +35,14 @@ int constexpr ETH_HDR_LEN = 14;
 
 class Packet
 {
-   public:
+public:
     Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
-        : packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
+        : packetTime(msec)
+        , netif_idx(n)
+        , data(d)
+        , packetLength(l)
+        , out(o)
+        , success(s)
     {
         setPacketTypes();
     };
@@ -281,7 +286,7 @@ class Packet
     const PacketType packetType() const;
     const std::vector<PacketType>& allPacketTypes() const;
 
-   private:
+private:
     void setPacketType(PacketType);
     void setPacketTypes();
 

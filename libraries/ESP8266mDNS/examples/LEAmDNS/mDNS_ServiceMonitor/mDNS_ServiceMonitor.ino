@@ -29,7 +29,6 @@
 
 */
 
-
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -39,27 +38,26 @@
    Global defines and vars
 */
 
-#define SERVICE_PORT                                    80                                  // HTTP port
+#define SERVICE_PORT 80 // HTTP port
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char*                                    ssid                    = STASSID;
-const char*                                    password                = STAPSK;
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
-char*                                          pcHostDomain            = 0;        // Negotiated host domain
-bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+char* pcHostDomain = 0; // Negotiated host domain
+bool bHostDomainConfirmed = false; // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService hMDNSService = 0; // The handle of the http service in the MDNS responder
+MDNSResponder::hMDNSServiceQuery hMDNSServiceQuery = 0; // The handle of the 'http.tcp' service query in the MDNS responder
 
-const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
-String                                         strHTTPServices         = cstrNoHTTPServices;
+const String cstrNoHTTPServices = "Currently no 'http.tcp' services in the local network!<br/>";
+String strHTTPServices = cstrNoHTTPServices;
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
-ESP8266WebServer                                     server(SERVICE_PORT);
-
+ESP8266WebServer server(SERVICE_PORT);
 
 /*
    setStationHostname
@@ -80,25 +78,25 @@ bool setStationHostname(const char* p_pcHostname) {
 void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
   String answerInfo;
   switch (answerType) {
-    case MDNSResponder::AnswerType::ServiceDomain :
+    case MDNSResponder::AnswerType::ServiceDomain:
       answerInfo = "ServiceDomain " + String(serviceInfo.serviceDomain());
       break;
-    case MDNSResponder::AnswerType::HostDomainAndPort :
+    case MDNSResponder::AnswerType::HostDomainAndPort:
       answerInfo = "HostDomainAndPort " + String(serviceInfo.hostDomain()) + ":" + String(serviceInfo.hostPort());
       break;
-    case MDNSResponder::AnswerType::IP4Address :
+    case MDNSResponder::AnswerType::IP4Address:
       answerInfo = "IP4Address ";
       for (IPAddress ip : serviceInfo.IP4Adresses()) {
         answerInfo += "- " + ip.toString();
       };
       break;
-    case MDNSResponder::AnswerType::Txt :
+    case MDNSResponder::AnswerType::Txt:
       answerInfo = "TXT " + String(serviceInfo.strKeyValue());
       for (auto kv : serviceInfo.keyValues()) {
         answerInfo += "\nkv : " + String(kv.first) + " : " + String(kv.second);
       }
       break;
-    default :
+    default:
       answerInfo = "Unknown Answertype";
   }
   Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
@@ -110,9 +108,9 @@ void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
 */
 
 void serviceProbeResult(String p_pcServiceName,
-                        const MDNSResponder::hMDNSService p_hMDNSService,
-                        bool p_bProbeResult) {
-  (void) p_hMDNSService;
+    const MDNSResponder::hMDNSService p_hMDNSService,
+    bool p_bProbeResult) {
+  (void)p_hMDNSService;
   Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
 }
 
@@ -186,7 +184,7 @@ void handleHTTPRequest() {
   s += WiFi.hostname() + ".local at " + WiFi.localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4>";
   s += "<ol>";
-  for (auto info :  MDNS.answerInfo(hMDNSServiceQuery)) {
+  for (auto info : MDNS.answerInfo(hMDNSServiceQuery)) {
     s += "<li>";
     s += info.serviceDomain();
     if (info.hostDomainAvailable()) {
@@ -245,8 +243,7 @@ void setup(void) {
   MDNS.setHostProbeResultCallback(hostProbeResult);
 
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!MDNS.begin(pcHostDomain))) {
+  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) || (!MDNS.begin(pcHostDomain))) {
     Serial.println(" Error setting up MDNS responder!");
     while (1) { // STOP
       delay(1000);
@@ -265,6 +262,3 @@ void loop(void) {
   // Allow MDNS processing
   MDNS.update();
 }
-
-
-

@@ -149,7 +149,9 @@ void serial_printf(const char* fmt, ...)
 static const SPISettings spiSettings(20000000, MSBFIRST, SPI_MODE0);
 
 ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr)
-    : _bank(ERXTX_BANK), _cs(cs), _spi(spi)
+    : _bank(ERXTX_BANK)
+    , _cs(cs)
+    , _spi(spi)
 {
     (void)intr;
 }
@@ -173,14 +175,14 @@ ENC28J60::is_mac_mii_reg(uint8_t reg)
     /* MAC or MII register (otherwise, ETH register)? */
     switch (_bank)
     {
-        case MACONX_BANK:
-            return reg < EIE;
-        case MAADRX_BANK:
-            return reg <= MAADR2 || reg == MISTAT;
-        case ERXTX_BANK:
-        case EPKTCNT_BANK:
-        default:
-            return 0;
+    case MACONX_BANK:
+        return reg < EIE;
+    case MAADRX_BANK:
+        return reg <= MAADR2 || reg == MISTAT;
+    case ERXTX_BANK:
+    case EPKTCNT_BANK:
+    default:
+        return 0;
     }
 }
 /*---------------------------------------------------------------------------*/
@@ -304,12 +306,12 @@ ENC28J60::readrev(void)
     rev = readreg(EREVID);
     switch (rev)
     {
-        case 2:
-            return 1;
-        case 6:
-            return 7;
-        default:
-            return rev;
+    case 2:
+        return 1;
+    case 6:
+        return 7;
+    default:
+        return rev;
     }
 }
 //#endif
@@ -463,8 +465,7 @@ bool ENC28J60::reset(void)
     setregbitfield(MACON1, MACON1_MARXEN | MACON1_TXPAUS | MACON1_RXPAUS);
 
     /* Set padding, crc, full duplex */
-    setregbitfield(MACON3, MACON3_PADCFG_FULL | MACON3_TXCRCEN | MACON3_FULDPX |
-                               MACON3_FRMLNEN);
+    setregbitfield(MACON3, MACON3_PADCFG_FULL | MACON3_TXCRCEN | MACON3_FULDPX | MACON3_FRMLNEN);
 
     /* Don't modify MACON4 */
 
@@ -616,8 +617,8 @@ ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
     else
     {
         PRINTF("enc28j60: tx: %d: %02x:%02x:%02x:%02x:%02x:%02x\n", datalen,
-               0xff & data[0], 0xff & data[1], 0xff & data[2],
-               0xff & data[3], 0xff & data[4], 0xff & data[5]);
+            0xff & data[0], 0xff & data[1], 0xff & data[2],
+            0xff & data[3], 0xff & data[4], 0xff & data[5]);
     }
 #endif
 
@@ -728,8 +729,8 @@ ENC28J60::readFrameData(uint8_t* buffer, uint16_t framesize)
         return 0;
     }
     PRINTF("enc28j60: rx: %d: %02x:%02x:%02x:%02x:%02x:%02x\n", _len,
-           0xff & buffer[0], 0xff & buffer[1], 0xff & buffer[2],
-           0xff & buffer[3], 0xff & buffer[4], 0xff & buffer[5]);
+        0xff & buffer[0], 0xff & buffer[1], 0xff & buffer[2],
+        0xff & buffer[3], 0xff & buffer[4], 0xff & buffer[5]);
 
     //received_packets++;
     //PRINTF("enc28j60: received_packets %d\n", received_packets);

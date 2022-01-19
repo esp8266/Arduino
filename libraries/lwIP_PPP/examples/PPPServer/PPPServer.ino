@@ -25,7 +25,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 #define LOGGERBAUD 115200
@@ -43,9 +43,9 @@ PPPServer ppp(&ppplink);
 
 void PPPConnectedCallback(netif* nif) {
   logger.printf("ppp: ip=%s/mask=%s/gw=%s\n",
-                IPAddress(&nif->ip_addr).toString().c_str(),
-                IPAddress(&nif->netmask).toString().c_str(),
-                IPAddress(&nif->gw).toString().c_str());
+      IPAddress(&nif->ip_addr).toString().c_str(),
+      IPAddress(&nif->netmask).toString().c_str(),
+      IPAddress(&nif->gw).toString().c_str());
 
   logger.printf("Heap before: %d\n", ESP.getFreeHeap());
   err_t ret = ip_napt_init(NAPT, NAPT_PORT);
@@ -80,9 +80,9 @@ void setup() {
     delay(500);
   }
   logger.printf("\nSTA: %s (dns: %s / %s)\n",
-                WiFi.localIP().toString().c_str(),
-                WiFi.dnsIP(0).toString().c_str(),
-                WiFi.dnsIP(1).toString().c_str());
+      WiFi.localIP().toString().c_str(),
+      WiFi.dnsIP(0).toString().c_str(),
+      WiFi.dnsIP(1).toString().c_str());
 
   ppplink.begin(PPPLINKBAUD);
   ppplink.enableIntTx(true);
@@ -96,7 +96,6 @@ void setup() {
   bool ret = ppp.begin(WiFi.localIP());
   logger.printf("ppp: %d\n", ret);
 }
-
 
 #else
 

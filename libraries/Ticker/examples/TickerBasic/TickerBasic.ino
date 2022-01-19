@@ -19,8 +19,8 @@ Ticker flipper;
 int count = 0;
 
 void flip() {
-  int state = digitalRead(LED_BUILTIN);  // get the current state of GPIO1 pin
-  digitalWrite(LED_BUILTIN, !state);     // set pin to the opposite state
+  int state = digitalRead(LED_BUILTIN); // get the current state of GPIO1 pin
+  digitalWrite(LED_BUILTIN, !state); // set pin to the opposite state
 
   ++count;
   // when the counter reaches a certain value, start blinking like crazy

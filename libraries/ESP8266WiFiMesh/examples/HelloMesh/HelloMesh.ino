@@ -34,14 +34,12 @@ constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; //
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
 // Note that it is also possible to use Strings as key seeds instead of arrays.
-uint8_t espnowEncryptedConnectionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
-                                            0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
-                                           };
-uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
-                             0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD
-                            };
+uint8_t espnowEncryptedConnectionKey[16] = { 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
+  0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11 };
+uint8_t espnowHashKey[16] = { 0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
+  0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD };
 
-bool meshMessageHandler(String &message, FloodingMesh &meshInstance);
+bool meshMessageHandler(String& message, FloodingMesh& meshInstance);
 
 /* Create the mesh node object */
 FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
@@ -62,7 +60,7 @@ bool useLED = false; // Change this to true if you wish the onboard LED to mark 
    @param meshInstance The FloodingMesh instance that received the message.
    @return True if this node should forward the received message to other nodes. False otherwise.
 */
-bool meshMessageHandler(String &message, FloodingMesh &meshInstance) {
+bool meshMessageHandler(String& message, FloodingMesh& meshInstance) {
   int32_t delimiterIndex = message.indexOf(meshInstance.metadataDelimiter());
   if (delimiterIndex == 0) {
     Serial.print(String(F("Message received from STA MAC ")) + meshInstance.getEspnowMeshBackend().getSenderMac() + F(": "));
@@ -138,7 +136,7 @@ void setup() {
   floodingMesh.begin();
   floodingMesh.activateAP(); // Required to receive messages
 
-  uint8_t apMacArray[6] {0};
+  uint8_t apMacArray[6] { 0 };
   theOneMac = TypeCast::macToString(WiFi.softAPmacAddress(apMacArray));
 
   if (useLED) {

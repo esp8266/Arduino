@@ -164,13 +164,13 @@ void Packet::ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
 {
     switch (getARPType())
     {
-        case 1:
-            sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
-            break;
-        case 2:
-            sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
-            MACtoString(ETH_HDR_LEN + 8, sstr);
-            break;
+    case 1:
+        sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        break;
+    case 2:
+        sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        MACtoString(ETH_HDR_LEN + 8, sstr);
+        break;
     }
     sstr.printf("\r\n");
     printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN], packetLength - ETH_HDR_LEN, netdumpDetail);
@@ -237,36 +237,36 @@ void Packet::ICMPtoString(PacketDetail, StreamString& sstr) const
     {
         switch (getIcmpType())
         {
-            case 0:
-                sstr.printf_P(PSTR("ping reply"));
-                break;
-            case 8:
-                sstr.printf_P(PSTR("ping request"));
-                break;
-            default:
-                sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType());
-                break;
+        case 0:
+            sstr.printf_P(PSTR("ping reply"));
+            break;
+        case 8:
+            sstr.printf_P(PSTR("ping request"));
+            break;
+        default:
+            sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType());
+            break;
         }
     }
     if (isIPv6())
     {
         switch (getIcmpType())
         {
-            case 129:
-                sstr.printf_P(PSTR("ping reply"));
-                break;
-            case 128:
-                sstr.printf_P(PSTR("ping request"));
-                break;
-            case 135:
-                sstr.printf_P(PSTR("Neighbour solicitation"));
-                break;
-            case 136:
-                sstr.printf_P(PSTR("Neighbour advertisement"));
-                break;
-            default:
-                sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType());
-                break;
+        case 129:
+            sstr.printf_P(PSTR("ping reply"));
+            break;
+        case 128:
+            sstr.printf_P(PSTR("ping request"));
+            break;
+        case 135:
+            sstr.printf_P(PSTR("Neighbour solicitation"));
+            break;
+        case 136:
+            sstr.printf_P(PSTR("Neighbour advertisement"));
+            break;
+        default:
+            sstr.printf_P(PSTR("type(0x%02x)"), getIcmpType());
+            break;
         }
     }
     sstr.printf_P(PSTR("\r\n"));
@@ -276,42 +276,42 @@ void Packet::IGMPtoString(PacketDetail, StreamString& sstr) const
 {
     switch (getIgmpType())
     {
-        case 1:
-            sstr.printf_P(PSTR("Create Group Request"));
-            break;
-        case 2:
-            sstr.printf_P(PSTR("Create Group Reply"));
-            break;
-        case 3:
-            sstr.printf_P(PSTR("Join Group Request"));
-            break;
-        case 4:
-            sstr.printf_P(PSTR("Join Group Reply"));
-            break;
-        case 5:
-            sstr.printf_P(PSTR("Leave Group Request"));
-            break;
-        case 6:
-            sstr.printf_P(PSTR("Leave Group Reply"));
-            break;
-        case 7:
-            sstr.printf_P(PSTR("Confirm Group Request"));
-            break;
-        case 8:
-            sstr.printf_P(PSTR("Confirm Group Reply"));
-            break;
-        case 0x11:
-            sstr.printf_P(PSTR("Group Membership Query"));
-            break;
-        case 0x12:
-            sstr.printf_P(PSTR("IGMPv1 Membership Report"));
-            break;
-        case 0x22:
-            sstr.printf_P(PSTR("IGMPv3 Membership Report"));
-            break;
-        default:
-            sstr.printf_P(PSTR("type(0x%02x)"), getIgmpType());
-            break;
+    case 1:
+        sstr.printf_P(PSTR("Create Group Request"));
+        break;
+    case 2:
+        sstr.printf_P(PSTR("Create Group Reply"));
+        break;
+    case 3:
+        sstr.printf_P(PSTR("Join Group Request"));
+        break;
+    case 4:
+        sstr.printf_P(PSTR("Join Group Reply"));
+        break;
+    case 5:
+        sstr.printf_P(PSTR("Leave Group Request"));
+        break;
+    case 6:
+        sstr.printf_P(PSTR("Leave Group Reply"));
+        break;
+    case 7:
+        sstr.printf_P(PSTR("Confirm Group Request"));
+        break;
+    case 8:
+        sstr.printf_P(PSTR("Confirm Group Reply"));
+        break;
+    case 0x11:
+        sstr.printf_P(PSTR("Group Membership Query"));
+        break;
+    case 0x12:
+        sstr.printf_P(PSTR("IGMPv1 Membership Report"));
+        break;
+    case 0x22:
+        sstr.printf_P(PSTR("IGMPv3 Membership Report"));
+        break;
+    default:
+        sstr.printf_P(PSTR("type(0x%02x)"), getIgmpType());
+        break;
     }
     sstr.printf_P(PSTR("\r\n"));
 }
@@ -359,60 +359,60 @@ const String Packet::toString(PacketDetail netdumpDetail) const
 
     switch (thisPacketType)
     {
-        case PacketType::ARP:
-        {
-            ARPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::MDNS:
-        case PacketType::DNS:
-        {
-            DNStoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::SSDP:
-        case PacketType::DHCP:
-        case PacketType::WSDD:
-        case PacketType::NETBIOS:
-        case PacketType::SMB:
-        case PacketType::OTA:
-        case PacketType::UDP:
-        {
-            UDPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::TCP:
-        case PacketType::HTTP:
-        {
-            TCPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::ICMP:
-        {
-            ICMPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::IGMP:
-        {
-            IGMPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::IPv4:
-        case PacketType::IPv6:
-        {
-            IPtoString(netdumpDetail, sstr);
-            break;
-        }
-        case PacketType::UKNW:
-        {
-            UKNWtoString(netdumpDetail, sstr);
-            break;
-        }
-        default:
-        {
-            sstr.printf_P(PSTR("Non identified packet\r\n"));
-            break;
-        }
+    case PacketType::ARP:
+    {
+        ARPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::MDNS:
+    case PacketType::DNS:
+    {
+        DNStoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::SSDP:
+    case PacketType::DHCP:
+    case PacketType::WSDD:
+    case PacketType::NETBIOS:
+    case PacketType::SMB:
+    case PacketType::OTA:
+    case PacketType::UDP:
+    {
+        UDPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::TCP:
+    case PacketType::HTTP:
+    {
+        TCPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::ICMP:
+    {
+        ICMPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::IGMP:
+    {
+        IGMPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::IPv4:
+    case PacketType::IPv6:
+    {
+        IPtoString(netdumpDetail, sstr);
+        break;
+    }
+    case PacketType::UKNW:
+    {
+        UKNWtoString(netdumpDetail, sstr);
+        break;
+    }
+    default:
+    {
+        sstr.printf_P(PSTR("Non identified packet\r\n"));
+        break;
+    }
     }
     return sstr;
 }

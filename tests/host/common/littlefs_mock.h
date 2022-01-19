@@ -29,12 +29,12 @@
 
 class LittleFSMock
 {
-   public:
+public:
     LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~LittleFSMock();
 
-   protected:
+protected:
     void load();
     void save();
 

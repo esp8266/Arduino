@@ -67,7 +67,6 @@ void setup() {
     return;
   }
 
-
   if (!saveConfig()) {
     Serial.println("Failed to save config");
   } else {

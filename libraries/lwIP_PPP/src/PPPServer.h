@@ -38,7 +38,7 @@
 
 class PPPServer
 {
-   public:
+public:
     PPPServer(Stream* sio);
 
     bool begin(const IPAddress& ourAddress, const IPAddress& peer = IPAddress(172, 31, 255, 254));
@@ -53,7 +53,7 @@ class PPPServer
         return &_netif.gw;
     }
 
-   protected:
+protected:
     static constexpr size_t _bufsize = 128;
     Stream* _sio;
     ppp_pcb* _ppp;

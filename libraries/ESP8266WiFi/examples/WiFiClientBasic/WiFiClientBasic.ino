@@ -9,10 +9,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
 const char* host = "192.168.1.1";
@@ -44,7 +44,6 @@ void setup() {
   delay(500);
 }
 
-
 void loop() {
   Serial.print("connecting to ");
   Serial.print(host);
@@ -75,4 +74,3 @@ void loop() {
   Serial.println("wait 5 sec...");
   delay(5000);
 }
-

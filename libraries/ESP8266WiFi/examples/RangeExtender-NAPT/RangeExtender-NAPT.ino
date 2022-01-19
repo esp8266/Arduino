@@ -7,7 +7,7 @@
 
 #ifndef STASSID
 #define STASSID "mynetwork"
-#define STAPSK  "mynetworkpassword"
+#define STAPSK "mynetworkpassword"
 #endif
 
 #include <ESP8266WiFi.h>
@@ -52,18 +52,18 @@ void setup() {
     delay(500);
   }
   Serial.printf("\nSTA: %s (dns: %s / %s)\n",
-                WiFi.localIP().toString().c_str(),
-                WiFi.dnsIP(0).toString().c_str(),
-                WiFi.dnsIP(1).toString().c_str());
+      WiFi.localIP().toString().c_str(),
+      WiFi.dnsIP(0).toString().c_str(),
+      WiFi.dnsIP(1).toString().c_str());
 
   // give DNS servers to AP side
   dhcpSoftAP.dhcps_set_dns(0, WiFi.dnsIP(0));
   dhcpSoftAP.dhcps_set_dns(1, WiFi.dnsIP(1));
 
-  WiFi.softAPConfig(  // enable AP, with android-compatible google domain
-    IPAddress(172, 217, 28, 254),
-    IPAddress(172, 217, 28, 254),
-    IPAddress(255, 255, 255, 0));
+  WiFi.softAPConfig( // enable AP, with android-compatible google domain
+      IPAddress(172, 217, 28, 254),
+      IPAddress(172, 217, 28, 254),
+      IPAddress(255, 255, 255, 0));
   WiFi.softAP(STASSID "extender", STAPSK);
   Serial.printf("AP: %s\n", WiFi.softAPIP().toString().c_str());
 
@@ -94,4 +94,3 @@ void setup() {
 
 void loop() {
 }
-

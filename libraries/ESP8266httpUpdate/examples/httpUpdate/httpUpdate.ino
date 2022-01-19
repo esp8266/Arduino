@@ -15,7 +15,7 @@
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK  "APPSK"
+#define APPSK "APPSK"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -37,8 +37,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
-
-
 }
 
 void update_started() {
@@ -56,7 +54,6 @@ void update_progress(int cur, int total) {
 void update_error(int err) {
   Serial.printf("CALLBACK:  HTTP update fatal error code %d\n", err);
 }
-
 
 void loop() {
   // wait for WiFi connection
@@ -97,4 +94,3 @@ void loop() {
     }
   }
 }
-

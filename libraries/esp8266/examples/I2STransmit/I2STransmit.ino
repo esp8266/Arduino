@@ -14,12 +14,12 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // Set your network here
-const char *SSID = STASSID;
-const char *PASS = STAPSK;
+const char* SSID = STASSID;
+const char* PASS = STAPSK;
 
 WiFiUDP udp;
 // Set your listener PC's IP here:
@@ -60,7 +60,6 @@ void setup() {
   udp.beginPacket(listener, port);
   udp.write("I2S Receiver\r\n");
   udp.endPacket();
-
 }
 
 void loop() {

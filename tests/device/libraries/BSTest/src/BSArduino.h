@@ -6,7 +6,7 @@ namespace bs
 {
 class ArduinoIOHelper
 {
-   public:
+public:
     ArduinoIOHelper(Stream& stream)
         : m_stream(stream)
     {
@@ -66,7 +66,7 @@ class ArduinoIOHelper
         return len;
     }
 
-   protected:
+protected:
     Stream& m_stream;
 };
 

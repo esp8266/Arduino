@@ -97,7 +97,7 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(ssh == "3.14159_abcd");
     String flash = (F("hello from flash"));
     REQUIRE(flash == "hello from flash");
-    const char textarray[6] = {'h', 'e', 'l', 'l', 'o', 0};
+    const char textarray[6] = { 'h', 'e', 'l', 'l', 'o', 0 };
     String hello(textarray);
     REQUIRE(hello == "hello");
     String hello2;
@@ -442,8 +442,8 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
 
     // Tests from #5883
     bool useURLencode = false;
-    const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0};  // Unicode euro symbol
-    const char yen[3] = {(char)0xc2, (char)0xa5, 0};               // Unicode yen symbol
+    const char euro[4] = { (char)0xe2, (char)0x82, (char)0xac, 0 };  // Unicode euro symbol
+    const char yen[3] = { (char)0xc2, (char)0xa5, 0 };               // Unicode yen symbol
 
     memset(space, 0xff, 64);
     new (s) String("%ssid%");
@@ -533,7 +533,7 @@ TEST_CASE("Strings with NULs", "[core][String]")
     REQUIRE(str3.length() == 32);
     str3 += str3;
     REQUIRE(str3.length() == 64);
-    static char zeros[64] = {0};
+    static char zeros[64] = { 0 };
     const char* p = str3.c_str();
     REQUIRE(!memcmp(p, zeros, 64));
 }
@@ -559,11 +559,12 @@ TEST_CASE("Replace and string expansion", "[core][String]")
 
 TEST_CASE("String chaining", "[core][String]")
 {
-    const char* chunks[]{
+    const char* chunks[] {
         "~12345",
         "67890",
         "qwertyuiopasdfghjkl",
-        "zxcvbnm"};
+        "zxcvbnm"
+    };
 
     String all;
     for (auto* chunk : chunks)

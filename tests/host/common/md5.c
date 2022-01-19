@@ -72,11 +72,11 @@ static void MD5Transform(uint32_t state[4], const uint8_t block[64]);
 static void Encode(uint8_t* output, uint32_t* input, uint32_t len);
 static void Decode(uint32_t* output, const uint8_t* input, uint32_t len);
 
-static const uint8_t PADDING[64] =
-    {
-        0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static const uint8_t PADDING[64] = {
+    0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
 
 /* F, G, H and I are basic MD5 functions.
  */
@@ -304,6 +304,5 @@ static void Decode(uint32_t* output, const uint8_t* input, uint32_t len)
     uint32_t i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
-        output[i] = ((uint32_t)input[j]) | (((uint32_t)input[j + 1]) << 8) |
-                    (((uint32_t)input[j + 2]) << 16) | (((uint32_t)input[j + 3]) << 24);
+        output[i] = ((uint32_t)input[j]) | (((uint32_t)input[j + 1]) << 8) | (((uint32_t)input[j + 2]) << 16) | (((uint32_t)input[j + 3]) << 24);
 }

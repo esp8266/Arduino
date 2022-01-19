@@ -146,21 +146,20 @@ void help(const char* argv0, int exitcode)
     exit(exitcode);
 }
 
-static struct option options[] =
-    {
-        {"help", no_argument, NULL, 'h'},
-        {"fast", no_argument, NULL, 'f'},
-        {"local", no_argument, NULL, 'l'},
-        {"sigint", no_argument, NULL, 'c'},
-        {"blockinguart", no_argument, NULL, 'b'},
-        {"verbose", no_argument, NULL, 'v'},
-        {"timestamp", no_argument, NULL, 'T'},
-        {"interface", required_argument, NULL, 'i'},
-        {"fspath", required_argument, NULL, 'P'},
-        {"spiffskb", required_argument, NULL, 'S'},
-        {"littlefskb", required_argument, NULL, 'L'},
-        {"portshifter", required_argument, NULL, 's'},
-        {"once", no_argument, NULL, '1'},
+static struct option options[] = {
+    { "help", no_argument, NULL, 'h' },
+    { "fast", no_argument, NULL, 'f' },
+    { "local", no_argument, NULL, 'l' },
+    { "sigint", no_argument, NULL, 'c' },
+    { "blockinguart", no_argument, NULL, 'b' },
+    { "verbose", no_argument, NULL, 'v' },
+    { "timestamp", no_argument, NULL, 'T' },
+    { "interface", required_argument, NULL, 'i' },
+    { "fspath", required_argument, NULL, 'P' },
+    { "spiffskb", required_argument, NULL, 'S' },
+    { "littlefskb", required_argument, NULL, 'L' },
+    { "portshifter", required_argument, NULL, 's' },
+    { "once", no_argument, NULL, '1' },
 };
 
 void cleanup()
@@ -219,47 +218,47 @@ int main(int argc, char* const argv[])
             break;
         switch (n)
         {
-            case 'h':
-                help(argv[0], EXIT_SUCCESS);
-                break;
-            case 'i':
-                host_interface = optarg;
-                break;
-            case 'l':
-                global_ipv4_netfmt = NO_GLOBAL_BINDING;
-                break;
-            case 's':
-                mock_port_shifter = atoi(optarg);
-                break;
-            case 'c':
-                ignore_sigint = true;
-                break;
-            case 'f':
-                fast = true;
-                break;
-            case 'S':
-                spiffs_kb = atoi(optarg);
-                break;
-            case 'L':
-                littlefs_kb = atoi(optarg);
-                break;
-            case 'P':
-                fspath = optarg;
-                break;
-            case 'b':
-                blocking_uart = true;
-                break;
-            case 'v':
-                mockdebug = true;
-                break;
-            case 'T':
-                serial_timestamp = true;
-                break;
-            case '1':
-                run_once = true;
-                break;
-            default:
-                help(argv[0], EXIT_FAILURE);
+        case 'h':
+            help(argv[0], EXIT_SUCCESS);
+            break;
+        case 'i':
+            host_interface = optarg;
+            break;
+        case 'l':
+            global_ipv4_netfmt = NO_GLOBAL_BINDING;
+            break;
+        case 's':
+            mock_port_shifter = atoi(optarg);
+            break;
+        case 'c':
+            ignore_sigint = true;
+            break;
+        case 'f':
+            fast = true;
+            break;
+        case 'S':
+            spiffs_kb = atoi(optarg);
+            break;
+        case 'L':
+            littlefs_kb = atoi(optarg);
+            break;
+        case 'P':
+            fspath = optarg;
+            break;
+        case 'b':
+            blocking_uart = true;
+            break;
+        case 'v':
+            mockdebug = true;
+            break;
+        case 'T':
+            serial_timestamp = true;
+            break;
+        case '1':
+            run_once = true;
+            break;
+        default:
+            help(argv[0], EXIT_FAILURE);
         }
     }
 

@@ -22,21 +22,19 @@
   Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
 */
 
-
 #include <PolledTimeout.h>
 
 void ledOn() {
-  digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  digitalWrite(LED_BUILTIN, LOW); // Turn the LED on (Note that LOW is the voltage level
 }
 
 void ledOff() {
-  digitalWrite(LED_BUILTIN, HIGH);  // Turn the LED off by making the voltage HIGH
+  digitalWrite(LED_BUILTIN, HIGH); // Turn the LED off by making the voltage HIGH
 }
 
 void ledToggle() {
-  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));  // Change the state of the LED
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); // Change the state of the LED
 }
-
 
 esp8266::polledTimeout::periodicFastUs halfPeriod(500000); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
@@ -57,7 +55,7 @@ void setup() {
   Serial.printf("periodic/oneShotFastNs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::rangeCompensate);
 #endif
 
-  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(LED_BUILTIN, OUTPUT); // Initialize the LED_BUILTIN pin as an output
 
   using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
 
@@ -82,7 +80,6 @@ void setup() {
   //Done with STEPs, do other stuff
   halfPeriod.reset(); //halfPeriod is global, so it gets inited on sketch start. Clear it here to make it ready for loop, where it's actually used.
 }
-
 
 // the loop function runs over and over again forever
 void loop() {

@@ -46,7 +46,7 @@
 */
 class ENC28J60
 {
-   public:
+public:
     /**
         Constructor that uses the default hardware SPI pins
         @param cs the Arduino Chip Select / Slave Select pin (default 10 on Uno)
@@ -79,7 +79,7 @@ class ENC28J60
     */
     virtual uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
-   protected:
+protected:
     static constexpr bool interruptIsPossible()
     {
         return false;
@@ -109,7 +109,7 @@ class ENC28J60
     */
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
-   private:
+private:
     uint8_t is_mac_mii_reg(uint8_t reg);
     uint8_t readreg(uint8_t reg);
     void writereg(uint8_t reg, uint8_t data);

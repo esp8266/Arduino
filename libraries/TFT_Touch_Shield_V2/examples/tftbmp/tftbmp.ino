@@ -16,29 +16,26 @@
 
 #include "TFTv2.h"
 
-#define MAX_BMP         10                      // bmp file num
-#define FILENAME_LEN    20                      // max file name length
+#define MAX_BMP 10 // bmp file num
+#define FILENAME_LEN 20 // max file name length
 
+const int PIN_SD_CS = 4; // pin of sd card
 
-const int PIN_SD_CS = 4;                        // pin of sd card
+const int __Gnbmp_height = 320; // bmp height
+const int __Gnbmp_width = 240; // bmp width
 
-const int __Gnbmp_height = 320;                 // bmp height
-const int __Gnbmp_width  = 240;                 // bmp width
+unsigned char __Gnbmp_image_offset = 0; // offset
 
-unsigned char __Gnbmp_image_offset  = 0;        // offset
+int __Gnfile_num = 3; // num of file
 
-
-int __Gnfile_num = 3;                           // num of file
-
-char __Gsbmp_files[3][FILENAME_LEN] = {         // add file name here
+char __Gsbmp_files[3][FILENAME_LEN] = {
+  // add file name here
   "flower.BMP",
   "hibiscus.bmp",
   "test.bmp",
 };
 
-
 File bmpFile;
-
 
 void setup() {
 
@@ -54,7 +51,8 @@ void setup() {
 
   if (!SD.begin(PIN_SD_CS)) {
     Serial.println("failed!");
-    while (1);                              // init fail, die here
+    while (1)
+      ; // init fail, die here
   }
 
   Serial.println("SD OK!");
@@ -65,12 +63,13 @@ void setup() {
 void loop() {
   for (unsigned char i = 0; i < __Gnfile_num; i++) {
     bmpFile = SD.open(__Gsbmp_files[i]);
-    if (! bmpFile) {
+    if (!bmpFile) {
       Serial.println("didn't find image");
-      while (1);
+      while (1)
+        ;
     }
 
-    if (! bmpReadHeader(bmpFile)) {
+    if (!bmpReadHeader(bmpFile)) {
       Serial.println("bad bmp");
       return;
     }
@@ -80,7 +79,6 @@ void loop() {
 
     delay(1000);
   }
-
 }
 
 /*********************************************/
@@ -90,15 +88,15 @@ void loop() {
 // more RAM but makes the drawing a little faster. 20 pixels' worth
 // is probably a good place
 
-#define BUFFPIXEL       60                      // must be a divisor of 240 
-#define BUFFPIXEL_X3    180                     // BUFFPIXELx3
+#define BUFFPIXEL 60 // must be a divisor of 240
+#define BUFFPIXEL_X3 180 // BUFFPIXELx3
 
 void bmpdraw(File f, int x, int y) {
   bmpFile.seek(__Gnbmp_image_offset);
 
   uint32_t time = millis();
 
-  uint8_t sdbuffer[BUFFPIXEL_X3];                 // 3 * pixels to buffer
+  uint8_t sdbuffer[BUFFPIXEL_X3]; // 3 * pixels to buffer
 
   for (int i = 0; i < __Gnbmp_height; i++) {
 
@@ -110,7 +108,7 @@ void bmpdraw(File f, int x, int y) {
       unsigned int __color[BUFFPIXEL];
 
       for (int k = 0; k < BUFFPIXEL; k++) {
-        __color[k] = sdbuffer[buffidx + 2] >> 3;                    // read
+        __color[k] = sdbuffer[buffidx + 2] >> 3; // read
         __color[k] = __color[k] << 6 | (sdbuffer[buffidx + 1] >> 2); // green
         __color[k] = __color[k] << 5 | (sdbuffer[buffidx + 0] >> 3); // blue
 
@@ -131,7 +129,6 @@ void bmpdraw(File f, int x, int y) {
 
       TFT_CS_HIGH;
     }
-
   }
 
   Serial.print(millis() - time, DEC);
@@ -165,11 +162,10 @@ boolean bmpReadHeader(File f) {
   Serial.print("header size ");
   Serial.println(tmp, DEC);
 
-
   int bmp_width = read32(f);
   int bmp_height = read32(f);
 
-  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height) {   // if image is not 320x240, return false
+  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height) { // if image is not 320x240, return false
     return false;
   }
 

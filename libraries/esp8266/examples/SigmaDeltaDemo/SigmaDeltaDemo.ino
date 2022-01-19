@@ -14,7 +14,6 @@ void setup() {
   Serial.println();
   Serial.println("Start Sigma Delta Example\n");
   Serial.printf("Frequency = %u\n", realFreq);
-
 }
 
 void loop() {
@@ -36,7 +35,6 @@ void loop() {
       sigmaDeltaWrite(0, duty);
       delay(10);
     }
-
   }
 
   Serial.println("Detaching builtin led & playing a blinkie\n");

@@ -31,7 +31,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
-
 }
 
 void loop() {
@@ -70,7 +69,7 @@ void loop() {
         // or "by hand"
 
         // get tcp stream
-        WiFiClient * stream = &client;
+        WiFiClient* stream = &client;
 
         // read all data from server
         while (http.connected() && (len > 0 || len == -1)) {

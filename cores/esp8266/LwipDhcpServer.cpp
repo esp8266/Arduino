@@ -197,12 +197,11 @@ DhcpServer::DhcpServer(netif* netif)
         // 1. `fw_has_started_softap_dhcps` is already initialized to 1
         // 2. global ctor DhcpServer's `dhcpSoftAP(&netif_git[SOFTAP_IF])` is called
         // 3. (that's here) => begin(legacy-values) is called
-        ip_info ip =
-            {
-                {0x0104a8c0},  // IP 192.168.4.1
-                {0x00ffffff},  // netmask 255.255.255.0
-                {0}            // gateway 0.0.0.0
-            };
+        ip_info ip = {
+            { 0x0104a8c0 },  // IP 192.168.4.1
+            { 0x00ffffff },  // netmask 255.255.255.0
+            { 0 }            // gateway 0.0.0.0
+        };
         begin(&ip);
         fw_has_started_softap_dhcps = 2;  // not 1, ending initial boot sequence
     }
@@ -737,32 +736,32 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 #endif
         switch ((sint16_t)*optptr)
         {
-            case DHCP_OPTION_MSG_TYPE:  //53
-                type = *(optptr + 2);
-                break;
+        case DHCP_OPTION_MSG_TYPE:  //53
+            type = *(optptr + 2);
+            break;
 
-            case DHCP_OPTION_REQ_IPADDR:  //50
-                //os_printf("dhcps:0x%08x,0x%08x\n",client.addr,*(uint32*)(optptr+2));
-                if (memcmp((char*)&client.addr, (char*)optptr + 2, 4) == 0)
-                {
-#if DHCPS_DEBUG
-                    os_printf("dhcps: DHCP_OPTION_REQ_IPADDR = 0 ok\n");
-#endif
-                    s.state = DHCPS_STATE_ACK;
-                }
-                else
-                {
-#if DHCPS_DEBUG
-                    os_printf("dhcps: DHCP_OPTION_REQ_IPADDR != 0 err\n");
-#endif
-                    s.state = DHCPS_STATE_NAK;
-                }
-                break;
-            case DHCP_OPTION_END:
+        case DHCP_OPTION_REQ_IPADDR:  //50
+            //os_printf("dhcps:0x%08x,0x%08x\n",client.addr,*(uint32*)(optptr+2));
+            if (memcmp((char*)&client.addr, (char*)optptr + 2, 4) == 0)
             {
-                is_dhcp_parse_end = true;
+#if DHCPS_DEBUG
+                os_printf("dhcps: DHCP_OPTION_REQ_IPADDR = 0 ok\n");
+#endif
+                s.state = DHCPS_STATE_ACK;
+            }
+            else
+            {
+#if DHCPS_DEBUG
+                os_printf("dhcps: DHCP_OPTION_REQ_IPADDR != 0 err\n");
+#endif
+                s.state = DHCPS_STATE_NAK;
             }
             break;
+        case DHCP_OPTION_END:
+        {
+            is_dhcp_parse_end = true;
+        }
+        break;
         }
 
         if (is_dhcp_parse_end)
@@ -775,43 +774,43 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 
     switch (type)
     {
-        case DHCPDISCOVER:  //1
-            s.state = DHCPS_STATE_OFFER;
+    case DHCPDISCOVER:  //1
+        s.state = DHCPS_STATE_OFFER;
 #if DHCPS_DEBUG
-            os_printf("dhcps: DHCPD_STATE_OFFER\n");
+        os_printf("dhcps: DHCPD_STATE_OFFER\n");
 #endif
-            break;
+        break;
 
-        case DHCPREQUEST:  //3
-            if (!(s.state == DHCPS_STATE_ACK || s.state == DHCPS_STATE_NAK))
+    case DHCPREQUEST:  //3
+        if (!(s.state == DHCPS_STATE_ACK || s.state == DHCPS_STATE_NAK))
+        {
+            if (renew == true)
             {
-                if (renew == true)
-                {
-                    s.state = DHCPS_STATE_ACK;
-                }
-                else
-                {
-                    s.state = DHCPS_STATE_NAK;
-                }
-#if DHCPS_DEBUG
-                os_printf("dhcps: DHCPD_STATE_NAK\n");
-#endif
+                s.state = DHCPS_STATE_ACK;
             }
-            break;
-
-        case DHCPDECLINE:  //4
-            s.state = DHCPS_STATE_IDLE;
+            else
+            {
+                s.state = DHCPS_STATE_NAK;
+            }
 #if DHCPS_DEBUG
-            os_printf("dhcps: DHCPD_STATE_IDLE\n");
+            os_printf("dhcps: DHCPD_STATE_NAK\n");
 #endif
-            break;
+        }
+        break;
 
-        case DHCPRELEASE:  //7
-            s.state = DHCPS_STATE_RELEASE;
+    case DHCPDECLINE:  //4
+        s.state = DHCPS_STATE_IDLE;
 #if DHCPS_DEBUG
-            os_printf("dhcps: DHCPD_STATE_IDLE\n");
+        os_printf("dhcps: DHCPD_STATE_IDLE\n");
 #endif
-            break;
+        break;
+
+    case DHCPRELEASE:  //7
+        s.state = DHCPS_STATE_RELEASE;
+#if DHCPS_DEBUG
+        os_printf("dhcps: DHCPD_STATE_IDLE\n");
+#endif
+        break;
     }
 #if DHCPS_DEBUG
     os_printf("dhcps: return s.state = %d\n", s.state);
@@ -823,8 +822,9 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 sint16_t DhcpServer::parse_msg(struct dhcps_msg* m, u16_t len)
 {
     if (memcmp((char*)m->options,
-               &magic_cookie,
-               sizeof(magic_cookie)) == 0)
+            &magic_cookie,
+            sizeof(magic_cookie))
+        == 0)
     {
         struct ipv4_addr ip;
         memcpy(&ip.addr, m->ciaddr, sizeof(ip.addr));
@@ -856,10 +856,10 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg* m, u16_t len)
 ///////////////////////////////////////////////////////////////////////////////////
 
 void DhcpServer::S_handle_dhcp(void* arg,
-                               struct udp_pcb* pcb,
-                               struct pbuf* p,
-                               const ip_addr_t* addr,
-                               uint16_t port)
+    struct udp_pcb* pcb,
+    struct pbuf* p,
+    const ip_addr_t* addr,
+    uint16_t port)
 {
     DhcpServer* instance = reinterpret_cast<DhcpServer*>(arg);
     instance->handle_dhcp(pcb, p, addr, port);
@@ -931,30 +931,30 @@ void DhcpServer::handle_dhcp(
 
     switch (parse_msg(pmsg_dhcps, tlen - 240))
     {
-        case DHCPS_STATE_OFFER:  //1
+    case DHCPS_STATE_OFFER:  //1
 #if DHCPS_DEBUG
-            os_printf("dhcps: handle_dhcp-> DHCPD_STATE_OFFER\n");
+        os_printf("dhcps: handle_dhcp-> DHCPD_STATE_OFFER\n");
 #endif
-            send_offer(pmsg_dhcps);
-            break;
-        case DHCPS_STATE_ACK:  //3
+        send_offer(pmsg_dhcps);
+        break;
+    case DHCPS_STATE_ACK:  //3
 #if DHCPS_DEBUG
-            os_printf("dhcps: handle_dhcp-> DHCPD_STATE_ACK\n");
+        os_printf("dhcps: handle_dhcp-> DHCPD_STATE_ACK\n");
 #endif
-            send_ack(pmsg_dhcps);
-            if (_netif->num == SOFTAP_IF)
-            {
-                wifi_softap_set_station_info(pmsg_dhcps->chaddr, &client_address);
-            }
-            break;
-        case DHCPS_STATE_NAK:  //4
+        send_ack(pmsg_dhcps);
+        if (_netif->num == SOFTAP_IF)
+        {
+            wifi_softap_set_station_info(pmsg_dhcps->chaddr, &client_address);
+        }
+        break;
+    case DHCPS_STATE_NAK:  //4
 #if DHCPS_DEBUG
-            os_printf("dhcps: handle_dhcp-> DHCPD_STATE_NAK\n");
+        os_printf("dhcps: handle_dhcp-> DHCPD_STATE_NAK\n");
 #endif
-            send_nak(pmsg_dhcps);
-            break;
-        default:
-            break;
+        send_nak(pmsg_dhcps);
+        break;
+    default:
+        break;
     }
 #if DHCPS_DEBUG
     os_printf("dhcps: handle_dhcp-> pbuf_free(p)\n");
@@ -1299,13 +1299,13 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
 
     switch (level)
     {
-        case OFFER_ROUTER:
-            offer = (*(uint8*)optarg) & 0x01;
-            offer_flag = true;
-            break;
-        default:
-            offer_flag = false;
-            break;
+    case OFFER_ROUTER:
+        offer = (*(uint8*)optarg) & 0x01;
+        offer_flag = true;
+        break;
+    default:
+        offer_flag = false;
+        break;
     }
     return offer_flag;
 }

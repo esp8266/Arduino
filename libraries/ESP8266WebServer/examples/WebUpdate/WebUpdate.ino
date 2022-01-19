@@ -9,7 +9,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* host = "esp8266-webupdate";
@@ -31,11 +31,11 @@ void setup(void) {
       server.sendHeader("Connection", "close");
       server.send(200, "text/html", serverIndex);
     });
-    server.on("/update", HTTP_POST, []() {
+    server.on(
+        "/update", HTTP_POST, []() {
       server.sendHeader("Connection", "close");
       server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-      ESP.restart();
-    }, []() {
+      ESP.restart(); }, []() {
       HTTPUpload& upload = server.upload();
       if (upload.status == UPLOAD_FILE_START) {
         Serial.setDebugOutput(true);
@@ -57,8 +57,7 @@ void setup(void) {
         }
         Serial.setDebugOutput(false);
       }
-      yield();
-    });
+      yield(); });
     server.begin();
     MDNS.addService("http", "tcp", 80);
 

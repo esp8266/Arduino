@@ -1,4 +1,4 @@
-#define TIMEOUT (10000UL)     // Maximum time to wait for serial activity to start
+#define TIMEOUT (10000UL) // Maximum time to wait for serial activity to start
 
 void setup() {
   // put your setup code here, to run once:
@@ -29,6 +29,4 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
 }
-

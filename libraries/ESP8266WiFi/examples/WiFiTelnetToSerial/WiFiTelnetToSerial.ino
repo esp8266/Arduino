@@ -24,7 +24,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 /*
@@ -64,7 +64,7 @@ SoftwareSerial* logger = nullptr;
 #define logger (&Serial1)
 #endif
 
-#define STACK_PROTECTOR  512 // bytes
+#define STACK_PROTECTOR 512 // bytes
 
 //how many clients should be able to telnet to this ESP8266
 #define MAX_SRV_CLIENTS 2

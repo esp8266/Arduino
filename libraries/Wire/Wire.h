@@ -35,7 +35,7 @@
 
 class TwoWire : public Stream
 {
-   private:
+private:
     static uint8_t rxBuffer[];
     static size_t rxBufferIndex;
     static size_t rxBufferLength;
@@ -51,7 +51,7 @@ class TwoWire : public Stream
     static void onRequestService(void);
     static void onReceiveService(uint8_t*, size_t);
 
-   public:
+public:
     TwoWire();
     void begin(int sda, int scl);
     void begin(int sda, int scl, uint8_t address);

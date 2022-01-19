@@ -505,7 +505,7 @@ extern "C"
     ip_addr_t dns_getserver(u8_t numdns)
     {
         (void)numdns;
-        ip_addr_t addr = {0x7f000001};
+        ip_addr_t addr = { 0x7f000001 };
         return addr;
     }
 

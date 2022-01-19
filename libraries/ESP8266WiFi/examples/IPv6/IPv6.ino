@@ -23,11 +23,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-#define FQDN  F("www.google.com")  // with both IPv4 & IPv6 addresses
-#define FQDN2 F("www.yahoo.com")   // with both IPv4 & IPv6 addresses
+#define FQDN F("www.google.com") // with both IPv4 & IPv6 addresses
+#define FQDN2 F("www.yahoo.com") // with both IPv4 & IPv6 addresses
 #define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
 #define STATUSDELAY_MS 10000
 #define TCP_PORT 23
@@ -80,20 +80,19 @@ void status(Print& out) {
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a.ifname().c_str(),
-               a.isV6(),
-               a.isLocal(),
-               a.ifhostname(),
-               a.toString().c_str());
+        a.ifname().c_str(),
+        a.isV6(),
+        a.isLocal(),
+        a.ifhostname(),
+        a.toString().c_str());
 
     if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
-                 a.netmask().toString().c_str(),
-                 a.gw().toString().c_str());
+          a.netmask().toString().c_str(),
+          a.gw().toString().c_str());
     }
 
     out.println();
-
   }
 
   // lwIP's dns client will ask for IPv4 first (by default)
@@ -101,7 +100,7 @@ void status(Print& out) {
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
 #if LWIP_IPV4 && LWIP_IPV6
-  fqdn_rt(out, FQDN,  DNSResolveType::DNS_AddrType_IPv4_IPv6); // IPv4 before IPv6
+  fqdn_rt(out, FQDN, DNSResolveType::DNS_AddrType_IPv4_IPv6); // IPv4 before IPv6
   fqdn_rt(out, FQDN2, DNSResolveType::DNS_AddrType_IPv6_IPv4); // IPv6 before IPv4
 #endif
   out.println(F("------------------------------"));
@@ -146,9 +145,9 @@ void setup() {
   for (bool configured = false; !configured;) {
     for (auto addr : addrList)
       if ((configured = !addr.isLocal()
-                        // && addr.isV6() // uncomment when IPv6 is mandatory
-                        // && addr.ifnumber() == STATION_IF
-          )) {
+              // && addr.isV6() // uncomment when IPv6 is mandatory
+              // && addr.ifnumber() == STATION_IF
+              )) {
         break;
       }
     Serial.print('.');
@@ -188,7 +187,7 @@ void loop() {
     udp.remoteIP().printTo(Serial);
     Serial.print(F(" :"));
     Serial.println(udp.remotePort());
-    int  c;
+    int c;
     while ((c = udp.read()) >= 0) {
       Serial.write(c);
     }
@@ -199,9 +198,7 @@ void loop() {
     udp.endPacket();
   }
 
-
   if (showStatusOnSerialNow) {
     status(Serial);
   }
-
 }

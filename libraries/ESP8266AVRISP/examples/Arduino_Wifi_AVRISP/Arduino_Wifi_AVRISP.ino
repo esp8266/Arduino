@@ -5,7 +5,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* host = "esp8266-avrisp";
@@ -52,20 +52,20 @@ void loop() {
   if (last_state != new_state) {
     switch (new_state) {
       case AVRISP_STATE_IDLE: {
-          Serial.printf("[AVRISP] now idle\r\n");
-          // Use the SPI bus for other purposes
-          break;
-        }
+        Serial.printf("[AVRISP] now idle\r\n");
+        // Use the SPI bus for other purposes
+        break;
+      }
       case AVRISP_STATE_PENDING: {
-          Serial.printf("[AVRISP] connection pending\r\n");
-          // Clean up your other purposes and prepare for programming mode
-          break;
-        }
+        Serial.printf("[AVRISP] connection pending\r\n");
+        // Clean up your other purposes and prepare for programming mode
+        break;
+      }
       case AVRISP_STATE_ACTIVE: {
-          Serial.printf("[AVRISP] programming mode\r\n");
-          // Stand by for completion
-          break;
-        }
+        Serial.printf("[AVRISP] programming mode\r\n");
+        // Stand by for completion
+        break;
+      }
     }
     last_state = new_state;
   }

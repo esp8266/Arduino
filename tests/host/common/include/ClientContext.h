@@ -32,15 +32,25 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 
 class ClientContext
 {
-   public:
+public:
     ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg)
-        : _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _sync(::getDefaultPrivateGlobalSyncValue()), _sock(-1)
+        : _discard_cb(discard_cb)
+        , _discard_cb_arg(discard_cb_arg)
+        , _refcnt(0)
+        , _next(0)
+        , _sync(::getDefaultPrivateGlobalSyncValue())
+        , _sock(-1)
     {
         (void)pcb;
     }
 
     ClientContext(int sock)
-        : _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr), _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
+        : _discard_cb(nullptr)
+        , _discard_cb_arg(nullptr)
+        , _refcnt(0)
+        , _next(nullptr)
+        , _sync(::getDefaultPrivateGlobalSyncValue())
+        , _sock(sock)
     {
     }
 
@@ -301,7 +311,7 @@ class ClientContext
         _inbufsize -= consume;
     }
 
-   private:
+private:
     discard_cb_t _discard_cb = nullptr;
     void* _discard_cb_arg = nullptr;
 

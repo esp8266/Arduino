@@ -21,7 +21,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* host = "esp8266-webupdate";
@@ -57,7 +57,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 -----END CERTIFICATE-----
 )EOF";
 
-static const char serverKey[] PROGMEM =  R"EOF(
+static const char serverKey[] PROGMEM = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -87,9 +87,7 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 -----END RSA PRIVATE KEY-----
 )EOF";
 
-
-void setup()
-{
+void setup() {
 
   Serial.begin(115200);
   Serial.println();
@@ -97,7 +95,7 @@ void setup()
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
 
-  while(WiFi.waitForConnectResult() != WL_CONNECTED){
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
   }
@@ -111,13 +109,13 @@ void setup()
   httpServer.begin();
 
   MDNS.addService("https", "tcp", 443);
-  Serial.printf("BearSSLUpdateServer ready!\nOpen https://%s.local%s in "\
-                "your browser and login with username '%s' and password "\
-                "'%s'\n", host, update_path, update_username, update_password);
+  Serial.printf("BearSSLUpdateServer ready!\nOpen https://%s.local%s in "
+                "your browser and login with username '%s' and password "
+                "'%s'\n",
+      host, update_path, update_username, update_password);
 }
 
-void loop()
-{
+void loop() {
   httpServer.handleClient();
   MDNS.update();
 }

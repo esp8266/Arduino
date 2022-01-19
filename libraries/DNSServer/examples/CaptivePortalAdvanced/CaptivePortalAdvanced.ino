@@ -20,14 +20,14 @@
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 #ifndef APSSID
 #define APSSID "ESP_ap"
-#define APPSK  "12345678"
+#define APPSK "12345678"
 #endif
 
-const char *softAP_ssid = APSSID;
-const char *softAP_password = APPSK;
+const char* softAP_ssid = APSSID;
+const char* softAP_password = APPSK;
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
-const char *myHostname = "esp8266";
+const char* myHostname = "esp8266";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
 char ssid[33] = "";
@@ -43,7 +43,6 @@ ESP8266WebServer server(80);
 /* Soft AP network parameters */
 IPAddress apIP(172, 217, 28, 1);
 IPAddress netMsk(255, 255, 255, 0);
-
 
 /** Should I connect to WLAN asap? */
 boolean connect;
@@ -74,8 +73,8 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/generate_204", handleRoot); //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot); //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.onNotFound(handleNotFound);
   server.begin(); // Web server start
   Serial.println("HTTP server started");

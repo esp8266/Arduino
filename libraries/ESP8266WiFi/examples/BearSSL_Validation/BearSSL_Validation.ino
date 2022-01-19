@@ -12,13 +12,13 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
-const char *   path = "/";
+const char* path = "/";
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -39,7 +39,7 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
   if (!path) {
     path = "/";
   }
@@ -70,7 +70,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
         break;
       }
       // Only print out first line up to \r, then abort connection
-      char *nl = strchr(tmp, '\r');
+      char* nl = strchr(tmp, '\r');
       if (nl) {
         *nl = 0;
         Serial.print(tmp);
@@ -222,7 +222,6 @@ void setup() {
   fetchCertAuthority();
   fetchFaster();
 }
-
 
 void loop() {
   // Nothing to do here

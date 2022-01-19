@@ -8,7 +8,6 @@
 
 // This example code is in the public domain.
 
-
 #include <Wire.h>
 #include <PolledTimeout.h>
 
@@ -18,8 +17,8 @@ const int16_t I2C_MASTER = 0x42;
 const int16_t I2C_SLAVE = 0x08;
 
 void setup() {
-  Serial.begin(115200);  // start serial for output
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER);        // join i2c bus (address optional for master)
+  Serial.begin(115200); // start serial for output
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER); // join i2c bus (address optional for master)
 }
 
 void loop() {
@@ -27,11 +26,11 @@ void loop() {
   static periodic nextPing(1000);
 
   if (nextPing) {
-    Wire.requestFrom(I2C_SLAVE, 6);    // request 6 bytes from slave device #8
+    Wire.requestFrom(I2C_SLAVE, 6); // request 6 bytes from slave device #8
 
     while (Wire.available()) { // slave may send less than requested
       char c = Wire.read(); // receive a byte as character
-      Serial.print(c);         // print the character
+      Serial.print(c); // print the character
     }
   }
 }

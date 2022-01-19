@@ -26,12 +26,12 @@
 
 class SpiffsMock
 {
-   public:
+public:
     SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~SpiffsMock();
 
-   protected:
+protected:
     void load();
     void save();
 

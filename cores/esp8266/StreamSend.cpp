@@ -23,9 +23,9 @@
 #include <StreamDev.h>
 
 size_t Stream::sendGeneric(Print* to,
-                           const ssize_t len,
-                           const int readUntilChar,
-                           const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+    const ssize_t len,
+    const int readUntilChar,
+    const esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
 {
     setReport(Report::Success);
 

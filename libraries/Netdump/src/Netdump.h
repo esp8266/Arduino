@@ -36,7 +36,7 @@ using namespace experimental::CBListImplentation;
 
 class Netdump
 {
-   public:
+public:
     using Filter = std::function<bool(const Packet&)>;
     using Callback = std::function<void(const Packet&)>;
     using LwipCallback = std::function<void(int, const char*, int, int, int)>;
@@ -53,7 +53,7 @@ class Netdump
     void fileDump(File& outfile, const Filter nf = nullptr);
     bool tcpDump(WiFiServer& tcpDumpServer, const Filter nf = nullptr);
 
-   private:
+private:
     Callback netDumpCallback = nullptr;
     Filter netDumpFilter = nullptr;
 

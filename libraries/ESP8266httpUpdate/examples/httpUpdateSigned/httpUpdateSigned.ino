@@ -23,7 +23,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -50,9 +50,9 @@ TQIDAQAB
 -----END PUBLIC KEY-----
 )EOF";
 #if MANUAL_SIGNING
-BearSSL::PublicKey *signPubKey = nullptr;
-BearSSL::HashSHA256 *hash;
-BearSSL::SigningVerifier *sign;
+BearSSL::PublicKey* signPubKey = nullptr;
+BearSSL::HashSHA256* hash;
+BearSSL::SigningVerifier* sign;
 #endif
 
 void setup() {
@@ -73,13 +73,12 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(STASSID, STAPSK);
 
-  #if MANUAL_SIGNING
+#if MANUAL_SIGNING
   signPubKey = new BearSSL::PublicKey(pubkey);
   hash = new BearSSL::HashSHA256();
   sign = new BearSSL::SigningVerifier(signPubKey);
-  #endif
+#endif
 }
-
 
 void loop() {
   // wait for WiFi connection
@@ -87,10 +86,10 @@ void loop() {
 
     WiFiClient client;
 
-    #if MANUAL_SIGNING
+#if MANUAL_SIGNING
     // Ensure all updates are signed appropriately.  W/o this call, all will be accepted.
     Update.installSignature(hash, sign);
-    #endif
+#endif
     // If the key files are present in the build directory, signing will be
     // enabled using them automatically
 
@@ -114,4 +113,3 @@ void loop() {
   }
   delay(10000);
 }
-

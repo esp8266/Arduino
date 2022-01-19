@@ -53,12 +53,11 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
 
-
 #define DBG_OUTPUT_PORT Serial
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // Indicate which digital I/Os should be displayed on the chart.
@@ -131,7 +130,6 @@ bool handleFileRead(String path) {
 
   return false;
 }
-
 
 /*
    The "Not Found" handler catches all URI not explicitly declared in code
@@ -240,7 +238,6 @@ void setup(void) {
   // Use it to read files from filesystem
   server.onNotFound(handleNotFound);
 
-
   // Start server
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
@@ -249,7 +246,6 @@ void setup(void) {
   DBG_OUTPUT_PORT.println(" 0 (OFF):    outputs are off and hidden from chart");
   DBG_OUTPUT_PORT.println(" 1 (AUTO):   outputs are rotated automatically every second");
   DBG_OUTPUT_PORT.println(" 2 (MANUAL): outputs can be toggled from the web page");
-
 }
 
 // Return default GPIO mask, that is all I/Os except SD card ones
@@ -329,4 +325,3 @@ void loop(void) {
       break;
   }
 }
-

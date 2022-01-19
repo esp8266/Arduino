@@ -5,7 +5,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -14,7 +14,7 @@ const char* host = "OTA-LEDS";
 
 int led_pin = 13;
 #define N_DIMMERS 3
-int dimmer_pin[] = {14, 5, 15};
+int dimmer_pin[] = { 14, 5, 15 };
 
 void setup() {
   Serial.begin(115200);
@@ -67,7 +67,6 @@ void setup() {
   /* setup the OTA server */
   ArduinoOTA.begin();
   Serial.println("Ready");
-
 }
 
 void loop() {

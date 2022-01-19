@@ -36,11 +36,12 @@ extern netif netif0;
 
 class UdpContext
 {
-   public:
+public:
     typedef std::function<void(void)> rxhandler_t;
 
     UdpContext()
-        : _on_rx(nullptr), _refcnt(0)
+        : _on_rx(nullptr)
+        , _refcnt(0)
     {
         _sock = mockUDPSocket();
     }
@@ -253,10 +254,10 @@ class UdpContext
             _on_rx();
     }
 
-   public:
+public:
     static uint32_t staticMCastAddr;
 
-   private:
+private:
     void translate_addr()
     {
         if (addrsize == 4)

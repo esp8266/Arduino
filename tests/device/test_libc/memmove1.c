@@ -91,7 +91,7 @@ void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
     {
         errors++;
         DEBUGP("memmove of n bytes returned %p instead of dest=%p\n",
-               retp, dest);
+            retp, dest);
     }
 }
 

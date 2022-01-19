@@ -28,13 +28,13 @@
 template <class RawDev>
 class LwipIntfDev : public LwipIntf, public RawDev
 {
-   public:
+public:
     LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1)
-        : RawDev(cs, spi, intr),
-          _mtu(DEFAULT_MTU),
-          _intrPin(intr),
-          _started(false),
-          _default(false)
+        : RawDev(cs, spi, intr)
+        , _mtu(DEFAULT_MTU)
+        , _intrPin(intr)
+        , _started(false)
+        , _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
     }
@@ -74,7 +74,7 @@ class LwipIntfDev : public LwipIntf, public RawDev
 
     wl_status_t status();
 
-   protected:
+protected:
     err_t netif_init();
     void netif_status_callback();
 
@@ -190,15 +190,15 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     {
         switch (dhcp_start(&_netif))
         {
-            case ERR_OK:
-                break;
+        case ERR_OK:
+            break;
 
-            case ERR_IF:
-                return false;
+        case ERR_IF:
+            return false;
 
-            default:
-                netif_remove(&_netif);
-                return false;
+        default:
+            netif_remove(&_netif);
+            return false;
         }
     }
 
@@ -218,11 +218,11 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     }
 
     if (_intrPin < 0 && !schedule_recurrent_function_us([&]()
-                                                        {
-                                                            this->handlePackets();
-                                                            return true;
-                                                        },
-                                                        100))
+            {
+                this->handlePackets();
+                return true;
+            },
+            100))
     {
         netif_remove(&_netif);
         return false;
@@ -278,8 +278,7 @@ err_t LwipIntfDev<RawDev>::netif_init()
     _netif.name[1] = '0' + _netif.num;
     _netif.mtu = _mtu;
     _netif.chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-    _netif.flags =
-        NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP;
+    _netif.flags = NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP;
 
     // lwIP's doc: This function typically first resolves the hardware
     // address, then sends the packet.  For ethernet physical layer, this is

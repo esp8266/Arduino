@@ -1,4 +1,4 @@
-BasedOnStyle: Chromium
+BasedOnStyle: WebKit
 AlignTrailingComments: true
 BreakBeforeBraces: Allman
 ColumnLimit: 0

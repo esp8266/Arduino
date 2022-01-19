@@ -9,7 +9,7 @@
 
 class LwipIntf
 {
-   public:
+public:
     using CBType = std::function<void(netif*)>;
 
     static bool stateUpCB(LwipIntf::CBType&& cb);
@@ -38,7 +38,7 @@ class LwipIntf
     }
     const char* getHostname();
 
-   protected:
+protected:
     static bool stateChangeSysCB(LwipIntf::CBType&& cb);
 };
 

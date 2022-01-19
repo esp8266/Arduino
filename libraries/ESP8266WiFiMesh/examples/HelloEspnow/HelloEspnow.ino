@@ -25,25 +25,22 @@ constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; //
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
 // Note that it is also possible to use Strings as key seeds instead of arrays.
-uint8_t espnowEncryptedConnectionKey[16] = {0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
-                                            0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11
-                                           };
-uint8_t espnowEncryptionKok[16] = {0x22, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting the encrypted connection key.
-                                   0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x33
-                                  };
-uint8_t espnowHashKey[16] = {0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
-                             0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD
-                            };
+uint8_t espnowEncryptedConnectionKey[16] = { 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting transmissions of encrypted connections.
+  0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11 };
+uint8_t espnowEncryptionKok[16] = { 0x22, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, // This is the key for encrypting the encrypted connection key.
+  0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x33 };
+uint8_t espnowHashKey[16] = { 0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44, // This is the secret key used for HMAC during encrypted connection requests.
+  0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD };
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
 
 const char broadcastMetadataDelimiter = 23; // 23 = End-of-Transmission-Block (ETB) control character in ASCII
 
-String manageRequest(const String &request, MeshBackendBase &meshInstance);
-TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance);
-void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
-bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance);
+String manageRequest(const String& request, MeshBackendBase& meshInstance);
+TransmissionStatusType manageResponse(const String& response, MeshBackendBase& meshInstance);
+void networkFilter(int numberOfNetworks, MeshBackendBase& meshInstance);
+bool broadcastFilter(String& firstTransmission, EspnowMeshBackend& meshInstance);
 
 /* Create the mesh node object */
 EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, networkFilter, broadcastFilter, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
@@ -55,12 +52,12 @@ EspnowMeshBackend espnowNode = EspnowMeshBackend(manageRequest, manageResponse, 
    @param meshInstance The MeshBackendBase instance that called the function.
    @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
 */
-String manageRequest(const String &request, MeshBackendBase &meshInstance) {
+String manageRequest(const String& request, MeshBackendBase& meshInstance) {
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+  if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
     Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
-  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
     (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print(F("TCP/IP: "));
   } else {
@@ -74,7 +71,7 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   Serial.print(F("Request received: "));
 
   if (request.charAt(0) == 0) {
-    Serial.println(request);  // substring will not work for multiStrings.
+    Serial.println(request); // substring will not work for multiStrings.
   } else {
     Serial.println(request.substring(0, 100));
   }
@@ -90,14 +87,14 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
    @param meshInstance The MeshBackendBase instance that called the function.
    @return The status code resulting from the response, as an int
 */
-TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance) {
+TransmissionStatusType manageResponse(const String& response, MeshBackendBase& meshInstance) {
   TransmissionStatusType statusCode = TransmissionStatusType::TRANSMISSION_COMPLETE;
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+  if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
     Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
-  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+  } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
     Serial.print(F("TCP/IP: "));
 
     // Getting the sent message like this will work as long as ONLY(!) TCP/IP is used.
@@ -126,7 +123,7 @@ TransmissionStatusType manageResponse(const String &response, MeshBackendBase &m
    @param numberOfNetworks The number of networks found in the WiFi scan.
    @param meshInstance The MeshBackendBase instance that called the function.
 */
-void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
+void networkFilter(int numberOfNetworks, MeshBackendBase& meshInstance) {
   // Note that the network index of a given node may change whenever a new scan is done.
   for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) {
     String currentSSID = WiFi.SSID(networkIndex);
@@ -137,9 +134,9 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
       uint64_t targetNodeID = TypeCast::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
       if (targetNodeID < TypeCast::stringToUint64(meshInstance.getNodeID())) {
-        if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
+        if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
           espnowInstance->connectionQueue().emplace_back(networkIndex);
-        } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+        } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
           tcpIpInstance->connectionQueue().emplace_back(networkIndex);
         } else {
           Serial.println(F("Invalid mesh backend!"));
@@ -161,14 +158,14 @@ void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
 
    @return True if the broadcast should be accepted. False otherwise.
 */
-bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance) {
+bool broadcastFilter(String& firstTransmission, EspnowMeshBackend& meshInstance) {
   // This example broadcastFilter will accept a transmission if it contains the broadcastMetadataDelimiter
   // and as metaData either no targetMeshName or a targetMeshName that matches the MeshName of meshInstance.
 
   int32_t metadataEndIndex = firstTransmission.indexOf(broadcastMetadataDelimiter);
 
   if (metadataEndIndex == -1) {
-    return false;  // broadcastMetadataDelimiter not found
+    return false; // broadcastMetadataDelimiter not found
   }
 
   String targetMeshName = firstTransmission.substring(0, metadataEndIndex);
@@ -195,7 +192,7 @@ bool broadcastFilter(String &firstTransmission, EspnowMeshBackend &meshInstance)
 
    @return True if attemptTransmission should continue with the next entry in the connectionQueue. False if attemptTransmission should stop.
 */
-bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
+bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase& meshInstance) {
   // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of attemptTransmission.
 
   (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
@@ -218,7 +215,7 @@ bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
    @return True if the response transmission process should continue with the next response in the waiting list.
            False if the response transmission process should stop once processing of the just sent response is complete.
 */
-bool exampleResponseTransmittedHook(bool transmissionSuccessful, const String &response, const uint8_t *recipientMac, uint32_t responseIndex, EspnowMeshBackend &meshInstance) {
+bool exampleResponseTransmittedHook(bool transmissionSuccessful, const String& response, const uint8_t* recipientMac, uint32_t responseIndex, EspnowMeshBackend& meshInstance) {
   // Currently this is exactly the same as the default hook, but you can modify it to alter the behaviour of sendEspnowResponses.
 
   (void)transmissionSuccessful; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
@@ -318,7 +315,7 @@ void loop() {
     if (espnowNode.latestTransmissionOutcomes().empty()) {
       Serial.println(F("No mesh AP found."));
     } else {
-      for (TransmissionOutcome &transmissionOutcome : espnowNode.latestTransmissionOutcomes()) {
+      for (TransmissionOutcome& transmissionOutcome : espnowNode.latestTransmissionOutcomes()) {
         if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::TRANSMISSION_FAILED) {
           Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionOutcome.SSID());
         } else if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::CONNECTION_FAILED) {
@@ -348,7 +345,7 @@ void loop() {
       // If you have a data array containing null values it is possible to transmit the raw data by making the array into a multiString as shown below.
       // You can use String::c_str() or String::begin() to retrieve the data array later.
       // Note that certain String methods such as String::substring use null values to determine String length, which means they will not work as normal with multiStrings.
-      uint8_t dataArray[] = {0, '\'', 0, '\'', ' ', '(', 'n', 'u', 'l', 'l', ')', ' ', 'v', 'a', 'l', 'u', 'e'};
+      uint8_t dataArray[] = { 0, '\'', 0, '\'', ' ', '(', 'n', 'u', 'l', 'l', ')', ' ', 'v', 'a', 'l', 'u', 'e' };
       String espnowMessage = TypeCast::uint8ArrayToMultiString(dataArray, sizeof dataArray) + F(" from ") + espnowNode.getMeshName() + espnowNode.getNodeID() + String('.');
       Serial.println(String(F("\nTransmitting: ")) + espnowMessage);
       espnowNode.attemptTransmission(espnowMessage, false);
@@ -356,7 +353,7 @@ void loop() {
 
       Serial.println(F("\nPerforming encrypted ESP-NOW transmissions."));
 
-      uint8_t targetBSSID[6] {0};
+      uint8_t targetBSSID[6] { 0 };
 
       // We can create encrypted connections to individual nodes so that all ESP-NOW communication with the node will be encrypted.
       if (espnowNode.constConnectionQueue()[0].getBSSID(targetBSSID) && espnowNode.requestEncryptedConnection(targetBSSID) == EncryptedConnectionStatus::CONNECTION_ESTABLISHED) {
@@ -434,7 +431,7 @@ void loop() {
           espnowNode.attemptAutoEncryptingTransmission(espnowMessage);
           espnowDelay(100); // Wait for response.
         } else {
-          Serial.println(String(F("Ooops! Encrypted connection removal failed. Status: ")) +  String(static_cast<int>(removalOutcome)));
+          Serial.println(String(F("Ooops! Encrypted connection removal failed. Status: ")) + String(static_cast<int>(removalOutcome)));
         }
 
         // Finally, should you ever want to stop other parties from sending unencrypted messages to the node
@@ -446,7 +443,7 @@ void loop() {
 
       // Our last request was sent to all nodes found, so time to create a new request.
       espnowNode.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ")
-                            + espnowNode.getMeshName() + espnowNode.getNodeID() + String('.'));
+          + espnowNode.getMeshName() + espnowNode.getNodeID() + String('.'));
     }
 
     Serial.println();

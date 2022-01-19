@@ -8,8 +8,8 @@
 #include <SPI.h>
 
 void setup() {
-  TFT_BL_ON;      // turn on the background light
-  Tft.TFTinit();  // init TFT library
+  TFT_BL_ON; // turn on the background light
+  Tft.TFTinit(); // init TFT library
 
   Tft.fillScreen(80, 160, 50, 150, RED);
   Tft.fillRectangle(30, 120, 100, 65, YELLOW);
@@ -17,7 +17,6 @@ void setup() {
 }
 
 void loop() {
-
 }
 /*********************************************************************************************************
   END FILE

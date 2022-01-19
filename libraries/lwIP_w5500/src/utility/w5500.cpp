@@ -278,7 +278,8 @@ int8_t Wiznet5500::wizphy_setphypmode(uint8_t pmode)
 }
 
 Wiznet5500::Wiznet5500(int8_t cs, SPIClass& spi, int8_t intr)
-    : _spi(spi), _cs(cs)
+    : _spi(spi)
+    , _cs(cs)
 {
     (void)intr;
 }

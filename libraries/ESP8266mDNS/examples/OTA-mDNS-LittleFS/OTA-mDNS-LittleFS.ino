@@ -14,12 +14,12 @@
 
 #ifndef APSSID
 #define APSSID "your-apssid"
-#define APPSK  "your-password"
+#define APPSK "your-password"
 #endif
 
 #ifndef STASSID
 #define STASSID "your-sta"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // includes
@@ -29,7 +29,6 @@
 #include <LittleFS.h>
 #include <ArduinoOTA.h>
 #include <ESP8266mDNS.h>
-
 
 /**
    @brief mDNS and OTA Constants
@@ -59,7 +58,7 @@ const char* ap_default_psk = APPSK; ///< Default PSK.
    and the WiFi PSK in the second line.
    Line separator can be \r\n (CR LF) \r or \n.
 */
-bool loadConfig(String *ssid, String *pass) {
+bool loadConfig(String* ssid, String* pass) {
   // open file for reading.
   File configFile = LittleFS.open("/cl_conf.txt", "r");
   if (!configFile) {
@@ -112,14 +111,13 @@ bool loadConfig(String *ssid, String *pass) {
   return true;
 } // loadConfig
 
-
 /**
    @brief Save WiFi SSID and PSK to configuration file.
    @param ssid SSID as string pointer.
    @param pass PSK as string pointer,
    @return True or False.
 */
-bool saveConfig(String *ssid, String *pass) {
+bool saveConfig(String* ssid, String* pass) {
   // Open config file for writing.
   File configFile = LittleFS.open("/cl_conf.txt", "w");
   if (!configFile) {
@@ -136,7 +134,6 @@ bool saveConfig(String *ssid, String *pass) {
 
   return true;
 } // saveConfig
-
 
 /**
    @brief Arduino setup function.
@@ -162,7 +159,6 @@ void setup() {
   Serial.println("Hostname: " + hostname);
   //Serial.println(WiFi.hostname());
 
-
   // Initialize file system.
   if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
@@ -170,7 +166,7 @@ void setup() {
   }
 
   // Load wifi connection information.
-  if (! loadConfig(&station_ssid, &station_psk)) {
+  if (!loadConfig(&station_ssid, &station_psk)) {
     station_ssid = STASSID;
     station_psk = STAPSK;
 
@@ -233,10 +229,9 @@ void setup() {
   }
 
   // Start OTA server.
-  ArduinoOTA.setHostname((const char *)hostname.c_str());
+  ArduinoOTA.setHostname((const char*)hostname.c_str());
   ArduinoOTA.begin();
 }
-
 
 /**
    @brief Arduino loop function.
@@ -245,4 +240,3 @@ void loop() {
   // Handle OTA server.
   ArduinoOTA.handle();
 }
-

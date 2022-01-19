@@ -153,7 +153,7 @@ bool LwipIntf::hostname(const char* aHostname)
             if (lwipret != ERR_OK)
             {
                 DEBUGV("WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n",
-                       intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
+                    intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
                 ret = false;
             }
         }

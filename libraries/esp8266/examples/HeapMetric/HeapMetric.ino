@@ -52,21 +52,18 @@ void tryit(int blocksize) {
     calculation of multiple elements combined with the rounding up for the
     8-byte alignment of each allocation can make for some tricky calculations.
   */
-  int rawMemoryMaxFreeBlockSize =  ESP.getMaxFreeBlockSize();
+  int rawMemoryMaxFreeBlockSize = ESP.getMaxFreeBlockSize();
   // Remove the space for overhead component of the blocks*sizeof(void*) array.
   int maxFreeBlockSize = rawMemoryMaxFreeBlockSize - UMM_OVERHEAD_ADJUST;
   // Initial estimate to use all of the MaxFreeBlock with multiples of 8 rounding up.
-  blocks = maxFreeBlockSize /
-           (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
+  blocks = maxFreeBlockSize / (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
   /*
     While we allowed for the 8-byte alignment overhead for blocks*blocksize we
     were unable to compensate in advance for the later 8-byte aligning needed
     for the blocks*sizeof(void*) allocation. Thus blocks may be off by one count.
     We now validate the estimate and adjust as needed.
   */
-  int rawMemoryEstimate =
-    blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) +
-    ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
+  int rawMemoryEstimate = blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
   if (rawMemoryMaxFreeBlockSize < rawMemoryEstimate) {
     --blocks;
   }

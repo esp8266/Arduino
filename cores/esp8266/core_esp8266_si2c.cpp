@@ -59,7 +59,7 @@ static inline __attribute__((always_inline)) bool SCL_READ(const int twi_scl)
 // Implement as a class to reduce code size by allowing access to many global variables with a single base pointer
 class Twi
 {
-   private:
+private:
     unsigned int preferred_si2c_clock = 100000;
     uint32_t twi_dcount = 18;
     unsigned char twi_sda = 0;
@@ -72,25 +72,27 @@ class Twi
     // byte-wide ones, and since these emums are used everywhere, the difference adds up fast.  There is only a single
     // instance of the class, though, so the extra 12 bytes of RAM used here saves a lot more IRAM.
     volatile enum { TWIPM_UNKNOWN = 0,
-                    TWIPM_IDLE,
-                    TWIPM_ADDRESSED,
-                    TWIPM_WAIT } twip_mode = TWIPM_IDLE;
+        TWIPM_IDLE,
+        TWIPM_ADDRESSED,
+        TWIPM_WAIT } twip_mode
+        = TWIPM_IDLE;
     volatile enum { TWIP_UNKNOWN = 0,
-                    TWIP_IDLE,
-                    TWIP_START,
-                    TWIP_SEND_ACK,
-                    TWIP_WAIT_ACK,
-                    TWIP_WAIT_STOP,
-                    TWIP_SLA_W,
-                    TWIP_SLA_R,
-                    TWIP_REP_START,
-                    TWIP_READ,
-                    TWIP_STOP,
-                    TWIP_REC_ACK,
-                    TWIP_READ_ACK,
-                    TWIP_RWAIT_ACK,
-                    TWIP_WRITE,
-                    TWIP_BUS_ERR } twip_state = TWIP_IDLE;
+        TWIP_IDLE,
+        TWIP_START,
+        TWIP_SEND_ACK,
+        TWIP_WAIT_ACK,
+        TWIP_WAIT_STOP,
+        TWIP_SLA_W,
+        TWIP_SLA_R,
+        TWIP_REP_START,
+        TWIP_READ,
+        TWIP_STOP,
+        TWIP_REC_ACK,
+        TWIP_READ_ACK,
+        TWIP_RWAIT_ACK,
+        TWIP_WRITE,
+        TWIP_BUS_ERR } twip_state
+        = TWIP_IDLE;
     volatile int twip_status = TW_NO_INFO;
     volatile int bitCount = 0;
 
@@ -100,10 +102,11 @@ class Twi
     volatile int twi_timeout_ms = 10;
 
     volatile enum { TWI_READY = 0,
-                    TWI_MRX,
-                    TWI_MTX,
-                    TWI_SRX,
-                    TWI_STX } twi_state = TWI_READY;
+        TWI_MRX,
+        TWI_MTX,
+        TWI_SRX,
+        TWI_STX } twi_state
+        = TWI_READY;
     volatile uint8_t twi_error = 0xFF;
 
     uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
@@ -167,7 +170,7 @@ class Twi
     // Generate a clock "valley" (at the end of a segment, just before a repeated start)
     void twi_scl_valley(void);
 
-   public:
+public:
     void setClock(unsigned int freq);
     void setClockStretchLimit(uint32_t limit);
     void init(unsigned char sda, unsigned char scl);
@@ -540,105 +543,105 @@ void IRAM_ATTR Twi::onTwipEvent(uint8_t status)
     twip_status = status;
     switch (status)
     {
-        // Slave Receiver
-        case TW_SR_SLA_ACK:             // addressed, returned ack
-        case TW_SR_GCALL_ACK:           // addressed generally, returned ack
-        case TW_SR_ARB_LOST_SLA_ACK:    // lost arbitration, returned ack
-        case TW_SR_ARB_LOST_GCALL_ACK:  // lost arbitration, returned ack
-            // enter slave receiver mode
-            twi_state = TWI_SRX;
-            // indicate that rx buffer can be overwritten and ack
-            twi_rxBufferIndex = 0;
+    // Slave Receiver
+    case TW_SR_SLA_ACK:             // addressed, returned ack
+    case TW_SR_GCALL_ACK:           // addressed generally, returned ack
+    case TW_SR_ARB_LOST_SLA_ACK:    // lost arbitration, returned ack
+    case TW_SR_ARB_LOST_GCALL_ACK:  // lost arbitration, returned ack
+        // enter slave receiver mode
+        twi_state = TWI_SRX;
+        // indicate that rx buffer can be overwritten and ack
+        twi_rxBufferIndex = 0;
+        reply(1);
+        break;
+    case TW_SR_DATA_ACK:        // data received, returned ack
+    case TW_SR_GCALL_DATA_ACK:  // data received generally, returned ack
+        // if there is still room in the rx buffer
+        if (twi_rxBufferIndex < TWI_BUFFER_LENGTH)
+        {
+            // put byte in buffer and ack
+            twi_rxBuffer[twi_rxBufferIndex++] = twi_data;
             reply(1);
-            break;
-        case TW_SR_DATA_ACK:        // data received, returned ack
-        case TW_SR_GCALL_DATA_ACK:  // data received generally, returned ack
-            // if there is still room in the rx buffer
-            if (twi_rxBufferIndex < TWI_BUFFER_LENGTH)
-            {
-                // put byte in buffer and ack
-                twi_rxBuffer[twi_rxBufferIndex++] = twi_data;
-                reply(1);
-            }
-            else
-            {
-                // otherwise nack
-                reply(0);
-            }
-            break;
-        case TW_SR_STOP:  // stop or repeated start condition received
-            // put a null char after data if there's room
-            if (twi_rxBufferIndex < TWI_BUFFER_LENGTH)
-            {
-                twi_rxBuffer[twi_rxBufferIndex] = '\0';
-            }
-            // callback to user-defined callback over event task to allow for non-RAM-residing code
-            //twi_rxBufferLock = true; // This may be necessary
-            ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_RX, twi_rxBufferIndex);
-
-            // since we submit rx buffer to "wire" library, we can reset it
-            twi_rxBufferIndex = 0;
-            break;
-
-        case TW_SR_DATA_NACK:        // data received, returned nack
-        case TW_SR_GCALL_DATA_NACK:  // data received generally, returned nack
-            // nack back at master
+        }
+        else
+        {
+            // otherwise nack
             reply(0);
-            break;
+        }
+        break;
+    case TW_SR_STOP:  // stop or repeated start condition received
+        // put a null char after data if there's room
+        if (twi_rxBufferIndex < TWI_BUFFER_LENGTH)
+        {
+            twi_rxBuffer[twi_rxBufferIndex] = '\0';
+        }
+        // callback to user-defined callback over event task to allow for non-RAM-residing code
+        //twi_rxBufferLock = true; // This may be necessary
+        ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_RX, twi_rxBufferIndex);
 
-        // Slave Transmitter
-        case TW_ST_SLA_ACK:           // addressed, returned ack
-        case TW_ST_ARB_LOST_SLA_ACK:  // arbitration lost, returned ack
-            // enter slave transmitter mode
-            twi_state = TWI_STX;
-            // ready the tx buffer index for iteration
-            twi_txBufferIndex = 0;
-            // set tx buffer length to be zero, to verify if user changes it
-            twi_txBufferLength = 0;
-            // callback to user-defined callback over event task to allow for non-RAM-residing code
-            // request for txBuffer to be filled and length to be set
-            // note: user must call twi_transmit(bytes, length) to do this
-            ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_TX, 0);
-            break;
+        // since we submit rx buffer to "wire" library, we can reset it
+        twi_rxBufferIndex = 0;
+        break;
 
-        case TW_ST_DATA_ACK:  // byte sent, ack returned
-            // copy data to output register
-            twi_data = twi_txBuffer[twi_txBufferIndex++];
+    case TW_SR_DATA_NACK:        // data received, returned nack
+    case TW_SR_GCALL_DATA_NACK:  // data received generally, returned nack
+        // nack back at master
+        reply(0);
+        break;
 
-            bitCount = 8;
-            bitCount--;
-            if (twi_data & 0x80)
-            {
-                SDA_HIGH(twi.twi_sda);
-            }
-            else
-            {
-                SDA_LOW(twi.twi_sda);
-            }
-            twi_data <<= 1;
+    // Slave Transmitter
+    case TW_ST_SLA_ACK:           // addressed, returned ack
+    case TW_ST_ARB_LOST_SLA_ACK:  // arbitration lost, returned ack
+        // enter slave transmitter mode
+        twi_state = TWI_STX;
+        // ready the tx buffer index for iteration
+        twi_txBufferIndex = 0;
+        // set tx buffer length to be zero, to verify if user changes it
+        twi_txBufferLength = 0;
+        // callback to user-defined callback over event task to allow for non-RAM-residing code
+        // request for txBuffer to be filled and length to be set
+        // note: user must call twi_transmit(bytes, length) to do this
+        ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_TX, 0);
+        break;
 
-            // if there is more to send, ack, otherwise nack
-            if (twi_txBufferIndex < twi_txBufferLength)
-            {
-                reply(1);
-            }
-            else
-            {
-                reply(0);
-            }
-            break;
-        case TW_ST_DATA_NACK:  // received nack, we are done
-        case TW_ST_LAST_DATA:  // received ack, but we are done already!
-            // leave slave receiver state
-            releaseBus();
-            break;
+    case TW_ST_DATA_ACK:  // byte sent, ack returned
+        // copy data to output register
+        twi_data = twi_txBuffer[twi_txBufferIndex++];
 
-        // All
-        case TW_NO_INFO:  // no state information
-            break;
-        case TW_BUS_ERROR:  // bus error, illegal stop/start
-            twi_error = TW_BUS_ERROR;
-            break;
+        bitCount = 8;
+        bitCount--;
+        if (twi_data & 0x80)
+        {
+            SDA_HIGH(twi.twi_sda);
+        }
+        else
+        {
+            SDA_LOW(twi.twi_sda);
+        }
+        twi_data <<= 1;
+
+        // if there is more to send, ack, otherwise nack
+        if (twi_txBufferIndex < twi_txBufferLength)
+        {
+            reply(1);
+        }
+        else
+        {
+            reply(0);
+        }
+        break;
+    case TW_ST_DATA_NACK:  // received nack, we are done
+    case TW_ST_LAST_DATA:  // received ack, but we are done already!
+        // leave slave receiver state
+        releaseBus();
+        break;
+
+    // All
+    case TW_NO_INFO:  // no state information
+        break;
+    case TW_BUS_ERROR:  // bus error, illegal stop/start
+        twi_error = TW_BUS_ERROR;
+        break;
     }
 }
 
@@ -660,26 +663,26 @@ void Twi::eventTask(ETSEvent* e)
 
     switch (e->sig)
     {
-        case TWI_SIG_TX:
-            twi.twi_onSlaveTransmit();
+    case TWI_SIG_TX:
+        twi.twi_onSlaveTransmit();
 
-            // if they didn't change buffer & length, initialize it
-            if (twi.twi_txBufferLength == 0)
-            {
-                twi.twi_txBufferLength = 1;
-                twi.twi_txBuffer[0] = 0x00;
-            }
+        // if they didn't change buffer & length, initialize it
+        if (twi.twi_txBufferLength == 0)
+        {
+            twi.twi_txBufferLength = 1;
+            twi.twi_txBuffer[0] = 0x00;
+        }
 
-            // Initiate transmission
-            twi.onTwipEvent(TW_ST_DATA_ACK);
+        // Initiate transmission
+        twi.onTwipEvent(TW_ST_DATA_ACK);
 
-            break;
+        break;
 
-        case TWI_SIG_RX:
-            // ack future responses and leave slave receiver state
-            twi.releaseBus();
-            twi.twi_onSlaveReceive(twi.twi_rxBuffer, e->par);
-            break;
+    case TWI_SIG_RX:
+        // ack future responses and leave slave receiver state
+        twi.releaseBus();
+        twi.twi_onSlaveReceive(twi.twi_rxBuffer, e->par);
+        break;
     }
 }
 

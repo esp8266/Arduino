@@ -18,7 +18,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -50,7 +50,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 -----END CERTIFICATE-----
 )EOF";
 
-static const char serverKey[] PROGMEM =  R"EOF(
+static const char serverKey[] PROGMEM = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -80,7 +80,6 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 -----END RSA PRIVATE KEY-----
 )EOF";
 
-
 const int led = 13;
 
 void handleRoot() {
@@ -89,24 +88,24 @@ void handleRoot() {
   digitalWrite(led, 0);
 }
 
-void handleNotFound(){
+void handleNotFound() {
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i=0; i<server.args(); i++){
+  for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void){
+void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -138,7 +137,7 @@ void setup(void){
 
   server.on("/", handleRoot);
 
-  server.on("/inline", [](){
+  server.on("/inline", []() {
     server.send(200, "text/plain", "this works as well");
   });
 
@@ -153,26 +152,26 @@ extern "C" void stack_thunk_dump_stack();
 void processKey(Print& out, int hotKey) {
   switch (hotKey) {
     case 'd': {
-        HeapSelectDram ephemeral;
-        umm_info(NULL, true);
-        break;
-      }
+      HeapSelectDram ephemeral;
+      umm_info(NULL, true);
+      break;
+    }
     case 'i': {
-        HeapSelectIram ephemeral;
-        umm_info(NULL, true);
-        break;
-      }
+      HeapSelectIram ephemeral;
+      umm_info(NULL, true);
+      break;
+    }
     case 'h': {
-        {
-          HeapSelectIram ephemeral;
-          Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
-        }
-        {
-          HeapSelectDram ephemeral;
-          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
-        }
-        break;
+      {
+        HeapSelectIram ephemeral;
+        Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
       }
+      {
+        HeapSelectDram ephemeral;
+        Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+      }
+      break;
+    }
 #ifdef DEBUG_ESP_PORT
     // From this context stack_thunk_dump_stack() will only work when Serial
     // debug is enabled.
@@ -210,8 +209,7 @@ void processKey(Print& out, int hotKey) {
   }
 }
 
-
-void loop(void){
+void loop(void) {
   server.handleClient();
   MDNS.update();
   if (Serial.available() > 0) {

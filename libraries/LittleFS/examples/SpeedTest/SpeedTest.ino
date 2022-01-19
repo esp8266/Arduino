@@ -15,7 +15,7 @@
 #define TESTSIZEKB 512
 
 // Format speed in bytes/second.  Static buffer so not re-entrant safe
-const char *rate(unsigned long start, unsigned long stop, unsigned long bytes) {
+const char* rate(unsigned long start, unsigned long stop, unsigned long bytes) {
   static char buff[64];
   if (stop == start) {
     strcpy_P(buff, PSTR("Inf b/s"));
@@ -33,7 +33,7 @@ const char *rate(unsigned long start, unsigned long stop, unsigned long bytes) {
   return buff;
 }
 
-void DoTest(FS *fs) {
+void DoTest(FS* fs) {
   if (!fs->format()) {
     Serial.printf("Unable to format(), aborting\n");
     return;
@@ -45,7 +45,7 @@ void DoTest(FS *fs) {
 
   uint8_t data[256];
   for (int i = 0; i < 256; i++) {
-    data[i] = (uint8_t) i;
+    data[i] = (uint8_t)i;
   }
 
   Serial.printf("Creating %dKB file, may take a while...\n", TESTSIZEKB);
@@ -132,7 +132,6 @@ void DoTest(FS *fs) {
   f.close();
   stop = millis();
   Serial.printf("==> Time to read 64KB in 1b chunks = %lu milliseconds = %s\n", stop - start, rate(start, stop, 65536));
-
 
   start = millis();
   auto dest = fs->open("/test1bw.bin", "w");

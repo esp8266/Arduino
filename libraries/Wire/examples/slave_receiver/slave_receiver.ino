@@ -8,7 +8,6 @@
 
 // This example code is in the public domain.
 
-
 #include <Wire.h>
 
 #define SDA_PIN 4
@@ -18,7 +17,7 @@ const int16_t I2C_MASTER = 0x42;
 const int16_t I2C_SLAVE = 0x08;
 
 void setup() {
-  Serial.begin(115200);           // start serial for output
+  Serial.begin(115200); // start serial for output
 
   Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)
   Wire.onReceive(receiveEvent); // register event
@@ -31,11 +30,11 @@ void loop() {
 // this function is registered as an event, see setup()
 void receiveEvent(size_t howMany) {
 
-  (void) howMany;
+  (void)howMany;
   while (1 < Wire.available()) { // loop through all but the last
     char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
+    Serial.print(c); // print the character
   }
-  int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
+  int x = Wire.read(); // receive byte as an integer
+  Serial.println(x); // print the integer
 }

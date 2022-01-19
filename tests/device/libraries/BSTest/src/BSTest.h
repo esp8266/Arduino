@@ -24,9 +24,13 @@ typedef void (*test_case_func_t)();
 
 class TestCase
 {
-   public:
+public:
     TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
-        : m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
+        : m_func(func)
+        , m_file(file)
+        , m_line(line)
+        , m_name(name)
+        , m_desc(desc)
     {
         if (prev)
         {
@@ -64,7 +68,7 @@ class TestCase
         return (m_desc) ? m_desc : "";
     }
 
-   protected:
+protected:
     TestCase* m_next = nullptr;
     test_case_func_t m_func;
     const char* m_file;
@@ -103,7 +107,7 @@ class Runner
 {
     typedef Runner<IO> Tself;
 
-   public:
+public:
     Runner(IO& io)
         : m_io(io)
     {
@@ -143,7 +147,7 @@ class Runner
         bs::fatal();
     }
 
-   protected:
+protected:
     bool do_menu()
     {
         protocol::output_menu_begin(m_io);
@@ -181,7 +185,7 @@ class Runner
         }
     }
 
-   protected:
+protected:
     IO& m_io;
     size_t m_check_pass_count;
     size_t m_check_fail_count;
@@ -189,7 +193,7 @@ class Runner
 
 class AutoReg
 {
-   public:
+public:
     AutoReg(test_case_func_t func, const char* file, size_t line, const char* name, const char* desc = nullptr)
     {
         g_env.m_registry.add(func, file, line, name, desc);
@@ -227,12 +231,12 @@ inline void require(bool condition, size_t line)
 #define BS_NAME_LINE(name, line) BS_NAME_LINE2(name, line)
 #define BS_UNIQUE_NAME(name) BS_NAME_LINE(name, __LINE__)
 
-#define TEST_CASE(...)                                                                                         \
-    static void BS_UNIQUE_NAME(TEST_FUNC__)();                                                                 \
-    namespace                                                                                                  \
-    {                                                                                                          \
-    bs::AutoReg BS_UNIQUE_NAME(test_autoreg__)(&BS_UNIQUE_NAME(TEST_FUNC__), __FILE__, __LINE__, __VA_ARGS__); \
-    }                                                                                                          \
+#define TEST_CASE(...)                                                                                             \
+    static void BS_UNIQUE_NAME(TEST_FUNC__)();                                                                     \
+    namespace                                                                                                      \
+    {                                                                                                              \
+        bs::AutoReg BS_UNIQUE_NAME(test_autoreg__)(&BS_UNIQUE_NAME(TEST_FUNC__), __FILE__, __LINE__, __VA_ARGS__); \
+    }                                                                                                              \
     static void BS_UNIQUE_NAME(TEST_FUNC__)()
 
 #define CHECK(condition) bs::check((condition), __LINE__)
@@ -242,7 +246,7 @@ inline void require(bool condition, size_t line)
 #define BS_ENV_DECLARE() \
     namespace bs         \
     {                    \
-    Env g_env;           \
+        Env g_env;       \
     }
 #define BS_RUN(...)                                      \
     do                                                   \

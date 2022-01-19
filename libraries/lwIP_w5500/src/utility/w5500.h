@@ -41,7 +41,7 @@
 
 class Wiznet5500
 {
-   public:
+public:
     /**
         Constructor that uses the default hardware SPI pins
         @param cs the Arduino Chip Select / Slave Select pin (default 10)
@@ -79,7 +79,7 @@ class Wiznet5500
     */
     uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
-   protected:
+protected:
     static constexpr bool interruptIsPossible()
     {
         return false;
@@ -109,7 +109,7 @@ class Wiznet5500
     */
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
-   private:
+private:
     //< SPI interface Read operation in Control Phase
     static const uint8_t AccessModeRead = (0x00 << 2);
 

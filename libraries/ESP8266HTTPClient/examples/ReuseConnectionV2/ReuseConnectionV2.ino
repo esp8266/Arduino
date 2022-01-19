@@ -6,14 +6,13 @@
    This example reuses the http connection and also restores the connection if the connection is lost
 */
 
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -42,7 +41,6 @@ void setup() {
 
   // allow reuse (if server supports it)
   http.setReuse(true);
-
 
   http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
   //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");

@@ -36,7 +36,7 @@ void setup() {
   // Here you can do whatever you need to do that doesn't need a WiFi connection.
   // ---
 
-  ESP.rtcUserMemoryRead(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
+  ESP.rtcUserMemoryRead(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t*>(&state), sizeof(state));
   unsigned long start = millis();
 
   if (!WiFi.resumeFromShutdown(state)
@@ -64,7 +64,7 @@ void setup() {
   // ---
 
   WiFi.shutdown(state);
-  ESP.rtcUserMemoryWrite(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t *>(&state), sizeof(state));
+  ESP.rtcUserMemoryWrite(RTC_USER_DATA_SLOT_WIFI_STATE, reinterpret_cast<uint32_t*>(&state), sizeof(state));
 
   // ---
   // Here you can do whatever you need to do that doesn't need a WiFi connection anymore.

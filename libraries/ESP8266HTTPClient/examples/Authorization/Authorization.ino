@@ -33,7 +33,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
-
 }
 
 void loop() {
@@ -47,7 +46,6 @@ void loop() {
     Serial.print("[HTTP] begin...\n");
     // configure traged server and url
 
-
     http.begin(client, "http://guest:guest@jigsaw.w3.org/HTTP/Basic/");
 
     /*
@@ -59,7 +57,6 @@ void loop() {
       http.begin(client, "http://jigsaw.w3.org/HTTP/Basic/");
       http.setAuthorization("Z3Vlc3Q6Z3Vlc3Q=");
     */
-
 
     Serial.print("[HTTP] GET...\n");
     // start connection and send HTTP header

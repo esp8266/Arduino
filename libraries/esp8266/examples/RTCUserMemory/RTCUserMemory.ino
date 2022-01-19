@@ -13,7 +13,7 @@
 // This example code is in the public domain.
 
 // CRC function used to ensure data validity
-uint32_t calculateCRC32(const uint8_t *data, size_t length);
+uint32_t calculateCRC32(const uint8_t* data, size_t length);
 
 // helper function to dump memory contents as hex
 void printMemory();
@@ -34,11 +34,11 @@ void setup() {
   delay(1000);
 
   // Read struct from RTC memory
-  if (ESP.rtcUserMemoryRead(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
+  if (ESP.rtcUserMemoryRead(0, (uint32_t*)&rtcData, sizeof(rtcData))) {
     Serial.println("Read: ");
     printMemory();
     Serial.println();
-    uint32_t crcOfData = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
+    uint32_t crcOfData = calculateCRC32((uint8_t*)&rtcData.data[0], sizeof(rtcData.data));
     Serial.print("CRC32 of data: ");
     Serial.println(crcOfData, HEX);
     Serial.print("CRC32 read from RTC: ");
@@ -55,9 +55,9 @@ void setup() {
     rtcData.data[i] = random(0, 128);
   }
   // Update CRC32 of data
-  rtcData.crc32 = calculateCRC32((uint8_t*) &rtcData.data[0], sizeof(rtcData.data));
+  rtcData.crc32 = calculateCRC32((uint8_t*)&rtcData.data[0], sizeof(rtcData.data));
   // Write struct to RTC memory
-  if (ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtcData, sizeof(rtcData))) {
+  if (ESP.rtcUserMemoryWrite(0, (uint32_t*)&rtcData, sizeof(rtcData))) {
     Serial.println("Write: ");
     printMemory();
     Serial.println();
@@ -70,7 +70,7 @@ void setup() {
 void loop() {
 }
 
-uint32_t calculateCRC32(const uint8_t *data, size_t length) {
+uint32_t calculateCRC32(const uint8_t* data, size_t length) {
   uint32_t crc = 0xffffffff;
   while (length--) {
     uint8_t c = *data++;
@@ -91,7 +91,7 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length) {
 //prints all rtcData, including the leading crc32
 void printMemory() {
   char buf[3];
-  uint8_t *ptr = (uint8_t *)&rtcData;
+  uint8_t* ptr = (uint8_t*)&rtcData;
   for (size_t i = 0; i < sizeof(rtcData); i++) {
     sprintf(buf, "%02X", ptr[i]);
     Serial.print(buf);

@@ -21,7 +21,7 @@ void checksketch(const char* what, const char* res1, const char* res2) {
 #endif
 
 void testStringPtrProgmem() {
-  static const char inProgmem [] PROGMEM = "I am in progmem";
+  static const char inProgmem[] PROGMEM = "I am in progmem";
   auto inProgmem2 = F("I am too in progmem");
 
   int heap = (int)ESP.getFreeHeap();
@@ -45,7 +45,6 @@ void testStreamString() {
   //
   // In non-default non-consume mode, it will just move a pointer.  That one
   // can be ::resetPointer(pos) anytime.  See the example below.
-
 
   // The String included in 'result' will not be modified by read:
   // (this is not the default)
@@ -182,7 +181,7 @@ void setup() {
   testStreamString();
 
   Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n",
-                (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
+      (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
 }
 
 #endif

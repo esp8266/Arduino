@@ -43,7 +43,7 @@ extern "C"
 
     static int s_uart_debug_nr = UART1;
 
-    static uart_t* UART[2] = {NULL, NULL};
+    static uart_t* UART[2] = { NULL, NULL };
 
     struct uart_rx_buffer_
     {
@@ -348,42 +348,42 @@ extern "C"
 
         switch (uart->uart_nr)
         {
-            case UART0:
-                uart->rx_enabled = (mode != UART_TX_ONLY);
-                uart->tx_enabled = (mode != UART_RX_ONLY);
-                if (uart->rx_enabled)
+        case UART0:
+            uart->rx_enabled = (mode != UART_TX_ONLY);
+            uart->tx_enabled = (mode != UART_RX_ONLY);
+            if (uart->rx_enabled)
+            {
+                struct uart_rx_buffer_* rx_buffer = (struct uart_rx_buffer_*)malloc(sizeof(struct uart_rx_buffer_));
+                if (rx_buffer == NULL)
                 {
-                    struct uart_rx_buffer_* rx_buffer = (struct uart_rx_buffer_*)malloc(sizeof(struct uart_rx_buffer_));
-                    if (rx_buffer == NULL)
-                    {
-                        free(uart);
-                        return NULL;
-                    }
-                    rx_buffer->size = rx_size;  //var this
-                    rx_buffer->rpos = 0;
-                    rx_buffer->wpos = 0;
-                    rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
-                    if (rx_buffer->buffer == NULL)
-                    {
-                        free(rx_buffer);
-                        free(uart);
-                        return NULL;
-                    }
-                    uart->rx_buffer = rx_buffer;
+                    free(uart);
+                    return NULL;
                 }
-                break;
+                rx_buffer->size = rx_size;  //var this
+                rx_buffer->rpos = 0;
+                rx_buffer->wpos = 0;
+                rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
+                if (rx_buffer->buffer == NULL)
+                {
+                    free(rx_buffer);
+                    free(uart);
+                    return NULL;
+                }
+                uart->rx_buffer = rx_buffer;
+            }
+            break;
 
-            case UART1:
-                // Note: uart_interrupt_handler does not support RX on UART 1.
-                uart->rx_enabled = false;
-                uart->tx_enabled = (mode != UART_RX_ONLY);
-                break;
+        case UART1:
+            // Note: uart_interrupt_handler does not support RX on UART 1.
+            uart->rx_enabled = false;
+            uart->tx_enabled = (mode != UART_RX_ONLY);
+            break;
 
-            case UART_NO:
-            default:
-                // big fail!
-                free(uart);
-                return NULL;
+        case UART_NO:
+        default:
+            // big fail!
+            free(uart);
+            return NULL;
         }
 
         uart_set_baudrate(uart, baudrate);

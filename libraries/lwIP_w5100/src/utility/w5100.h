@@ -41,7 +41,7 @@
 
 class Wiznet5100
 {
-   public:
+public:
     /**
         Constructor that uses the default hardware SPI pins
         @param cs the Arduino Chip Select / Slave Select pin (default 10)
@@ -79,7 +79,7 @@ class Wiznet5100
     */
     uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
-   protected:
+protected:
     static constexpr bool interruptIsPossible()
     {
         return false;
@@ -109,7 +109,7 @@ class Wiznet5100
     */
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
-   private:
+private:
     static const uint16_t TxBufferAddress = 0x4000;                   /* Internal Tx buffer address of the iinchip */
     static const uint16_t RxBufferAddress = 0x6000;                   /* Internal Rx buffer address of the iinchip */
     static const uint8_t TxBufferSize = 0x3;                          /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
