@@ -1,34 +1,34 @@
 /*
-    littlefs_mock.cpp - LittleFS mock for host side testing
-    Copyright © 2019 Earle F. Philhower, III
+ littlefs_mock.cpp - LittleFS mock for host side testing
+ Copyright © 2019 Earle F. Philhower, III
 
-    Based off spiffs_mock.cpp:
-    Copyright © 2016 Ivan Grokhotkov
+ Based off spiffs_mock.cpp:
+ Copyright © 2016 Ivan Grokhotkov
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 */
 
 #include "littlefs_mock.h"
-#include <LittleFS.h>
+#include "spiffs_mock.h"
+#include "spiffs/spiffs.h"
+#include "debug.h"
 #include <flash_utils.h>
 #include <stdlib.h>
-#include "debug.h"
-#include "spiffs/spiffs.h"
-#include "spiffs_mock.h"
+#include <LittleFS.h>
 
 #include <spiffs_api.h>
 
-#include <fcntl.h>
-#include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
 #include "flash_hal_mock.h"
@@ -41,9 +41,7 @@ LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, con
 {
     m_storage = storage;
     if ((m_overwrite = (fs_size < 0)))
-    {
         fs_size = -fs_size;
-    }
 
     fprintf(stderr, "LittleFS: %zd bytes\n", fs_size);
 
@@ -77,9 +75,7 @@ LittleFSMock::~LittleFSMock()
 void LittleFSMock::load()
 {
     if (!m_fs.size() || !m_storage.length())
-    {
         return;
-    }
 
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
@@ -111,9 +107,7 @@ void LittleFSMock::load()
         fprintf(stderr, "LittleFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
         ssize_t r = ::read(fs, m_fs.data(), m_fs.size());
         if (r != (ssize_t)m_fs.size())
-        {
             fprintf(stderr, "LittleFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
-        }
     }
     ::close(fs);
 }
@@ -121,9 +115,7 @@ void LittleFSMock::load()
 void LittleFSMock::save()
 {
     if (!m_fs.size() || !m_storage.length())
-    {
         return;
-    }
 
     int fs = ::open(m_storage.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if (fs == -1)
@@ -134,11 +126,7 @@ void LittleFSMock::save()
     fprintf(stderr, "LittleFS: saving %zi bytes to '%s'\n", m_fs.size(), m_storage.c_str());
 
     if (::write(fs, m_fs.data(), m_fs.size()) != (ssize_t)m_fs.size())
-    {
         fprintf(stderr, "LittleFS: writing %zi bytes: %s\n", m_fs.size(), strerror(errno));
-    }
     if (::close(fs) == -1)
-    {
         fprintf(stderr, "LittleFS: closing %s: %s\n", m_storage.c_str(), strerror(errno));
-    }
 }

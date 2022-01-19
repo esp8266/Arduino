@@ -23,8 +23,8 @@
 #ifndef __STREAMSTRING_H
 #define __STREAMSTRING_H
 
-#include <algorithm>
 #include <limits>
+#include <algorithm>
 #include "Stream.h"
 #include "WString.h"
 

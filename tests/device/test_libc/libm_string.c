@@ -1,7 +1,7 @@
-#include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #define memcmp memcmp_P
 #define memcpy memcpy_P
@@ -46,9 +46,7 @@ _DEFUN(funcqual, (a, b, l), char* a _AND char* b _AND int l)
 
     //  line(l);
     if (a == NULL && b == NULL)
-    {
         return;
-    }
     if (strcmp(a, b))
     {
         printf("string.c:%d (%s)\n", l, it);
@@ -116,8 +114,8 @@ void libm_test_string()
     (void)strcat(one, "cd");
     equal(one, "cd");
 
-    /*  strncat - first test it as strcat, with big counts,
-        then test the count mechanism.  */
+    /* strncat - first test it as strcat, with big counts,
+     then test the count mechanism.  */
     it = "strncat";
     (void)strcpy(one, "ijk");
     check(strncat(one, "lmn", 99) == one); /* Returned value. */
@@ -419,75 +417,75 @@ void libm_test_string()
     equal(two, "hi there"); /* Just paranoia. */
     equal(one, "hi there"); /* Stomped on source? */
 #if 0
-    /* memmove - must work on overlap.  */
-    it = "memmove";
-    check(memmove(one, "abc", 4) == one); /* Returned value. */
-    equal(one, "abc");		/* Did the copy go right? */
+  /* memmove - must work on overlap.  */
+  it = "memmove";
+  check(memmove(one, "abc", 4) == one); /* Returned value. */
+  equal(one, "abc");		/* Did the copy go right? */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) memmove(one + 1, "xyz", 2);
-    equal(one, "axydefgh");	/* Basic test. */
+  (void) strcpy(one, "abcdefgh");
+  (void) memmove(one+1, "xyz", 2);
+  equal(one, "axydefgh");	/* Basic test. */
 
-    (void) strcpy(one, "abc");
-    (void) memmove(one, "xyz", 0);
-    equal(one, "abc");		/* Zero-length copy. */
+  (void) strcpy(one, "abc");
+  (void) memmove(one, "xyz", 0);
+  equal(one, "abc");		/* Zero-length copy. */
 
-    (void) strcpy(one, "hi there");
-    (void) strcpy(two, "foo");
-    (void) memmove(two, one, 9);
-    equal(two, "hi there");	/* Just paranoia. */
-    equal(one, "hi there");	/* Stomped on source? */
+  (void) strcpy(one, "hi there");
+  (void) strcpy(two, "foo");
+  (void) memmove(two, one, 9);
+  equal(two, "hi there");	/* Just paranoia. */
+  equal(one, "hi there");	/* Stomped on source? */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) memmove(one + 1, one, 9);
-    equal(one, "aabcdefgh");	/* Overlap, right-to-left. */
+  (void) strcpy(one, "abcdefgh");
+  (void) memmove(one+1, one, 9);
+  equal(one, "aabcdefgh");	/* Overlap, right-to-left. */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) memmove(one + 1, one + 2, 7);
-    equal(one, "acdefgh");	/* Overlap, left-to-right. */
+  (void) strcpy(one, "abcdefgh");
+  (void) memmove(one+1, one+2, 7);
+  equal(one, "acdefgh");	/* Overlap, left-to-right. */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) memmove(one, one, 9);
-    equal(one, "abcdefgh");	/* 100% overlap. */
+  (void) strcpy(one, "abcdefgh");
+  (void) memmove(one, one, 9);
+  equal(one, "abcdefgh");	/* 100% overlap. */
 #endif
 #if 0
-    /*  memccpy - first test like memcpy, then the search part
-        The SVID, the only place where memccpy is mentioned, says
-        overlap might fail, so we don't try it.  Besides, it's hard
-        to see the rationale for a non-left-to-right memccpy.  */
-    it = "memccpy";
-    check(memccpy(one, "abc", 'q', 4) == NULL); /* Returned value. */
-    equal(one, "abc");		/* Did the copy go right? */
+  /* memccpy - first test like memcpy, then the search part
+     The SVID, the only place where memccpy is mentioned, says
+     overlap might fail, so we don't try it.  Besides, it's hard
+     to see the rationale for a non-left-to-right memccpy.  */
+  it = "memccpy";
+  check(memccpy(one, "abc", 'q', 4) == NULL); /* Returned value. */
+  equal(one, "abc");		/* Did the copy go right? */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) memccpy(one + 1, "xyz", 'q', 2);
-    equal(one, "axydefgh");	/* Basic test. */
+  (void) strcpy(one, "abcdefgh");
+  (void) memccpy(one+1, "xyz", 'q', 2);
+  equal(one, "axydefgh");	/* Basic test. */
 
-    (void) strcpy(one, "abc");
-    (void) memccpy(one, "xyz", 'q', 0);
-    equal(one, "abc");		/* Zero-length copy. */
+  (void) strcpy(one, "abc");
+  (void) memccpy(one, "xyz", 'q', 0);
+  equal(one, "abc");		/* Zero-length copy. */
 
-    (void) strcpy(one, "hi there");
-    (void) strcpy(two, "foo");
-    (void) memccpy(two, one, 'q', 9);
-    equal(two, "hi there");	/* Just paranoia. */
-    equal(one, "hi there");	/* Stomped on source? */
+  (void) strcpy(one, "hi there");
+  (void) strcpy(two, "foo");
+  (void) memccpy(two, one, 'q', 9);
+  equal(two, "hi there");	/* Just paranoia. */
+  equal(one, "hi there");	/* Stomped on source? */
 
-    (void) strcpy(one, "abcdefgh");
-    (void) strcpy(two, "horsefeathers");
-    check(memccpy(two, one, 'f', 9) == two + 6);	/* Returned value. */
-    equal(one, "abcdefgh");	/* Source intact? */
-    equal(two, "abcdefeathers"); /* Copy correct? */
+  (void) strcpy(one, "abcdefgh");
+  (void) strcpy(two, "horsefeathers");
+  check(memccpy(two, one, 'f', 9) == two+6);	/* Returned value. */
+  equal(one, "abcdefgh");	/* Source intact? */
+  equal(two, "abcdefeathers"); /* Copy correct? */
 
-    (void) strcpy(one, "abcd");
-    (void) strcpy(two, "bumblebee");
-    check(memccpy(two, one, 'a', 4) == two + 1); /* First char. */
-    equal(two, "aumblebee");
-    check(memccpy(two, one, 'd', 4) == two + 4); /* Last char. */
-    equal(two, "abcdlebee");
-    (void) strcpy(one, "xyz");
-    check(memccpy(two, one, 'x', 1) == two + 1); /* Singleton. */
-    equal(two, "xbcdlebee");
+  (void) strcpy(one, "abcd");
+  (void) strcpy(two, "bumblebee");
+  check(memccpy(two, one, 'a', 4) == two+1); /* First char. */
+  equal(two, "aumblebee");
+  check(memccpy(two, one, 'd', 4) == two+4); /* Last char. */
+  equal(two, "abcdlebee");
+  (void) strcpy(one, "xyz");
+  check(memccpy(two, one, 'x', 1) == two+1); /* Singleton. */
+  equal(two, "xbcdlebee");
 #endif
     /* memset.  */
     it = "memset";
@@ -505,8 +503,8 @@ void libm_test_string()
     (void)memset(one + 2, 010045, 1);
     equal(one, "ax\045xe"); /* Unsigned char convert. */
 
-    /*  bcopy - much like memcpy.
-        Berklix manual is silent about overlap, so don't test it.  */
+    /* bcopy - much like memcpy.
+     Berklix manual is silent about overlap, so don't test it.  */
     it = "bcopy";
     (void)bcopy("abc", one, 4);
     equal(one, "abc"); /* Simple copy. */
@@ -548,20 +546,18 @@ void libm_test_string()
     check(bcmp("abc", "def", 0) == 0);   /* Zero count. */
 
     if (errors)
-    {
         abort();
-    }
     printf("ok\n");
 
 #if 0 /* strerror - VERY system-dependent.  */
-    {
-        extern CONST unsigned int _sys_nerr;
-        extern CONST char *CONST _sys_errlist[];
-        int f;
-        it = "strerror";
-        f = open("/", O_WRONLY);	/* Should always fail. */
-        check(f < 0 && errno > 0 && errno < _sys_nerr);
-        equal(strerror(errno), _sys_errlist[errno]);
-    }
+{
+  extern CONST unsigned int _sys_nerr;
+  extern CONST char *CONST _sys_errlist[];
+  int f;
+  it = "strerror";
+  f = open("/", O_WRONLY);	/* Should always fail. */
+  check(f < 0 && errno > 0 && errno < _sys_nerr);
+  equal(strerror(errno), _sys_errlist[errno]);
+}
 #endif
 }

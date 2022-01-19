@@ -1,23 +1,23 @@
 /*
-    test_string.cpp - String tests
-    Copyright © 2018 Earle F. Philhower, III
+ test_string.cpp - String tests
+ Copyright © 2018 Earle F. Philhower, III
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-*/
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ */
 
-#include <StreamString.h>
+#include <catch.hpp>
+#include <string.h>
 #include <WString.h>
 #include <limits.h>
-#include <string.h>
-#include <catch.hpp>
+#include <StreamString.h>
 
 TEST_CASE("String::move", "[core][String]")
 {
@@ -162,15 +162,11 @@ TEST_CASE("String concantenation", "[core][String]")
     n.concat(buff, 3);
     REQUIRE(n == "1abc");  // Ensure the trailing 0 is always present even w/this funky concat
     for (int i = 0; i < 20; i++)
-    {
         n.concat(buff, 1);  // Add 20 'a's to go from SSO to normal string
-    }
     REQUIRE(n == "1abcaaaaaaaaaaaaaaaaaaaa");
     n = "";
     for (int i = 0; i <= 5; i++)
-    {
         n.concat(buff, i);
-    }
     REQUIRE(n == "aababcabcdabcde");
     n.concat(buff, 0);  // And check no add'n
     REQUIRE(n == "aababcabcdabcde");

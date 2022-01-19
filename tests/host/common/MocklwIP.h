@@ -4,8 +4,8 @@
 
 extern "C"
 {
-#include <lwip/netif.h>
 #include <user_interface.h>
+#include <lwip/netif.h>
 
     extern netif netif0;
 

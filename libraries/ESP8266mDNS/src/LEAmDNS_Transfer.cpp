@@ -28,8 +28,8 @@ extern "C"
 }
 
 #include "ESP8266mDNS.h"
-#include "LEAmDNS_Priv.h"
 #include "LEAmDNS_lwIPdefs.h"
+#include "LEAmDNS_Priv.h"
 
 namespace esp8266
 {

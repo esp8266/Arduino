@@ -1,14 +1,14 @@
 /*
-    Copyright (C) 2002 by Red Hat, Incorporated. All rights reserved.
+ * Copyright (C) 2002 by Red Hat, Incorporated. All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software
+ * is freely granted, provided that this notice is preserved.
+ */
 
-    Permission to use, copy, modify, and distribute this software
-    is freely granted, provided that this notice is preserved.
-*/
-
-#include <pgmspace.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <pgmspace.h>
 
 #define MAX_1 50
 #define memcmp memcmp_P
@@ -238,19 +238,15 @@ void tstring_main(void)
     {
         for (i = j - 1; i <= j + 1; ++i)
         {
-            /*  don't bother checking unaligned data in the larger
-                sizes since it will waste time without performing additional testing */
+            /* don't bother checking unaligned data in the larger
+	     sizes since it will waste time without performing additional testing */
             if ((size_t)i <= 16 * sizeof(long))
             {
                 align_test_iterations = 2 * sizeof(long);
                 if ((size_t)i <= 2 * sizeof(long) + 1)
-                {
                     z = 2;
-                }
                 else
-                {
                     z = 2 * sizeof(long);
-                }
             }
             else
             {
@@ -358,9 +354,7 @@ void tstring_main(void)
     }
 
     if (test_failed)
-    {
         abort();
-    }
 
     printf("ok\n");
 }

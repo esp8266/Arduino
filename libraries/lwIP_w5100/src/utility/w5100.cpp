@@ -32,8 +32,8 @@
 
 // original sources: https://github.com/njh/W5100MacRaw
 
-#include "w5100.h"
 #include <SPI.h>
+#include "w5100.h"
 
 uint8_t Wiznet5100::wizchip_read(uint16_t address)
 {

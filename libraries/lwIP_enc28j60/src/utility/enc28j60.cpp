@@ -35,9 +35,9 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 
 #include "enc28j60.h"

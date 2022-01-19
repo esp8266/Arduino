@@ -22,14 +22,14 @@
 
 */
 
-#include <AddrList.h>
 #include <Schedule.h>
+#include <AddrList.h>
 
+#include "ESP8266mDNS.h"
+#include "LEAmDNS_Priv.h"
 #include <LwipIntf.h>  // LwipIntf::stateUpCB()
 #include <lwip/igmp.h>
 #include <lwip/prot/dns.h>
-#include "ESP8266mDNS.h"
-#include "LEAmDNS_Priv.h"
 
 namespace esp8266
 {

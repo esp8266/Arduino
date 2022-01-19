@@ -10,8 +10,8 @@
 // using NAT instead (see in example)
 
 #include <Arduino.h>
-#include <IPAddress.h>
 #include <Schedule.h>
+#include <IPAddress.h>
 #include <lwip/dns.h>
 
 #include "PPPServer.h"

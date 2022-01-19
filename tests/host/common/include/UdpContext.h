@@ -23,8 +23,8 @@
 
 #include <functional>
 
-#include <IPAddress.h>
 #include <MocklwIP.h>
+#include <IPAddress.h>
 #include <PolledTimeout.h>
 
 class UdpContext;
@@ -222,9 +222,7 @@ class UdpContext
         size_t wrt = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
         err_t ret = _outbufsize ? ERR_OK : ERR_ABRT;
         if (!keepBuffer || wrt == _outbufsize)
-        {
             cancelBuffer();
-        }
         return ret;
     }
 
@@ -243,22 +241,16 @@ class UdpContext
         err_t err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port)) != ERR_OK) && !timeout)
-        {
             delay(0);
-        }
         if (err != ERR_OK)
-        {
             cancelBuffer();
-        }
         return err == ERR_OK;
     }
 
     void mock_cb(void)
     {
         if (_on_rx)
-        {
             _on_rx();
-        }
     }
 
    public:
@@ -276,9 +268,7 @@ class UdpContext
             //ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
         }
         else
-        {
             mockverbose("TODO unhandled udp address of size %d\n", (int)addrsize);
-        }
     }
 
     int _sock = -1;

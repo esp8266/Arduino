@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "BSTest.h"
+#include <stdio.h>
 
 BS_ENV_DECLARE();
 

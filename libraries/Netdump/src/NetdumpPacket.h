@@ -22,12 +22,12 @@
 #ifndef __NETDUMP_PACKET_H
 #define __NETDUMP_PACKET_H
 
+#include <lwipopts.h>
 #include <IPAddress.h>
 #include <StreamString.h>
-#include <lwipopts.h>
-#include <vector>
 #include "NetdumpIP.h"
 #include "PacketType.h"
+#include <vector>
 
 namespace NetCapture
 {

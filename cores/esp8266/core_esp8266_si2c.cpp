@@ -19,15 +19,15 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
 */
-#include "PolledTimeout.h"
-#include "pins_arduino.h"
 #include "twi.h"
+#include "pins_arduino.h"
 #include "wiring_private.h"
+#include "PolledTimeout.h"
 
 extern "C"
 {
-#include "ets_sys.h"
 #include "twi_util.h"
+#include "ets_sys.h"
 };
 
 // Inline helpers

@@ -102,14 +102,14 @@
 #ifndef MDNS_H
 #define MDNS_H
 
-#include <PolledTimeout.h>
 #include <functional>  // for UdpContext.h
-#include <limits>
-#include <map>
 #include "WiFiUdp.h"
+#include "lwip/udp.h"
 #include "debug.h"
 #include "include/UdpContext.h"
-#include "lwip/udp.h"
+#include <limits>
+#include <PolledTimeout.h>
+#include <map>
 
 #include "ESP8266WiFi.h"
 

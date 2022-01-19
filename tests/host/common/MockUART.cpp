@@ -1,36 +1,36 @@
 /*
-    MockUART.cpp - esp8266 UART HAL EMULATION
+ MockUART.cpp - esp8266 UART HAL EMULATION
 
-    Copyright (c) 2019 Clemens Kirchgatterer. All rights reserved.
-    This file is part of the esp8266 core for Arduino environment.
+ Copyright (c) 2019 Clemens Kirchgatterer. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
 /*
-    This UART driver is directly derived from the ESP8266 UART HAL driver
-    Copyright (c) 2014 Ivan Grokhotkov. It provides the same API as the
-    original driver and was striped from all HW dependent interfaces.
+ This UART driver is directly derived from the ESP8266 UART HAL driver
+ Copyright (c) 2014 Ivan Grokhotkov. It provides the same API as the
+ original driver and was striped from all HW dependent interfaces.
 
-    UART0 writes got to stdout, while UART1 writes got to stderr. The user
-    is responsible for feeding the RX FIFO new data by calling uart_new_data().
-*/
+ UART0 writes got to stdout, while UART1 writes got to stderr. The user
+ is responsible for feeding the RX FIFO new data by calling uart_new_data().
+ */
 
+#include <unistd.h>    // write
 #include <sys/time.h>  // gettimeofday
 #include <time.h>      // localtime
-#include <unistd.h>    // write
 
 #include "Arduino.h"
 #include "uart.h"
@@ -111,9 +111,7 @@ extern "C"
             return;
 #else
             if (++rx_buffer->rpos == rx_buffer->size)
-            {
                 rx_buffer->rpos = 0;
-            }
 #endif
         }
         rx_buffer->buffer[rx_buffer->wpos] = data;
@@ -140,9 +138,7 @@ extern "C"
         size_t ret = rx_buffer->wpos - rx_buffer->rpos;
 
         if (rx_buffer->wpos < rx_buffer->rpos)
-        {
             ret = (rx_buffer->wpos + rx_buffer->size) - rx_buffer->rpos;
-        }
 
         return ret;
     }
@@ -170,9 +166,7 @@ extern "C"
     uart_rx_available(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_enabled)
-        {
             return 0;
-        }
 
         return uart_rx_available_unsafe(uart->rx_buffer);
     }
@@ -181,14 +175,10 @@ extern "C"
     uart_peek_char(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_enabled)
-        {
             return -1;
-        }
 
         if (!uart_rx_available_unsafe(uart->rx_buffer))
-        {
             return -1;
-        }
 
         return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
     }
@@ -204,17 +194,13 @@ extern "C"
     uart_read(uart_t* uart, char* userbuffer, size_t usersize)
     {
         if (uart == NULL || !uart->rx_enabled)
-        {
             return 0;
-        }
 
         if (!blocking_uart)
         {
             char c;
             if (read(0, &c, 1) == 1)
-            {
                 uart_new_data(0, c);
-            }
         }
 
         size_t ret = 0;
@@ -224,9 +210,7 @@ extern "C"
             // get largest linear length from sw buffer
             size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos ? uart->rx_buffer->wpos - uart->rx_buffer->rpos : uart->rx_buffer->size - uart->rx_buffer->rpos;
             if (ret + chunk > usersize)
-            {
                 chunk = usersize - ret;
-            }
             memcpy(userbuffer + ret, uart->rx_buffer->buffer + uart->rx_buffer->rpos, chunk);
             uart->rx_buffer->rpos = (uart->rx_buffer->rpos + chunk) % uart->rx_buffer->size;
             ret += chunk;
@@ -238,31 +222,21 @@ extern "C"
     uart_resize_rx_buffer(uart_t* uart, size_t new_size)
     {
         if (uart == NULL || !uart->rx_enabled)
-        {
             return 0;
-        }
 
         if (uart->rx_buffer->size == new_size)
-        {
             return uart->rx_buffer->size;
-        }
 
         uint8_t* new_buf = (uint8_t*)malloc(new_size);
         if (!new_buf)
-        {
             return uart->rx_buffer->size;
-        }
 
         size_t new_wpos = 0;
         // if uart_rx_available_unsafe() returns non-0, uart_read_char_unsafe() can't return -1
         while (uart_rx_available_unsafe(uart->rx_buffer) && new_wpos < new_size)
-        {
             new_buf[new_wpos++] = uart_read_char_unsafe(uart);
-        }
         if (new_wpos == new_size)
-        {
             new_wpos = 0;
-        }
 
         uint8_t* old_buf = uart->rx_buffer->buffer;
         uart->rx_buffer->rpos = 0;
@@ -283,9 +257,7 @@ extern "C"
     uart_write_char(uart_t* uart, char c)
     {
         if (uart == NULL || !uart->tx_enabled)
-        {
             return 0;
-        }
 
         uart_do_write_char(uart->uart_nr, c);
 
@@ -296,16 +268,12 @@ extern "C"
     uart_write(uart_t* uart, const char* buf, size_t size)
     {
         if (uart == NULL || !uart->tx_enabled)
-        {
             return 0;
-        }
 
         size_t ret = size;
         const int uart_nr = uart->uart_nr;
         while (size--)
-        {
             uart_do_write_char(uart_nr, *buf++);
-        }
 
         return ret;
     }
@@ -314,9 +282,7 @@ extern "C"
     uart_tx_free(uart_t* uart)
     {
         if (uart == NULL || !uart->tx_enabled)
-        {
             return 0;
-        }
 
         return UART_TX_FIFO_SIZE;
     }
@@ -331,9 +297,7 @@ extern "C"
     uart_flush(uart_t* uart)
     {
         if (uart == NULL)
-        {
             return;
-        }
 
         if (uart->rx_enabled)
         {
@@ -346,9 +310,7 @@ extern "C"
     uart_set_baudrate(uart_t* uart, int baud_rate)
     {
         if (uart == NULL)
-        {
             return;
-        }
 
         uart->baud_rate = baud_rate;
     }
@@ -357,9 +319,7 @@ extern "C"
     uart_get_baudrate(uart_t* uart)
     {
         if (uart == NULL)
-        {
             return 0;
-        }
 
         return uart->baud_rate;
     }
@@ -381,9 +341,7 @@ extern "C"
         (void)invert;
         uart_t* uart = (uart_t*)malloc(sizeof(uart_t));
         if (uart == NULL)
-        {
             return NULL;
-        }
 
         uart->uart_nr = uart_nr;
         uart->rx_overrun = false;
@@ -439,9 +397,7 @@ extern "C"
     uart_uninit(uart_t* uart)
     {
         if (uart == NULL)
-        {
             return;
-        }
 
         if (uart->rx_enabled)
         {
@@ -480,9 +436,7 @@ extern "C"
     uart_tx_enabled(uart_t* uart)
     {
         if (uart == NULL)
-        {
             return false;
-        }
 
         return uart->tx_enabled;
     }
@@ -491,9 +445,7 @@ extern "C"
     uart_rx_enabled(uart_t* uart)
     {
         if (uart == NULL)
-        {
             return false;
-        }
 
         return uart->rx_enabled;
     }
@@ -502,9 +454,7 @@ extern "C"
     uart_has_overrun(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_overrun)
-        {
             return false;
-        }
 
         // clear flag
         uart->rx_overrun = false;

@@ -24,9 +24,7 @@ TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
     oneShotFastNs timeout(500000000);
     before = micros();
     while (!timeout.expired())
-    {
         yield();
-    }
     after = micros();
 
     delta = after - before;
@@ -39,9 +37,7 @@ TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
     timeout.reset();
     before = micros();
     while (!timeout)
-    {
         yield();
-    }
     after = micros();
 
     delta = after - before;
@@ -61,9 +57,7 @@ TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
     oneShotFastUs timeout(3000000);
     before = micros();
     while (!timeout.expired())
-    {
         yield();
-    }
     after = micros();
 
     delta = after - before;
@@ -76,9 +70,7 @@ TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
     timeout.reset();
     before = micros();
     while (!timeout)
-    {
         yield();
-    }
     after = micros();
 
     delta = after - before;
@@ -98,9 +90,7 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
     oneShotMs timeout(3000);
     before = millis();
     while (!timeout.expired())
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -113,9 +103,7 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
     timeout.reset();
     before = millis();
     while (!timeout)
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -135,9 +123,7 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
     oneShotMs timeout(3000);
     before = millis();
     while (!timeout.expired())
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -150,9 +136,7 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
     timeout.reset(1000);
     before = millis();
     while (!timeout)
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -172,9 +156,7 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
     periodicMs timeout(3000);
     before = millis();
     while (!timeout)
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -186,9 +168,7 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 
     before = millis();
     while (!timeout)
-    {
         yield();
-    }
     after = millis();
 
     delta = after - before;
@@ -215,9 +195,7 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
         {
             Serial.print("*");
             if (!--counter)
-            {
                 break;
-            }
             yield();
         }
     }

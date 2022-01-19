@@ -31,13 +31,13 @@
 
 #include <lwip/def.h>
 
-#include <arpa/inet.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <arpa/inet.h>
 
 #include "MocklwIP.h"
 
@@ -86,8 +86,8 @@ DhcpServer dhcpSoftAP(nullptr);
 
 extern "C"
 {
-#include <lwip/netif.h>
 #include <user_interface.h>
+#include <lwip/netif.h>
 
     uint8 wifi_get_opmode(void)
     {
@@ -125,9 +125,7 @@ extern "C"
         strcpy((char*)config->password, "emulated-ssid-password");
         config->bssid_set = 0;
         for (int i = 0; i < 6; i++)
-        {
             config->bssid[i] = i;
-        }
         config->threshold.rssi = 1;
         config->threshold.authmode = AUTH_WPA_PSK;
 #ifdef NONOSDK3V0
@@ -182,9 +180,7 @@ extern "C"
         }
 
         if (host_interface)
-        {
             mockverbose("host: looking for interface '%s':\n", host_interface);
-        }
 
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
@@ -195,10 +191,8 @@ extern "C"
                 auto test_ipv4 = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
                 mockverbose(" IPV4 (0x%08lx)", test_ipv4);
                 if ((test_ipv4 & 0xff000000) == 0x7f000000)
-                // 127./8
-                {
+                    // 127./8
                     mockverbose(" (local, ignored)");
-                }
                 else
                 {
                     if (!host_interface || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
@@ -208,9 +202,7 @@ extern "C"
                         mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
                         mockverbose(" (selected)\n");
                         if (host_interface)
-                        {
                             global_source_address = ntohl(ipv4);
-                        }
                         break;
                     }
                 }
@@ -219,18 +211,14 @@ extern "C"
         }
 
         if (ifAddrStruct != NULL)
-        {
             freeifaddrs(ifAddrStruct);
-        }
 
         (void)if_index;
         //if (if_index != STATION_IF)
         //	fprintf(stderr, "we are not AP");
 
         if (global_ipv4_netfmt == NO_GLOBAL_BINDING)
-        {
             global_ipv4_netfmt = ipv4;
-        }
 
         if (info)
         {

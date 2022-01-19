@@ -1,14 +1,14 @@
-/*  Splitting string into tokens, taking quotes and escape sequences into account.
-    From https://github.com/espressif/esp-idf/blob/master/components/console/split_argv.c
-    Copyright 2016-2017 Espressif Systems (Shanghai) PTE LTD
-    Licensed under the Apache License 2.0.
-*/
+/* Splitting string into tokens, taking quotes and escape sequences into account.
+ * From https://github.com/espressif/esp-idf/blob/master/components/console/split_argv.c
+ * Copyright 2016-2017 Espressif Systems (Shanghai) PTE LTD
+ * Licensed under the Apache License 2.0.
+ */
 
 #ifndef BS_ARGS_H
 #define BS_ARGS_H
 
-#include <ctype.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 
 namespace bs
@@ -41,29 +41,29 @@ typedef enum
     } while (0);
 
 /**
-    @brief Split command line into arguments in place
-
-    - This function finds whitespace-separated arguments in the given input line.
-
-       'abc def 1 20 .3' -> [ 'abc', 'def', '1', '20', '.3' ]
-
-    - Argument which include spaces may be surrounded with quotes. In this case
-     spaces are preserved and quotes are stripped.
-
-       'abc "123 456" def' -> [ 'abc', '123 456', 'def' ]
-
-    - Escape sequences may be used to produce backslash, double quote, and space:
-
-       'a\ b\\c\"' -> [ 'a b\c"' ]
-
-    Pointers to at most argv_size - 1 arguments are returned in argv array.
-    The pointer after the last one (i.e. argv[argc]) is set to NULL.
-
-    @param line pointer to buffer to parse; it is modified in place
-    @param argv array where the pointers to arguments are written
-    @param argv_size number of elements in argv_array (max. number of arguments will be argv_size - 1)
-    @return number of arguments found (argc)
-*/
+ * @brief Split command line into arguments in place
+ *
+ * - This function finds whitespace-separated arguments in the given input line.
+ *
+ *     'abc def 1 20 .3' -> [ 'abc', 'def', '1', '20', '.3' ]
+ *
+ * - Argument which include spaces may be surrounded with quotes. In this case
+ *   spaces are preserved and quotes are stripped.
+ *
+ *     'abc "123 456" def' -> [ 'abc', '123 456', 'def' ]
+ *
+ * - Escape sequences may be used to produce backslash, double quote, and space:
+ *
+ *     'a\ b\\c\"' -> [ 'a b\c"' ]
+ *
+ * Pointers to at most argv_size - 1 arguments are returned in argv array.
+ * The pointer after the last one (i.e. argv[argc]) is set to NULL.
+ *
+ * @param line pointer to buffer to parse; it is modified in place
+ * @param argv array where the pointers to arguments are written
+ * @param argv_size number of elements in argv_array (max. number of arguments will be argv_size - 1)
+ * @return number of arguments found (argc)
+ */
 inline size_t split_args(char* line, char** argv, size_t argv_size)
 {
     const int QUOTE = '"';

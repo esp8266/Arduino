@@ -1,11 +1,11 @@
 
 extern "C"
 {
-#include "lwip/dhcp.h"
-#include "lwip/dns.h"
 #include "lwip/err.h"
-#include "lwip/init.h"  // LWIP_VERSION_
 #include "lwip/ip_addr.h"
+#include "lwip/dns.h"
+#include "lwip/dhcp.h"
+#include "lwip/init.h"  // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h"  // struct netif
 #endif
@@ -13,8 +13,8 @@ extern "C"
 #include <user_interface.h>
 }
 
-#include "LwipIntf.h"
 #include "debug.h"
+#include "LwipIntf.h"
 
 // args      | esp order    arduino order
 // ----      + ---------    -------------

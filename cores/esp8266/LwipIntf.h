@@ -2,8 +2,8 @@
 #ifndef _LWIPINTF_H
 #define _LWIPINTF_H
 
-#include <IPAddress.h>
 #include <lwip/netif.h>
+#include <IPAddress.h>
 
 #include <functional>
 

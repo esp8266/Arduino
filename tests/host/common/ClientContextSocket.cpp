@@ -1,43 +1,43 @@
 
 /*
-    Arduino emulation - socket part of ClientContext
-    Copyright (c) 2018 david gauchard. All rights reserved.
+ Arduino emulation - socket part of ClientContext
+ Copyright (c) 2018 david gauchard. All rights reserved.
 
-    Permission is hereby granted, free of charge, to any person obtaining a
-    copy of this software and associated documentation files (the "Software"),
-    to deal with the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    and/or sell copies of the Software, and to permit persons to whom the
-    Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal with the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-    - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimers.
+ - Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
 
-    - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimers in the
-    documentation and/or other materials provided with the distribution.
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
 
-    - The names of its contributors may not be used to endorse or promote
-    products derived from this Software without specific prior written
-    permission.
+ - The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-    THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-    DEALINGS WITH THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS WITH THE SOFTWARE.
 */
 // separated from lwIP to avoid type conflicts
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netinet/tcp.h>
-#include <poll.h>
-#include <sys/socket.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <poll.h>
+#include <fcntl.h>
+#include <errno.h>
 
 int mockSockSetup(int sock)
 {
@@ -113,9 +113,7 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
     // usersize==0: peekAvailable()
 
     if (usersize > CCBUFSIZE)
-    {
         mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
-    }
 
     struct pollfd p;
     size_t retsize = 0;
@@ -135,10 +133,8 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
         }
 
         if (usersize == 0 && ccinbufsize)
-        // peekAvailable
-        {
+            // peekAvailable
             return ccinbufsize;
-        }
 
         if (usersize <= ccinbufsize)
         {
@@ -164,9 +160,7 @@ ssize_t mockRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf
 {
     ssize_t copied = mockPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
     if (copied < 0)
-    {
         return -1;
-    }
     // swallow (XXX use a circular buffer)
     memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
     ccinbufsize -= copied;
@@ -201,9 +195,7 @@ ssize_t mockWrite(int sock, const uint8_t* data, size_t size, int timeout_ms)
             }
             sent += ret;
             if (sent < size)
-            {
                 fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent, size);
-            }
         }
     }
 #ifdef DEBUG_ESP_WIFI

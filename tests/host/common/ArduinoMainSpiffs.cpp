@@ -11,8 +11,6 @@ void mock_start_spiffs(const String& fname, size_t size_kb, size_t block_kb, siz
 void mock_stop_spiffs()
 {
     if (spiffs_mock)
-    {
         delete spiffs_mock;
-    }
     spiffs_mock = nullptr;
 }

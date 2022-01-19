@@ -6,19 +6,19 @@
 // remove all Serial.print
 // unchain pbufs
 
-#include <lwip/apps/sntp.h>
-#include <lwip/dhcp.h>
-#include <lwip/dns.h>
-#include <lwip/etharp.h>
+#include <netif/ethernet.h>
 #include <lwip/init.h>
 #include <lwip/netif.h>
-#include <netif/ethernet.h>
+#include <lwip/etharp.h>
+#include <lwip/dhcp.h>
+#include <lwip/dns.h>
+#include <lwip/apps/sntp.h>
 
 #include <user_interface.h>  // wifi_get_macaddr()
 
-#include "LwipIntf.h"
 #include "SPI.h"
 #include "Schedule.h"
+#include "LwipIntf.h"
 #include "wl_definitions.h"
 
 #ifndef DEFAULT_MTU

@@ -32,8 +32,8 @@
 
 // original sources: https://github.com/njh/W5500MacRaw
 
-#include "w5500.h"
 #include <SPI.h>
+#include "w5500.h"
 
 uint8_t Wiznet5500::wizchip_read(uint8_t block, uint16_t address)
 {

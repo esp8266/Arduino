@@ -24,13 +24,13 @@
 
 extern "C"
 {
-#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 }
 
-#include "Wire.h"
 #include "twi.h"
+#include "Wire.h"
 
 //Some boards don't have these pins available, and hence don't support Wire.
 //Check here for compile-time error.

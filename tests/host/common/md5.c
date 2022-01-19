@@ -1,40 +1,40 @@
 /*
-    Copyright (c) 2007, Cameron Rich
-
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
-
- * * Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
- * * Neither the name of the axTLS project nor the names of its contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ * Copyright (c) 2007, Cameron Rich
+ * 
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, 
+ *   this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, 
+ *   this list of conditions and the following disclaimer in the documentation 
+ *   and/or other materials provided with the distribution.
+ * * Neither the name of the axTLS project nor the names of its contributors 
+ *   may be used to endorse or promote products derived from this software 
+ *   without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 /**
-    This file implements the MD5 algorithm as defined in RFC1321
-*/
+ * This file implements the MD5 algorithm as defined in RFC1321
+ */
 
-#include <stddef.h>
-#include <stdint.h>
 #include <string.h>
+#include <stdint.h>
+#include <stddef.h>
 
 #define EXP_FUNC extern
 #define STDCALL
@@ -48,8 +48,8 @@ typedef struct
     uint8_t buffer[64]; /* input buffer */
 } MD5_CTX;
 
-/*  Constants for MD5Transform routine.
-*/
+/* Constants for MD5Transform routine.
+ */
 #define S11 7
 #define S12 12
 #define S13 17
@@ -78,8 +78,8 @@ static const uint8_t PADDING[64] =
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-/*  F, G, H and I are basic MD5 functions.
-*/
+/* F, G, H and I are basic MD5 functions.
+ */
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
 #define H(x, y, z) ((x) ^ (y) ^ (z))
@@ -88,8 +88,8 @@ static const uint8_t PADDING[64] =
 /* ROTATE_LEFT rotates x left n bits.  */
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
-/*  FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
-    Rotation is separate from addition to prevent recomputation.  */
+/* FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
+   Rotation is separate from addition to prevent recomputation.  */
 #define FF(a, b, c, d, x, s, ac)                        \
     {                                                   \
         (a) += F((b), (c), (d)) + (x) + (uint32_t)(ac); \
@@ -116,14 +116,14 @@ static const uint8_t PADDING[64] =
     }
 
 /**
-    MD5 initialization - begins an MD5 operation, writing a new ctx.
-*/
+ * MD5 initialization - begins an MD5 operation, writing a new ctx.
+ */
 EXP_FUNC void STDCALL MD5Init(MD5_CTX* ctx)
 {
     ctx->count[0] = ctx->count[1] = 0;
 
-    /*  Load magic initialization constants.
-    */
+    /* Load magic initialization constants.
+     */
     ctx->state[0] = 0x67452301;
     ctx->state[1] = 0xefcdab89;
     ctx->state[2] = 0x98badcfe;
@@ -131,8 +131,8 @@ EXP_FUNC void STDCALL MD5Init(MD5_CTX* ctx)
 }
 
 /**
-    Accepts an array of octets as the next portion of the message.
-*/
+ * Accepts an array of octets as the next portion of the message.
+ */
 EXP_FUNC void STDCALL MD5Update(MD5_CTX* ctx, const uint8_t* msg, int len)
 {
     uint32_t x;
@@ -143,9 +143,7 @@ EXP_FUNC void STDCALL MD5Update(MD5_CTX* ctx, const uint8_t* msg, int len)
 
     /* Update number of bits */
     if ((ctx->count[0] += ((uint32_t)len << 3)) < ((uint32_t)len << 3))
-    {
         ctx->count[1]++;
-    }
     ctx->count[1] += ((uint32_t)len >> 29);
 
     partLen = 64 - x;
@@ -157,24 +155,20 @@ EXP_FUNC void STDCALL MD5Update(MD5_CTX* ctx, const uint8_t* msg, int len)
         MD5Transform(ctx->state, ctx->buffer);
 
         for (i = partLen; i + 63 < len; i += 64)
-        {
             MD5Transform(ctx->state, &msg[i]);
-        }
 
         x = 0;
     }
     else
-    {
         i = 0;
-    }
 
     /* Buffer remaining input */
     memcpy(&ctx->buffer[x], &msg[i], len - i);
 }
 
 /**
-    Return the 128-bit message digest into the user's array
-*/
+ * Return the 128-bit message digest into the user's array
+ */
 EXP_FUNC void STDCALL MD5Final(uint8_t* digest, MD5_CTX* ctx)
 {
     uint8_t bits[8];
@@ -183,8 +177,8 @@ EXP_FUNC void STDCALL MD5Final(uint8_t* digest, MD5_CTX* ctx)
     /* Save number of bits */
     Encode(bits, ctx->count, 8);
 
-    /*  Pad out to 56 mod 64.
-    */
+    /* Pad out to 56 mod 64.
+     */
     x = (uint32_t)((ctx->count[0] >> 3) & 0x3f);
     padLen = (x < 56) ? (56 - x) : (120 - x);
     MD5Update(ctx, PADDING, padLen);
@@ -197,8 +191,8 @@ EXP_FUNC void STDCALL MD5Final(uint8_t* digest, MD5_CTX* ctx)
 }
 
 /**
-    MD5 basic transformation. Transforms state based on block.
-*/
+ * MD5 basic transformation. Transforms state based on block.
+ */
 static void MD5Transform(uint32_t state[4], const uint8_t block[64])
 {
     uint32_t a = state[0], b = state[1], c = state[2],
@@ -285,9 +279,9 @@ static void MD5Transform(uint32_t state[4], const uint8_t block[64])
 }
 
 /**
-    Encodes input (uint32_t) into output (uint8_t). Assumes len is
-     a multiple of 4.
-*/
+ * Encodes input (uint32_t) into output (uint8_t). Assumes len is
+ *   a multiple of 4.
+ */
 static void Encode(uint8_t* output, uint32_t* input, uint32_t len)
 {
     uint32_t i, j;
@@ -302,9 +296,9 @@ static void Encode(uint8_t* output, uint32_t* input, uint32_t len)
 }
 
 /**
-    Decodes input (uint8_t) into output (uint32_t). Assumes len is
-     a multiple of 4.
-*/
+ *  Decodes input (uint8_t) into output (uint32_t). Assumes len is
+ *   a multiple of 4.
+ */
 static void Decode(uint32_t* output, const uint8_t* input, uint32_t len)
 {
     uint32_t i, j;

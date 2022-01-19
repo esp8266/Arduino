@@ -1,43 +1,43 @@
 /*
-    Arduino emulator main loop
-    Copyright (c) 2018 david gauchard. All rights reserved.
+ Arduino emulator main loop
+ Copyright (c) 2018 david gauchard. All rights reserved.
 
-    Permission is hereby granted, free of charge, to any person obtaining a
-    copy of this software and associated documentation files (the "Software"),
-    to deal with the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense,
-    and/or sell copies of the Software, and to permit persons to whom the
-    Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal with the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
 
-    - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimers.
+ - Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
 
-    - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimers in the
-    documentation and/or other materials provided with the distribution.
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
 
-    - The names of its contributors may not be used to endorse or promote
-    products derived from this Software without specific prior written
-    permission.
+ - The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-    THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-    DEALINGS WITH THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ DEALINGS WITH THE SOFTWARE.
 */
 
 #include <Arduino.h>
 #include <user_interface.h>  // wifi_get_ip_info()
 
-#include <getopt.h>
 #include <signal.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <termios.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
 
 #define MOCK_PORT_SHIFTER 9000
 
@@ -61,9 +61,7 @@ int mockverbose(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     if (mockdebug)
-    {
         return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
-    }
     return 0;
 }
 
@@ -100,9 +98,7 @@ static int mock_start_uart(void)
 static int mock_stop_uart(void)
 {
     if (!restore_tty)
-    {
         return 0;
-    }
     if (!isatty(STDIN))
     {
         perror("restoring tty: isatty(STDIN)");
@@ -182,17 +178,13 @@ void make_fs_filename(String& name, const char* fspath, const char* argv0)
         int lastSlash = -1;
         for (int i = 0; argv0[i]; i++)
             if (argv0[i] == '/')
-            {
                 lastSlash = i;
-            }
         name = fspath;
         name += '/';
         name += &argv0[lastSlash + 1];
     }
     else
-    {
         name = argv0;
-    }
 }
 
 void control_c(int sig)
@@ -216,21 +208,15 @@ int main(int argc, char* const argv[])
     signal(SIGINT, control_c);
     signal(SIGTERM, control_c);
     if (geteuid() == 0)
-    {
         mock_port_shifter = 0;
-    }
     else
-    {
         mock_port_shifter = MOCK_PORT_SHIFTER;
-    }
 
     for (;;)
     {
         int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
         if (n < 0)
-        {
             break;
-        }
         switch (n)
         {
             case 'h':
@@ -320,21 +306,15 @@ int main(int argc, char* const argv[])
         uint8_t data = mock_read_uart();
 
         if (data)
-        {
             uart_new_data(UART0, data);
-        }
         if (!fast)
-        {
             usleep(1000);  // not 100% cpu, ~1000 loops per second
-        }
         loop();
         loop_end();
         check_incoming_udp();
 
         if (run_once)
-        {
             user_exit = true;
-        }
     }
     cleanup();
 

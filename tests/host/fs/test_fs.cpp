@@ -1,28 +1,28 @@
 /*
-    test_fs.cpp - host side file system tests
-    Copyright © 2016 Ivan Grokhotkov
+ test_fs.cpp - host side file system tests
+ Copyright © 2016 Ivan Grokhotkov
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 */
 
-#include <FS.h>
-#include <LittleFS.h>
-#include <spiffs/spiffs.h>
 #include <catch.hpp>
 #include <map>
-#include "../../../libraries/SD/src/SD.h"
-#include "../../../libraries/SDFS/src/SDFS.h"
+#include <FS.h>
+#include "../common/spiffs_mock.h"
 #include "../common/littlefs_mock.h"
 #include "../common/sdfs_mock.h"
-#include "../common/spiffs_mock.h"
+#include <spiffs/spiffs.h>
+#include <LittleFS.h>
+#include "../../../libraries/SDFS/src/SDFS.h"
+#include "../../../libraries/SD/src/SD.h"
 
 namespace spiffs_test
 {

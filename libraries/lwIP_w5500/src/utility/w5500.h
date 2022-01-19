@@ -35,9 +35,9 @@
 #ifndef W5500_H
 #define W5500_H
 
+#include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
-#include <stdint.h>
 
 class Wiznet5500
 {

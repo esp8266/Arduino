@@ -40,17 +40,17 @@
 
 #define USE_DNS
 
-#include "lwip/err.h"
 #include "lwip/inet.h"
-#include "lwip/mem.h"
+#include "lwip/err.h"
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
+#include "lwip/mem.h"
 #include "osapi.h"
 
 #include "LwipDhcpServer.h"
 
-#include "mem.h"
 #include "user_interface.h"
+#include "mem.h"
 
 typedef struct dhcps_state
 {

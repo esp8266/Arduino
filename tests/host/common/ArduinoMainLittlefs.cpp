@@ -11,8 +11,6 @@ void mock_start_littlefs(const String& fname, size_t size_kb, size_t block_kb, s
 void mock_stop_littlefs()
 {
     if (littlefs_mock)
-    {
         delete littlefs_mock;
-    }
     littlefs_mock = nullptr;
 }

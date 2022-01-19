@@ -8,10 +8,10 @@
 #ifndef LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_NETDUMPIP_H_
 #define LIBRARIES_ESPGOODIES_HR_SRC_NETDUMP_NETDUMPIP_H_
 
-#include <IPAddress.h>
-#include <StreamString.h>
-#include <lwip/init.h>
 #include <stdint.h>
+#include <lwip/init.h>
+#include <StreamString.h>
+#include <IPAddress.h>
 
 namespace NetCapture
 {

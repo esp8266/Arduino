@@ -22,11 +22,11 @@
 
 */
 
-#include <AddrList.h>
-#include <IPAddress.h>
-#include <WString.h>
-#include <lwip/ip_addr.h>
 #include <sys/time.h>
+#include <IPAddress.h>
+#include <AddrList.h>
+#include <lwip/ip_addr.h>
+#include <WString.h>
 #include <cstdint>
 
 /*
@@ -39,8 +39,8 @@ extern "C"
 }
 
 #include "ESP8266mDNS.h"
-#include "LEAmDNS_Priv.h"
 #include "LEAmDNS_lwIPdefs.h"
+#include "LEAmDNS_Priv.h"
 
 namespace esp8266
 {
