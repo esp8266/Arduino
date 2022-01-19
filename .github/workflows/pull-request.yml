@@ -242,7 +242,7 @@ jobs:
         TRAVIS_TAG: ${{ github.ref }}
       run: |
           sudo apt update
-          sudo apt install astyle clang-format
+          sudo apt install astyle clang-format-12
           bash ./tests/ci/style_check.sh
 
 
