@@ -18,18 +18,22 @@ makeClangConf()
 
     cat << EOF > .clang-format
 BasedOnStyle: WebKit
+SortIncludes: false
 AlignTrailingComments: true
-BreakBeforeBraces: Allman
 ColumnLimit: 0
 KeepEmptyLinesAtTheStartOfBlocks: false
+SpaceBeforeInheritanceColon: false
 SpacesBeforeTrailingComments: 2
 AlignTrailingComments: true
-SortIncludes: false
-BreakConstructorInitializers: AfterColon
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveDeclarations: Consecutive
 AlignAfterOpenBracket: Align
+BreakConstructorInitializers: AfterColon
+BreakBeforeBinaryOperators: All
+BreakBeforeConceptDeclarations: true
+FixNamespaceComments: true
+NamespaceIndentation: Inner
 BreakBeforeBraces: ${BreakBeforeBraces}
 IndentWidth: ${IndentWidth}
 IndentCaseLabels: ${IndentCaseLabels}
