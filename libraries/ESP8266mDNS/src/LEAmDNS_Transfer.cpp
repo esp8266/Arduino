@@ -1604,9 +1604,9 @@ namespace MDNSImplementation
                                 (_write16(MDNS_SRV_WEIGHT, p_rSendParameter)) &&                                                                                                              // Weight
                                 (_write16(p_rService.m_u16Port, p_rSendParameter)) &&                                                                                                         // Port
                                 (p_rSendParameter.addDomainCacheItem((const void*)m_pcHostname, false, p_rSendParameter.m_u16Offset)) && (_writeMDNSRRDomain(hostDomain, p_rSendParameter)))  // Host, eg. esp8266.local
-                             // Cache available for domain
-                                             : ((MDNS_DOMAIN_COMPRESS_MARK > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK)) &&  // Valid offset
-                                (_write16((sizeof(uint16_t /*Prio*/) +                                                        // RDLength
+                                                                                                                                                                                              // Cache available for domain
+                                             : ((MDNS_DOMAIN_COMPRESS_MARK > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK)) &&                                                                  // Valid offset
+                                (_write16((sizeof(uint16_t /*Prio*/) +                                                                                                                        // RDLength
                                            sizeof(uint16_t /*Weight*/) + sizeof(uint16_t /*Port*/) + 2),
                                           p_rSendParameter))
                                 &&                                                                                          // Length of 'C0xx'
