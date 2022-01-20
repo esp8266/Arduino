@@ -4,9 +4,7 @@
 #include <Arduino.h>
 #include <Hash.h>
 
-void setup() {
-  Serial.begin(115200);
-}
+void setup() { Serial.begin(115200); }
 
 void loop() {
   // usage as String

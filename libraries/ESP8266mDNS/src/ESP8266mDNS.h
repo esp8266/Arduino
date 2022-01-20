@@ -3,15 +3,19 @@
     This file is part of the esp8266 core for Arduino environment.
 
     mDNS implementation, that supports many mDNS features like:
-    - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
-    - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
+    - Presenting a DNS-SD service to interested observers, eg. a http server by presenting
+   _http._tcp service
+    - Support for multi-level compressed names in input; in output only a very simple one-leven
+   full-name compression is implemented
     - Probing host and service domains for uniqueness in the local network
-    - Tiebreaking while probing is supported in a very minimalistic way (the 'higher' IP address wins the tiebreak)
+    - Tiebreaking while probing is supported in a very minimalistic way (the 'higher' IP address
+   wins the tiebreak)
     - Announcing available services after successful probing
     - Using fixed service TXT items or
     - Using dynamic service TXT items for presented services (via callback)
     - Remove services (and un-announcing them to the observers by sending goodbye-messages)
-    - Static queries for DNS-SD services (creating a fixed answer set after a certain timeout period)
+    - Static queries for DNS-SD services (creating a fixed answer set after a certain timeout
+   period)
     - Dynamic queries for DNS-SD services with cached and updated answers and user notifications
     - Support for multi-homed client host domains
 

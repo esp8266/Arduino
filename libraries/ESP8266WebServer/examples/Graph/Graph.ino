@@ -78,17 +78,11 @@ static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 ////////////////////////////////
 // Utils to return HTTP codes
 
-void replyOK() {
-  server.send(200, FPSTR(TEXT_PLAIN), "");
-}
+void replyOK() { server.send(200, FPSTR(TEXT_PLAIN), ""); }
 
-void replyOKWithMsg(String msg) {
-  server.send(200, FPSTR(TEXT_PLAIN), msg);
-}
+void replyOKWithMsg(String msg) { server.send(200, FPSTR(TEXT_PLAIN), msg); }
 
-void replyNotFound(String msg) {
-  server.send(404, FPSTR(TEXT_PLAIN), msg);
-}
+void replyNotFound(String msg) { server.send(404, FPSTR(TEXT_PLAIN), msg); }
 
 void replyBadRequest(String msg) {
   DBG_OUTPUT_PORT.println(msg);
@@ -216,7 +210,7 @@ void setup(void) {
   ////////////////////////////////
   // WEB SERVER INIT
 
-  //get heap status, analog input value and all GPIO statuses in one json call
+  // get heap status, analog input value and all GPIO statuses in one json call
   server.on("/espData", HTTP_GET, []() {
     String json;
     json.reserve(88);

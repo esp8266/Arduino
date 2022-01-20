@@ -67,8 +67,7 @@ void setup() {
   ESP.deepSleep(5e6);
 }
 
-void loop() {
-}
+void loop() { }
 
 uint32_t calculateCRC32(const uint8_t* data, size_t length) {
   uint32_t crc = 0xffffffff;
@@ -88,7 +87,7 @@ uint32_t calculateCRC32(const uint8_t* data, size_t length) {
   return crc;
 }
 
-//prints all rtcData, including the leading crc32
+// prints all rtcData, including the leading crc32
 void printMemory() {
   char     buf[3];
   uint8_t* ptr = (uint8_t*)&rtcData;

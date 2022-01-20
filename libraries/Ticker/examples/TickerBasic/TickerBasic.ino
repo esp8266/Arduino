@@ -41,5 +41,4 @@ void setup() {
   flipper.attach(0.3, flip);
 }
 
-void loop() {
-}
+void loop() { }

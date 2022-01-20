@@ -55,18 +55,17 @@
 #define TOO_MANY_ERRORS 11
 int errors = 0;
 
-#define DEBUGP                              \
-    if (errors == TOO_MANY_ERRORS)          \
-        printf("Further errors omitted\n"); \
-    else if (errors < TOO_MANY_ERRORS)      \
+#define DEBUGP                                                                                     \
+    if (errors == TOO_MANY_ERRORS)                                                                 \
+        printf("Further errors omitted\n");                                                        \
+    else if (errors < TOO_MANY_ERRORS)                                                             \
     printf
 
 /* A safe target-independent memmove.  */
 
 void mymemmove(unsigned char* dest, unsigned char* src, size_t n)
 {
-    if ((src <= dest && src + n <= dest)
-        || src >= dest)
+    if ((src <= dest && src + n <= dest) || src >= dest)
         while (n-- > 0)
             *dest++ = *src++;
     else
@@ -80,8 +79,7 @@ void mymemmove(unsigned char* dest, unsigned char* src, size_t n)
 
 /* It's either the noinline attribute or forcing the test framework to
    pass -fno-builtin-memmove.  */
-void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
-    __attribute__((__noinline__));
+void xmemmove(unsigned char* dest, unsigned char* src, size_t n) __attribute__((__noinline__));
 
 void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
 {
@@ -91,8 +89,7 @@ void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
     if (retp != dest)
     {
         errors++;
-        DEBUGP("memmove of n bytes returned %p instead of dest=%p\n",
-               retp, dest);
+        DEBUGP("memmove of n bytes returned %p instead of dest=%p\n", retp, dest);
     }
 }
 
@@ -112,8 +109,8 @@ void memmove_main(void)
     int    errors = 0;
 
     /* Leave some room before and after the area tested, so we can detect
-     overwrites of up to N bytes, N being the amount tested.  If you
-     want to test using valgrind, make these malloced instead.  */
+       overwrites of up to N bytes, N being the amount tested.  If you
+       want to test using valgrind, make these malloced instead.  */
     unsigned char from_test[MAX * 3];
     unsigned char to_test[MAX * 3];
     unsigned char from_known[MAX * 3];
@@ -123,7 +120,7 @@ void memmove_main(void)
     for (i = 0; i < MAX; i++)
     {
         /* Do the memmove first before setting the known array, so we know
-         it didn't change any of the known array.  */
+           it didn't change any of the known array.  */
         fill(from_test);
         fill(to_test);
         xmemmove(to_test + MAX, 1 + from_test + MAX, i);

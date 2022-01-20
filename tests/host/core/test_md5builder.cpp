@@ -38,7 +38,8 @@ TEST_CASE("MD5Builder::addHexString works as expected", "[core][MD5Builder]")
     {
         MD5Builder builder;
         builder.begin();
-        const char* myPayload = "1234567890abcdeffedcba98765432106469676974616c7369676e61747572656170706c69636174696F6e73";
+        const char* myPayload = "1234567890abcdeffedcba98765432106469676974616c7369676e617475726561"
+                                "70706c69636174696F6e73";
         builder.addHexString(myPayload);
         builder.calculate();
         REQUIRE(builder.toString() == "47b937a6f9f12a4c389fa5854e023efb");
@@ -48,7 +49,8 @@ TEST_CASE("MD5Builder::addHexString works as expected", "[core][MD5Builder]")
     {
         MD5Builder builder;
         builder.begin();
-        builder.addHexString(String("1234567890abcdeffedcba98765432106469676974616c7369676e61747572656170706c69636174696f6e73"));
+        builder.addHexString(String("1234567890abcdeffedcba98765432106469676974616c7369676e61747572"
+                                    "656170706c69636174696f6e73"));
         builder.calculate();
         REQUIRE(builder.toString() == "47b937a6f9f12a4c389fa5854e023efb");
     }
@@ -57,7 +59,8 @@ TEST_CASE("MD5Builder::addHexString works as expected", "[core][MD5Builder]")
 TEST_CASE("MD5Builder::addStream works", "[core][MD5Builder]")
 {
     MD5Builder  builder;
-    const char* str = "MD5Builder::addStream_works_longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong";
+    const char* str = "MD5Builder::addStream_works_"
+                      "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong";
     {
         StreamString stream;
         stream.print(str);

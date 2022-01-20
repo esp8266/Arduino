@@ -72,7 +72,8 @@ void setup() {
   ESP.setExternalHeap();
   uint32_t* vm = (uint32_t*)malloc(1024 * sizeof(uint32_t));
   Serial.printf("External buffer: Address %p, free %d\n", vm, ESP.getFreeHeap());
-  // Make sure we go back to the internal heap for other allocations.  Don't forget to ESP.resetHeap()!
+  // Make sure we go back to the internal heap for other allocations.  Don't forget to
+  // ESP.resetHeap()!
   ESP.resetHeap();
 
   uint32_t res;
@@ -132,5 +133,4 @@ void setup() {
   ESP.resetHeap();
 }
 
-void loop() {
-}
+void loop() { }

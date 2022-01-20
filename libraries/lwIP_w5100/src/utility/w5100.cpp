@@ -203,11 +203,7 @@ void Wiznet5100::wizchip_sw_reset()
     setSHAR(_mac_address);
 }
 
-Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr) :
-    _spi(spi), _cs(cs)
-{
-    (void)intr;
-}
+Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr) : _spi(spi), _cs(cs) { (void)intr; }
 
 boolean Wiznet5100::begin(const uint8_t* mac_address)
 {

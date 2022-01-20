@@ -43,10 +43,7 @@ Netdump::~Netdump()
     }
 };
 
-void Netdump::setCallback(const Callback nc)
-{
-    netDumpCallback = nc;
-}
+void Netdump::setCallback(const Callback nc) { netDumpCallback = nc; }
 
 void Netdump::setCallback(const Callback nc, const Filter nf)
 {
@@ -54,30 +51,20 @@ void Netdump::setCallback(const Callback nc, const Filter nf)
     netDumpCallback = nc;
 }
 
-void Netdump::setFilter(const Filter nf)
-{
-    netDumpFilter = nf;
-}
+void Netdump::setFilter(const Filter nf) { netDumpFilter = nf; }
 
-void Netdump::reset()
-{
-    setCallback(nullptr, nullptr);
-}
+void Netdump::reset() { setCallback(nullptr, nullptr); }
 
 void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
     out.printf_P(PSTR("netDump starting\r\n"));
-    setCallback([&out, ndd, this](const Packet& ndp)
-                { printDumpProcess(out, ndd, ndp); },
-                nf);
+    setCallback([&out, ndd, this](const Packet& ndp) { printDumpProcess(out, ndd, ndp); }, nf);
 }
 
 void Netdump::fileDump(File& outfile, const Filter nf)
 {
     writePcapHeader(outfile);
-    setCallback([&outfile, this](const Packet& ndp)
-                { fileDumpProcess(outfile, ndp); },
-                nf);
+    setCallback([&outfile, this](const Packet& ndp) { fileDumpProcess(outfile, ndp); }, nf);
 }
 bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
 {
@@ -92,8 +79,7 @@ bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
     }
     bufferIndex = 0;
 
-    schedule_function([&tcpDumpServer, this, nf]()
-                      { tcpDumpLoop(tcpDumpServer, nf); });
+    schedule_function([&tcpDumpServer, this, nf]() { tcpDumpLoop(tcpDumpServer, nf); });
     return true;
 }
 
@@ -101,7 +87,8 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
 {
     if (lwipCallback.execute(netif_idx, data, len, out, success) == 0)
     {
-        phy_capture = nullptr;  // No active callback/netdump instances, will be set again by new object.
+        phy_capture
+            = nullptr;  // No active callback/netdump instances, will be set again by new object.
     }
 }
 
@@ -191,9 +178,7 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
         bufferIndex = 0;
         writePcapHeader(tcpDumpClient);
 
-        setCallback([this](const Packet& ndp)
-                    { tcpDumpProcess(ndp); },
-                    nf);
+        setCallback([this](const Packet& ndp) { tcpDumpProcess(ndp); }, nf);
     }
     if (!tcpDumpClient || !tcpDumpClient.connected())
     {
@@ -207,8 +192,7 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
 
     if (tcpDumpServer.status() != CLOSED)
     {
-        schedule_function([&tcpDumpServer, this, nf]()
-                          { tcpDumpLoop(tcpDumpServer, nf); });
+        schedule_function([&tcpDumpServer, this, nf]() { tcpDumpLoop(tcpDumpServer, nf); });
     }
 }
 

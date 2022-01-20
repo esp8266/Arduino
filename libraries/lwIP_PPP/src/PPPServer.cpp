@@ -2,8 +2,8 @@
 // This is still beta / a work in progress
 
 // testing on linux:
-// sudo /usr/sbin/pppd /dev/ttyUSB1 38400 noipdefault nocrtscts local defaultroute noauth nodetach debug dump
-// sudo /usr/sbin/pppd /dev/ttyUSB1 38400 noipdefault nocrtscts local defaultroute noauth
+// sudo /usr/sbin/pppd /dev/ttyUSB1 38400 noipdefault nocrtscts local defaultroute noauth nodetach
+// debug dump sudo /usr/sbin/pppd /dev/ttyUSB1 38400 noipdefault nocrtscts local defaultroute noauth
 
 // proxy arp is needed but we don't have it
 // http://lwip.100.n7.nabble.com/PPP-proxy-arp-support-tp33286p33345.html
@@ -16,10 +16,7 @@
 
 #include "PPPServer.h"
 
-PPPServer::PPPServer(Stream* sio) :
-    _sio(sio), _cb(netif_status_cb_s), _enabled(false)
-{
-}
+PPPServer::PPPServer(Stream* sio) : _sio(sio), _cb(netif_status_cb_s), _enabled(false) { }
 
 bool PPPServer::handlePackets()
 {
@@ -166,21 +163,19 @@ bool PPPServer::begin(const IPAddress& ourAddress, const IPAddress& peer)
     ppp_set_ipcp_ouraddr(_ppp, ip_2_ip4((const ip_addr_t*)ourAddress));
     ppp_set_ipcp_hisaddr(_ppp, ip_2_ip4((const ip_addr_t*)peer));
 
-    //ip4_addr_t addr;
-    //IP4_ADDR(&addr, 10,0,1,254);
-    //ppp_set_ipcp_dnsaddr(_ppp, 0, &addr);
+    // ip4_addr_t addr;
+    // IP4_ADDR(&addr, 10,0,1,254);
+    // ppp_set_ipcp_dnsaddr(_ppp, 0, &addr);
 
-    //ppp_set_auth(_ppp, PPPAUTHTYPE_ANY, "login", "password");
-    //ppp_set_auth_required(_ppp, 1);
+    // ppp_set_auth(_ppp, PPPAUTHTYPE_ANY, "login", "password");
+    // ppp_set_auth_required(_ppp, 1);
 
     ppp_set_silent(_ppp, 1);
     ppp_listen(_ppp);
     netif_set_status_callback(&_netif, _cb);
 
     _enabled = true;
-    if (!schedule_recurrent_function_us([&]()
-                                        { return this->handlePackets(); },
-                                        1000))
+    if (!schedule_recurrent_function_us([&]() { return this->handlePackets(); }, 1000))
     {
         netif_remove(&_netif);
         return false;

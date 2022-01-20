@@ -121,6 +121,4 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
-  server.handleClient();
-}
+void loop(void) { server.handleClient(); }

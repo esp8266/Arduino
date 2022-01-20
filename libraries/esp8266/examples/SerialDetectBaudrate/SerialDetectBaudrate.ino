@@ -10,7 +10,8 @@ void setup() {
   unsigned long detectedBaudrate = Serial.detectBaudrate(TIMEOUT);
 
   if (detectedBaudrate) {
-    Serial.printf("\nDetected baudrate is %lu, switching to that baudrate now...\n", detectedBaudrate);
+    Serial.printf("\nDetected baudrate is %lu, switching to that baudrate now...\n",
+                  detectedBaudrate);
 
     // Wait for printf to finish
     while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) {
@@ -20,7 +21,8 @@ void setup() {
     // Clear Tx buffer to avoid extra characters being printed
     Serial.flush();
 
-    // After this, any writing to Serial will print gibberish on the serial monitor if the baudrate doesn't match
+    // After this, any writing to Serial will print gibberish on the serial monitor if the baudrate
+    // doesn't match
     Serial.begin(detectedBaudrate);
   } else {
     Serial.println("\nNothing detected");

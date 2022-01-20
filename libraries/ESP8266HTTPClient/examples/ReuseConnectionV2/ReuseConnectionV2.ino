@@ -3,7 +3,8 @@
 
     Created on: 22.11.2015
 
-   This example reuses the http connection and also restores the connection if the connection is lost
+   This example reuses the http connection and also restores the connection if the connection is
+   lost
 */
 
 #include <ESP8266WiFi.h>
@@ -42,7 +43,7 @@ void setup() {
   http.setReuse(true);
 
   http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
-  //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
+  // http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 }
 
 int pass = 0;
@@ -65,7 +66,7 @@ void loop() {
       // Something went wrong with the connection, try to reconnect
       http.end();
       http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
-      //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
+      // http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
     }
 
     if (pass == 10) {

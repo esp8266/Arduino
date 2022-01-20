@@ -18,9 +18,7 @@ extern "C" {
 }
 #endif
 
-void setup() {
-  Serial.begin(115200);
-}
+void setup() { Serial.begin(115200); }
 
 void loop() {
   // Call Espressif SDK functionality - wrapped in ifdef so that it still

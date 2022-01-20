@@ -58,8 +58,9 @@ void setup() {
 }
 
 void loop() {
-  WiFiClient client = server.available();     // returns first client which has data to read or a 'false' client
-  if (client) {                               // client is true only if it is connected and has data to read
+  WiFiClient client
+      = server.available();  // returns first client which has data to read or a 'false' client
+  if (client) {              // client is true only if it is connected and has data to read
     String s = client.readStringUntil('\n');  // read the message incoming from one of the clients
     s.trim();                                 // trim eventual \r
     Serial.println(s);                        // print the message to Serial Monitor

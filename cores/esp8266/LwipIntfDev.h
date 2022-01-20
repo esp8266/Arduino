@@ -25,50 +25,31 @@
 #define DEFAULT_MTU 1500
 #endif
 
-template <class RawDev>
-class LwipIntfDev: public LwipIntf, public RawDev
+template <class RawDev> class LwipIntfDev: public LwipIntf, public RawDev
 {
 public:
     LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1) :
-        RawDev(cs, spi, intr),
-        _mtu(DEFAULT_MTU),
-        _intrPin(intr),
-        _started(false),
-        _default(false)
+        RawDev(cs, spi, intr), _mtu(DEFAULT_MTU), _intrPin(intr), _started(false), _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
     }
 
-    boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
+    boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2,
+                   const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
     // default mac-address is inferred from esp8266's STA interface
     boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
 
-    const netif* getNetIf() const
-    {
-        return &_netif;
-    }
+    const netif* getNetIf() const { return &_netif; }
 
-    IPAddress localIP() const
-    {
-        return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr)));
-    }
-    IPAddress subnetMask() const
-    {
-        return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.netmask)));
-    }
-    IPAddress gatewayIP() const
-    {
-        return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
-    }
+    IPAddress localIP() const { return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr))); }
+    IPAddress subnetMask() const { return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.netmask))); }
+    IPAddress gatewayIP() const { return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw))); }
 
     void setDefault();
 
     // true if interface has a valid IPv4 address
-    bool connected()
-    {
-        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
-    }
+    bool connected() { return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr)); }
 
     // ESP8266WiFi API compatibility
 
@@ -97,7 +78,9 @@ protected:
 };
 
 template <class RawDev>
-boolean LwipIntfDev<RawDev>::config(const IPAddress& localIP, const IPAddress& gateway, const IPAddress& netmask, const IPAddress& dns1, const IPAddress& dns2)
+boolean LwipIntfDev<RawDev>::config(const IPAddress& localIP, const IPAddress& gateway,
+                                    const IPAddress& netmask, const IPAddress& dns1,
+                                    const IPAddress& dns2)
 {
     if (_started)
     {
@@ -160,7 +143,7 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
 #endif
         _macAddress[3] += _netif.num;  // alter base mac address
         _macAddress[0] &= 0xfe;        // set as locally administered, unicast, per
-        _macAddress[0] |= 0x02;        // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
+        _macAddress[0] |= 0x02;  // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
     }
 
     if (!RawDev::begin(_macAddress))
@@ -179,7 +162,8 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     ip_addr_copy(netmask, _netif.netmask);
     ip_addr_copy(gw, _netif.gw);
 
-    if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this, netif_init_s, ethernet_input))
+    if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this,
+                   netif_init_s, ethernet_input))
     {
         return false;
     }
@@ -208,21 +192,24 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     {
         if (RawDev::interruptIsPossible())
         {
-            //attachInterrupt(_intrPin, [&]() { this->handlePackets(); }, FALLING);
+            // attachInterrupt(_intrPin, [&]() { this->handlePackets(); }, FALLING);
         }
         else
         {
-            ::printf((PGM_P)F("lwIP_Intf: Interrupt not implemented yet, enabling transparent polling\r\n"));
+            ::printf((PGM_P)F(
+                "lwIP_Intf: Interrupt not implemented yet, enabling transparent polling\r\n"));
             _intrPin = -1;
         }
     }
 
-    if (_intrPin < 0 && !schedule_recurrent_function_us([&]()
-                                                        {
-                                                            this->handlePackets();
-                                                            return true;
-                                                        },
-                                                        100))
+    if (_intrPin < 0
+        && !schedule_recurrent_function_us(
+            [&]()
+            {
+                this->handlePackets();
+                return true;
+            },
+            100))
     {
         netif_remove(&_netif);
         return false;
@@ -231,14 +218,12 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     return true;
 }
 
-template <class RawDev>
-wl_status_t LwipIntfDev<RawDev>::status()
+template <class RawDev> wl_status_t LwipIntfDev<RawDev>::status()
 {
     return _started ? (connected() ? WL_CONNECTED : WL_DISCONNECTED) : WL_NO_SHIELD;
 }
 
-template <class RawDev>
-err_t LwipIntfDev<RawDev>::linkoutput_s(netif* netif, struct pbuf* pbuf)
+template <class RawDev> err_t LwipIntfDev<RawDev>::linkoutput_s(netif* netif, struct pbuf* pbuf)
 {
     LwipIntfDev* ths = (LwipIntfDev*)netif->state;
 
@@ -252,36 +237,31 @@ err_t LwipIntfDev<RawDev>::linkoutput_s(netif* netif, struct pbuf* pbuf)
 #if PHY_HAS_CAPTURE
     if (phy_capture)
     {
-        phy_capture(ths->_netif.num, (const char*)pbuf->payload, pbuf->len, /*out*/ 1, /*success*/ len == pbuf->len);
+        phy_capture(ths->_netif.num, (const char*)pbuf->payload, pbuf->len, /*out*/ 1,
+                    /*success*/ len == pbuf->len);
     }
 #endif
 
     return len == pbuf->len ? ERR_OK : ERR_MEM;
 }
 
-template <class RawDev>
-err_t LwipIntfDev<RawDev>::netif_init_s(struct netif* netif)
+template <class RawDev> err_t LwipIntfDev<RawDev>::netif_init_s(struct netif* netif)
 {
     return ((LwipIntfDev*)netif->state)->netif_init();
 }
 
-template <class RawDev>
-void LwipIntfDev<RawDev>::netif_status_callback_s(struct netif* netif)
+template <class RawDev> void LwipIntfDev<RawDev>::netif_status_callback_s(struct netif* netif)
 {
     ((LwipIntfDev*)netif->state)->netif_status_callback();
 }
 
-template <class RawDev>
-err_t LwipIntfDev<RawDev>::netif_init()
+template <class RawDev> err_t LwipIntfDev<RawDev>::netif_init()
 {
     _netif.name[0]      = 'e';
     _netif.name[1]      = '0' + _netif.num;
     _netif.mtu          = _mtu;
     _netif.chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-    _netif.flags        = NETIF_FLAG_ETHARP
-        | NETIF_FLAG_IGMP
-        | NETIF_FLAG_BROADCAST
-        | NETIF_FLAG_LINK_UP;
+    _netif.flags = NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP;
 
     // lwIP's doc: This function typically first resolves the hardware
     // address, then sends the packet.  For ethernet physical layer, this is
@@ -297,8 +277,7 @@ err_t LwipIntfDev<RawDev>::netif_init()
     return ERR_OK;
 }
 
-template <class RawDev>
-void LwipIntfDev<RawDev>::netif_status_callback()
+template <class RawDev> void LwipIntfDev<RawDev>::netif_status_callback()
 {
     if (connected())
     {
@@ -317,8 +296,7 @@ void LwipIntfDev<RawDev>::netif_status_callback()
     }
 }
 
-template <class RawDev>
-err_t LwipIntfDev<RawDev>::handlePackets()
+template <class RawDev> err_t LwipIntfDev<RawDev>::handlePackets()
 {
     int pkt = 0;
     while (1)
@@ -370,7 +348,8 @@ err_t LwipIntfDev<RawDev>::handlePackets()
 #if PHY_HAS_CAPTURE
         if (phy_capture)
         {
-            phy_capture(_netif.num, (const char*)pbuf->payload, tot_len, /*out*/ 0, /*success*/ err == ERR_OK);
+            phy_capture(_netif.num, (const char*)pbuf->payload, tot_len, /*out*/ 0,
+                        /*success*/ err == ERR_OK);
         }
 #endif
 
@@ -383,8 +362,7 @@ err_t LwipIntfDev<RawDev>::handlePackets()
     }
 }
 
-template <class RawDev>
-void LwipIntfDev<RawDev>::setDefault()
+template <class RawDev> void LwipIntfDev<RawDev>::setDefault()
 {
     _default = true;
     if (connected())

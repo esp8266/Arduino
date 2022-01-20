@@ -9,10 +9,10 @@
 #endif
 
 #ifndef DEBUGV
-#define DEBUGV(...) \
-    do              \
-    {               \
-        (void)0;    \
+#define DEBUGV(...)                                                                                \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
 #endif
 
@@ -33,21 +33,21 @@ extern "C"
 
 #ifdef DEBUG_ESP_CORE
     extern void __iamslow(const char* what);
-#define IAMSLOW()                                  \
-    do                                             \
-    {                                              \
-        static bool once = false;                  \
-        if (!once)                                 \
-        {                                          \
-            once = true;                           \
-            __iamslow((PGM_P)FPSTR(__FUNCTION__)); \
-        }                                          \
+#define IAMSLOW()                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        static bool once = false;                                                                  \
+        if (!once)                                                                                 \
+        {                                                                                          \
+            once = true;                                                                           \
+            __iamslow((PGM_P)FPSTR(__FUNCTION__));                                                 \
+        }                                                                                          \
     } while (0)
 #else
-#define IAMSLOW() \
-    do            \
-    {             \
-        (void)0;  \
+#define IAMSLOW()                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
 #endif
 
@@ -55,4 +55,4 @@ extern "C"
 }
 #endif
 
-#endif  //ARD_DEBUG_H
+#endif  // ARD_DEBUG_H

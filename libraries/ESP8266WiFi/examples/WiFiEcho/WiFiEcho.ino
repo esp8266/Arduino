@@ -72,7 +72,7 @@ void loop() {
     Serial.printf("\n");
   }
 
-  //check if there are any new clients
+  // check if there are any new clients
   if (server.hasClient()) {
     client = server.accept();
     Serial.println("New client");
@@ -101,7 +101,8 @@ void loop() {
         break;
       case '4':
         t = 4;
-        Serial.printf("direct access (sendAll - close peer to stop, then press 1, 2 or 3 before restarting peer)\n");
+        Serial.printf("direct access (sendAll - close peer to stop, then press 1, 2 or 3 before "
+                      "restarting peer)\n");
         break;
     }
     tot = cnt = 0;
@@ -129,7 +130,8 @@ void loop() {
       size_t  tcp_got  = client.read(buf, maxTo);
       size_t  tcp_sent = client.write(buf, tcp_got);
       if (tcp_sent != maxTo) {
-        Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got, tcp_sent);
+        Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got,
+                      tcp_sent);
       }
       tot += tcp_sent;
       cnt++;

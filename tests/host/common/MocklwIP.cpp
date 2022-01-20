@@ -17,14 +17,9 @@ extern "C"
         return ERR_OK;
     }
 
-    void sntp_setserver(u8_t, const ip_addr_t)
-    {
-    }
+    void sntp_setserver(u8_t, const ip_addr_t) { }
 
-    const ip_addr_t* sntp_getserver(u8_t)
-    {
-        return IP_ADDR_ANY;
-    }
+    const ip_addr_t* sntp_getserver(u8_t) { return IP_ADDR_ANY; }
 
     err_t etharp_request(struct netif* netif, const ip4_addr_t* ipaddr)
     {

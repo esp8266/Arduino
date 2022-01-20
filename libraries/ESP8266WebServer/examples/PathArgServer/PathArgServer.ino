@@ -37,9 +37,7 @@ void setup(void) {
     Serial.println("MDNS responder started");
   }
 
-  server.on(F("/"), []() {
-    server.send(200, "text/plain", "hello from esp8266!");
-  });
+  server.on(F("/"), []() { server.send(200, "text/plain", "hello from esp8266!"); });
 
   server.on(UriBraces("/users/{}"), []() {
     String user = server.pathArg(0);
@@ -56,6 +54,4 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
-  server.handleClient();
-}
+void loop(void) { server.handleClient(); }

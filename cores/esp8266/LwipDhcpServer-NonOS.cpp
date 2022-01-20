@@ -55,9 +55,6 @@ extern "C"
 #endif
     }
 
-    void dhcps_stop()
-    {
-        dhcpSoftAP.end();
-    }
+    void dhcps_stop() { dhcpSoftAP.end(); }
 
 }  // extern "C"

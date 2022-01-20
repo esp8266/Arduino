@@ -105,9 +105,10 @@ void loop(void) {
 
   String s;
   if (req == "/") {
-    IPAddress ip    = WiFi.localIP();
-    String    ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s               = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
+    IPAddress ip = WiFi.localIP();
+    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from "
+        "ESP8266 at ";
     s += ipStr;
     s += "</html>\r\n\r\n";
     Serial.println("Sending 200");

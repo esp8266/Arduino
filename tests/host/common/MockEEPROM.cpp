@@ -42,9 +42,7 @@
 
 #define EEPROM_FILE_NAME "eeprom"
 
-EEPROMClass::EEPROMClass()
-{
-}
+EEPROMClass::EEPROMClass() { }
 
 EEPROMClass::~EEPROMClass()
 {
@@ -55,10 +53,12 @@ EEPROMClass::~EEPROMClass()
 void EEPROMClass::begin(size_t size)
 {
     _size = size;
-    if ((_fd = open(EEPROM_FILE_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1
+    if ((_fd = open(EEPROM_FILE_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH))
+            == -1
         || ftruncate(_fd, size) == -1)
     {
-        fprintf(stderr, MOCK "EEPROM: cannot open/create '%s' for r/w: %s\n\r", EEPROM_FILE_NAME, strerror(errno));
+        fprintf(stderr, MOCK "EEPROM: cannot open/create '%s' for r/w: %s\n\r", EEPROM_FILE_NAME,
+                strerror(errno));
         _fd = -1;
     }
 }
@@ -69,10 +69,7 @@ void EEPROMClass::end()
         close(_fd);
 }
 
-bool EEPROMClass::commit()
-{
-    return true;
-}
+bool EEPROMClass::commit() { return true; }
 
 uint8_t EEPROMClass::read(int x)
 {

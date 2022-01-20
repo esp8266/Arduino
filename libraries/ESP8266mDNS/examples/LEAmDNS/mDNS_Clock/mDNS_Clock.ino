@@ -56,9 +56,10 @@
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-char*                       pcHostDomain         = 0;      // Negotiated host domain
-bool                        bHostDomainConfirmed = false;  // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService hMDNSService         = 0;      // The handle of the clock service in the MDNS responder
+char* pcHostDomain         = 0;      // Negotiated host domain
+bool  bHostDomainConfirmed = false;  // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService hMDNSService
+    = 0;  // The handle of the clock service in the MDNS responder
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
 ESP8266WebServer server(SERVICE_PORT);
@@ -83,10 +84,12 @@ const char* getTimeString(void) {
    Set time via NTP
 */
 void setClock(void) {
-  configTime((TIMEZONE_OFFSET * 3600), (DST_OFFSET * 3600), "pool.ntp.org", "time.nist.gov", "time.windows.com");
+  configTime((TIMEZONE_OFFSET * 3600), (DST_OFFSET * 3600), "pool.ntp.org", "time.nist.gov",
+             "time.windows.com");
 
   Serial.print("Waiting for NTP time sync: ");
-  time_t now = time(nullptr);   // Secs since 01.01.1970 (when uninitialized starts with (8 * 3600 = 28800)
+  time_t now
+      = time(nullptr);  // Secs since 01.01.1970 (when uninitialized starts with (8 * 3600 = 28800)
   while (now < 8 * 3600 * 2) {  // Wait for realistic value
     delay(500);
     Serial.print(".");
@@ -137,7 +140,8 @@ void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService)
 */
 void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
   Serial.println("MDNSProbeResultCallback");
-  Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(),
+                (p_bProbeResult ? "free" : "already USED!"));
   if (true == p_bProbeResult) {
     // Set station hostname
     setStationHostname(pcHostDomain);
@@ -147,7 +151,8 @@ void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
       bHostDomainConfirmed = true;
 
       if (!hMDNSService) {
-        // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+        // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance
+        // domain
         hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
         if (hMDNSService) {
           // Add a simple static MDNS service TXT item

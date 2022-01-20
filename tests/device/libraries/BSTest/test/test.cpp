@@ -40,14 +40,9 @@ TEST_CASE("another test which fails and crashes", "[bluesmoke][fail]")
     REQUIRE(false);
 }
 
-TEST_CASE("third test which should be skipped", "[.]")
-{
-    FAIL();
-}
+TEST_CASE("third test which should be skipped", "[.]") { FAIL(); }
 
-TEST_CASE("this test also runs successfully", "[bluesmoke]")
-{
-}
+TEST_CASE("this test also runs successfully", "[bluesmoke]") { }
 
 TEST_CASE("environment variables can be set and read from python", "[bluesmoke]")
 {

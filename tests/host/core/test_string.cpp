@@ -135,13 +135,21 @@ TEST_CASE("String concantenation", "[core][String]")
     str += LLONG_MIN;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808");
     str += String(LLONG_MIN, 10);
-    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808");
+    REQUIRE(str
+            == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-"
+               "9223372036854775808");
     str += LLONG_MAX;
-    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-92233720368547758089223372036854775807");
+    REQUIRE(str
+            == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-"
+               "92233720368547758089223372036854775807");
     str += ULLONG_MAX;
-    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615");
+    REQUIRE(str
+            == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-"
+               "9223372036854775808922337203685477580718446744073709551615");
     str += String(ULLONG_MAX, 16);
-    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-9223372036854775808922337203685477580718446744073709551615ffffffffffffffff");
+    REQUIRE(str
+            == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01-9223372036854775808-"
+               "9223372036854775808922337203685477580718446744073709551615ffffffffffffffff");
     str = "clean";
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
@@ -502,8 +510,8 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
 
 TEST_CASE("Strings with NULs", "[core][String]")
 {
-    // The following should never be done in a real app! This is only to inject 0s in the middle of a string.
-    // Fits in SSO...
+    // The following should never be done in a real app! This is only to inject 0s in the middle of
+    // a string. Fits in SSO...
     String str("01234567");
     REQUIRE(str.length() == 8);
     char* ptr = (char*)str.c_str();
@@ -559,12 +567,7 @@ TEST_CASE("Replace and string expansion", "[core][String]")
 
 TEST_CASE("String chaining", "[core][String]")
 {
-    const char* chunks[] {
-        "~12345",
-        "67890",
-        "qwertyuiopasdfghjkl",
-        "zxcvbnm"
-    };
+    const char* chunks[] { "~12345", "67890", "qwertyuiopasdfghjkl", "zxcvbnm" };
 
     String all;
     for (auto* chunk : chunks)
@@ -576,8 +579,10 @@ TEST_CASE("String chaining", "[core][String]")
     REQUIRE((String(chunks[0]) + String(chunks[1]) + String(chunks[2]) + String(chunks[3])) == all);
     REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
     REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
-    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3])) == all);
-    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3])) == all);
+    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3]))
+            == all);
+    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3]))
+            == all);
 
     // these are still invalid (and also cannot compile at all):
     // - `F(...)` + `F(...)`

@@ -67,12 +67,13 @@ extern "C"
 #define make_stack_thunk(fcnToThunk)
 };
 
-void configTime(int timezone, int daylightOffset_sec,
-                const char* server1, const char* server2, const char* server3)
+void configTime(int timezone, int daylightOffset_sec, const char* server1, const char* server2,
+                const char* server3)
 {
     (void)server1;
     (void)server2;
     (void)server3;
 
-    mockverbose("configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", timezone, daylightOffset_sec);
+    mockverbose("configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", timezone,
+                daylightOffset_sec);
 }

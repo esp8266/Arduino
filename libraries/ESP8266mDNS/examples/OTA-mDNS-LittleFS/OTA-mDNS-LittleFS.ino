@@ -157,7 +157,7 @@ void setup() {
 
   // Print hostname.
   Serial.println("Hostname: " + hostname);
-  //Serial.println(WiFi.hostname());
+  // Serial.println(WiFi.hostname());
 
   // Initialize file system.
   if (!LittleFS.begin()) {
@@ -192,7 +192,7 @@ void setup() {
     Serial.println(WiFi.SSID());
 
     // ... Uncomment this for debugging output.
-    //WiFi.printDiag(Serial);
+    // WiFi.printDiag(Serial);
   } else {
     // ... Begin with sdk config.
     WiFi.begin();
@@ -204,7 +204,7 @@ void setup() {
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
     Serial.write('.');
-    //Serial.print(WiFi.status());
+    // Serial.print(WiFi.status());
     delay(500);
   }
   Serial.println();

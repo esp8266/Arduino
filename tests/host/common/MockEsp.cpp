@@ -36,57 +36,27 @@
 
 #include <stdlib.h>
 
-unsigned long long operator"" _kHz(unsigned long long x)
-{
-    return x * 1000;
-}
+unsigned long long operator"" _kHz(unsigned long long x) { return x * 1000; }
 
-unsigned long long operator"" _MHz(unsigned long long x)
-{
-    return x * 1000 * 1000;
-}
+unsigned long long operator"" _MHz(unsigned long long x) { return x * 1000 * 1000; }
 
-unsigned long long operator"" _GHz(unsigned long long x)
-{
-    return x * 1000 * 1000 * 1000;
-}
+unsigned long long operator"" _GHz(unsigned long long x) { return x * 1000 * 1000 * 1000; }
 
-unsigned long long operator"" _kBit(unsigned long long x)
-{
-    return x * 1024;
-}
+unsigned long long operator"" _kBit(unsigned long long x) { return x * 1024; }
 
-unsigned long long operator"" _MBit(unsigned long long x)
-{
-    return x * 1024 * 1024;
-}
+unsigned long long operator"" _MBit(unsigned long long x) { return x * 1024 * 1024; }
 
-unsigned long long operator"" _GBit(unsigned long long x)
-{
-    return x * 1024 * 1024 * 1024;
-}
+unsigned long long operator"" _GBit(unsigned long long x) { return x * 1024 * 1024 * 1024; }
 
-unsigned long long operator"" _kB(unsigned long long x)
-{
-    return x * 1024;
-}
+unsigned long long operator"" _kB(unsigned long long x) { return x * 1024; }
 
-unsigned long long operator"" _MB(unsigned long long x)
-{
-    return x * 1024 * 1024;
-}
+unsigned long long operator"" _MB(unsigned long long x) { return x * 1024 * 1024; }
 
-unsigned long long operator"" _GB(unsigned long long x)
-{
-    return x * 1024 * 1024 * 1024;
-}
+unsigned long long operator"" _GB(unsigned long long x) { return x * 1024 * 1024 * 1024; }
 
 uint32_t _SPIFFS_start;
 
-void eboot_command_write(struct eboot_command* cmd)
-{
-    (void)cmd;
-}
+void eboot_command_write(struct eboot_command* cmd) { (void)cmd; }
 
 EspClass ESP;
 
@@ -96,10 +66,7 @@ void EspClass::restart()
     exit(EXIT_SUCCESS);
 }
 
-uint32_t EspClass::getChipId()
-{
-    return 0xee1337;
-}
+uint32_t EspClass::getChipId() { return 0xee1337; }
 
 bool EspClass::checkFlashConfig(bool needsEquals)
 {
@@ -107,40 +74,19 @@ bool EspClass::checkFlashConfig(bool needsEquals)
     return true;
 }
 
-uint32_t EspClass::getSketchSize()
-{
-    return 400000;
-}
+uint32_t EspClass::getSketchSize() { return 400000; }
 
-uint32_t EspClass::getFreeHeap()
-{
-    return 30000;
-}
+uint32_t EspClass::getFreeHeap() { return 30000; }
 
-uint32_t EspClass::getMaxFreeBlockSize()
-{
-    return 20000;
-}
+uint32_t EspClass::getMaxFreeBlockSize() { return 20000; }
 
-String EspClass::getResetReason()
-{
-    return "Power on";
-}
+String EspClass::getResetReason() { return "Power on"; }
 
-uint32_t EspClass::getFreeSketchSpace()
-{
-    return 4 * 1024 * 1024;
-}
+uint32_t EspClass::getFreeSketchSpace() { return 4 * 1024 * 1024; }
 
-const char* EspClass::getSdkVersion()
-{
-    return "2.5.0";
-}
+const char* EspClass::getSdkVersion() { return "2.5.0"; }
 
-uint32_t EspClass::getFlashChipSpeed()
-{
-    return 40;
-}
+uint32_t EspClass::getFlashChipSpeed() { return 40; }
 
 void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 {
@@ -161,10 +107,7 @@ bool EspClass::flashEraseSector(uint32_t sector)
     return true;
 }
 
-FlashMode_t EspClass::getFlashChipMode()
-{
-    return FM_DOUT;
-}
+FlashMode_t EspClass::getFlashChipMode() { return FM_DOUT; }
 
 FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 {
@@ -227,34 +170,17 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte)
     }
 }
 
-uint32_t EspClass::getFlashChipRealSize(void)
-{
-    return magicFlashChipSize(4);
-}
+uint32_t EspClass::getFlashChipRealSize(void) { return magicFlashChipSize(4); }
 
-uint32_t EspClass::getFlashChipSize(void)
-{
-    return magicFlashChipSize(4);
-}
+uint32_t EspClass::getFlashChipSize(void) { return magicFlashChipSize(4); }
 
-String EspClass::getFullVersion()
-{
-    return "emulation-on-host";
-}
+String EspClass::getFullVersion() { return "emulation-on-host"; }
 
-uint32_t EspClass::getFreeContStack()
-{
-    return 4000;
-}
+uint32_t EspClass::getFreeContStack() { return 4000; }
 
-void EspClass::resetFreeContStack()
-{
-}
+void EspClass::resetFreeContStack() { }
 
-uint32_t EspClass::getCycleCount()
-{
-    return esp_get_cycle_count();
-}
+uint32_t EspClass::getCycleCount() { return esp_get_cycle_count(); }
 
 uint32_t esp_get_cycle_count()
 {
@@ -263,18 +189,10 @@ uint32_t esp_get_cycle_count()
     return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
 }
 
-void EspClass::setDramHeap()
-{
-}
+void EspClass::setDramHeap() { }
 
-void EspClass::setIramHeap()
-{
-}
+void EspClass::setIramHeap() { }
 
-void EspClass::setExternalHeap()
-{
-}
+void EspClass::setExternalHeap() { }
 
-void EspClass::resetHeap()
-{
-}
+void EspClass::resetHeap() { }

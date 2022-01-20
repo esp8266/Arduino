@@ -30,7 +30,8 @@
      self-signed CA or any other CA you'd like)
        openssl genrsa -out server_key.pem 2048
        openssl req -out server_req.csr -key server_key.pem -new -config server.conf
-       openssl x509 -req -in server_req.csr -out server_cer.pem -sha256 -CAcreateserial -days 4000 -CA ca_cer.pem -CAkey ca_key.pem
+       openssl x509 -req -in server_req.csr -out server_cer.pem -sha256 -CAcreateserial -days 4000
+  -CA ca_cer.pem -CAkey ca_key.pem
 
      KEEP server_key.pem SECURE, IT IS YOUR SERVER'S PRIVATE KEY.
      THIS WILL BE STORED IN THE SERVER ALONE. CLIENTS DO NOT NEED IT!
@@ -42,7 +43,8 @@
      private CA above)
        openssl genrsa -out client1_key.pem 2048
        openssl req -out client1_req.csr -key client1_key.pem -new -config client.conf
-       openssl x509 -req -in client1_req.csr -out client1_cer.pem -sha256 -CAcreateserial -days 4000 -CA ca_cer.pem -CAkey ca_key.pem
+       openssl x509 -req -in client1_req.csr -out client1_cer.pem -sha256 -CAcreateserial -days 4000
+  -CA ca_cer.pem -CAkey ca_key.pem
 
      Every client should have its own unique certificate generated and
      a copy of that specific client's private key.
@@ -57,7 +59,8 @@
   If you don't specify the client cert and key on the WGET command
   line, you will not get connected.
 
-  ex: wget --quiet --O - --no-check-certificate --certificate=client1_cer.pem --private-key=client1_key.pem https://esp.ip.add.ress/
+  ex: wget --quiet --O - --no-check-certificate --certificate=client1_cer.pem
+  --private-key=client1_key.pem https://esp.ip.add.ress/
 
   This example is released into the public domain.
 */

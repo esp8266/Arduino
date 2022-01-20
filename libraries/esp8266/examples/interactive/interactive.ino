@@ -35,15 +35,14 @@ void setup() {
   }
   Serial.println();
   Serial.println(WiFi.localIP());
-  Serial.print(
-      "WL_IDLE_STATUS      = 0\n"
-      "WL_NO_SSID_AVAIL    = 1\n"
-      "WL_SCAN_COMPLETED   = 2\n"
-      "WL_CONNECTED        = 3\n"
-      "WL_CONNECT_FAILED   = 4\n"
-      "WL_CONNECTION_LOST  = 5\n"
-      "WL_WRONG_PASSWORD   = 6\n"
-      "WL_DISCONNECTED     = 7\n");
+  Serial.print("WL_IDLE_STATUS      = 0\n"
+               "WL_NO_SSID_AVAIL    = 1\n"
+               "WL_SCAN_COMPLETED   = 2\n"
+               "WL_CONNECTED        = 3\n"
+               "WL_CONNECT_FAILED   = 4\n"
+               "WL_CONNECTION_LOST  = 5\n"
+               "WL_WRONG_PASSWORD   = 6\n"
+               "WL_DISCONNECTED     = 7\n");
 }
 
 void WiFiOn() {
@@ -62,17 +61,17 @@ void WiFiOff() {
 }
 
 void loop() {
-#define TEST(name, var, varinit, func)   \
-  static decltype(func) var = (varinit); \
-  if ((var) != (func)) {                 \
-    var = (func);                        \
-    Serial.printf("**** %s: ", name);    \
-    Serial.println(var);                 \
+#define TEST(name, var, varinit, func)                                                             \
+  static decltype(func) var = (varinit);                                                           \
+  if ((var) != (func)) {                                                                           \
+    var = (func);                                                                                  \
+    Serial.printf("**** %s: ", name);                                                              \
+    Serial.println(var);                                                                           \
   }
 
-#define DO(x...)         \
-  Serial.println(F(#x)); \
-  x;                     \
+#define DO(x...)                                                                                   \
+  Serial.println(F(#x));                                                                           \
+  x;                                                                                               \
   break
 
   TEST("Free Heap", freeHeap, 0, ESP.getFreeHeap());

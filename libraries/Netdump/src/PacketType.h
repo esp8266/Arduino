@@ -37,17 +37,10 @@ public:
     };
 
     PacketType();
-    PacketType(PType pt) :
-        ptype(pt) {};
+    PacketType(PType pt) : ptype(pt) {};
 
-    operator PType() const
-    {
-        return ptype;
-    };
-    bool operator==(const PacketType& p)
-    {
-        return ptype == p.ptype;
-    };
+         operator PType() const { return ptype; };
+    bool operator==(const PacketType& p) { return ptype == p.ptype; };
 
     String toString() const;
 

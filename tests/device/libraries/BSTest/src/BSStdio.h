@@ -9,9 +9,7 @@ namespace bs
 class StdIOHelper
 {
 public:
-    StdIOHelper()
-    {
-    }
+    StdIOHelper() { }
 
     size_t printf(const char* format, ...)
     {
@@ -41,11 +39,8 @@ public:
 
 typedef StdIOHelper IOHelper;
 
-inline void fatal()
-{
-    throw std::runtime_error("fatal error");
-}
+inline void fatal() { throw std::runtime_error("fatal error"); }
 
 }  // namespace bs
 
-#endif  //BS_STDIO_H
+#endif  // BS_STDIO_H

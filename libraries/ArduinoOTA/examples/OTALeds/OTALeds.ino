@@ -69,6 +69,4 @@ void setup() {
   Serial.println("Ready");
 }
 
-void loop() {
-  ArduinoOTA.handle();
-}
+void loop() { ArduinoOTA.handle(); }

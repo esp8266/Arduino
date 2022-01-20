@@ -9,9 +9,7 @@
 
 namespace NetCapture
 {
-PacketType::PacketType()
-{
-}
+PacketType::PacketType() { }
 
 String PacketType::toString() const
 {

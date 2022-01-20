@@ -121,28 +121,27 @@ static uint8_t mock_read_uart(void)
 
 void help(const char* argv0, int exitcode)
 {
-    printf(
-        "%s - compiled with esp8266/arduino emulator\n"
-        "options:\n"
-        "\t-h\n"
-        "\tnetwork:\n"
-        "\t-i <interface> - use this interface for IP address\n"
-        "\t-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
-        "\t-s             - port shifter (default: %d, when root: 0)\n"
-        "\tterminal:\n"
-        "\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
-        "\t-T             - show timestamp on output\n"
-        "\tFS:\n"
-        "\t-P             - path for fs-persistent files (default: %s-)\n"
-        "\t-S             - spiffs size in KBytes (default: %zd)\n"
-        "\t-L             - littlefs size in KBytes (default: %zd)\n"
-        "\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
-        "\tgeneral:\n"
-        "\t-c             - ignore CTRL-C (send it via Serial)\n"
-        "\t-f             - no throttle (possibly 100%%CPU)\n"
-        "\t-1             - run loop once then exit (for host testing)\n"
-        "\t-v             - verbose\n",
-        argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
+    printf("%s - compiled with esp8266/arduino emulator\n"
+           "options:\n"
+           "\t-h\n"
+           "\tnetwork:\n"
+           "\t-i <interface> - use this interface for IP address\n"
+           "\t-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+           "\t-s             - port shifter (default: %d, when root: 0)\n"
+           "\tterminal:\n"
+           "\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
+           "\t-T             - show timestamp on output\n"
+           "\tFS:\n"
+           "\t-P             - path for fs-persistent files (default: %s-)\n"
+           "\t-S             - spiffs size in KBytes (default: %zd)\n"
+           "\t-L             - littlefs size in KBytes (default: %zd)\n"
+           "\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
+           "\tgeneral:\n"
+           "\t-c             - ignore CTRL-C (send it via Serial)\n"
+           "\t-f             - no throttle (possibly 100%%CPU)\n"
+           "\t-1             - run loop once then exit (for host testing)\n"
+           "\t-v             - verbose\n",
+           argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
     exit(exitcode);
 }
 

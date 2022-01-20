@@ -21,5 +21,4 @@ void setup() {
   EEPROM.end();
 }
 
-void loop() {
-}
+void loop() { }

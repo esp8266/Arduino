@@ -83,16 +83,9 @@ protected:
     void        send_ack(struct dhcps_msg* m);
     uint8_t     parse_options(uint8_t* optptr, sint16_t len);
     sint16_t    parse_msg(struct dhcps_msg* m, u16_t len);
-    static void S_handle_dhcp(void*            arg,
-                              struct udp_pcb*  pcb,
-                              struct pbuf*     p,
-                              const ip_addr_t* addr,
-                              uint16_t         port);
-    void        handle_dhcp(
-               struct udp_pcb*  pcb,
-               struct pbuf*     p,
-               const ip_addr_t* addr,
-               uint16_t         port);
+    static void S_handle_dhcp(void* arg, struct udp_pcb* pcb, struct pbuf* p, const ip_addr_t* addr,
+                              uint16_t port);
+    void   handle_dhcp(struct udp_pcb* pcb, struct pbuf* p, const ip_addr_t* addr, uint16_t port);
     void   kill_oldest_dhcps_pool(void);
     void   dhcps_coarse_tmr(void);  // CURRENTLY NOT CALLED
     void   dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force);

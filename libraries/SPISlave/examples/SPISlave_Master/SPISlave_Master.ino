@@ -9,9 +9,9 @@
      12       D6      MISO  |   D12
      14       D5      SCK   |   D13
 
-    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH (deselected)
-    the ESP8266 WILL FAIL to boot!
-    See SPISlave_SafeMaster example for possible workaround
+    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH
+   (deselected) the ESP8266 WILL FAIL to boot! See SPISlave_SafeMaster example for possible
+   workaround
 
 */
 #include <SPI.h>
@@ -21,8 +21,7 @@ class ESPMaster {
   uint8_t _ss_pin;
 
   public:
-  ESPMaster(uint8_t pin) :
-      _ss_pin(pin) { }
+  ESPMaster(uint8_t pin) : _ss_pin(pin) { }
   void begin() {
     pinMode(_ss_pin, OUTPUT);
     digitalWrite(_ss_pin, HIGH);
@@ -31,7 +30,8 @@ class ESPMaster {
   uint32_t readStatus() {
     digitalWrite(_ss_pin, LOW);
     SPI.transfer(0x04);
-    uint32_t status = (SPI.transfer(0) | ((uint32_t)(SPI.transfer(0)) << 8) | ((uint32_t)(SPI.transfer(0)) << 16) | ((uint32_t)(SPI.transfer(0)) << 24));
+    uint32_t status = (SPI.transfer(0) | ((uint32_t)(SPI.transfer(0)) << 8)
+                       | ((uint32_t)(SPI.transfer(0)) << 16) | ((uint32_t)(SPI.transfer(0)) << 24));
     digitalWrite(_ss_pin, HIGH);
     return status;
   }
@@ -77,9 +77,7 @@ class ESPMaster {
     return String(data);
   }
 
-  void writeData(const char* data) {
-    writeData((uint8_t*)data, strlen(data));
-  }
+  void writeData(const char* data) { writeData((uint8_t*)data, strlen(data)); }
 };
 
 ESPMaster esp(SS);

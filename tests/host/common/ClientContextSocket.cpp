@@ -97,7 +97,9 @@ ssize_t mockFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize)
     {
         if (errno != EAGAIN)
         {
-            fprintf(stderr, MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
+            fprintf(stderr,
+                    MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n",
+                    sock, maxread, strerror(errno));
             // error
             return -1;
         }
@@ -108,12 +110,14 @@ ssize_t mockFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize)
     return ret;
 }
 
-ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
+ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf,
+                      size_t& ccinbufsize)
 {
     // usersize==0: peekAvailable()
 
     if (usersize > CCBUFSIZE)
-        mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
+        mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE,
+                    usersize - CCBUFSIZE, usersize);
 
     struct pollfd p;
     size_t        retsize = 0;
@@ -156,7 +160,8 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
     return retsize;
 }
 
-ssize_t mockRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
+ssize_t mockRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf,
+                 size_t& ccinbufsize)
 {
     ssize_t copied = mockPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
     if (copied < 0)
@@ -195,7 +200,8 @@ ssize_t mockWrite(int sock, const uint8_t* data, size_t size, int timeout_ms)
             }
             sent += ret;
             if (sent < size)
-                fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent, size);
+                fprintf(stderr, MOCK "ClientContext::write: sent %d bytes (%zd / %zd)\n", ret, sent,
+                        size);
         }
     }
 #ifdef DEBUG_ESP_WIFI

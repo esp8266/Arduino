@@ -39,7 +39,8 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port,
+              const char* path) {
   if (!path) {
     path = "/";
   }
@@ -183,14 +184,18 @@ may make sense
   client.setCiphersLessSecure();
   now = millis();
   fetchURL(&client, gitlab_host, gitlab_port, path);
-  uint32_t              delta2       = millis() - now;
-  std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
+  uint32_t              delta2 = millis() - now;
+  std::vector<uint16_t> myCustomList
+      = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
+          BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
   client.setInsecure();
   client.setCiphers(myCustomList);
   now = millis();
   fetchURL(&client, gitlab_host, gitlab_port, path);
   uint32_t delta3 = millis() - now;
-  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
+  Serial.printf(
+      "Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n",
+      delta, delta2, delta3);
 }
 
 void setup() {

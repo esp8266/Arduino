@@ -39,9 +39,9 @@
 
 void pinMode(uint8_t pin, uint8_t mode)
 {
-#define xxx(mode)            \
-    case mode:               \
-        m = STRHELPER(mode); \
+#define xxx(mode)                                                                                  \
+    case mode:                                                                                     \
+        m = STRHELPER(mode);                                                                       \
         break
     const char* m;
     switch (mode)
@@ -73,15 +73,9 @@ void pinMode(uint8_t pin, uint8_t mode)
     VERBOSE("gpio%d: mode='%s'\n", pin, m);
 }
 
-void digitalWrite(uint8_t pin, uint8_t val)
-{
-    VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val);
-}
+void digitalWrite(uint8_t pin, uint8_t val) { VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val); }
 
-void analogWrite(uint8_t pin, int val)
-{
-    VERBOSE("analogWrite(pin=%d, val=%d\n", pin, val);
-}
+void analogWrite(uint8_t pin, int val) { VERBOSE("analogWrite(pin=%d, val=%d\n", pin, val); }
 
 int analogRead(uint8_t pin)
 {
@@ -89,10 +83,7 @@ int analogRead(uint8_t pin)
     return 512;
 }
 
-void analogWriteRange(uint32_t range)
-{
-    VERBOSE("analogWriteRange(range=%d)\n", range);
-}
+void analogWriteRange(uint32_t range) { VERBOSE("analogWriteRange(range=%d)\n", range); }
 
 int digitalRead(uint8_t pin)
 {

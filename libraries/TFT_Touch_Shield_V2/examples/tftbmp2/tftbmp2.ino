@@ -56,8 +56,7 @@ bool checkBMP(char* _name, char r_name[]) {
   }
 
   // if xxx.bmp or xxx.BMP
-  if (r_name[len - 4] == '.'
-      && (r_name[len - 3] == 'b' || (r_name[len - 3] == 'B'))
+  if (r_name[len - 4] == '.' && (r_name[len - 3] == 'b' || (r_name[len - 3] == 'B'))
       && (r_name[len - 2] == 'm' || (r_name[len - 2] == 'M'))
       && (r_name[len - 1] == 'p' || (r_name[len - 1] == 'P'))) {
     return true;
@@ -272,7 +271,8 @@ boolean bmpReadHeader(File f) {
   int bmp_width  = read32(f);
   int bmp_height = read32(f);
 
-  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height) {  // if image is not 320x240, return false
+  if (bmp_width != __Gnbmp_width
+      || bmp_height != __Gnbmp_height) {  // if image is not 320x240, return false
     return false;
   }
 

@@ -30,7 +30,8 @@
 */
 
 #define CORE_MOCK 1
-#define MOCK "(mock) "  // TODO: provide common logging API instead of adding this string everywhere?
+#define MOCK                                                                                       \
+    "(mock) "  // TODO: provide common logging API instead of adding this string everywhere?
 
 //
 
@@ -104,10 +105,7 @@ extern "C"
     int ets_printf(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 #define os_printf_plus printf
 #define ets_vsnprintf vsnprintf
-    inline void ets_putc(char c)
-    {
-        putchar(c);
-    }
+    inline void ets_putc(char c) { putchar(c); }
 
     int mockverbose(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 
@@ -157,10 +155,14 @@ int     serverAccept(int sock);
 void   check_incoming_udp();
 int    mockUDPSocket();
 bool   mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
-size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
-size_t mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
-size_t mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
-size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
+size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize,
+                        uint8_t addr[16], uint16_t& port);
+size_t mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf,
+                        size_t& ccinbufsize);
+size_t mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf,
+                   size_t& ccinbufsize);
+size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4,
+                    uint16_t port);
 void   mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize);
 
 class UdpContext;
@@ -168,9 +170,11 @@ void register_udp(int sock, UdpContext* udp = nullptr);
 
 //
 
-void mock_start_spiffs(const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_start_spiffs(const String& fname, size_t size_kb, size_t block_kb = 8,
+                       size_t page_b = 512);
 void mock_stop_spiffs();
-void mock_start_littlefs(const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_start_littlefs(const String& fname, size_t size_kb, size_t block_kb = 8,
+                         size_t page_b = 512);
 void mock_stop_littlefs();
 
 //

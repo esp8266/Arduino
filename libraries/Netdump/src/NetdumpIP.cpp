@@ -23,11 +23,10 @@
 
 namespace NetCapture
 {
-NetdumpIP::NetdumpIP()
-{
-}
+NetdumpIP::NetdumpIP() { }
 
-NetdumpIP::NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet)
+NetdumpIP::NetdumpIP(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet,
+                     uint8_t fourth_octet)
 {
     setV4();
     (*this)[0] = first_octet;
@@ -205,7 +204,8 @@ bool NetdumpIP::fromString6(const char* address)
     {
         for (int i = dots - doubledots - 1; i >= 0; i--)
         {
-            reinterpret_cast<uint16_t*>(rawip)[8 - dots + doubledots + i] = reinterpret_cast<uint16_t*>(rawip)[doubledots + i];
+            reinterpret_cast<uint16_t*>(rawip)[8 - dots + doubledots + i]
+                = reinterpret_cast<uint16_t*>(rawip)[doubledots + i];
         }
         for (int i = doubledots; i < 8 - dots + doubledots; i++)
         {

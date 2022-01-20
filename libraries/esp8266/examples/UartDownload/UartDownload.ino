@@ -110,13 +110,13 @@ void setup() {
   // stub, then both devices shift their UART speeds to the command line value.
   Serial.begin(115200);
 
-  Serial.println(F(
-      "\r\n\r\n"
-      "Boot UART Download Demo - initialization started.\r\n"
-      "\r\n"
-      "For a quick test to see the UART Download work,\r\n"
-      "stop your serial terminal APP and run:\r\n"
-      "  esptool.py --chip esp8266 --before no_reset --after soft_reset flash_id\r\n"));
+  Serial.println(
+      F("\r\n\r\n"
+        "Boot UART Download Demo - initialization started.\r\n"
+        "\r\n"
+        "For a quick test to see the UART Download work,\r\n"
+        "stop your serial terminal APP and run:\r\n"
+        "  esptool.py --chip esp8266 --before no_reset --after soft_reset flash_id\r\n"));
 
   // ...
 }

@@ -63,7 +63,8 @@ void tryit(int blocksize) {
     for the blocks*sizeof(void*) allocation. Thus blocks may be off by one count.
     We now validate the estimate and adjust as needed.
   */
-  int rawMemoryEstimate = blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
+  int rawMemoryEstimate = blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7)
+                          + ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
   if (rawMemoryMaxFreeBlockSize < rawMemoryEstimate) {
     --blocks;
   }
@@ -155,5 +156,4 @@ void setup() {
 #endif
 }
 
-void loop() {
-}
+void loop() { }

@@ -55,7 +55,8 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
 
 void SpiffsMock::reset()
 {
-    SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
+    SPIFFS
+        = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
     load();
 }
 
@@ -93,20 +94,24 @@ void SpiffsMock::load()
 
     if (flen != (off_t)m_fs.size())
     {
-        fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
+        fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n",
+                m_storage.c_str(), (int)flen, m_fs.size());
         if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "SPIFFS: aborting at user request\n");
             exit(1);
         }
-        fprintf(stderr, "SPIFFS: continuing without loading at user request, '%s' will be overwritten\n", m_storage.c_str());
+        fprintf(stderr,
+                "SPIFFS: continuing without loading at user request, '%s' will be overwritten\n",
+                m_storage.c_str());
     }
     else
     {
         fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
         ssize_t r = ::read(fs, m_fs.data(), m_fs.size());
         if (r != (ssize_t)m_fs.size())
-            fprintf(stderr, "SPIFFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
+            fprintf(stderr, "SPIFFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r,
+                    strerror(errno));
     }
     ::close(fs);
 }

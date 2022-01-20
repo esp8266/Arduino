@@ -1,5 +1,6 @@
 /*
-  To upload through terminal you can use: curl -u admin:admin -F "image=@firmware.bin" esp8266-webupdate.local/firmware
+  To upload through terminal you can use: curl -u admin:admin -F "image=@firmware.bin"
+  esp8266-webupdate.local/firmware
 */
 
 #include <ESP8266WiFi.h>
@@ -41,7 +42,9 @@ void setup(void) {
   httpServer.begin();
 
   MDNS.addService("http", "tcp", 80);
-  Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with username '%s' and password '%s'\n", host, update_path, update_username, update_password);
+  Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with "
+                "username '%s' and password '%s'\n",
+                host, update_path, update_username, update_password);
 }
 
 void loop(void) {

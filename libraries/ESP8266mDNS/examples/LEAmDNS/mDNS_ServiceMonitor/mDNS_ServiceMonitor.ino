@@ -14,9 +14,9 @@
   is already used in the local network, another host domain is negotiated. Keep an
   eye to the serial output to learn the final host domain for the HTTP service.
   The service itself is is announced as 'host domain'._http._tcp.local.
-  The HTTP server delivers a short greeting and the current  list of other 'HTTP' services (not updated).
-  The web server code is taken nearly 1:1 from the 'mDNS_Web_Server.ino' example.
-  Point your browser to 'host domain'.local to see this web page.
+  The HTTP server delivers a short greeting and the current  list of other 'HTTP' services (not
+  updated). The web server code is taken nearly 1:1 from the 'mDNS_Web_Server.ino' example. Point
+  your browser to 'host domain'.local to see this web page.
 
   Instructions:
   - Update WiFi SSID and password as necessary.
@@ -48,10 +48,12 @@
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-char*                            pcHostDomain         = 0;      // Negotiated host domain
-bool                             bHostDomainConfirmed = false;  // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService      hMDNSService         = 0;      // The handle of the http service in the MDNS responder
-MDNSResponder::hMDNSServiceQuery hMDNSServiceQuery    = 0;      // The handle of the 'http.tcp' service query in the MDNS responder
+char* pcHostDomain         = 0;      // Negotiated host domain
+bool  bHostDomainConfirmed = false;  // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService hMDNSService
+    = 0;  // The handle of the http service in the MDNS responder
+MDNSResponder::hMDNSServiceQuery hMDNSServiceQuery
+    = 0;  // The handle of the 'http.tcp' service query in the MDNS responder
 
 const String cstrNoHTTPServices = "Currently no 'http.tcp' services in the local network!<br/>";
 String       strHTTPServices    = cstrNoHTTPServices;
@@ -74,14 +76,16 @@ bool setStationHostname(const char* p_pcHostname) {
    MDNSServiceQueryCallback
 */
 
-void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
+void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo,
+                              MDNSResponder::AnswerType answerType, bool p_bSetContent) {
   String answerInfo;
   switch (answerType) {
     case MDNSResponder::AnswerType::ServiceDomain:
       answerInfo = "ServiceDomain " + String(serviceInfo.serviceDomain());
       break;
     case MDNSResponder::AnswerType::HostDomainAndPort:
-      answerInfo = "HostDomainAndPort " + String(serviceInfo.hostDomain()) + ":" + String(serviceInfo.hostPort());
+      answerInfo = "HostDomainAndPort " + String(serviceInfo.hostDomain()) + ":"
+                   + String(serviceInfo.hostPort());
       break;
     case MDNSResponder::AnswerType::IP4Address:
       answerInfo = "IP4Address ";
@@ -106,11 +110,11 @@ void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
    Probe result callback for Services
 */
 
-void serviceProbeResult(String                            p_pcServiceName,
-                        const MDNSResponder::hMDNSService p_hMDNSService,
-                        bool                              p_bProbeResult) {
+void serviceProbeResult(String p_pcServiceName, const MDNSResponder::hMDNSService p_hMDNSService,
+                        bool p_bProbeResult) {
   (void)p_hMDNSService;
-  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(),
+                (p_bProbeResult ? "succeeded." : "failed!"));
 }
 
 /*
@@ -125,7 +129,8 @@ void serviceProbeResult(String                            p_pcServiceName,
 */
 
 void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
-  Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n",
+                p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
   if (true == p_bProbeResult) {
     // Set station hostname
@@ -152,9 +157,11 @@ void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
         if (!hMDNSServiceQuery) {
           hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback);
           if (hMDNSServiceQuery) {
-            Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
+            Serial.printf(
+                "MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
           } else {
-            Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' services!\n");
+            Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' "
+                          "services!\n");
           }
         }
       }

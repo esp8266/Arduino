@@ -35,25 +35,13 @@
 class S2Stream: public Stream
 {
 public:
-    S2Stream(String& string, int peekPointer = -1) :
-        string(&string), peekPointer(peekPointer)
-    {
-    }
+    S2Stream(String& string, int peekPointer = -1) : string(&string), peekPointer(peekPointer) { }
 
-    S2Stream(String* string, int peekPointer = -1) :
-        string(string), peekPointer(peekPointer)
-    {
-    }
+    S2Stream(String* string, int peekPointer = -1) : string(string), peekPointer(peekPointer) { }
 
-    virtual int available() override
-    {
-        return string->length();
-    }
+    virtual int available() override { return string->length(); }
 
-    virtual int availableForWrite() override
-    {
-        return std::numeric_limits<int16_t>::max();
-    }
+    virtual int availableForWrite() override { return std::numeric_limits<int16_t>::max(); }
 
     virtual int read() override
     {
@@ -77,10 +65,7 @@ public:
         return -1;
     }
 
-    virtual size_t write(uint8_t data) override
-    {
-        return string->concat((char)data);
-    }
+    virtual size_t write(uint8_t data) override { return string->concat((char)data); }
 
     virtual int read(uint8_t* buffer, size_t len) override
     {
@@ -132,22 +117,13 @@ public:
         // nothing to do
     }
 
-    virtual bool inputCanTimeout() override
-    {
-        return false;
-    }
+    virtual bool inputCanTimeout() override { return false; }
 
-    virtual bool outputCanTimeout() override
-    {
-        return false;
-    }
+    virtual bool outputCanTimeout() override { return false; }
 
     //// Stream's peekBufferAPI
 
-    virtual bool hasPeekBufferAPI() const override
-    {
-        return true;
-    }
+    virtual bool hasPeekBufferAPI() const override { return true; }
 
     virtual size_t peekAvailable()
     {
@@ -192,18 +168,12 @@ public:
 
     // calling setConsume() will consume bytes as the stream is read
     // (enabled by default)
-    void setConsume()
-    {
-        peekPointer = -1;
-    }
+    void setConsume() { peekPointer = -1; }
 
     // Reading this stream will mark the string as read without consuming
     // (not enabled by default)
     // Calling resetPointer() resets the read state and allows rereading.
-    void resetPointer(int pointer = 0)
-    {
-        peekPointer = pointer;
-    }
+    void resetPointer(int pointer = 0) { peekPointer = pointer; }
 
 protected:
     String* string;
@@ -224,38 +194,38 @@ protected:
     }
 
 public:
-    StreamString(StreamString&& bro) :
-        String(bro), S2Stream(this) { }
-    StreamString(const StreamString& bro) :
-        String(bro), S2Stream(this) { }
+    StreamString(StreamString&& bro) : String(bro), S2Stream(this) { }
+    StreamString(const StreamString& bro) : String(bro), S2Stream(this) { }
 
     // duplicate String constructors and operator=:
 
-    StreamString(const char* text = nullptr) :
-        String(text), S2Stream(this) { }
-    StreamString(const String& string) :
-        String(string), S2Stream(this) { }
-    StreamString(const __FlashStringHelper* str) :
-        String(str), S2Stream(this) { }
-    StreamString(String&& string) :
-        String(string), S2Stream(this) { }
+    StreamString(const char* text = nullptr) : String(text), S2Stream(this) { }
+    StreamString(const String& string) : String(string), S2Stream(this) { }
+    StreamString(const __FlashStringHelper* str) : String(str), S2Stream(this) { }
+    StreamString(String&& string) : String(string), S2Stream(this) { }
 
-    explicit StreamString(char c) :
-        String(c), S2Stream(this) { }
+    explicit StreamString(char c) : String(c), S2Stream(this) { }
     explicit StreamString(unsigned char c, unsigned char base = 10) :
-        String(c, base), S2Stream(this) { }
-    explicit StreamString(int i, unsigned char base = 10) :
-        String(i, base), S2Stream(this) { }
-    explicit StreamString(unsigned int i, unsigned char base = 10) :
-        String(i, base), S2Stream(this) { }
-    explicit StreamString(long l, unsigned char base = 10) :
-        String(l, base), S2Stream(this) { }
+        String(c, base), S2Stream(this)
+    {
+    }
+    explicit StreamString(int i, unsigned char base = 10) : String(i, base), S2Stream(this) { }
+    explicit StreamString(unsigned int i, unsigned char base = 10) : String(i, base), S2Stream(this)
+    {
+    }
+    explicit StreamString(long l, unsigned char base = 10) : String(l, base), S2Stream(this) { }
     explicit StreamString(unsigned long l, unsigned char base = 10) :
-        String(l, base), S2Stream(this) { }
+        String(l, base), S2Stream(this)
+    {
+    }
     explicit StreamString(float f, unsigned char decimalPlaces = 2) :
-        String(f, decimalPlaces), S2Stream(this) { }
+        String(f, decimalPlaces), S2Stream(this)
+    {
+    }
     explicit StreamString(double d, unsigned char decimalPlaces = 2) :
-        String(d, decimalPlaces), S2Stream(this) { }
+        String(d, decimalPlaces), S2Stream(this)
+    {
+    }
 
     StreamString& operator=(const StreamString& rhs)
     {

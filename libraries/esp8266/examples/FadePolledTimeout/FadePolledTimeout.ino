@@ -42,7 +42,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  // Initialize the LED_BUILTIN pin as an output
   analogWriteRange(1000);
 
-  using esp8266::polledTimeout::oneShotMs;  //import the type to the local namespace
+  using esp8266::polledTimeout::oneShotMs;  // import the type to the local namespace
 
   digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on (Note that LOW is the voltage level
 

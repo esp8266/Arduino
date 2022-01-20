@@ -35,7 +35,8 @@ ESP8266WebServer server(80);
 // ===== Simple functions used to answer simple GET requests =====
 
 // This function is called when the WebServer was requested without giving a filename.
-// This will redirect to the file index.htm when it is existing otherwise to the built-in $upload.htm page
+// This will redirect to the file index.htm when it is existing otherwise to the built-in
+// $upload.htm page
 void handleRedirect() {
   TRACE("Redirect...");
   String url = "/index.htm";
@@ -48,8 +49,8 @@ void handleRedirect() {
   server.send(302);
 }  // handleRedirect()
 
-// This function is called when the WebServer was requested to list all existing files in the filesystem.
-// a JSON array with file information is returned.
+// This function is called when the WebServer was requested to list all existing files in the
+// filesystem. a JSON array with file information is returned.
 void handleListFiles() {
   Dir    dir = LittleFS.openDir("/");
   String result;
@@ -91,16 +92,16 @@ void handleSysInfo() {
 
 // ===== Request Handler class used to answer more complex requests =====
 
-// The FileServerHandler is registered to the web server to support DELETE and UPLOAD of files into the filesystem.
+// The FileServerHandler is registered to the web server to support DELETE and UPLOAD of files into
+// the filesystem.
 class FileServerHandler: public RequestHandler {
   public:
   // @brief Construct a new File Server Handler object
   // @param fs The file system to be used.
-  // @param path Path to the root folder in the file system that is used for serving static data down and upload.
+  // @param path Path to the root folder in the file system that is used for serving static data
+  // down and upload.
   // @param cache_header Cache Header to be used in replies.
-  FileServerHandler() {
-    TRACE("FileServerHandler is registered\n");
-  }
+  FileServerHandler() { TRACE("FileServerHandler is registered\n"); }
 
   // @brief check incoming request. Can handle POST for uploads and DELETE.
   // @param requestMethod method of the http request line.
@@ -115,7 +116,8 @@ class FileServerHandler: public RequestHandler {
     return (uri == "/");
   }  // canUpload()
 
-  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, const String& requestUri) override {
+  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod,
+              const String& requestUri) override {
     // ensure that filename starts with '/'
     String fName = requestUri;
     if (!fName.startsWith("/")) {
@@ -136,7 +138,8 @@ class FileServerHandler: public RequestHandler {
   }  // handle()
 
   // uploading process
-  void upload(ESP8266WebServer UNUSED& server, const String UNUSED& _requestUri, HTTPUpload& upload) override {
+  void upload(ESP8266WebServer UNUSED& server, const String UNUSED& _requestUri,
+              HTTPUpload& upload) override {
     // ensure that filename starts with '/'
     String fName = upload.filename;
     if (!fName.startsWith("/")) {
@@ -210,9 +213,7 @@ void setup(void) {
   TRACE("Register service handlers...\n");
 
   // serve a built-in htm page
-  server.on("/$upload.htm", []() {
-    server.send(200, "text/html", FPSTR(uploadContent));
-  });
+  server.on("/$upload.htm", []() { server.send(200, "text/html", FPSTR(uploadContent)); });
 
   // register a redirect handler when only domain name is given.
   server.on("/", HTTP_GET, handleRedirect);
@@ -244,8 +245,6 @@ void setup(void) {
 }  // setup
 
 // run the server...
-void loop(void) {
-  server.handleClient();
-}  // loop()
+void loop(void) { server.handleClient(); }  // loop()
 
 // end.

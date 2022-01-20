@@ -40,5 +40,4 @@ void setup() {
   Serial.printf("CRC check: %s\n", ESP.checkFlashCRC() ? "OK" : "ERROR");
 }
 
-void loop() {
-}
+void loop() { }

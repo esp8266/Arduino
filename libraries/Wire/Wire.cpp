@@ -32,8 +32,8 @@ extern "C"
 #include "twi.h"
 #include "Wire.h"
 
-//Some boards don't have these pins available, and hence don't support Wire.
-//Check here for compile-time error.
+// Some boards don't have these pins available, and hence don't support Wire.
+// Check here for compile-time error.
 #if !defined(PIN_WIRE_SDA) || !defined(PIN_WIRE_SCL)
 #error Wire library is not supported on this board
 #endif
@@ -87,10 +87,7 @@ void TwoWire::pins(int sda, int scl)
     default_scl_pin = scl;
 }
 
-void TwoWire::begin(void)
-{
-    begin(default_sda_pin, default_scl_pin);
-}
+void TwoWire::begin(void) { begin(default_sda_pin, default_scl_pin); }
 
 void TwoWire::begin(uint8_t address)
 {
@@ -100,25 +97,13 @@ void TwoWire::begin(uint8_t address)
     begin();
 }
 
-uint8_t TwoWire::status()
-{
-    return twi_status();
-}
+uint8_t TwoWire::status() { return twi_status(); }
 
-void TwoWire::begin(int address)
-{
-    begin((uint8_t)address);
-}
+void TwoWire::begin(int address) { begin((uint8_t)address); }
 
-void TwoWire::setClock(uint32_t frequency)
-{
-    twi_setClock(frequency);
-}
+void TwoWire::setClock(uint32_t frequency) { twi_setClock(frequency); }
 
-void TwoWire::setClockStretchLimit(uint32_t limit)
-{
-    twi_setClockStretchLimit(limit);
-}
+void TwoWire::setClockStretchLimit(uint32_t limit) { twi_setClockStretchLimit(limit); }
 
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
 {
@@ -149,7 +134,8 @@ uint8_t TwoWire::requestFrom(int address, int quantity)
 
 uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 {
-    return requestFrom(static_cast<uint8_t>(address), static_cast<size_t>(quantity), static_cast<bool>(sendStop));
+    return requestFrom(static_cast<uint8_t>(address), static_cast<size_t>(quantity),
+                       static_cast<bool>(sendStop));
 }
 
 void TwoWire::beginTransmission(uint8_t address)
@@ -160,10 +146,7 @@ void TwoWire::beginTransmission(uint8_t address)
     txBufferLength = 0;
 }
 
-void TwoWire::beginTransmission(int address)
-{
-    beginTransmission((uint8_t)address);
-}
+void TwoWire::beginTransmission(int address) { beginTransmission((uint8_t)address); }
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop)
 {
@@ -174,10 +157,7 @@ uint8_t TwoWire::endTransmission(uint8_t sendStop)
     return ret;
 }
 
-uint8_t TwoWire::endTransmission(void)
-{
-    return endTransmission(true);
-}
+uint8_t TwoWire::endTransmission(void) { return endTransmission(true); }
 
 size_t TwoWire::write(uint8_t data)
 {

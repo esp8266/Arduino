@@ -9,9 +9,9 @@
      12       D6      MISO  |   D12
      14       D5      SCK   |   D13
 
-    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH (deselected)
-    the ESP8266 WILL FAIL to boot!
-    See SPISlave_SafeMaster example for possible workaround
+    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH
+  (deselected) the ESP8266 WILL FAIL to boot! See SPISlave_SafeMaster example for possible
+  workaround
 
 */
 
@@ -41,22 +41,18 @@ void setup() {
 
   // The master has read out outgoing data buffer
   // that buffer can be set with SPISlave.setData
-  SPISlave.onDataSent([]() {
-    Serial.println("Answer Sent");
-  });
+  SPISlave.onDataSent([]() { Serial.println("Answer Sent"); });
 
   // status has been received from the master.
-  // The status register is a special register that bot the slave and the master can write to and read from.
-  // Can be used to exchange small data or status information
+  // The status register is a special register that bot the slave and the master can write to and
+  // read from. Can be used to exchange small data or status information
   SPISlave.onStatus([](uint32_t data) {
     Serial.printf("Status: %u\n", data);
-    SPISlave.setStatus(millis());  //set next status
+    SPISlave.setStatus(millis());  // set next status
   });
 
   // The master has read the status register
-  SPISlave.onStatusSent([]() {
-    Serial.println("Status Sent");
-  });
+  SPISlave.onStatusSent([]() { Serial.println("Status Sent"); });
 
   // Setup SPI Slave registers and pins
   SPISlave.begin();

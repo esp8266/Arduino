@@ -30,7 +30,7 @@ void dump(int netif_idx, const char* data, size_t len, int out, int success) {
   // optional filter example: if (netDump_is_ARP(data))
   {
     netDump(Serial, data, len);
-    //netDumpHex(Serial, data, len);
+    // netDumpHex(Serial, data, len);
   }
 }
 #endif
@@ -51,19 +51,15 @@ void setup() {
     Serial.print('.');
     delay(500);
   }
-  Serial.printf("\nSTA: %s (dns: %s / %s)\n",
-                WiFi.localIP().toString().c_str(),
-                WiFi.dnsIP(0).toString().c_str(),
-                WiFi.dnsIP(1).toString().c_str());
+  Serial.printf("\nSTA: %s (dns: %s / %s)\n", WiFi.localIP().toString().c_str(),
+                WiFi.dnsIP(0).toString().c_str(), WiFi.dnsIP(1).toString().c_str());
 
   // give DNS servers to AP side
   dhcpSoftAP.dhcps_set_dns(0, WiFi.dnsIP(0));
   dhcpSoftAP.dhcps_set_dns(1, WiFi.dnsIP(1));
 
   WiFi.softAPConfig(  // enable AP, with android-compatible google domain
-      IPAddress(172, 217, 28, 254),
-      IPAddress(172, 217, 28, 254),
-      IPAddress(255, 255, 255, 0));
+      IPAddress(172, 217, 28, 254), IPAddress(172, 217, 28, 254), IPAddress(255, 255, 255, 0));
   WiFi.softAP(STASSID "extender", STAPSK);
   Serial.printf("AP: %s\n", WiFi.softAPIP().toString().c_str());
 
@@ -74,7 +70,8 @@ void setup() {
     ret = ip_napt_enable_no(SOFTAP_IF, 1);
     Serial.printf("ip_napt_enable_no(SOFTAP_IF): ret=%d (OK=%d)\n", (int)ret, (int)ERR_OK);
     if (ret == ERR_OK) {
-      Serial.printf("WiFi Network '%s' with same password is now NATed behind '%s'\n", STASSID "extender", STASSID);
+      Serial.printf("WiFi Network '%s' with same password is now NATed behind '%s'\n",
+                    STASSID "extender", STASSID);
     }
   }
   Serial.printf("Heap after napt init: %d\n", ESP.getFreeHeap());
@@ -92,5 +89,4 @@ void setup() {
 
 #endif
 
-void loop() {
-}
+void loop() { }

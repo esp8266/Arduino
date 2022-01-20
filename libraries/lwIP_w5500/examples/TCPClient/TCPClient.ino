@@ -5,8 +5,8 @@
 
 #include <SPI.h>
 #include <W5500lwIP.h>
-//or #include <W5100lwIP.h>
-//or #include <ENC28J60lwIP.h>
+// or #include <W5100lwIP.h>
+// or #include <ENC28J60lwIP.h>
 
 #include <WiFiClient.h>  // WiFiClient (-> TCPClient)
 

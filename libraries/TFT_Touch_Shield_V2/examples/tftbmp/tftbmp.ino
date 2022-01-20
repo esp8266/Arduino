@@ -163,7 +163,8 @@ boolean bmpReadHeader(File f) {
   int bmp_width  = read32(f);
   int bmp_height = read32(f);
 
-  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height) {  // if image is not 320x240, return false
+  if (bmp_width != __Gnbmp_width
+      || bmp_height != __Gnbmp_height) {  // if image is not 320x240, return false
     return false;
   }
 

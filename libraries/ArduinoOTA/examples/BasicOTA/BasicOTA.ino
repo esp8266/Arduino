@@ -46,9 +46,7 @@ void setup() {
     // NOTE: if updating FS this would be the place to unmount FS using FS.end()
     Serial.println("Start updating " + type);
   });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
+  ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
@@ -72,6 +70,4 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-void loop() {
-  ArduinoOTA.handle();
-}
+void loop() { ArduinoOTA.handle(); }

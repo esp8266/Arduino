@@ -25,10 +25,7 @@ public:
     NetdumpIP(const IPAddress& ip);
     NetdumpIP(const String& ip);
 
-    uint8_t& operator[](int index)
-    {
-        return rawip[index];
-    }
+    uint8_t& operator[](int index) { return rawip[index]; }
 
     bool fromString(const char* address);
 
@@ -45,34 +42,13 @@ private:
 
     uint8_t rawip[16] = { 0 };
 
-    void setV4()
-    {
-        ipv = IPversion::IPV4;
-    };
-    void setV6()
-    {
-        ipv = IPversion::IPV6;
-    };
-    void setUnset()
-    {
-        ipv = IPversion::UNSET;
-    };
-    bool isV4() const
-    {
-        return (ipv == IPversion::IPV4);
-    };
-    bool isV6() const
-    {
-        return (ipv == IPversion::IPV6);
-    };
-    bool isUnset() const
-    {
-        return (ipv == IPversion::UNSET);
-    };
-    bool isSet() const
-    {
-        return (ipv != IPversion::UNSET);
-    };
+    void setV4() { ipv = IPversion::IPV4; };
+    void setV6() { ipv = IPversion::IPV6; };
+    void setUnset() { ipv = IPversion::UNSET; };
+    bool isV4() const { return (ipv == IPversion::IPV4); };
+    bool isV6() const { return (ipv == IPversion::IPV6); };
+    bool isUnset() const { return (ipv == IPversion::UNSET); };
+    bool isSet() const { return (ipv != IPversion::UNSET); };
 
     bool compareRaw(IPversion v, const uint8_t* a, const uint8_t* b) const;
     bool compareIP(const IPAddress& ip) const;
@@ -84,22 +60,10 @@ private:
     size_t printTo(Print& p);
 
 public:
-    bool operator==(const IPAddress& addr) const
-    {
-        return compareIP(addr);
-    };
-    bool operator!=(const IPAddress& addr)
-    {
-        return compareIP(addr);
-    };
-    bool operator==(const NetdumpIP& addr)
-    {
-        return compareIP(addr);
-    };
-    bool operator!=(const NetdumpIP& addr)
-    {
-        return !compareIP(addr);
-    };
+    bool operator==(const IPAddress& addr) const { return compareIP(addr); };
+    bool operator!=(const IPAddress& addr) { return compareIP(addr); };
+    bool operator==(const NetdumpIP& addr) { return compareIP(addr); };
+    bool operator!=(const NetdumpIP& addr) { return !compareIP(addr); };
 };
 
 }  // namespace NetCapture

@@ -70,13 +70,9 @@ const char* password = STAPSK;
 
 ESP8266WebServer web_server(80);
 
-void handle_http_not_found() {
-  web_server.send(404, "text/plain", "Not Found");
-}
+void handle_http_not_found() { web_server.send(404, "text/plain", "Not Found"); }
 
-void handle_http_root() {
-  web_server.send(200, "text/plain", "It works!");
-}
+void handle_http_root() { web_server.send(200, "text/plain", "It works!"); }
 
 void setup(void) {
   Serial.begin(115200);
@@ -107,6 +103,4 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
-  web_server.handleClient();
-}
+void loop(void) { web_server.handleClient(); }

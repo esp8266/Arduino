@@ -54,8 +54,7 @@ bool isValid(uint32_t* probe) {
   uint32_t saveData = *probe;
   for (size_t i = 0; i < 32; i++) {
     *probe = BIT(i);
-    asm volatile("" ::
-                     : "memory");
+    asm volatile("" ::: "memory");
     uint32_t val = *probe;
     if (val != BIT(i)) {
       ets_uart_printf("  Read 0x%08X != Wrote 0x%08X\n", val, (uint32_t)BIT(i));
@@ -108,7 +107,8 @@ void print_mmu_status(Print& oStream) {
 #ifdef MMU_IRAM_SIZE
   oStream.printf_P(PSTR("  IRAM Size:               %u"), MMU_IRAM_SIZE);
   oStream.println();
-  const uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - (uintptr_t)XCHAL_INSTRAM1_VADDR);
+  const uint32_t iram_free
+      = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - (uintptr_t)XCHAL_INSTRAM1_VADDR);
   oStream.printf_P(PSTR("  IRAM free:               %u"), iram_free);
   oStream.println();
 #endif
@@ -177,23 +177,31 @@ void processKey(Print& out, int hotKey) {
       uint32_t tmp;
       out.printf_P(PSTR("Test how much time is added by exception handling"));
       out.println();
-      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read((char*)0x40200003, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."),
+                   timed_byte_read((char*)0x40200003, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read((char*)0x40200003, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."),
+                   timed_byte_read((char*)0x40200003, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char*)0x40108000, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."),
+                   timed_byte_read((char*)0x40108000, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read((char*)((uintptr_t)&read_var + 1), &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."),
+                   timed_byte_read((char*)((uintptr_t)&read_var + 1), &tmp), tmp);
       out.println();
       out.printf_P(PSTR("Test how much time is used by the inline function method"));
       out.println();
-      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read2((char*)0x40200003, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."),
+                   timed_byte_read2((char*)0x40200003, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."), timed_byte_read2((char*)0x40200003, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iCACHE %u cpu cycle count, 0x%02X."),
+                   timed_byte_read2((char*)0x40200003, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char*)0x40108000, &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from iRAM %u cpu cycle count, 0x%02X."),
+                   timed_byte_read2((char*)0x40108000, &tmp), tmp);
       out.println();
-      out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."), timed_byte_read2((char*)((uintptr_t)&read_var + 1), &tmp), tmp);
+      out.printf_P(PSTR("Timed byte read from dRAM %u cpu cycle count, 0x%02X."),
+                   timed_byte_read2((char*)((uintptr_t)&read_var + 1), &tmp), tmp);
       out.println();
       out.println();
       break;
@@ -215,7 +223,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read Byte, 0x%02X at %p"), probe_c[0], probe_c);
       xt_rsil(0);
       out.println();
-      out.printf_P(PSTR("With Non32-bit access enabled, access range check is only done when 'Tools->Debug Level: CORE ...' is set."));
+      out.printf_P(PSTR("With Non32-bit access enabled, access range check is only done when "
+                        "'Tools->Debug Level: CORE ...' is set."));
       out.println();
       break;
     case 'b':
@@ -315,10 +324,6 @@ void serialClientLoop(void) {
   }
 }
 
-void loop() {
-  serialClientLoop();
-}
+void loop() { serialClientLoop(); }
 
-int __attribute__((noinline)) divideA_B(int a, int b) {
-  return (a / b);
-}
+int __attribute__((noinline)) divideA_B(int a, int b) { return (a / b); }

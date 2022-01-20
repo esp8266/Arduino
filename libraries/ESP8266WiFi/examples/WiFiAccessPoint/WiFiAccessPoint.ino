@@ -48,9 +48,7 @@ ESP8266WebServer server(80);
 /* Just a little test message.  Go to http://192.168.4.1 in a web browser
    connected to this access point to see it.
 */
-void handleRoot() {
-  server.send(200, "text/html", "<h1>You are connected</h1>");
-}
+void handleRoot() { server.send(200, "text/html", "<h1>You are connected</h1>"); }
 
 void setup() {
   delay(1000);
@@ -68,6 +66,4 @@ void setup() {
   Serial.println("HTTP server started");
 }
 
-void loop() {
-  server.handleClient();
-}
+void loop() { server.handleClient(); }

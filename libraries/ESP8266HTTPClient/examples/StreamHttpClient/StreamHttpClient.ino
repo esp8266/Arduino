@@ -36,13 +36,14 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
     WiFiClient client;
-    HTTPClient http;  //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
+    HTTPClient http;  // must be declared after WiFiClient for correct destruction order, because
+                      // used by http.begin(client,...)
 
     Serial.print("[HTTP] begin...\n");
 
     // configure server and url
     http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
-    //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
+    // http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 
     Serial.print("[HTTP] GET...\n");
     // start connection and send HTTP header

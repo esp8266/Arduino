@@ -9,10 +9,9 @@
      12       D6      MISO  |   D12
      14       D5      SCK   |   D13
 
-    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH (deselected)
-    the ESP8266 WILL FAIL to boot!
-    This sketch tries to go around this issue by only pulsing the Slave Select line to reset the command
-    and keeping the line LOW all other time.
+    Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH
+   (deselected) the ESP8266 WILL FAIL to boot! This sketch tries to go around this issue by only
+   pulsing the Slave Select line to reset the command and keeping the line LOW all other time.
 
 */
 #include <SPI.h>
@@ -27,8 +26,7 @@ class ESPSafeMaster {
   }
 
   public:
-  ESPSafeMaster(uint8_t pin) :
-      _ss_pin(pin) { }
+  ESPSafeMaster(uint8_t pin) : _ss_pin(pin) { }
   void begin() {
     pinMode(_ss_pin, OUTPUT);
     _pulseSS();
@@ -37,7 +35,8 @@ class ESPSafeMaster {
   uint32_t readStatus() {
     _pulseSS();
     SPI.transfer(0x04);
-    uint32_t status = (SPI.transfer(0) | ((uint32_t)(SPI.transfer(0)) << 8) | ((uint32_t)(SPI.transfer(0)) << 16) | ((uint32_t)(SPI.transfer(0)) << 24));
+    uint32_t status = (SPI.transfer(0) | ((uint32_t)(SPI.transfer(0)) << 8)
+                       | ((uint32_t)(SPI.transfer(0)) << 16) | ((uint32_t)(SPI.transfer(0)) << 24));
     _pulseSS();
     return status;
   }
@@ -83,9 +82,7 @@ class ESPSafeMaster {
     return String(data);
   }
 
-  void writeData(const char* data) {
-    writeData((uint8_t*)data, strlen(data));
-  }
+  void writeData(const char* data) { writeData((uint8_t*)data, strlen(data)); }
 };
 
 ESPSafeMaster esp(SS);

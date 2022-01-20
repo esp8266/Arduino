@@ -33,13 +33,13 @@ unsigned int localPort = 2390;  // local port to listen for UDP packets
 
 /* Don't hardwire the IP address or we won't get the benefits of the pool.
     Lookup the IP address for the host name instead */
-//IPAddress timeServer(129, 6, 15, 28); // time.nist.gov NTP server
+// IPAddress timeServer(129, 6, 15, 28); // time.nist.gov NTP server
 IPAddress   timeServerIP;  // time.nist.gov NTP server address
 const char* ntpServerName = "time.nist.gov";
 
 const int NTP_PACKET_SIZE = 48;  // NTP time stamp is in the first 48 bytes of the message
 
-byte packetBuffer[NTP_PACKET_SIZE];  //buffer to hold incoming and outgoing packets
+byte packetBuffer[NTP_PACKET_SIZE];  // buffer to hold incoming and outgoing packets
 
 // A UDP instance to let us send and receive packets over UDP
 WiFiUDP udp;
@@ -72,7 +72,7 @@ void setup() {
 }
 
 void loop() {
-  //get a random server from the pool
+  // get a random server from the pool
   WiFi.hostByName(ntpServerName, timeServerIP);
 
   sendNTPpacket(timeServerIP);  // send an NTP packet to a time server
@@ -88,7 +88,7 @@ void loop() {
     // We've received a packet, read the data from it
     udp.read(packetBuffer, NTP_PACKET_SIZE);  // read the packet into the buffer
 
-    //the timestamp starts at byte 40 of the received packet and is four bytes,
+    // the timestamp starts at byte 40 of the received packet and is four bytes,
     // or two words, long. First, esxtract the two words:
 
     unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
@@ -147,7 +147,7 @@ void sendNTPpacket(IPAddress& address) {
 
   // all NTP fields have been given values, now
   // you can send a packet requesting a timestamp:
-  udp.beginPacket(address, 123);  //NTP requests are to port 123
+  udp.beginPacket(address, 123);  // NTP requests are to port 123
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
 }

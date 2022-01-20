@@ -50,10 +50,7 @@ WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
     _port = port;
 }
 
-WiFiServer::WiFiServer(uint16_t port)
-{
-    _port = port;
-}
+WiFiServer::WiFiServer(uint16_t port) { _port = port; }
 
 WiFiClient WiFiServer::available(uint8_t* status)
 {

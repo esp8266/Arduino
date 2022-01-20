@@ -63,15 +63,9 @@ public:
         return ERR_OK;
     }
 
-    ~ClientContext()
-    {
-        abort();
-    }
+    ~ClientContext() { abort(); }
 
-    ClientContext* next() const
-    {
-        return _next;
-    }
+    ClientContext* next() const { return _next; }
 
     ClientContext* next(ClientContext* new_next)
     {
@@ -110,10 +104,7 @@ public:
         return 512;
     }
 
-    void setNoDelay(bool nodelay)
-    {
-        mockverbose("TODO setNoDelay(%d)\n", (int)nodelay);
-    }
+    void setNoDelay(bool nodelay) { mockverbose("TODO setNoDelay(%d)\n", (int)nodelay); }
 
     bool getNoDelay() const
     {
@@ -121,15 +112,9 @@ public:
         return false;
     }
 
-    void setTimeout(int timeout_ms)
-    {
-        _timeout_ms = timeout_ms;
-    }
+    void setTimeout(int timeout_ms) { _timeout_ms = timeout_ms; }
 
-    int getTimeout() const
-    {
-        return _timeout_ms;
-    }
+    int getTimeout() const { return _timeout_ms; }
 
     uint32_t getRemoteAddress() const
     {
@@ -204,10 +189,7 @@ public:
         return ret;
     }
 
-    void discard_received()
-    {
-        mockverbose("TODO: ClientContext::discard_received()\n");
-    }
+    void discard_received() { mockverbose("TODO: ClientContext::discard_received()\n"); }
 
     bool wait_until_acked(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
@@ -232,7 +214,9 @@ public:
         return ret;
     }
 
-    void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC,
+                   uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC,
+                   uint8_t  count    = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
         (void)idle_sec;
         (void)intv_sec;
@@ -278,10 +262,7 @@ public:
 
     // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
-    const char* peekBuffer()
-    {
-        return _inbuf;
-    }
+    const char* peekBuffer() { return _inbuf; }
 
     // return number of byte accessible by peekBuffer()
     size_t peekAvailable()
@@ -321,4 +302,4 @@ private:
     size_t _inbufsize = 0;
 };
 
-#endif  //CLIENTCONTEXT_H
+#endif  // CLIENTCONTEXT_H

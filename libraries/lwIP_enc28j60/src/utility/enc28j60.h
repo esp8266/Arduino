@@ -80,10 +80,7 @@ public:
     virtual uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
 protected:
-    static constexpr bool interruptIsPossible()
-    {
-        return false;
-    }
+    static constexpr bool interruptIsPossible() { return false; }
 
     /**
         Read an Ethernet frame size

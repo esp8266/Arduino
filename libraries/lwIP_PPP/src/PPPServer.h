@@ -44,14 +44,8 @@ public:
     bool begin(const IPAddress& ourAddress, const IPAddress& peer = IPAddress(172, 31, 255, 254));
     void stop();
 
-    void ifUpCb(void (*cb)(netif*))
-    {
-        _cb = cb;
-    }
-    const ip_addr_t* getPeerAddress() const
-    {
-        return &_netif.gw;
-    }
+    void             ifUpCb(void (*cb)(netif*)) { _cb = cb; }
+    const ip_addr_t* getPeerAddress() const { return &_netif.gw; }
 
 protected:
     static constexpr size_t _bufsize = 128;

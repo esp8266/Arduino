@@ -97,7 +97,8 @@ void Wiznet5500::wizchip_write_word(uint8_t block, uint16_t address, uint16_t wo
     wizchip_write(block, address + 1, (uint8_t)word);
 }
 
-void Wiznet5500::wizchip_write_buf(uint8_t block, uint16_t address, const uint8_t* pBuf, uint16_t len)
+void Wiznet5500::wizchip_write_buf(uint8_t block, uint16_t address, const uint8_t* pBuf,
+                                   uint16_t len)
 {
     uint16_t i;
 
@@ -277,11 +278,7 @@ int8_t Wiznet5500::wizphy_setphypmode(uint8_t pmode)
     return -1;
 }
 
-Wiznet5500::Wiznet5500(int8_t cs, SPIClass& spi, int8_t intr) :
-    _spi(spi), _cs(cs)
-{
-    (void)intr;
-}
+Wiznet5500::Wiznet5500(int8_t cs, SPIClass& spi, int8_t intr) : _spi(spi), _cs(cs) { (void)intr; }
 
 boolean Wiznet5500::begin(const uint8_t* mac_address)
 {

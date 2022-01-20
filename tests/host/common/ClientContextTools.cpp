@@ -37,7 +37,8 @@
 
 #include <netdb.h>  // gethostbyname
 
-err_t dns_gethostbyname(const char* hostname, ip_addr_t* addr, dns_found_callback found, void* callback_arg)
+err_t dns_gethostbyname(const char* hostname, ip_addr_t* addr, dns_found_callback found,
+                        void* callback_arg)
 {
     (void)callback_arg;
     (void)found;

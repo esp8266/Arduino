@@ -8,8 +8,8 @@
   dns0=10.43.1.254
   Try me at these addresses:
   (with 'telnet <addr> or 'nc -u <addr> 23')
-  IF='st'(0) IPv6=0 local=0 hostname='ipv6test' addr= 10.43.1.244 / mask:255.255.255.0 / gw:10.43.1.254
-  IF='st'(0) IPv6=1 local=1 hostname='ipv6test' addr= fe80::1afe:34ff:fed1:cec7
+  IF='st'(0) IPv6=0 local=0 hostname='ipv6test' addr= 10.43.1.244 / mask:255.255.255.0 /
+  gw:10.43.1.254 IF='st'(0) IPv6=1 local=1 hostname='ipv6test' addr= fe80::1afe:34ff:fed1:cec7
   IF='st'(0) IPV6=1 local=0 hostname='ipv6test' addr= 2xxx:xxxx:xxxx:xxxx:1afe:34ff:fed1:cec7
   resolving www.google.com: 216.58.205.100
   resolving ipv6.google.com: 2a00:1450:4002:808::200e
@@ -79,17 +79,11 @@ void status(Print& out) {
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
-    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a.ifname().c_str(),
-               a.isV6(),
-               a.isLocal(),
-               a.ifhostname(),
-               a.toString().c_str());
+    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s", a.ifname().c_str(), a.isV6(),
+               a.isLocal(), a.ifhostname(), a.toString().c_str());
 
     if (a.isLegacy()) {
-      out.printf(" / mask:%s / gw:%s",
-                 a.netmask().toString().c_str(),
-                 a.gw().toString().c_str());
+      out.printf(" / mask:%s / gw:%s", a.netmask().toString().c_str(), a.gw().toString().c_str());
     }
 
     out.println();

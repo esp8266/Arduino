@@ -22,9 +22,7 @@ static int   errors = 0;
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)
 
-static void
-_DEFUN(checkit, (ok, l),
-       int ok _AND int l)
+static void _DEFUN(checkit, (ok, l), int ok _AND int l)
 
 {
     //  newfunc(it);
@@ -40,9 +38,7 @@ _DEFUN(checkit, (ok, l),
 /* Complain if first two args don't strcmp as equal.  */
 #define equal(a, b) funcqual(a, b, __LINE__);
 
-static void
-_DEFUN(funcqual, (a, b, l),
-       char* a _AND char* b _AND int l)
+static void _DEFUN(funcqual, (a, b, l), char* a _AND char* b _AND int l)
 {
     //  newfunc(it);
 
@@ -117,7 +113,7 @@ void libm_test_string()
     equal(one, "cd");
 
     /* strncat - first test it as strcat, with big counts,
-     then test the count mechanism.  */
+       then test the count mechanism.  */
     it = "strncat";
     (void)strcpy(one, "ijk");
     check(strncat(one, "lmn", 99) == one); /* Returned value. */
@@ -506,7 +502,7 @@ void libm_test_string()
     equal(one, "ax\045xe"); /* Unsigned char convert. */
 
     /* bcopy - much like memcpy.
-     Berklix manual is silent about overlap, so don't test it.  */
+       Berklix manual is silent about overlap, so don't test it.  */
     it = "bcopy";
     (void)bcopy("abc", one, 4);
     equal(one, "abc"); /* Simple copy. */

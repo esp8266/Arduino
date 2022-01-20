@@ -4,10 +4,8 @@
 #define mockverbose printf
 #include "common/MockEsp.cpp"  // getCycleCount
 
-//This won't work for
-template <typename argT>
-inline bool
-fuzzycomp(argT a, argT b)
+// This won't work for
+template <typename argT> inline bool fuzzycomp(argT a, argT b)
 {
     const argT epsilon = 10;
     return (std::max(a, b) - std::min(a, b) <= epsilon);

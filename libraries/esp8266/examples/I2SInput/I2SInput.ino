@@ -50,6 +50,5 @@ void setup() {
   }
 }
 
-void loop() {
-  /* Nothing here */
+void loop() { /* Nothing here */
 }

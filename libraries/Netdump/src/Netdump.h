@@ -57,7 +57,7 @@ private:
     Callback netDumpCallback = nullptr;
     Filter   netDumpFilter   = nullptr;
 
-    static void                                 capture(int netif_idx, const char* data, size_t len, int out, int success);
+    static void capture(int netif_idx, const char* data, size_t len, int out, int success);
     static CallBackList<LwipCallback>           lwipCallback;
     CallBackList<LwipCallback>::CallBackHandler lwipHandler;
 

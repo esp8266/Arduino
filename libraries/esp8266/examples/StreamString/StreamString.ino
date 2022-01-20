@@ -4,9 +4,7 @@
 #include <StreamDev.h>
 #include <StreamString.h>
 
-void loop() {
-  delay(1000);
-}
+void loop() { delay(1000); }
 
 void checksketch(const char* what, const char* res1, const char* res2) {
   if (strcmp(res1, res2) == 0) {
@@ -162,7 +160,8 @@ void testStreamString() {
     if (heap != 0) {
       check("heap is occupied by String/StreamString(progmem)", heapStr.c_str(), heapStr.c_str());
     } else {
-      check("ERROR: heap should be occupied by String/StreamString(progmem)", heapStr.c_str(), "-1");
+      check("ERROR: heap should be occupied by String/StreamString(progmem)", heapStr.c_str(),
+            "-1");
     }
   }
 
@@ -180,8 +179,8 @@ void setup() {
 
   testStreamString();
 
-  Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n",
-                (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
+  Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n", (int)sizeof(String),
+                (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
 }
 
 #endif

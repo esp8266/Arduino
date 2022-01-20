@@ -39,20 +39,11 @@ class UdpContext
 public:
     typedef std::function<void(void)> rxhandler_t;
 
-    UdpContext() :
-        _on_rx(nullptr), _refcnt(0)
-    {
-        _sock = mockUDPSocket();
-    }
+    UdpContext() : _on_rx(nullptr), _refcnt(0) { _sock = mockUDPSocket(); }
 
-    ~UdpContext()
-    {
-    }
+    ~UdpContext() { }
 
-    void ref()
-    {
-        ++_refcnt;
-    }
+    void ref() { ++_refcnt; }
 
     void unref()
     {
@@ -103,30 +94,18 @@ public:
     void setMulticastTTL(int ttl)
     {
         (void)ttl;
-        //mockverbose("TODO: UdpContext::setMulticastTTL\n");
+        // mockverbose("TODO: UdpContext::setMulticastTTL\n");
     }
 
-    netif* getInputNetif() const
-    {
-        return &netif0;
-    }
+    netif* getInputNetif() const { return &netif0; }
 
     // warning: handler is called from tcp stack context
     // esp_yield and non-reentrant functions which depend on it will fail
-    void onRx(rxhandler_t handler)
-    {
-        _on_rx = handler;
-    }
+    void onRx(rxhandler_t handler) { _on_rx = handler; }
 
-    size_t getSize()
-    {
-        return _inbufsize;
-    }
+    size_t getSize() { return _inbufsize; }
 
-    size_t tell() const
-    {
-        return 0;
-    }
+    size_t tell() const { return 0; }
 
     void seek(const size_t pos)
     {
@@ -138,25 +117,16 @@ public:
         mockUDPSwallow(pos, _inbuf, _inbufsize);
     }
 
-    bool isValidOffset(const size_t pos) const
-    {
-        return pos <= _inbufsize;
-    }
+    bool isValidOffset(const size_t pos) const { return pos <= _inbufsize; }
 
-    IPAddress getRemoteAddress()
-    {
-        return _dst.addr;
-    }
+    IPAddress getRemoteAddress() { return _dst.addr; }
 
-    uint16_t getRemotePort()
-    {
-        return _dstport;
-    }
+    uint16_t getRemotePort() { return _dstport; }
 
     IPAddress getDestAddress()
     {
         mockverbose("TODO: implement UDP getDestAddress\n");
-        return 0;  //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
+        return 0;  // ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
     }
 
     uint16_t getLocalPort()
@@ -196,8 +166,8 @@ public:
 
     void flush()
     {
-        //mockverbose("UdpContext::flush() does not follow arduino's flush concept\n");
-        //exit(EXIT_FAILURE);
+        // mockverbose("UdpContext::flush() does not follow arduino's flush concept\n");
+        // exit(EXIT_FAILURE);
         // would be:
         _inbufsize = 0;
     }
@@ -206,7 +176,8 @@ public:
     {
         if (size + _outbufsize > sizeof _outbuf)
         {
-            mockverbose("UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE, (size + _outbufsize));
+            mockverbose("UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE,
+                        (size + _outbufsize));
             exit(EXIT_FAILURE);
         }
 
@@ -219,17 +190,15 @@ public:
     {
         uint32_t dst     = addr ? addr->addr : _dst.addr;
         uint16_t dstport = port ?: _dstport;
-        size_t   wrt     = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
-        err_t    ret     = _outbufsize ? ERR_OK : ERR_ABRT;
+        size_t   wrt
+            = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
+        err_t ret = _outbufsize ? ERR_OK : ERR_ABRT;
         if (!keepBuffer || wrt == _outbufsize)
             cancelBuffer();
         return ret;
     }
 
-    void cancelBuffer()
-    {
-        _outbufsize = 0;
-    }
+    void cancelBuffer() { _outbufsize = 0; }
 
     bool send(ip_addr_t* addr = 0, uint16_t port = 0)
     {
@@ -266,7 +235,7 @@ private:
             memcpy(&ipv4, addr, 4);
             ip4_addr_set_u32(&ip_2_ip4(_dst), ipv4);
             // ^ this is a workaround for "type-punned pointer" with "*(uint32*)addr"
-            //ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
+            // ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
         }
         else
             mockverbose("TODO unhandled udp address of size %d\n", (int)addrsize);
@@ -297,4 +266,4 @@ extern "C" inline err_t igmp_joingroup(const ip4_addr_t* ifaddr, const ip4_addr_
     return ERR_OK;
 }
 
-#endif  //UDPCONTEXT_H
+#endif  // UDPCONTEXT_H

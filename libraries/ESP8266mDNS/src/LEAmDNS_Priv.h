@@ -46,8 +46,9 @@ namespace MDNSImplementation
 #endif
 
 //
-// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful probing
-// This allows to drive the responder in a environment, where 'update()' isn't called in the loop
+// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful
+// probing This allows to drive the responder in a environment, where 'update()' isn't called in the
+// loop
 //#define ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
 
 // Enable/disable debug trace macros
@@ -86,35 +87,34 @@ namespace MDNSImplementation
 #define DEBUG_OUTPUT Serial
 #endif
 #else
-#define DEBUG_EX_INFO(A) \
-    do                   \
-    {                    \
-        (void)0;         \
+#define DEBUG_EX_INFO(A)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
-#define DEBUG_EX_ERR(A) \
-    do                  \
-    {                   \
-        (void)0;        \
+#define DEBUG_EX_ERR(A)                                                                            \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
-#define DEBUG_EX_TX(A) \
-    do                 \
-    {                  \
-        (void)0;       \
+#define DEBUG_EX_TX(A)                                                                             \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
-#define DEBUG_EX_RX(A) \
-    do                 \
-    {                  \
-        (void)0;       \
+#define DEBUG_EX_RX(A)                                                                             \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
     } while (0)
 #endif
 
 /*  already defined in lwIP ('lwip/prot/dns.h')
     #ifdef MDNS_IP4_SUPPORT
-    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
-    #endif
-    #ifdef MDNS_IP6_SUPPORT
-    #define DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
-    #endif*/
+    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t
+   v4group = DNS_MQUERY_IPV4_GROUP_INIT #endif #ifdef MDNS_IP6_SUPPORT #define
+   DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group =
+   DNS_MQUERY_IPV6_GROUP_INIT #endif*/
 //#define MDNS_MULTICAST_PORT               5353
 
 /*
@@ -153,7 +153,8 @@ namespace MDNSImplementation
 /*
     Delay between and number of probes for host and service domains
     Delay between and number of announces for host and service domains
-    Delay between and number of service queries; the delay is multiplied by the resent number in '_checkServiceQueryCache'
+    Delay between and number of service queries; the delay is multiplied by the resent number in
+   '_checkServiceQueryCache'
 */
 #define MDNS_PROBE_DELAY 250
 #define MDNS_PROBE_COUNT 3

@@ -68,8 +68,7 @@
 #define TOO_MANY_ERRORS 11
 static int errors = 0;
 
-static void
-print_error(char const* msg, ...)
+static void print_error(char const* msg, ...)
 {
     errors++;
     if (errors == TOO_MANY_ERRORS)
@@ -108,12 +107,12 @@ void       memcpy_main(void)
     }
 
     /* Make calls to memcpy with block sizes ranging between 1 and
-     MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
+       MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
     for (sa = 0; sa <= MAX_OFFSET; sa++)
         for (da = 0; da <= MAX_OFFSET; da++)
             for (n = 1; n <= MAX_BLOCK_SIZE; n++)
             {
-                //printf (".");
+                // printf (".");
                 /* Zero dest so we can check it properly after the copying.  */
                 for (j = 0; j < BUFF_SIZE; j++)
                     dest[j] = 0;
@@ -129,8 +128,8 @@ void       memcpy_main(void)
                                 n, sa, da, ret, dest + START_COPY + da);
 
                 /* Check that content of the destination buffer
-             is the same as the source buffer, and
-             memory outside destination buffer is not modified.  */
+                   is the same as the source buffer, and
+                   memory outside destination buffer is not modified.  */
                 for (j = 0; j < BUFF_SIZE; j++)
                     if ((unsigned)j < START_COPY + da)
                     {

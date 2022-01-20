@@ -80,10 +80,7 @@ public:
     uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
 protected:
-    static constexpr bool interruptIsPossible()
-    {
-        return false;
-    }
+    static constexpr bool interruptIsPossible() { return false; }
 
     /**
         Read an Ethernet frame size
@@ -110,14 +107,18 @@ protected:
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
 private:
-    static const uint16_t TxBufferAddress = 0x4000;                    /* Internal Tx buffer address of the iinchip */
-    static const uint16_t RxBufferAddress = 0x6000;                    /* Internal Rx buffer address of the iinchip */
-    static const uint8_t  TxBufferSize    = 0x3;                       /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
-    static const uint8_t  RxBufferSize    = 0x3;                       /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
-    static const uint16_t TxBufferLength  = (1 << TxBufferSize) << 10; /* Length of Tx buffer in bytes */
-    static const uint16_t RxBufferLength  = (1 << RxBufferSize) << 10; /* Length of Rx buffer in bytes */
-    static const uint16_t TxBufferMask    = TxBufferLength - 1;
-    static const uint16_t RxBufferMask    = RxBufferLength - 1;
+    static const uint16_t TxBufferAddress = 0x4000; /* Internal Tx buffer address of the iinchip */
+    static const uint16_t RxBufferAddress = 0x6000; /* Internal Rx buffer address of the iinchip */
+    static const uint8_t  TxBufferSize
+        = 0x3; /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
+    static const uint8_t RxBufferSize
+        = 0x3; /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
+    static const uint16_t TxBufferLength = (1 << TxBufferSize)
+                                           << 10; /* Length of Tx buffer in bytes */
+    static const uint16_t RxBufferLength = (1 << RxBufferSize)
+                                           << 10; /* Length of Rx buffer in bytes */
+    static const uint16_t TxBufferMask = TxBufferLength - 1;
+    static const uint16_t RxBufferMask = RxBufferLength - 1;
 
     SPIClass& _spi;
     int8_t    _cs;
@@ -125,23 +126,17 @@ private:
 
     /**
         Default function to select chip.
-        @note This function help not to access wrong address. If you do not describe this function or register any functions,
-        null function is called.
+        @note This function help not to access wrong address. If you do not describe this function
+       or register any functions, null function is called.
     */
-    inline void wizchip_cs_select()
-    {
-        digitalWrite(_cs, LOW);
-    }
+    inline void wizchip_cs_select() { digitalWrite(_cs, LOW); }
 
     /**
         Default function to deselect chip.
-        @note This function help not to access wrong address. If you do not describe this function or register any functions,
-        null function is called.
+        @note This function help not to access wrong address. If you do not describe this function
+       or register any functions, null function is called.
     */
-    inline void wizchip_cs_deselect()
-    {
-        digitalWrite(_cs, HIGH);
-    }
+    inline void wizchip_cs_deselect() { digitalWrite(_cs, HIGH); }
 
     /**
         Read a 1 byte value from a register.
@@ -198,9 +193,9 @@ private:
         It copies data to internal TX memory
 
         @details This function reads the Tx write pointer register and after that,
-        it copies the <i>wizdata(pointer buffer)</i> of the length of <i>len(variable)</i> bytes to internal TX memory
-        and updates the Tx write pointer register.
-        This function is being called by send() and sendto() function also.
+        it copies the <i>wizdata(pointer buffer)</i> of the length of <i>len(variable)</i> bytes to
+       internal TX memory and updates the Tx write pointer register. This function is being called
+       by send() and sendto() function also.
 
         @param wizdata Pointer buffer to write data
         @param len Data length
@@ -224,7 +219,8 @@ private:
 
     /**
         It discard the received data in RX memory.
-        @details It discards the data of the length of <i>len(variable)</i> bytes in internal RX memory.
+        @details It discards the data of the length of <i>len(variable)</i> bytes in internal RX
+       memory.
         @param len Data length
     */
     void wizchip_recv_ignore(uint16_t len);
@@ -347,100 +343,72 @@ private:
         @param (uint8_t)mr The value to be set.
         @sa getMR()
     */
-    inline void setMR(uint8_t mode)
-    {
-        wizchip_write(MR, mode);
-    }
+    inline void setMR(uint8_t mode) { wizchip_write(MR, mode); }
 
     /**
         Get Mode Register
         @return uint8_t. The value of Mode register.
         @sa setMR()
     */
-    inline uint8_t getMR()
-    {
-        return wizchip_read(MR);
-    }
+    inline uint8_t getMR() { return wizchip_read(MR); }
 
     /**
         Set local MAC address
-        @param (uint8_t*)shar Pointer variable to set local MAC address. It should be allocated 6 bytes.
+        @param (uint8_t*)shar Pointer variable to set local MAC address. It should be allocated 6
+       bytes.
         @sa getSHAR()
     */
-    inline void setSHAR(const uint8_t* macaddr)
-    {
-        wizchip_write_buf(SHAR, macaddr, 6);
-    }
+    inline void setSHAR(const uint8_t* macaddr) { wizchip_write_buf(SHAR, macaddr, 6); }
 
     /**
         Get local MAC address
-        @param (uint8_t*)shar Pointer variable to get local MAC address. It should be allocated 6 bytes.
+        @param (uint8_t*)shar Pointer variable to get local MAC address. It should be allocated 6
+       bytes.
         @sa setSHAR()
     */
-    inline void getSHAR(uint8_t* macaddr)
-    {
-        wizchip_read_buf(SHAR, macaddr, 6);
-    }
+    inline void getSHAR(uint8_t* macaddr) { wizchip_read_buf(SHAR, macaddr, 6); }
 
     /**
         Get @ref Sn_TX_WR register
         @param (uint16_t)txwr Value to set @ref Sn_TX_WR
         @sa GetSn_TX_WR()
     */
-    inline uint16_t getSn_TX_WR()
-    {
-        return wizchip_read_word(Sn_TX_WR);
-    }
+    inline uint16_t getSn_TX_WR() { return wizchip_read_word(Sn_TX_WR); }
 
     /**
         Set @ref Sn_TX_WR register
         @param (uint16_t)txwr Value to set @ref Sn_TX_WR
         @sa GetSn_TX_WR()
     */
-    inline void setSn_TX_WR(uint16_t txwr)
-    {
-        wizchip_write_word(Sn_TX_WR, txwr);
-    }
+    inline void setSn_TX_WR(uint16_t txwr) { wizchip_write_word(Sn_TX_WR, txwr); }
 
     /**
         Get @ref Sn_RX_RD register
         @regurn uint16_t. Value of @ref Sn_RX_RD.
         @sa setSn_RX_RD()
     */
-    inline uint16_t getSn_RX_RD()
-    {
-        return wizchip_read_word(Sn_RX_RD);
-    }
+    inline uint16_t getSn_RX_RD() { return wizchip_read_word(Sn_RX_RD); }
 
     /**
         Set @ref Sn_RX_RD register
         @param (uint16_t)rxrd Value to set @ref Sn_RX_RD
         @sa getSn_RX_RD()
     */
-    inline void setSn_RX_RD(uint16_t rxrd)
-    {
-        wizchip_write_word(Sn_RX_RD, rxrd);
-    }
+    inline void setSn_RX_RD(uint16_t rxrd) { wizchip_write_word(Sn_RX_RD, rxrd); }
 
     /**
         Set @ref Sn_MR register
         @param (uint8_t)mr Value to set @ref Sn_MR
         @sa getSn_MR()
     */
-    inline void setSn_MR(uint8_t mr)
-    {
-        wizchip_write(Sn_MR, mr);
-    }
+    inline void setSn_MR(uint8_t mr) { wizchip_write(Sn_MR, mr); }
 
     /**
         Get @ref Sn_MR register
         @return uint8_t. Value of @ref Sn_MR.
         @sa setSn_MR()
     */
-    inline uint8_t getSn_MR()
-    {
-        return wizchip_read(Sn_MR);
-    }
+    inline uint8_t getSn_MR() { return wizchip_read(Sn_MR); }
 
     /**
         Set @ref Sn_CR register, then wait for the command to execute
@@ -454,39 +422,27 @@ private:
         @return uint8_t. Value of @ref Sn_CR.
         @sa setSn_CR()
     */
-    inline uint8_t getSn_CR()
-    {
-        return wizchip_read(Sn_CR);
-    }
+    inline uint8_t getSn_CR() { return wizchip_read(Sn_CR); }
 
     /**
         Get @ref Sn_SR register
         @return uint8_t. Value of @ref Sn_SR.
     */
-    inline uint8_t getSn_SR()
-    {
-        return wizchip_read(Sn_SR);
-    }
+    inline uint8_t getSn_SR() { return wizchip_read(Sn_SR); }
 
     /**
         Get @ref Sn_IR register
         @return uint8_t. Value of @ref Sn_IR.
         @sa setSn_IR()
     */
-    inline uint8_t getSn_IR()
-    {
-        return wizchip_read(Sn_IR);
-    }
+    inline uint8_t getSn_IR() { return wizchip_read(Sn_IR); }
 
     /**
         Set @ref Sn_IR register
         @param (uint8_t)ir Value to set @ref Sn_IR
         @sa getSn_IR()
     */
-    inline void setSn_IR(uint8_t ir)
-    {
-        wizchip_write(Sn_IR, ir);
-    }
+    inline void setSn_IR(uint8_t ir) { wizchip_write(Sn_IR, ir); }
 };
 
 #endif  // W5100_H

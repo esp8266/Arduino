@@ -69,7 +69,7 @@ static bool                               time_machine_run_once = false;
 // OPTIONAL: change SNTP startup delay
 // a weak function is already defined and returns 0 (RFC violation)
 // it can be redefined:
-//uint32_t sntp_startup_delay_MS_rfc_not_less_than_60000 ()
+// uint32_t sntp_startup_delay_MS_rfc_not_less_than_60000 ()
 //{
 //    //info_sntp_startup_delay_MS_rfc_not_less_than_60000_has_been_called = true;
 //    return 60000; // 60s (or lwIP's original default: (random() % 5000))
@@ -78,14 +78,14 @@ static bool                               time_machine_run_once = false;
 // OPTIONAL: change SNTP update delay
 // a weak function is already defined and returns 1 hour
 // it can be redefined:
-//uint32_t sntp_update_delay_MS_rfc_not_less_than_15000 ()
+// uint32_t sntp_update_delay_MS_rfc_not_less_than_15000 ()
 //{
 //    //info_sntp_update_delay_MS_rfc_not_less_than_15000_has_been_called = true;
 //    return 15000; // 15s
 //}
 
-#define PTM(w)              \
-  Serial.print(" " #w "="); \
+#define PTM(w)                                                                                     \
+  Serial.print(" " #w "=");                                                                        \
   Serial.print(tm->tm_##w);
 
 void printTm(const char* what, const tm* tm) {
@@ -156,8 +156,7 @@ void showTime() {
       } else {
         Serial.printf("%s ", sntp.toString().c_str());
       }
-      Serial.printf("- IPv6: %s - Reachability: %o\n",
-                    sntp.isV6() ? "Yes" : "No",
+      Serial.printf("- IPv6: %s - Reachability: %o\n", sntp.isV6() ? "Yes" : "No",
                     sntp_getreachability(i));
     }
   }
@@ -173,11 +172,10 @@ void showTime() {
     gettimeofday(&tv, nullptr);
     if (tv.tv_sec != prevtv.tv_sec) {
       Serial.printf("time(): %u   gettimeofday(): %u.%06u  seconds are unchanged\n",
-                    (uint32_t)prevtime,
-                    (uint32_t)prevtv.tv_sec, (uint32_t)prevtv.tv_usec);
+                    (uint32_t)prevtime, (uint32_t)prevtv.tv_sec, (uint32_t)prevtv.tv_usec);
       Serial.printf("time(): %u   gettimeofday(): %u.%06u  <-- seconds have changed\n",
-                    (uint32_t)(prevtime = time(nullptr)),
-                    (uint32_t)tv.tv_sec, (uint32_t)tv.tv_usec);
+                    (uint32_t)(prevtime = time(nullptr)), (uint32_t)tv.tv_sec,
+                    (uint32_t)tv.tv_usec);
       break;
     }
     prevtv = tv;
@@ -216,8 +214,7 @@ void time_is_set(bool from_sntp /* <= this parameter is optional */) {
   if (time_machine_running) {
     now          = time(nullptr);
     const tm* tm = localtime(&now);
-    Serial.printf(": future=%3ddays: DST=%s - ",
-                  time_machine_days,
+    Serial.printf(": future=%3ddays: DST=%s - ", time_machine_days,
                   tm->tm_isdst ? "true " : "false");
     Serial.print(ctime(&now));
     gettimeofday(&tv, nullptr);
@@ -265,10 +262,10 @@ void setup() {
 
   // Former configTime is still valid, here is the call for 7 hours to the west
   // with an enabled 30mn DST
-  //configTime(7 * 3600, 3600 / 2, "pool.ntp.org");
+  // configTime(7 * 3600, 3600 / 2, "pool.ntp.org");
 
   // OPTIONAL: disable obtaining SNTP servers from DHCP
-  //sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)
+  // sntp_servermode_dhcp(0); // 0: disable obtaining SNTP servers from DHCP (enabled by default)
 
   // Give now a chance to the settimeofday callback,
   // because it is *always* deferred to the next yield()/loop()-call.

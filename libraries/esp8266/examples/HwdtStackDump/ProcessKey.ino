@@ -32,7 +32,8 @@ void processKey(Print& out, int hotKey) {
                    "mov.n a5, %3\n\t"
                    "mov.n a6, %4\n\t"
                    :
-                   : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa)
+                   : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa),
+                     "r"(0xaaaaaaaa)
                    : "memory");
       // Could not find these in the stack dump, unless interrupts were enabled.
       {
@@ -62,7 +63,8 @@ void processKey(Print& out, int hotKey) {
       break;
     case 'w':
       out.println(F("Now calling: void crashMeIfYouCan(void)__attribute__((weak));"));
-      out.println(F("This function has a prototype but was missing when the sketch was linked. ..."));
+      out.println(
+          F("This function has a prototype but was missing when the sketch was linked. ..."));
       crashMeIfYouCan();
       break;
     case 'b':
@@ -90,8 +92,10 @@ void processKey(Print& out, int hotKey) {
       out.println(F("  s    - Software WDT"));
       out.println(F("  h    - Hardware WDT - looping with interrupts disabled"));
       out.println(F("  w    - Hardware WDT - calling a missing (weak) function."));
-      out.println(F("  0    - Hardware WDT - a hard coded compiler breakpoint from a compile time detected divide by zero"));
-      out.println(F("  b    - Hardware WDT - a forgotten hard coded 'break 1, 15;' and no GDB running."));
+      out.println(F("  0    - Hardware WDT - a hard coded compiler breakpoint from a compile time "
+                    "detected divide by zero"));
+      out.println(
+          F("  b    - Hardware WDT - a forgotten hard coded 'break 1, 15;' and no GDB running."));
       out.println(F("  z    - Divide by zero, exception(0);"));
       out.println(F("  p    - panic();"));
       out.println();
@@ -106,12 +110,8 @@ void processKey(Print& out, int hotKey) {
 
 // With the current toolchain 10.1, using this to divide by zero will *not* be
 // caught at compile time.
-int __attribute__((noinline)) divideA_B(int a, int b) {
-  return (a / b);
-}
+int __attribute__((noinline)) divideA_B(int a, int b) { return (a / b); }
 
 // With the current toolchain 10.1, using this to divide by zero *will* be
 // caught at compile time. And a hard coded breakpoint will be inserted.
-int divideA_B_bp(int a, int b) {
-  return (a / b);
-}
+int divideA_B_bp(int a, int b) { return (a / b); }

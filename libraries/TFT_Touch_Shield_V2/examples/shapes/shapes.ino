@@ -10,8 +10,8 @@ void setup() {
 }
 
 void loop() {
-  for (int r = 0; r < 115; r = r + 2) {           //set r : 0--115
-    Tft.drawCircle(119, 160, r, random(0xFFFF));  //draw circle, center:(119, 160), color: random
+  for (int r = 0; r < 115; r = r + 2) {           // set r : 0--115
+    Tft.drawCircle(119, 160, r, random(0xFFFF));  // draw circle, center:(119, 160), color: random
   }
   delay(10);
 }

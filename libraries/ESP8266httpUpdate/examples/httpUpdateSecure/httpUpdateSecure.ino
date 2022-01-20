@@ -72,7 +72,8 @@ void setup() {
   Serial.print(F("Number of CA certs read: "));
   Serial.println(numCerts);
   if (numCerts == 0) {
-    Serial.println(F("No certs found. Did you run certs-from-mozill.py and upload the LittleFS directory before running?"));
+    Serial.println(F("No certs found. Did you run certs-from-mozill.py and upload the LittleFS "
+                     "directory before running?"));
     return;  // Can't connect to anything w/o certs!
   }
 }
@@ -83,7 +84,8 @@ void loop() {
     setClock();
 
     BearSSL::WiFiClientSecure client;
-    bool                      mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
+    bool                      mfln = client.probeMaxFragmentLength(
+        "server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
     Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
       client.setBufferSizes(1024, 1024);
@@ -100,11 +102,12 @@ void loop() {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
     // Or:
-    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
+    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(),
+                      ESPhttpUpdate.getLastErrorString().c_str());
         break;
 
       case HTTP_UPDATE_NO_UPDATES:

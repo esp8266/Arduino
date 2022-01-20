@@ -58,10 +58,7 @@ int serverAccept(int srvsock)
     return mockSockSetup(clisock);
 }
 
-void WiFiServer::begin(uint16_t port)
-{
-    return begin(port, !0);
-}
+void WiFiServer::begin(uint16_t port) { return begin(port, !0); }
 
 void WiFiServer::begin(uint16_t port, uint8_t backlog)
 {
@@ -81,7 +78,8 @@ void WiFiServer::begin()
     if (mockport < 1024 && mock_port_shifter)
     {
         mockport += mock_port_shifter;
-        fprintf(stderr, MOCK "=====> WiFiServer port: %d shifted to %d (use option -s) <=====\n", _port, mockport);
+        fprintf(stderr, MOCK "=====> WiFiServer port: %d shifted to %d (use option -s) <=====\n",
+                _port, mockport);
     }
     else
         fprintf(stderr, MOCK "=====> WiFiServer port: %d <=====\n", mockport);
@@ -133,10 +131,7 @@ void WiFiServer::close()
     _listen_pcb = int2pcb(-1);
 }
 
-void WiFiServer::stop()
-{
-    close();
-}
+void WiFiServer::stop() { close(); }
 
 size_t WiFiServer::hasClientData()
 {
@@ -144,7 +139,8 @@ size_t WiFiServer::hasClientData()
     // There is no waiting list of clients in this trivial mocking code,
     // so the code has to act as if the tcp backlog list is full,
     // and nothing is known about potential further clients.
-    // It could be implemented by accepting new clients and store their data until the current one is closed.
+    // It could be implemented by accepting new clients and store their data until the current one
+    // is closed.
     return 0;
 }
 

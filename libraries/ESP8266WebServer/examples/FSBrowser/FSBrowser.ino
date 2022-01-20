@@ -92,17 +92,11 @@ static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 ////////////////////////////////
 // Utils to return HTTP codes, and determine content-type
 
-void replyOK() {
-  server.send(200, FPSTR(TEXT_PLAIN), "");
-}
+void replyOK() { server.send(200, FPSTR(TEXT_PLAIN), ""); }
 
-void replyOKWithMsg(String msg) {
-  server.send(200, FPSTR(TEXT_PLAIN), msg);
-}
+void replyOKWithMsg(String msg) { server.send(200, FPSTR(TEXT_PLAIN), msg); }
 
-void replyNotFound(String msg) {
-  server.send(404, FPSTR(TEXT_PLAIN), msg);
-}
+void replyNotFound(String msg) { server.send(404, FPSTR(TEXT_PLAIN), msg); }
 
 void replyBadRequest(String msg) {
   DBG_OUTPUT_PORT.println(msg);
@@ -116,8 +110,8 @@ void replyServerError(String msg) {
 
 #ifdef USE_SPIFFS
 /*
-   Checks filename for character combinations that are not supported by FSBrowser (alhtough valid on SPIFFS).
-   Returns an empty String if supported, or detail of error(s) if unsupported
+   Checks filename for character combinations that are not supported by FSBrowser (alhtough valid on
+   SPIFFS). Returns an empty String if supported, or detail of error(s) if unsupported
 */
 String checkForUnsupportedPath(String filename) {
   String error = String();
@@ -379,9 +373,9 @@ void handleFileCreate() {
    If it's a file, delete it.
    If it's a folder, delete all nested contents first then the folder itself
 
-   IMPORTANT NOTE: using recursion is generally not recommended on embedded devices and can lead to crashes (stack overflow errors).
-   This use is just for demonstration purpose, and FSBrowser might crash in case of deeply nested filesystems.
-   Please don't do this on a production system.
+   IMPORTANT NOTE: using recursion is generally not recommended on embedded devices and can lead to
+   crashes (stack overflow errors). This use is just for demonstration purpose, and FSBrowser might
+   crash in case of deeply nested filesystems. Please don't do this on a production system.
 */
 void deleteRecursive(String path) {
   File file  = fileSystem->open(path, "r");
@@ -513,9 +507,8 @@ void handleNotFound() {
 
 /*
    This specific handler returns the index.htm (or a gzipped version) from the /edit folder.
-   If the file is not present but the flag INCLUDE_FALLBACK_INDEX_HTM has been set, falls back to the version
-   embedded in the program code.
-   Otherwise, fails with a 404 page with debug information
+   If the file is not present but the flag INCLUDE_FALLBACK_INDEX_HTM has been set, falls back to
+   the version embedded in the program code. Otherwise, fails with a 404 page with debug information
 */
 void handleGetEdit() {
   if (handleFileRead(F("/edit/index.htm"))) {
@@ -550,8 +543,9 @@ void setup(void) {
   Dir dir = fileSystem->openDir("");
   DBG_OUTPUT_PORT.println(F("List of files at root of filesystem:"));
   while (dir.next()) {
-    String error    = checkForUnsupportedPath(dir.fileName());
-    String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
+    String error = checkForUnsupportedPath(dir.fileName());
+    String fileInfo
+        = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
     DBG_OUTPUT_PORT.println(error + fileInfo);
     if (error.length() > 0) {
       unsupportedFiles += error + fileInfo + '\n';

@@ -117,9 +117,9 @@ void setup() {
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
   delay(10);
-  Serial.println("\r\n\r\nThis sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'");
+  Serial.println("\r\n\r\nThis sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd "
+                 "Heap (shared)'");
 }
 
-void loop(void) {
-}
+void loop(void) { }
 #endif

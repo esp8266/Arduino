@@ -17,21 +17,13 @@ Ticker tickerSetLow;
 Ticker tickerSetHigh;
 Ticker tickerSetChar;
 
-void setPinLow() {
-  digitalWrite(LED_BUILTIN, 0);
-}
+void setPinLow() { digitalWrite(LED_BUILTIN, 0); }
 
-void setPinHigh() {
-  digitalWrite(LED_BUILTIN, 1);
-}
+void setPinHigh() { digitalWrite(LED_BUILTIN, 1); }
 
-void setPin(int state) {
-  digitalWrite(LED_BUILTIN, state);
-}
+void setPin(int state) { digitalWrite(LED_BUILTIN, state); }
 
-void setPinChar(char state) {
-  digitalWrite(LED_BUILTIN, state);
-}
+void setPinChar(char state) { digitalWrite(LED_BUILTIN, state); }
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -46,5 +38,4 @@ void setup() {
   tickerSetChar.attach_ms(26, setPinChar, (char)1);
 }
 
-void loop() {
-}
+void loop() { }

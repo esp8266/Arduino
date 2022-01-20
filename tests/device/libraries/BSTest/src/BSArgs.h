@@ -32,38 +32,39 @@ namespace protocol
     } split_state_t;
 
 /* helper macro, called when done with an argument */
-#define END_ARG()                      \
-    do                                 \
-    {                                  \
-        char_out     = 0;              \
-        argv[argc++] = next_arg_start; \
-        state        = SS_SPACE;       \
+#define END_ARG()                                                                                  \
+    do                                                                                             \
+    {                                                                                              \
+        char_out     = 0;                                                                          \
+        argv[argc++] = next_arg_start;                                                             \
+        state        = SS_SPACE;                                                                   \
     } while (0);
 
     /**
- * @brief Split command line into arguments in place
- *
- * - This function finds whitespace-separated arguments in the given input line.
- *
- *     'abc def 1 20 .3' -> [ 'abc', 'def', '1', '20', '.3' ]
- *
- * - Argument which include spaces may be surrounded with quotes. In this case
- *   spaces are preserved and quotes are stripped.
- *
- *     'abc "123 456" def' -> [ 'abc', '123 456', 'def' ]
- *
- * - Escape sequences may be used to produce backslash, double quote, and space:
- *
- *     'a\ b\\c\"' -> [ 'a b\c"' ]
- *
- * Pointers to at most argv_size - 1 arguments are returned in argv array.
- * The pointer after the last one (i.e. argv[argc]) is set to NULL.
- *
- * @param line pointer to buffer to parse; it is modified in place
- * @param argv array where the pointers to arguments are written
- * @param argv_size number of elements in argv_array (max. number of arguments will be argv_size - 1)
- * @return number of arguments found (argc)
- */
+     * @brief Split command line into arguments in place
+     *
+     * - This function finds whitespace-separated arguments in the given input line.
+     *
+     *     'abc def 1 20 .3' -> [ 'abc', 'def', '1', '20', '.3' ]
+     *
+     * - Argument which include spaces may be surrounded with quotes. In this case
+     *   spaces are preserved and quotes are stripped.
+     *
+     *     'abc "123 456" def' -> [ 'abc', '123 456', 'def' ]
+     *
+     * - Escape sequences may be used to produce backslash, double quote, and space:
+     *
+     *     'a\ b\\c\"' -> [ 'a b\c"' ]
+     *
+     * Pointers to at most argv_size - 1 arguments are returned in argv array.
+     * The pointer after the last one (i.e. argv[argc]) is set to NULL.
+     *
+     * @param line pointer to buffer to parse; it is modified in place
+     * @param argv array where the pointers to arguments are written
+     * @param argv_size number of elements in argv_array (max. number of arguments will be argv_size
+     * - 1)
+     * @return number of arguments found (argc)
+     */
     inline size_t split_args(char* line, char** argv, size_t argv_size)
     {
         const int     QUOTE          = '"';
@@ -174,4 +175,4 @@ namespace protocol
 
 }  // namespace bs
 
-#endif  //BS_ARGS_H
+#endif  // BS_ARGS_H

@@ -103,7 +103,8 @@ void setup() {
 
   MDNS.begin(host);
 
-  httpServer.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
+  httpServer.getServer().setRSACert(new BearSSL::X509List(serverCert),
+                                    new BearSSL::PrivateKey(serverKey));
   httpUpdater.setup(&httpServer, update_path, update_username, update_password);
   httpServer.begin();
 

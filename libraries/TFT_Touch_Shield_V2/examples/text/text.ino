@@ -23,8 +23,8 @@ void setup() {
 
   Tft.drawString("Hello", 0, 180, 3, CYAN);  // draw string: "hello", (0, 180), size: 3, color: CYAN
 
-  Tft.drawString("World!!", 60, 220, 4, WHITE);  // draw string: "world!!", (80, 230), size: 4, color: WHITE
+  Tft.drawString("World!!", 60, 220, 4,
+                 WHITE);  // draw string: "world!!", (80, 230), size: 4, color: WHITE
 }
 
-void loop() {
-}
+void loop() { }

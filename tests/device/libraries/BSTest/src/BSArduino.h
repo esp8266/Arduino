@@ -7,10 +7,7 @@ namespace bs
 class ArduinoIOHelper
 {
 public:
-    ArduinoIOHelper(Stream& stream) :
-        m_stream(stream)
-    {
-    }
+    ArduinoIOHelper(Stream& stream) : m_stream(stream) { }
 
     size_t printf(const char* format, ...)
     {
@@ -72,11 +69,8 @@ protected:
 
 typedef ArduinoIOHelper IOHelper;
 
-inline void fatal()
-{
-    ESP.restart();
-}
+inline void fatal() { ESP.restart(); }
 
 }  // namespace bs
 
-#endif  //BS_ARDUINO_H
+#endif  // BS_ARDUINO_H

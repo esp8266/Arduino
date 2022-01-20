@@ -62,9 +62,7 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
     return false;
 }
 
-void DhcpServer::end()
-{
-}
+void DhcpServer::end() { }
 
 bool DhcpServer::begin(struct ip_info* info)
 {
@@ -72,15 +70,9 @@ bool DhcpServer::begin(struct ip_info* info)
     return false;
 }
 
-DhcpServer::DhcpServer(netif* netif)
-{
-    (void)netif;
-}
+DhcpServer::DhcpServer(netif* netif) { (void)netif; }
 
-DhcpServer::~DhcpServer()
-{
-    end();
-}
+DhcpServer::~DhcpServer() { end(); }
 
 DhcpServer dhcpSoftAP(nullptr);
 
@@ -89,35 +81,17 @@ extern "C"
 #include <user_interface.h>
 #include <lwip/netif.h>
 
-    uint8 wifi_get_opmode(void)
-    {
-        return STATION_MODE;
-    }
+    uint8 wifi_get_opmode(void) { return STATION_MODE; }
 
-    phy_mode_t wifi_get_phy_mode(void)
-    {
-        return PHY_MODE_11N;
-    }
+    phy_mode_t wifi_get_phy_mode(void) { return PHY_MODE_11N; }
 
-    uint8 wifi_get_channel(void)
-    {
-        return 1;
-    }
+    uint8 wifi_get_channel(void) { return 1; }
 
-    uint8 wifi_station_get_current_ap_id(void)
-    {
-        return 0;
-    }
+    uint8 wifi_station_get_current_ap_id(void) { return 0; }
 
-    station_status_t wifi_station_get_connect_status(void)
-    {
-        return STATION_GOT_IP;
-    }
+    station_status_t wifi_station_get_connect_status(void) { return STATION_GOT_IP; }
 
-    uint8 wifi_station_get_auto_connect(void)
-    {
-        return 1;
-    }
+    uint8 wifi_station_get_auto_connect(void) { return 1; }
 
     bool wifi_station_get_config(struct station_config* config)
     {
@@ -134,9 +108,7 @@ extern "C"
         return true;
     }
 
-    void wifi_fpm_close(void)
-    {
-    }
+    void wifi_fpm_close(void) { }
 
     sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us)
     {
@@ -144,18 +116,11 @@ extern "C"
         return 1;
     }
 
-    void wifi_fpm_do_wakeup(void)
-    {
-    }
+    void wifi_fpm_do_wakeup(void) { }
 
-    void wifi_fpm_open(void)
-    {
-    }
+    void wifi_fpm_open(void) { }
 
-    void wifi_fpm_set_sleep_type(sleep_type_t type)
-    {
-        (void)type;
-    }
+    void wifi_fpm_set_sleep_type(sleep_type_t type) { (void)type; }
 
     uint32_t global_ipv4_netfmt = 0;  // global binding
 
@@ -185,20 +150,22 @@ extern "C"
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
-            if (ifa->ifa_addr
-                && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
             )
             {
-                auto test_ipv4 = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
+                auto test_ipv4
+                    = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
                 mockverbose(" IPV4 (0x%08lx)", test_ipv4);
                 if ((test_ipv4 & 0xff000000) == 0x7f000000)
                     // 127./8
                     mockverbose(" (local, ignored)");
                 else
                 {
-                    if (!host_interface || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
+                    if (!host_interface
+                        || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
                     {
-                        // use the first non-local interface, or, if specified, the one selected by user on cmdline
+                        // use the first non-local interface, or, if specified, the one selected by
+                        // user on cmdline
                         ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
                         mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
                         mockverbose(" (selected)\n");
@@ -215,7 +182,7 @@ extern "C"
             freeifaddrs(ifAddrStruct);
 
         (void)if_index;
-        //if (if_index != STATION_IF)
+        // if (if_index != STATION_IF)
         //	fprintf(stderr, "we are not AP");
 
         if (global_ipv4_netfmt == NO_GLOBAL_BINDING)
@@ -237,10 +204,7 @@ extern "C"
         return true;
     }
 
-    uint8 wifi_get_listen_interval(void)
-    {
-        return 1;
-    }
+    uint8 wifi_get_listen_interval(void) { return 1; }
 
     bool wifi_get_macaddr(uint8 if_index, uint8* macaddr)
     {
@@ -254,24 +218,15 @@ extern "C"
         return true;
     }
 
-    uint8 wifi_get_opmode_default(void)
-    {
-        return STATION_MODE;
-    }
+    uint8 wifi_get_opmode_default(void) { return STATION_MODE; }
 
 #ifdef NONOSDK3V0
 
-    sleep_level_t wifi_get_sleep_level(void)
-    {
-        return MIN_SLEEP_T;
-    }
+    sleep_level_t wifi_get_sleep_level(void) { return MIN_SLEEP_T; }
 
 #endif  // nonos-sdk-pre-3
 
-    sleep_type_t wifi_get_sleep_type(void)
-    {
-        return NONE_SLEEP_T;
-    }
+    sleep_type_t wifi_get_sleep_type(void) { return NONE_SLEEP_T; }
 
     bool wifi_set_channel(uint8 channel)
     {
@@ -331,25 +286,13 @@ extern "C"
         return true;
     }
 
-    bool wifi_station_connect(void)
-    {
-        return true;
-    }
+    bool wifi_station_connect(void) { return true; }
 
-    bool wifi_station_dhcpc_start(void)
-    {
-        return true;
-    }
+    bool wifi_station_dhcpc_start(void) { return true; }
 
-    bool wifi_station_dhcpc_stop(void)
-    {
-        return true;
-    }
+    bool wifi_station_dhcpc_stop(void) { return true; }
 
-    bool wifi_station_disconnect(void)
-    {
-        return true;
-    }
+    bool wifi_station_disconnect(void) { return true; }
 
     bool wifi_station_get_config_default(struct station_config* config)
     {
@@ -362,20 +305,11 @@ extern "C"
         return strcpy(wifi_station_get_hostname_str, "esposix");
     }
 
-    bool wifi_station_get_reconnect_policy()
-    {
-        return true;
-    }
+    bool wifi_station_get_reconnect_policy() { return true; }
 
-    sint8 wifi_station_get_rssi(void)
-    {
-        return 5;
-    }
+    sint8 wifi_station_get_rssi(void) { return 5; }
 
-    bool wifi_station_set_auto_connect(uint8 set)
-    {
-        return set != 0;
-    }
+    bool wifi_station_set_auto_connect(uint8 set) { return set != 0; }
 
     bool wifi_station_set_config(struct station_config* config)
     {
@@ -401,25 +335,13 @@ extern "C"
         return true;
     }
 
-    void system_phy_set_max_tpw(uint8 max_tpw)
-    {
-        (void)max_tpw;
-    }
+    void system_phy_set_max_tpw(uint8 max_tpw) { (void)max_tpw; }
 
-    bool wifi_softap_dhcps_start(void)
-    {
-        return true;
-    }
+    bool wifi_softap_dhcps_start(void) { return true; }
 
-    enum dhcp_status wifi_softap_dhcps_status(void)
-    {
-        return DHCP_STARTED;
-    }
+    enum dhcp_status wifi_softap_dhcps_status(void) { return DHCP_STARTED; }
 
-    bool wifi_softap_dhcps_stop(void)
-    {
-        return true;
-    }
+    bool wifi_softap_dhcps_stop(void) { return true; }
 
     bool wifi_softap_get_config(struct softap_config* config)
     {
@@ -439,10 +361,7 @@ extern "C"
         return wifi_softap_get_config(config);
     }
 
-    uint8 wifi_softap_get_station_num(void)
-    {
-        return 2;
-    }
+    uint8 wifi_softap_get_station_num(void) { return 2; }
 
     bool wifi_softap_set_config(struct softap_config* config)
     {
@@ -487,15 +406,9 @@ extern "C"
     ///////////////////////////////////////
     // not user_interface
 
-    void ets_isr_mask(int intr)
-    {
-        (void)intr;
-    }
+    void ets_isr_mask(int intr) { (void)intr; }
 
-    void ets_isr_unmask(int intr)
-    {
-        (void)intr;
-    }
+    void ets_isr_unmask(int intr) { (void)intr; }
 
     void dns_setserver(u8_t numdns, ip_addr_t* dnsserver)
     {
@@ -513,19 +426,13 @@ extern "C"
 #include <smartconfig.h>
     bool smartconfig_start(sc_callback_t cb, ...)
     {
-        //XXXFIXME ... -> ptr
+        // XXXFIXME ... -> ptr
         cb(SC_STATUS_LINK, NULL);
         return true;
     }
 
-    bool smartconfig_stop(void)
-    {
-        return true;
-    }
+    bool smartconfig_stop(void) { return true; }
 
-    sleep_type_t wifi_fpm_get_sleep_type(void)
-    {
-        return NONE_SLEEP_T;
-    }
+    sleep_type_t wifi_fpm_get_sleep_type(void) { return NONE_SLEEP_T; }
 
 }  // extern "C"

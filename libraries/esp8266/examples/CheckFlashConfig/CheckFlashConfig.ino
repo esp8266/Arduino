@@ -5,9 +5,7 @@
 
 */
 
-void setup(void) {
-  Serial.begin(115200);
-}
+void setup(void) { Serial.begin(115200); }
 
 void loop() {
   uint32_t    realSize = ESP.getFlashChipRealSize();
@@ -19,10 +17,11 @@ void loop() {
 
   Serial.printf("Flash ide  size: %u bytes\n", ideSize);
   Serial.printf("Flash ide speed: %u Hz\n", ESP.getFlashChipSpeed());
-  Serial.printf("Flash ide mode:  %s\n", (ideMode == FM_QIO ? "QIO" : ideMode == FM_QOUT ? "QOUT"
-                                              : ideMode == FM_DIO                        ? "DIO"
-                                              : ideMode == FM_DOUT                       ? "DOUT"
-                                                                                         : "UNKNOWN"));
+  Serial.printf("Flash ide mode:  %s\n", (ideMode == FM_QIO  ? "QIO" :
+                                          ideMode == FM_QOUT ? "QOUT" :
+                                          ideMode == FM_DIO  ? "DIO" :
+                                          ideMode == FM_DOUT ? "DOUT" :
+                                                               "UNKNOWN"));
 
   if (ideSize != realSize) {
     Serial.println("Flash Chip configuration wrong!\n");

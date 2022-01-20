@@ -20,8 +20,7 @@ void setup() {
   Wire.onRequest(requestEvent);             // register event
 }
 
-void loop() {
-}
+void loop() { }
 
 // function that executes whenever data is requested by master
 // this function is registered as an event, see setup()

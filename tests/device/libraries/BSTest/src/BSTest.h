@@ -25,8 +25,10 @@ typedef void (*test_case_func_t)();
 class TestCase
 {
 public:
-    TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc) :
-        m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
+    TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name,
+             const char* desc) :
+        m_func(func),
+        m_file(file), m_line(line), m_name(name), m_desc(desc)
     {
         if (prev)
         {
@@ -34,35 +36,17 @@ public:
         }
     }
 
-    void run() const
-    {
-        (*m_func)();
-    }
+    void run() const { (*m_func)(); }
 
-    TestCase* next() const
-    {
-        return m_next;
-    }
+    TestCase* next() const { return m_next; }
 
-    const char* file() const
-    {
-        return m_file;
-    }
+    const char* file() const { return m_file; }
 
-    size_t line() const
-    {
-        return m_line;
-    }
+    size_t line() const { return m_line; }
 
-    const char* name() const
-    {
-        return m_name;
-    }
+    const char* name() const { return m_name; }
 
-    const char* desc() const
-    {
-        return (m_desc) ? m_desc : "";
-    }
+    const char* desc() const { return (m_desc) ? m_desc : ""; }
 
 protected:
     TestCase*        m_next = nullptr;
@@ -75,7 +59,8 @@ protected:
 
 struct Registry
 {
-    void add(test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
+    void add(test_case_func_t func, const char* file, size_t line, const char* name,
+             const char* desc)
     {
         TestCase* tc = new TestCase(m_last, func, file, line, name, desc);
         if (!m_first)
@@ -98,14 +83,12 @@ struct Env
 
 extern Env g_env;
 
-template <typename IO>
-class Runner
+template <typename IO> class Runner
 {
     typedef Runner<IO> Tself;
 
 public:
-    Runner(IO& io) :
-        m_io(io)
+    Runner(IO& io) : m_io(io)
     {
         g_env.m_check_pass = std::bind(&Tself::check_pass, this);
         g_env.m_check_fail = std::bind(&Tself::check_fail, this, std::placeholders::_1);
@@ -126,10 +109,7 @@ public:
         } while (do_menu());
     }
 
-    void check_pass()
-    {
-        ++m_check_pass_count;
-    }
+    void check_pass() { ++m_check_pass_count; }
 
     void check_fail(size_t line)
     {
@@ -139,7 +119,8 @@ public:
 
     void fail(size_t line)
     {
-        protocol::output_test_end(m_io, false, m_check_pass_count + m_check_fail_count, m_check_fail_count, line);
+        protocol::output_test_end(m_io, false, m_check_pass_count + m_check_fail_count,
+                                  m_check_fail_count, line);
         bs::fatal();
     }
 
@@ -177,7 +158,8 @@ protected:
             protocol::output_test_start(m_io, tc->file(), tc->line(), tc->name(), tc->desc());
             tc->run();
             bool success = m_check_fail_count == 0;
-            protocol::output_test_end(m_io, success, m_check_pass_count + m_check_fail_count, m_check_fail_count);
+            protocol::output_test_end(m_io, success, m_check_pass_count + m_check_fail_count,
+                                      m_check_fail_count);
         }
     }
 
@@ -190,7 +172,8 @@ protected:
 class AutoReg
 {
 public:
-    AutoReg(test_case_func_t func, const char* file, size_t line, const char* name, const char* desc = nullptr)
+    AutoReg(test_case_func_t func, const char* file, size_t line, const char* name,
+            const char* desc = nullptr)
     {
         g_env.m_registry.add(func, file, line, name, desc);
     }
@@ -227,29 +210,30 @@ inline void require(bool condition, size_t line)
 #define BS_NAME_LINE(name, line) BS_NAME_LINE2(name, line)
 #define BS_UNIQUE_NAME(name) BS_NAME_LINE(name, __LINE__)
 
-#define TEST_CASE(...)                                                                                             \
-    static void BS_UNIQUE_NAME(TEST_FUNC__)();                                                                     \
-    namespace                                                                                                      \
-    {                                                                                                              \
-        bs::AutoReg BS_UNIQUE_NAME(test_autoreg__)(&BS_UNIQUE_NAME(TEST_FUNC__), __FILE__, __LINE__, __VA_ARGS__); \
-    }                                                                                                              \
+#define TEST_CASE(...)                                                                             \
+    static void BS_UNIQUE_NAME(TEST_FUNC__)();                                                     \
+    namespace                                                                                      \
+    {                                                                                              \
+        bs::AutoReg BS_UNIQUE_NAME(test_autoreg__)(&BS_UNIQUE_NAME(TEST_FUNC__), __FILE__,         \
+                                                   __LINE__, __VA_ARGS__);                         \
+    }                                                                                              \
     static void BS_UNIQUE_NAME(TEST_FUNC__)()
 
 #define CHECK(condition) bs::check((condition), __LINE__)
 #define REQUIRE(condition) bs::require((condition), __LINE__)
 #define FAIL() bs::g_env.m_fail(__LINE__)
 
-#define BS_ENV_DECLARE() \
-    namespace bs         \
-    {                    \
-        Env g_env;       \
+#define BS_ENV_DECLARE()                                                                           \
+    namespace bs                                                                                   \
+    {                                                                                              \
+        Env g_env;                                                                                 \
     }
-#define BS_RUN(...)                                                  \
-    do                                                               \
-    {                                                                \
-        bs::IOHelper             helper = bs::IOHelper(__VA_ARGS__); \
-        bs::Runner<bs::IOHelper> runner(helper);                     \
-        runner.run();                                                \
+#define BS_RUN(...)                                                                                \
+    do                                                                                             \
+    {                                                                                              \
+        bs::IOHelper             helper = bs::IOHelper(__VA_ARGS__);                               \
+        bs::Runner<bs::IOHelper> runner(helper);                                                   \
+        runner.run();                                                                              \
     } while (0);
 
-#endif  //BSTEST_H
+#endif  // BSTEST_H

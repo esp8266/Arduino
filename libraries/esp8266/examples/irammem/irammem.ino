@@ -67,10 +67,8 @@ __attribute__((noinline)) void aliasTestO3(uint16_t* x) {
 // Evaluate if optomizer may have changed 32-bit access to 8-bit.
 // 8-bit access will take longer as it will be processed thought
 // the exception handler. For this case the -O0 version will appear faster.
-#pragma GCC optimize("O0")
-__attribute__((noinline)) IRAM_ATTR
-    uint32_t
-    timedRead_Reference(uint8_t* res) {
+#pragma GCC                                  optimize("O0")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_Reference(uint8_t* res) {
   // This test case was verified with GCC 10.3
   // There is a code case that can result in 32-bit wide IRAM load from memory
   // being optimized down to an 8-bit memory access. In this test case we need
@@ -83,28 +81,22 @@ __attribute__((noinline)) IRAM_ATTR
   *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
-#pragma GCC optimize("Os")
-__attribute__((noinline)) IRAM_ATTR
-    uint32_t
-    timedRead_Os(uint8_t* res) {
+#pragma GCC                                  optimize("Os")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_Os(uint8_t* res) {
   const uint8_t* x = (const uint8_t*)0x40100003ul;
   uint32_t       b = ESP.getCycleCount();
   *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
-#pragma GCC optimize("O2")
-__attribute__((noinline)) IRAM_ATTR
-    uint32_t
-    timedRead_O2(uint8_t* res) {
+#pragma GCC                                  optimize("O2")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_O2(uint8_t* res) {
   const uint8_t* x = (const uint8_t*)0x40100003ul;
   uint32_t       b = ESP.getCycleCount();
   *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
-#pragma GCC optimize("O3")
-__attribute__((noinline)) IRAM_ATTR
-    uint32_t
-    timedRead_O3(uint8_t* res) {
+#pragma GCC                                  optimize("O3")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_O3(uint8_t* res) {
   const uint8_t* x = (const uint8_t*)0x40100003ul;
   uint32_t       b = ESP.getCycleCount();
   *res             = mmu_get_uint8(x);
@@ -116,7 +108,8 @@ bool test4_32bit_loads() {
   bool     result = true;
   uint8_t  res;
   uint32_t cycle_count_ref, cycle_count;
-  Serial.printf("\r\nFor mmu_get_uint8, verify that 32-bit wide IRAM access is preserved across different optimizations:\r\n");
+  Serial.printf("\r\nFor mmu_get_uint8, verify that 32-bit wide IRAM access is preserved across "
+                "different optimizations:\r\n");
   cycle_count_ref = timedRead_Reference(&res);
   /*
     If the optimizer (for options -Os, -O2, and -O3) replaces the 32-bit wide
@@ -360,21 +353,34 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
   bool     success = true;
   int      sres, verify_sres;
 
-  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception handling for IRAM.\r\n");
+  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception "
+                "handling for IRAM.\r\n");
   ;
   t = cyclesToWrite_nKx16(nK, (uint16_t*)mem);
-  Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "DRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx16(nK, (uint16_t*)mem, &verify_res);
-  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_res);
+  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer "
+                "(sum %08x)\r\n",
+                t, nK, t / (nK * 1024), verify_res);
   t = cyclesToWrite_nKxs16(nK, (int16_t*)mem);
-  Serial.printf("DRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "DRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKxs16(nK, (int16_t*)mem, &verify_sres);
-  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_sres);
+  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer "
+                "(sum %08x)\r\n",
+                t, nK, t / (nK * 1024), verify_sres);
 
   t = cyclesToWrite_nKx16_viaInline(nK, (uint16_t*)imem);
-  Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write Inline:  %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx16_viaInline(nK, (uint16_t*)imem, &res);
-  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
+  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by uint16, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
   } else {
@@ -383,9 +389,13 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
   }
 
   t = cyclesToWrite_nKxs16_viaInline(nK, (int16_t*)imem);
-  Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write Inline:  %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKxs16_viaInline(nK, (int16_t*)imem, &sres);
-  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), sres);
+  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  int16, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), sres);
   if (sres == verify_sres) {
     Serial.printf("- passed\r\n");
   } else {
@@ -394,9 +404,13 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
   }
 
   t = cyclesToWrite_nKx16(nK, (uint16_t*)imem);
-  Serial.printf("IRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx16(nK, (uint16_t*)imem, &res);
-  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
+  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
   } else {
@@ -404,9 +418,13 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
     success = false;
   }
   t = cyclesToWrite_nKxs16(nK, (int16_t*)imem);
-  Serial.printf("IRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKxs16(nK, (int16_t*)imem, &sres);
-  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), sres);
+  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), sres);
   if (sres == verify_sres) {
     Serial.printf("- passed\r\n");
   } else {
@@ -414,17 +432,26 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
     success = false;
   }
 
-  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception handling for IRAM access.\r\n");
+  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception "
+                "handling for IRAM access.\r\n");
   ;
   t = cyclesToWrite_nKx8(nK, (uint8_t*)mem);
-  Serial.printf("DRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "DRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx8(nK, (uint8_t*)mem, &verify_res);
-  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_res);
+  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer "
+                "(sum %08x)\r\n",
+                t, nK, t / (nK * 1024), verify_res);
 
   t = cyclesToWrite_nKx8_viaInline(nK, (uint8_t*)imem);
-  Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write Inline:  %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx8_viaInline(nK, (uint8_t*)imem, &res);
-  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
+  Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  uint8, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
   } else {
@@ -433,9 +460,13 @@ bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
   }
 
   t = cyclesToWrite_nKx8(nK, (uint8_t*)imem);
-  Serial.printf("IRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx8(nK, (uint8_t*)imem, &res);
-  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
+  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer "
+                "(sum %08x) ",
+                t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
   } else {
@@ -455,11 +486,12 @@ void setup() {
   delay(20);
   Serial.printf_P(PSTR("\n\nSetup ...\r\n"));
 #ifndef UMM_HEAP_IRAM
-  Serial.printf("\r\n"
-                "This example needs IRAM Heap support enabled.\r\n"
-                "  eg. Arduino IDE 'Tools->MMU:\"16KB cache + 48KB IRAM and 2nd Heap (shared)\"'\r\n"
-                "This build has IRAM Heap support disabled.\r\n"
-                "In this situation, all IRAM requests are satisfied with DRAM.\r\n\r\n");
+  Serial.printf(
+      "\r\n"
+      "This example needs IRAM Heap support enabled.\r\n"
+      "  eg. Arduino IDE 'Tools->MMU:\"16KB cache + 48KB IRAM and 2nd Heap (shared)\"'\r\n"
+      "This build has IRAM Heap support disabled.\r\n"
+      "In this situation, all IRAM requests are satisfied with DRAM.\r\n\r\n");
 #endif
 
   // Compiling with Secondary Heap option does not change malloc to use the
@@ -501,17 +533,26 @@ void setup() {
   uint32_t res;
   uint32_t t;
   int      nK = 1;
-  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros needed.\r\n");
+  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros "
+                "needed.\r\n");
   ;
   t = cyclesToWrite_nKx32(nK, mem);
-  Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "DRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, mem, &res);
-  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by uint32, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
+  Serial.printf("DRAM Memory Read:          %7d cycles for %dK by uint32, %3d AVG cycles/transfer "
+                "(sum %08x)\r\n",
+                t, nK, t / (nK * 1024), res);
 
   t = cyclesToWrite_nKx32(nK, imem);
-  Serial.printf("IRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
+  Serial.printf(
+      "IRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK,
+      t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, imem, &res);
-  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint32, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
+  Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint32, %3d AVG cycles/transfer "
+                "(sum %08x)\r\n",
+                t, nK, t / (nK * 1024), res);
   Serial.println();
 
   if (perfTest_nK(1, mem, imem) && testPunning() && test4_32bit_loads()) {
@@ -594,8 +635,7 @@ void setup() {
     uint32_t hmax;
     uint8_t  hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
-    ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
-               hfree, hmax, hfrag);
+    ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n", hfree, hmax, hfrag);
     if (free_iram > UMM_OVERHEAD_ADJUST) {
       void* all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
       ETS_PRINTF("%p = malloc(%u)\n", all, free_iram);

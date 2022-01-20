@@ -19,7 +19,7 @@
 #define FAKE_INCREASED_AVAILABLE 100  // test readBytes's timeout
 
 #define TIMEOUT 5000
-#define DEBUG(x...)  //x
+#define DEBUG(x...)  // x
 
 uint8_t buf[BUFFER_SIZE];
 uint8_t temp[BUFFER_SIZE];
@@ -37,18 +37,23 @@ static uint64_t timeout;
 Stream* logger;
 
 void error(const char* what) {
-  logger->printf("\nerror: %s after %ld minutes\nread idx:  %d\nwrite idx: %d\ntotal:     %ld\nlast read: %d\nmaxavail:  %d\n",
-                 what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total, (int)local_receive_size, maxavail);
+  logger->printf("\nerror: %s after %ld minutes\nread idx:  %d\nwrite idx: %d\ntotal:     "
+                 "%ld\nlast read: %d\nmaxavail:  %d\n",
+                 what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total,
+                 (int)local_receive_size, maxavail);
   if (Serial.hasOverrun()) {
     logger->printf("overrun!\n");
   }
-  logger->printf("should be (size=%d idx=%d..%d):\n    ", BUFFER_SIZE, in_idx, in_idx + local_receive_size - 1);
+  logger->printf("should be (size=%d idx=%d..%d):\n    ", BUFFER_SIZE, in_idx,
+                 in_idx + local_receive_size - 1);
   for (size_t i = in_idx; i < in_idx + local_receive_size; i++) {
-    logger->printf("%02x(%c) ", buf[i], (unsigned char)((buf[i] > 31 && buf[i] < 128) ? buf[i] : '.'));
+    logger->printf("%02x(%c) ", buf[i],
+                   (unsigned char)((buf[i] > 31 && buf[i] < 128) ? buf[i] : '.'));
   }
   logger->print("\n\nis: ");
   for (size_t i = 0; i < local_receive_size; i++) {
-    logger->printf("%02x(%c) ", temp[i], (unsigned char)((temp[i] > 31 && temp[i] < 128) ? temp[i] : '.'));
+    logger->printf("%02x(%c) ", temp[i],
+                   (unsigned char)((temp[i] > 31 && temp[i] < 128) ? temp[i] : '.'));
   }
   logger->println("\n\n");
 
@@ -75,8 +80,8 @@ void setup() {
 
   int baud = Serial.baudRate();
   logger->printf(ESP.getFullVersion().c_str());
-  logger->printf("\n\nBAUD: %d - CoreRxBuffer: %d bytes - TestBuffer: %d bytes\n",
-                 baud, SERIAL_SIZE_RX, BUFFER_SIZE);
+  logger->printf("\n\nBAUD: %d - CoreRxBuffer: %d bytes - TestBuffer: %d bytes\n", baud,
+                 SERIAL_SIZE_RX, BUFFER_SIZE);
 
   size_for_1sec = baud / 10;  // 8n1=10baudFor8bits
   logger->printf("led changes state every %zd bytes (= 1 second)\n", size_for_1sec);
@@ -108,13 +113,15 @@ void loop() {
     maxlen = BUFFER_SIZE - out_idx;
   }
   // check if not cycling more than buffer size relatively to input
-  size_t in_out = out_idx == in_idx ? BUFFER_SIZE : (in_idx + BUFFER_SIZE - out_idx - 1) % BUFFER_SIZE;
+  size_t in_out
+      = out_idx == in_idx ? BUFFER_SIZE : (in_idx + BUFFER_SIZE - out_idx - 1) % BUFFER_SIZE;
   if (maxlen > in_out) {
     maxlen = in_out;
   }
   DEBUG(logger->printf("(aw%i/w%i", Serial.availableForWrite(), maxlen));
   size_t local_written_size = Serial.write(buf + out_idx, maxlen);
-  DEBUG(logger->printf(":w%i/aw%i/ar%i)\n", local_written_size, Serial.availableForWrite(), Serial.available()));
+  DEBUG(logger->printf(":w%i/aw%i/ar%i)\n", local_written_size, Serial.availableForWrite(),
+                       Serial.available()));
   if (local_written_size > maxlen) {
     error("bad write");
   }

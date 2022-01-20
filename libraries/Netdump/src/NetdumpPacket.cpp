@@ -24,7 +24,8 @@
 
 namespace NetCapture
 {
-void Packet::printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const
+void Packet::printDetail(Print& out, const String& indent, const char* data, size_t size,
+                         PacketDetail pd) const
 {
     if (pd == PacketDetail::NONE)
     {
@@ -138,15 +139,9 @@ void Packet::setPacketTypes()
     }
 }
 
-const PacketType Packet::packetType() const
-{
-    return thisPacketType;
-}
+const PacketType Packet::packetType() const { return thisPacketType; }
 
-const std::vector<PacketType>& Packet::allPacketTypes() const
-{
-    return thisAllPacketTypes;
-}
+const std::vector<PacketType>& Packet::allPacketTypes() const { return thisAllPacketTypes; }
 
 void Packet::MACtoString(int dataIdx, StreamString& sstr) const
 {
@@ -165,7 +160,8 @@ void Packet::ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     switch (getARPType())
     {
     case 1:
-        sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(), getIP(ETH_HDR_LEN + 14).toString().c_str());
+        sstr.printf_P(PSTR("who has %s tell %s"), getIP(ETH_HDR_LEN + 24).toString().c_str(),
+                      getIP(ETH_HDR_LEN + 14).toString().c_str());
         break;
     case 2:
         sstr.printf_P(PSTR("%s is at "), getIP(ETH_HDR_LEN + 14).toString().c_str());
@@ -173,7 +169,8 @@ void Packet::ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
         break;
     }
     sstr.printf("\r\n");
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN], packetLength - ETH_HDR_LEN, netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN], packetLength - ETH_HDR_LEN,
+                netdumpDetail);
 }
 
 void Packet::DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const
@@ -198,8 +195,10 @@ void Packet::DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const
         sstr.printf_P(PSTR("DR=%d "), t);
     }
     sstr.printf_P(PSTR("\r\n"));
-    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
+    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(),
+                netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()],
+                getUdpLen(), netdumpDetail);
 }
 
 void Packet::UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
@@ -207,8 +206,10 @@ void Packet::UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
     sstr.printf_P(PSTR("%d:%d"), getSrcPort(), getDstPort());
     sstr.printf_P(PSTR("\r\n"));
-    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(), netdumpDetail);
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()], getUdpLen(), netdumpDetail);
+    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getUdpHdrLen(),
+                netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getUdpHdrLen()],
+                getUdpLen(), netdumpDetail);
 }
 
 void Packet::TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
@@ -224,10 +225,13 @@ void Packet::TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
             sstr.print(chars[i]);
         }
     sstr.print(']');
-    sstr.printf_P(PSTR(" len: %u seq: %u, ack: %u, wnd: %u "), getTcpLen(), getTcpSeq(), getTcpAck(), getTcpWindow());
+    sstr.printf_P(PSTR(" len: %u seq: %u, ack: %u, wnd: %u "), getTcpLen(), getTcpSeq(),
+                  getTcpAck(), getTcpWindow());
     sstr.printf_P(PSTR("\r\n"));
-    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getTcpHdrLen(), netdumpDetail);
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getTcpHdrLen()], getTcpLen(), netdumpDetail);
+    printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN + getIpHdrLen()], getTcpHdrLen(),
+                netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen() + getTcpHdrLen()],
+                getTcpLen(), netdumpDetail);
 }
 
 void Packet::ICMPtoString(PacketDetail, StreamString& sstr) const
@@ -321,7 +325,8 @@ void Packet::IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const
     sstr.printf_P(PSTR("%s>%s "), sourceIP().toString().c_str(), destIP().toString().c_str());
     sstr.printf_P(PSTR("Unknown IP type : %d\r\n"), ipType());
     printDetail(sstr, PSTR("           H "), &data[ETH_HDR_LEN], getIpHdrLen(), netdumpDetail);
-    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen()], getIpTotalLen() - getIpHdrLen(), netdumpDetail);
+    printDetail(sstr, PSTR("           D "), &data[ETH_HDR_LEN + getIpHdrLen()],
+                getIpTotalLen() - getIpHdrLen(), netdumpDetail);
 }
 
 void Packet::UKNWtoString(PacketDetail, StreamString& sstr) const
@@ -333,17 +338,15 @@ void Packet::UKNWtoString(PacketDetail, StreamString& sstr) const
     sstr.printf_P(PSTR("\r\n"));
 }
 
-const String Packet::toString() const
-{
-    return toString(PacketDetail::NONE);
-}
+const String Packet::toString() const { return toString(PacketDetail::NONE); }
 
 const String Packet::toString(PacketDetail netdumpDetail) const
 {
     StreamString sstr;
     sstr.reserve(128);
 
-    sstr.printf_P(PSTR("%d %3s %-4s "), netif_idx, out ? "out" : "in ", packetType().toString().c_str());
+    sstr.printf_P(PSTR("%d %3s %-4s "), netif_idx, out ? "out" : "in ",
+                  packetType().toString().c_str());
 
     if (netdumpDetail == PacketDetail::RAW)
     {

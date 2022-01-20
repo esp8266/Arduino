@@ -57,12 +57,14 @@ void setup() {
   Serial.println();
   Serial.println("Configuring access point...");
 
-  /* Disable the WiFi persistence to avoid any re-configuration that may erase static lease when starting softAP */
+  /* Disable the WiFi persistence to avoid any re-configuration that may erase static lease when
+   * starting softAP */
   WiFi.persistent(false);
 
   WiFi.mode(WIFI_AP);
   /* Configure AP with IP = 192.168.0.1 / Gateway = 192.168.0.1 / Subnet = 255.255.255.0
-     if you specify the ESP8266's IP-address with 192.168.0.1, the function softAPConfig() sets the DHCP-range as 192.168.0.100 - 192.168.0.200
+     if you specify the ESP8266's IP-address with 192.168.0.1, the function softAPConfig() sets the
+     DHCP-range as 192.168.0.100 - 192.168.0.200
   */
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   /* Setup your static leases.
@@ -73,7 +75,8 @@ void setup() {
      first call to wifi_softap_add_dhcps_lease() will setup first IP address of the range
      second call to wifi_softap_add_dhcps_lease() will setup second IP address of the range
      ...
-     any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
+     any client not listed will use next IP address available from the range (here 192.168.0.102 and
+     more)
   */
   dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
   dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
@@ -87,6 +90,4 @@ void setup() {
   Serial.println("HTTP server started");
 }
 
-void loop() {
-  server.handleClient();
-}
+void loop() { server.handleClient(); }

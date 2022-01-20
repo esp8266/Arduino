@@ -66,8 +66,7 @@ extern "C"
     bool serial_timestamp = false;
 
     // write one byte to the emulated UART
-    static void
-    uart_do_write_char(const int uart_nr, char c)
+    static void uart_do_write_char(const int uart_nr, char c)
     {
         static bool w = false;
 
@@ -81,7 +80,8 @@ extern "C"
                     timeval tv;
                     gettimeofday(&tv, nullptr);
                     const tm* tm = localtime(&tv.tv_sec);
-                    fprintf(out, "\r\n%d:%02d:%02d.%06d: ", tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tv.tv_usec);
+                    fprintf(out, "\r\n%d:%02d:%02d.%06d: ", tm->tm_hour, tm->tm_min, tm->tm_sec,
+                            (int)tv.tv_usec);
                     fflush(out);
                     w = false;
                 }
@@ -98,8 +98,7 @@ extern "C"
     }
 
     // write a new byte into the RX FIFO buffer
-    static void
-    uart_handle_data(uart_t* uart, uint8_t data)
+    static void uart_handle_data(uart_t* uart, uint8_t data)
     {
         struct uart_rx_buffer_* rx_buffer = uart->rx_buffer;
 
@@ -119,8 +118,7 @@ extern "C"
     }
 
     // insert a new byte into the RX FIFO nuffer
-    void
-    uart_new_data(const int uart_nr, uint8_t data)
+    void uart_new_data(const int uart_nr, uint8_t data)
     {
         uart_t* uart = UART[uart_nr];
 
@@ -132,8 +130,7 @@ extern "C"
         uart_handle_data(uart, data);
     }
 
-    static size_t
-    uart_rx_available_unsafe(const struct uart_rx_buffer_* rx_buffer)
+    static size_t uart_rx_available_unsafe(const struct uart_rx_buffer_* rx_buffer)
     {
         size_t ret = rx_buffer->wpos - rx_buffer->rpos;
 
@@ -144,8 +141,7 @@ extern "C"
     }
 
     // taking data straight from fifo, only needed in uart_resize_rx_buffer()
-    static int
-    uart_read_char_unsafe(uart_t* uart)
+    static int uart_read_char_unsafe(uart_t* uart)
     {
         if (uart_rx_available_unsafe(uart->rx_buffer))
         {
@@ -162,8 +158,7 @@ extern "C"
     /************ UART API FUNCTIONS **************************/
     /**********************************************************/
 
-    size_t
-    uart_rx_available(uart_t* uart)
+    size_t uart_rx_available(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_enabled)
             return 0;
@@ -171,8 +166,7 @@ extern "C"
         return uart_rx_available_unsafe(uart->rx_buffer);
     }
 
-    int
-    uart_peek_char(uart_t* uart)
+    int uart_peek_char(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_enabled)
             return -1;
@@ -183,15 +177,13 @@ extern "C"
         return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
     }
 
-    int
-    uart_read_char(uart_t* uart)
+    int uart_read_char(uart_t* uart)
     {
         uint8_t ret;
         return uart_read(uart, (char*)&ret, 1) ? ret : -1;
     }
 
-    size_t
-    uart_read(uart_t* uart, char* userbuffer, size_t usersize)
+    size_t uart_read(uart_t* uart, char* userbuffer, size_t usersize)
     {
         if (uart == NULL || !uart->rx_enabled)
             return 0;
@@ -208,7 +200,9 @@ extern "C"
         {
             // pour sw buffer to user's buffer
             // get largest linear length from sw buffer
-            size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos ? uart->rx_buffer->wpos - uart->rx_buffer->rpos : uart->rx_buffer->size - uart->rx_buffer->rpos;
+            size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos ?
+                               uart->rx_buffer->wpos - uart->rx_buffer->rpos :
+                               uart->rx_buffer->size - uart->rx_buffer->rpos;
             if (ret + chunk > usersize)
                 chunk = usersize - ret;
             memcpy(userbuffer + ret, uart->rx_buffer->buffer + uart->rx_buffer->rpos, chunk);
@@ -218,8 +212,7 @@ extern "C"
         return ret;
     }
 
-    size_t
-    uart_resize_rx_buffer(uart_t* uart, size_t new_size)
+    size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size)
     {
         if (uart == NULL || !uart->rx_enabled)
             return 0;
@@ -247,14 +240,12 @@ extern "C"
         return uart->rx_buffer->size;
     }
 
-    size_t
-    uart_get_rx_buffer_size(uart_t* uart)
+    size_t uart_get_rx_buffer_size(uart_t* uart)
     {
         return uart && uart->rx_enabled ? uart->rx_buffer->size : 0;
     }
 
-    size_t
-    uart_write_char(uart_t* uart, char c)
+    size_t uart_write_char(uart_t* uart, char c)
     {
         if (uart == NULL || !uart->tx_enabled)
             return 0;
@@ -264,8 +255,7 @@ extern "C"
         return 1;
     }
 
-    size_t
-    uart_write(uart_t* uart, const char* buf, size_t size)
+    size_t uart_write(uart_t* uart, const char* buf, size_t size)
     {
         if (uart == NULL || !uart->tx_enabled)
             return 0;
@@ -278,8 +268,7 @@ extern "C"
         return ret;
     }
 
-    size_t
-    uart_tx_free(uart_t* uart)
+    size_t uart_tx_free(uart_t* uart)
     {
         if (uart == NULL || !uart->tx_enabled)
             return 0;
@@ -287,14 +276,9 @@ extern "C"
         return UART_TX_FIFO_SIZE;
     }
 
-    void
-    uart_wait_tx_empty(uart_t* uart)
-    {
-        (void)uart;
-    }
+    void uart_wait_tx_empty(uart_t* uart) { (void)uart; }
 
-    void
-    uart_flush(uart_t* uart)
+    void uart_flush(uart_t* uart)
     {
         if (uart == NULL)
             return;
@@ -306,8 +290,7 @@ extern "C"
         }
     }
 
-    void
-    uart_set_baudrate(uart_t* uart, int baud_rate)
+    void uart_set_baudrate(uart_t* uart, int baud_rate)
     {
         if (uart == NULL)
             return;
@@ -315,8 +298,7 @@ extern "C"
         uart->baud_rate = baud_rate;
     }
 
-    int
-    uart_get_baudrate(uart_t* uart)
+    int uart_get_baudrate(uart_t* uart)
     {
         if (uart == NULL)
             return 0;
@@ -324,8 +306,7 @@ extern "C"
         return uart->baud_rate;
     }
 
-    uint8_t
-    uart_get_bit_length(const int uart_nr)
+    uint8_t uart_get_bit_length(const int uart_nr)
     {
         uint8_t width  = ((uart_nr % 16) >> 2) + 5;
         uint8_t parity = (uart_nr >> 5) + 1;
@@ -333,8 +314,8 @@ extern "C"
         return (width + parity + stop + 1);
     }
 
-    uart_t*
-    uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size, bool invert)
+    uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size,
+                      bool invert)
     {
         (void)config;
         (void)tx_pin;
@@ -353,13 +334,14 @@ extern "C"
             uart->tx_enabled = (mode != UART_RX_ONLY);
             if (uart->rx_enabled)
             {
-                struct uart_rx_buffer_* rx_buffer = (struct uart_rx_buffer_*)malloc(sizeof(struct uart_rx_buffer_));
+                struct uart_rx_buffer_* rx_buffer
+                    = (struct uart_rx_buffer_*)malloc(sizeof(struct uart_rx_buffer_));
                 if (rx_buffer == NULL)
                 {
                     free(uart);
                     return NULL;
                 }
-                rx_buffer->size   = rx_size;  //var this
+                rx_buffer->size   = rx_size;  // var this
                 rx_buffer->rpos   = 0;
                 rx_buffer->wpos   = 0;
                 rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
@@ -393,8 +375,7 @@ extern "C"
         return uart;
     }
 
-    void
-    uart_uninit(uart_t* uart)
+    void uart_uninit(uart_t* uart)
     {
         if (uart == NULL)
             return;
@@ -407,24 +388,21 @@ extern "C"
         free(uart);
     }
 
-    bool
-    uart_swap(uart_t* uart, int tx_pin)
+    bool uart_swap(uart_t* uart, int tx_pin)
     {
         (void)uart;
         (void)tx_pin;
         return true;
     }
 
-    bool
-    uart_set_tx(uart_t* uart, int tx_pin)
+    bool uart_set_tx(uart_t* uart, int tx_pin)
     {
         (void)uart;
         (void)tx_pin;
         return true;
     }
 
-    bool
-    uart_set_pins(uart_t* uart, int tx, int rx)
+    bool uart_set_pins(uart_t* uart, int tx, int rx)
     {
         (void)uart;
         (void)tx;
@@ -432,8 +410,7 @@ extern "C"
         return true;
     }
 
-    bool
-    uart_tx_enabled(uart_t* uart)
+    bool uart_tx_enabled(uart_t* uart)
     {
         if (uart == NULL)
             return false;
@@ -441,8 +418,7 @@ extern "C"
         return uart->tx_enabled;
     }
 
-    bool
-    uart_rx_enabled(uart_t* uart)
+    bool uart_rx_enabled(uart_t* uart)
     {
         if (uart == NULL)
             return false;
@@ -450,8 +426,7 @@ extern "C"
         return uart->rx_enabled;
     }
 
-    bool
-    uart_has_overrun(uart_t* uart)
+    bool uart_has_overrun(uart_t* uart)
     {
         if (uart == NULL || !uart->rx_overrun)
             return false;
@@ -461,33 +436,19 @@ extern "C"
         return true;
     }
 
-    bool
-    uart_has_rx_error(uart_t* uart)
+    bool uart_has_rx_error(uart_t* uart)
     {
         (void)uart;
         return false;
     }
 
-    void
-    uart_set_debug(int uart_nr)
-    {
-        (void)uart_nr;
-    }
+    void uart_set_debug(int uart_nr) { (void)uart_nr; }
 
-    int
-    uart_get_debug()
-    {
-        return s_uart_debug_nr;
-    }
+    int uart_get_debug() { return s_uart_debug_nr; }
 
-    void
-    uart_start_detect_baudrate(int uart_nr)
-    {
-        (void)uart_nr;
-    }
+    void uart_start_detect_baudrate(int uart_nr) { (void)uart_nr; }
 
-    int
-    uart_detect_baudrate(int uart_nr)
+    int uart_detect_baudrate(int uart_nr)
     {
         (void)uart_nr;
         return 115200;

@@ -110,8 +110,7 @@ static int errors = 0;
 
 const char* testname = "strcmp";
 
-static void
-print_error(char const* msg, ...)
+static void print_error(char const* msg, ...)
 {
     errors++;
     if (errors == TOO_MANY_ERRORS)
@@ -147,7 +146,7 @@ void       strcmp_main(void)
     int      ret;
 
     /* Make calls to strcmp with block sizes ranging between 1 and
-     MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
+       MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
     for (sa = 0; sa <= MAX_OFFSET; sa++)
         for (da = 0; da <= MAX_OFFSET; da++)
             for (n = 1; n <= MAX_BLOCK_SIZE; n++)
@@ -277,12 +276,12 @@ void       strcmp_main(void)
     if (ret >= 0)
         print_error("\nFailed: expected negative, return %d\n", ret);
 
-    //printf ("\n");
+    // printf ("\n");
     if (errors != 0)
     {
         printf("ERROR. FAILED.\n");
         abort();
     }
-    //exit (0);
+    // exit (0);
     printf("ok\n");
 }

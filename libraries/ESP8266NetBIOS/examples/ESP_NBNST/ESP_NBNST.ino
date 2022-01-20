@@ -46,6 +46,4 @@ void setup() {
   NBNS.begin("ESP");
 }
 
-void loop() {
-  wwwserver.handleClient();
-}
+void loop() { wwwserver.handleClient(); }

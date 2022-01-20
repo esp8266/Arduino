@@ -20,7 +20,7 @@ makeClangConf()
 BasedOnStyle: WebKit
 SortIncludes: false
 AlignTrailingComments: true
-ColumnLimit: 0
+ColumnLimit: 100
 KeepEmptyLinesAtTheStartOfBlocks: false
 SpaceBeforeInheritanceColon: false
 SpacesBeforeTrailingComments: 2
@@ -29,8 +29,10 @@ AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveDeclarations: Consecutive
 AlignAfterOpenBracket: Align
+AlignOperands: Align
 BreakConstructorInitializers: AfterColon
 BreakBeforeBinaryOperators: All
+BreakBeforeTernaryOperators: false
 BreakBeforeConceptDeclarations: true
 FixNamespaceComments: true
 NamespaceIndentation: Inner
@@ -83,3 +85,7 @@ for d in libraries; do
     echo "-------- examples in $d:"
     find $d -name "*.ino" -exec clang-format-12 -i {} \;
 done
+
+#########################################
+
+rm -f .clang-format

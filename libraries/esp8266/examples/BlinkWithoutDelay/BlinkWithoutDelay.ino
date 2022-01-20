@@ -15,9 +15,7 @@ int ledState = LOW;
 unsigned long previousMillis = 0;
 const long    interval       = 1000;
 
-void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-}
+void setup() { pinMode(LED_BUILTIN, OUTPUT); }
 
 void loop() {
   unsigned long currentMillis = millis();

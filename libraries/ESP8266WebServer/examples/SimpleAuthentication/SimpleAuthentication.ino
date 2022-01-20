@@ -12,7 +12,7 @@ const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
-//Check if header is present and correct
+// Check if header is present and correct
 bool is_authenticated() {
   Serial.println("Enter is_authenticated");
   if (server.hasHeader("Cookie")) {
@@ -28,7 +28,7 @@ bool is_authenticated() {
   return false;
 }
 
-//login page, also called for disconnect
+// login page, also called for disconnect
 void handleLogin() {
   String msg;
   if (server.hasHeader("Cookie")) {
@@ -56,7 +56,8 @@ void handleLogin() {
     msg = "Wrong username/password! try again.";
     Serial.println("Log in Failed");
   }
-  String content = "<html><body><form action='/login' method='POST'>To log in, please use : admin/admin<br>";
+  String content
+      = "<html><body><form action='/login' method='POST'>To log in, please use : admin/admin<br>";
   content += "User:<input type='text' name='USERNAME' placeholder='user name'><br>";
   content += "Password:<input type='password' name='PASSWORD' placeholder='password'><br>";
   content += "<input type='submit' name='SUBMIT' value='Submit'></form>" + msg + "<br>";
@@ -64,7 +65,7 @@ void handleLogin() {
   server.send(200, "text/html", content);
 }
 
-//root page can be accessed only if authentication is ok
+// root page can be accessed only if authentication is ok
 void handleRoot() {
   Serial.println("Enter handleRoot");
   String header;
@@ -78,11 +79,12 @@ void handleRoot() {
   if (server.hasHeader("User-Agent")) {
     content += "the user agent used is : " + server.header("User-Agent") + "<br><br>";
   }
-  content += "You can access this page until you <a href=\"/login?DISCONNECT=YES\">disconnect</a></body></html>";
+  content += "You can access this page until you <a "
+             "href=\"/login?DISCONNECT=YES\">disconnect</a></body></html>";
   server.send(200, "text/html", content);
 }
 
-//no need authentication
+// no need authentication
 void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -117,17 +119,14 @@ void setup(void) {
 
   server.on("/", handleRoot);
   server.on("/login", handleLogin);
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works without need of authentication");
-  });
+  server.on("/inline",
+            []() { server.send(200, "text/plain", "this works without need of authentication"); });
 
   server.onNotFound(handleNotFound);
-  //ask server to track these headers
+  // ask server to track these headers
   server.collectHeaders("User-Agent", "Cookie");
   server.begin();
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
-  server.handleClient();
-}
+void loop(void) { server.handleClient(); }

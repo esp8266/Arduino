@@ -52,7 +52,8 @@ void setup() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port,
+              const char* path) {
   if (!path) {
     path = "/";
   }
