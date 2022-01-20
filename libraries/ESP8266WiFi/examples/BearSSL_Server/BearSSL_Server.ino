@@ -42,8 +42,8 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* pass = STAPSK;
+const char*               ssid = STASSID;
+const char*               pass = STAPSK;
 
 // The HTTPS server
 BearSSL::WiFiServerSecure server(443);
@@ -85,7 +85,7 @@ Zs0aiirNGTEymRX4rw26Qg==
 )EOF";
 
 // The server's public certificate which must be shared
-const char server_cert[] PROGMEM = R"EOF(
+const char server_cert[] PROGMEM        = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDUTCCAjmgAwIBAgIJAOcfK7c3JQtnMA0GCSqGSIb3DQEBCwUAMD8xCzAJBgNV
 BAYTAkFVMQ0wCwYDVQQIDAROb25lMQ0wCwYDVQQKDAROb25lMRIwEAYDVQQDDAlF
@@ -109,7 +109,7 @@ UsQIIGpPVh1plR1vYNndDeBpRJSFkoJTkgAIrlFzSMwNebU0pg==
 )EOF";
 
 #else
-const char server_cert[] PROGMEM = R"EOF(
+const char              server_cert[] PROGMEM        = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIB0zCCAXqgAwIBAgIJALANi2eTiGD/MAoGCCqGSM49BAMCMEUxCzAJBgNVBAYT
 AkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRn
@@ -125,7 +125,7 @@ Af8wCgYIKoZIzj0EAwIDRwAwRAIgWvy7ofQTGZMNqxUfe4gjtkU+C9AkQtaOMW2U
 )EOF";
 
 // The server's private key which must be kept secret
-const char server_private_key[] PROGMEM = R"EOF(
+const char              server_private_key[] PROGMEM = R"EOF(
 -----BEGIN EC PARAMETERS-----
 BggqhkjOPQMBBw==
 -----END EC PARAMETERS-----
@@ -138,11 +138,11 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 
 #endif
 
-#define CACHE_SIZE 5 // Number of sessions to cache.
-// Caching SSL sessions shortens the length of the SSL handshake.
-// You can see the performance improvement by looking at the
-// Network tab of the developer tools of your browser.
-#define USE_CACHE // Enable SSL session caching.
+#define CACHE_SIZE 5  // Number of sessions to cache.
+#define USE_CACHE     // Enable SSL session caching.                                    \
+                      // Caching SSL sessions shortens the length of the SSL handshake. \
+                      // You can see the performance improvement by looking at the      \
+                      // Network tab of the developer tools of your browser.
 //#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
 
 #if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
@@ -150,11 +150,12 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 BearSSL::ServerSessions serverCache(CACHE_SIZE);
 #elif defined(USE_CACHE)
 // Statically allocated cache.
-ServerSession store[CACHE_SIZE];
+ServerSession           store[CACHE_SIZE];
 BearSSL::ServerSessions serverCache(store, CACHE_SIZE);
 #endif
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -165,7 +166,8 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -176,8 +178,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Attach the server private cert/key combo
-  BearSSL::X509List* serverCertList = new BearSSL::X509List(server_cert);
-  BearSSL::PrivateKey* serverPrivKey = new BearSSL::PrivateKey(server_private_key);
+  BearSSL::X509List*   serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey* serverPrivKey  = new BearSSL::PrivateKey(server_private_key);
 #ifndef USE_EC
   server.setRSACert(serverCertList, serverPrivKey);
 #else
@@ -204,34 +206,46 @@ static const char* HTTP_RES = "HTTP/1.0 200 OK\r\n"
                               "</body>\r\n"
                               "</html>\r\n";
 
-void loop() {
-  static int cnt;
+void loop()
+{
+  static int                cnt;
   BearSSL::WiFiClientSecure incoming = server.accept();
-  if (!incoming) {
+  if (!incoming)
+  {
     return;
   }
   Serial.printf("Incoming connection...%d\n", cnt++);
 
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
   uint32_t timeout = millis() + 1000;
-  int lcwn = 0;
-  for (;;) {
+  int      lcwn    = 0;
+  for (;;)
+  {
     unsigned char x = 0;
-    if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
+    if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0))
+    {
       incoming.stop();
       Serial.printf("Connection error, closed\n");
       return;
-    } else if (!x) {
+    }
+    else if (!x)
+    {
       yield();
       continue;
-    } else if (x == 0x0D) {
+    }
+    else if (x == 0x0D)
+    {
       continue;
-    } else if (x == 0x0A) {
-      if (lcwn) {
+    }
+    else if (x == 0x0A)
+    {
+      if (lcwn)
+      {
         break;
       }
       lcwn = 1;
-    } else
+    }
+    else
       lcwn = 0;
   }
   incoming.write((uint8_t*)HTTP_RES, strlen(HTTP_RES));

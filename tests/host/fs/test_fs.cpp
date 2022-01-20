@@ -47,9 +47,9 @@ namespace spiffs_test
 TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
 {
     SPIFFS_MOCK_DECLARE(64, 8, 512, "");
-    FSConfig f;
-    SPIFFSConfig s;
-    SDFSConfig d;
+    FSConfig       f;
+    SPIFFSConfig   s;
+    SDFSConfig     d;
     LittleFSConfig l;
 
     REQUIRE_FALSE(SPIFFS.setConfig(f));
@@ -82,9 +82,9 @@ namespace littlefs_test
 TEST_CASE("LittleFS checks the config object passed in", "[fs]")
 {
     LITTLEFS_MOCK_DECLARE(64, 8, 512, "");
-    FSConfig f;
-    SPIFFSConfig s;
-    SDFSConfig d;
+    FSConfig       f;
+    SPIFFSConfig   s;
+    SDFSConfig     d;
     LittleFSConfig l;
 
     REQUIRE_FALSE(LittleFS.setConfig(f));
@@ -119,9 +119,9 @@ namespace sdfs_test
 TEST_CASE("SDFS checks the config object passed in", "[fs]")
 {
     SDFS_MOCK_DECLARE(64, 8, 512, "");
-    FSConfig f;
-    SPIFFSConfig s;
-    SDFSConfig d;
+    FSConfig       f;
+    SPIFFSConfig   s;
+    SDFSConfig     d;
     LittleFSConfig l;
 
     REQUIRE_FALSE(SDFS.setConfig(f));
@@ -156,7 +156,7 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
     File g = SD.open("/file2.txt", FILE_WRITE);
     g.write(0);
     g.close();
-    g = SD.open("/file2.txt", FILE_READ);
+    g         = SD.open("/file2.txt", FILE_READ);
     uint8_t u = 0x66;
     g.read(&u, 1);
     g.close();

@@ -30,7 +30,7 @@ public:
         return rawip[index];
     }
 
-    bool fromString(const char* address);
+    bool   fromString(const char* address);
 
     String toString();
 
@@ -41,11 +41,11 @@ private:
         IPV4,
         IPV6
     };
-    IPversion ipv = IPversion::UNSET;
+    IPversion ipv       = IPversion::UNSET;
 
-    uint8_t rawip[16] = { 0 };
+    uint8_t   rawip[16] = { 0 };
 
-    void setV4()
+    void      setV4()
     {
         ipv = IPversion::IPV4;
     };
@@ -74,12 +74,12 @@ private:
         return (ipv != IPversion::UNSET);
     };
 
-    bool compareRaw(IPversion v, const uint8_t* a, const uint8_t* b) const;
-    bool compareIP(const IPAddress& ip) const;
-    bool compareIP(const NetdumpIP& nip) const;
+    bool   compareRaw(IPversion v, const uint8_t* a, const uint8_t* b) const;
+    bool   compareIP(const IPAddress& ip) const;
+    bool   compareIP(const NetdumpIP& nip) const;
 
-    bool fromString4(const char* address);
-    bool fromString6(const char* address);
+    bool   fromString4(const char* address);
+    bool   fromString6(const char* address);
 
     size_t printTo(Print& p);
 

@@ -44,7 +44,7 @@
 
 void serial_printf(const char* fmt, ...)
 {
-    char buf[128];
+    char    buf[128];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 128, fmt, args);
@@ -148,10 +148,8 @@ void serial_printf(const char* fmt, ...)
 // The ENC28J60 SPI Interface supports clock speeds up to 20 MHz
 static const SPISettings spiSettings(20000000, MSBFIRST, SPI_MODE0);
 
-ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr)
-    : _bank(ERXTX_BANK)
-    , _cs(cs)
-    , _spi(spi)
+ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr) :
+    _bank(ERXTX_BANK), _cs(cs), _spi(spi)
 {
     (void)intr;
 }
@@ -526,9 +524,9 @@ bool ENC28J60::reset(void)
 boolean
 ENC28J60::begin(const uint8_t* address)
 {
-    _localMac = address;
+    _localMac   = address;
 
-    bool ret = reset();
+    bool    ret = reset();
     uint8_t rev = readrev();
 
     PRINTF("ENC28J60 rev. B%d\n", rev);
@@ -597,7 +595,7 @@ ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
     if ((readreg(ESTAT) & ESTAT_TXABRT) != 0)
     {
         uint16_t erdpt;
-        uint8_t tsv[7];
+        uint8_t  tsv[7];
         erdpt = (readreg(ERDPTH) << 8) | readreg(ERDPTL);
         writereg(ERDPTL, (dataend + 1) & 0xff);
         writereg(ERDPTH, (dataend + 1) >> 8);
@@ -606,16 +604,16 @@ ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
         writereg(ERDPTH, erdpt >> 8);
         PRINTF("enc28j60: tx err: %d: %02x:%02x:%02x:%02x:%02x:%02x\n"
                "                  tsv: %02x%02x%02x%02x%02x%02x%02x\n",
-            datalen,
-            0xff & data[0], 0xff & data[1], 0xff & data[2],
-            0xff & data[3], 0xff & data[4], 0xff & data[5],
-            tsv[6], tsv[5], tsv[4], tsv[3], tsv[2], tsv[1], tsv[0]);
+               datalen,
+               0xff & data[0], 0xff & data[1], 0xff & data[2],
+               0xff & data[3], 0xff & data[4], 0xff & data[5],
+               tsv[6], tsv[5], tsv[4], tsv[3], tsv[2], tsv[1], tsv[0]);
     }
     else
     {
         PRINTF("enc28j60: tx: %d: %02x:%02x:%02x:%02x:%02x:%02x\n", datalen,
-            0xff & data[0], 0xff & data[1], 0xff & data[2],
-            0xff & data[3], 0xff & data[4], 0xff & data[5]);
+               0xff & data[0], 0xff & data[1], 0xff & data[2],
+               0xff & data[3], 0xff & data[4], 0xff & data[5]);
     }
 #endif
 
@@ -656,13 +654,13 @@ ENC28J60::readFrameSize()
     /* Read the next packet pointer */
     nxtpkt[0] = readdatabyte();
     nxtpkt[1] = readdatabyte();
-    _next = (nxtpkt[1] << 8) + nxtpkt[0];
+    _next     = (nxtpkt[1] << 8) + nxtpkt[0];
 
     PRINTF("enc28j60: nxtpkt 0x%02x%02x\n", _nxtpkt[1], _nxtpkt[0]);
 
     length[0] = readdatabyte();
     length[1] = readdatabyte();
-    _len = (length[1] << 8) + length[0];
+    _len      = (length[1] << 8) + length[0];
 
     PRINTF("enc28j60: length 0x%02x%02x\n", length[1], length[0]);
 
@@ -726,8 +724,8 @@ ENC28J60::readFrameData(uint8_t* buffer, uint16_t framesize)
         return 0;
     }
     PRINTF("enc28j60: rx: %d: %02x:%02x:%02x:%02x:%02x:%02x\n", _len,
-        0xff & buffer[0], 0xff & buffer[1], 0xff & buffer[2],
-        0xff & buffer[3], 0xff & buffer[4], 0xff & buffer[5]);
+           0xff & buffer[0], 0xff & buffer[1], 0xff & buffer[2],
+           0xff & buffer[3], 0xff & buffer[4], 0xff & buffer[5]);
 
     //received_packets++;
     //PRINTF("enc28j60: received_packets %d\n", received_packets);

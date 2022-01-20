@@ -40,19 +40,21 @@
 #endif
 
 /* Set these to your desired credentials. */
-const char* ssid = APSSID;
-const char* password = APPSK;
+const char*      ssid     = APSSID;
+const char*      password = APPSK;
 
 ESP8266WebServer server(80);
 
 /* Just a little test message.  Go to http://192.168.4.1 in a web browser
    connected to this access point to see it.
 */
-void handleRoot() {
+void             handleRoot()
+{
   server.send(200, "text/html", "<h1>You are connected</h1>");
 }
 
-void setup() {
+void setup()
+{
   delay(1000);
   Serial.begin(115200);
   Serial.println();
@@ -68,6 +70,7 @@ void setup() {
   Serial.println("HTTP server started");
 }
 
-void loop() {
+void loop()
+{
   server.handleClient();
 }

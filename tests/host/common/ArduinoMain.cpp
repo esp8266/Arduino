@@ -41,22 +41,22 @@
 
 #define MOCK_PORT_SHIFTER 9000
 
-bool user_exit = false;
-bool run_once = false;
-const char* host_interface = nullptr;
-size_t spiffs_kb = 1024;
-size_t littlefs_kb = 1024;
-bool ignore_sigint = false;
-bool restore_tty = false;
-bool mockdebug = false;
-int mock_port_shifter = MOCK_PORT_SHIFTER;
-const char* fspath = nullptr;
+bool        user_exit         = false;
+bool        run_once          = false;
+const char* host_interface    = nullptr;
+size_t      spiffs_kb         = 1024;
+size_t      littlefs_kb       = 1024;
+bool        ignore_sigint     = false;
+bool        restore_tty       = false;
+bool        mockdebug         = false;
+int         mock_port_shifter = MOCK_PORT_SHIFTER;
+const char* fspath            = nullptr;
 
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
 
-int mockverbose(const char* fmt, ...)
+int                   mockverbose(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -84,7 +84,7 @@ static int mock_start_uart(void)
     settings.c_lflag &= ~(ECHO | ICANON);
     settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON);
     settings.c_oflag |= (ONLCR);
-    settings.c_cc[VMIN] = 0;
+    settings.c_cc[VMIN]  = 0;
     settings.c_cc[VTIME] = 0;
     if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
     {
@@ -201,7 +201,7 @@ void control_c(int sig)
 
 int main(int argc, char* const argv[])
 {
-    bool fast = false;
+    bool fast     = false;
     blocking_uart = false;  // global
 
     signal(SIGINT, control_c);

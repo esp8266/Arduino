@@ -46,8 +46,8 @@
 
 int serverAccept(int srvsock)
 {
-    int clisock;
-    socklen_t n;
+    int                clisock;
+    socklen_t          n;
     struct sockaddr_in client;
     n = sizeof(client);
     if ((clisock = accept(srvsock, (struct sockaddr*)&client, &n)) == -1)
@@ -73,8 +73,8 @@ void WiFiServer::begin(uint16_t port, uint8_t backlog)
 
 void WiFiServer::begin()
 {
-    int sock;
-    int mockport;
+    int                sock;
+    int                mockport;
     struct sockaddr_in server;
 
     mockport = _port;
@@ -99,8 +99,8 @@ void WiFiServer::begin()
         exit(EXIT_FAILURE);
     }
 
-    server.sin_family = AF_INET;
-    server.sin_port = htons(mockport);
+    server.sin_family      = AF_INET;
+    server.sin_port        = htons(mockport);
     server.sin_addr.s_addr = htonl(global_source_address);
     if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
     {
@@ -121,7 +121,7 @@ void WiFiServer::begin()
 bool WiFiServer::hasClient()
 {
     struct pollfd p;
-    p.fd = pcb2int(_listen_pcb);
+    p.fd     = pcb2int(_listen_pcb);
     p.events = POLLIN;
     return poll(&p, 1, 0) && p.revents == POLLIN;
 }

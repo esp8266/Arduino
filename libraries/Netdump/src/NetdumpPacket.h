@@ -36,13 +36,8 @@ int constexpr ETH_HDR_LEN = 14;
 class Packet
 {
 public:
-    Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s)
-        : packetTime(msec)
-        , netif_idx(n)
-        , data(d)
-        , packetLength(l)
-        , out(o)
-        , success(s)
+    Packet(unsigned long msec, int n, const char* d, size_t l, int o, int s) :
+        packetTime(msec), netif_idx(n), data(d), packetLength(l), out(o), success(s)
     {
         setPacketTypes();
     };
@@ -279,34 +274,34 @@ public:
         return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
 
-    const String toString() const;
-    const String toString(PacketDetail netdumpDetail) const;
-    void printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
+    const String                   toString() const;
+    const String                   toString(PacketDetail netdumpDetail) const;
+    void                           printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
-    const PacketType packetType() const;
+    const PacketType               packetType() const;
     const std::vector<PacketType>& allPacketTypes() const;
 
 private:
-    void setPacketType(PacketType);
-    void setPacketTypes();
+    void                    setPacketType(PacketType);
+    void                    setPacketTypes();
 
-    void MACtoString(int dataIdx, StreamString& sstr) const;
-    void ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    MACtoString(int dataIdx, StreamString& sstr) const;
+    void                    ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void                    UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
 
-    time_t packetTime;
-    int netif_idx;
-    const char* data;
-    size_t packetLength;
-    int out;
-    int success;
-    PacketType thisPacketType;
+    time_t                  packetTime;
+    int                     netif_idx;
+    const char*             data;
+    size_t                  packetLength;
+    int                     out;
+    int                     success;
+    PacketType              thisPacketType;
     std::vector<PacketType> thisAllPacketTypes;
 };
 

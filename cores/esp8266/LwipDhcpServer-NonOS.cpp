@@ -31,7 +31,7 @@
 extern netif netif_git[2];
 
 // global DHCP instance for softAP interface
-DhcpServer dhcpSoftAP(&netif_git[SOFTAP_IF]);
+DhcpServer   dhcpSoftAP(&netif_git[SOFTAP_IF]);
 
 extern "C"
 {

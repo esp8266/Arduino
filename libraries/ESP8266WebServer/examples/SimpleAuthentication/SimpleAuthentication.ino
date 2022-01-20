@@ -7,19 +7,22 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
+const char*      ssid     = STASSID;
+const char*      password = STAPSK;
 
 ESP8266WebServer server(80);
 
 //Check if header is present and correct
-bool is_authenticated() {
+bool             is_authenticated()
+{
   Serial.println("Enter is_authenticated");
-  if (server.hasHeader("Cookie")) {
+  if (server.hasHeader("Cookie"))
+  {
     Serial.print("Found cookie: ");
     String cookie = server.header("Cookie");
     Serial.println(cookie);
-    if (cookie.indexOf("ESPSESSIONID=1") != -1) {
+    if (cookie.indexOf("ESPSESSIONID=1") != -1)
+    {
       Serial.println("Authentication Successful");
       return true;
     }
@@ -29,14 +32,17 @@ bool is_authenticated() {
 }
 
 //login page, also called for disconnect
-void handleLogin() {
+void handleLogin()
+{
   String msg;
-  if (server.hasHeader("Cookie")) {
+  if (server.hasHeader("Cookie"))
+  {
     Serial.print("Found cookie: ");
     String cookie = server.header("Cookie");
     Serial.println(cookie);
   }
-  if (server.hasArg("DISCONNECT")) {
+  if (server.hasArg("DISCONNECT"))
+  {
     Serial.println("Disconnection");
     server.sendHeader("Location", "/login");
     server.sendHeader("Cache-Control", "no-cache");
@@ -44,8 +50,10 @@ void handleLogin() {
     server.send(301);
     return;
   }
-  if (server.hasArg("USERNAME") && server.hasArg("PASSWORD")) {
-    if (server.arg("USERNAME") == "admin" && server.arg("PASSWORD") == "admin") {
+  if (server.hasArg("USERNAME") && server.hasArg("PASSWORD"))
+  {
+    if (server.arg("USERNAME") == "admin" && server.arg("PASSWORD") == "admin")
+    {
       server.sendHeader("Location", "/");
       server.sendHeader("Cache-Control", "no-cache");
       server.sendHeader("Set-Cookie", "ESPSESSIONID=1");
@@ -65,17 +73,20 @@ void handleLogin() {
 }
 
 //root page can be accessed only if authentication is ok
-void handleRoot() {
+void handleRoot()
+{
   Serial.println("Enter handleRoot");
   String header;
-  if (!is_authenticated()) {
+  if (!is_authenticated())
+  {
     server.sendHeader("Location", "/login");
     server.sendHeader("Cache-Control", "no-cache");
     server.send(301);
     return;
   }
   String content = "<html><body><H2>hello, you successfully connected to esp8266!</H2><br>";
-  if (server.hasHeader("User-Agent")) {
+  if (server.hasHeader("User-Agent"))
+  {
     content += "the user agent used is : " + server.header("User-Agent") + "<br><br>";
   }
   content += "You can access this page until you <a href=\"/login?DISCONNECT=YES\">disconnect</a></body></html>";
@@ -83,7 +94,8 @@ void handleRoot() {
 }
 
 //no need authentication
-void handleNotFound() {
+void handleNotFound()
+{
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -92,20 +104,23 @@ void handleNotFound() {
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++)
+  {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
 }
 
-void setup(void) {
+void setup(void)
+{
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -117,9 +132,8 @@ void setup(void) {
 
   server.on("/", handleRoot);
   server.on("/login", handleLogin);
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works without need of authentication");
-  });
+  server.on("/inline", []()
+            { server.send(200, "text/plain", "this works without need of authentication"); });
 
   server.onNotFound(handleNotFound);
   //ask server to track these headers
@@ -128,6 +142,7 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
+void loop(void)
+{
   server.handleClient();
 }

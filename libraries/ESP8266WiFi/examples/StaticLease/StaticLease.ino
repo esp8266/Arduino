@@ -7,31 +7,32 @@
 #include <LwipDhcpServer.h>
 
 /* Set these to your desired credentials. */
-const char* ssid = "ESPap";
-const char* password = "thereisnospoon";
+const char*      ssid     = "ESPap";
+const char*      password = "thereisnospoon";
 
 ESP8266WebServer server(80);
 
 /* Set the IP Address you want for your AP */
-IPAddress apIP(192, 168, 0, 1);
+IPAddress        apIP(192, 168, 0, 1);
 
 /* Go to http://192.168.0.1 in a web browser to see current lease */
-void handleRoot() {
-  String result;
-  char wifiClientMac[18];
-  unsigned char number_client;
+void             handleRoot()
+{
+  String               result;
+  char                 wifiClientMac[18];
+  unsigned char        number_client;
   struct station_info* stat_info;
 
-  int i = 1;
+  int                  i = 1;
 
-  number_client = wifi_softap_get_station_num();
-  stat_info = wifi_softap_get_station_info();
+  number_client          = wifi_softap_get_station_num();
+  stat_info              = wifi_softap_get_station_info();
 
-  result = "<html><body><h1>Total Connected Clients : ";
+  result                 = "<html><body><h1>Total Connected Clients : ";
   result += String(number_client);
   result += "</h1></br>";
-  while (stat_info != NULL) {
-
+  while (stat_info != NULL)
+  {
     result += "Client ";
     result += String(i);
     result += " = ";
@@ -49,10 +50,11 @@ void handleRoot() {
   server.send(200, "text/html", result);
 }
 
-void setup() {
+void setup()
+{
   /* List of mac address for static lease */
   uint8 mac_CAM[6] = { 0x00, 0x0C, 0x43, 0x01, 0x60, 0x15 };
-  uint8 mac_PC[6] = { 0xb4, 0x52, 0x7e, 0x9a, 0x19, 0xa5 };
+  uint8 mac_PC[6]  = { 0xb4, 0x52, 0x7e, 0x9a, 0x19, 0xa5 };
 
   Serial.begin(115200);
   Serial.println();
@@ -76,8 +78,8 @@ void setup() {
      ...
      any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
   */
-  dhcpSoftAP.add_dhcps_lease(mac_CAM); // always 192.168.0.100
-  dhcpSoftAP.add_dhcps_lease(mac_PC); // always 192.168.0.101
+  dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
+  dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
   /* Start Access Point. You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");
@@ -88,6 +90,7 @@ void setup() {
   Serial.println("HTTP server started");
 }
 
-void loop() {
+void loop()
+{
   server.handleClient();
 }

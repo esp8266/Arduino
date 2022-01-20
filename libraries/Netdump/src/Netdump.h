@@ -37,8 +37,8 @@ using namespace experimental::CBListImplentation;
 class Netdump
 {
 public:
-    using Filter = std::function<bool(const Packet&)>;
-    using Callback = std::function<void(const Packet&)>;
+    using Filter       = std::function<bool(const Packet&)>;
+    using Callback     = std::function<void(const Packet&)>;
     using LwipCallback = std::function<void(int, const char*, int, int, int)>;
 
     Netdump();
@@ -54,29 +54,29 @@ public:
     bool tcpDump(WiFiServer& tcpDumpServer, const Filter nf = nullptr);
 
 private:
-    Callback netDumpCallback = nullptr;
-    Filter netDumpFilter = nullptr;
+    Callback                                    netDumpCallback = nullptr;
+    Filter                                      netDumpFilter   = nullptr;
 
-    static void capture(int netif_idx, const char* data, size_t len, int out, int success);
-    static CallBackList<LwipCallback> lwipCallback;
+    static void                                 capture(int netif_idx, const char* data, size_t len, int out, int success);
+    static CallBackList<LwipCallback>           lwipCallback;
     CallBackList<LwipCallback>::CallBackHandler lwipHandler;
 
-    void netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success);
+    void                                        netdumpCapture(int netif_idx, const char* data, size_t len, int out, int success);
 
-    void printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
-    void fileDumpProcess(File& outfile, const Packet& np) const;
-    void tcpDumpProcess(const Packet& np);
-    void tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf);
+    void                                        printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packet& np) const;
+    void                                        fileDumpProcess(File& outfile, const Packet& np) const;
+    void                                        tcpDumpProcess(const Packet& np);
+    void                                        tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf);
 
-    void writePcapHeader(Stream& s) const;
+    void                                        writePcapHeader(Stream& s) const;
 
-    WiFiClient tcpDumpClient;
-    char* packetBuffer = nullptr;
-    int bufferIndex = 0;
+    WiFiClient                                  tcpDumpClient;
+    char*                                       packetBuffer  = nullptr;
+    int                                         bufferIndex   = 0;
 
-    static constexpr int tcpBufferSize = 2048;
-    static constexpr int maxPcapLength = 1024;
-    static constexpr uint32_t pcapMagic = 0xa1b2c3d4;
+    static constexpr int                        tcpBufferSize = 2048;
+    static constexpr int                        maxPcapLength = 1024;
+    static constexpr uint32_t                   pcapMagic     = 0xa1b2c3d4;
 };
 
 }  // namespace NetCapture

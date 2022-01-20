@@ -17,24 +17,28 @@
 */
 #include <SPI.h>
 
-class ESPSafeMaster {
+class ESPSafeMaster
+{
   private:
   uint8_t _ss_pin;
-  void _pulseSS() {
+  void    _pulseSS()
+  {
     digitalWrite(_ss_pin, HIGH);
     delayMicroseconds(5);
     digitalWrite(_ss_pin, LOW);
   }
 
   public:
-  ESPSafeMaster(uint8_t pin)
-      : _ss_pin(pin) { }
-  void begin() {
+  ESPSafeMaster(uint8_t pin) :
+      _ss_pin(pin) { }
+  void begin()
+  {
     pinMode(_ss_pin, OUTPUT);
     _pulseSS();
   }
 
-  uint32_t readStatus() {
+  uint32_t readStatus()
+  {
     _pulseSS();
     SPI.transfer(0x04);
     uint32_t status = (SPI.transfer(0) | ((uint32_t)(SPI.transfer(0)) << 8) | ((uint32_t)(SPI.transfer(0)) << 16) | ((uint32_t)(SPI.transfer(0)) << 24));
@@ -42,7 +46,8 @@ class ESPSafeMaster {
     return status;
   }
 
-  void writeStatus(uint32_t status) {
+  void writeStatus(uint32_t status)
+  {
     _pulseSS();
     SPI.transfer(0x01);
     SPI.transfer(status & 0xFF);
@@ -52,45 +57,53 @@ class ESPSafeMaster {
     _pulseSS();
   }
 
-  void readData(uint8_t* data) {
+  void readData(uint8_t* data)
+  {
     _pulseSS();
     SPI.transfer(0x03);
     SPI.transfer(0x00);
-    for (uint8_t i = 0; i < 32; i++) {
+    for (uint8_t i = 0; i < 32; i++)
+    {
       data[i] = SPI.transfer(0);
     }
     _pulseSS();
   }
 
-  void writeData(uint8_t* data, size_t len) {
+  void writeData(uint8_t* data, size_t len)
+  {
     uint8_t i = 0;
     _pulseSS();
     SPI.transfer(0x02);
     SPI.transfer(0x00);
-    while (len-- && i < 32) {
+    while (len-- && i < 32)
+    {
       SPI.transfer(data[i++]);
     }
-    while (i++ < 32) {
+    while (i++ < 32)
+    {
       SPI.transfer(0);
     }
     _pulseSS();
   }
 
-  String readData() {
+  String readData()
+  {
     char data[33];
     data[32] = 0;
     readData((uint8_t*)data);
     return String(data);
   }
 
-  void writeData(const char* data) {
+  void writeData(const char* data)
+  {
     writeData((uint8_t*)data, strlen(data));
   }
 };
 
 ESPSafeMaster esp(SS);
 
-void send(const char* message) {
+void          send(const char* message)
+{
   Serial.print("Master: ");
   Serial.println(message);
   esp.writeData(message);
@@ -100,7 +113,8 @@ void send(const char* message) {
   Serial.println();
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   SPI.begin();
   esp.begin();
@@ -108,7 +122,8 @@ void setup() {
   send("Hello Slave!");
 }
 
-void loop() {
+void loop()
+{
   delay(1000);
   send("Are you alive?");
 }

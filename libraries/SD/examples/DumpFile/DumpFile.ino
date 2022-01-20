@@ -25,14 +25,16 @@
 
 const int chipSelect = 4;
 
-void setup() {
+void      setup()
+{
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
 
   Serial.print("Initializing SD card...");
 
   // see if the card is present and can be initialized:
-  if (!SD.begin(chipSelect)) {
+  if (!SD.begin(chipSelect))
+  {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     return;
@@ -44,17 +46,21 @@ void setup() {
   File dataFile = SD.open("datalog.txt");
 
   // if the file is available, write to it:
-  if (dataFile) {
-    while (dataFile.available()) {
+  if (dataFile)
+  {
+    while (dataFile.available())
+    {
       Serial.write(dataFile.read());
     }
     dataFile.close();
   }
   // if the file isn't open, pop up an error:
-  else {
+  else
+  {
     Serial.println("error opening datalog.txt");
   }
 }
 
-void loop() {
+void loop()
+{
 }

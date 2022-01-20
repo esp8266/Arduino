@@ -6,21 +6,21 @@
 #if defined(CORE_MOCK)
 #define XCHAL_INSTRAM1_VADDR 0x40100000
 #else
-#include <sys/config.h> // For config/core-isa.h
+#include <sys/config.h>  // For config/core-isa.h
 #endif
 
 uint32_t timed_byte_read(char* pc, uint32_t* o);
 uint32_t timed_byte_read2(char* pc, uint32_t* o);
-int divideA_B(int a, int b);
+int      divideA_B(int a, int b);
 
-int* nullPointer = NULL;
+int*     nullPointer       = NULL;
 
-char* probe_b = NULL;
-short* probe_s = NULL;
-char* probe_c = (char*)0x40110000;
-short* unaligned_probe_s = NULL;
+char*    probe_b           = NULL;
+short*   probe_s           = NULL;
+char*    probe_c           = (char*)0x40110000;
+short*   unaligned_probe_s = NULL;
 
-uint32_t read_var = 0x11223344;
+uint32_t read_var          = 0x11223344;
 
 /*
   Notes,
@@ -31,33 +31,37 @@ uint32_t read_var = 0x11223344;
 
 #if defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
 uint32_t* gobble;
-size_t gobble_sz;
+size_t    gobble_sz;
 
 #elif (MMU_IRAM_SIZE > 32 * 1024)
-uint32_t gobble[4 * 1024] IRAM_ATTR;
+uint32_t         gobble[4 * 1024] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
 
 #else
-uint32_t gobble[256] IRAM_ATTR;
+uint32_t         gobble[256] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
 #endif
 
-bool isValid(uint32_t* probe) {
+bool isValid(uint32_t* probe)
+{
   bool rc = true;
-  if (NULL == probe) {
+  if (NULL == probe)
+  {
     ets_uart_printf("\nNULL memory pointer %p ...\n", probe);
     return false;
   }
 
   ets_uart_printf("\nTesting for valid memory at %p ...\n", probe);
-  uint32_t savePS = xt_rsil(15);
+  uint32_t savePS   = xt_rsil(15);
   uint32_t saveData = *probe;
-  for (size_t i = 0; i < 32; i++) {
+  for (size_t i = 0; i < 32; i++)
+  {
     *probe = BIT(i);
     asm volatile("" ::
                      : "memory");
     uint32_t val = *probe;
-    if (val != BIT(i)) {
+    if (val != BIT(i))
+    {
       ets_uart_printf("  Read 0x%08X != Wrote 0x%08X\n", val, (uint32_t)BIT(i));
       rc = false;
     }
@@ -68,16 +72,20 @@ bool isValid(uint32_t* probe) {
   return rc;
 }
 
-void dump_mem32(const void* addr, const size_t len) {
+void dump_mem32(const void* addr, const size_t len)
+{
   uint32_t* addr32 = (uint32_t*)addr;
   ets_uart_printf("\n");
-  if ((uintptr_t)addr32 & 3) {
+  if ((uintptr_t)addr32 & 3)
+  {
     ets_uart_printf("non-32-bit access\n");
     ets_delay_us(12000);
   }
-  for (size_t i = 0; i < len;) {
+  for (size_t i = 0; i < len;)
+  {
     ets_uart_printf("%p: ", &addr32[i]);
-    do {
+    do
+    {
       ets_uart_printf(" 0x%08x", addr32[i]);
     } while (i++, (i & 3) && (i < len));
     ets_uart_printf("\n");
@@ -87,17 +95,20 @@ void dump_mem32(const void* addr, const size_t len) {
 
 extern "C" void _text_end(void);
 // extern void *_text_end;
-void print_mmu_status(Print& oStream) {
+void            print_mmu_status(Print& oStream)
+{
   oStream.println();
   oStream.printf_P(PSTR("MMU Configuration"));
   oStream.println();
   oStream.println();
   uint32_t iram_bank_reg = ESP8266_DREG(0x24);
-  if (0 == (iram_bank_reg & 0x10)) { // if bit clear, is enabled
+  if (0 == (iram_bank_reg & 0x10))
+  {  // if bit clear, is enabled
     oStream.printf_P(PSTR("  IRAM block mapped to:    0x40108000"));
     oStream.println();
   }
-  if (0 == (iram_bank_reg & 0x08)) {
+  if (0 == (iram_bank_reg & 0x08))
+  {
     oStream.printf_P(PSTR("  IRAM block mapped to:    0x4010C000"));
     oStream.println();
   }
@@ -122,7 +133,8 @@ void print_mmu_status(Print& oStream) {
 #endif
 }
 
-void setup() {
+void setup()
+{
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
   // Serial.begin(74880);
@@ -136,22 +148,24 @@ void setup() {
   {
     HeapSelectIram ephemeral;
     // Serial.printf_P(PSTR("ESP.getFreeHeap(): %u\n"), ESP.getFreeHeap());
-    gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST; // - 4096;
-    gobble = (uint32_t*)malloc(gobble_sz);
+    gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST;  // - 4096;
+    gobble    = (uint32_t*)malloc(gobble_sz);
   }
   Serial.printf_P(PSTR("\r\nmalloc() from IRAM Heap:\r\n"));
   Serial.printf_P(PSTR("  gobble_sz: %u\r\n"), gobble_sz);
   Serial.printf_P(PSTR("  gobble:    %p\r\n"), gobble);
 
 #elif defined(MMU_SEC_HEAP)
-  gobble = (uint32_t*)MMU_SEC_HEAP;
+  gobble    = (uint32_t*)MMU_SEC_HEAP;
   gobble_sz = MMU_SEC_HEAP_SIZE;
 #endif
 
 #if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
-  if (isValid(gobble)) {
+  if (isValid(gobble))
+  {
     // Put something in our new memory
-    for (size_t i = 0; i < (gobble_sz / 4); i++) {
+    for (size_t i = 0; i < (gobble_sz / 4); i++)
+    {
       gobble[i] = (uint32_t)&gobble[i];
     }
 
@@ -166,14 +180,17 @@ void setup() {
   Serial.printf_P(PSTR("\r\nPeek over the edge of memory at 0x4010C000\r\n"));
   dump_mem32((void*)(0x4010C000 - 16 * 4), 32);
 
-  probe_b = (char*)gobble;
-  probe_s = (short*)((uintptr_t)gobble);
+  probe_b           = (char*)gobble;
+  probe_s           = (short*)((uintptr_t)gobble);
   unaligned_probe_s = (short*)((uintptr_t)gobble + 1);
 }
 
-void processKey(Print& out, int hotKey) {
-  switch (hotKey) {
-    case 't': {
+void processKey(Print& out, int hotKey)
+{
+  switch (hotKey)
+  {
+    case 't':
+    {
       uint32_t tmp;
       out.printf_P(PSTR("Test how much time is added by exception handling"));
       out.println();
@@ -225,7 +242,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read Byte from iRAM, 0x%02X at %p"), probe_b[0], probe_b);
       out.println();
       break;
-    case 'B': {
+    case 'B':
+    {
       out.printf_P(PSTR("Load/Store exception by writing byte to iRAM"));
       out.println();
       char val = 0x55;
@@ -244,7 +262,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read short from iRAM, 0x%04X at %p"), probe_s[0], probe_s);
       out.println();
       break;
-    case 'S': {
+    case 'S':
+    {
       out.printf_P(PSTR("Load/Store exception by writing short to iRAM"));
       out.println();
       short int val = 0x0AA0;
@@ -308,17 +327,21 @@ void processKey(Print& out, int hotKey) {
   }
 }
 
-void serialClientLoop(void) {
-  if (Serial.available() > 0) {
+void serialClientLoop(void)
+{
+  if (Serial.available() > 0)
+  {
     int hotKey = Serial.read();
     processKey(Serial, hotKey);
   }
 }
 
-void loop() {
+void loop()
+{
   serialClientLoop();
 }
 
-int __attribute__((noinline)) divideA_B(int a, int b) {
+int __attribute__((noinline)) divideA_B(int a, int b)
+{
   return (a / b);
 }

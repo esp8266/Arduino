@@ -43,9 +43,9 @@
 
 typedef struct
 {
-    uint32_t state[4];  /* state (ABCD) */
-    uint32_t count[2];  /* number of bits, modulo 2^64 (lsb first) */
-    uint8_t buffer[64]; /* input buffer */
+    uint32_t state[4];   /* state (ABCD) */
+    uint32_t count[2];   /* number of bits, modulo 2^64 (lsb first) */
+    uint8_t  buffer[64]; /* input buffer */
 } MD5_CTX;
 
 /* Constants for MD5Transform routine.
@@ -68,9 +68,9 @@ typedef struct
 #define S44 21
 
 /* ----- static functions ----- */
-static void MD5Transform(uint32_t state[4], const uint8_t block[64]);
-static void Encode(uint8_t* output, uint32_t* input, uint32_t len);
-static void Decode(uint32_t* output, const uint8_t* input, uint32_t len);
+static void          MD5Transform(uint32_t state[4], const uint8_t block[64]);
+static void          Encode(uint8_t* output, uint32_t* input, uint32_t len);
+static void          Decode(uint32_t* output, const uint8_t* input, uint32_t len);
 
 static const uint8_t PADDING[64] = {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -124,10 +124,10 @@ EXP_FUNC void STDCALL MD5Init(MD5_CTX* ctx)
 
     /* Load magic initialization constants.
      */
-    ctx->state[0] = 0x67452301;
-    ctx->state[1] = 0xefcdab89;
-    ctx->state[2] = 0x98badcfe;
-    ctx->state[3] = 0x10325476;
+    ctx->state[0]                 = 0x67452301;
+    ctx->state[1]                 = 0xefcdab89;
+    ctx->state[2]                 = 0x98badcfe;
+    ctx->state[3]                 = 0x10325476;
 }
 
 /**
@@ -136,7 +136,7 @@ EXP_FUNC void STDCALL MD5Init(MD5_CTX* ctx)
 EXP_FUNC void STDCALL MD5Update(MD5_CTX* ctx, const uint8_t* msg, int len)
 {
     uint32_t x;
-    int i, partLen;
+    int      i, partLen;
 
     /* Compute number of bytes mod 64 */
     x = (uint32_t)((ctx->count[0] >> 3) & 0x3F);
@@ -171,7 +171,7 @@ EXP_FUNC void STDCALL MD5Update(MD5_CTX* ctx, const uint8_t* msg, int len)
  */
 EXP_FUNC void STDCALL MD5Final(uint8_t* digest, MD5_CTX* ctx)
 {
-    uint8_t bits[8];
+    uint8_t  bits[8];
     uint32_t x, padLen;
 
     /* Save number of bits */
@@ -179,7 +179,7 @@ EXP_FUNC void STDCALL MD5Final(uint8_t* digest, MD5_CTX* ctx)
 
     /* Pad out to 56 mod 64.
      */
-    x = (uint32_t)((ctx->count[0] >> 3) & 0x3f);
+    x      = (uint32_t)((ctx->count[0] >> 3) & 0x3f);
     padLen = (x < 56) ? (56 - x) : (120 - x);
     MD5Update(ctx, PADDING, padLen);
 
@@ -288,7 +288,7 @@ static void Encode(uint8_t* output, uint32_t* input, uint32_t len)
 
     for (i = 0, j = 0; j < len; i++, j += 4)
     {
-        output[j] = (uint8_t)(input[i] & 0xff);
+        output[j]     = (uint8_t)(input[i] & 0xff);
         output[j + 1] = (uint8_t)((input[i] >> 8) & 0xff);
         output[j + 2] = (uint8_t)((input[i] >> 16) & 0xff);
         output[j + 3] = (uint8_t)((input[i] >> 24) & 0xff);

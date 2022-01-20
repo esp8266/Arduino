@@ -20,7 +20,7 @@
 */
 #include <ESP8266WiFi.h>
 
-#include <algorithm> // std::min
+#include <algorithm>  // std::min
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -64,20 +64,20 @@ SoftwareSerial* logger = nullptr;
 #define logger (&Serial1)
 #endif
 
-#define STACK_PROTECTOR 512 // bytes
+#define STACK_PROTECTOR 512  // bytes
 
 //how many clients should be able to telnet to this ESP8266
 #define MAX_SRV_CLIENTS 2
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-const int port = 23;
+const int   port     = 23;
 
-WiFiServer server(port);
-WiFiClient serverClients[MAX_SRV_CLIENTS];
+WiFiServer  server(port);
+WiFiClient  serverClients[MAX_SRV_CLIENTS];
 
-void setup() {
-
+void        setup()
+{
   Serial.begin(BAUD_SERIAL);
   Serial.setRxBufferSize(RXBUFFERSIZE);
 
@@ -98,7 +98,7 @@ void setup() {
   logger->printf("Serial receive buffer size: %d bytes\n", RXBUFFERSIZE);
 
 #if SERIAL_LOOPBACK
-  USC0(0) |= (1 << UCLBE); // incomplete HardwareSerial API
+  USC0(0) |= (1 << UCLBE);  // incomplete HardwareSerial API
   logger->println("Serial Internal Loopback enabled");
 #endif
 
@@ -106,7 +106,8 @@ void setup() {
   WiFi.begin(ssid, password);
   logger->print("\nConnecting to ");
   logger->println(ssid);
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     logger->print('.');
     delay(500);
   }
@@ -123,13 +124,16 @@ void setup() {
   logger->printf(" %d' to connect\n", port);
 }
 
-void loop() {
+void loop()
+{
   //check if there are any new clients
-  if (server.hasClient()) {
+  if (server.hasClient())
+  {
     //find free/disconnected spot
     int i;
     for (i = 0; i < MAX_SRV_CLIENTS; i++)
-      if (!serverClients[i]) { // equivalent to !serverClients[i].connected()
+      if (!serverClients[i])
+      {  // equivalent to !serverClients[i].connected()
         serverClients[i] = server.accept();
         logger->print("New client: index ");
         logger->print(i);
@@ -137,7 +141,8 @@ void loop() {
       }
 
     //no free/disconnected spot so reject
-    if (i == MAX_SRV_CLIENTS) {
+    if (i == MAX_SRV_CLIENTS)
+    {
       server.accept().println("busy");
       // hints: server.accept() is a WiFiClient with short-term scope
       // when out of scope, a WiFiClient will
@@ -152,20 +157,23 @@ void loop() {
   // Incredibly, this code is faster than the buffered one below - #4620 is needed
   // loopback/3000000baud average 348KB/s
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
-    while (serverClients[i].available() && Serial.availableForWrite() > 0) {
+    while (serverClients[i].available() && Serial.availableForWrite() > 0)
+    {
       // working char by char is not very efficient
       Serial.write(serverClients[i].read());
     }
 #else
   // loopback/3000000baud average: 312KB/s
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
-    while (serverClients[i].available() && Serial.availableForWrite() > 0) {
+    while (serverClients[i].available() && Serial.availableForWrite() > 0)
+    {
       size_t maxToSerial = std::min(serverClients[i].available(), Serial.availableForWrite());
-      maxToSerial = std::min(maxToSerial, (size_t)STACK_PROTECTOR);
+      maxToSerial        = std::min(maxToSerial, (size_t)STACK_PROTECTOR);
       uint8_t buf[maxToSerial];
-      size_t tcp_got = serverClients[i].read(buf, maxToSerial);
-      size_t serial_sent = Serial.write(buf, tcp_got);
-      if (serial_sent != maxToSerial) {
+      size_t  tcp_got     = serverClients[i].read(buf, maxToSerial);
+      size_t  serial_sent = Serial.write(buf, tcp_got);
+      if (serial_sent != maxToSerial)
+      {
         logger->printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxToSerial, tcp_got, serial_sent);
       }
     }
@@ -175,15 +183,22 @@ void loop() {
   // client.availableForWrite() returns 0 when !client.connected()
   int maxToTcp = 0;
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
-    if (serverClients[i]) {
+    if (serverClients[i])
+    {
       int afw = serverClients[i].availableForWrite();
-      if (afw) {
-        if (!maxToTcp) {
+      if (afw)
+      {
+        if (!maxToTcp)
+        {
           maxToTcp = afw;
-        } else {
+        }
+        else
+        {
           maxToTcp = std::min(maxToTcp, afw);
         }
-      } else {
+      }
+      else
+      {
         // warn but ignore congested clients
         logger->println("one client is congested");
       }
@@ -191,18 +206,21 @@ void loop() {
 
   //check UART for data
   size_t len = std::min(Serial.available(), maxToTcp);
-  len = std::min(len, (size_t)STACK_PROTECTOR);
-  if (len) {
+  len        = std::min(len, (size_t)STACK_PROTECTOR);
+  if (len)
+  {
     uint8_t sbuf[len];
-    int serial_got = Serial.readBytes(sbuf, len);
+    int     serial_got = Serial.readBytes(sbuf, len);
     // push UART data to all connected telnet clients
     for (int i = 0; i < MAX_SRV_CLIENTS; i++)
       // if client.availableForWrite() was 0 (congested)
       // and increased since then,
       // ensure write space is sufficient:
-      if (serverClients[i].availableForWrite() >= serial_got) {
+      if (serverClients[i].availableForWrite() >= serial_got)
+      {
         size_t tcp_sent = serverClients[i].write(sbuf, serial_got);
-        if (tcp_sent != len) {
+        if (tcp_sent != len)
+        {
           logger->printf("len mismatch: available:%zd serial-read:%zd tcp-write:%zd\n", len, serial_got, tcp_sent);
         }
       }

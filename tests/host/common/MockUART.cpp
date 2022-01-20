@@ -39,27 +39,27 @@
 
 extern "C"
 {
-    bool blocking_uart = true;  // system default
+    bool           blocking_uart   = true;  // system default
 
-    static int s_uart_debug_nr = UART1;
+    static int     s_uart_debug_nr = UART1;
 
-    static uart_t* UART[2] = { NULL, NULL };
+    static uart_t* UART[2]         = { NULL, NULL };
 
     struct uart_rx_buffer_
     {
-        size_t size;
-        size_t rpos;
-        size_t wpos;
+        size_t   size;
+        size_t   rpos;
+        size_t   wpos;
         uint8_t* buffer;
     };
 
     struct uart_
     {
-        int uart_nr;
-        int baud_rate;
-        bool rx_enabled;
-        bool tx_enabled;
-        bool rx_overrun;
+        int                     uart_nr;
+        int                     baud_rate;
+        bool                    rx_enabled;
+        bool                    tx_enabled;
+        bool                    rx_overrun;
         struct uart_rx_buffer_* rx_buffer;
     };
 
@@ -77,7 +77,7 @@ extern "C"
             {
                 if (w)
                 {
-                    FILE* out = uart_nr == UART0 ? stdout : stderr;
+                    FILE*   out = uart_nr == UART0 ? stdout : stderr;
                     timeval tv;
                     gettimeofday(&tv, nullptr);
                     const tm* tm = localtime(&tv.tv_sec);
@@ -103,7 +103,7 @@ extern "C"
     {
         struct uart_rx_buffer_* rx_buffer = uart->rx_buffer;
 
-        size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
+        size_t                  nextPos   = (rx_buffer->wpos + 1) % rx_buffer->size;
         if (nextPos == rx_buffer->rpos)
         {
             uart->rx_overrun = true;
@@ -115,7 +115,7 @@ extern "C"
 #endif
         }
         rx_buffer->buffer[rx_buffer->wpos] = data;
-        rx_buffer->wpos = nextPos;
+        rx_buffer->wpos                    = nextPos;
     }
 
     // insert a new byte into the RX FIFO nuffer
@@ -150,7 +150,7 @@ extern "C"
         if (uart_rx_available_unsafe(uart->rx_buffer))
         {
             // take oldest sw data
-            int ret = uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+            int ret               = uart->rx_buffer->buffer[uart->rx_buffer->rpos];
             uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
             return ret;
         }
@@ -238,10 +238,10 @@ extern "C"
         if (new_wpos == new_size)
             new_wpos = 0;
 
-        uint8_t* old_buf = uart->rx_buffer->buffer;
-        uart->rx_buffer->rpos = 0;
-        uart->rx_buffer->wpos = new_wpos;
-        uart->rx_buffer->size = new_size;
+        uint8_t* old_buf        = uart->rx_buffer->buffer;
+        uart->rx_buffer->rpos   = 0;
+        uart->rx_buffer->wpos   = new_wpos;
+        uart->rx_buffer->size   = new_size;
         uart->rx_buffer->buffer = new_buf;
         free(old_buf);
         return uart->rx_buffer->size;
@@ -270,7 +270,7 @@ extern "C"
         if (uart == NULL || !uart->tx_enabled)
             return 0;
 
-        size_t ret = size;
+        size_t    ret     = size;
         const int uart_nr = uart->uart_nr;
         while (size--)
             uart_do_write_char(uart_nr, *buf++);
@@ -327,9 +327,9 @@ extern "C"
     uint8_t
     uart_get_bit_length(const int uart_nr)
     {
-        uint8_t width = ((uart_nr % 16) >> 2) + 5;
+        uint8_t width  = ((uart_nr % 16) >> 2) + 5;
         uint8_t parity = (uart_nr >> 5) + 1;
-        uint8_t stop = uart_nr % 4;
+        uint8_t stop   = uart_nr % 4;
         return (width + parity + stop + 1);
     }
 
@@ -343,7 +343,7 @@ extern "C"
         if (uart == NULL)
             return NULL;
 
-        uart->uart_nr = uart_nr;
+        uart->uart_nr    = uart_nr;
         uart->rx_overrun = false;
 
         switch (uart->uart_nr)
@@ -359,9 +359,9 @@ extern "C"
                     free(uart);
                     return NULL;
                 }
-                rx_buffer->size = rx_size;  //var this
-                rx_buffer->rpos = 0;
-                rx_buffer->wpos = 0;
+                rx_buffer->size   = rx_size;  //var this
+                rx_buffer->rpos   = 0;
+                rx_buffer->wpos   = 0;
                 rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
                 if (rx_buffer->buffer == NULL)
                 {
@@ -494,9 +494,9 @@ extern "C"
     }
 };
 
-size_t uart_peek_available(uart_t* uart) { return 0; }
+size_t      uart_peek_available(uart_t* uart) { return 0; }
 const char* uart_peek_buffer(uart_t* uart) { return nullptr; }
-void uart_peek_consume(uart_t* uart, size_t consume)
+void        uart_peek_consume(uart_t* uart, size_t consume)
 {
     (void)uart;
     (void)consume;

@@ -20,13 +20,13 @@ namespace protocol
     typedef enum
     {
         /* parsing the space between arguments */
-        SS_SPACE = 0x0,
+        SS_SPACE              = 0x0,
         /* parsing an argument which isn't quoted */
-        SS_ARG = 0x1,
+        SS_ARG                = 0x1,
         /* parsing a quoted argument */
-        SS_QUOTED_ARG = 0x2,
+        SS_QUOTED_ARG         = 0x2,
         /* parsing an escape sequence within unquoted argument */
-        SS_ARG_ESCAPED = SS_ARG | SS_FLAG_ESCAPE,
+        SS_ARG_ESCAPED        = SS_ARG | SS_FLAG_ESCAPE,
         /* parsing an escape sequence within a quoted argument */
         SS_QUOTED_ARG_ESCAPED = SS_QUOTED_ARG | SS_FLAG_ESCAPE,
     } split_state_t;
@@ -35,9 +35,9 @@ namespace protocol
 #define END_ARG()                      \
     do                                 \
     {                                  \
-        char_out = 0;                  \
+        char_out     = 0;              \
         argv[argc++] = next_arg_start; \
-        state = SS_SPACE;              \
+        state        = SS_SPACE;       \
     } while (0);
 
     /**
@@ -66,13 +66,13 @@ namespace protocol
  */
     inline size_t split_args(char* line, char** argv, size_t argv_size)
     {
-        const int QUOTE = '"';
-        const int ESCAPE = '\\';
-        const int SPACE = ' ';
-        split_state_t state = SS_SPACE;
-        size_t argc = 0;
-        char* next_arg_start = line;
-        char* out_ptr = line;
+        const int     QUOTE          = '"';
+        const int     ESCAPE         = '\\';
+        const int     SPACE          = ' ';
+        split_state_t state          = SS_SPACE;
+        size_t        argc           = 0;
+        char*         next_arg_start = line;
+        char*         out_ptr        = line;
         for (char* in_ptr = line; argc < argv_size - 1; ++in_ptr)
         {
             int char_in = (unsigned char)*in_ptr;
@@ -92,18 +92,18 @@ namespace protocol
                 else if (char_in == QUOTE)
                 {
                     next_arg_start = out_ptr;
-                    state = SS_QUOTED_ARG;
+                    state          = SS_QUOTED_ARG;
                 }
                 else if (char_in == ESCAPE)
                 {
                     next_arg_start = out_ptr;
-                    state = SS_ARG_ESCAPED;
+                    state          = SS_ARG_ESCAPED;
                 }
                 else
                 {
                     next_arg_start = out_ptr;
-                    state = SS_ARG;
-                    char_out = char_in;
+                    state          = SS_ARG;
+                    char_out       = char_in;
                 }
                 break;
 

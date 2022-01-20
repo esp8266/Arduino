@@ -34,7 +34,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-FS SPIFFS(nullptr);
+FS                     SPIFFS(nullptr);
 
 SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage)
 {
@@ -45,11 +45,11 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
     fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
 
     m_fs.resize(fs_size, 0xff);
-    s_phys_addr = 0;
-    s_phys_size = static_cast<uint32_t>(fs_size);
-    s_phys_page = static_cast<uint32_t>(fs_page);
+    s_phys_addr  = 0;
+    s_phys_size  = static_cast<uint32_t>(fs_size);
+    s_phys_page  = static_cast<uint32_t>(fs_page);
     s_phys_block = static_cast<uint32_t>(fs_block);
-    s_phys_data = m_fs.data();
+    s_phys_data  = m_fs.data();
     reset();
 }
 
@@ -62,11 +62,11 @@ void SpiffsMock::reset()
 SpiffsMock::~SpiffsMock()
 {
     save();
-    s_phys_addr = 0;
-    s_phys_size = 0;
-    s_phys_page = 0;
+    s_phys_addr  = 0;
+    s_phys_size  = 0;
+    s_phys_page  = 0;
     s_phys_block = 0;
-    s_phys_data = nullptr;
+    s_phys_data  = nullptr;
     m_fs.resize(0);
     SPIFFS = FS(FSImplPtr(nullptr));
 }

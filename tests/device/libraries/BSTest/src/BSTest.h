@@ -25,12 +25,8 @@ typedef void (*test_case_func_t)();
 class TestCase
 {
 public:
-    TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc)
-        : m_func(func)
-        , m_file(file)
-        , m_line(line)
-        , m_name(name)
-        , m_desc(desc)
+    TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name, const char* desc) :
+        m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
     {
         if (prev)
         {
@@ -69,12 +65,12 @@ public:
     }
 
 protected:
-    TestCase* m_next = nullptr;
+    TestCase*        m_next = nullptr;
     test_case_func_t m_func;
-    const char* m_file;
-    size_t m_line;
-    const char* m_name;
-    const char* m_desc;
+    const char*      m_file;
+    size_t           m_line;
+    const char*      m_name;
+    const char*      m_desc;
 };
 
 struct Registry
@@ -89,15 +85,15 @@ struct Registry
         m_last = tc;
     }
     TestCase* m_first = nullptr;
-    TestCase* m_last = nullptr;
+    TestCase* m_last  = nullptr;
 };
 
 struct Env
 {
-    std::function<void(void)> m_check_pass;
+    std::function<void(void)>   m_check_pass;
     std::function<void(size_t)> m_check_fail;
     std::function<void(size_t)> m_fail;
-    Registry m_registry;
+    Registry                    m_registry;
 };
 
 extern Env g_env;
@@ -108,19 +104,19 @@ class Runner
     typedef Runner<IO> Tself;
 
 public:
-    Runner(IO& io)
-        : m_io(io)
+    Runner(IO& io) :
+        m_io(io)
     {
         g_env.m_check_pass = std::bind(&Tself::check_pass, this);
         g_env.m_check_fail = std::bind(&Tself::check_fail, this, std::placeholders::_1);
-        g_env.m_fail = std::bind(&Tself::fail, this, std::placeholders::_1);
+        g_env.m_fail       = std::bind(&Tself::fail, this, std::placeholders::_1);
     }
 
     ~Runner()
     {
         g_env.m_check_pass = 0;
         g_env.m_check_fail = 0;
-        g_env.m_fail = 0;
+        g_env.m_fail       = 0;
     }
 
     void run()
@@ -159,7 +155,7 @@ protected:
         protocol::output_menu_end(m_io);
         while (true)
         {
-            int id;
+            int  id;
             char line_buf[BS_LINE_BUF_SIZE];
             if (!protocol::input_handle(m_io, line_buf, sizeof(line_buf), id))
             {
@@ -186,7 +182,7 @@ protected:
     }
 
 protected:
-    IO& m_io;
+    IO&    m_io;
     size_t m_check_pass_count;
     size_t m_check_fail_count;
 };
@@ -248,12 +244,12 @@ inline void require(bool condition, size_t line)
     {                    \
         Env g_env;       \
     }
-#define BS_RUN(...)                                      \
-    do                                                   \
-    {                                                    \
-        bs::IOHelper helper = bs::IOHelper(__VA_ARGS__); \
-        bs::Runner<bs::IOHelper> runner(helper);         \
-        runner.run();                                    \
+#define BS_RUN(...)                                                  \
+    do                                                               \
+    {                                                                \
+        bs::IOHelper             helper = bs::IOHelper(__VA_ARGS__); \
+        bs::Runner<bs::IOHelper> runner(helper);                     \
+        runner.run();                                                \
     } while (0);
 
 #endif  //BSTEST_H

@@ -33,24 +33,16 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 class ClientContext
 {
 public:
-    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg)
-        : _discard_cb(discard_cb)
-        , _discard_cb_arg(discard_cb_arg)
-        , _refcnt(0)
-        , _next(0)
-        , _sync(::getDefaultPrivateGlobalSyncValue())
-        , _sock(-1)
+    ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
+        _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
+        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(-1)
     {
         (void)pcb;
     }
 
-    ClientContext(int sock)
-        : _discard_cb(nullptr)
-        , _discard_cb_arg(nullptr)
-        , _refcnt(0)
-        , _next(nullptr)
-        , _sync(::getDefaultPrivateGlobalSyncValue())
-        , _sock(sock)
+    ClientContext(int sock) :
+        _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr),
+        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
     {
     }
 
@@ -312,21 +304,21 @@ public:
     }
 
 private:
-    discard_cb_t _discard_cb = nullptr;
-    void* _discard_cb_arg = nullptr;
+    discard_cb_t   _discard_cb     = nullptr;
+    void*          _discard_cb_arg = nullptr;
 
-    int8_t _refcnt;
+    int8_t         _refcnt;
     ClientContext* _next;
 
-    bool _sync;
+    bool           _sync;
 
     // MOCK
 
-    int _sock = -1;
-    int _timeout_ms = 5000;
+    int            _sock       = -1;
+    int            _timeout_ms = 5000;
 
-    char _inbuf[CCBUFSIZE];
-    size_t _inbufsize = 0;
+    char           _inbuf[CCBUFSIZE];
+    size_t         _inbufsize = 0;
 };
 
 #endif  //CLIENTCONTEXT_H

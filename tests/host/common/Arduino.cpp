@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include <Schedule.h>
 
-static struct timeval gtod0 = { 0, 0 };
+static struct timeval    gtod0 = { 0, 0 };
 
 extern "C" unsigned long millis()
 {
@@ -109,7 +109,7 @@ extern "C" void delayMicroseconds(unsigned int us)
 }
 
 #include "cont.h"
-cont_t* g_pcont = NULL;
+cont_t*         g_pcont = NULL;
 extern "C" void cont_suspend(cont_t*)
 {
 }

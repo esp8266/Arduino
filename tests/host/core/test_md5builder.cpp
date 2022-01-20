@@ -56,7 +56,7 @@ TEST_CASE("MD5Builder::addHexString works as expected", "[core][MD5Builder]")
 
 TEST_CASE("MD5Builder::addStream works", "[core][MD5Builder]")
 {
-    MD5Builder builder;
+    MD5Builder  builder;
     const char* str = "MD5Builder::addStream_works_longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong";
     {
         StreamString stream;

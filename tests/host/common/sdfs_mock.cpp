@@ -18,4 +18,4 @@
 
 #define SDSIZE 16LL
 uint64_t _sdCardSizeB = 0;
-uint8_t* _sdCard = nullptr;
+uint8_t* _sdCard      = nullptr;

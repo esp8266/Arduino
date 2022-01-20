@@ -20,8 +20,8 @@ ESP8266WiFiMulti WiFiMulti;
 #define APPSK "APPSK"
 #endif
 
-void setup() {
-
+void setup()
+{
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -29,7 +29,8 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  for (uint8_t t = 4; t > 0; t--) {
+  for (uint8_t t = 4; t > 0; t--)
+  {
     Serial.printf("[SETUP] WAIT %d...\n", t);
     Serial.flush();
     delay(1000);
@@ -39,10 +40,11 @@ void setup() {
   WiFiMulti.addAP(APSSID, APPSK);
 }
 
-void loop() {
+void loop()
+{
   // wait for WiFi connection
-  if ((WiFiMulti.run() == WL_CONNECTED)) {
-
+  if ((WiFiMulti.run() == WL_CONNECTED))
+  {
     Serial.println("Update LittleFS...");
 
     WiFiClient client;
@@ -56,11 +58,13 @@ void loop() {
     ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
     t_httpUpdate_return ret = ESPhttpUpdate.updateFS(client, "http://server/spiffs.bin");
-    if (ret == HTTP_UPDATE_OK) {
+    if (ret == HTTP_UPDATE_OK)
+    {
       Serial.println("Update sketch...");
       ret = ESPhttpUpdate.update(client, "http://server/file.bin");
 
-      switch (ret) {
+      switch (ret)
+      {
         case HTTP_UPDATE_FAILED:
           Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
           break;

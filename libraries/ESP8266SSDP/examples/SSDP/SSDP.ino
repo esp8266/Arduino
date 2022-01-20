@@ -7,27 +7,26 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
+const char*      ssid     = STASSID;
+const char*      password = STAPSK;
 
 ESP8266WebServer HTTP(80);
 
-void setup() {
+void             setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.println("Starting WiFi...");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() == WL_CONNECTED) {
-
+  if (WiFi.waitForConnectResult() == WL_CONNECTED)
+  {
     Serial.printf("Starting HTTP...\n");
-    HTTP.on("/index.html", HTTP_GET, []() {
-      HTTP.send(200, "text/plain", "Hello World!");
-    });
-    HTTP.on("/description.xml", HTTP_GET, []() {
-      SSDP.schema(HTTP.client());
-    });
+    HTTP.on("/index.html", HTTP_GET, []()
+            { HTTP.send(200, "text/plain", "Hello World!"); });
+    HTTP.on("/description.xml", HTTP_GET, []()
+            { SSDP.schema(HTTP.client()); });
     HTTP.begin();
 
     Serial.printf("Starting SSDP...\n");
@@ -44,15 +43,19 @@ void setup() {
     SSDP.begin();
 
     Serial.printf("Ready!\n");
-  } else {
+  }
+  else
+  {
     Serial.printf("WiFi Failed\n");
-    while (1) {
+    while (1)
+    {
       delay(100);
     }
   }
 }
 
-void loop() {
+void loop()
+{
   HTTP.handleClient();
   delay(1);
 }

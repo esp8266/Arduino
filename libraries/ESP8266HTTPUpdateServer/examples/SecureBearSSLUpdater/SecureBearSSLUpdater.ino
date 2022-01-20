@@ -24,17 +24,17 @@
 #define STAPSK "your-password"
 #endif
 
-const char* host = "esp8266-webupdate";
-const char* update_path = "/firmware";
-const char* update_username = "admin";
-const char* update_password = "admin";
-const char* ssid = STASSID;
-const char* password = STAPSK;
+const char*                   host            = "esp8266-webupdate";
+const char*                   update_path     = "/firmware";
+const char*                   update_username = "admin";
+const char*                   update_password = "admin";
+const char*                   ssid            = STASSID;
+const char*                   password        = STAPSK;
 
-ESP8266WebServerSecure httpServer(443);
+ESP8266WebServerSecure        httpServer(443);
 ESP8266HTTPUpdateServerSecure httpUpdater;
 
-static const char serverCert[] PROGMEM = R"EOF(
+static const char             serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDSzCCAjMCCQD2ahcfZAwXxDANBgkqhkiG9w0BAQsFADCBiTELMAkGA1UEBhMC
 VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU9yYW5nZSBDb3VudHkx
@@ -57,7 +57,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 -----END CERTIFICATE-----
 )EOF";
 
-static const char serverKey[] PROGMEM = R"EOF(
+static const char             serverKey[] PROGMEM  = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -87,15 +87,16 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 -----END RSA PRIVATE KEY-----
 )EOF";
 
-void setup() {
-
+void                          setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.println("Booting Sketch...");
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
 
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  while (WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
   }
@@ -112,10 +113,11 @@ void setup() {
   Serial.printf("BearSSLUpdateServer ready!\nOpen https://%s.local%s in "
                 "your browser and login with username '%s' and password "
                 "'%s'\n",
-      host, update_path, update_username, update_password);
+                host, update_path, update_username, update_password);
 }
 
-void loop() {
+void loop()
+{
   httpServer.handleClient();
   MDNS.update();
 }

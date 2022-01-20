@@ -49,7 +49,7 @@ err_t dns_gethostbyname(const char* hostname, ip_addr_t* addr, dns_found_callbac
 }
 
 static struct tcp_pcb mock_tcp_pcb;
-tcp_pcb* tcp_new(void)
+tcp_pcb*              tcp_new(void)
 {
     // this is useless
     // ClientContext is setting the source port and we don't care here

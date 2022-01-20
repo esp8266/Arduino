@@ -79,7 +79,7 @@ bool mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
     (void)dstaddr;
     //servaddr.sin_addr.s_addr = htonl(global_source_address);
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(mockport);
+    servaddr.sin_port        = htons(mockport);
 
     // Bind the socket with the server address
     if (bind(sock, (const struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
@@ -130,10 +130,10 @@ bool mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port)
 {
     struct sockaddr_storage addrbuf;
-    socklen_t addrbufsize = std::min((socklen_t)sizeof(addrbuf), (socklen_t)16);
+    socklen_t               addrbufsize = std::min((socklen_t)sizeof(addrbuf), (socklen_t)16);
 
-    size_t maxread = CCBUFSIZE - ccinbufsize;
-    ssize_t ret = ::recvfrom(sock, ccinbuf + ccinbufsize, maxread, 0 /*flags*/, (sockaddr*)&addrbuf, &addrbufsize);
+    size_t                  maxread     = CCBUFSIZE - ccinbufsize;
+    ssize_t                 ret         = ::recvfrom(sock, ccinbuf + ccinbufsize, maxread, 0 /*flags*/, (sockaddr*)&addrbuf, &addrbufsize);
     if (ret == -1)
     {
         if (errno != EAGAIN)
@@ -194,10 +194,10 @@ size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, 
     (void)timeout_ms;
     // Filling server information
     struct sockaddr_in peer;
-    peer.sin_family = AF_INET;
+    peer.sin_family      = AF_INET;
     peer.sin_addr.s_addr = ipv4;  //XXFIXME should use lwip_htonl?
-    peer.sin_port = htons(port);
-    int ret = ::sendto(sock, data, size, 0 /*flags*/, (const sockaddr*)&peer, sizeof(peer));
+    peer.sin_port        = htons(port);
+    int ret              = ::sendto(sock, data, size, 0 /*flags*/, (const sockaddr*)&peer, sizeof(peer));
     if (ret == -1)
     {
         fprintf(stderr, MOCK "UDPContext::write: write(%d): %s\n", sock, strerror(errno));

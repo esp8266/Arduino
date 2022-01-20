@@ -106,7 +106,7 @@
 #endif
 
 #define TOO_MANY_ERRORS 11
-static int errors = 0;
+static int  errors   = 0;
 
 const char* testname = "strcmp";
 
@@ -132,19 +132,19 @@ print_error(char const* msg, ...)
 }
 
 extern int rand_seed;
-void strcmp_main(void)
+void       strcmp_main(void)
 {
     /* Allocate buffers to read and write from.  */
     char src[BUFF_SIZE], dest[BUFF_SIZE];
 
     /* Fill the source buffer with non-null values, reproducible random data. */
     srand(rand_seed);
-    int i, j, zeros;
+    int      i, j, zeros;
     unsigned sa;
     unsigned da;
     unsigned n, m, len;
-    char* p;
-    int ret;
+    char*    p;
+    int      ret;
 
     /* Make calls to strcmp with block sizes ranging between 1 and
      MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
@@ -161,7 +161,7 @@ void strcmp_main(void)
                             /* Make a copy of the source.  */
                             for (i = 0; i < BUFF_SIZE; i++)
                             {
-                                src[i] = 'A' + (i % 26);
+                                src[i]  = 'A' + (i % 26);
                                 dest[i] = src[i];
                             }
                             delay(0);
@@ -179,7 +179,7 @@ void strcmp_main(void)
                             for (j = 0; j < (int)len; j++)
                                 *p++ = 'x';
                             /* Make dest 0-terminated.  */
-                            *p = '\0';
+                            *p  = '\0';
 
                             ret = strcmp(src + sa, dest + da);
 
@@ -190,35 +190,32 @@ void strcmp_main(void)
                                 {
                                     if (ret != 0)
                                     {
-                                        print_error(
-                                            "\nFailed: after %s of %u bytes "
-                                            "with src_align %u and dst_align %u, "
-                                            "dest after %d bytes is modified for %d bytes, "
-                                            "return value is %d, expected 0.\n",
-                                            testname, n, sa, da, m, len, ret);
+                                        print_error("\nFailed: after %s of %u bytes "
+                                                    "with src_align %u and dst_align %u, "
+                                                    "dest after %d bytes is modified for %d bytes, "
+                                                    "return value is %d, expected 0.\n",
+                                                    testname, n, sa, da, m, len, ret);
                                     }
                                 }
                                 else
                                 {
                                     if (ret >= 0)
-                                        print_error(
-                                            "\nFailed: after %s of %u bytes "
-                                            "with src_align %u and dst_align %u, "
-                                            "dest after %d bytes is modified for %d bytes, "
-                                            "return value is %d, expected negative.\n",
-                                            testname, n, sa, da, m, len, ret);
+                                        print_error("\nFailed: after %s of %u bytes "
+                                                    "with src_align %u and dst_align %u, "
+                                                    "dest after %d bytes is modified for %d bytes, "
+                                                    "return value is %d, expected negative.\n",
+                                                    testname, n, sa, da, m, len, ret);
                                 }
                             }
                             else if (m > n)
                             {
                                 if (ret >= 0)
                                 {
-                                    print_error(
-                                        "\nFailed: after %s of %u bytes "
-                                        "with src_align %u and dst_align %u, "
-                                        "dest after %d bytes is modified for %d bytes, "
-                                        "return value is %d, expected negative.\n",
-                                        testname, n, sa, da, m, len, ret);
+                                    print_error("\nFailed: after %s of %u bytes "
+                                                "with src_align %u and dst_align %u, "
+                                                "dest after %d bytes is modified for %d bytes, "
+                                                "return value is %d, expected negative.\n",
+                                                testname, n, sa, da, m, len, ret);
                                 }
                             }
                             else /* m < n */
@@ -226,59 +223,57 @@ void strcmp_main(void)
                                 if (len == 0)
                                 {
                                     if (ret <= 0)
-                                        print_error(
-                                            "\nFailed: after %s of %u bytes "
-                                            "with src_align %u and dst_align %u, "
-                                            "dest after %d bytes is modified for %d bytes, "
-                                            "return value is %d, expected positive.\n",
-                                            testname, n, sa, da, m, len, ret);
+                                        print_error("\nFailed: after %s of %u bytes "
+                                                    "with src_align %u and dst_align %u, "
+                                                    "dest after %d bytes is modified for %d bytes, "
+                                                    "return value is %d, expected positive.\n",
+                                                    testname, n, sa, da, m, len, ret);
                                 }
                                 else
                                 {
                                     if (ret >= 0)
-                                        print_error(
-                                            "\nFailed: after %s of %u bytes "
-                                            "with src_align %u and dst_align %u, "
-                                            "dest after %d bytes is modified for %d bytes, "
-                                            "return value is %d, expected negative.\n",
-                                            testname, n, sa, da, m, len, ret);
+                                        print_error("\nFailed: after %s of %u bytes "
+                                                    "with src_align %u and dst_align %u, "
+                                                    "dest after %d bytes is modified for %d bytes, "
+                                                    "return value is %d, expected negative.\n",
+                                                    testname, n, sa, da, m, len, ret);
                                 }
                             }
                         }
             }
 
     /* Check some corner cases.  */
-    src[1] = 'A';
+    src[1]  = 'A';
     dest[1] = 'A';
-    src[2] = 'B';
+    src[2]  = 'B';
     dest[2] = 'B';
-    src[3] = 'C';
+    src[3]  = 'C';
     dest[3] = 'C';
-    src[4] = '\0';
+    src[4]  = '\0';
     dest[4] = '\0';
 
-    src[0] = 0xc1;
+    src[0]  = 0xc1;
     dest[0] = 0x41;
-    ret = strcmp(src, dest);
+    ret     = strcmp(src, dest);
     if (ret <= 0)
         print_error("\nFailed: expected positive, return %d\n", ret);
 
-    src[0] = 0x01;
+    src[0]  = 0x01;
     dest[0] = 0x82;
-    ret = strcmp(src, dest);
+    ret     = strcmp(src, dest);
     if (ret >= 0)
         print_error("\nFailed: expected negative, return %d\n", ret);
 
     dest[0] = src[0] = 'D';
-    src[3] = 0xc1;
-    dest[3] = 0x41;
-    ret = strcmp(src, dest);
+    src[3]           = 0xc1;
+    dest[3]          = 0x41;
+    ret              = strcmp(src, dest);
     if (ret <= 0)
         print_error("\nFailed: expected positive, return %d\n", ret);
 
-    src[3] = 0x01;
+    src[3]  = 0x01;
     dest[3] = 0x82;
-    ret = strcmp(src, dest);
+    ret     = strcmp(src, dest);
     if (ret >= 0)
         print_error("\nFailed: expected negative, return %d\n", ret);
 

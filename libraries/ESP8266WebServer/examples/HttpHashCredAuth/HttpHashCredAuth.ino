@@ -21,16 +21,16 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* wifi_pw = STAPSK;
+const char*            ssid                 = STASSID;
+const char*            wifi_pw              = STAPSK;
 
-const String file_credentials = R"(/credentials.txt)"; // LittleFS file name for the saved credentials
-const String change_creds = "changecreds"; // Address for a credential change
+const String           file_credentials     = R"(/credentials.txt)";  // LittleFS file name for the saved credentials
+const String           change_creds         = "changecreds";          // Address for a credential change
 
 //The ESP8266WebServerSecure requires an encryption certificate and matching key.
 //These can generated with the bash script available in the ESP8266 Arduino repository.
 //These values can be used for testing but are available publicly so should not be used in production.
-static const char serverCert[] PROGMEM = R"EOF(
+static const char      serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDSzCCAjMCCQD2ahcfZAwXxDANBgkqhkiG9w0BAQsFADCBiTELMAkGA1UEBhMC
 VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU9yYW5nZSBDb3VudHkx
@@ -52,7 +52,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 5tAF1D5vAAwA8nfPysumlLsIjohJZo4lgnhB++AlOg==
 -----END CERTIFICATE-----
 )EOF";
-static const char serverKey[] PROGMEM = R"EOF(
+static const char      serverKey[] PROGMEM  = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -85,16 +85,18 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 ESP8266WebServerSecure server(443);
 
 //These are temporary credentials that will only be used if none are found saved in LittleFS.
-String login = "admin";
-const String realm = "global";
-String H1 = "";
-String authentication_failed = "User authentication has failed.";
+String                 login                 = "admin";
+const String           realm                 = "global";
+String                 H1                    = "";
+String                 authentication_failed = "User authentication has failed.";
 
-void setup() {
+void                   setup()
+{
   Serial.begin(115200);
 
   //Initialize LittleFS to save credentials
-  if (!LittleFS.begin()) {
+  if (!LittleFS.begin())
+  {
     Serial.println("LittleFS initialization error, programmer flash configured?");
     ESP.restart();
   }
@@ -105,15 +107,16 @@ void setup() {
   //Initialize wifi
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, wifi_pw);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  if (WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
     Serial.println("WiFi Connect Failed! Rebooting...");
     delay(1000);
     ESP.restart();
   }
 
   server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
-  server.on("/", showcredentialpage); //for this simple example, just show a simple page for changing credentials at the root
-  server.on("/" + change_creds, handlecredentialchange); //handles submission of credentials from the client
+  server.on("/", showcredentialpage);                     //for this simple example, just show a simple page for changing credentials at the root
+  server.on("/" + change_creds, handlecredentialchange);  //handles submission of credentials from the client
   server.onNotFound(redirect);
   server.begin();
 
@@ -122,30 +125,36 @@ void setup() {
   Serial.println("/ in your browser to see it working");
 }
 
-void loop() {
+void loop()
+{
   yield();
   server.handleClient();
 }
 
 //This function redirects home
-void redirect() {
+void redirect()
+{
   String url = "https://" + WiFi.localIP().toString();
   Serial.println("Redirect called. Redirecting to " + url);
   server.sendHeader("Location", url, true);
   Serial.println("Header sent.");
-  server.send(302, "text/plain", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  server.send(302, "text/plain", "");  // Empty content inhibits Content-length header so we have to close the socket ourselves.
   Serial.println("Empty page sent.");
-  server.client().stop(); // Stop is needed because we sent no content length
+  server.client().stop();  // Stop is needed because we sent no content length
   Serial.println("Client stopped.");
 }
 
 //This function checks whether the current session has been authenticated. If not, a request for credentials is sent.
-bool session_authenticated() {
+bool session_authenticated()
+{
   Serial.println("Checking authentication.");
-  if (server.authenticateDigest(login, H1)) {
+  if (server.authenticateDigest(login, H1))
+  {
     Serial.println("Authentication confirmed.");
     return true;
-  } else {
+  }
+  else
+  {
     Serial.println("Not authenticated. Requesting credentials.");
     server.requestAuthentication(DIGEST_AUTH, realm.c_str(), authentication_failed);
     redirect();
@@ -154,9 +163,11 @@ bool session_authenticated() {
 }
 
 //This function sends a simple webpage for changing login credentials to the client
-void showcredentialpage() {
+void showcredentialpage()
+{
   Serial.println("Show credential page called.");
-  if (!session_authenticated()) {
+  if (!session_authenticated())
+  {
     return;
   }
 
@@ -189,15 +200,17 @@ void showcredentialpage() {
 }
 
 //Saves credentials to LittleFS
-void savecredentials(String new_login, String new_password) {
+void savecredentials(String new_login, String new_password)
+{
   //Set global variables to new values
   login = new_login;
-  H1 = ESP8266WebServer::credentialHash(new_login, realm, new_password);
+  H1    = ESP8266WebServer::credentialHash(new_login, realm, new_password);
 
   //Save new values to LittleFS for loading on next reboot
   Serial.println("Saving credentials.");
-  File f = LittleFS.open(file_credentials, "w"); //open as a brand new file, discard old contents
-  if (f) {
+  File f = LittleFS.open(file_credentials, "w");  //open as a brand new file, discard old contents
+  if (f)
+  {
     Serial.println("Modifying credentials in file system.");
     f.println(login);
     f.println(H1);
@@ -209,48 +222,56 @@ void savecredentials(String new_login, String new_password) {
 }
 
 //loads credentials from LittleFS
-void loadcredentials() {
+void loadcredentials()
+{
   Serial.println("Searching for credentials.");
   File f;
   f = LittleFS.open(file_credentials, "r");
-  if (f) {
+  if (f)
+  {
     Serial.println("Loading credentials from file system.");
-    String mod = f.readString(); //read the file to a String
-    int index_1 = mod.indexOf('\n', 0); //locate the first line break
-    int index_2 = mod.indexOf('\n', index_1 + 1); //locate the second line break
-    login = mod.substring(0, index_1 - 1); //get the first line (excluding the line break)
-    H1 = mod.substring(index_1 + 1, index_2 - 1); //get the second line (excluding the line break)
+    String mod     = f.readString();                           //read the file to a String
+    int    index_1 = mod.indexOf('\n', 0);                     //locate the first line break
+    int    index_2 = mod.indexOf('\n', index_1 + 1);           //locate the second line break
+    login          = mod.substring(0, index_1 - 1);            //get the first line (excluding the line break)
+    H1             = mod.substring(index_1 + 1, index_2 - 1);  //get the second line (excluding the line break)
     f.close();
-  } else {
-    String default_login = "admin";
+  }
+  else
+  {
+    String default_login    = "admin";
     String default_password = "changeme";
     Serial.println("None found. Setting to default credentials.");
     Serial.println("user:" + default_login);
     Serial.println("password:" + default_password);
     login = default_login;
-    H1 = ESP8266WebServer::credentialHash(default_login, realm, default_password);
+    H1    = ESP8266WebServer::credentialHash(default_login, realm, default_password);
   }
 }
 
 //This function handles a credential change from a client.
-void handlecredentialchange() {
+void handlecredentialchange()
+{
   Serial.println("Handle credential change called.");
-  if (!session_authenticated()) {
+  if (!session_authenticated())
+  {
     return;
   }
 
   Serial.println("Handling credential change request from client.");
 
   String login = server.arg("login");
-  String pw1 = server.arg("password");
-  String pw2 = server.arg("password_duplicate");
+  String pw1   = server.arg("password");
+  String pw2   = server.arg("password_duplicate");
 
-  if (login != "" && pw1 != "" && pw1 == pw2) {
-
+  if (login != "" && pw1 != "" && pw1 == pw2)
+  {
     savecredentials(login, pw1);
     server.send(200, "text/plain", "Credentials updated");
     redirect();
-  } else {
+  }
+  else
+  {
     server.send(200, "text/plain", "Malformed credentials");
     redirect();
   }

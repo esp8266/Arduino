@@ -15,20 +15,24 @@
 const char* ssid = STASSID;
 const char* pass = STAPSK;
 
-void fetch(BearSSL::WiFiClientSecure* client) {
+void        fetch(BearSSL::WiFiClientSecure* client)
+{
   client->write("GET / HTTP/1.0\r\nHost: tls.mbed.org\r\nUser-Agent: ESP8266\r\n\r\n");
   client->flush();
   using oneShot = esp8266::polledTimeout::oneShot;
   oneShot timeout(5000);
-  do {
+  do
+  {
     char tmp[32];
-    int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+    int  rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
     yield();
-    if (rlen < 0) {
+    if (rlen < 0)
+    {
       break;
     }
-    if (rlen == 0) {
-      delay(10); // Give background processes some time
+    if (rlen == 0)
+    {
+      delay(10);  // Give background processes some time
       continue;
     }
     tmp[rlen] = '\0';
@@ -38,7 +42,8 @@ void fetch(BearSSL::WiFiClientSecure* client) {
   Serial.printf("\n-------\n");
 }
 
-int fetchNoMaxFragmentLength() {
+int fetchNoMaxFragmentLength()
+{
   int ret = ESP.getFreeHeap();
 
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
@@ -47,18 +52,22 @@ int fetchNoMaxFragmentLength() {
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
   client.connect("tls.mbed.org", 443);
-  if (client.connected()) {
+  if (client.connected())
+  {
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
     fetch(&client);
-  } else {
+  }
+  else
+  {
     Serial.printf("Unable to connect\n");
   }
   return ret;
 }
 
-int fetchMaxFragmentLength() {
-  int ret = ESP.getFreeHeap();
+int fetchMaxFragmentLength()
+{
+  int                       ret = ESP.getFreeHeap();
 
   // Servers which implement RFC6066's Maximum Fragment Length Negotiation
   // can be configured to limit the size of TLS fragments they transmit.
@@ -82,22 +91,27 @@ int fetchMaxFragmentLength() {
   bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 512);
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
   Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
-  if (mfln) {
+  if (mfln)
+  {
     client.setBufferSizes(512, 512);
   }
   client.connect("tls.mbed.org", 443);
-  if (client.connected()) {
+  if (client.connected())
+  {
     Serial.printf("MFLN status: %s\n", client.getMFLNStatus() ? "true" : "false");
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
     fetch(&client);
-  } else {
+  }
+  else
+  {
     Serial.printf("Unable to connect\n");
   }
   return ret;
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   delay(1000);
@@ -111,7 +125,8 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -122,7 +137,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-void loop() {
+void loop()
+{
   Serial.printf("\n\n\n\n\n");
 
   yield();

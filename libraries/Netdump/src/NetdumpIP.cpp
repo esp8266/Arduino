@@ -100,8 +100,8 @@ bool NetdumpIP::fromString4(const char* address)
 {
     // TODO: (IPv4) add support for "a", "a.b", "a.b.c" formats
 
-    uint16_t acc = 0;  // Accumulator
-    uint8_t dots = 0;
+    uint16_t acc  = 0;  // Accumulator
+    uint8_t  dots = 0;
 
     while (*address)
     {
@@ -123,7 +123,7 @@ bool NetdumpIP::fromString4(const char* address)
                 return false;
             }
             (*this)[dots++] = acc;
-            acc = 0;
+            acc             = 0;
         }
         else
         {
@@ -147,8 +147,8 @@ bool NetdumpIP::fromString6(const char* address)
 {
     // TODO: test test test
 
-    uint32_t acc = 0;  // Accumulator
-    int dots = 0, doubledots = -1;
+    uint32_t acc  = 0;  // Accumulator
+    int      dots = 0, doubledots = -1;
 
     while (*address)
     {
@@ -185,7 +185,7 @@ bool NetdumpIP::fromString6(const char* address)
                 return false;
             }
             reinterpret_cast<uint16_t*>(rawip)[dots++] = PP_HTONS(acc);
-            acc = 0;
+            acc                                        = 0;
         }
         else
         // Invalid char

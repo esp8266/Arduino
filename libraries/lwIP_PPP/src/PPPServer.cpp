@@ -16,10 +16,8 @@
 
 #include "PPPServer.h"
 
-PPPServer::PPPServer(Stream* sio)
-    : _sio(sio)
-    , _cb(netif_status_cb_s)
-    , _enabled(false)
+PPPServer::PPPServer(Stream* sio) :
+    _sio(sio), _cb(netif_status_cb_s), _enabled(false)
 {
 }
 
@@ -41,8 +39,8 @@ bool PPPServer::handlePackets()
 
 void PPPServer::link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx)
 {
-    bool stop = true;
-    netif* nif = ppp_netif(pcb);
+    bool   stop = true;
+    netif* nif  = ppp_netif(pcb);
 
     switch (err_code)
     {
@@ -143,7 +141,7 @@ u32_t PPPServer::output_cb_s(ppp_pcb* pcb, u8_t* data, u32_t len, void* ctx)
 void PPPServer::netif_status_cb_s(netif* nif)
 {
     ets_printf("PPPNETIF: %c%c%d is %s\n", nif->name[0], nif->name[1], nif->num,
-        netif_is_up(nif) ? "UP" : "DOWN");
+               netif_is_up(nif) ? "UP" : "DOWN");
 #if LWIP_IPV4
     ets_printf("IPV4: Host at %s ", ip4addr_ntoa(netif_ip4_addr(nif)));
     ets_printf("mask %s ", ip4addr_ntoa(netif_ip4_netmask(nif)));
@@ -181,8 +179,8 @@ bool PPPServer::begin(const IPAddress& ourAddress, const IPAddress& peer)
 
     _enabled = true;
     if (!schedule_recurrent_function_us([&]()
-            { return this->handlePackets(); },
-            1000))
+                                        { return this->handlePackets(); },
+                                        1000))
     {
         netif_remove(&_netif);
         return false;

@@ -8,7 +8,36 @@ pwd
 test -d cores/esp8266
 test -d libraries
 
-# should be: all="cores/esp8266 libraries"
+#########################################
+
+makeClangConf()
+{
+    IndentWidth="$1"
+    IndentCaseLabels="$2"
+
+    cat << EOF > .clang-format
+BasedOnStyle: WebKit
+AlignTrailingComments: true
+BreakBeforeBraces: Allman
+ColumnLimit: 0
+KeepEmptyLinesAtTheStartOfBlocks: false
+SpacesBeforeTrailingComments: 2
+AlignTrailingComments: true
+SortIncludes: false
+BreakConstructorInitializers: AfterColon
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+AlignAfterOpenBracket: Align
+
+IndentWidth: ${IndentWidth}
+IndentCaseLabels: ${IndentCaseLabels}
+EOF
+
+}
+
+#########################################
+# 'all' variable should be "cores/esp8266 libraries"
 
 all="
 libraries/ESP8266mDNS
@@ -23,9 +52,11 @@ libraries/Netdump
 tests
 "
 
-# core
+#########################################
+# restyling core
 
-cp tests/clang-format-core .clang-format
+makeClangConf 4 false
+
 for d in $all; do
     if [ -d "$d" ]; then
         echo "-------- directory $d:"
@@ -38,9 +69,11 @@ for d in $all; do
     fi
 done
 
-# examples
+#########################################
+# restyling arduino examples
 
-cp tests/clang-format-arduino .clang-format
+makeClangConf 2 true
+
 for d in libraries; do
     echo "-------- examples in $d:"
     find $d -name "*.ino" -exec clang-format-12 -i {} \;

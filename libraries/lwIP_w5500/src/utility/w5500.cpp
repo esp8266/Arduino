@@ -243,7 +243,7 @@ void Wiznet5500::wizphy_reset()
 int8_t Wiznet5500::wizphy_setphypmode(uint8_t pmode)
 {
     uint8_t tmp = 0;
-    tmp = getPHYCFGR();
+    tmp         = getPHYCFGR();
     if ((tmp & PHYCFGR_OPMD) == 0)
     {
         return -1;
@@ -277,9 +277,8 @@ int8_t Wiznet5500::wizphy_setphypmode(uint8_t pmode)
     return -1;
 }
 
-Wiznet5500::Wiznet5500(int8_t cs, SPIClass& spi, int8_t intr)
-    : _spi(spi)
-    , _cs(cs)
+Wiznet5500::Wiznet5500(int8_t cs, SPIClass& spi, int8_t intr) :
+    _spi(spi), _cs(cs)
 {
     (void)intr;
 }
@@ -360,7 +359,7 @@ uint16_t Wiznet5500::readFrameSize()
         return 0;
     }
 
-    uint8_t head[2];
+    uint8_t  head[2];
     uint16_t data_len = 0;
 
     wizchip_recv_data(head, 2);

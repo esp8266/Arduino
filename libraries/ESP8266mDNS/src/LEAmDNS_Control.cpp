@@ -93,7 +93,7 @@ namespace MDNSImplementation
     bool MDNSResponder::_restart(void)
     {
         return ((_resetProbeStatus(true /*restart*/)) &&  // Stop and restart probing
-            (_allocUDPContext()));                        // Restart UDP
+                (_allocUDPContext()));                    // Restart UDP
     }
 
     /**
@@ -106,14 +106,14 @@ namespace MDNSImplementation
     bool MDNSResponder::_parseMessage(void)
     {
         DEBUG_EX_INFO(
-            unsigned long ulStartTime = millis();
-            unsigned uStartMemory = ESP.getFreeHeap();
+            unsigned long ulStartTime  = millis();
+            unsigned      uStartMemory = ESP.getFreeHeap();
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseMessage (Time: %lu ms, heap: %u bytes, from %s(%u), to %s(%u))\n"), ulStartTime, uStartMemory,
-                IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), m_pUDPContext->getRemotePort(),
-                IPAddress(m_pUDPContext->getDestAddress()).toString().c_str(), m_pUDPContext->getLocalPort()););
+                                  IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), m_pUDPContext->getRemotePort(),
+                                  IPAddress(m_pUDPContext->getDestAddress()).toString().c_str(), m_pUDPContext->getLocalPort()););
         //DEBUG_EX_INFO(_udpDump(););
 
-        bool bResult = false;
+        bool              bResult = false;
 
         stcMDNS_MsgHeader header;
         if (_readMDNSMsgHeader(header))
@@ -167,10 +167,10 @@ namespace MDNSImplementation
 */
     bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHeader)
     {
-        bool bResult = true;
+        bool                 bResult = true;
 
         stcMDNSSendParameter sendParameter;
-        uint8_t u8HostOrServiceReplies = 0;
+        uint8_t              u8HostOrServiceReplies = 0;
         for (uint16_t qd = 0; ((bResult) && (qd < p_MsgHeader.m_u16QDCount)); ++qd)
         {
             stcMDNS_RRQuestion questionRR;
@@ -178,12 +178,12 @@ namespace MDNSImplementation
             {
                 // Define host replies, BUT only answer queries after probing is done
                 u8HostOrServiceReplies = sendParameter.m_u8HostReplyMask |= (((ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus))
-                        ? _replyMaskForHost(questionRR.m_Header, 0)
-                        : 0);
+                                                                                 ? _replyMaskForHost(questionRR.m_Header, 0)
+                                                                                 : 0);
                 DEBUG_EX_INFO(if (u8HostOrServiceReplies)
-                    {
-                        DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Host reply needed 0x%X\n"), u8HostOrServiceReplies);
-                    });
+                              {
+                                  DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Host reply needed 0x%X\n"), u8HostOrServiceReplies);
+                              });
 
                 // Check tiebreak need for host domain
                 if (ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus)
@@ -206,13 +206,13 @@ namespace MDNSImplementation
                 {
                     // Define service replies, BUT only answer queries after probing is done
                     uint8_t u8ReplyMaskForQuestion = (((ProbingStatus_Done == pService->m_ProbeInformation.m_ProbingStatus))
-                            ? _replyMaskForService(questionRR.m_Header, *pService, 0)
-                            : 0);
+                                                          ? _replyMaskForService(questionRR.m_Header, *pService, 0)
+                                                          : 0);
                     u8HostOrServiceReplies |= (pService->m_u8ReplyMask |= u8ReplyMaskForQuestion);
                     DEBUG_EX_INFO(if (u8ReplyMaskForQuestion)
-                        {
-                            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Service reply needed for (%s.%s.%s): 0x%X (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyMaskForQuestion, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str());
-                        });
+                                  {
+                                      DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Service reply needed for (%s.%s.%s): 0x%X (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyMaskForQuestion, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str());
+                                  });
 
                     // Check tiebreak need for service domain
                     if (ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus)
@@ -234,35 +234,35 @@ namespace MDNSImplementation
                 // Handle unicast and legacy specialities
                 // If only one question asks for unicast reply, the whole reply packet is send unicast
                 if (((DNS_MQUERY_PORT != m_pUDPContext->getRemotePort()) ||  // Unicast (maybe legacy) query OR
-                        (questionRR.m_bUnicast))
+                     (questionRR.m_bUnicast))
                     &&  // Expressivly unicast query
                     (!sendParameter.m_bUnicast))
                 {
-                    sendParameter.m_bUnicast = true;
+                    sendParameter.m_bUnicast    = true;
                     sendParameter.m_bCacheFlush = false;
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Unicast response for %s!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
 
                     if ((DNS_MQUERY_PORT != m_pUDPContext->getRemotePort()) &&  // Unicast (maybe legacy) query AND
                         (1 == p_MsgHeader.m_u16QDCount) &&                      // Only one question AND
                         ((sendParameter.m_u8HostReplyMask) ||                   //  Host replies OR
-                            (u8HostOrServiceReplies)))                          //  Host or service replies available
+                         (u8HostOrServiceReplies)))                             //  Host or service replies available
                     {
                         // We're a match for this legacy query, BUT
                         // make sure, that the query comes from a local host
                         ip_info IPInfo_Local;
                         ip_info IPInfo_Remote;
                         if (((IPInfo_Remote.ip.addr = m_pUDPContext->getRemoteAddress())) && (((wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local)) && (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) ||  // Remote IP in SOFTAP's subnet OR
-                                ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) && (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask)))))                                                                // Remote IP in STATION's subnet
+                                                                                              ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) && (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask)))))  // Remote IP in STATION's subnet
                         {
                             DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s, id %u!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), p_MsgHeader.m_u16ID););
 
-                            sendParameter.m_u16ID = p_MsgHeader.m_u16ID;
+                            sendParameter.m_u16ID        = p_MsgHeader.m_u16ID;
                             sendParameter.m_bLegacyQuery = true;
-                            sendParameter.m_pQuestions = new stcMDNS_RRQuestion;
+                            sendParameter.m_pQuestions   = new stcMDNS_RRQuestion;
                             if ((bResult = (0 != sendParameter.m_pQuestions)))
                             {
-                                sendParameter.m_pQuestions->m_Header.m_Domain = questionRR.m_Header.m_Domain;
-                                sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = questionRR.m_Header.m_Attributes.m_u16Type;
+                                sendParameter.m_pQuestions->m_Header.m_Domain                = questionRR.m_Header.m_Domain;
+                                sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type  = questionRR.m_Header.m_Attributes.m_u16Type;
                                 sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = questionRR.m_Header.m_Attributes.m_u16Class;
                             }
                             else
@@ -289,9 +289,9 @@ namespace MDNSImplementation
         // Handle known answers
         uint32_t u32Answers = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
         DEBUG_EX_INFO(if ((u8HostOrServiceReplies) && (u32Answers))
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Known answers(%u):\n"), u32Answers);
-            });
+                      {
+                          DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Known answers(%u):\n"), u32Answers);
+                      });
 
         for (uint32_t an = 0; ((bResult) && (an < u32Answers)); ++an)
         {
@@ -512,10 +512,10 @@ namespace MDNSImplementation
             {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Sending answer(0x%X)...\n"), u8ReplyNeeded););
 
-                sendParameter.m_bResponse = true;
+                sendParameter.m_bResponse    = true;
                 sendParameter.m_bAuthorative = true;
 
-                bResult = _sendMDNSMessage(sendParameter);
+                bResult                      = _sendMDNSMessage(sendParameter);
             }
             DEBUG_EX_INFO(
                 else
@@ -545,9 +545,9 @@ namespace MDNSImplementation
             }
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -606,15 +606,15 @@ namespace MDNSImplementation
 
             //
             // Read and collect answers
-            stcMDNS_RRAnswer* pCollectedRRAnswers = 0;
-            uint32_t u32NumberOfAnswerRRs = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
+            stcMDNS_RRAnswer* pCollectedRRAnswers  = 0;
+            uint32_t          u32NumberOfAnswerRRs = (p_MsgHeader.m_u16ANCount + p_MsgHeader.m_u16NSCount + p_MsgHeader.m_u16ARCount);
             for (uint32_t an = 0; ((bResult) && (an < u32NumberOfAnswerRRs)); ++an)
             {
                 stcMDNS_RRAnswer* pRRAnswer = 0;
                 if (((bResult = _readRRAnswer(pRRAnswer))) && (pRRAnswer))
                 {
                     //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseResponse: ADDING answer!\n")););
-                    pRRAnswer->m_pNext = pCollectedRRAnswers;
+                    pRRAnswer->m_pNext  = pCollectedRRAnswers;
                     pCollectedRRAnswers = pRRAnswer;
                 }
                 else
@@ -676,9 +676,9 @@ namespace MDNSImplementation
             bResult = true;
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseResponse: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseResponse: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -710,7 +710,7 @@ namespace MDNSImplementation
             bool bFoundNewKeyAnswer;
             do
             {
-                bFoundNewKeyAnswer = false;
+                bFoundNewKeyAnswer                = false;
 
                 const stcMDNS_RRAnswer* pRRAnswer = p_pAnswers;
                 while ((pRRAnswer) && (bResult))
@@ -782,9 +782,9 @@ namespace MDNSImplementation
             } while ((bFoundNewKeyAnswer) && (bResult));
         }  // else: No answers provided
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAnswers: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAnswers: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -792,7 +792,7 @@ namespace MDNSImplementation
     MDNSResponder::_processPTRAnswer
 */
     bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* p_pPTRAnswer,
-        bool& p_rbFoundNewKeyAnswer)
+                                          bool&                                     p_rbFoundNewKeyAnswer)
     {
         bool bResult = false;
 
@@ -828,15 +828,15 @@ namespace MDNSImplementation
                                 DEBUG_OUTPUT.printf_P(PSTR("\n")););
                         }
                     }
-                    else if ((p_pPTRAnswer->m_u32TTL) &&                     // Not just a goodbye-message
-                        ((pSQAnswer = new stcMDNSServiceQuery::stcAnswer)))  // Not yet included -> add answer
+                    else if ((p_pPTRAnswer->m_u32TTL) &&                          // Not just a goodbye-message
+                             ((pSQAnswer = new stcMDNSServiceQuery::stcAnswer)))  // Not yet included -> add answer
                     {
                         pSQAnswer->m_ServiceDomain = p_pPTRAnswer->m_PTRDomain;
                         pSQAnswer->m_u32ContentFlags |= ServiceQueryAnswerType_ServiceDomain;
                         pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL);
                         pSQAnswer->releaseServiceDomain();
 
-                        bResult = pServiceQuery->addAnswer(pSQAnswer);
+                        bResult               = pServiceQuery->addAnswer(pSQAnswer);
                         p_rbFoundNewKeyAnswer = true;
                         if (pServiceQuery->m_fnCallback)
                         {
@@ -849,9 +849,9 @@ namespace MDNSImplementation
             }
         }  // else: No p_pPTRAnswer
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processPTRAnswer: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processPTRAnswer: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -859,7 +859,7 @@ namespace MDNSImplementation
     MDNSResponder::_processSRVAnswer
 */
     bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* p_pSRVAnswer,
-        bool& p_rbFoundNewKeyAnswer)
+                                          bool&                                     p_rbFoundNewKeyAnswer)
     {
         bool bResult = false;
 
@@ -909,9 +909,9 @@ namespace MDNSImplementation
             }  // while(service query)
         }      // else: No p_pSRVAnswer
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processSRVAnswer: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processSRVAnswer: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -965,9 +965,9 @@ namespace MDNSImplementation
             }  // while(service query)
         }      // else: No p_pTXTAnswer
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processTXTAnswer: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processTXTAnswer: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -1036,9 +1036,9 @@ namespace MDNSImplementation
             }  // while(service query)
         }      // else: No p_pAAnswer
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAAnswer: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAAnswer: FAILED!\n"));
+                     });
         return bResult;
     }
 #endif
@@ -1143,7 +1143,7 @@ namespace MDNSImplementation
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
         }
         else if ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&  // Probing AND
-            (m_HostProbeInformation.m_Timeout.expired()))                                 // Time for next probe
+                 (m_HostProbeInformation.m_Timeout.expired()))                            // Time for next probe
         {
             if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8SentCount)  // Send next probe
             {
@@ -1199,7 +1199,7 @@ namespace MDNSImplementation
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
             }
             else if ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                (pService->m_ProbeInformation.m_Timeout.expired()))                                 // Time for next probe
+                     (pService->m_ProbeInformation.m_Timeout.expired()))                            // Time for next probe
             {
                 if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8SentCount)  // Send next probe
                 {
@@ -1245,9 +1245,9 @@ namespace MDNSImplementation
             }
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: FAILED!\n\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: FAILED!\n\n"));
+                     });
         return bResult;
     }
 
@@ -1278,12 +1278,12 @@ namespace MDNSImplementation
     bool MDNSResponder::_hasProbesWaitingForAnswers(void) const
     {
         bool bResult = ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&  // Probing
-            (0 < m_HostProbeInformation.m_u8SentCount));                                         // And really probing
+                        (0 < m_HostProbeInformation.m_u8SentCount));                             // And really probing
 
         for (stcMDNSService* pService = m_pServices; ((!bResult) && (pService)); pService = pService->m_pNext)
         {
             bResult = ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing
-                (0 < pService->m_ProbeInformation.m_u8SentCount));                                    // And really probing
+                       (0 < pService->m_ProbeInformation.m_u8SentCount));                             // And really probing
         }
         return bResult;
     }
@@ -1303,17 +1303,17 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendHostProbe (%s, %lu)\n"), m_pcHostname, millis()););
 
-        bool bResult = true;
+        bool                 bResult = true;
 
         // Requests for host domain
         stcMDNSSendParameter sendParameter;
         sendParameter.m_bCacheFlush = false;  // RFC 6762 10.2
 
-        sendParameter.m_pQuestions = new stcMDNS_RRQuestion;
+        sendParameter.m_pQuestions  = new stcMDNS_RRQuestion;
         if (((bResult = (0 != sendParameter.m_pQuestions))) && ((bResult = _buildDomainForHost(m_pcHostname, sendParameter.m_pQuestions->m_Header.m_Domain))))
         {
             //sendParameter.m_pQuestions->m_bUnicast = true;
-            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
+            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type  = DNS_RRTYPE_ANY;
             sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);  // Unicast & INternet
 
             // Add known answers
@@ -1334,9 +1334,9 @@ namespace MDNSImplementation
             }
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendHostProbe: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendHostProbe: FAILED!\n"));
+                     });
         return ((bResult) && (_sendMDNSMessage(sendParameter)));
     }
 
@@ -1356,21 +1356,21 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendServiceProbe (%s.%s.%s, %lu)\n"), (p_rService.m_pcName ?: m_pcHostname), p_rService.m_pcService, p_rService.m_pcProtocol, millis()););
 
-        bool bResult = true;
+        bool                 bResult = true;
 
         // Requests for service instance domain
         stcMDNSSendParameter sendParameter;
         sendParameter.m_bCacheFlush = false;  // RFC 6762 10.2
 
-        sendParameter.m_pQuestions = new stcMDNS_RRQuestion;
+        sendParameter.m_pQuestions  = new stcMDNS_RRQuestion;
         if (((bResult = (0 != sendParameter.m_pQuestions))) && ((bResult = _buildDomainForService(p_rService, true, sendParameter.m_pQuestions->m_Header.m_Domain))))
         {
-            sendParameter.m_pQuestions->m_bUnicast = true;
-            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
+            sendParameter.m_pQuestions->m_bUnicast                       = true;
+            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type  = DNS_RRTYPE_ANY;
             sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);  // Unicast & INternet
 
             // Add known answers
-            p_rService.m_u8ReplyMask = (ContentFlag_SRV | ContentFlag_PTR_NAME);  // Add SRV and PTR NAME answers
+            p_rService.m_u8ReplyMask                                     = (ContentFlag_SRV | ContentFlag_PTR_NAME);  // Add SRV and PTR NAME answers
         }
         else
         {
@@ -1382,9 +1382,9 @@ namespace MDNSImplementation
             }
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendServiceProbe: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendServiceProbe: FAILED!\n"));
+                     });
         return ((bResult) && (_sendMDNSMessage(sendParameter)));
     }
 
@@ -1450,18 +1450,18 @@ namespace MDNSImplementation
     inside the '_writeXXXAnswer' procs via 'sendParameter.m_bUnannounce = true'
 */
     bool MDNSResponder::_announce(bool p_bAnnounce,
-        bool p_bIncludeServices)
+                                  bool p_bIncludeServices)
     {
-        bool bResult = false;
+        bool                 bResult = false;
 
         stcMDNSSendParameter sendParameter;
         if (ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus)
         {
-            bResult = true;
+            bResult                         = true;
 
-            sendParameter.m_bResponse = true;  // Announces are 'Unsolicited authoritative responses'
-            sendParameter.m_bAuthorative = true;
-            sendParameter.m_bUnannounce = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
+            sendParameter.m_bResponse       = true;  // Announces are 'Unsolicited authoritative responses'
+            sendParameter.m_bAuthorative    = true;
+            sendParameter.m_bUnannounce     = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
 
             // Announce host
             sendParameter.m_u8HostReplyMask = 0;
@@ -1491,9 +1491,9 @@ namespace MDNSImplementation
             }
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announce: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announce: FAILED!\n"));
+                     });
         return ((bResult) && (_sendMDNSMessage(sendParameter)));
     }
 
@@ -1501,30 +1501,30 @@ namespace MDNSImplementation
     MDNSResponder::_announceService
 */
     bool MDNSResponder::_announceService(stcMDNSService& p_rService,
-        bool p_bAnnounce /*= true*/)
+                                         bool            p_bAnnounce /*= true*/)
     {
-        bool bResult = false;
+        bool                 bResult = false;
 
         stcMDNSSendParameter sendParameter;
         if (ProbingStatus_Done == p_rService.m_ProbeInformation.m_ProbingStatus)
         {
-            sendParameter.m_bResponse = true;  // Announces are 'Unsolicited authoritative responses'
-            sendParameter.m_bAuthorative = true;
-            sendParameter.m_bUnannounce = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
+            sendParameter.m_bResponse       = true;  // Announces are 'Unsolicited authoritative responses'
+            sendParameter.m_bAuthorative    = true;
+            sendParameter.m_bUnannounce     = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
 
             // DON'T announce host
             sendParameter.m_u8HostReplyMask = 0;
 
             // Announce services (service type, name, SRV (location) and TXTs)
-            p_rService.m_u8ReplyMask = (ContentFlag_PTR_TYPE | ContentFlag_PTR_NAME | ContentFlag_SRV | ContentFlag_TXT);
+            p_rService.m_u8ReplyMask        = (ContentFlag_PTR_TYPE | ContentFlag_PTR_NAME | ContentFlag_SRV | ContentFlag_TXT);
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announceService: Announcing service %s.%s.%s (content 0x%X)\n"), (p_rService.m_pcName ?: m_pcHostname), p_rService.m_pcService, p_rService.m_pcProtocol, p_rService.m_u8ReplyMask););
 
             bResult = true;
         }
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announceService: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announceService: FAILED!\n"));
+                     });
         return ((bResult) && (_sendMDNSMessage(sendParameter)));
     }
 
@@ -1575,8 +1575,8 @@ namespace MDNSImplementation
                 {
                     ++pServiceQuery->m_u8SentCount;
                     pServiceQuery->m_ResendTimeout.reset((MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount)
-                            ? (MDNS_DYNAMIC_QUERY_RESEND_DELAY * (pServiceQuery->m_u8SentCount - 1))
-                            : esp8266::polledTimeout::oneShotMs::neverExpires);
+                                                             ? (MDNS_DYNAMIC_QUERY_RESEND_DELAY * (pServiceQuery->m_u8SentCount - 1))
+                                                             : esp8266::polledTimeout::oneShotMs::neverExpires);
                 }
                 DEBUG_EX_INFO(
                     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: %s to resend service query!"), (bResult ? "Succeeded" : "FAILED"));
@@ -1618,7 +1618,7 @@ namespace MDNSImplementation
                                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
                                 printedInfo = true;);
 
-                            bResult = pServiceQuery->removeAnswer(pSQAnswer);
+                            bResult   = pServiceQuery->removeAnswer(pSQAnswer);
                             pSQAnswer = 0;
                             continue;  // Don't use this answer anymore
                         }
@@ -1709,8 +1709,8 @@ namespace MDNSImplementation
                     // 3. level answers
 #ifdef MDNS_IP4_SUPPORT
                     // IP4Address (from A)
-                    stcMDNSServiceQuery::stcAnswer::stcIP4Address* pIP4Address = pSQAnswer->m_pIP4Addresses;
-                    bool bAUpdateQuerySent = false;
+                    stcMDNSServiceQuery::stcAnswer::stcIP4Address* pIP4Address       = pSQAnswer->m_pIP4Addresses;
+                    bool                                           bAUpdateQuerySent = false;
                     while ((pIP4Address) && (bResult))
                     {
                         stcMDNSServiceQuery::stcAnswer::stcIP4Address* pNextIP4Address = pIP4Address->m_pNext;  // Get 'next' early, as 'current' may be deleted at the end...
@@ -1758,8 +1758,8 @@ namespace MDNSImplementation
 #endif
 #ifdef MDNS_IP6_SUPPORT
                     // IP6Address (from AAAA)
-                    stcMDNSServiceQuery::stcAnswer::stcIP6Address* pIP6Address = pSQAnswer->m_pIP6Addresses;
-                    bool bAAAAUpdateQuerySent = false;
+                    stcMDNSServiceQuery::stcAnswer::stcIP6Address* pIP6Address          = pSQAnswer->m_pIP6Addresses;
+                    bool                                           bAAAAUpdateQuerySent = false;
                     while ((pIP6Address) && (bResult))
                     {
                         stcMDNSServiceQuery::stcAnswer::stcIP6Address* pNextIP6Address = pIP6Address->m_pNext;  // Get 'next' early, as 'current' may be deleted at the end...
@@ -1814,9 +1814,9 @@ namespace MDNSImplementation
                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
             });
         DEBUG_EX_ERR(if (!bResult)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: FAILED!\n"));
-            });
+                     {
+                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: FAILED!\n"));
+                     });
         return bResult;
     }
 
@@ -1830,7 +1830,7 @@ namespace MDNSImplementation
     In addition, a full name match (question domain == host domain) is marked.
 */
     uint8_t MDNSResponder::_replyMaskForHost(const MDNSResponder::stcMDNS_RRHeader& p_RRHeader,
-        bool* p_pbFullNameMatch /*= 0*/) const
+                                             bool*                                  p_pbFullNameMatch /*= 0*/) const
     {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForHost\n")););
 
@@ -1887,9 +1887,9 @@ namespace MDNSImplementation
             //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForHost: INVALID RR-class (0x%04X)!\n"), p_RRHeader.m_Attributes.m_u16Class););
         }
         DEBUG_EX_INFO(if (u8ReplyMask)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForHost: 0x%X\n"), u8ReplyMask);
-            });
+                      {
+                          DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForHost: 0x%X\n"), u8ReplyMask);
+                      });
         return u8ReplyMask;
     }
 
@@ -1906,8 +1906,8 @@ namespace MDNSImplementation
     In addition, a full name match (question domain == service instance domain) is marked.
 */
     uint8_t MDNSResponder::_replyMaskForService(const MDNSResponder::stcMDNS_RRHeader& p_RRHeader,
-        const MDNSResponder::stcMDNSService& p_Service,
-        bool* p_pbFullNameMatch /*= 0*/) const
+                                                const MDNSResponder::stcMDNSService&   p_Service,
+                                                bool*                                  p_pbFullNameMatch /*= 0*/) const
     {
         uint8_t u8ReplyMask = 0;
         (p_pbFullNameMatch ? * p_pbFullNameMatch = false : 0);
@@ -1952,9 +1952,9 @@ namespace MDNSImplementation
             //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForService: INVALID RR-class (0x%04X)!\n"), p_RRHeader.m_Attributes.m_u16Class););
         }
         DEBUG_EX_INFO(if (u8ReplyMask)
-            {
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForService(%s.%s.%s): 0x%X\n"), p_Service.m_pcName, p_Service.m_pcService, p_Service.m_pcProtocol, u8ReplyMask);
-            });
+                      {
+                          DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _replyMaskForService(%s.%s.%s): 0x%X\n"), p_Service.m_pcName, p_Service.m_pcService, p_Service.m_pcProtocol, u8ReplyMask);
+                      });
         return u8ReplyMask;
     }
 

@@ -70,7 +70,7 @@ int mockConnect(uint32_t ipv4, int& sock, int port)
         return 0;
     }
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
+    server.sin_port   = htons(port);
     memcpy(&server.sin_addr, &ipv4, 4);
     if (::connect(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
     {
@@ -83,8 +83,8 @@ int mockConnect(uint32_t ipv4, int& sock, int port)
 
 ssize_t mockFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize)
 {
-    size_t maxread = CCBUFSIZE - ccinbufsize;
-    ssize_t ret = ::read(sock, ccinbuf + ccinbufsize, maxread);
+    size_t  maxread = CCBUFSIZE - ccinbufsize;
+    ssize_t ret     = ::read(sock, ccinbuf + ccinbufsize, maxread);
 
     if (ret == 0)
     {
@@ -116,7 +116,7 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
         mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
     struct pollfd p;
-    size_t retsize = 0;
+    size_t        retsize = 0;
     do
     {
         if (usersize && usersize <= ccinbufsize)
@@ -144,7 +144,7 @@ ssize_t mockPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char
         }
 
         // wait for more data until timeout
-        p.fd = sock;
+        p.fd     = sock;
         p.events = POLLIN;
     } while (poll(&p, 1, timeout_ms) == 1);
 
@@ -173,9 +173,9 @@ ssize_t mockWrite(int sock, const uint8_t* data, size_t size, int timeout_ms)
     while (sent < size)
     {
         struct pollfd p;
-        p.fd = sock;
+        p.fd     = sock;
         p.events = POLLOUT;
-        int ret = poll(&p, 1, timeout_ms);
+        int ret  = poll(&p, 1, timeout_ms);
         if (ret == -1)
         {
             fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));

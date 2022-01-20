@@ -30,10 +30,10 @@ void eprintf(int line, char* result, char* expected, int size)
 {
     if (size != 0)
         printf("Failure at line %d, result is <%.*s>, should be <%s> of size %d\n",
-            line, size, result, expected, size);
+               line, size, result, expected, size);
     else
         printf("Failure at line %d, result is <%s>, should be <%s>\n",
-            line, result, expected);
+               line, result, expected);
 }
 
 void mycopy(char* target, char* source, int size)
@@ -58,34 +58,34 @@ void myset(char* target, char ch, int size)
 
 void tstring_main(void)
 {
-    char target[MAX_1] = "A";
-    char first_char;
-    char second_char;
-    char array[] = "abcdefghijklmnopqrstuvwxz";
-    char array2[] = "0123456789!@#$%^&*(";
-    char buffer2[MAX_1];
-    char buffer3[MAX_1];
-    char buffer4[MAX_1];
-    char buffer5[MAX_2];
-    char buffer6[MAX_2];
-    char buffer7[MAX_2];
-    char expected[MAX_1];
+    char  target[MAX_1] = "A";
+    char  first_char;
+    char  second_char;
+    char  array[]  = "abcdefghijklmnopqrstuvwxz";
+    char  array2[] = "0123456789!@#$%^&*(";
+    char  buffer2[MAX_1];
+    char  buffer3[MAX_1];
+    char  buffer4[MAX_1];
+    char  buffer5[MAX_2];
+    char  buffer6[MAX_2];
+    char  buffer7[MAX_2];
+    char  expected[MAX_1];
     char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
-    int i, j, k, x, z, align_test_iterations;
-    z = 0;
+    int   i, j, k, x, z, align_test_iterations;
+    z               = 0;
 
     int test_failed = 0;
 
-    tmp1 = target;
-    tmp2 = buffer2;
-    tmp3 = buffer3;
-    tmp4 = buffer4;
-    tmp5 = buffer5;
-    tmp6 = buffer6;
-    tmp7 = buffer7;
+    tmp1            = target;
+    tmp2            = buffer2;
+    tmp3            = buffer3;
+    tmp4            = buffer4;
+    tmp5            = buffer5;
+    tmp6            = buffer6;
+    tmp7            = buffer7;
 
-    tmp2[0] = 'Z';
-    tmp2[1] = '\0';
+    tmp2[0]         = 'Z';
+    tmp2[1]         = '\0';
 
     if (memset(target, 'X', 0) != target || memcpy(target, "Y", 0) != target || memmove(target, "K", 0) != target || strncpy(tmp2, "4", 0) != tmp2 || strncat(tmp2, "123", 0) != tmp2 || strcat(target, "") != target)
     {
@@ -165,7 +165,7 @@ void tstring_main(void)
     }
 
     target[3] = '\0';
-    tmp5[0] = '\0';
+    tmp5[0]   = '\0';
     strncat(tmp5, "123", 2);
     if (memcmp(target, "ZZZ", 3) || strcmp(target, "ZZZ") || strcmp(tmp3, target) || strcmp(tmp4, target) || strncmp(target, "ZZZ", 4) || strncmp(target, "ZZY", 3) <= 0 || strncmp("ZZY", target, 4) >= 0 || memcmp(tmp5, "12", 3) || strlen(target) != 3)
     {
@@ -209,14 +209,14 @@ void tstring_main(void)
 
             for (x = 0; x < align_test_iterations; ++x)
             {
-                tmp1 = target + x;
-                tmp2 = buffer2 + x;
-                tmp3 = buffer3 + x;
-                tmp4 = buffer4 + x;
-                tmp5 = buffer5 + x;
-                tmp6 = buffer6 + x;
+                tmp1        = target + x;
+                tmp2        = buffer2 + x;
+                tmp3        = buffer3 + x;
+                tmp4        = buffer4 + x;
+                tmp5        = buffer5 + x;
+                tmp6        = buffer6 + x;
 
-                first_char = array[i % (sizeof(array) - 1)];
+                first_char  = array[i % (sizeof(array) - 1)];
                 second_char = array2[i % (sizeof(array2) - 1)];
                 memset(tmp1, first_char, i);
                 mycopy(tmp2, tmp1, i);
@@ -272,14 +272,14 @@ void tstring_main(void)
                     if (memcmp(tmp3, tmp4, i - k + 1) != 0 || strncmp(tmp3, tmp4, i - k + 1) != 0)
                     {
                         printf("Failure at line %d, comparing %.*s with %.*s\n",
-                            __LINE__, i, tmp3, i, tmp4);
+                               __LINE__, i, tmp3, i, tmp4);
                         test_failed = 1;
                     }
                     tmp4[i - k] = first_char + 1;
                     if (memcmp(tmp3, tmp4, i) >= 0 || strncmp(tmp3, tmp4, i) >= 0 || memcmp(tmp4, tmp3, i) <= 0 || strncmp(tmp4, tmp3, i) <= 0)
                     {
                         printf("Failure at line %d, comparing %.*s with %.*s\n",
-                            __LINE__, i, tmp3, i, tmp4);
+                               __LINE__, i, tmp3, i, tmp4);
                         test_failed = 1;
                     }
                     tmp4[i - k] = first_char;

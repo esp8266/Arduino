@@ -46,11 +46,11 @@ LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, con
     fprintf(stderr, "LittleFS: %zd bytes\n", fs_size);
 
     m_fs.resize(fs_size, 0xff);
-    s_phys_addr = 0;
-    s_phys_size = static_cast<uint32_t>(fs_size);
-    s_phys_page = static_cast<uint32_t>(fs_page);
+    s_phys_addr  = 0;
+    s_phys_size  = static_cast<uint32_t>(fs_size);
+    s_phys_page  = static_cast<uint32_t>(fs_page);
     s_phys_block = static_cast<uint32_t>(fs_block);
-    s_phys_data = m_fs.data();
+    s_phys_data  = m_fs.data();
     reset();
 }
 
@@ -63,11 +63,11 @@ void LittleFSMock::reset()
 LittleFSMock::~LittleFSMock()
 {
     save();
-    s_phys_addr = 0;
-    s_phys_size = 0;
-    s_phys_page = 0;
+    s_phys_addr  = 0;
+    s_phys_size  = 0;
+    s_phys_page  = 0;
     s_phys_block = 0;
-    s_phys_data = nullptr;
+    s_phys_data  = nullptr;
     m_fs.resize(0);
     LittleFS = FS(FSImplPtr(nullptr));
 }

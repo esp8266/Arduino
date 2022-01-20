@@ -74,7 +74,7 @@ namespace protocol
         {
             return false;
         }
-        char* argv[4];
+        char*  argv[4];
         size_t argc = split_args(line_buf, argv, sizeof(argv) / sizeof(argv[0]));
         if (argc == 0)
         {

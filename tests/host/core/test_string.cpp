@@ -23,8 +23,8 @@ TEST_CASE("String::move", "[core][String]")
 {
     const char buffer[] = "this string goes over the sso limit";
 
-    String target;
-    String source(buffer);
+    String     target;
+    String     source(buffer);
 
     target = std::move(source);
     REQUIRE(source.c_str() != nullptr);
@@ -43,8 +43,8 @@ TEST_CASE("String::trim", "[core][String]")
 TEST_CASE("String::replace", "[core][String]")
 {
     String str;
-    str = "The quick brown fox jumped over the lazy dog.";
-    String find = "fox";
+    str            = "The quick brown fox jumped over the lazy dog.";
+    String find    = "fox";
     String replace = "vulpes vulpes";
     str.replace(find, replace);
     REQUIRE(str == "The quick brown vulpes vulpes jumped over the lazy dog.");
@@ -84,7 +84,7 @@ TEST_CASE("String constructors", "[core][String]")
     String s2(s1);
     REQUIRE(s1 == s2);
     String* s3 = new String("manos");
-    s2 = *s3;
+    s2         = *s3;
     delete s3;
     REQUIRE(s2 == "manos");
     s3 = new String("thisismuchlongerthantheother");
@@ -98,7 +98,7 @@ TEST_CASE("String constructors", "[core][String]")
     String flash = (F("hello from flash"));
     REQUIRE(flash == "hello from flash");
     const char textarray[6] = { 'h', 'e', 'l', 'l', 'o', 0 };
-    String hello(textarray);
+    String     hello(textarray);
     REQUIRE(hello == "hello");
     String hello2;
     hello2 = textarray;
@@ -156,7 +156,7 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "-100");
     // Non-zero-terminated array concatenation
     const char buff[] = "abcdefg";
-    String n;
+    String     n;
     n = "1234567890";  // Make it a SSO string, fill with non-0 data
     n = "1";           // Overwrite [1] with 0, but leave old junk in SSO space still
     n.concat(buff, 3);
@@ -211,7 +211,7 @@ TEST_CASE("String byte access", "[core][String]")
 TEST_CASE("String conversion", "[core][String]")
 {
     String s = "12345";
-    long l = s.toInt();
+    long   l = s.toInt();
     REQUIRE(l == 12345);
     s = "2147483647";
     l = s.toInt();
@@ -222,7 +222,7 @@ TEST_CASE("String conversion", "[core][String]")
     s = "-2147483648";
     l = s.toInt();
     REQUIRE(l == INT_MIN);
-    s = "3.14159";
+    s       = "3.14159";
     float f = s.toFloat();
     REQUIRE(fabs(f - 3.14159) < 0.0001);
 }
@@ -434,16 +434,16 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
     // We fill the SSO space with garbage then construct an object in it and check consistency
     // This is NOT how you want to use Strings outside of this testing!
     unsigned char space[64];
-    String* s = (String*)space;
+    String*       s = (String*)space;
     memset(space, 0xff, 64);
     new (s) String;
     REQUIRE(*s == "");
     s->~String();
 
     // Tests from #5883
-    bool useURLencode = false;
-    const char euro[4] = { (char)0xe2, (char)0x82, (char)0xac, 0 };  // Unicode euro symbol
-    const char yen[3] = { (char)0xc2, (char)0xa5, 0 };               // Unicode yen symbol
+    bool       useURLencode = false;
+    const char euro[4]      = { (char)0xe2, (char)0x82, (char)0xac, 0 };  // Unicode euro symbol
+    const char yen[3]       = { (char)0xc2, (char)0xa5, 0 };              // Unicode yen symbol
 
     memset(space, 0xff, 64);
     new (s) String("%ssid%");
@@ -507,18 +507,18 @@ TEST_CASE("Strings with NULs", "[core][String]")
     String str("01234567");
     REQUIRE(str.length() == 8);
     char* ptr = (char*)str.c_str();
-    ptr[3] = 0;
+    ptr[3]    = 0;
     String str2;
     str2 = str;
     REQUIRE(str2.length() == 8);
     // Needs a buffer pointer
-    str = "0123456789012345678901234567890123456789";
-    ptr = (char*)str.c_str();
+    str    = "0123456789012345678901234567890123456789";
+    ptr    = (char*)str.c_str();
     ptr[3] = 0;
-    str2 = str;
+    str2   = str;
     REQUIRE(str2.length() == 40);
     String str3("a");
-    ptr = (char*)str3.c_str();
+    ptr  = (char*)str3.c_str();
     *ptr = 0;
     REQUIRE(str3.length() == 1);
     str3 += str3;
@@ -534,16 +534,16 @@ TEST_CASE("Strings with NULs", "[core][String]")
     str3 += str3;
     REQUIRE(str3.length() == 64);
     static char zeros[64] = { 0 };
-    const char* p = str3.c_str();
+    const char* p         = str3.c_str();
     REQUIRE(!memcmp(p, zeros, 64));
 }
 
 TEST_CASE("Replace and string expansion", "[core][String]")
 {
-    String s, l;
+    String      s, l;
     // Make these large enough to span SSO and non SSO
-    String whole = "#123456789012345678901234567890";
-    const char* res = "abcde123456789012345678901234567890";
+    String      whole = "#123456789012345678901234567890";
+    const char* res   = "abcde123456789012345678901234567890";
     for (size_t i = 1; i < whole.length(); i++)
     {
         s = whole.substring(0, i);
@@ -590,7 +590,7 @@ TEST_CASE("String chaining", "[core][String]")
     {
         String tmp(chunks[3]);
         tmp.reserve(2 * all.length());
-        auto* ptr = tmp.c_str();
+        auto*  ptr = tmp.c_str();
         String result("~1" + String(&chunks[0][0] + 2) + F(chunks[1]) + chunks[2] + std::move(tmp));
         REQUIRE(result == all);
         REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));

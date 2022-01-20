@@ -185,7 +185,7 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 
     Serial.println("Periodic 10T Timeout 1000ms");
 
-    int counter = 10;
+    int        counter = 10;
 
     periodicMs timeout(1000);
     before = millis();
@@ -209,8 +209,8 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout]")
 {
     using YieldOrSkipPolicy = esp8266::polledTimeout::YieldPolicy::YieldOrSkip;
-    using oneShotMsYield = esp8266::polledTimeout::timeoutTemplate<false, YieldOrSkipPolicy>;
-    using timeType = oneShotMsYield::timeType;
+    using oneShotMsYield    = esp8266::polledTimeout::timeoutTemplate<false, YieldOrSkipPolicy>;
+    using timeType          = oneShotMsYield::timeType;
     timeType before, after, delta;
 
     Serial.println("OneShot Timeout 3000ms");

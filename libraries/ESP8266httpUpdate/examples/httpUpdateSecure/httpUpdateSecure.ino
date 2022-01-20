@@ -30,12 +30,14 @@ ESP8266WiFiMulti WiFiMulti;
 BearSSL::CertStore certStore;
 
 // Set time via NTP, as required for x.509 validation
-void setClock() {
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov"); // UTC
+void               setClock()
+{
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");  // UTC
 
   Serial.print(F("Waiting for NTP time sync: "));
   time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
+  while (now < 8 * 3600 * 2)
+  {
     yield();
     delay(500);
     Serial.print(F("."));
@@ -49,8 +51,8 @@ void setClock() {
   Serial.print(asctime(&timeinfo));
 }
 
-void setup() {
-
+void setup()
+{
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -58,7 +60,8 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  for (uint8_t t = 4; t > 0; t--) {
+  for (uint8_t t = 4; t > 0; t--)
+  {
     Serial.printf("[SETUP] WAIT %d...\n", t);
     Serial.flush();
     delay(1000);
@@ -72,22 +75,25 @@ void setup() {
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   Serial.print(F("Number of CA certs read: "));
   Serial.println(numCerts);
-  if (numCerts == 0) {
+  if (numCerts == 0)
+  {
     Serial.println(F("No certs found. Did you run certs-from-mozill.py and upload the LittleFS directory before running?"));
-    return; // Can't connect to anything w/o certs!
+    return;  // Can't connect to anything w/o certs!
   }
 }
 
-void loop() {
+void loop()
+{
   // wait for WiFi connection
-  if ((WiFiMulti.run() == WL_CONNECTED)) {
-
+  if ((WiFiMulti.run() == WL_CONNECTED))
+  {
     setClock();
 
     BearSSL::WiFiClientSecure client;
-    bool mfln = client.probeMaxFragmentLength("server", 443, 1024); // server must be the same as in ESPhttpUpdate.update()
+    bool                      mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
     Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
-    if (mfln) {
+    if (mfln)
+    {
       client.setBufferSizes(1024, 1024);
     }
     client.setCertStore(&certStore);
@@ -104,7 +110,8 @@ void loop() {
     // Or:
     //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
 
-    switch (ret) {
+    switch (ret)
+    {
       case HTTP_UPDATE_FAILED:
         Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
         break;

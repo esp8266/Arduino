@@ -12,18 +12,20 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* pass = STAPSK;
+const char* ssid        = STASSID;
+const char* pass        = STAPSK;
 
-long timezone = 2;
-byte daysavetime = 1;
+long        timezone    = 2;
+byte        daysavetime = 1;
 
-void listDir(const char* dirname) {
+void        listDir(const char* dirname)
+{
   Serial.printf("Listing directory: %s\n", dirname);
 
   Dir root = LittleFS.openDir(dirname);
 
-  while (root.next()) {
+  while (root.next())
+  {
     File file = root.openFile("r");
     Serial.print("  FILE: ");
     Serial.print(root.fileName());
@@ -39,74 +41,96 @@ void listDir(const char* dirname) {
   }
 }
 
-void readFile(const char* path) {
+void readFile(const char* path)
+{
   Serial.printf("Reading file: %s\n", path);
 
   File file = LittleFS.open(path, "r");
-  if (!file) {
+  if (!file)
+  {
     Serial.println("Failed to open file for reading");
     return;
   }
 
   Serial.print("Read from file: ");
-  while (file.available()) {
+  while (file.available())
+  {
     Serial.write(file.read());
   }
   file.close();
 }
 
-void writeFile(const char* path, const char* message) {
+void writeFile(const char* path, const char* message)
+{
   Serial.printf("Writing file: %s\n", path);
 
   File file = LittleFS.open(path, "w");
-  if (!file) {
+  if (!file)
+  {
     Serial.println("Failed to open file for writing");
     return;
   }
-  if (file.print(message)) {
+  if (file.print(message))
+  {
     Serial.println("File written");
-  } else {
+  }
+  else
+  {
     Serial.println("Write failed");
   }
-  delay(2000); // Make sure the CREATE and LASTWRITE times are different
+  delay(2000);  // Make sure the CREATE and LASTWRITE times are different
   file.close();
 }
 
-void appendFile(const char* path, const char* message) {
+void appendFile(const char* path, const char* message)
+{
   Serial.printf("Appending to file: %s\n", path);
 
   File file = LittleFS.open(path, "a");
-  if (!file) {
+  if (!file)
+  {
     Serial.println("Failed to open file for appending");
     return;
   }
-  if (file.print(message)) {
+  if (file.print(message))
+  {
     Serial.println("Message appended");
-  } else {
+  }
+  else
+  {
     Serial.println("Append failed");
   }
   file.close();
 }
 
-void renameFile(const char* path1, const char* path2) {
+void renameFile(const char* path1, const char* path2)
+{
   Serial.printf("Renaming file %s to %s\n", path1, path2);
-  if (LittleFS.rename(path1, path2)) {
+  if (LittleFS.rename(path1, path2))
+  {
     Serial.println("File renamed");
-  } else {
+  }
+  else
+  {
     Serial.println("Rename failed");
   }
 }
 
-void deleteFile(const char* path) {
+void deleteFile(const char* path)
+{
   Serial.printf("Deleting file: %s\n", path);
-  if (LittleFS.remove(path)) {
+  if (LittleFS.remove(path))
+  {
     Serial.println("File deleted");
-  } else {
+  }
+  else
+  {
     Serial.println("Delete failed");
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   // We start by connecting to a WiFi network
   Serial.println();
@@ -116,7 +140,8 @@ void setup() {
 
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -134,7 +159,8 @@ void setup() {
   Serial.println("Formatting LittleFS filesystem");
   LittleFS.format();
   Serial.println("Mount LittleFS");
-  if (!LittleFS.begin()) {
+  if (!LittleFS.begin())
+  {
     Serial.println("LittleFS mount failed");
     return;
   }
@@ -150,7 +176,8 @@ void setup() {
   Serial.println("Timestamp should be valid, data should be good.");
   LittleFS.end();
   Serial.println("Now mount it");
-  if (!LittleFS.begin()) {
+  if (!LittleFS.begin())
+  {
     Serial.println("LittleFS mount failed");
     return;
   }

@@ -126,7 +126,7 @@ extern "C"
         config->bssid_set = 0;
         for (int i = 0; i < 6; i++)
             config->bssid[i] = i;
-        config->threshold.rssi = 1;
+        config->threshold.rssi     = 1;
         config->threshold.authmode = AUTH_WPA_PSK;
 #ifdef NONOSDK3V0
         config->open_and_wep_mode_disable = true;
@@ -159,18 +159,18 @@ extern "C"
 
     uint32_t global_ipv4_netfmt = 0;  // global binding
 
-    netif netif0;
+    netif    netif0;
     uint32_t global_source_address = INADDR_ANY;
 
-    bool wifi_get_ip_info(uint8 if_index, struct ip_info* info)
+    bool     wifi_get_ip_info(uint8 if_index, struct ip_info* info)
     {
         // emulate wifi_get_ip_info()
         // ignore if_index
         // use global option -i (host_interface) to select bound interface/address
 
         struct ifaddrs *ifAddrStruct = NULL, *ifa = NULL;
-        uint32_t ipv4 = lwip_htonl(0x7f000001);
-        uint32_t mask = lwip_htonl(0xff000000);
+        uint32_t        ipv4  = lwip_htonl(0x7f000001);
+        uint32_t        mask  = lwip_htonl(0xff000000);
         global_source_address = INADDR_ANY;  // =0
 
         if (getifaddrs(&ifAddrStruct) != 0)
@@ -223,15 +223,15 @@ extern "C"
 
         if (info)
         {
-            info->ip.addr = ipv4;
-            info->netmask.addr = mask;
-            info->gw.addr = ipv4;
+            info->ip.addr       = ipv4;
+            info->netmask.addr  = mask;
+            info->gw.addr       = ipv4;
 
             netif0.ip_addr.addr = ipv4;
             netif0.netmask.addr = mask;
-            netif0.gw.addr = ipv4;
-            netif0.flags = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
-            netif0.next = nullptr;
+            netif0.gw.addr      = ipv4;
+            netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
+            netif0.next         = nullptr;
         }
 
         return true;
@@ -280,7 +280,7 @@ extern "C"
     }
 
     wifi_event_handler_cb_t wifi_event_handler_cb_emu = nullptr;
-    void wifi_set_event_handler_cb(wifi_event_handler_cb_t cb)
+    void                    wifi_set_event_handler_cb(wifi_event_handler_cb_t cb)
     {
         wifi_event_handler_cb_emu = cb;
         mockverbose("TODO: wifi_set_event_handler_cb set\n");
@@ -356,7 +356,7 @@ extern "C"
         return wifi_station_get_config(config);
     }
 
-    char wifi_station_get_hostname_str[128];
+    char        wifi_station_get_hostname_str[128];
     const char* wifi_station_get_hostname(void)
     {
         return strcpy(wifi_station_get_hostname_str, "esposix");
@@ -425,11 +425,11 @@ extern "C"
     {
         strcpy((char*)config->ssid, "apssid");
         strcpy((char*)config->password, "appasswd");
-        config->ssid_len = strlen("appasswd");
-        config->channel = 1;
-        config->authmode = AUTH_WPA2_PSK;
-        config->ssid_hidden = 0;
-        config->max_connection = 4;
+        config->ssid_len        = strlen("appasswd");
+        config->channel         = 1;
+        config->authmode        = AUTH_WPA2_PSK;
+        config->ssid_hidden     = 0;
+        config->max_connection  = 4;
         config->beacon_interval = 100;
         return true;
     }
@@ -487,7 +487,7 @@ extern "C"
     ///////////////////////////////////////
     // not user_interface
 
-    void ets_isr_mask(int intr)
+    void     ets_isr_mask(int intr)
     {
         (void)intr;
     }

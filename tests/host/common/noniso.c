@@ -27,8 +27,8 @@ void reverse(char* begin, char* end)
     while (is < ie)
     {
         char tmp = *ie;
-        *ie = *is;
-        *is = tmp;
+        *ie      = *is;
+        *is      = tmp;
         ++is;
         --ie;
     }
@@ -42,13 +42,13 @@ char* utoa(unsigned value, char* result, int base)
         return result;
     }
 
-    char* out = result;
+    char*    out      = result;
     unsigned quotient = value;
 
     do
     {
         const unsigned tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
+        *out               = "0123456789abcdef"[quotient - (tmp * base)];
         ++out;
         quotient = tmp;
     } while (quotient);
@@ -70,13 +70,13 @@ char* itoa(int value, char* result, int base)
         return utoa((unsigned)value, result, base);
     }
 
-    char* out = result;
-    int quotient = abs(value);
+    char* out      = result;
+    int   quotient = abs(value);
 
     do
     {
         const int tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
+        *out          = "0123456789abcdef"[quotient - (tmp * base)];
         ++out;
         quotient = tmp;
     } while (quotient);

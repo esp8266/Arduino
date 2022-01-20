@@ -38,23 +38,24 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
+const char*      ssid     = STASSID;
+const char*      password = STAPSK;
 
 ESP8266WebServer server(80);
 
-const int led = 13;
+const int        led = 13;
 
-void handleRoot() {
+void             handleRoot()
+{
   digitalWrite(led, 1);
   char temp[400];
-  int sec = millis() / 1000;
-  int min = sec / 60;
-  int hr = min / 60;
+  int  sec = millis() / 1000;
+  int  min = sec / 60;
+  int  hr  = min / 60;
 
   snprintf(temp, 400,
 
-      "<html>\
+           "<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
     <title>ESP8266 Demo</title>\
@@ -69,12 +70,13 @@ void handleRoot() {
   </body>\
 </html>",
 
-      hr, min % 60, sec % 60);
+           hr, min % 60, sec % 60);
   server.send(200, "text/html", temp);
   digitalWrite(led, 0);
 }
 
-void handleNotFound() {
+void handleNotFound()
+{
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -85,7 +87,8 @@ void handleNotFound() {
   message += server.args();
   message += "\n";
 
-  for (uint8_t i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++)
+  {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
 
@@ -93,7 +96,8 @@ void handleNotFound() {
   digitalWrite(led, 0);
 }
 
-void drawGraph() {
+void drawGraph()
+{
   String out;
   out.reserve(2600);
   char temp[70];
@@ -101,7 +105,8 @@ void drawGraph() {
   out += "<rect width=\"400\" height=\"150\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
   int y = rand() % 130;
-  for (int x = 10; x < 390; x += 10) {
+  for (int x = 10; x < 390; x += 10)
+  {
     int y2 = rand() % 130;
     sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, 140 - y, x + 10, 140 - y2);
     out += temp;
@@ -112,7 +117,8 @@ void drawGraph() {
   server.send(200, "image/svg+xml", out);
 }
 
-void setup(void) {
+void setup(void)
+{
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -121,7 +127,8 @@ void setup(void) {
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -132,21 +139,22 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
+  if (MDNS.begin("esp8266"))
+  {
     Serial.println("MDNS responder started");
   }
 
   server.on("/", handleRoot);
   server.on("/test.svg", drawGraph);
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-  });
+  server.on("/inline", []()
+            { server.send(200, "text/plain", "this works as well"); });
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
+void loop(void)
+{
   server.handleClient();
   MDNS.update();
 }

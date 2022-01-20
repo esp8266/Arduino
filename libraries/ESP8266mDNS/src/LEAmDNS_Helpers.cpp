@@ -52,11 +52,11 @@ namespace MDNSImplementation
     if no default is given, 'esp8266' is used.
 
 */
-    /*static*/ bool MDNSResponder::indexDomain(char*& p_rpcDomain,
-        const char* p_pcDivider /*= "-"*/,
-        const char* p_pcDefaultDomain /*= 0*/)
+    /*static*/ bool MDNSResponder::indexDomain(char*&      p_rpcDomain,
+                                               const char* p_pcDivider /*= "-"*/,
+                                               const char* p_pcDefaultDomain /*= 0*/)
     {
-        bool bResult = false;
+        bool        bResult   = false;
 
         // Ensure a divider exists; use '-' as default
         const char* pcDivider = (p_pcDivider ?: "-");
@@ -66,14 +66,14 @@ namespace MDNSImplementation
             const char* pFoundDivider = strrstr(p_rpcDomain, pcDivider);
             if (pFoundDivider)  // maybe already extended
             {
-                char* pEnd = 0;
+                char*         pEnd    = 0;
                 unsigned long ulIndex = strtoul((pFoundDivider + strlen(pcDivider)), &pEnd, 10);
                 if ((ulIndex) && ((pEnd - p_rpcDomain) == (ptrdiff_t)strlen(p_rpcDomain)) && (!*pEnd))  // Valid (old) index found
                 {
                     char acIndexBuffer[16];
                     sprintf(acIndexBuffer, "%lu", (++ulIndex));
-                    size_t stLength = ((pFoundDivider - p_rpcDomain + strlen(pcDivider)) + strlen(acIndexBuffer) + 1);
-                    char* pNewHostname = new char[stLength];
+                    size_t stLength     = ((pFoundDivider - p_rpcDomain + strlen(pcDivider)) + strlen(acIndexBuffer) + 1);
+                    char*  pNewHostname = new char[stLength];
                     if (pNewHostname)
                     {
                         memcpy(pNewHostname, p_rpcDomain, (pFoundDivider - p_rpcDomain + strlen(pcDivider)));
@@ -83,7 +83,7 @@ namespace MDNSImplementation
                         delete[] p_rpcDomain;
                         p_rpcDomain = pNewHostname;
 
-                        bResult = true;
+                        bResult     = true;
                     }
                     else
                     {
@@ -98,8 +98,8 @@ namespace MDNSImplementation
 
             if (!pFoundDivider)  // not yet extended (or failed to increment extension) -> start indexing
             {
-                size_t stLength = strlen(p_rpcDomain) + (strlen(pcDivider) + 1 + 1);  // Name + Divider + '2' + '\0'
-                char* pNewHostname = new char[stLength];
+                size_t stLength     = strlen(p_rpcDomain) + (strlen(pcDivider) + 1 + 1);  // Name + Divider + '2' + '\0'
+                char*  pNewHostname = new char[stLength];
                 if (pNewHostname)
                 {
                     sprintf(pNewHostname, "%s%s2", p_rpcDomain, pcDivider);
@@ -107,7 +107,7 @@ namespace MDNSImplementation
                     delete[] p_rpcDomain;
                     p_rpcDomain = pNewHostname;
 
-                    bResult = true;
+                    bResult     = true;
                 }
                 else
                 {
@@ -120,8 +120,8 @@ namespace MDNSImplementation
             // No given host domain, use base or default
             const char* cpcDefaultName = (p_pcDefaultDomain ?: "esp8266");
 
-            size_t stLength = strlen(cpcDefaultName) + 1;  // '\0'
-            p_rpcDomain = new char[stLength];
+            size_t      stLength       = strlen(cpcDefaultName) + 1;  // '\0'
+            p_rpcDomain                = new char[stLength];
             if (p_rpcDomain)
             {
                 strncpy(p_rpcDomain, cpcDefaultName, stLength);
@@ -208,7 +208,7 @@ namespace MDNSImplementation
         {
             // Link to query list
             pServiceQuery->m_pNext = m_pServiceQueries;
-            m_pServiceQueries = pServiceQuery;
+            m_pServiceQueries      = pServiceQuery;
         }
         return m_pServiceQueries;
     }
@@ -313,12 +313,12 @@ namespace MDNSImplementation
     /*
     MDNSResponder::_findNextServiceQueryByServiceType
 */
-    MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findNextServiceQueryByServiceType(const stcMDNS_RRDomain& p_ServiceTypeDomain,
-        const stcMDNSServiceQuery* p_pPrevServiceQuery)
+    MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findNextServiceQueryByServiceType(const stcMDNS_RRDomain&    p_ServiceTypeDomain,
+                                                                                          const stcMDNSServiceQuery* p_pPrevServiceQuery)
     {
         stcMDNSServiceQuery* pMatchingServiceQuery = 0;
 
-        stcMDNSServiceQuery* pServiceQuery = (p_pPrevServiceQuery ? p_pPrevServiceQuery->m_pNext : m_pServiceQueries);
+        stcMDNSServiceQuery* pServiceQuery         = (p_pPrevServiceQuery ? p_pPrevServiceQuery->m_pNext : m_pServiceQueries);
         while (pServiceQuery)
         {
             if (p_ServiceTypeDomain == pServiceQuery->m_ServiceTypeDomain)
@@ -388,19 +388,19 @@ namespace MDNSImplementation
     MDNSResponder::_allocService
 */
     MDNSResponder::stcMDNSService* MDNSResponder::_allocService(const char* p_pcName,
-        const char* p_pcService,
-        const char* p_pcProtocol,
-        uint16_t p_u16Port)
+                                                                const char* p_pcService,
+                                                                const char* p_pcProtocol,
+                                                                uint16_t    p_u16Port)
     {
         stcMDNSService* pService = 0;
         if (((!p_pcName) || (MDNS_DOMAIN_LABEL_MAXLENGTH >= strlen(p_pcName))) && (p_pcService) && (MDNS_SERVICE_NAME_LENGTH >= strlen(p_pcService)) && (p_pcProtocol) && (MDNS_SERVICE_PROTOCOL_LENGTH >= strlen(p_pcProtocol)) && (p_u16Port) && (0 != (pService = new stcMDNSService)) && (pService->setName(p_pcName ?: m_pcHostname)) && (pService->setService(p_pcService)) && (pService->setProtocol(p_pcProtocol)))
         {
             pService->m_bAutoName = (0 == p_pcName);
-            pService->m_u16Port = p_u16Port;
+            pService->m_u16Port   = p_u16Port;
 
             // Add to list (or start list)
-            pService->m_pNext = m_pServices;
-            m_pServices = pService;
+            pService->m_pNext     = m_pServices;
+            m_pServices           = pService;
         }
         return pService;
     }
@@ -460,8 +460,8 @@ namespace MDNSImplementation
     MDNSResponder::_findService
 */
     MDNSResponder::stcMDNSService* MDNSResponder::_findService(const char* p_pcName,
-        const char* p_pcService,
-        const char* p_pcProtocol)
+                                                               const char* p_pcService,
+                                                               const char* p_pcProtocol)
     {
         stcMDNSService* pService = m_pServices;
         while (pService)
@@ -500,21 +500,21 @@ namespace MDNSImplementation
     MDNSResponder::_allocServiceTxt
 */
     MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_allocServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        const char* p_pcKey,
-        const char* p_pcValue,
-        bool p_bTemp)
+                                                                      const char*                    p_pcKey,
+                                                                      const char*                    p_pcValue,
+                                                                      bool                           p_bTemp)
     {
         stcMDNSServiceTxt* pTxt = 0;
 
-        if ((p_pService) && (p_pcKey) && (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() + 1 +  // Length byte
-                                              (p_pcKey ? strlen(p_pcKey) : 0) + 1 +                        // '='
-                                              (p_pcValue ? strlen(p_pcValue) : 0))))
+        if ((p_pService) && (p_pcKey) && (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() + 1 +      // Length byte
+                                                                        (p_pcKey ? strlen(p_pcKey) : 0) + 1 +  // '='
+                                                                        (p_pcValue ? strlen(p_pcValue) : 0))))
         {
             pTxt = new stcMDNSServiceTxt;
             if (pTxt)
             {
                 size_t stLength = (p_pcKey ? strlen(p_pcKey) : 0);
-                pTxt->m_pcKey = new char[stLength + 1];
+                pTxt->m_pcKey   = new char[stLength + 1];
                 if (pTxt->m_pcKey)
                 {
                     strncpy(pTxt->m_pcKey, p_pcKey, stLength);
@@ -523,7 +523,7 @@ namespace MDNSImplementation
 
                 if (p_pcValue)
                 {
-                    stLength = (p_pcValue ? strlen(p_pcValue) : 0);
+                    stLength        = (p_pcValue ? strlen(p_pcValue) : 0);
                     pTxt->m_pcValue = new char[stLength + 1];
                     if (pTxt->m_pcValue)
                     {
@@ -543,8 +543,8 @@ namespace MDNSImplementation
     /*
     MDNSResponder::_releaseServiceTxt
 */
-    bool MDNSResponder::_releaseServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        MDNSResponder::stcMDNSServiceTxt* p_pTxt)
+    bool MDNSResponder::_releaseServiceTxt(MDNSResponder::stcMDNSService*    p_pService,
+                                           MDNSResponder::stcMDNSServiceTxt* p_pTxt)
     {
         return ((p_pService) && (p_pTxt) && (p_pService->m_Txts.remove(p_pTxt)));
     }
@@ -552,10 +552,10 @@ namespace MDNSImplementation
     /*
     MDNSResponder::_updateServiceTxt
 */
-    MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_updateServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        MDNSResponder::stcMDNSServiceTxt* p_pTxt,
-        const char* p_pcValue,
-        bool p_bTemp)
+    MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_updateServiceTxt(MDNSResponder::stcMDNSService*    p_pService,
+                                                                       MDNSResponder::stcMDNSServiceTxt* p_pTxt,
+                                                                       const char*                       p_pcValue,
+                                                                       bool                              p_bTemp)
     {
         if ((p_pService) && (p_pTxt) && (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() - (p_pTxt->m_pcValue ? strlen(p_pTxt->m_pcValue) : 0) + (p_pcValue ? strlen(p_pcValue) : 0))))
         {
@@ -569,7 +569,7 @@ namespace MDNSImplementation
     MDNSResponder::_findServiceTxt
 */
     MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_findServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        const char* p_pcKey)
+                                                                     const char*                    p_pcKey)
     {
         return (p_pService ? p_pService->m_Txts.find(p_pcKey) : 0);
     }
@@ -578,7 +578,7 @@ namespace MDNSImplementation
     MDNSResponder::_findServiceTxt
 */
     MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_findServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        const hMDNSTxt p_hTxt)
+                                                                     const hMDNSTxt                 p_hTxt)
     {
         return (((p_pService) && (p_hTxt)) ? p_pService->m_Txts.find((stcMDNSServiceTxt*)p_hTxt) : 0);
     }
@@ -587,9 +587,9 @@ namespace MDNSImplementation
     MDNSResponder::_addServiceTxt
 */
     MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::stcMDNSService* p_pService,
-        const char* p_pcKey,
-        const char* p_pcValue,
-        bool p_bTemp)
+                                                                    const char*                    p_pcKey,
+                                                                    const char*                    p_pcValue,
+                                                                    bool                           p_bTemp)
     {
         stcMDNSServiceTxt* pResult = 0;
 
@@ -609,10 +609,10 @@ namespace MDNSImplementation
     }
 
     MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
-        const uint32_t p_u32AnswerIndex)
+                                                                     const uint32_t          p_u32AnswerIndex)
     {
-        stcMDNSServiceQuery* pServiceQuery = _findServiceQuery(p_hServiceQuery);
-        stcMDNSServiceQuery::stcAnswer* pSQAnswer = (pServiceQuery ? pServiceQuery->answerAtIndex(p_u32AnswerIndex) : 0);
+        stcMDNSServiceQuery*            pServiceQuery = _findServiceQuery(p_hServiceQuery);
+        stcMDNSServiceQuery::stcAnswer* pSQAnswer     = (pServiceQuery ? pServiceQuery->answerAtIndex(p_u32AnswerIndex) : 0);
         // Fill m_pcTxts (if not already done)
         return (pSQAnswer) ? pSQAnswer->m_Txts.m_pTxts : 0;
     }
@@ -654,8 +654,8 @@ namespace MDNSImplementation
     {
         //DEBUG_OUTPUT.printf_P(PSTR("Domain: "));
 
-        const char* pCursor = p_RRDomain.m_acName;
-        uint8_t u8Length = *pCursor++;
+        const char* pCursor  = p_RRDomain.m_acName;
+        uint8_t     u8Length = *pCursor++;
         if (u8Length)
         {
             while (u8Length)
@@ -702,7 +702,7 @@ namespace MDNSImplementation
         case DNS_RRTYPE_TXT:
         {
             size_t stTxtLength = ((const stcMDNS_RRAnswerTXT*)&p_RRAnswer)->m_Txts.c_strLength();
-            char* pTxts = new char[stTxtLength];
+            char*  pTxts       = new char[stTxtLength];
             if (pTxts)
             {
                 ((/*const c_str()!!*/ stcMDNS_RRAnswerTXT*)&p_RRAnswer)->m_Txts.c_str(pTxts);

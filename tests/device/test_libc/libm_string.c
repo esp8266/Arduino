@@ -16,14 +16,15 @@
 #define strcmp strcmp_P
 #define strncmp strncmp_P
 
-_CONST char* it = "<UNSET>"; /* Routine name for message routines. */
-static int errors = 0;
+_CONST char* it     = "<UNSET>"; /* Routine name for message routines. */
+static int   errors = 0;
 
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)
 
 static void
-_DEFUN(checkit, (ok, l), int ok _AND int l)
+_DEFUN(checkit, (ok, l),
+       int ok _AND int l)
 
 {
     //  newfunc(it);
@@ -40,7 +41,8 @@ _DEFUN(checkit, (ok, l), int ok _AND int l)
 #define equal(a, b) funcqual(a, b, __LINE__);
 
 static void
-_DEFUN(funcqual, (a, b, l), char* a _AND char* b _AND int l)
+_DEFUN(funcqual, (a, b, l),
+       char* a _AND char* b _AND int l)
 {
     //  newfunc(it);
 
@@ -56,7 +58,7 @@ _DEFUN(funcqual, (a, b, l), char* a _AND char* b _AND int l)
 static char one[50];
 static char two[50];
 
-void libm_test_string()
+void        libm_test_string()
 {
     /* Test strcmp first because we use it to test other things.  */
     it = "strcmp";

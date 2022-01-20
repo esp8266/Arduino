@@ -8,14 +8,14 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
+const char*      ssid     = STASSID;
+const char*      password = STAPSK;
 
 ESP8266WebServer server(80);
 
-const int led = LED_BUILTIN;
+const int        led       = LED_BUILTIN;
 
-const String postForms = "<html>\
+const String     postForms = "<html>\
   <head>\
     <title>ESP8266 Web Server POST handling</title>\
     <style>\
@@ -36,33 +36,43 @@ const String postForms = "<html>\
   </body>\
 </html>";
 
-void handleRoot() {
+void             handleRoot()
+{
   digitalWrite(led, 1);
   server.send(200, "text/html", postForms);
   digitalWrite(led, 0);
 }
 
-void handlePlain() {
-  if (server.method() != HTTP_POST) {
+void handlePlain()
+{
+  if (server.method() != HTTP_POST)
+  {
     digitalWrite(led, 1);
     server.send(405, "text/plain", "Method Not Allowed");
     digitalWrite(led, 0);
-  } else {
+  }
+  else
+  {
     digitalWrite(led, 1);
     server.send(200, "text/plain", "POST body was:\n" + server.arg("plain"));
     digitalWrite(led, 0);
   }
 }
 
-void handleForm() {
-  if (server.method() != HTTP_POST) {
+void handleForm()
+{
+  if (server.method() != HTTP_POST)
+  {
     digitalWrite(led, 1);
     server.send(405, "text/plain", "Method Not Allowed");
     digitalWrite(led, 0);
-  } else {
+  }
+  else
+  {
     digitalWrite(led, 1);
     String message = "POST form was:\n";
-    for (uint8_t i = 0; i < server.args(); i++) {
+    for (uint8_t i = 0; i < server.args(); i++)
+    {
       message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     }
     server.send(200, "text/plain", message);
@@ -70,7 +80,8 @@ void handleForm() {
   }
 }
 
-void handleNotFound() {
+void handleNotFound()
+{
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -80,14 +91,16 @@ void handleNotFound() {
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++)
+  {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void) {
+void setup(void)
+{
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -95,7 +108,8 @@ void setup(void) {
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -105,7 +119,8 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
+  if (MDNS.begin("esp8266"))
+  {
     Serial.println("MDNS responder started");
   }
 
@@ -121,6 +136,7 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-void loop(void) {
+void loop(void)
+{
   server.handleClient();
 }

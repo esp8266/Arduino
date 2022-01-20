@@ -16,25 +16,28 @@
 uint32_t calculateCRC32(const uint8_t* data, size_t length);
 
 // helper function to dump memory contents as hex
-void printMemory();
+void     printMemory();
 
 // Structure which will be stored in RTC memory.
 // First field is CRC32, which is calculated based on the
 // rest of structure contents.
 // Any fields can go after CRC32.
 // We use byte array as an example.
-struct {
+struct
+{
   uint32_t crc32;
-  byte data[508];
+  byte     data[508];
 } rtcData;
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
   delay(1000);
 
   // Read struct from RTC memory
-  if (ESP.rtcUserMemoryRead(0, (uint32_t*)&rtcData, sizeof(rtcData))) {
+  if (ESP.rtcUserMemoryRead(0, (uint32_t*)&rtcData, sizeof(rtcData)))
+  {
     Serial.println("Read: ");
     printMemory();
     Serial.println();
@@ -43,21 +46,26 @@ void setup() {
     Serial.println(crcOfData, HEX);
     Serial.print("CRC32 read from RTC: ");
     Serial.println(rtcData.crc32, HEX);
-    if (crcOfData != rtcData.crc32) {
+    if (crcOfData != rtcData.crc32)
+    {
       Serial.println("CRC32 in RTC memory doesn't match CRC32 of data. Data is probably invalid!");
-    } else {
+    }
+    else
+    {
       Serial.println("CRC32 check ok, data is probably valid.");
     }
   }
 
   // Generate new data set for the struct
-  for (size_t i = 0; i < sizeof(rtcData.data); i++) {
+  for (size_t i = 0; i < sizeof(rtcData.data); i++)
+  {
     rtcData.data[i] = random(0, 128);
   }
   // Update CRC32 of data
   rtcData.crc32 = calculateCRC32((uint8_t*)&rtcData.data[0], sizeof(rtcData.data));
   // Write struct to RTC memory
-  if (ESP.rtcUserMemoryWrite(0, (uint32_t*)&rtcData, sizeof(rtcData))) {
+  if (ESP.rtcUserMemoryWrite(0, (uint32_t*)&rtcData, sizeof(rtcData)))
+  {
     Serial.println("Write: ");
     printMemory();
     Serial.println();
@@ -67,20 +75,26 @@ void setup() {
   ESP.deepSleep(5e6);
 }
 
-void loop() {
+void loop()
+{
 }
 
-uint32_t calculateCRC32(const uint8_t* data, size_t length) {
+uint32_t calculateCRC32(const uint8_t* data, size_t length)
+{
   uint32_t crc = 0xffffffff;
-  while (length--) {
+  while (length--)
+  {
     uint8_t c = *data++;
-    for (uint32_t i = 0x80; i > 0; i >>= 1) {
+    for (uint32_t i = 0x80; i > 0; i >>= 1)
+    {
       bool bit = crc & 0x80000000;
-      if (c & i) {
+      if (c & i)
+      {
         bit = !bit;
       }
       crc <<= 1;
-      if (bit) {
+      if (bit)
+      {
         crc ^= 0x04c11db7;
       }
     }
@@ -89,15 +103,20 @@ uint32_t calculateCRC32(const uint8_t* data, size_t length) {
 }
 
 //prints all rtcData, including the leading crc32
-void printMemory() {
-  char buf[3];
+void printMemory()
+{
+  char     buf[3];
   uint8_t* ptr = (uint8_t*)&rtcData;
-  for (size_t i = 0; i < sizeof(rtcData); i++) {
+  for (size_t i = 0; i < sizeof(rtcData); i++)
+  {
     sprintf(buf, "%02X", ptr[i]);
     Serial.print(buf);
-    if ((i + 1) % 32 == 0) {
+    if ((i + 1) % 32 == 0)
+    {
       Serial.println();
-    } else {
+    }
+    else
+    {
       Serial.print(" ");
     }
   }

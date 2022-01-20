@@ -38,15 +38,15 @@
 
 #if defined USE_SPIFFS
 #include <FS.h>
-FS* fileSystem = &SPIFFS;
-SPIFFSConfig fileSystemConfig = SPIFFSConfig();
+FS*           fileSystem       = &SPIFFS;
+SPIFFSConfig  fileSystemConfig = SPIFFSConfig();
 #elif defined USE_LITTLEFS
 #include <LittleFS.h>
-FS* fileSystem = &LittleFS;
+FS*            fileSystem       = &LittleFS;
 LittleFSConfig fileSystemConfig = LittleFSConfig();
 #elif defined USE_SDFS
 #include <SDFS.h>
-FS* fileSystem = &SDFS;
+FS*        fileSystem       = &SDFS;
 SDFSConfig fileSystemConfig = SDFSConfig();
 // fileSystemConfig.setCSPin(chipSelectPin);
 #else
@@ -63,39 +63,44 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 // Indicate which digital I/Os should be displayed on the chart.
 // From GPIO16 to GPIO0, a '1' means the corresponding GPIO will be shown
 // e.g. 0b11111000000111111
-unsigned int gpioMask;
+unsigned int      gpioMask;
 
-const char* ssid = STASSID;
-const char* password = STAPSK;
-const char* host = "graph";
+const char*       ssid     = STASSID;
+const char*       password = STAPSK;
+const char*       host     = "graph";
 
-ESP8266WebServer server(80);
+ESP8266WebServer  server(80);
 
-static const char TEXT_PLAIN[] PROGMEM = "text/plain";
-static const char FS_INIT_ERROR[] PROGMEM = "FS INIT ERROR";
+static const char TEXT_PLAIN[] PROGMEM     = "text/plain";
+static const char FS_INIT_ERROR[] PROGMEM  = "FS INIT ERROR";
 static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 
 ////////////////////////////////
 // Utils to return HTTP codes
 
-void replyOK() {
+void              replyOK()
+{
   server.send(200, FPSTR(TEXT_PLAIN), "");
 }
 
-void replyOKWithMsg(String msg) {
+void replyOKWithMsg(String msg)
+{
   server.send(200, FPSTR(TEXT_PLAIN), msg);
 }
 
-void replyNotFound(String msg) {
+void replyNotFound(String msg)
+{
   server.send(404, FPSTR(TEXT_PLAIN), msg);
 }
 
-void replyBadRequest(String msg) {
+void replyBadRequest(String msg)
+{
   DBG_OUTPUT_PORT.println(msg);
   server.send(400, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
 
-void replyServerError(String msg) {
+void replyServerError(String msg)
+{
   DBG_OUTPUT_PORT.println(msg);
   server.send(500, FPSTR(TEXT_PLAIN), msg + "\r\n");
 }
@@ -106,22 +111,27 @@ void replyServerError(String msg) {
 /*
    Read the given file from the filesystem and stream it back to the client
 */
-bool handleFileRead(String path) {
+bool handleFileRead(String path)
+{
   DBG_OUTPUT_PORT.println(String("handleFileRead: ") + path);
 
-  if (path.endsWith("/")) {
+  if (path.endsWith("/"))
+  {
     path += "index.htm";
   }
 
   String contentType = mime::getContentType(path);
 
-  if (!fileSystem->exists(path)) {
+  if (!fileSystem->exists(path))
+  {
     // File not found, try gzip version
     path = path + ".gz";
   }
-  if (fileSystem->exists(path)) {
+  if (fileSystem->exists(path))
+  {
     File file = fileSystem->open(path, "r");
-    if (server.streamFile(file, contentType) != file.size()) {
+    if (server.streamFile(file, contentType) != file.size())
+    {
       DBG_OUTPUT_PORT.println("Sent less data than expected!");
     }
     file.close();
@@ -136,10 +146,12 @@ bool handleFileRead(String path) {
    First try to find and return the requested file from the filesystem,
    and if it fails, return a 404 page with debug information
 */
-void handleNotFound() {
-  String uri = ESP8266WebServer::urlDecode(server.uri()); // required to read paths with blanks
+void handleNotFound()
+{
+  String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
 
-  if (handleFileRead(uri)) {
+  if (handleFileRead(uri))
+  {
     return;
   }
 
@@ -153,7 +165,8 @@ void handleNotFound() {
   message += F("\nArguments: ");
   message += server.args();
   message += '\n';
-  for (uint8_t i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++)
+  {
     message += F(" NAME:");
     message += server.argName(i);
     message += F("\n VALUE:");
@@ -168,7 +181,8 @@ void handleNotFound() {
   return replyNotFound(message);
 }
 
-void setup(void) {
+void setup(void)
+{
   ////////////////////////////////
   // SERIAL INIT
   DBG_OUTPUT_PORT.begin(115200);
@@ -196,7 +210,8 @@ void setup(void) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     DBG_OUTPUT_PORT.print(".");
   }
@@ -206,7 +221,8 @@ void setup(void) {
 
   ////////////////////////////////
   // MDNS INIT
-  if (MDNS.begin(host)) {
+  if (MDNS.begin(host))
+  {
     MDNS.addService("http", "tcp", 80);
     DBG_OUTPUT_PORT.print(F("Open http://"));
     DBG_OUTPUT_PORT.print(host);
@@ -217,22 +233,23 @@ void setup(void) {
   // WEB SERVER INIT
 
   //get heap status, analog input value and all GPIO statuses in one json call
-  server.on("/espData", HTTP_GET, []() {
-    String json;
-    json.reserve(88);
-    json = "{\"time\":";
-    json += millis();
-    json += ", \"heap\":";
-    json += ESP.getFreeHeap();
-    json += ", \"analog\":";
-    json += analogRead(A0);
-    json += ", \"gpioMask\":";
-    json += gpioMask;
-    json += ", \"gpioData\":";
-    json += (uint32_t)(((GPI | GPO) & 0xFFFF) | ((GP16I & 0x01) << 16));
-    json += "}";
-    server.send(200, "text/json", json);
-  });
+  server.on("/espData", HTTP_GET, []()
+            {
+              String json;
+              json.reserve(88);
+              json = "{\"time\":";
+              json += millis();
+              json += ", \"heap\":";
+              json += ESP.getFreeHeap();
+              json += ", \"analog\":";
+              json += analogRead(A0);
+              json += ", \"gpioMask\":";
+              json += gpioMask;
+              json += ", \"gpioData\":";
+              json += (uint32_t)(((GPI | GPO) & 0xFFFF) | ((GP16I & 0x01) << 16));
+              json += "}";
+              server.send(200, "text/json", json);
+            });
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem
@@ -249,40 +266,48 @@ void setup(void) {
 }
 
 // Return default GPIO mask, that is all I/Os except SD card ones
-unsigned int defaultMask() {
+unsigned int defaultMask()
+{
   unsigned int mask = 0b11111111111111111;
-  for (auto pin = 0; pin <= 16; pin++) {
-    if (isFlashInterfacePin(pin)) {
+  for (auto pin = 0; pin <= 16; pin++)
+  {
+    if (isFlashInterfacePin(pin))
+    {
       mask &= ~(1 << pin);
     }
   }
   return mask;
 }
 
-int rgbMode = 1; // 0=off - 1=auto - 2=manual
-int rgbValue = 0;
+int                                rgbMode  = 1;  // 0=off - 1=auto - 2=manual
+int                                rgbValue = 0;
 esp8266::polledTimeout::periodicMs timeToChange(1000);
-bool modeChangeRequested = false;
+bool                               modeChangeRequested = false;
 
-void loop(void) {
+void                               loop(void)
+{
   server.handleClient();
   MDNS.update();
 
-  if (digitalRead(4) == 0) {
+  if (digitalRead(4) == 0)
+  {
     // button pressed
     modeChangeRequested = true;
   }
 
   // see if one second has passed since last change, otherwise stop here
-  if (!timeToChange) {
+  if (!timeToChange)
+  {
     return;
   }
 
   // see if a mode change was requested
-  if (modeChangeRequested) {
+  if (modeChangeRequested)
+  {
     // increment mode (reset after 2)
     rgbMode++;
-    if (rgbMode > 2) {
+    if (rgbMode > 2)
+    {
       rgbMode = 0;
     }
 
@@ -290,12 +315,13 @@ void loop(void) {
   }
 
   // act according to mode
-  switch (rgbMode) {
-    case 0: // off
+  switch (rgbMode)
+  {
+    case 0:  // off
       gpioMask = defaultMask();
-      gpioMask &= ~(1 << 12); // Hide GPIO 12
-      gpioMask &= ~(1 << 13); // Hide GPIO 13
-      gpioMask &= ~(1 << 15); // Hide GPIO 15
+      gpioMask &= ~(1 << 12);  // Hide GPIO 12
+      gpioMask &= ~(1 << 13);  // Hide GPIO 13
+      gpioMask &= ~(1 << 15);  // Hide GPIO 15
 
       // reset outputs
       digitalWrite(12, 0);
@@ -303,12 +329,13 @@ void loop(void) {
       digitalWrite(15, 0);
       break;
 
-    case 1: // auto
+    case 1:  // auto
       gpioMask = defaultMask();
 
       // increment value (reset after 7)
       rgbValue++;
-      if (rgbValue > 7) {
+      if (rgbValue > 7)
+      {
         rgbValue = 0;
       }
 
@@ -318,7 +345,7 @@ void loop(void) {
       digitalWrite(15, rgbValue & 0b100);
       break;
 
-    case 2: // manual
+    case 2:  // manual
       gpioMask = defaultMask();
 
       // keep outputs unchanged

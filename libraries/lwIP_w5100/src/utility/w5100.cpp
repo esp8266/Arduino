@@ -131,17 +131,17 @@ void Wiznet5100::wizchip_send_data(const uint8_t* wizdata, uint16_t len)
     uint16_t dst_mask;
     uint16_t dst_ptr;
 
-    ptr = getSn_TX_WR();
+    ptr      = getSn_TX_WR();
 
     dst_mask = ptr & TxBufferMask;
-    dst_ptr = TxBufferAddress + dst_mask;
+    dst_ptr  = TxBufferAddress + dst_mask;
 
     if (dst_mask + len > TxBufferLength)
     {
         size = TxBufferLength - dst_mask;
         wizchip_write_buf(dst_ptr, wizdata, size);
         wizdata += size;
-        size = len - size;
+        size    = len - size;
         dst_ptr = TxBufferAddress;
         wizchip_write_buf(dst_ptr, wizdata, size);
     }
@@ -162,17 +162,17 @@ void Wiznet5100::wizchip_recv_data(uint8_t* wizdata, uint16_t len)
     uint16_t src_mask;
     uint16_t src_ptr;
 
-    ptr = getSn_RX_RD();
+    ptr      = getSn_RX_RD();
 
     src_mask = ptr & RxBufferMask;
-    src_ptr = RxBufferAddress + src_mask;
+    src_ptr  = RxBufferAddress + src_mask;
 
     if ((src_mask + len) > RxBufferLength)
     {
         size = RxBufferLength - src_mask;
         wizchip_read_buf(src_ptr, wizdata, size);
         wizdata += size;
-        size = len - size;
+        size    = len - size;
         src_ptr = RxBufferAddress;
         wizchip_read_buf(src_ptr, wizdata, size);
     }
@@ -203,9 +203,8 @@ void Wiznet5100::wizchip_sw_reset()
     setSHAR(_mac_address);
 }
 
-Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr)
-    : _spi(spi)
-    , _cs(cs)
+Wiznet5100::Wiznet5100(int8_t cs, SPIClass& spi, int8_t intr) :
+    _spi(spi), _cs(cs)
 {
     (void)intr;
 }
@@ -286,7 +285,7 @@ uint16_t Wiznet5100::readFrameSize()
         return 0;
     }
 
-    uint8_t head[2];
+    uint8_t  head[2];
     uint16_t data_len = 0;
 
     wizchip_recv_data(head, 2);

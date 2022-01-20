@@ -35,7 +35,7 @@
 
 std::map<int, UdpContext*> udps;
 
-void register_udp(int sock, UdpContext* udp)
+void                       register_udp(int sock, UdpContext* udp)
 {
     if (udp)
         udps[sock] = udp;
@@ -49,7 +49,7 @@ void check_incoming_udp()
     for (auto& udp : udps)
     {
         pollfd p;
-        p.fd = udp.first;
+        p.fd     = udp.first;
         p.events = POLLIN;
         if (poll(&p, 1, 0) && p.revents == POLLIN)
         {

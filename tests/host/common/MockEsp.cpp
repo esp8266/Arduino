@@ -83,14 +83,14 @@ unsigned long long operator"" _GB(unsigned long long x)
 
 uint32_t _SPIFFS_start;
 
-void eboot_command_write(struct eboot_command* cmd)
+void     eboot_command_write(struct eboot_command* cmd)
 {
     (void)cmd;
 }
 
 EspClass ESP;
 
-void EspClass::restart()
+void     EspClass::restart()
 {
     mockverbose("Esp.restart(): exiting\n");
     exit(EXIT_SUCCESS);
@@ -145,7 +145,7 @@ uint32_t EspClass::getFlashChipSpeed()
 void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 {
     uint32_t hf = 10 * 1024;
-    float hm = 1 * 1024;
+    float    hm = 1 * 1024;
 
     if (hfree)
         *hfree = hf;

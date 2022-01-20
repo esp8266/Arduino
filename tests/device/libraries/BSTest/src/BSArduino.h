@@ -7,8 +7,8 @@ namespace bs
 class ArduinoIOHelper
 {
 public:
-    ArduinoIOHelper(Stream& stream)
-        : m_stream(stream)
+    ArduinoIOHelper(Stream& stream) :
+        m_stream(stream)
     {
     }
 
@@ -16,9 +16,9 @@ public:
     {
         va_list arg;
         va_start(arg, format);
-        char temp[128];
-        char* buffer = temp;
-        size_t len = vsnprintf(temp, sizeof(temp), format, arg);
+        char   temp[128];
+        char*  buffer = temp;
+        size_t len    = vsnprintf(temp, sizeof(temp), format, arg);
         va_end(arg);
         if (len > sizeof(temp) - 1)
         {
@@ -72,7 +72,7 @@ protected:
 
 typedef ArduinoIOHelper IOHelper;
 
-inline void fatal()
+inline void             fatal()
 {
     ESP.restart();
 }

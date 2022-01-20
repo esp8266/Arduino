@@ -29,20 +29,20 @@ template <class RawDev>
 class LwipIntfDev : public LwipIntf, public RawDev
 {
 public:
-    LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1)
-        : RawDev(cs, spi, intr)
-        , _mtu(DEFAULT_MTU)
-        , _intrPin(intr)
-        , _started(false)
-        , _default(false)
+    LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1) :
+        RawDev(cs, spi, intr),
+        _mtu(DEFAULT_MTU),
+        _intrPin(intr),
+        _started(false),
+        _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
     }
 
-    boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
+    boolean      config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
     // default mac-address is inferred from esp8266's STA interface
-    boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
+    boolean      begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
 
     const netif* getNetIf() const
     {
@@ -75,25 +75,25 @@ public:
     wl_status_t status();
 
 protected:
-    err_t netif_init();
-    void netif_status_callback();
+    err_t        netif_init();
+    void         netif_status_callback();
 
     static err_t netif_init_s(netif* netif);
     static err_t linkoutput_s(netif* netif, struct pbuf* p);
-    static void netif_status_callback_s(netif* netif);
+    static void  netif_status_callback_s(netif* netif);
 
     // called on a regular basis or on interrupt
-    err_t handlePackets();
+    err_t        handlePackets();
 
     // members
 
-    netif _netif;
+    netif        _netif;
 
-    uint16_t _mtu;
-    int8_t _intrPin;
-    uint8_t _macAddress[6];
-    bool _started;
-    bool _default;
+    uint16_t     _mtu;
+    int8_t       _intrPin;
+    uint8_t      _macAddress[6];
+    bool         _started;
+    bool         _default;
 };
 
 template <class RawDev>
@@ -218,11 +218,11 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     }
 
     if (_intrPin < 0 && !schedule_recurrent_function_us([&]()
-            {
-                this->handlePackets();
-                return true;
-            },
-            100))
+                                                        {
+                                                            this->handlePackets();
+                                                            return true;
+                                                        },
+                                                        100))
     {
         netif_remove(&_netif);
         return false;
@@ -274,11 +274,11 @@ void LwipIntfDev<RawDev>::netif_status_callback_s(struct netif* netif)
 template <class RawDev>
 err_t LwipIntfDev<RawDev>::netif_init()
 {
-    _netif.name[0] = 'e';
-    _netif.name[1] = '0' + _netif.num;
-    _netif.mtu = _mtu;
+    _netif.name[0]      = 'e';
+    _netif.name[1]      = '0' + _netif.num;
+    _netif.mtu          = _mtu;
     _netif.chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-    _netif.flags = NETIF_FLAG_ETHARP
+    _netif.flags        = NETIF_FLAG_ETHARP
         | NETIF_FLAG_IGMP
         | NETIF_FLAG_BROADCAST
         | NETIF_FLAG_LINK_UP;
@@ -286,11 +286,11 @@ err_t LwipIntfDev<RawDev>::netif_init()
     // lwIP's doc: This function typically first resolves the hardware
     // address, then sends the packet.  For ethernet physical layer, this is
     // usually lwIP's etharp_output()
-    _netif.output = etharp_output;
+    _netif.output          = etharp_output;
 
     // lwIP's doc: This function outputs the pbuf as-is on the link medium
     // (this must points to the raw ethernet driver, meaning: us)
-    _netif.linkoutput = linkoutput_s;
+    _netif.linkoutput      = linkoutput_s;
 
     _netif.status_callback = netif_status_callback_s;
 

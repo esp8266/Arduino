@@ -4,14 +4,19 @@
 #include <StreamDev.h>
 #include <StreamString.h>
 
-void loop() {
+void loop()
+{
   delay(1000);
 }
 
-void checksketch(const char* what, const char* res1, const char* res2) {
-  if (strcmp(res1, res2) == 0) {
+void checksketch(const char* what, const char* res1, const char* res2)
+{
+  if (strcmp(res1, res2) == 0)
+  {
     Serial << "PASSED: Test " << what << " (result: '" << res1 << "')\n";
-  } else {
+  }
+  else
+  {
     Serial << "FAILED: Test " << what << ": '" << res1 << "' <> '" << res2 << "' !\n";
   }
 }
@@ -20,20 +25,22 @@ void checksketch(const char* what, const char* res1, const char* res2) {
 #define check(what, res1, res2) checksketch(what, res1, res2)
 #endif
 
-void testStringPtrProgmem() {
+void testStringPtrProgmem()
+{
   static const char inProgmem[] PROGMEM = "I am in progmem";
-  auto inProgmem2 = F("I am too in progmem");
+  auto              inProgmem2          = F("I am too in progmem");
 
-  int heap = (int)ESP.getFreeHeap();
-  auto stream1 = StreamConstPtr(inProgmem, sizeof(inProgmem) - 1);
-  auto stream2 = StreamConstPtr(inProgmem2);
+  int               heap                = (int)ESP.getFreeHeap();
+  auto              stream1             = StreamConstPtr(inProgmem, sizeof(inProgmem) - 1);
+  auto              stream2             = StreamConstPtr(inProgmem2);
   Serial << stream1 << " - " << stream2 << "\n";
   heap -= (int)ESP.getFreeHeap();
   check("NO heap occupation while streaming progmem strings", String(heap).c_str(), "0");
 }
 
-void testStreamString() {
-  String inputString = "hello";
+void testStreamString()
+{
+  String       inputString = "hello";
   StreamString result;
 
   // By default, reading a S2Stream(String) or a StreamString will consume the String.
@@ -109,7 +116,7 @@ void testStreamString() {
     result.clear();
     S2Stream input(inputString);
     // reading stream will consume the string
-    input.setConsume(); // can be omitted, this is the default
+    input.setConsume();  // can be omitted, this is the default
 
     input.sendSize(result, 1);
     input.sendSize(result, 2);
@@ -154,14 +161,17 @@ void testStreamString() {
 
   // .. but it does when S2Stream or StreamString is used
   {
-    int heap = (int)ESP.getFreeHeap();
+    int  heap   = (int)ESP.getFreeHeap();
     auto stream = StreamString(F("I am in progmem"));
     Serial << stream << "\n";
     heap -= (int)ESP.getFreeHeap();
     String heapStr(heap);
-    if (heap != 0) {
+    if (heap != 0)
+    {
       check("heap is occupied by String/StreamString(progmem)", heapStr.c_str(), heapStr.c_str());
-    } else {
+    }
+    else
+    {
       check("ERROR: heap should be occupied by String/StreamString(progmem)", heapStr.c_str(), "-1");
     }
   }
@@ -174,14 +184,15 @@ void testStreamString() {
 
 #ifndef TEST_CASE
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   delay(1000);
 
   testStreamString();
 
   Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n",
-      (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
+                (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
 }
 
 #endif

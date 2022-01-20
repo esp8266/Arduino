@@ -55,12 +55,12 @@ public:
         @param address the local MAC address for the Ethernet interface
         @return Returns true if setting up the Ethernet interface was successful
     */
-    boolean begin(const uint8_t* address);
+    boolean  begin(const uint8_t* address);
 
     /**
         Shut down the Ethernet controlled
     */
-    void end();
+    void     end();
 
     /**
         Send an Ethernet frame
@@ -96,7 +96,7 @@ protected:
         discard an Ethernet frame
         @param framesize readFrameSize()'s result
     */
-    void discardFrame(uint16_t framesize);
+    void     discardFrame(uint16_t framesize);
 
     /**
         Read an Ethernet frame data
@@ -110,25 +110,25 @@ protected:
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
 private:
-    static const uint16_t TxBufferAddress = 0x4000;                   /* Internal Tx buffer address of the iinchip */
-    static const uint16_t RxBufferAddress = 0x6000;                   /* Internal Rx buffer address of the iinchip */
-    static const uint8_t TxBufferSize = 0x3;                          /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
-    static const uint8_t RxBufferSize = 0x3;                          /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
-    static const uint16_t TxBufferLength = (1 << TxBufferSize) << 10; /* Length of Tx buffer in bytes */
-    static const uint16_t RxBufferLength = (1 << RxBufferSize) << 10; /* Length of Rx buffer in bytes */
-    static const uint16_t TxBufferMask = TxBufferLength - 1;
-    static const uint16_t RxBufferMask = RxBufferLength - 1;
+    static const uint16_t TxBufferAddress = 0x4000;                    /* Internal Tx buffer address of the iinchip */
+    static const uint16_t RxBufferAddress = 0x6000;                    /* Internal Rx buffer address of the iinchip */
+    static const uint8_t  TxBufferSize    = 0x3;                       /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
+    static const uint8_t  RxBufferSize    = 0x3;                       /* Buffer size configuration: 0=1kb, 1=2kB, 2=4kB, 3=8kB */
+    static const uint16_t TxBufferLength  = (1 << TxBufferSize) << 10; /* Length of Tx buffer in bytes */
+    static const uint16_t RxBufferLength  = (1 << RxBufferSize) << 10; /* Length of Rx buffer in bytes */
+    static const uint16_t TxBufferMask    = TxBufferLength - 1;
+    static const uint16_t RxBufferMask    = RxBufferLength - 1;
 
-    SPIClass& _spi;
-    int8_t _cs;
-    uint8_t _mac_address[6];
+    SPIClass&             _spi;
+    int8_t                _cs;
+    uint8_t               _mac_address[6];
 
     /**
         Default function to select chip.
         @note This function help not to access wrong address. If you do not describe this function or register any functions,
         null function is called.
     */
-    inline void wizchip_cs_select()
+    inline void           wizchip_cs_select()
     {
         digitalWrite(_cs, LOW);
     }
@@ -148,7 +148,7 @@ private:
         @param address Register address
         @return The value of register
     */
-    uint8_t wizchip_read(uint16_t address);
+    uint8_t  wizchip_read(uint16_t address);
 
     /**
         Reads a 2 byte value from a register.
@@ -163,7 +163,7 @@ private:
         @param pBuf Pointer buffer to read data
         @param len Data length
     */
-    void wizchip_read_buf(uint16_t address, uint8_t* pBuf, uint16_t len);
+    void     wizchip_read_buf(uint16_t address, uint8_t* pBuf, uint16_t len);
 
     /**
         Write a 1 byte value to a register.
@@ -171,7 +171,7 @@ private:
         @param wb Write data
         @return void
     */
-    void wizchip_write(uint16_t address, uint8_t wb);
+    void     wizchip_write(uint16_t address, uint8_t wb);
 
     /**
         Write a 2 byte value to a register.
@@ -179,7 +179,7 @@ private:
         @param wb Write data
         @return void
     */
-    void wizchip_write_word(uint16_t address, uint16_t word);
+    void     wizchip_write_word(uint16_t address, uint16_t word);
 
     /**
         It writes sequence data to registers.
@@ -187,12 +187,12 @@ private:
         @param pBuf Pointer buffer to write data
         @param len Data length
     */
-    void wizchip_write_buf(uint16_t address, const uint8_t* pBuf, uint16_t len);
+    void     wizchip_write_buf(uint16_t address, const uint8_t* pBuf, uint16_t len);
 
     /**
         Reset WIZCHIP by softly.
     */
-    void wizchip_sw_reset(void);
+    void     wizchip_sw_reset(void);
 
     /**
         It copies data to internal TX memory
@@ -206,7 +206,7 @@ private:
         @param len Data length
         @sa wizchip_recv_data()
     */
-    void wizchip_send_data(const uint8_t* wizdata, uint16_t len);
+    void     wizchip_send_data(const uint8_t* wizdata, uint16_t len);
 
     /**
         It copies data to your buffer from internal RX memory
@@ -220,14 +220,14 @@ private:
         @param len Data length
         @sa wizchip_send_data()
     */
-    void wizchip_recv_data(uint8_t* wizdata, uint16_t len);
+    void     wizchip_recv_data(uint8_t* wizdata, uint16_t len);
 
     /**
         It discard the received data in RX memory.
         @details It discards the data of the length of <i>len(variable)</i> bytes in internal RX memory.
         @param len Data length
     */
-    void wizchip_recv_ignore(uint16_t len);
+    void     wizchip_recv_ignore(uint16_t len);
 
     /**
         Get @ref Sn_TX_FSR register
@@ -244,15 +244,15 @@ private:
     /** Common registers */
     enum
     {
-        MR = 0x0000,    ///< Mode Register address (R/W)
-        GAR = 0x0001,   ///< Gateway IP Register address (R/W)
+        MR   = 0x0000,  ///< Mode Register address (R/W)
+        GAR  = 0x0001,  ///< Gateway IP Register address (R/W)
         SUBR = 0x0005,  ///< Subnet mask Register address (R/W)
         SHAR = 0x0009,  ///< Source MAC Register address (R/W)
         SIPR = 0x000F,  ///< Source IP Register address (R/W)
-        IR = 0x0015,    ///< Interrupt Register (R/W)
-        IMR = 0x0016,   ///< Socket Interrupt Mask Register (R/W)
-        RTR = 0x0017,   ///< Timeout register address (1 is 100us) (R/W)
-        RCR = 0x0019,   ///< Retry count register (R/W)
+        IR   = 0x0015,  ///< Interrupt Register (R/W)
+        IMR  = 0x0016,  ///< Socket Interrupt Mask Register (R/W)
+        RTR  = 0x0017,  ///< Timeout register address (1 is 100us) (R/W)
+        RCR  = 0x0019,  ///< Retry count register (R/W)
         RMSR = 0x001A,  ///< Receive Memory Size
         TMSR = 0x001B,  ///< Transmit Memory Size
     };
@@ -260,86 +260,86 @@ private:
     /** Socket registers */
     enum
     {
-        Sn_MR = 0x0400,      ///< Socket Mode register(R/W)
-        Sn_CR = 0x0401,      ///< Socket command register (R/W)
-        Sn_IR = 0x0402,      ///< Socket interrupt register (R)
-        Sn_SR = 0x0403,      ///< Socket status register (R)
-        Sn_PORT = 0x0404,    ///< Source port register (R/W)
-        Sn_DHAR = 0x0406,    ///< Peer MAC register address (R/W)
-        Sn_DIPR = 0x040C,    ///< Peer IP register address (R/W)
-        Sn_DPORT = 0x0410,   ///< Peer port register address (R/W)
-        Sn_MSSR = 0x0412,    ///< Maximum Segment Size(Sn_MSSR0) register address (R/W)
-        Sn_PROTO = 0x0414,   ///< IP Protocol(PROTO) Register (R/W)
-        Sn_TOS = 0x0415,     ///< IP Type of Service(TOS) Register (R/W)
-        Sn_TTL = 0x0416,     ///< IP Time to live(TTL) Register (R/W)
+        Sn_MR     = 0x0400,  ///< Socket Mode register(R/W)
+        Sn_CR     = 0x0401,  ///< Socket command register (R/W)
+        Sn_IR     = 0x0402,  ///< Socket interrupt register (R)
+        Sn_SR     = 0x0403,  ///< Socket status register (R)
+        Sn_PORT   = 0x0404,  ///< Source port register (R/W)
+        Sn_DHAR   = 0x0406,  ///< Peer MAC register address (R/W)
+        Sn_DIPR   = 0x040C,  ///< Peer IP register address (R/W)
+        Sn_DPORT  = 0x0410,  ///< Peer port register address (R/W)
+        Sn_MSSR   = 0x0412,  ///< Maximum Segment Size(Sn_MSSR0) register address (R/W)
+        Sn_PROTO  = 0x0414,  ///< IP Protocol(PROTO) Register (R/W)
+        Sn_TOS    = 0x0415,  ///< IP Type of Service(TOS) Register (R/W)
+        Sn_TTL    = 0x0416,  ///< IP Time to live(TTL) Register (R/W)
         Sn_TX_FSR = 0x0420,  ///< Transmit free memory size register (R)
-        Sn_TX_RD = 0x0422,   ///< Transmit memory read pointer register address (R)
-        Sn_TX_WR = 0x0424,   ///< Transmit memory write pointer register address (R/W)
+        Sn_TX_RD  = 0x0422,  ///< Transmit memory read pointer register address (R)
+        Sn_TX_WR  = 0x0424,  ///< Transmit memory write pointer register address (R/W)
         Sn_RX_RSR = 0x0426,  ///< Received data size register (R)
-        Sn_RX_RD = 0x0428,   ///< Read point of Receive memory (R/W)
-        Sn_RX_WR = 0x042A,   ///< Write point of Receive memory (R)
+        Sn_RX_RD  = 0x0428,  ///< Read point of Receive memory (R/W)
+        Sn_RX_WR  = 0x042A,  ///< Write point of Receive memory (R)
     };
 
     /** Mode register values */
     enum
     {
         MR_RST = 0x80,  ///< Reset
-        MR_PB = 0x10,   ///< Ping block
-        MR_AI = 0x02,   ///< Address Auto-Increment in Indirect Bus Interface
+        MR_PB  = 0x10,  ///< Ping block
+        MR_AI  = 0x02,  ///< Address Auto-Increment in Indirect Bus Interface
         MR_IND = 0x01,  ///< Indirect Bus Interface mode
     };
 
     /** Socket Mode Register values @ref Sn_MR */
     enum
     {
-        Sn_MR_CLOSE = 0x00,   ///< Unused socket
-        Sn_MR_TCP = 0x01,     ///< TCP
-        Sn_MR_UDP = 0x02,     ///< UDP
-        Sn_MR_IPRAW = 0x03,   ///< IP LAYER RAW SOCK
+        Sn_MR_CLOSE  = 0x00,  ///< Unused socket
+        Sn_MR_TCP    = 0x01,  ///< TCP
+        Sn_MR_UDP    = 0x02,  ///< UDP
+        Sn_MR_IPRAW  = 0x03,  ///< IP LAYER RAW SOCK
         Sn_MR_MACRAW = 0x04,  ///< MAC LAYER RAW SOCK
-        Sn_MR_ND = 0x20,      ///< No Delayed Ack(TCP) flag
-        Sn_MR_MF = 0x40,      ///< Use MAC filter
-        Sn_MR_MULTI = 0x80,   ///< support multicating
+        Sn_MR_ND     = 0x20,  ///< No Delayed Ack(TCP) flag
+        Sn_MR_MF     = 0x40,  ///< Use MAC filter
+        Sn_MR_MULTI  = 0x80,  ///< support multicating
     };
 
     /** Socket Command Register values */
     enum
     {
-        Sn_CR_OPEN = 0x01,       ///< Initialise or open socket
-        Sn_CR_CLOSE = 0x10,      ///< Close socket
-        Sn_CR_SEND = 0x20,       ///< Update TX buffer pointer and send data
-        Sn_CR_SEND_MAC = 0x21,   ///< Send data with MAC address, so without ARP process
+        Sn_CR_OPEN      = 0x01,  ///< Initialise or open socket
+        Sn_CR_CLOSE     = 0x10,  ///< Close socket
+        Sn_CR_SEND      = 0x20,  ///< Update TX buffer pointer and send data
+        Sn_CR_SEND_MAC  = 0x21,  ///< Send data with MAC address, so without ARP process
         Sn_CR_SEND_KEEP = 0x22,  ///< Send keep alive message
-        Sn_CR_RECV = 0x40,       ///< Update RX buffer pointer and receive data
+        Sn_CR_RECV      = 0x40,  ///< Update RX buffer pointer and receive data
     };
 
     /** Socket Interrupt register values */
     enum
     {
-        Sn_IR_CON = 0x01,      ///< CON Interrupt
-        Sn_IR_DISCON = 0x02,   ///< DISCON Interrupt
-        Sn_IR_RECV = 0x04,     ///< RECV Interrupt
+        Sn_IR_CON     = 0x01,  ///< CON Interrupt
+        Sn_IR_DISCON  = 0x02,  ///< DISCON Interrupt
+        Sn_IR_RECV    = 0x04,  ///< RECV Interrupt
         Sn_IR_TIMEOUT = 0x08,  ///< TIMEOUT Interrupt
-        Sn_IR_SENDOK = 0x10,   ///< SEND_OK Interrupt
+        Sn_IR_SENDOK  = 0x10,  ///< SEND_OK Interrupt
     };
 
     /** Socket Status Register values */
     enum
     {
-        SOCK_CLOSED = 0x00,       ///< Closed
-        SOCK_INIT = 0x13,         ///< Initiate state
-        SOCK_LISTEN = 0x14,       ///< Listen state
-        SOCK_SYNSENT = 0x15,      ///< Connection state
-        SOCK_SYNRECV = 0x16,      ///< Connection state
+        SOCK_CLOSED      = 0x00,  ///< Closed
+        SOCK_INIT        = 0x13,  ///< Initiate state
+        SOCK_LISTEN      = 0x14,  ///< Listen state
+        SOCK_SYNSENT     = 0x15,  ///< Connection state
+        SOCK_SYNRECV     = 0x16,  ///< Connection state
         SOCK_ESTABLISHED = 0x17,  ///< Success to connect
-        SOCK_FIN_WAIT = 0x18,     ///< Closing state
-        SOCK_CLOSING = 0x1A,      ///< Closing state
-        SOCK_TIME_WAIT = 0x1B,    ///< Closing state
-        SOCK_CLOSE_WAIT = 0x1C,   ///< Closing state
-        SOCK_LAST_ACK = 0x1D,     ///< Closing state
-        SOCK_UDP = 0x22,          ///< UDP socket
-        SOCK_IPRAW = 0x32,        ///< IP raw mode socket
-        SOCK_MACRAW = 0x42,       ///< MAC raw mode socket
+        SOCK_FIN_WAIT    = 0x18,  ///< Closing state
+        SOCK_CLOSING     = 0x1A,  ///< Closing state
+        SOCK_TIME_WAIT   = 0x1B,  ///< Closing state
+        SOCK_CLOSE_WAIT  = 0x1C,  ///< Closing state
+        SOCK_LAST_ACK    = 0x1D,  ///< Closing state
+        SOCK_UDP         = 0x22,  ///< UDP socket
+        SOCK_IPRAW       = 0x32,  ///< IP raw mode socket
+        SOCK_MACRAW      = 0x42,  ///< MAC raw mode socket
     };
 
     /**
@@ -447,7 +447,7 @@ private:
         @param (uint8_t)cr Value to set @ref Sn_CR
         @sa getSn_CR()
     */
-    void setSn_CR(uint8_t cr);
+    void           setSn_CR(uint8_t cr);
 
     /**
         Get @ref Sn_CR register

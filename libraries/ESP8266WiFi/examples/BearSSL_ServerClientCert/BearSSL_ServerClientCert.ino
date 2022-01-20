@@ -70,15 +70,15 @@
 #define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* pass = STAPSK;
+const char*               ssid = STASSID;
+const char*               pass = STAPSK;
 
 // The server which will require a client cert signed by the trusted CA
 BearSSL::WiFiServerSecure server(443);
 
 // The hardcoded certificate authority for this example.
 // Don't use it on your own apps!!!!!
-const char ca_cert[] PROGMEM = R"EOF(
+const char                ca_cert[] PROGMEM            = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIC1TCCAb2gAwIBAgIJAMPt1Ms37+hLMA0GCSqGSIb3DQEBCwUAMCExCzAJBgNV
 BAYTAlVTMRIwEAYDVQQDDAkxMjcuMC4wLjMwHhcNMTgwMzE0MDQyMTU0WhcNMjkw
@@ -100,7 +100,7 @@ X8yKI14mFOGxuvcygG8L2xxysW7Zq+9g+O7gW0Pm6RDYnUQmIwY83h1KFCtYCJdS
 )EOF";
 
 // The server's private key which must be kept secret
-const char server_private_key[] PROGMEM = R"EOF(
+const char                server_private_key[] PROGMEM = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAsRNVTvqP++YUh8NrbXwE83xVsDqcB3F76xcXNKFDERfVd2P/
 LvyDovCcoQtT0UCRgPcxRp894EuPH/Ru6Z2Lu85sV//i7ce27tc2WRFSfuhlRxHP
@@ -131,7 +131,7 @@ tPYglR5fjuRF/wnt3oX9JlQ2RtSbs+3naXH8JoherHaqNn8UpH0t
 )EOF";
 
 // The server's public certificate which must be shared
-const char server_cert[] PROGMEM = R"EOF(
+const char                server_cert[] PROGMEM        = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDTzCCAjcCCQDPXvMRYOpeuDANBgkqhkiG9w0BAQsFADCBpjESMBAGA1UEAwwJ
 MTI3LjAuMC4xMQswCQYDVQQGEwJVUzElMCMGA1UECgwcTXkgT3duIENlcnRpZmlj
@@ -160,12 +160,14 @@ seoK24dHmt6tWmn/sbxX7Aa6TL/4mVlFoOgcaTJyVaY/BrY=
 // head of the app.
 
 // Set time via NTP, as required for x.509 validation
-void setClock() {
+void                      setClock()
+{
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
+  while (now < 8 * 3600 * 2)
+  {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -177,7 +179,8 @@ void setClock() {
   Serial.print(asctime(&timeinfo));
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -188,7 +191,8 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -198,11 +202,11 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  setClock(); // Required for X.509 validation
+  setClock();  // Required for X.509 validation
 
   // Attach the server private cert/key combo
-  BearSSL::X509List* serverCertList = new BearSSL::X509List(server_cert);
-  BearSSL::PrivateKey* serverPrivKey = new BearSSL::PrivateKey(server_private_key);
+  BearSSL::X509List*   serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey* serverPrivKey  = new BearSSL::PrivateKey(server_private_key);
   server.setRSACert(serverCertList, serverPrivKey);
 
   // Require a certificate validated by the trusted CA
@@ -224,33 +228,45 @@ static const char* HTTP_RES = "HTTP/1.0 200 OK\r\n"
                               "</body>\r\n"
                               "</html>\r\n";
 
-void loop() {
+void loop()
+{
   BearSSL::WiFiClientSecure incoming = server.accept();
-  if (!incoming) {
+  if (!incoming)
+  {
     return;
   }
   Serial.println("Incoming connection...\n");
 
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
   uint32_t timeout = millis() + 1000;
-  int lcwn = 0;
-  for (;;) {
+  int      lcwn    = 0;
+  for (;;)
+  {
     unsigned char x = 0;
-    if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
+    if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0))
+    {
       incoming.stop();
       Serial.printf("Connection error, closed\n");
       return;
-    } else if (!x) {
+    }
+    else if (!x)
+    {
       yield();
       continue;
-    } else if (x == 0x0D) {
+    }
+    else if (x == 0x0D)
+    {
       continue;
-    } else if (x == 0x0A) {
-      if (lcwn) {
+    }
+    else if (x == 0x0A)
+    {
+      if (lcwn)
+      {
         break;
       }
       lcwn = 1;
-    } else
+    }
+    else
       lcwn = 0;
   }
   incoming.write((uint8_t*)HTTP_RES, strlen(HTTP_RES));

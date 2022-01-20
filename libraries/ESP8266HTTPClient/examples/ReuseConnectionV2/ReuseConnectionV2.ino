@@ -17,11 +17,11 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
-HTTPClient http;
-WiFiClient client;
+HTTPClient       http;
+WiFiClient       client;
 
-void setup() {
-
+void             setup()
+{
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -33,7 +33,8 @@ void setup() {
   WiFiMulti.addAP(STASSID, STAPSK);
 
   // wait for WiFi connection
-  while ((WiFiMulti.run() != WL_CONNECTED)) {
+  while ((WiFiMulti.run() != WL_CONNECTED))
+  {
     Serial.write('.');
     delay(500);
   }
@@ -46,22 +47,28 @@ void setup() {
   //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 }
 
-int pass = 0;
+int  pass = 0;
 
-void loop() {
+void loop()
+{
   // First 10 loop()s, retrieve the URL
-  if (pass < 10) {
+  if (pass < 10)
+  {
     pass++;
     Serial.printf("Reuse connection example, GET url for the %d time\n", pass);
     int httpCode = http.GET();
-    if (httpCode > 0) {
+    if (httpCode > 0)
+    {
       Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
       // file found at server
-      if (httpCode == HTTP_CODE_OK) {
+      if (httpCode == HTTP_CODE_OK)
+      {
         http.writeToStream(&Serial);
       }
-    } else {
+    }
+    else
+    {
       Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
       // Something went wrong with the connection, try to reconnect
       http.end();
@@ -69,10 +76,13 @@ void loop() {
       //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
     }
 
-    if (pass == 10) {
+    if (pass == 10)
+    {
       http.end();
       Serial.println("Done testing");
-    } else {
+    }
+    else
+    {
       Serial.println("\n\n\nWait 5 second...\n");
       delay(5000);
     }

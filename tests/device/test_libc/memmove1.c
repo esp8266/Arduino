@@ -92,7 +92,7 @@ void xmemmove(unsigned char* dest, unsigned char* src, size_t n)
     {
         errors++;
         DEBUGP("memmove of n bytes returned %p instead of dest=%p\n",
-            retp, dest);
+               retp, dest);
     }
 }
 
@@ -108,8 +108,8 @@ void fill(unsigned char dest[MAX * 3])
 
 void memmove_main(void)
 {
-    size_t i;
-    int errors = 0;
+    size_t        i;
+    int           errors = 0;
 
     /* Leave some room before and after the area tested, so we can detect
      overwrites of up to N bytes, N being the amount tested.  If you
@@ -156,7 +156,7 @@ void memmove_main(void)
                 errors++;
                 DEBUGP("memmove failed for %d bytes,"
                        " with src %d bytes before dest\n",
-                    i, j);
+                       i, j);
             }
         }
     }
@@ -178,7 +178,7 @@ void memmove_main(void)
                 errors++;
                 DEBUGP("memmove failed when moving %d bytes,"
                        " with src %d bytes after dest\n",
-                    i, j);
+                       i, j);
             }
         }
     }

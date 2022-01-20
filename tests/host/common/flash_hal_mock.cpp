@@ -5,11 +5,11 @@
 
 extern "C"
 {
-    uint32_t s_phys_addr = 0;
-    uint32_t s_phys_size = 0;
-    uint32_t s_phys_page = 0;
+    uint32_t s_phys_addr  = 0;
+    uint32_t s_phys_size  = 0;
+    uint32_t s_phys_page  = 0;
     uint32_t s_phys_block = 0;
-    uint8_t* s_phys_data = nullptr;
+    uint8_t* s_phys_data  = nullptr;
 }
 
 int32_t flash_hal_read(uint32_t addr, uint32_t size, uint8_t* dst)
@@ -30,7 +30,7 @@ int32_t flash_hal_erase(uint32_t addr, uint32_t size)
     {
         abort();
     }
-    const uint32_t sector = addr / FLASH_SECTOR_SIZE;
+    const uint32_t sector      = addr / FLASH_SECTOR_SIZE;
     const uint32_t sectorCount = size / FLASH_SECTOR_SIZE;
     for (uint32_t i = 0; i < sectorCount; ++i)
     {

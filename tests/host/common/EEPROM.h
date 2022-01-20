@@ -39,11 +39,11 @@ public:
     EEPROMClass(void);
     ~EEPROMClass();
 
-    void begin(size_t size);
+    void    begin(size_t size);
     uint8_t read(int address);
-    void write(int address, uint8_t val);
-    bool commit();
-    void end();
+    void    write(int address, uint8_t val);
+    bool    commit();
+    void    end();
 
     template <typename T>
     T& get(int const address, T& t)
@@ -65,14 +65,14 @@ public:
         return t;
     }
 
-    size_t length() { return _size; }
+    size_t  length() { return _size; }
 
     //uint8_t& operator[](int const address) { return read(address); }
     uint8_t operator[](int address) { return read(address); }
 
 protected:
     size_t _size = 0;
-    int _fd = -1;
+    int    _fd   = -1;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
