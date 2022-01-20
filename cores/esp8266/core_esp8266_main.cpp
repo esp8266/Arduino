@@ -365,7 +365,11 @@ extern "C" void app_entry_redefinable(void)
 
     /* Doing umm_init just once before starting the SDK, allowed us to remove
        test and init calls at each malloc API entry point, saving IRAM. */
+#ifdef UMM_INIT_USE_ICACHE
+    mmu_wrap_irom_fn(umm_init);
+#else
     umm_init();
+#endif
     /* Call the entry point of the SDK code. */
     call_user_start();
 }

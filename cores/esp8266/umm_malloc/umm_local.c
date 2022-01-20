@@ -166,7 +166,7 @@ size_t umm_block_size(void) {
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw(void) {
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     umm_heap_context_t *_context = umm_get_current_heap();
     return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);

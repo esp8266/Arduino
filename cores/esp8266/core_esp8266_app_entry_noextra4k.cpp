@@ -39,7 +39,12 @@ extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
 
+    #ifdef UMM_INIT_USE_ICACHE
+    mmu_wrap_irom_fn(umm_init);
+    #else
     umm_init();
+    #endif
+
     /* Call the entry point of the SDK code. */
     call_user_start();
 }

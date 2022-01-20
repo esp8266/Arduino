@@ -63,24 +63,26 @@ extern "C" {
 #define DBGLOG_LEVEL 0
 #endif
 
-// Save 104 bytes by calling umm_init() early once from app_entry()
-// Some minor UMM_CRITICAL_METRICS counts will be lost through CRT0 init.
-// #define UMM_INIT_HEAP if (!umm_heap) { umm_init(); }
-#define UMM_INIT_HEAP (void)0
-
 #include "dbglog/dbglog.h"
 
-// C This change is new in upstream umm_malloc.I think this would have created a
-// C breaking change. Keeping the old #define method in umm_malloc_cfg.h.
-// C I don't see a simple way of making it work. We would have to run code before
-// C the SDK has run to set a value for uint32_t UMM_MALLOC_CFG_HEAP_SIZE.
-// C On the other hand, a manual call to umm_init() before anything else has had a
-// C chance to run would mean that all those calls testing to see if the heap has
-// C been initialized at every umm_malloc API could be removed.
-// C
-// C before starting the NON OS SDK
-// C extern void *UMM_MALLOC_CFG_HEAP_ADDR;
-// C extern uint32_t UMM_MALLOC_CFG_HEAP_SIZE;
+/*
+ * These variables are used in upstream umm_malloc for initializing the heap.
+ * Our port initialization is different and does not use them at this time.
+extern void *UMM_MALLOC_CFG_HEAP_ADDR;
+extern uint32_t UMM_MALLOC_CFG_HEAP_SIZE;
+ */
+/*
+ * In our port, we leave UMM_CHECK_INITIALIZED unset. Since we initialize the
+ * heap before CRT0 init has run, commonly used testing methods for heap init
+ * may not work. Not using UMM_CHECK_INITIALIZED saves about 104 bytes of IRAM.
+ *
+ * In our configuration app_entry_redefinable() must call umm_init(), before
+ * calling the SDK's app_entry_custom(). The DRAM Heap must be available before
+ * the SDK starts.
+ *
+ * If building with UMM_CRITICAL_METRICS, some minor counts will be lost through
+ * CRT0 init.
+ */
 
 #include "umm_local.h"      // target-dependent supplemental
 
@@ -90,7 +92,6 @@ UMM_H_ATTPACKPRE typedef struct umm_ptr_t {
     uint16_t next;
     uint16_t prev;
 } UMM_H_ATTPACKSUF umm_ptr;
-
 
 UMM_H_ATTPACKPRE typedef struct umm_block_t {
     union {
@@ -425,20 +426,28 @@ static uint16_t umm_assimilate_down(umm_heap_context_t *_context, uint16_t c, ui
 }
 
 /* ------------------------------------------------------------------------- */
-
-static void umm_init_stage_2(umm_heap_context_t *_context) {
+#ifdef UMM_INIT_USE_ICACHE
+// Freeup IRAM
+#define ICACHE_MAYBE ICACHE_FLASH_ATTR
+#else
+// umm_init(), ... stays in IRAM
+#define ICACHE_MAYBE
+#endif
+/*
+ * In this port, we split the upstream version of umm_init_heap() into two
+ * parts: _umm_init_heap and umm_init_heap. Then add multiple heap support.
+ */
+static void ICACHE_MAYBE _umm_init_heap(umm_heap_context_t *_context) {
     /* setup initial blank heap structure */
     UMM_FRAGMENTATION_METRIC_INIT();
 
     /* init stats.free_blocks */
-    #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
     #if defined(UMM_STATS_FULL)
-    _context->stats.free_blocks_min =
-        _context->stats.free_blocks_isr_min = UMM_NUMBLOCKS - 2;
+    _context->stats.free_blocks_min = UMM_NUMBLOCKS - 2;
+    _context->stats.free_blocks_isr_min = UMM_NUMBLOCKS - 2;
     #endif
-    #ifndef UMM_INLINE_METRICS
+    #if (defined(UMM_STATS) || defined(UMM_STATS_FULL)) && !defined(UMM_INLINE_METRICS)
     _context->stats.free_blocks = UMM_NUMBLOCKS - 2;
-    #endif
     #endif
 
     /* Set up umm_block[0], which just points to umm_block[1] */
@@ -478,78 +487,91 @@ static void umm_init_stage_2(umm_heap_context_t *_context) {
     UMM_PBLOCK(UMM_BLOCK_LAST) = 1;
 }
 
-
-void umm_init_common(size_t id, void *start_addr, size_t size, bool zero) {
-    /* Preserve internal setup */
+void ICACHE_MAYBE umm_init_heap(size_t id, void *start_addr, size_t size, bool full_init) {
+    /* Check for bad values and block duplicate init attempts. */
     umm_heap_context_t *_context = umm_get_heap_by_id(id);
     if (NULL == start_addr || NULL == _context || _context->heap) {
         return;
     }
 
     /* init heap pointer and size, and memset it to 0 */
+
     _context->id = id;
     _context->heap = (umm_block *)start_addr;
     _context->heap_end = (void *)((uintptr_t)start_addr + size);
     _context->numblocks = (size / sizeof(umm_block));
 
-    // An option for blocking the zeroing of extra heaps allows for performing
-    // post-crash discovery.
-    if (zero) {
+    // An option for blocking the zeroing of extra heaps. This allows for
+    // post-crash debugging after reboot.
+    if (full_init) {
         memset(_context->heap, 0x00, size);
         #if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
         memset(&_context->stats, 0x00, sizeof(_context->stats));
         #endif
 
         /* Set up internal data structures */
-        umm_init_stage_2(_context);
+        _umm_init_heap(_context);
     }
 }
 
-void umm_init(void) {
-    // if (umm_heap) {
-    //   return;
-    // }
+void ICACHE_MAYBE umm_init(void) {
+
+    // We can get called before "C" runtime has run. Here we handles that
+    // beginning of time initialization. As such heap_context[] must be
+    // defined with attributes to prevent initialization by the "C" runtime.
+    // A late "C" runtime init would destroy our work.
+
+    // Assume no "C" runtime zero init
     for (size_t i = 0; i < UMM_NUM_HEAPS; i++) {
         heap_context[i].heap = NULL;
     }
     memset(&heap_context[0], 0, sizeof(heap_context));
-    umm_init_common(UMM_HEAP_DRAM, (void *)UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE, true);
-    // umm_heap = (void *)&heap_context;
+    // Note, full_init must be true for the primary heap, DRAM.
+    umm_init_heap(UMM_HEAP_DRAM, (void *)UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE, true);
+
+    // upstream ref:
+    //   Initialize the heap from linker supplied values */
+    //   umm_init_heap(UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE);
 }
 
+/*
+ * Only the Internal DRAM init, needs (or maybe not) to be called from IRAM.
+ * umm_init_iram and umm_init_vm are called from user_init() after the SDK has
+ * inited and ICACHE has been enabled.
+ */
 #ifdef UMM_HEAP_IRAM
-void umm_init_iram_ex(void *addr, unsigned int size, bool zero) {
+void ICACHE_FLASH_ATTR umm_init_iram_ex(void *addr, unsigned int size, bool full_init) {
     /* We need the main, internal heap set up first */
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
-    umm_init_common(UMM_HEAP_IRAM, addr, size, zero);
+    umm_init_heap(UMM_HEAP_IRAM, addr, size, full_init);
 }
 
 void _text_end(void);
-void umm_init_iram(void) __attribute__((weak));
+void ICACHE_FLASH_ATTR umm_init_iram(void) __attribute__((weak));
 
 /*
   By using a weak link, it is possible to reduce the IRAM heap size with a
   user-supplied init function. This would allow the creation of a block of IRAM
   dedicated to a sketch and possibly used/preserved across reboots.
  */
-void umm_init_iram(void) {
+void ICACHE_FLASH_ATTR umm_init_iram(void) {
     umm_init_iram_ex(mmu_sec_heap(), mmu_sec_heap_size(), true);
 }
 #endif  // #ifdef UMM_HEAP_IRAM
 
 #ifdef UMM_HEAP_EXTERNAL
-void umm_init_vm(void *vmaddr, unsigned int vmsize) {
+void ICACHE_FLASH_ATTR umm_init_vm(void *vmaddr, unsigned int vmsize) {
     /* We need the main, internal (DRAM) heap set up first */
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
-    umm_init_common(UMM_HEAP_EXTERNAL, vmaddr, vmsize, true);
+    umm_init_heap(UMM_HEAP_EXTERNAL, vmaddr, vmsize, true);
 }
 #endif
 
 /* ------------------------------------------------------------------------
  * Must be called only from within critical sections guarded by
- * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ * UMM_CRITICAL_ENTRY(id) and UMM_CRITICAL_EXIT(id).
  */
 
 static void umm_free_core(umm_heap_context_t *_context, void *ptr) {
@@ -614,7 +636,7 @@ static void umm_free_core(umm_heap_context_t *_context, void *ptr) {
 void umm_free(void *ptr) {
     UMM_CRITICAL_DECL(id_free);
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     /* If we're being asked to free a NULL pointer, well that's just silly! */
 
@@ -769,7 +791,7 @@ void *umm_malloc(size_t size) {
 
     void *ptr = NULL;
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     /*
      * "Is it safe"
@@ -878,7 +900,7 @@ void *umm_realloc(void *ptr, size_t size) {
 
     size_t curSize;
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     /*
      * This code looks after the case of a NULL value for ptr. The ANSI C
