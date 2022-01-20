@@ -58,7 +58,7 @@ _DEFUN(funcqual, (a, b, l),
 static char one[50];
 static char two[50];
 
-void        libm_test_string()
+void libm_test_string()
 {
     /* Test strcmp first because we use it to test other things.  */
     it = "strcmp";

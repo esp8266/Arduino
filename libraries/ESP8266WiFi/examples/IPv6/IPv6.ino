@@ -37,60 +37,48 @@ WiFiServer                         statusServer(TCP_PORT);
 WiFiUDP                            udp;
 esp8266::polledTimeout::periodicMs showStatusOnSerialNow(STATUSDELAY_MS);
 
-void                               fqdn(Print& out, const String& fqdn)
-{
+void fqdn(Print& out, const String& fqdn) {
   out.print(F("resolving "));
   out.print(fqdn);
   out.print(F(": "));
   IPAddress result;
-  if (WiFi.hostByName(fqdn.c_str(), result))
-  {
+  if (WiFi.hostByName(fqdn.c_str(), result)) {
     result.printTo(out);
     out.println();
-  }
-  else
-  {
+  } else {
     out.println(F("timeout or not found"));
   }
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
-void fqdn_rt(Print& out, const String& fqdn, DNSResolveType resolveType)
-{
+void fqdn_rt(Print& out, const String& fqdn, DNSResolveType resolveType) {
   out.print(F("resolving "));
   out.print(fqdn);
   out.print(F(": "));
   IPAddress result;
-  if (WiFi.hostByName(fqdn.c_str(), result, 10000, resolveType))
-  {
+  if (WiFi.hostByName(fqdn.c_str(), result, 10000, resolveType)) {
     result.printTo(out);
     out.println();
-  }
-  else
-  {
+  } else {
     out.println(F("timeout or not found"));
   }
 }
 #endif
 
-void status(Print& out)
-{
+void status(Print& out) {
   out.println(F("------------------------------"));
   out.println(ESP.getFullVersion());
 
-  for (int i = 0; i < DNS_MAX_SERVERS; i++)
-  {
+  for (int i = 0; i < DNS_MAX_SERVERS; i++) {
     IPAddress dns = WiFi.dnsIP(i);
-    if (dns.isSet())
-    {
+    if (dns.isSet()) {
       out.printf("dns%d: %s\n", i, dns.toString().c_str());
     }
   }
 
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
-  for (auto a : addrList)
-  {
+  for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
                a.ifname().c_str(),
                a.isV6(),
@@ -98,8 +86,7 @@ void status(Print& out)
                a.ifhostname(),
                a.toString().c_str());
 
-    if (a.isLegacy())
-    {
+    if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
                  a.netmask().toString().c_str(),
                  a.gw().toString().c_str());
@@ -119,8 +106,7 @@ void status(Print& out)
   out.println(F("------------------------------"));
 }
 
-void setup()
-{
+void setup() {
   WiFi.hostname("ipv6test");
 
   Serial.begin(115200);
@@ -156,14 +142,12 @@ void setup()
   //   (false for any other including 192.168./16 and 10./24 since NAT may be in the equation)
   // - IPV6 link-local addresses (fe80::/64)
 
-  for (bool configured = false; !configured;)
-  {
+  for (bool configured = false; !configured;) {
     for (auto addr : addrList)
       if ((configured = !addr.isLocal()
            // && addr.isV6() // uncomment when IPv6 is mandatory
            // && addr.ifnumber() == STATION_IF
-           ))
-      {
+           )) {
         break;
       }
     Serial.print('.');
@@ -187,18 +171,15 @@ void setup()
 
 unsigned long statusTimeMs = 0;
 
-void          loop()
-{
-  if (statusServer.hasClient())
-  {
+void loop() {
+  if (statusServer.hasClient()) {
     WiFiClient cli = statusServer.accept();
     status(cli);
   }
 
   // if there's data available, read a packet
   int packetSize = udp.parsePacket();
-  if (packetSize)
-  {
+  if (packetSize) {
     Serial.print(F("udp received "));
     Serial.print(packetSize);
     Serial.print(F(" bytes from "));
@@ -206,8 +187,7 @@ void          loop()
     Serial.print(F(" :"));
     Serial.println(udp.remotePort());
     int c;
-    while ((c = udp.read()) >= 0)
-    {
+    while ((c = udp.read()) >= 0) {
       Serial.write(c);
     }
 
@@ -217,8 +197,7 @@ void          loop()
     udp.endPacket();
   }
 
-  if (showStatusOnSerialNow)
-  {
+  if (showStatusOnSerialNow) {
     status(Serial);
   }
 }

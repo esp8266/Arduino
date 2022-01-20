@@ -24,8 +24,7 @@
 #endif
 
 // durable - as in long life, persisting across reboots.
-struct durable
-{
+struct durable {
   uint32_t bootCounter;
   uint32_t chksum;
 };
@@ -57,21 +56,18 @@ extern struct rst_info resetInfo;
   REASON_EXT_SYS_RST, you could add additional logic to set and verify a CRC or
   XOR sum on the IRAM data (or just a section of the IRAM data).
 */
-inline bool            is_iram_valid(void)
-{
+inline bool is_iram_valid(void) {
   return (REASON_WDT_RST <= resetInfo.reason && REASON_SOFT_RESTART >= resetInfo.reason);
 }
 
-void setup()
-{
+void setup() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
   delay(10);
   Serial.printf_P(PSTR("\r\nSetup ...\r\n"));
 
-  if (!is_iram_valid())
-  {
+  if (!is_iram_valid()) {
     DURABLE->bootCounter = 0;
   }
 
@@ -82,10 +78,8 @@ void setup()
   processKey(Serial, '?');
 }
 
-void loop(void)
-{
-  if (Serial.available() > 0)
-  {
+void loop(void) {
+  if (Serial.available() > 0) {
     int hotKey = Serial.read();
     processKey(Serial, hotKey);
   }
@@ -102,8 +96,7 @@ void loop(void)
 
 extern "C" void _text_end(void);
 
-extern "C" void umm_init_iram(void)
-{
+extern "C" void umm_init_iram(void) {
   /*
     Calculate the start of 2nd heap, staying clear of possible segment alignment
     adjustments and checksums. These can affect the persistence of data across
@@ -113,15 +106,13 @@ extern "C" void umm_init_iram(void)
   sec_heap &= ~7;
   size_t sec_heap_sz = 0xC000UL - (sec_heap - (uintptr_t)XCHAL_INSTRAM1_VADDR);
   sec_heap_sz -= IRAM_RESERVE_SZ;  // Shrink IRAM heap
-  if (0xC000UL > sec_heap_sz)
-  {
+  if (0xC000UL > sec_heap_sz) {
     umm_init_iram_ex((void*)sec_heap, sec_heap_sz, true);
   }
 }
 
 #else
-void setup()
-{
+void setup() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
@@ -129,7 +120,6 @@ void setup()
   Serial.println("\r\n\r\nThis sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'");
 }
 
-void loop(void)
-{
+void loop(void) {
 }
 #endif

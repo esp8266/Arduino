@@ -7,7 +7,7 @@ void loadCredentials() {
   EEPROM.get(0 + sizeof(ssid) + sizeof(password), ok);
   EEPROM.end();
   if (String(ok) != String("OK")) {
-    ssid[0] = 0;
+    ssid[0]     = 0;
     password[0] = 0;
   }
   Serial.println("Recovered credentials:");

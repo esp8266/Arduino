@@ -9,7 +9,6 @@ void setup() {
 }
 
 void loop() {
-
   // usage as String
   // SHA1:a9993e364706816aba3e25717850c26c9cd0d89d
 

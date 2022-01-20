@@ -56,7 +56,7 @@ const char* fspath            = nullptr;
 
 static struct termios initial_settings;
 
-int                   mockverbose(const char* fmt, ...)
+int mockverbose(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

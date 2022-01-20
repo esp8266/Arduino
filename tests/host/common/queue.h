@@ -501,8 +501,8 @@ struct quehead
 static __inline void
 insque(void* a, void* b)
 {
-    struct quehead *element    = (struct quehead*)a,
-                   *head       = (struct quehead*)b;
+    struct quehead *element = (struct quehead*)a,
+                   *head    = (struct quehead*)b;
 
     element->qh_link           = head->qh_link;
     element->qh_rlink          = head;
@@ -513,7 +513,7 @@ insque(void* a, void* b)
 static __inline void
 remque(void* a)
 {
-    struct quehead* element    = (struct quehead*)a;
+    struct quehead* element = (struct quehead*)a;
 
     element->qh_link->qh_rlink = element->qh_rlink;
     element->qh_rlink->qh_link = element->qh_link;

@@ -14,6 +14,7 @@ makeClangConf()
 {
     IndentWidth="$1"
     IndentCaseLabels="$2"
+    BreakBeforeBraces="$3"
 
     cat << EOF > .clang-format
 BasedOnStyle: WebKit
@@ -25,11 +26,11 @@ SpacesBeforeTrailingComments: 2
 AlignTrailingComments: true
 SortIncludes: false
 BreakConstructorInitializers: AfterColon
-AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
-AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
-AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: Consecutive
 AlignAfterOpenBracket: Align
-
+BreakBeforeBraces: ${BreakBeforeBraces}
 IndentWidth: ${IndentWidth}
 IndentCaseLabels: ${IndentCaseLabels}
 EOF
@@ -55,7 +56,7 @@ tests
 #########################################
 # restyling core
 
-makeClangConf 4 false
+makeClangConf 4 false Allman
 
 for d in $all; do
     if [ -d "$d" ]; then
@@ -72,7 +73,7 @@ done
 #########################################
 # restyling arduino examples
 
-makeClangConf 2 true
+makeClangConf 2 true Attach
 
 for d in libraries; do
     echo "-------- examples in $d:"

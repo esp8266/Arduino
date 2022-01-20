@@ -7,8 +7,7 @@
 #include <TFTv2.h>
 #include <SPI.h>
 
-void setup()
-{
+void setup() {
   TFT_BL_ON;      // turn on the background light
   Tft.TFTinit();  // init TFT library
 
@@ -27,6 +26,5 @@ void setup()
   Tft.drawString("World!!", 60, 220, 4, WHITE);  // draw string: "world!!", (80, 230), size: 4, color: WHITE
 }
 
-void loop()
-{
+void loop() {
 }

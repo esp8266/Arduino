@@ -137,8 +137,8 @@ void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packe
 
 void Netdump::fileDumpProcess(File& outfile, const Packet& np) const
 {
-    size_t         incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
-    uint32_t       pcapHeader[4];
+    size_t   incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
+    uint32_t pcapHeader[4];
 
     struct timeval tv;
     gettimeofday(&tv, nullptr);

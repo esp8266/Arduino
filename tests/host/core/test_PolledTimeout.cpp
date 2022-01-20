@@ -185,7 +185,7 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 
     Serial.println("Periodic 10T Timeout 1000ms");
 
-    int        counter = 10;
+    int counter = 10;
 
     periodicMs timeout(1000);
     before = millis();

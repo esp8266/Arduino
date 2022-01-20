@@ -33,7 +33,7 @@ void Packet::printDetail(Print& out, const String& indent, const char* data, siz
 
     uint16_t charCount = (pd == PacketDetail::CHAR) ? 80 : 24;
 
-    size_t   start     = 0;
+    size_t start = 0;
     while (start < size)
     {
         size_t end = start + charCount;

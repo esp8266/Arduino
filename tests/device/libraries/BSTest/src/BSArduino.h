@@ -72,7 +72,7 @@ protected:
 
 typedef ArduinoIOHelper IOHelper;
 
-inline void             fatal()
+inline void fatal()
 {
     ESP.restart();
 }

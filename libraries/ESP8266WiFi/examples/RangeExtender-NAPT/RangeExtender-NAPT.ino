@@ -22,8 +22,7 @@
 
 #include <NetDump.h>
 
-void dump(int netif_idx, const char* data, size_t len, int out, int success)
-{
+void dump(int netif_idx, const char* data, size_t len, int out, int success) {
   (void)success;
   Serial.print(out ? F("out ") : F(" in "));
   Serial.printf("%d ", netif_idx);
@@ -36,8 +35,7 @@ void dump(int netif_idx, const char* data, size_t len, int out, int success)
 }
 #endif
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.printf("\n\nNAPT Range extender\n");
   Serial.printf("Heap on start: %d\n", ESP.getFreeHeap());
@@ -49,8 +47,7 @@ void setup()
   // first, connect to STA so we can get a proper local DNS server
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
   }
@@ -73,32 +70,27 @@ void setup()
   Serial.printf("Heap before: %d\n", ESP.getFreeHeap());
   err_t ret = ip_napt_init(NAPT, NAPT_PORT);
   Serial.printf("ip_napt_init(%d,%d): ret=%d (OK=%d)\n", NAPT, NAPT_PORT, (int)ret, (int)ERR_OK);
-  if (ret == ERR_OK)
-  {
+  if (ret == ERR_OK) {
     ret = ip_napt_enable_no(SOFTAP_IF, 1);
     Serial.printf("ip_napt_enable_no(SOFTAP_IF): ret=%d (OK=%d)\n", (int)ret, (int)ERR_OK);
-    if (ret == ERR_OK)
-    {
+    if (ret == ERR_OK) {
       Serial.printf("WiFi Network '%s' with same password is now NATed behind '%s'\n", STASSID "extender", STASSID);
     }
   }
   Serial.printf("Heap after napt init: %d\n", ESP.getFreeHeap());
-  if (ret != ERR_OK)
-  {
+  if (ret != ERR_OK) {
     Serial.printf("NAPT initialization failed\n");
   }
 }
 
 #else
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.printf("\n\nNAPT not supported in this configuration\n");
 }
 
 #endif
 
-void loop()
-{
+void loop() {
 }

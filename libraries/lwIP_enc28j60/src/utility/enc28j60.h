@@ -60,7 +60,7 @@ public:
         @param address the local MAC address for the Ethernet interface
         @return Returns true if setting up the Ethernet interface was successful
     */
-    boolean          begin(const uint8_t* address);
+    boolean begin(const uint8_t* address);
 
     /**
         Send an Ethernet frame
@@ -96,7 +96,7 @@ protected:
         discard an Ethernet frame
         @param framesize readFrameSize()'s result
     */
-    void     discardFrame(uint16_t framesize);
+    void discardFrame(uint16_t framesize);
 
     /**
         Read an Ethernet frame data
@@ -110,37 +110,37 @@ protected:
     uint16_t readFrameData(uint8_t* frame, uint16_t framesize);
 
 private:
-    uint8_t        is_mac_mii_reg(uint8_t reg);
-    uint8_t        readreg(uint8_t reg);
-    void           writereg(uint8_t reg, uint8_t data);
-    void           setregbitfield(uint8_t reg, uint8_t mask);
-    void           clearregbitfield(uint8_t reg, uint8_t mask);
-    void           setregbank(uint8_t new_bank);
-    void           writedata(const uint8_t* data, int datalen);
-    void           writedatabyte(uint8_t byte);
-    int            readdata(uint8_t* buf, int len);
-    uint8_t        readdatabyte(void);
-    void           softreset(void);
-    uint8_t        readrev(void);
-    bool           reset(void);
+    uint8_t is_mac_mii_reg(uint8_t reg);
+    uint8_t readreg(uint8_t reg);
+    void    writereg(uint8_t reg, uint8_t data);
+    void    setregbitfield(uint8_t reg, uint8_t mask);
+    void    clearregbitfield(uint8_t reg, uint8_t mask);
+    void    setregbank(uint8_t new_bank);
+    void    writedata(const uint8_t* data, int datalen);
+    void    writedatabyte(uint8_t byte);
+    int     readdata(uint8_t* buf, int len);
+    uint8_t readdatabyte(void);
+    void    softreset(void);
+    uint8_t readrev(void);
+    bool    reset(void);
 
-    void           enc28j60_arch_spi_init(void);
-    uint8_t        enc28j60_arch_spi_write(uint8_t data);
-    uint8_t        enc28j60_arch_spi_read(void);
-    void           enc28j60_arch_spi_select(void);
-    void           enc28j60_arch_spi_deselect(void);
+    void    enc28j60_arch_spi_init(void);
+    uint8_t enc28j60_arch_spi_write(uint8_t data);
+    uint8_t enc28j60_arch_spi_read(void);
+    void    enc28j60_arch_spi_select(void);
+    void    enc28j60_arch_spi_deselect(void);
 
     // Previously defined in contiki/core/sys/clock.h
-    void           clock_delay_usec(uint16_t dt);
+    void clock_delay_usec(uint16_t dt);
 
-    uint8_t        _bank;
-    int8_t         _cs;
-    SPIClass&      _spi;
+    uint8_t   _bank;
+    int8_t    _cs;
+    SPIClass& _spi;
 
     const uint8_t* _localMac;
 
     /* readFrame*() state */
-    uint16_t       _next, _len;
+    uint16_t _next, _len;
 };
 
 #endif /* ENC28J60_H */

@@ -21,10 +21,10 @@
 #define TIMEOUT 5000
 #define DEBUG(x...)  //x
 
-uint8_t         buf[BUFFER_SIZE];
-uint8_t         temp[BUFFER_SIZE];
-bool            reading              = true;
-size_t          testReadBytesTimeout = 0;
+uint8_t buf[BUFFER_SIZE];
+uint8_t temp[BUFFER_SIZE];
+bool    reading              = true;
+size_t  testReadBytesTimeout = 0;
 
 static size_t   out_idx = 0, in_idx = 0;
 static size_t   local_receive_size = 0;
@@ -34,36 +34,30 @@ static uint64_t in_total = 0, in_prev = 0;
 static uint64_t start_ms, last_ms;
 static uint64_t timeout;
 
-Stream*         logger;
+Stream* logger;
 
-void            error(const char* what)
-{
+void error(const char* what) {
   logger->printf("\nerror: %s after %ld minutes\nread idx:  %d\nwrite idx: %d\ntotal:     %ld\nlast read: %d\nmaxavail:  %d\n",
                  what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total, (int)local_receive_size, maxavail);
-  if (Serial.hasOverrun())
-  {
+  if (Serial.hasOverrun()) {
     logger->printf("overrun!\n");
   }
   logger->printf("should be (size=%d idx=%d..%d):\n    ", BUFFER_SIZE, in_idx, in_idx + local_receive_size - 1);
-  for (size_t i = in_idx; i < in_idx + local_receive_size; i++)
-  {
+  for (size_t i = in_idx; i < in_idx + local_receive_size; i++) {
     logger->printf("%02x(%c) ", buf[i], (unsigned char)((buf[i] > 31 && buf[i] < 128) ? buf[i] : '.'));
   }
   logger->print("\n\nis: ");
-  for (size_t i = 0; i < local_receive_size; i++)
-  {
+  for (size_t i = 0; i < local_receive_size; i++) {
     logger->printf("%02x(%c) ", temp[i], (unsigned char)((temp[i] > 31 && temp[i] < 128) ? temp[i] : '.'));
   }
   logger->println("\n\n");
 
-  while (true)
-  {
+  while (true) {
     delay(1000);
   }
 }
 
-void setup()
-{
+void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(BAUD);
@@ -90,8 +84,7 @@ void setup()
   logger->printf("press 't' to toggle timeout testing on readBytes\n");
 
   // prepare send/compare buffer
-  for (size_t i = 0; i < sizeof buf; i++)
-  {
+  for (size_t i = 0; i < sizeof buf; i++) {
     buf[i] = (uint8_t)i;
   }
 
@@ -100,8 +93,7 @@ void setup()
 
   while (Serial.read() == -1)
     ;
-  if (Serial.hasOverrun())
-  {
+  if (Serial.hasOverrun()) {
     logger->print("overrun?\n");
   }
 
@@ -109,72 +101,58 @@ void setup()
   logger->println("setup done");
 }
 
-void loop()
-{
+void loop() {
   size_t maxlen = Serial.availableForWrite();
   // check remaining space in buffer
-  if (maxlen > BUFFER_SIZE - out_idx)
-  {
+  if (maxlen > BUFFER_SIZE - out_idx) {
     maxlen = BUFFER_SIZE - out_idx;
   }
   // check if not cycling more than buffer size relatively to input
   size_t in_out = out_idx == in_idx ? BUFFER_SIZE : (in_idx + BUFFER_SIZE - out_idx - 1) % BUFFER_SIZE;
-  if (maxlen > in_out)
-  {
+  if (maxlen > in_out) {
     maxlen = in_out;
   }
   DEBUG(logger->printf("(aw%i/w%i", Serial.availableForWrite(), maxlen));
   size_t local_written_size = Serial.write(buf + out_idx, maxlen);
   DEBUG(logger->printf(":w%i/aw%i/ar%i)\n", local_written_size, Serial.availableForWrite(), Serial.available()));
-  if (local_written_size > maxlen)
-  {
+  if (local_written_size > maxlen) {
     error("bad write");
   }
-  if ((out_idx += local_written_size) == BUFFER_SIZE)
-  {
+  if ((out_idx += local_written_size) == BUFFER_SIZE) {
     out_idx = 0;
   }
   yield();
 
   DEBUG(logger->printf("----------\n"));
 
-  if (Serial.hasOverrun())
-  {
+  if (Serial.hasOverrun()) {
     logger->printf("rx overrun!\n");
   }
-  if (Serial.hasRxError())
-  {
+  if (Serial.hasRxError()) {
     logger->printf("rx error!\n");
   }
 
-  if (reading)
-  {
+  if (reading) {
     // receive data
     maxlen = Serial.available() + testReadBytesTimeout;
-    if (maxlen > maxavail)
-    {
+    if (maxlen > maxavail) {
       maxavail = maxlen;
     }
     // check space in temp receive buffer
-    if (maxlen > BUFFER_SIZE - in_idx)
-    {
+    if (maxlen > BUFFER_SIZE - in_idx) {
       maxlen = BUFFER_SIZE - in_idx;
     }
     DEBUG(logger->printf("(ar%i/r%i", Serial.available(), maxlen));
     local_receive_size = Serial.readBytes(temp, maxlen);
     DEBUG(logger->printf(":r%i/ar%i)\n", local_receive_size, Serial.available()));
-    if (local_receive_size > maxlen)
-    {
+    if (local_receive_size > maxlen) {
       error("bad read");
     }
-    if (local_receive_size)
-    {
-      if (memcmp(buf + in_idx, temp, local_receive_size) != 0)
-      {
+    if (local_receive_size) {
+      if (memcmp(buf + in_idx, temp, local_receive_size) != 0) {
         error("fail");
       }
-      if ((in_idx += local_receive_size) == BUFFER_SIZE)
-      {
+      if ((in_idx += local_receive_size) == BUFFER_SIZE) {
         in_idx = 0;
       }
       in_total += local_receive_size;
@@ -183,13 +161,11 @@ void loop()
   }
 
   // say something on data every second
-  if ((size_for_led += local_written_size) >= size_for_1sec || millis() > timeout)
-  {
+  if ((size_for_led += local_written_size) >= size_for_1sec || millis() > timeout) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     size_for_led = 0;
 
-    if (in_prev == in_total)
-    {
+    if (in_prev == in_total) {
       error("receiving nothing?\n");
     }
 
@@ -203,8 +179,7 @@ void loop()
   }
 
   if (logger->available())
-    switch (logger->read())
-    {
+    switch (logger->read()) {
       case 's':
         logger->println("now stopping reading, keeping writing");
         reading = false;

@@ -35,7 +35,7 @@
 
 std::map<int, UdpContext*> udps;
 
-void                       register_udp(int sock, UdpContext* udp)
+void register_udp(int sock, UdpContext* udp)
 {
     if (udp)
         udps[sock] = udp;

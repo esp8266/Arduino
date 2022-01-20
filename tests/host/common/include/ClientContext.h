@@ -304,21 +304,21 @@ public:
     }
 
 private:
-    discard_cb_t   _discard_cb     = nullptr;
-    void*          _discard_cb_arg = nullptr;
+    discard_cb_t _discard_cb     = nullptr;
+    void*        _discard_cb_arg = nullptr;
 
     int8_t         _refcnt;
     ClientContext* _next;
 
-    bool           _sync;
+    bool _sync;
 
     // MOCK
 
-    int            _sock       = -1;
-    int            _timeout_ms = 5000;
+    int _sock       = -1;
+    int _timeout_ms = 5000;
 
-    char           _inbuf[CCBUFSIZE];
-    size_t         _inbufsize = 0;
+    char   _inbuf[CCBUFSIZE];
+    size_t _inbufsize = 0;
 };
 
 #endif  //CLIENTCONTEXT_H

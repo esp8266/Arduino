@@ -36,13 +36,11 @@ ESP8266WebServer server(80);
 
 // This function is called when the WebServer was requested without giving a filename.
 // This will redirect to the file index.htm when it is existing otherwise to the built-in $upload.htm page
-void handleRedirect()
-{
+void handleRedirect() {
   TRACE("Redirect...");
   String url = "/index.htm";
 
-  if (!LittleFS.exists(url))
-  {
+  if (!LittleFS.exists(url)) {
     url = "/$update.htm";
   }
 
@@ -52,16 +50,13 @@ void handleRedirect()
 
 // This function is called when the WebServer was requested to list all existing files in the filesystem.
 // a JSON array with file information is returned.
-void handleListFiles()
-{
+void handleListFiles() {
   Dir    dir = LittleFS.openDir("/");
   String result;
 
   result += "[\n";
-  while (dir.next())
-  {
-    if (result.length() > 4)
-    {
+  while (dir.next()) {
+    if (result.length() > 4) {
       result += ",";
     }
     result += "  {";
@@ -77,8 +72,7 @@ void handleListFiles()
 }  // handleListFiles()
 
 // This function is called when the sysInfo service was requested.
-void handleSysInfo()
-{
+void handleSysInfo() {
   String result;
 
   FSInfo fs_info;
@@ -98,15 +92,13 @@ void handleSysInfo()
 // ===== Request Handler class used to answer more complex requests =====
 
 // The FileServerHandler is registered to the web server to support DELETE and UPLOAD of files into the filesystem.
-class FileServerHandler : public RequestHandler
-{
+class FileServerHandler : public RequestHandler {
   public:
   // @brief Construct a new File Server Handler object
   // @param fs The file system to be used.
   // @param path Path to the root folder in the file system that is used for serving static data down and upload.
   // @param cache_header Cache Header to be used in replies.
-  FileServerHandler()
-  {
+  FileServerHandler() {
     TRACE("FileServerHandler is registered\n");
   }
 
@@ -114,34 +106,26 @@ class FileServerHandler : public RequestHandler
   // @param requestMethod method of the http request line.
   // @param requestUri request ressource from the http request line.
   // @return true when method can be handled.
-  bool canHandle(HTTPMethod requestMethod, const String UNUSED& _uri) override
-  {
+  bool canHandle(HTTPMethod requestMethod, const String UNUSED& _uri) override {
     return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
   }  // canHandle()
 
-  bool canUpload(const String& uri) override
-  {
+  bool canUpload(const String& uri) override {
     // only allow upload on root fs level.
     return (uri == "/");
   }  // canUpload()
 
-  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, const String& requestUri) override
-  {
+  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, const String& requestUri) override {
     // ensure that filename starts with '/'
     String fName = requestUri;
-    if (!fName.startsWith("/"))
-    {
+    if (!fName.startsWith("/")) {
       fName = "/" + fName;
     }
 
-    if (requestMethod == HTTP_POST)
-    {
+    if (requestMethod == HTTP_POST) {
       // all done in upload. no other forms.
-    }
-    else if (requestMethod == HTTP_DELETE)
-    {
-      if (LittleFS.exists(fName))
-      {
+    } else if (requestMethod == HTTP_DELETE) {
+      if (LittleFS.exists(fName)) {
         LittleFS.remove(fName);
       }
     }  // if
@@ -151,37 +135,27 @@ class FileServerHandler : public RequestHandler
   }  // handle()
 
   // uploading process
-  void upload(ESP8266WebServer UNUSED& server, const String UNUSED& _requestUri, HTTPUpload& upload) override
-  {
+  void upload(ESP8266WebServer UNUSED& server, const String UNUSED& _requestUri, HTTPUpload& upload) override {
     // ensure that filename starts with '/'
     String fName = upload.filename;
-    if (!fName.startsWith("/"))
-    {
+    if (!fName.startsWith("/")) {
       fName = "/" + fName;
     }
 
-    if (upload.status == UPLOAD_FILE_START)
-    {
+    if (upload.status == UPLOAD_FILE_START) {
       // Open the file
-      if (LittleFS.exists(fName))
-      {
+      if (LittleFS.exists(fName)) {
         LittleFS.remove(fName);
       }  // if
       _fsUploadFile = LittleFS.open(fName, "w");
-    }
-    else if (upload.status == UPLOAD_FILE_WRITE)
-    {
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
       // Write received bytes
-      if (_fsUploadFile)
-      {
+      if (_fsUploadFile) {
         _fsUploadFile.write(upload.buf, upload.currentSize);
       }
-    }
-    else if (upload.status == UPLOAD_FILE_END)
-    {
+    } else if (upload.status == UPLOAD_FILE_END) {
       // Close the file
-      if (_fsUploadFile)
-      {
+      if (_fsUploadFile) {
         _fsUploadFile.close();
       }
     }  // if
@@ -192,8 +166,7 @@ class FileServerHandler : public RequestHandler
 };
 
 // Setup everything to make the webserver work.
-void setup(void)
-{
+void setup(void) {
   delay(3000);  // wait for serial monitor to start completely.
 
   // Use Serial port for some trace information from the example
@@ -203,8 +176,7 @@ void setup(void)
   TRACE("Starting WebServer example...\n");
 
   TRACE("Mounting the filesystem...\n");
-  if (!LittleFS.begin())
-  {
+  if (!LittleFS.begin()) {
     TRACE("could not mount the filesystem...\n");
     delay(2000);
     ESP.restart();
@@ -212,12 +184,9 @@ void setup(void)
 
   // start WiFI
   WiFi.mode(WIFI_STA);
-  if (strlen(ssid) == 0)
-  {
+  if (strlen(ssid) == 0) {
     WiFi.begin();
-  }
-  else
-  {
+  } else {
     WiFi.begin(ssid, passPhrase);
   }
 
@@ -225,8 +194,7 @@ void setup(void)
   WiFi.setHostname(HOSTNAME);
 
   TRACE("Connect to WiFi...\n");
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     TRACE(".");
   }
@@ -239,8 +207,7 @@ void setup(void)
   TRACE("Register service handlers...\n");
 
   // serve a built-in htm page
-  server.on("/$upload.htm", []()
-            { server.send(200, "text/html", FPSTR(uploadContent)); });
+  server.on("/$upload.htm", []() { server.send(200, "text/html", FPSTR(uploadContent)); });
 
   // register a redirect handler when only domain name is given.
   server.on("/", HTTP_GET, handleRedirect);
@@ -262,19 +229,17 @@ void setup(void)
   server.serveStatic("/", LittleFS, "/");
 
   // handle cases when file is not found
-  server.onNotFound([]()
-                    {
-                      // standard not found in browser.
-                      server.send(404, "text/html", FPSTR(notFoundContent));
-                    });
+  server.onNotFound([]() {
+    // standard not found in browser.
+    server.send(404, "text/html", FPSTR(notFoundContent));
+  });
 
   server.begin();
   TRACE("hostname=%s\n", WiFi.getHostname());
 }  // setup
 
 // run the server...
-void loop(void)
-{
+void loop(void) {
   server.handleClient();
 }  // loop()
 

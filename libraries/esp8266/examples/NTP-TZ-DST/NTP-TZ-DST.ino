@@ -52,14 +52,14 @@
 #include <sntp.h>  // sntp_servermode_dhcp()
 
 // for testing purpose:
-extern "C" int                            clock_gettime(clockid_t unused, struct timespec* tp);
+extern "C" int clock_gettime(clockid_t unused, struct timespec* tp);
 
 ////////////////////////////////////////////////////////
 
-static timeval                            tv;
-static timespec                           tp;
-static time_t                             now;
-static uint32_t                           now_ms, now_us;
+static timeval  tv;
+static timespec tp;
+static time_t   now;
+static uint32_t now_ms, now_us;
 
 static esp8266::polledTimeout::periodicMs showTimeNow(60000);
 static int                                time_machine_days     = 0;  // 0 = present
@@ -88,8 +88,7 @@ static bool                               time_machine_run_once = false;
   Serial.print(" " #w "="); \
   Serial.print(tm->tm_##w);
 
-void printTm(const char* what, const tm* tm)
-{
+void printTm(const char* what, const tm* tm) {
   Serial.print(what);
   PTM(isdst);
   PTM(yday);
@@ -102,8 +101,7 @@ void printTm(const char* what, const tm* tm)
   PTM(sec);
 }
 
-void showTime()
-{
+void showTime() {
   gettimeofday(&tv, nullptr);
   clock_gettime(0, &tp);
   now    = time(nullptr);
@@ -148,19 +146,14 @@ void showTime()
   Serial.print(ctime(&now));
 
   // lwIP v2 is able to list more details about the currently configured SNTP servers
-  for (int i = 0; i < SNTP_MAX_SERVERS; i++)
-  {
+  for (int i = 0; i < SNTP_MAX_SERVERS; i++) {
     IPAddress   sntp = *sntp_getserver(i);
     const char* name = sntp_getservername(i);
-    if (sntp.isSet())
-    {
+    if (sntp.isSet()) {
       Serial.printf("sntp%d:     ", i);
-      if (name)
-      {
+      if (name) {
         Serial.printf("%s (%s) ", name, sntp.toString().c_str());
-      }
-      else
-      {
+      } else {
         Serial.printf("%s ", sntp.toString().c_str());
       }
       Serial.printf("- IPv6: %s - Reachability: %o\n",
@@ -176,11 +169,9 @@ void showTime()
   time_t  prevtime = time(nullptr);
   gettimeofday(&prevtv, nullptr);
 
-  while (true)
-  {
+  while (true) {
     gettimeofday(&tv, nullptr);
-    if (tv.tv_sec != prevtv.tv_sec)
-    {
+    if (tv.tv_sec != prevtv.tv_sec) {
       Serial.printf("time(): %u   gettimeofday(): %u.%06u  seconds are unchanged\n",
                     (uint32_t)prevtime,
                     (uint32_t)prevtv.tv_sec, (uint32_t)prevtv.tv_usec);
@@ -196,43 +187,33 @@ void showTime()
   Serial.println();
 }
 
-void time_is_set(bool from_sntp /* <= this parameter is optional */)
-{
+void time_is_set(bool from_sntp /* <= this parameter is optional */) {
   // in CONT stack, unlike ISRs,
   // any function is allowed in this callback
 
-  if (time_machine_days == 0)
-  {
-    if (time_machine_running)
-    {
+  if (time_machine_days == 0) {
+    if (time_machine_running) {
       time_machine_run_once = true;
       time_machine_running  = false;
-    }
-    else
-    {
+    } else {
       time_machine_running = from_sntp && !time_machine_run_once;
     }
-    if (time_machine_running)
-    {
+    if (time_machine_running) {
       Serial.printf("\n-- \n-- Starting time machine demo to show libc's "
                     "automatic DST handling\n-- \n");
     }
   }
 
   Serial.print("settimeofday(");
-  if (from_sntp)
-  {
+  if (from_sntp) {
     Serial.print("SNTP");
-  }
-  else
-  {
+  } else {
     Serial.print("USER");
   }
   Serial.print(")");
 
   // time machine demo
-  if (time_machine_running)
-  {
+  if (time_machine_running) {
     now          = time(nullptr);
     const tm* tm = localtime(&now);
     Serial.printf(": future=%3ddays: DST=%s - ",
@@ -242,25 +223,19 @@ void time_is_set(bool from_sntp /* <= this parameter is optional */)
     gettimeofday(&tv, nullptr);
     constexpr int days = 30;
     time_machine_days += days;
-    if (time_machine_days > 360)
-    {
+    if (time_machine_days > 360) {
       tv.tv_sec -= (time_machine_days - days) * 60 * 60 * 24;
       time_machine_days = 0;
-    }
-    else
-    {
+    } else {
       tv.tv_sec += days * 60 * 60 * 24;
     }
     settimeofday(&tv, nullptr);
-  }
-  else
-  {
+  } else {
     Serial.println();
   }
 }
 
-void setup()
-{
+void setup() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_OFF);
 
@@ -308,10 +283,8 @@ void setup()
   showTime();
 }
 
-void loop()
-{
-  if (showTimeNow)
-  {
+void loop() {
+  if (showTimeNow) {
     showTime();
   }
 }

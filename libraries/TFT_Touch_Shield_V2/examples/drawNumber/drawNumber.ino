@@ -8,8 +8,7 @@
 #include <TFTv2.h>
 #include <SPI.h>
 
-void setup()
-{
+void setup() {
   TFT_BL_ON;  // turn on the background light
 
   Tft.TFTinit();  // init TFT library
@@ -29,8 +28,7 @@ void setup()
   Tft.drawFloat(1.2345, 4, 0, 250, 4, RED);  // draw a float number: 1.2345 Location: (0, 250), size: 4, decimal: 4, color: RED
 }
 
-void loop()
-{
+void loop() {
 }
 
 /*********************************************************************************************************

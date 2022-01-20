@@ -55,12 +55,12 @@ public:
         @param address the local MAC address for the Ethernet interface
         @return Returns true if setting up the Ethernet interface was successful
     */
-    boolean  begin(const uint8_t* address);
+    boolean begin(const uint8_t* address);
 
     /**
         Shut down the Ethernet controlled
     */
-    void     end();
+    void end();
 
     /**
         Send an Ethernet frame
@@ -96,7 +96,7 @@ protected:
         discard an Ethernet frame
         @param framesize readFrameSize()'s result
     */
-    void     discardFrame(uint16_t framesize);
+    void discardFrame(uint16_t framesize);
 
     /**
         Read an Ethernet frame data
@@ -119,16 +119,16 @@ private:
     static const uint16_t TxBufferMask    = TxBufferLength - 1;
     static const uint16_t RxBufferMask    = RxBufferLength - 1;
 
-    SPIClass&             _spi;
-    int8_t                _cs;
-    uint8_t               _mac_address[6];
+    SPIClass& _spi;
+    int8_t    _cs;
+    uint8_t   _mac_address[6];
 
     /**
         Default function to select chip.
         @note This function help not to access wrong address. If you do not describe this function or register any functions,
         null function is called.
     */
-    inline void           wizchip_cs_select()
+    inline void wizchip_cs_select()
     {
         digitalWrite(_cs, LOW);
     }
@@ -148,7 +148,7 @@ private:
         @param address Register address
         @return The value of register
     */
-    uint8_t  wizchip_read(uint16_t address);
+    uint8_t wizchip_read(uint16_t address);
 
     /**
         Reads a 2 byte value from a register.
@@ -163,7 +163,7 @@ private:
         @param pBuf Pointer buffer to read data
         @param len Data length
     */
-    void     wizchip_read_buf(uint16_t address, uint8_t* pBuf, uint16_t len);
+    void wizchip_read_buf(uint16_t address, uint8_t* pBuf, uint16_t len);
 
     /**
         Write a 1 byte value to a register.
@@ -171,7 +171,7 @@ private:
         @param wb Write data
         @return void
     */
-    void     wizchip_write(uint16_t address, uint8_t wb);
+    void wizchip_write(uint16_t address, uint8_t wb);
 
     /**
         Write a 2 byte value to a register.
@@ -179,7 +179,7 @@ private:
         @param wb Write data
         @return void
     */
-    void     wizchip_write_word(uint16_t address, uint16_t word);
+    void wizchip_write_word(uint16_t address, uint16_t word);
 
     /**
         It writes sequence data to registers.
@@ -187,12 +187,12 @@ private:
         @param pBuf Pointer buffer to write data
         @param len Data length
     */
-    void     wizchip_write_buf(uint16_t address, const uint8_t* pBuf, uint16_t len);
+    void wizchip_write_buf(uint16_t address, const uint8_t* pBuf, uint16_t len);
 
     /**
         Reset WIZCHIP by softly.
     */
-    void     wizchip_sw_reset(void);
+    void wizchip_sw_reset(void);
 
     /**
         It copies data to internal TX memory
@@ -206,7 +206,7 @@ private:
         @param len Data length
         @sa wizchip_recv_data()
     */
-    void     wizchip_send_data(const uint8_t* wizdata, uint16_t len);
+    void wizchip_send_data(const uint8_t* wizdata, uint16_t len);
 
     /**
         It copies data to your buffer from internal RX memory
@@ -220,14 +220,14 @@ private:
         @param len Data length
         @sa wizchip_send_data()
     */
-    void     wizchip_recv_data(uint8_t* wizdata, uint16_t len);
+    void wizchip_recv_data(uint8_t* wizdata, uint16_t len);
 
     /**
         It discard the received data in RX memory.
         @details It discards the data of the length of <i>len(variable)</i> bytes in internal RX memory.
         @param len Data length
     */
-    void     wizchip_recv_ignore(uint16_t len);
+    void wizchip_recv_ignore(uint16_t len);
 
     /**
         Get @ref Sn_TX_FSR register
@@ -447,7 +447,7 @@ private:
         @param (uint8_t)cr Value to set @ref Sn_CR
         @sa getSn_CR()
     */
-    void           setSn_CR(uint8_t cr);
+    void setSn_CR(uint8_t cr);
 
     /**
         Get @ref Sn_CR register

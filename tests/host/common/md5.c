@@ -68,9 +68,9 @@ typedef struct
 #define S44 21
 
 /* ----- static functions ----- */
-static void          MD5Transform(uint32_t state[4], const uint8_t block[64]);
-static void          Encode(uint8_t* output, uint32_t* input, uint32_t len);
-static void          Decode(uint32_t* output, const uint8_t* input, uint32_t len);
+static void MD5Transform(uint32_t state[4], const uint8_t block[64]);
+static void Encode(uint8_t* output, uint32_t* input, uint32_t len);
+static void Decode(uint32_t* output, const uint8_t* input, uint32_t len);
 
 static const uint8_t PADDING[64] = {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -124,10 +124,10 @@ EXP_FUNC void STDCALL MD5Init(MD5_CTX* ctx)
 
     /* Load magic initialization constants.
      */
-    ctx->state[0]                 = 0x67452301;
-    ctx->state[1]                 = 0xefcdab89;
-    ctx->state[2]                 = 0x98badcfe;
-    ctx->state[3]                 = 0x10325476;
+    ctx->state[0] = 0x67452301;
+    ctx->state[1] = 0xefcdab89;
+    ctx->state[2] = 0x98badcfe;
+    ctx->state[3] = 0x10325476;
 }
 
 /**

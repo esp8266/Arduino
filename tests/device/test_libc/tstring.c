@@ -72,20 +72,20 @@ void tstring_main(void)
     char  expected[MAX_1];
     char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
     int   i, j, k, x, z, align_test_iterations;
-    z               = 0;
+    z = 0;
 
     int test_failed = 0;
 
-    tmp1            = target;
-    tmp2            = buffer2;
-    tmp3            = buffer3;
-    tmp4            = buffer4;
-    tmp5            = buffer5;
-    tmp6            = buffer6;
-    tmp7            = buffer7;
+    tmp1 = target;
+    tmp2 = buffer2;
+    tmp3 = buffer3;
+    tmp4 = buffer4;
+    tmp5 = buffer5;
+    tmp6 = buffer6;
+    tmp7 = buffer7;
 
-    tmp2[0]         = 'Z';
-    tmp2[1]         = '\0';
+    tmp2[0] = 'Z';
+    tmp2[1] = '\0';
 
     if (memset(target, 'X', 0) != target || memcpy(target, "Y", 0) != target || memmove(target, "K", 0) != target || strncpy(tmp2, "4", 0) != tmp2 || strncat(tmp2, "123", 0) != tmp2 || strcat(target, "") != target)
     {
@@ -209,12 +209,12 @@ void tstring_main(void)
 
             for (x = 0; x < align_test_iterations; ++x)
             {
-                tmp1        = target + x;
-                tmp2        = buffer2 + x;
-                tmp3        = buffer3 + x;
-                tmp4        = buffer4 + x;
-                tmp5        = buffer5 + x;
-                tmp6        = buffer6 + x;
+                tmp1 = target + x;
+                tmp2 = buffer2 + x;
+                tmp3 = buffer3 + x;
+                tmp4 = buffer4 + x;
+                tmp5 = buffer5 + x;
+                tmp6 = buffer6 + x;
 
                 first_char  = array[i % (sizeof(array) - 1)];
                 second_char = array2[i % (sizeof(array2) - 1)];

@@ -7,12 +7,10 @@
 #define LED4 14
 #define LED5 15
 
-class ExampleClass
-{
+class ExampleClass {
   public:
   ExampleClass(int pin, int duration) :
-      _pin(pin), _duration(duration)
-  {
+      _pin(pin), _duration(duration) {
     pinMode(_pin, OUTPUT);
     _myTicker.attach_ms(_duration, std::bind(&ExampleClass::classBlink, this));
   }
@@ -21,36 +19,31 @@ class ExampleClass
   int    _pin, _duration;
   Ticker _myTicker;
 
-  void   classBlink()
-  {
+  void classBlink() {
     digitalWrite(_pin, !digitalRead(_pin));
   }
 };
 
-void staticBlink()
-{
+void staticBlink() {
   digitalWrite(LED2, !digitalRead(LED2));
 }
 
-void scheduledBlink()
-{
+void scheduledBlink() {
   digitalWrite(LED3, !digitalRead(LED2));
 }
 
-void parameterBlink(int p)
-{
+void parameterBlink(int p) {
   digitalWrite(p, !digitalRead(p));
 }
 
-Ticker       staticTicker;
-Ticker       scheduledTicker;
-Ticker       parameterTicker;
-Ticker       lambdaTicker;
+Ticker staticTicker;
+Ticker scheduledTicker;
+Ticker parameterTicker;
+Ticker lambdaTicker;
 
 ExampleClass example(LED1, 100);
 
-void         setup()
-{
+void setup() {
   pinMode(LED2, OUTPUT);
   staticTicker.attach_ms(100, staticBlink);
 
@@ -61,10 +54,8 @@ void         setup()
   parameterTicker.attach_ms(100, std::bind(parameterBlink, LED4));
 
   pinMode(LED5, OUTPUT);
-  lambdaTicker.attach_ms(100, []()
-                         { digitalWrite(LED5, !digitalRead(LED5)); });
+  lambdaTicker.attach_ms(100, []() { digitalWrite(LED5, !digitalRead(LED5)); });
 }
 
-void loop()
-{
+void loop() {
 }

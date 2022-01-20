@@ -53,25 +53,25 @@ private:
 
 public:
     TwoWire();
-    void           begin(int sda, int scl);
-    void           begin(int sda, int scl, uint8_t address);
-    void           pins(int sda, int scl) __attribute__((deprecated));  // use begin(sda, scl) in new code
-    void           begin();
-    void           begin(uint8_t);
-    void           begin(int);
-    void           setClock(uint32_t);
-    void           setClockStretchLimit(uint32_t);
-    void           beginTransmission(uint8_t);
-    void           beginTransmission(int);
-    uint8_t        endTransmission(void);
-    uint8_t        endTransmission(uint8_t);
-    size_t         requestFrom(uint8_t address, size_t size, bool sendStop);
-    uint8_t        status();
+    void    begin(int sda, int scl);
+    void    begin(int sda, int scl, uint8_t address);
+    void    pins(int sda, int scl) __attribute__((deprecated));  // use begin(sda, scl) in new code
+    void    begin();
+    void    begin(uint8_t);
+    void    begin(int);
+    void    setClock(uint32_t);
+    void    setClockStretchLimit(uint32_t);
+    void    beginTransmission(uint8_t);
+    void    beginTransmission(int);
+    uint8_t endTransmission(void);
+    uint8_t endTransmission(uint8_t);
+    size_t  requestFrom(uint8_t address, size_t size, bool sendStop);
+    uint8_t status();
 
-    uint8_t        requestFrom(uint8_t, uint8_t);
-    uint8_t        requestFrom(uint8_t, uint8_t, uint8_t);
-    uint8_t        requestFrom(int, int);
-    uint8_t        requestFrom(int, int, int);
+    uint8_t requestFrom(uint8_t, uint8_t);
+    uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
+    uint8_t requestFrom(int, int);
+    uint8_t requestFrom(int, int, int);
 
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t*, size_t);

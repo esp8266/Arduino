@@ -83,14 +83,14 @@ unsigned long long operator"" _GB(unsigned long long x)
 
 uint32_t _SPIFFS_start;
 
-void     eboot_command_write(struct eboot_command* cmd)
+void eboot_command_write(struct eboot_command* cmd)
 {
     (void)cmd;
 }
 
 EspClass ESP;
 
-void     EspClass::restart()
+void EspClass::restart()
 {
     mockverbose("Esp.restart(): exiting\n");
     exit(EXIT_SUCCESS);

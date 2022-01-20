@@ -61,8 +61,8 @@ size_t Stream::SendGenericPeekBuffer(Print* to, const ssize_t len, const int rea
     // "neverExpires (default, impossible)" is translated to default timeout
     esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
     // len==-1 => maxLen=0 <=> until starvation
-    const size_t                          maxLen  = std::max((ssize_t)0, len);
-    size_t                                written = 0;
+    const size_t maxLen  = std::max((ssize_t)0, len);
+    size_t       written = 0;
 
     while (!maxLen || written < maxLen)
     {
@@ -151,8 +151,8 @@ size_t Stream::SendGenericRegularUntil(Print* to, const ssize_t len, const int r
     // "neverExpires (default, impossible)" is translated to default timeout
     esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
     // len==-1 => maxLen=0 <=> until starvation
-    const size_t                          maxLen  = std::max((ssize_t)0, len);
-    size_t                                written = 0;
+    const size_t maxLen  = std::max((ssize_t)0, len);
+    size_t       written = 0;
 
     while (!maxLen || written < maxLen)
     {
@@ -227,8 +227,8 @@ size_t Stream::SendGenericRegular(Print* to, const ssize_t len, const esp8266::p
     // "neverExpires (default, impossible)" is translated to default timeout
     esp8266::polledTimeout::oneShotFastMs timedOut(timeoutMs >= esp8266::polledTimeout::oneShotFastMs::neverExpires ? getTimeout() : timeoutMs);
     // len==-1 => maxLen=0 <=> until starvation
-    const size_t                          maxLen  = std::max((ssize_t)0, len);
-    size_t                                written = 0;
+    const size_t maxLen  = std::max((ssize_t)0, len);
+    size_t       written = 0;
 
     while (!maxLen || written < maxLen)
     {

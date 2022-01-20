@@ -25,18 +25,16 @@
 unsigned int localPort = 8888;  // local port to listen on
 
 // buffers for receiving and sending data
-char         packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1];  //buffer to hold incoming packet,
-char         ReplyBuffer[] = "acknowledged\r\n";        // a string to send back
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1];  //buffer to hold incoming packet,
+char ReplyBuffer[] = "acknowledged\r\n";        // a string to send back
 
-WiFiUDP      Udp;
+WiFiUDP Udp;
 
-void         setup()
-{
+void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
   }
@@ -46,12 +44,10 @@ void         setup()
   Udp.begin(localPort);
 }
 
-void loop()
-{
+void loop() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
-  if (packetSize)
-  {
+  if (packetSize) {
     Serial.printf("Received packet of size %d from %s:%d\n    (to %s:%d, free heap = %d B)\n",
                   packetSize,
                   Udp.remoteIP().toString().c_str(), Udp.remotePort(),

@@ -58,12 +58,10 @@ const char* ap_default_psk  = APPSK;   ///< Default PSK.
    and the WiFi PSK in the second line.
    Line separator can be \r\n (CR LF) \r or \n.
 */
-bool        loadConfig(String* ssid, String* pass)
-{
+bool loadConfig(String* ssid, String* pass) {
   // open file for reading.
   File configFile = LittleFS.open("/cl_conf.txt", "r");
-  if (!configFile)
-  {
+  if (!configFile) {
     Serial.println("Failed to open cl_conf.txt.");
 
     return false;
@@ -79,19 +77,16 @@ bool        loadConfig(String* ssid, String* pass)
   int8_t  pos = content.indexOf("\r\n");
   uint8_t le  = 2;
   // check for linux and mac line ending.
-  if (pos == -1)
-  {
+  if (pos == -1) {
     le  = 1;
     pos = content.indexOf("\n");
-    if (pos == -1)
-    {
+    if (pos == -1) {
       pos = content.indexOf("\r");
     }
   }
 
   // If there is no second line: Some information is missing.
-  if (pos == -1)
-  {
+  if (pos == -1) {
     Serial.println("Infvalid content.");
     Serial.println(content);
 
@@ -122,12 +117,10 @@ bool        loadConfig(String* ssid, String* pass)
    @param pass PSK as string pointer,
    @return True or False.
 */
-bool saveConfig(String* ssid, String* pass)
-{
+bool saveConfig(String* ssid, String* pass) {
   // Open config file for writing.
   File configFile = LittleFS.open("/cl_conf.txt", "w");
-  if (!configFile)
-  {
+  if (!configFile) {
     Serial.println("Failed to open cl_conf.txt for writing");
 
     return false;
@@ -145,8 +138,7 @@ bool saveConfig(String* ssid, String* pass)
 /**
    @brief Arduino setup function.
 */
-void setup()
-{
+void setup() {
   String station_ssid = "";
   String station_psk  = "";
 
@@ -168,15 +160,13 @@ void setup()
   //Serial.println(WiFi.hostname());
 
   // Initialize file system.
-  if (!LittleFS.begin())
-  {
+  if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
     return;
   }
 
   // Load wifi connection information.
-  if (!loadConfig(&station_ssid, &station_psk))
-  {
+  if (!loadConfig(&station_ssid, &station_psk)) {
     station_ssid = STASSID;
     station_psk  = STAPSK;
 
@@ -185,15 +175,13 @@ void setup()
 
   // Check WiFi connection
   // ... check mode
-  if (WiFi.getMode() != WIFI_STA)
-  {
+  if (WiFi.getMode() != WIFI_STA) {
     WiFi.mode(WIFI_STA);
     delay(10);
   }
 
   // ... Compare file config with sdk config.
-  if (WiFi.SSID() != station_ssid || WiFi.psk() != station_psk)
-  {
+  if (WiFi.SSID() != station_ssid || WiFi.psk() != station_psk) {
     Serial.println("WiFi config changed.");
 
     // ... Try to connect to WiFi station.
@@ -205,9 +193,7 @@ void setup()
 
     // ... Uncomment this for debugging output.
     //WiFi.printDiag(Serial);
-  }
-  else
-  {
+  } else {
     // ... Begin with sdk config.
     WiFi.begin();
   }
@@ -216,8 +202,7 @@ void setup()
 
   // ... Give ESP 10 seconds to connect to station.
   unsigned long startTime = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000)
-  {
+  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
     Serial.write('.');
     //Serial.print(WiFi.status());
     delay(500);
@@ -225,14 +210,11 @@ void setup()
   Serial.println();
 
   // Check connection
-  if (WiFi.status() == WL_CONNECTED)
-  {
+  if (WiFi.status() == WL_CONNECTED) {
     // ... print IP Address
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-  }
-  else
-  {
+  } else {
     Serial.println("Can not connect to WiFi station. Go into AP mode.");
 
     // Go into software AP mode.
@@ -254,8 +236,7 @@ void setup()
 /**
    @brief Arduino loop function.
 */
-void loop()
-{
+void loop() {
   // Handle OTA server.
   ArduinoOTA.handle();
 }

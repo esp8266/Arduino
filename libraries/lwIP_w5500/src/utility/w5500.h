@@ -55,12 +55,12 @@ public:
         @param address the local MAC address for the Ethernet interface
         @return Returns true if setting up the Ethernet interface was successful
     */
-    boolean  begin(const uint8_t* address);
+    boolean begin(const uint8_t* address);
 
     /**
         Shut down the Ethernet controlled
     */
-    void     end();
+    void end();
 
     /**
         Send an Ethernet frame
@@ -96,7 +96,7 @@ protected:
         discard an Ethernet frame
         @param framesize readFrameSize()'s result
     */
-    void     discardFrame(uint16_t framesize);
+    void discardFrame(uint16_t framesize);
 
     /**
         Read an Ethernet frame data
@@ -111,16 +111,16 @@ protected:
 
 private:
     //< SPI interface Read operation in Control Phase
-    static const uint8_t AccessModeRead   = (0x00 << 2);
+    static const uint8_t AccessModeRead = (0x00 << 2);
 
     //< SPI interface Read operation in Control Phase
-    static const uint8_t AccessModeWrite  = (0x01 << 2);
+    static const uint8_t AccessModeWrite = (0x01 << 2);
 
     //< Common register block in Control Phase
-    static const uint8_t BlockSelectCReg  = (0x00 << 3);
+    static const uint8_t BlockSelectCReg = (0x00 << 3);
 
     //< Socket 0 register block in Control Phase
-    static const uint8_t BlockSelectSReg  = (0x01 << 3);
+    static const uint8_t BlockSelectSReg = (0x01 << 3);
 
     //< Socket 0 Tx buffer address block
     static const uint8_t BlockSelectTxBuf = (0x02 << 3);
@@ -128,16 +128,16 @@ private:
     //< Socket 0 Rx buffer address block
     static const uint8_t BlockSelectRxBuf = (0x03 << 3);
 
-    SPIClass&            _spi;
-    int8_t               _cs;
-    uint8_t              _mac_address[6];
+    SPIClass& _spi;
+    int8_t    _cs;
+    uint8_t   _mac_address[6];
 
     /**
         Default function to select chip.
         @note This function help not to access wrong address. If you do not describe this function or register any functions,
         null function is called.
     */
-    inline void          wizchip_cs_select()
+    inline void wizchip_cs_select()
     {
         digitalWrite(_cs, LOW);
     }
@@ -177,7 +177,7 @@ private:
         @param address Register address
         @return The value of register
     */
-    uint8_t  wizchip_read(uint8_t block, uint16_t address);
+    uint8_t wizchip_read(uint8_t block, uint16_t address);
 
     /**
         Reads a 2 byte value from a register.
@@ -192,7 +192,7 @@ private:
         @param pBuf Pointer buffer to read data
         @param len Data length
     */
-    void     wizchip_read_buf(uint8_t block, uint16_t address, uint8_t* pBuf, uint16_t len);
+    void wizchip_read_buf(uint8_t block, uint16_t address, uint8_t* pBuf, uint16_t len);
 
     /**
         Write a 1 byte value to a register.
@@ -200,7 +200,7 @@ private:
         @param wb Write data
         @return void
     */
-    void     wizchip_write(uint8_t block, uint16_t address, uint8_t wb);
+    void wizchip_write(uint8_t block, uint16_t address, uint8_t wb);
 
     /**
         Write a 2 byte value to a register.
@@ -208,7 +208,7 @@ private:
         @param wb Write data
         @return void
     */
-    void     wizchip_write_word(uint8_t block, uint16_t address, uint16_t word);
+    void wizchip_write_word(uint8_t block, uint16_t address, uint16_t word);
 
     /**
         It writes sequence data to registers.
@@ -216,7 +216,7 @@ private:
         @param pBuf Pointer buffer to write data
         @param len Data length
     */
-    void     wizchip_write_buf(uint8_t block, uint16_t address, const uint8_t* pBuf, uint16_t len);
+    void wizchip_write_buf(uint8_t block, uint16_t address, const uint8_t* pBuf, uint16_t len);
 
     /**
         Get @ref Sn_TX_FSR register
@@ -233,28 +233,28 @@ private:
     /**
         Reset WIZCHIP by softly.
     */
-    void     wizchip_sw_reset();
+    void wizchip_sw_reset();
 
     /**
         Get the link status of phy in WIZCHIP
     */
-    int8_t   wizphy_getphylink();
+    int8_t wizphy_getphylink();
 
     /**
         Get the power mode of PHY in WIZCHIP
     */
-    int8_t   wizphy_getphypmode();
+    int8_t wizphy_getphypmode();
 
     /**
         Reset Phy
     */
-    void     wizphy_reset();
+    void wizphy_reset();
 
     /**
         set the power mode of phy inside WIZCHIP. Refer to @ref PHYCFGR in W5500, @ref PHYSTATUS in W5200
         @param pmode Settig value of power down mode.
     */
-    int8_t   wizphy_setphypmode(uint8_t pmode);
+    int8_t wizphy_setphypmode(uint8_t pmode);
 
     /**
         It copies data to internal TX memory
@@ -268,7 +268,7 @@ private:
         @param len Data length
         @sa wizchip_recv_data()
     */
-    void     wizchip_send_data(const uint8_t* wizdata, uint16_t len);
+    void wizchip_send_data(const uint8_t* wizdata, uint16_t len);
 
     /**
         It copies data to your buffer from internal RX memory
@@ -282,14 +282,14 @@ private:
         @param len Data length
         @sa wizchip_send_data()
     */
-    void     wizchip_recv_data(uint8_t* wizdata, uint16_t len);
+    void wizchip_recv_data(uint8_t* wizdata, uint16_t len);
 
     /**
         It discard the received data in RX memory.
         @details It discards the data of the length of <i>len(variable)</i> bytes in internal RX memory.
         @param len Data length
     */
-    void     wizchip_recv_ignore(uint16_t len);
+    void wizchip_recv_ignore(uint16_t len);
 
     /** Common registers */
     enum
@@ -589,7 +589,7 @@ private:
         @param (uint8_t)cr Value to set @ref Sn_CR
         @sa getSn_CR()
     */
-    void           setSn_CR(uint8_t cr);
+    void setSn_CR(uint8_t cr);
 
     /**
         Get @ref Sn_CR register

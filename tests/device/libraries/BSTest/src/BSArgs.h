@@ -20,13 +20,13 @@ namespace protocol
     typedef enum
     {
         /* parsing the space between arguments */
-        SS_SPACE              = 0x0,
+        SS_SPACE = 0x0,
         /* parsing an argument which isn't quoted */
-        SS_ARG                = 0x1,
+        SS_ARG = 0x1,
         /* parsing a quoted argument */
-        SS_QUOTED_ARG         = 0x2,
+        SS_QUOTED_ARG = 0x2,
         /* parsing an escape sequence within unquoted argument */
-        SS_ARG_ESCAPED        = SS_ARG | SS_FLAG_ESCAPE,
+        SS_ARG_ESCAPED = SS_ARG | SS_FLAG_ESCAPE,
         /* parsing an escape sequence within a quoted argument */
         SS_QUOTED_ARG_ESCAPED = SS_QUOTED_ARG | SS_FLAG_ESCAPE,
     } split_state_t;

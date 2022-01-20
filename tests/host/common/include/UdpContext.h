@@ -276,18 +276,18 @@ private:
     rxhandler_t _on_rx;
     int         _refcnt = 0;
 
-    ip_addr_t   _dst;
-    uint16_t    _dstport;
+    ip_addr_t _dst;
+    uint16_t  _dstport;
 
-    char        _inbuf[CCBUFSIZE];
-    size_t      _inbufsize = 0;
-    char        _outbuf[CCBUFSIZE];
-    size_t      _outbufsize = 0;
+    char   _inbuf[CCBUFSIZE];
+    size_t _inbufsize = 0;
+    char   _outbuf[CCBUFSIZE];
+    size_t _outbufsize = 0;
 
-    int         _timeout_ms = 0;
+    int _timeout_ms = 0;
 
-    uint8_t     addrsize;
-    uint8_t     addr[16];
+    uint8_t addrsize;
+    uint8_t addr[16];
 };
 
 extern "C" inline err_t igmp_joingroup(const ip4_addr_t* ifaddr, const ip4_addr_t* groupaddr)

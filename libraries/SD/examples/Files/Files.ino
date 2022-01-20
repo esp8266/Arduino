@@ -22,26 +22,21 @@
 
 File myFile;
 
-void setup()
-{
+void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(4))
-  {
+  if (!SD.begin(4)) {
     Serial.println("initialization failed!");
     return;
   }
   Serial.println("initialization done.");
 
-  if (SD.exists("example.txt"))
-  {
+  if (SD.exists("example.txt")) {
     Serial.println("example.txt exists.");
-  }
-  else
-  {
+  } else {
     Serial.println("example.txt doesn't exist.");
   }
 
@@ -51,12 +46,9 @@ void setup()
   myFile.close();
 
   // Check to see if the file exists:
-  if (SD.exists("example.txt"))
-  {
+  if (SD.exists("example.txt")) {
     Serial.println("example.txt exists.");
-  }
-  else
-  {
+  } else {
     Serial.println("example.txt doesn't exist.");
   }
 
@@ -64,17 +56,13 @@ void setup()
   Serial.println("Removing example.txt...");
   SD.remove("example.txt");
 
-  if (SD.exists("example.txt"))
-  {
+  if (SD.exists("example.txt")) {
     Serial.println("example.txt exists.");
-  }
-  else
-  {
+  } else {
     Serial.println("example.txt doesn't exist.");
   }
 }
 
-void loop()
-{
+void loop() {
   // nothing happens after setup finishes.
 }

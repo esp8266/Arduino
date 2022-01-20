@@ -21,8 +21,7 @@ const char* ssid           = STASSID;
 const char* password       = STAPSK;
 char        hostString[16] = { 0 };
 
-void        setup()
-{
+void setup() {
   Serial.begin(115200);
   delay(100);
   Serial.println("\r\nsetup()");
@@ -34,8 +33,7 @@ void        setup()
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(250);
     Serial.print(".");
   }
@@ -45,8 +43,7 @@ void        setup()
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (!MDNS.begin(hostString))
-  {
+  if (!MDNS.begin(hostString)) {
     Serial.println("Error setting up MDNS responder!");
   }
   Serial.println("mDNS responder started");
@@ -55,16 +52,12 @@ void        setup()
   Serial.println("Sending mDNS query");
   int n = MDNS.queryService("esp", "tcp");  // Send out query for esp tcp services
   Serial.println("mDNS query done");
-  if (n == 0)
-  {
+  if (n == 0) {
     Serial.println("no services found");
-  }
-  else
-  {
+  } else {
     Serial.print(n);
     Serial.println(" service(s) found");
-    for (int i = 0; i < n; ++i)
-    {
+    for (int i = 0; i < n; ++i) {
       // Print details for each service found
       Serial.print(i + 1);
       Serial.print(": ");
@@ -81,8 +74,7 @@ void        setup()
   Serial.println("loop() next");
 }
 
-void loop()
-{
+void loop() {
   // put your main code here, to run repeatedly:
   MDNS.update();
 }

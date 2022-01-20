@@ -1,78 +1,65 @@
 
-uint32_t cyclesToRead1Kx32(unsigned int* x, uint32_t* res)
-{
+uint32_t cyclesToRead1Kx32(unsigned int* x, uint32_t* res) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite1Kx32(unsigned int* x)
-{
+uint32_t cyclesToWrite1Kx32(unsigned int* x) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead1Kx16(unsigned short* x, uint32_t* res)
-{
+uint32_t cyclesToRead1Kx16(unsigned short* x, uint32_t* res) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite1Kx16(unsigned short* x)
-{
+uint32_t cyclesToWrite1Kx16(unsigned short* x) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead1Kx8(unsigned char* x, uint32_t* res)
-{
+uint32_t cyclesToRead1Kx8(unsigned char* x, uint32_t* res) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += *(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite1Kx8(unsigned char* x)
-{
+uint32_t cyclesToWrite1Kx8(unsigned char* x) {
   uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++)
-  {
+  for (int i = 0; i < 1024; i++) {
     sum += i;
     *(x++) = sum;
   }
   return ESP.getCycleCount() - b;
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.printf("\n");
 
@@ -123,8 +110,7 @@ void setup()
   // Let's use external heap to make a big ole' String
   ESP.setExternalHeap();
   String s = "";
-  for (int i = 0; i < 100; i++)
-  {
+  for (int i = 0; i < 100; i++) {
     s += i;
     s += ' ';
   }
@@ -146,6 +132,5 @@ void setup()
   ESP.resetHeap();
 }
 
-void loop()
-{
+void loop() {
 }

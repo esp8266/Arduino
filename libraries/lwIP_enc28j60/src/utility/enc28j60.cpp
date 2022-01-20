@@ -524,7 +524,7 @@ bool ENC28J60::reset(void)
 boolean
 ENC28J60::begin(const uint8_t* address)
 {
-    _localMac   = address;
+    _localMac = address;
 
     bool    ret = reset();
     uint8_t rev = readrev();

@@ -24,26 +24,22 @@
 
 #include <PolledTimeout.h>
 
-void ledOn()
-{
+void ledOn() {
   digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on (Note that LOW is the voltage level
 }
 
-void ledOff()
-{
+void ledOff() {
   digitalWrite(LED_BUILTIN, HIGH);  // Turn the LED off by making the voltage HIGH
 }
 
-void ledToggle()
-{
+void ledToggle() {
   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));  // Change the state of the LED
 }
 
 esp8266::polledTimeout::periodicFastUs halfPeriod(500000);  //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 // the setup function runs only once at start
-void                                   setup()
-{
+void setup() {
   Serial.begin(115200);
 
   Serial.println();
@@ -68,8 +64,7 @@ void                                   setup()
 
   //STEP2: wait for ON timeout
   oneShotMs timeoutOn(2000);
-  while (!timeoutOn)
-  {
+  while (!timeoutOn) {
     yield();
   }
 
@@ -78,8 +73,7 @@ void                                   setup()
 
   //STEP4: wait for OFF timeout to assure the led is kept off for this time before exiting setup
   oneShotMs timeoutOff(2000);
-  while (!timeoutOff)
-  {
+  while (!timeoutOff) {
     yield();
   }
 
@@ -88,10 +82,8 @@ void                                   setup()
 }
 
 // the loop function runs over and over again forever
-void loop()
-{
-  if (halfPeriod)
-  {
+void loop() {
+  if (halfPeriod) {
     ledToggle();
   }
 }

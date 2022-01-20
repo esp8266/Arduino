@@ -4,10 +4,8 @@ int  divideA_B(int a, int b);
 
 int* nullPointer = NULL;
 
-void processKey(Print& out, int hotKey)
-{
-  switch (hotKey)
-  {
+void processKey(Print& out, int hotKey) {
+  switch (hotKey) {
     case 'r':
       out.printf_P(PSTR("Reset, ESP.reset(); ...\r\n"));
       ESP.reset();
@@ -16,19 +14,16 @@ void processKey(Print& out, int hotKey)
       out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
       break;
-    case 's':
-    {
+    case 's': {
       uint32_t startTime = millis();
       out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds.\r\n"));
       ets_install_putc1(ets_putc);
-      while (true)
-      {
+      while (true) {
         ets_printf("%9lu\r", (millis() - startTime));
         ets_delay_us(250000);
         // stay in an loop blocking other system activity.
       }
-    }
-    break;
+    } break;
     case 'h':
       out.printf_P(PSTR("Now crashing with Hardware WDT. This will take about 6 seconds.\r\n"));
       asm volatile("mov.n a2, %0\n\t"
@@ -46,8 +41,7 @@ void processKey(Print& out, int hotKey)
         // the system and crash.
         ets_install_putc1(ets_putc);
         xt_rsil(15);
-        while (true)
-        {
+        while (true) {
           ets_printf("%9lu\r", (millis() - startTime));
           ets_delay_us(250000);
           // stay in an loop blocking other system activity.
@@ -112,14 +106,12 @@ void processKey(Print& out, int hotKey)
 
 // With the current toolchain 10.1, using this to divide by zero will *not* be
 // caught at compile time.
-int __attribute__((noinline)) divideA_B(int a, int b)
-{
+int __attribute__((noinline)) divideA_B(int a, int b) {
   return (a / b);
 }
 
 // With the current toolchain 10.1, using this to divide by zero *will* be
 // caught at compile time. And a hard coded breakpoint will be inserted.
-int divideA_B_bp(int a, int b)
-{
+int divideA_B_bp(int a, int b) {
   return (a / b);
 }

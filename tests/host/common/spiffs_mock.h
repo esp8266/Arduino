@@ -32,8 +32,8 @@ public:
     ~SpiffsMock();
 
 protected:
-    void                 load();
-    void                 save();
+    void load();
+    void save();
 
     std::vector<uint8_t> m_fs;
     String               m_storage;

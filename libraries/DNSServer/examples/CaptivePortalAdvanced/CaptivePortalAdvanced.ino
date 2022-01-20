@@ -23,38 +23,37 @@
 #define APPSK "12345678"
 #endif
 
-const char*      softAP_ssid     = APSSID;
-const char*      softAP_password = APPSK;
+const char* softAP_ssid     = APSSID;
+const char* softAP_password = APPSK;
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
-const char*      myHostname      = "esp8266";
+const char* myHostname = "esp8266";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
-char             ssid[33]        = "";
-char             password[65]    = "";
+char ssid[33]     = "";
+char password[65] = "";
 
 // DNS server
-const byte       DNS_PORT        = 53;
-DNSServer        dnsServer;
+const byte DNS_PORT = 53;
+DNSServer  dnsServer;
 
 // Web server
 ESP8266WebServer server(80);
 
 /* Soft AP network parameters */
-IPAddress        apIP(172, 217, 28, 1);
-IPAddress        netMsk(255, 255, 255, 0);
+IPAddress apIP(172, 217, 28, 1);
+IPAddress netMsk(255, 255, 255, 0);
 
 /** Should I connect to WLAN asap? */
-boolean          connect;
+boolean connect;
 
 /** Last time I tried to connect to WLAN */
-unsigned long    lastConnectTry = 0;
+unsigned long lastConnectTry = 0;
 
 /** Current WLAN status */
-unsigned int     status         = WL_IDLE_STATUS;
+unsigned int status = WL_IDLE_STATUS;
 
-void             setup()
-{
+void setup() {
   delay(1000);
   Serial.begin(115200);
   Serial.println();
@@ -83,8 +82,7 @@ void             setup()
   connect = strlen(ssid) > 0;  // Request WLAN connect if there is a SSID
 }
 
-void connectWifi()
-{
+void connectWifi() {
   Serial.println("Connecting as wifi client...");
   WiFi.disconnect();
   WiFi.begin(ssid, password);
@@ -93,10 +91,8 @@ void connectWifi()
   Serial.println(connRes);
 }
 
-void loop()
-{
-  if (connect)
-  {
+void loop() {
+  if (connect) {
     Serial.println("Connect requested");
     connect = false;
     connectWifi();
@@ -104,19 +100,16 @@ void loop()
   }
   {
     unsigned int s = WiFi.status();
-    if (s == 0 && millis() > (lastConnectTry + 60000))
-    {
+    if (s == 0 && millis() > (lastConnectTry + 60000)) {
       /* If WLAN disconnected and idle try to connect */
       /* Don't set retry time too low as retry interfere the softAP operation */
       connect = true;
     }
-    if (status != s)
-    {  // WLAN status change
+    if (status != s) {  // WLAN status change
       Serial.print("Status: ");
       Serial.println(s);
       status = s;
-      if (s == WL_CONNECTED)
-      {
+      if (s == WL_CONNECTED) {
         /* Just connected to WLAN */
         Serial.println("");
         Serial.print("Connected to ");
@@ -125,24 +118,18 @@ void loop()
         Serial.println(WiFi.localIP());
 
         // Setup MDNS responder
-        if (!MDNS.begin(myHostname))
-        {
+        if (!MDNS.begin(myHostname)) {
           Serial.println("Error setting up MDNS responder!");
-        }
-        else
-        {
+        } else {
           Serial.println("mDNS responder started");
           // Add service to MDNS-SD
           MDNS.addService("http", "tcp", 80);
         }
-      }
-      else if (s == WL_NO_SSID_AVAIL)
-      {
+      } else if (s == WL_NO_SSID_AVAIL) {
         WiFi.disconnect();
       }
     }
-    if (s == WL_CONNECTED)
-    {
+    if (s == WL_CONNECTED) {
       MDNS.update();
     }
   }

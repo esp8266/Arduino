@@ -21,13 +21,13 @@
 #define STAPSK "your-password"
 #endif
 
-const char*                     ssid     = STASSID;
-const char*                     password = STAPSK;
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure server(443);
 BearSSL::ServerSessions         serverCache(5);
 
-static const char               serverCert[] PROGMEM = R"EOF(
+static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIDSzCCAjMCCQD2ahcfZAwXxDANBgkqhkiG9w0BAQsFADCBiTELMAkGA1UEBhMC
 VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU9yYW5nZSBDb3VudHkx
@@ -50,7 +50,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 -----END CERTIFICATE-----
 )EOF";
 
-static const char               serverKey[] PROGMEM  = R"EOF(
+static const char serverKey[] PROGMEM = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -80,17 +80,15 @@ gz5JWYhbD6c38khSzJb0pNXCo3EuYAVa36kDM96k1BtWuhRS10Q1VXk=
 -----END RSA PRIVATE KEY-----
 )EOF";
 
-const int                       led                  = 13;
+const int led = 13;
 
-void                            handleRoot()
-{
+void handleRoot() {
   digitalWrite(led, 1);
   server.send(200, "text/plain", "Hello from esp8266 over HTTPS!");
   digitalWrite(led, 0);
 }
 
-void handleNotFound()
-{
+void handleNotFound() {
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -100,16 +98,14 @@ void handleNotFound()
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++)
-  {
+  for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void)
-{
+void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -117,8 +113,7 @@ void setup(void)
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -131,8 +126,7 @@ void setup(void)
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266"))
-  {
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
@@ -143,8 +137,7 @@ void setup(void)
 
   server.on("/", handleRoot);
 
-  server.on("/inline", []()
-            { server.send(200, "text/plain", "this works as well"); });
+  server.on("/inline", []() { server.send(200, "text/plain", "this works as well"); });
 
   server.onNotFound(handleNotFound);
 
@@ -154,24 +147,19 @@ void setup(void)
 
 extern "C" void stack_thunk_dump_stack();
 
-void            processKey(Print& out, int hotKey)
-{
-  switch (hotKey)
-  {
-    case 'd':
-    {
+void processKey(Print& out, int hotKey) {
+  switch (hotKey) {
+    case 'd': {
       HeapSelectDram ephemeral;
       umm_info(NULL, true);
       break;
     }
-    case 'i':
-    {
+    case 'i': {
       HeapSelectIram ephemeral;
       umm_info(NULL, true);
       break;
     }
-    case 'h':
-    {
+    case 'h': {
       {
         HeapSelectIram ephemeral;
         Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
@@ -219,12 +207,10 @@ void            processKey(Print& out, int hotKey)
   }
 }
 
-void loop(void)
-{
+void loop(void) {
   server.handleClient();
   MDNS.update();
-  if (Serial.available() > 0)
-  {
+  if (Serial.available() > 0) {
     int hotKey = Serial.read();
     processKey(Serial, hotKey);
   }

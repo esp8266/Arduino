@@ -41,8 +41,7 @@ SoftwareSerial  ppplink(RX, TX);
 HardwareSerial& logger = Serial;
 PPPServer       ppp(&ppplink);
 
-void            PPPConnectedCallback(netif* nif)
-{
+void PPPConnectedCallback(netif* nif) {
   logger.printf("ppp: ip=%s/mask=%s/gw=%s\n",
                 IPAddress(&nif->ip_addr).toString().c_str(),
                 IPAddress(&nif->netmask).toString().c_str(),
@@ -51,12 +50,10 @@ void            PPPConnectedCallback(netif* nif)
   logger.printf("Heap before: %d\n", ESP.getFreeHeap());
   err_t ret = ip_napt_init(NAPT, NAPT_PORT);
   logger.printf("ip_napt_init(%d,%d): ret=%d (OK=%d)\n", NAPT, NAPT_PORT, (int)ret, (int)ERR_OK);
-  if (ret == ERR_OK)
-  {
+  if (ret == ERR_OK) {
     ret = ip_napt_enable_no(nif->num, 1);
     logger.printf("ip_napt_enable(nif): ret=%d (OK=%d)\n", (int)ret, (int)ERR_OK);
-    if (ret == ERR_OK)
-    {
+    if (ret == ERR_OK) {
       logger.printf("PPP client is NATed\n");
     }
 
@@ -67,21 +64,18 @@ void            PPPConnectedCallback(netif* nif)
     logger.printf("redirect443=%d\n", ip_portmap_add(IP_PROTO_TCP, ip_2_ip4(&nif->ip_addr)->addr, 443, ip_2_ip4(&nif->gw)->addr, 443));
   }
   logger.printf("Heap after napt init: %d\n", ESP.getFreeHeap());
-  if (ret != ERR_OK)
-  {
+  if (ret != ERR_OK) {
     logger.printf("NAPT initialization failed\n");
   }
 }
 
-void setup()
-{
+void setup() {
   logger.begin(LOGGERBAUD);
 
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     logger.print('.');
     delay(500);
   }
@@ -105,14 +99,12 @@ void setup()
 
 #else
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.printf("\n\nPPP/NAPT not supported in this configuration\n");
 }
 
 #endif
 
-void loop()
-{
+void loop() {
 }

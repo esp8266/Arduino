@@ -72,7 +72,7 @@ namespace MDNSImplementation
     Any reply flags in installed services are removed at the end!
 
 */
-    bool               MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSendParameter)
+    bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSendParameter)
     {
         bool bResult = true;
 
@@ -162,9 +162,9 @@ namespace MDNSImplementation
         stcMDNS_MsgHeader msgHeader(p_rSendParameter.m_u16ID, p_rSendParameter.m_bResponse, 0, p_rSendParameter.m_bAuthorative);
         // If this is a response, the answers are anwers,
         // else this is a query or probe and the answers go into auth section
-        uint16_t&         ru16Answers = (p_rSendParameter.m_bResponse
-                                             ? msgHeader.m_u16ANCount
-                                             : msgHeader.m_u16NSCount);
+        uint16_t& ru16Answers = (p_rSendParameter.m_bResponse
+                                     ? msgHeader.m_u16ANCount
+                                     : msgHeader.m_u16NSCount);
 
         /**
         enuSequence
@@ -361,14 +361,14 @@ namespace MDNSImplementation
                                        uint16_t                               p_u16QueryType,
                                        stcMDNSServiceQuery::stcAnswer*        p_pKnownAnswers /*= 0*/)
     {
-        bool                 bResult = false;
+        bool bResult = false;
 
         stcMDNSSendParameter sendParameter;
         if (0 != ((sendParameter.m_pQuestions = new stcMDNS_RRQuestion)))
         {
-            sendParameter.m_pQuestions->m_Header.m_Domain                = p_QueryDomain;
+            sendParameter.m_pQuestions->m_Header.m_Domain = p_QueryDomain;
 
-            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type  = p_u16QueryType;
+            sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = p_u16QueryType;
             // It seems, that some mDNS implementations don't support 'unicast response' questions...
             sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (/*0x8000 |*/ DNS_RRCLASS_IN);  // /*Unicast &*/ INternet
 
@@ -434,7 +434,7 @@ namespace MDNSImplementation
     {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
 
-        bool             bResult = false;
+        bool bResult = false;
 
         stcMDNS_RRHeader header;
         uint32_t         u32TTL;
@@ -569,19 +569,19 @@ namespace MDNSImplementation
         p_rRRAnswerTXT.clear();
         if (p_u16RDLength)
         {
-            bResult                  = false;
+            bResult = false;
 
             unsigned char* pucBuffer = new unsigned char[p_u16RDLength];
             if (pucBuffer)
             {
                 if (_udpReadBuffer(pucBuffer, p_u16RDLength))
                 {
-                    bResult                        = true;
+                    bResult = true;
 
                     const unsigned char* pucCursor = pucBuffer;
                     while ((pucCursor < (pucBuffer + p_u16RDLength)) && (bResult))
                     {
-                        bResult                     = false;
+                        bResult = false;
 
                         stcMDNSServiceTxt* pTxt     = 0;
                         unsigned char      ucLength = *pucCursor++;  // Length of the next txt item
@@ -747,7 +747,7 @@ namespace MDNSImplementation
 
         if (MDNS_DOMAIN_MAX_REDIRCTION >= p_u8Depth)
         {
-            bResult       = true;
+            bResult = true;
 
             uint8_t u8Len = 0;
             do
@@ -1047,9 +1047,9 @@ namespace MDNSImplementation
 */
     bool MDNSResponder::_udpDump(bool p_bMovePointer /*= false*/)
     {
-        const uint8_t cu8BytesPerLine  = 16;
+        const uint8_t cu8BytesPerLine = 16;
 
-        uint32_t      u32StartPosition = m_pUDPContext->tell();
+        uint32_t u32StartPosition = m_pUDPContext->tell();
         DEBUG_OUTPUT.println("UDP Context Dump:");
         uint32_t u32Counter = 0;
         uint8_t  u8Byte     = 0;
@@ -1109,7 +1109,7 @@ namespace MDNSImplementation
 */
     bool MDNSResponder::_readMDNSMsgHeader(MDNSResponder::stcMDNS_MsgHeader& p_rMsgHeader)
     {
-        bool    bResult = false;
+        bool bResult = false;
 
         uint8_t u8B1;
         uint8_t u8B2;
@@ -1121,9 +1121,9 @@ namespace MDNSImplementation
             p_rMsgHeader.m_1bTC     = (u8B1 & 0x02);  // Truncation flag
             p_rMsgHeader.m_1bRD     = (u8B1 & 0x01);  // Recursion desired
 
-            p_rMsgHeader.m_1bRA     = (u8B2 & 0x80);  // Recursion available
-            p_rMsgHeader.m_3bZ      = (u8B2 & 0x70);  // Zero
-            p_rMsgHeader.m_4bRCode  = (u8B2 & 0x0F);  // Response code
+            p_rMsgHeader.m_1bRA    = (u8B2 & 0x80);  // Recursion available
+            p_rMsgHeader.m_3bZ     = (u8B2 & 0x70);  // Zero
+            p_rMsgHeader.m_4bRCode = (u8B2 & 0x0F);  // Response code
 
             /*  DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readMDNSMsgHeader: ID:%u QR:%u OP:%u AA:%u TC:%u RD:%u RA:%u R:%u QD:%u AN:%u NS:%u AR:%u\n"),
                 (unsigned)p_rMsgHeader.m_u16ID,
@@ -1133,7 +1133,7 @@ namespace MDNSImplementation
                 (unsigned)p_rMsgHeader.m_u16ANCount,
                 (unsigned)p_rMsgHeader.m_u16NSCount,
                 (unsigned)p_rMsgHeader.m_u16ARCount););*/
-            bResult                 = true;
+            bResult = true;
         }
         DEBUG_EX_ERR(if (!bResult)
                      {
@@ -1251,7 +1251,7 @@ namespace MDNSImplementation
                                              MDNSResponder::stcMDNSSendParameter& p_rSendParameter)
     {
         // The 'skip-compression' version is handled in '_writeMDNSAnswer_SRV'
-        uint16_t         u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)p_pcHostname, false);
+        uint16_t u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)p_pcHostname, false);
 
         stcMDNS_RRDomain hostDomain;
         bool             bResult = (u16CachedDomainOffset
@@ -1290,7 +1290,7 @@ namespace MDNSImplementation
                                                 MDNSResponder::stcMDNSSendParameter& p_rSendParameter)
     {
         // The 'skip-compression' version is handled in '_writeMDNSAnswer_SRV'
-        uint16_t         u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)&p_Service, p_bIncludeName);
+        uint16_t u16CachedDomainOffset = p_rSendParameter.findCachedDomainOffset((const void*)&p_Service, p_bIncludeName);
 
         stcMDNS_RRDomain serviceDomain;
         bool             bResult = (u16CachedDomainOffset
@@ -1477,7 +1477,7 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_TXT\n")););
 
-        bool                 bResult = false;
+        bool bResult = false;
 
         stcMDNS_RRAttributes attributes(DNS_RRTYPE_TXT,
                                         ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));  // Cache flush? & INternet
@@ -1584,9 +1584,9 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_SRV\n")););
 
-        uint16_t             u16CachedDomainOffset = (p_rSendParameter.m_bLegacyQuery
-                                                          ? 0
-                                                          : p_rSendParameter.findCachedDomainOffset((const void*)m_pcHostname, false));
+        uint16_t u16CachedDomainOffset = (p_rSendParameter.m_bLegacyQuery
+                                              ? 0
+                                              : p_rSendParameter.findCachedDomainOffset((const void*)m_pcHostname, false));
 
         stcMDNS_RRAttributes attributes(DNS_RRTYPE_SRV,
                                         ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));  // Cache flush? & INternet
@@ -1604,9 +1604,9 @@ namespace MDNSImplementation
                                 (_write16(MDNS_SRV_WEIGHT, p_rSendParameter)) &&                                                                                                              // Weight
                                 (_write16(p_rService.m_u16Port, p_rSendParameter)) &&                                                                                                         // Port
                                 (p_rSendParameter.addDomainCacheItem((const void*)m_pcHostname, false, p_rSendParameter.m_u16Offset)) && (_writeMDNSRRDomain(hostDomain, p_rSendParameter)))  // Host, eg. esp8266.local
-                             // Cache available for domain
-                                             : ((MDNS_DOMAIN_COMPRESS_MARK > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK)) &&  // Valid offset
-                                (_write16((sizeof(uint16_t /*Prio*/) +                                                        // RDLength
+                                                                                                                                                                                              // Cache available for domain
+                                             : ((MDNS_DOMAIN_COMPRESS_MARK > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK)) &&                                                                  // Valid offset
+                                (_write16((sizeof(uint16_t /*Prio*/) +                                                                                                                        // RDLength
                                            sizeof(uint16_t /*Weight*/) + sizeof(uint16_t /*Port*/) + 2),
                                           p_rSendParameter))
                                 &&                                                                                          // Length of 'C0xx'

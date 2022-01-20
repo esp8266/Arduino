@@ -274,26 +274,26 @@ public:
         return (isIP() && ((getSrcPort() == p) || (getDstPort() == p)));
     }
 
-    const String                   toString() const;
-    const String                   toString(PacketDetail netdumpDetail) const;
-    void                           printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
+    const String toString() const;
+    const String toString(PacketDetail netdumpDetail) const;
+    void         printDetail(Print& out, const String& indent, const char* data, size_t size, PacketDetail pd) const;
 
     const PacketType               packetType() const;
     const std::vector<PacketType>& allPacketTypes() const;
 
 private:
-    void                    setPacketType(PacketType);
-    void                    setPacketTypes();
+    void setPacketType(PacketType);
+    void setPacketTypes();
 
-    void                    MACtoString(int dataIdx, StreamString& sstr) const;
-    void                    ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
-    void                    UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void MACtoString(int dataIdx, StreamString& sstr) const;
+    void ARPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void DNStoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void UDPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void TCPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void ICMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void IGMPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void IPtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
+    void UKNWtoString(PacketDetail netdumpDetail, StreamString& sstr) const;
 
     time_t                  packetTime;
     int                     netif_idx;

@@ -41,7 +41,7 @@ public:
 
 typedef StdIOHelper IOHelper;
 
-inline void         fatal()
+inline void fatal()
 {
     throw std::runtime_error("fatal error");
 }

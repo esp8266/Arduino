@@ -15,7 +15,7 @@
 #include <assert.h>
 #include <FloodingMesh.h>
 
-namespace TypeCast                              = MeshTypeConversionFunctions;
+namespace TypeCast = MeshTypeConversionFunctions;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -28,26 +28,26 @@ namespace TypeCast                              = MeshTypeConversionFunctions;
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-constexpr char exampleMeshName[] PROGMEM        = "MeshNode_";                    // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
-constexpr char exampleWiFiPassword[] PROGMEM    = "ChangeThisWiFiPassword_TODO";  // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleMeshName[] PROGMEM     = "MeshNode_";                    // The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example networkFilter and broadcastFilter functions below.
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";  // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 // A custom encryption key is required when using encrypted ESP-NOW transmissions. There is always a default Kok set, but it can be replaced if desired.
 // All ESP-NOW keys below must match in an encrypted connection pair for encrypted communication to be possible.
 // Note that it is also possible to use Strings as key seeds instead of arrays.
-uint8_t        espnowEncryptedConnectionKey[16] = { 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44,  // This is the key for encrypting transmissions of encrypted connections.
+uint8_t espnowEncryptedConnectionKey[16] = { 0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x33, 0x44,  // This is the key for encrypting transmissions of encrypted connections.
                                              0x33, 0x44, 0x33, 0x44, 0x33, 0x44, 0x32, 0x11 };
-uint8_t        espnowHashKey[16]                = { 0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44,  // This is the secret key used for HMAC during encrypted connection requests.
+uint8_t espnowHashKey[16]                = { 0xEF, 0x44, 0x33, 0x0C, 0x33, 0x44, 0xFE, 0x44,  // This is the secret key used for HMAC during encrypted connection requests.
                               0x33, 0x44, 0x33, 0xB0, 0x33, 0x44, 0x32, 0xAD };
 
-bool           meshMessageHandler(String& message, FloodingMesh& meshInstance);
+bool meshMessageHandler(String& message, FloodingMesh& meshInstance);
 
 /* Create the mesh node object */
-FloodingMesh   floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
+FloodingMesh floodingMesh = FloodingMesh(meshMessageHandler, FPSTR(exampleWiFiPassword), espnowEncryptedConnectionKey, espnowHashKey, FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
 
-bool           theOne       = true;
-String         theOneMac;
+bool   theOne = true;
+String theOneMac;
 
-bool           useLED = false;  // Change this to true if you wish the onboard LED to mark The One.
+bool useLED = false;  // Change this to true if you wish the onboard LED to mark The One.
 
 /**
    Callback for when a message is received from the mesh network.
@@ -60,48 +60,37 @@ bool           useLED = false;  // Change this to true if you wish the onboard L
    @param meshInstance The FloodingMesh instance that received the message.
    @return True if this node should forward the received message to other nodes. False otherwise.
 */
-bool           meshMessageHandler(String& message, FloodingMesh& meshInstance)
-{
+bool meshMessageHandler(String& message, FloodingMesh& meshInstance) {
   int32_t delimiterIndex = message.indexOf(meshInstance.metadataDelimiter());
-  if (delimiterIndex == 0)
-  {
+  if (delimiterIndex == 0) {
     Serial.print(String(F("Message received from STA MAC ")) + meshInstance.getEspnowMeshBackend().getSenderMac() + F(": "));
     Serial.println(message.substring(2, 102));
 
     String potentialMac = message.substring(2, 14);
 
-    if (potentialMac >= theOneMac)
-    {
-      if (potentialMac > theOneMac)
-      {
+    if (potentialMac >= theOneMac) {
+      if (potentialMac > theOneMac) {
         theOne    = false;
         theOneMac = potentialMac;
       }
 
-      if (useLED && !theOne)
-      {
+      if (useLED && !theOne) {
         bool ledState = message.charAt(1) == '1';
         digitalWrite(LED_BUILTIN, ledState);  // Turn LED on/off (LED_BUILTIN is active low)
       }
 
       return true;
-    }
-    else
-    {
+    } else {
       return false;
     }
-  }
-  else if (delimiterIndex > 0)
-  {
-    if (meshInstance.getOriginMac() == theOneMac)
-    {
-      uint32_t        totalBroadcasts = strtoul(message.c_str(), nullptr, 0);  // strtoul stops reading input when an invalid character is discovered.
+  } else if (delimiterIndex > 0) {
+    if (meshInstance.getOriginMac() == theOneMac) {
+      uint32_t totalBroadcasts = strtoul(message.c_str(), nullptr, 0);  // strtoul stops reading input when an invalid character is discovered.
 
       // Static variables are only initialized once.
-      static uint32_t firstBroadcast  = totalBroadcasts;
+      static uint32_t firstBroadcast = totalBroadcasts;
 
-      if (totalBroadcasts - firstBroadcast >= 100)
-      {                                               // Wait a little to avoid start-up glitches
+      if (totalBroadcasts - firstBroadcast >= 100) {  // Wait a little to avoid start-up glitches
         static uint32_t missedBroadcasts        = 1;  // Starting at one to compensate for initial -1 below.
         static uint32_t previousTotalBroadcasts = totalBroadcasts;
         static uint32_t totalReceivedBroadcasts = 0;
@@ -110,19 +99,15 @@ bool           meshMessageHandler(String& message, FloodingMesh& meshInstance)
         missedBroadcasts += totalBroadcasts - previousTotalBroadcasts - 1;  // We expect an increment by 1.
         previousTotalBroadcasts = totalBroadcasts;
 
-        if (totalReceivedBroadcasts % 50 == 0)
-        {
+        if (totalReceivedBroadcasts % 50 == 0) {
           Serial.println(String(F("missed/total: ")) + String(missedBroadcasts) + '/' + String(totalReceivedBroadcasts));
         }
-        if (totalReceivedBroadcasts % 500 == 0)
-        {
+        if (totalReceivedBroadcasts % 500 == 0) {
           Serial.println(String(F("Benchmark message: ")) + message.substring(0, 100));
         }
       }
     }
-  }
-  else
-  {
+  } else {
     // Only show first 100 characters because printing a large String takes a lot of time, which is a bad thing for a callback function.
     // If you need to print the whole String it is better to store it and print it in the loop() later.
     Serial.print(String(F("Message with origin ")) + meshInstance.getOriginMac() + F(" received: "));
@@ -132,8 +117,7 @@ bool           meshMessageHandler(String& message, FloodingMesh& meshInstance)
   return true;
 }
 
-void setup()
-{
+void setup() {
   // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
   // This will however delay node WiFi start-up by about 700 ms. The delay is 900 ms if we otherwise would have stored the WiFi network we want to connect to.
   WiFi.persistent(false);
@@ -155,8 +139,7 @@ void setup()
   uint8_t apMacArray[6] { 0 };
   theOneMac = TypeCast::macToString(WiFi.softAPmacAddress(apMacArray));
 
-  if (useLED)
-  {
+  if (useLED) {
     pinMode(LED_BUILTIN, OUTPUT);    // Initialize the LED_BUILTIN pin as an output
     digitalWrite(LED_BUILTIN, LOW);  // Turn LED on (LED_BUILTIN is active low)
   }
@@ -172,8 +155,7 @@ void setup()
 }
 
 int32_t timeOfLastProclamation = -10000;
-void    loop()
-{
+void    loop() {
   static bool     ledState       = 1;
   static uint32_t benchmarkCount = 0;
   static uint32_t loopStart      = millis();
@@ -190,10 +172,8 @@ void    loop()
   // Unencrypted: TransmissionStatusType floodingMesh.getEspnowMeshBackend().attemptTransmission(message, EspnowNetworkInfo(recipientMac));
   // Encrypted (slow): floodingMesh.getEspnowMeshBackend().attemptAutoEncryptingTransmission(message, EspnowNetworkInfo(recipientMac));
 
-  if (theOne)
-  {
-    if (millis() - timeOfLastProclamation > 10000)
-    {
+  if (theOne) {
+    if (millis() - timeOfLastProclamation > 10000) {
       uint32_t startTime = millis();
       ledState           = ledState ^ bool(benchmarkCount);  // Make other nodes' LEDs alternate between on and off once benchmarking begins.
 
@@ -205,8 +185,7 @@ void    loop()
       floodingMeshDelay(20);
     }
 
-    if (millis() - loopStart > 23000)
-    {  // Start benchmarking the mesh once three proclamations have been made
+    if (millis() - loopStart > 23000) {  // Start benchmarking the mesh once three proclamations have been made
       uint32_t startTime = millis();
       floodingMesh.broadcast(String(benchmarkCount++) + String(floodingMesh.metadataDelimiter()) + F(": Not a spoon in sight."));
       Serial.println(String(F("Benchmark broadcast done in ")) + String(millis() - startTime) + F(" ms."));

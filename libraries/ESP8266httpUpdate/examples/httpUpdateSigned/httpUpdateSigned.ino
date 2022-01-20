@@ -55,8 +55,7 @@ BearSSL::HashSHA256*      hash;
 BearSSL::SigningVerifier* sign;
 #endif
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -64,8 +63,7 @@ void setup()
   Serial.println();
   Serial.println();
 
-  for (uint8_t t = 4; t > 0; t--)
-  {
+  for (uint8_t t = 4; t > 0; t--) {
     Serial.printf("[SETUP] WAIT %d...\n", t);
     Serial.flush();
     delay(1000);
@@ -81,11 +79,9 @@ void setup()
 #endif
 }
 
-void loop()
-{
+void loop() {
   // wait for WiFi connection
-  if ((WiFiMulti.run() == WL_CONNECTED))
-  {
+  if ((WiFiMulti.run() == WL_CONNECTED)) {
     WiFiClient client;
 
 #if MANUAL_SIGNING
@@ -99,8 +95,7 @@ void loop()
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://192.168.1.8/esp8266.bin");
 
-    switch (ret)
-    {
+    switch (ret) {
       case HTTP_UPDATE_FAILED:
         Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
         break;

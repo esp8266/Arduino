@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include <Schedule.h>
 
-static struct timeval    gtod0 = { 0, 0 };
+static struct timeval gtod0 = { 0, 0 };
 
 extern "C" unsigned long millis()
 {

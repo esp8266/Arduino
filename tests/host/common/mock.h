@@ -61,8 +61,8 @@ extern "C"
 {
 #endif
     // TODO: #include <stdlib_noniso.h> ?
-    char*  itoa(int val, char* s, int radix);
-    char*  ltoa(long val, char* s, int radix);
+    char* itoa(int val, char* s, int radix);
+    char* ltoa(long val, char* s, int radix);
 
     size_t strlcat(char* dst, const char* src, size_t size);
     size_t strlcpy(char* dst, const char* src, size_t size);
@@ -109,7 +109,7 @@ extern "C"
         putchar(c);
     }
 
-    int                mockverbose(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
+    int mockverbose(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 
     extern const char* host_interface;  // cmdline parameter
     extern bool        serial_timestamp;
@@ -120,7 +120,7 @@ extern "C"
 #define NO_GLOBAL_BINDING 0xffffffff
     extern uint32_t global_ipv4_netfmt;  // selected interface addresse to bind to
 
-    void            loop_end();
+    void loop_end();
 
 #ifdef __cplusplus
 }
@@ -154,14 +154,14 @@ ssize_t mockWrite(int sock, const uint8_t* data, size_t size, int timeout_ms);
 int     serverAccept(int sock);
 
 // udp
-void    check_incoming_udp();
-int     mockUDPSocket();
-bool    mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
-size_t  mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
-size_t  mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
-size_t  mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
-size_t  mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
-void    mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize);
+void   check_incoming_udp();
+int    mockUDPSocket();
+bool   mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
+size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
+size_t mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
+size_t mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
+size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
+void   mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize);
 
 class UdpContext;
 void register_udp(int sock, UdpContext* udp = nullptr);

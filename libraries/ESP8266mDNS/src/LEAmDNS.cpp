@@ -168,7 +168,7 @@ namespace MDNSImplementation
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_ReadyToStart;
 
             // Replace 'auto-set' service names
-            bResult                                = true;
+            bResult = true;
             for (stcMDNSService* pService = m_pServices; ((bResult) && (pService)); pService = pService->m_pNext)
             {
                 if (pService->m_bAutoName)
@@ -408,7 +408,7 @@ namespace MDNSImplementation
     bool MDNSResponder::removeServiceTxt(const MDNSResponder::hMDNSService p_hService,
                                          const MDNSResponder::hMDNSTxt     p_hTxt)
     {
-        bool            bResult  = false;
+        bool bResult = false;
 
         stcMDNSService* pService = _findService(p_hService);
         if (pService)
@@ -432,7 +432,7 @@ namespace MDNSImplementation
     bool MDNSResponder::removeServiceTxt(const MDNSResponder::hMDNSService p_hService,
                                          const char*                       p_pcKey)
     {
-        bool            bResult  = false;
+        bool bResult = false;
 
         stcMDNSService* pService = _findService(p_hService);
         if (pService)
@@ -458,7 +458,7 @@ namespace MDNSImplementation
                                          const char* p_pcProtocol,
                                          const char* p_pcKey)
     {
-        bool            bResult  = false;
+        bool bResult = false;
 
         stcMDNSService* pService = _findService((p_pcName ?: m_pcHostname), p_pcService, p_pcProtocol);
         if (pService)
@@ -518,14 +518,14 @@ namespace MDNSImplementation
     bool MDNSResponder::setDynamicServiceTxtCallback(MDNSResponder::hMDNSService                      p_hService,
                                                      MDNSResponder::MDNSDynamicServiceTxtCallbackFunc p_fnCallback)
     {
-        bool            bResult  = false;
+        bool bResult = false;
 
         stcMDNSService* pService = _findService(p_hService);
         if (pService)
         {
             pService->m_fnTxtCallback = p_fnCallback;
 
-            bResult                   = true;
+            bResult = true;
         }
         DEBUG_EX_ERR(if (!bResult)
                      {
@@ -543,7 +543,7 @@ namespace MDNSImplementation
     {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] addDynamicServiceTxt (%s=%s)\n"), p_pcKey, p_pcValue););
 
-        hMDNSTxt        hTxt     = 0;
+        hMDNSTxt hTxt = 0;
 
         stcMDNSService* pService = _findService(p_hService);
         if (pService)
@@ -667,7 +667,7 @@ namespace MDNSImplementation
 
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryService '%s.%s'\n"), p_pcService, p_pcProtocol););
 
-        uint32_t             u32Result     = 0;
+        uint32_t u32Result = 0;
 
         stcMDNSServiceQuery* pServiceQuery = 0;
         if ((p_pcService) && (os_strlen(p_pcService)) && (p_pcProtocol) && (os_strlen(p_pcProtocol)) && (p_u16Timeout) && (_removeLegacyServiceQuery()) && ((pServiceQuery = _allocServiceQuery())) && (_buildDomainForService(p_pcService, p_pcProtocol, pServiceQuery->m_ServiceTypeDomain)))
@@ -816,7 +816,7 @@ namespace MDNSImplementation
                                                                         const char*                                 p_pcProtocol,
                                                                         MDNSResponder::MDNSServiceQueryCallbackFunc p_fnCallback)
     {
-        hMDNSServiceQuery    hResult       = 0;
+        hMDNSServiceQuery hResult = 0;
 
         stcMDNSServiceQuery* pServiceQuery = 0;
         if ((p_pcService) && (os_strlen(p_pcService)) && (p_pcProtocol) && (os_strlen(p_pcProtocol)) && (p_fnCallback) && ((pServiceQuery = _allocServiceQuery())) && (_buildDomainForService(p_pcService, p_pcProtocol, pServiceQuery->m_ServiceTypeDomain)))
@@ -1110,14 +1110,14 @@ namespace MDNSImplementation
     bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                       MDNSResponder::MDNSServiceProbeFn p_fnCallback)
     {
-        bool            bResult  = false;
+        bool bResult = false;
 
         stcMDNSService* pService = _findService(p_hService);
         if (pService)
         {
             pService->m_ProbeInformation.m_fnServiceProbeResultCallback = p_fnCallback;
 
-            bResult                                                     = true;
+            bResult = true;
         }
         return bResult;
     }

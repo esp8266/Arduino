@@ -4,19 +4,14 @@
 #include <StreamDev.h>
 #include <StreamString.h>
 
-void loop()
-{
+void loop() {
   delay(1000);
 }
 
-void checksketch(const char* what, const char* res1, const char* res2)
-{
-  if (strcmp(res1, res2) == 0)
-  {
+void checksketch(const char* what, const char* res1, const char* res2) {
+  if (strcmp(res1, res2) == 0) {
     Serial << "PASSED: Test " << what << " (result: '" << res1 << "')\n";
-  }
-  else
-  {
+  } else {
     Serial << "FAILED: Test " << what << ": '" << res1 << "' <> '" << res2 << "' !\n";
   }
 }
@@ -25,21 +20,19 @@ void checksketch(const char* what, const char* res1, const char* res2)
 #define check(what, res1, res2) checksketch(what, res1, res2)
 #endif
 
-void testStringPtrProgmem()
-{
+void testStringPtrProgmem() {
   static const char inProgmem[] PROGMEM = "I am in progmem";
   auto              inProgmem2          = F("I am too in progmem");
 
-  int               heap                = (int)ESP.getFreeHeap();
-  auto              stream1             = StreamConstPtr(inProgmem, sizeof(inProgmem) - 1);
-  auto              stream2             = StreamConstPtr(inProgmem2);
+  int  heap    = (int)ESP.getFreeHeap();
+  auto stream1 = StreamConstPtr(inProgmem, sizeof(inProgmem) - 1);
+  auto stream2 = StreamConstPtr(inProgmem2);
   Serial << stream1 << " - " << stream2 << "\n";
   heap -= (int)ESP.getFreeHeap();
   check("NO heap occupation while streaming progmem strings", String(heap).c_str(), "0");
 }
 
-void testStreamString()
-{
+void testStreamString() {
   String       inputString = "hello";
   StreamString result;
 
@@ -166,12 +159,9 @@ void testStreamString()
     Serial << stream << "\n";
     heap -= (int)ESP.getFreeHeap();
     String heapStr(heap);
-    if (heap != 0)
-    {
+    if (heap != 0) {
       check("heap is occupied by String/StreamString(progmem)", heapStr.c_str(), heapStr.c_str());
-    }
-    else
-    {
+    } else {
       check("ERROR: heap should be occupied by String/StreamString(progmem)", heapStr.c_str(), "-1");
     }
   }
@@ -184,8 +174,7 @@ void testStreamString()
 
 #ifndef TEST_CASE
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   delay(1000);
 

@@ -8,7 +8,7 @@
 static int       netifStatusChangeListLength = 0;
 LwipIntf::CBType netifStatusChangeList[NETIF_STATUS_CB_SIZE];
 
-extern "C" void  netif_status_changed(struct netif* netif)
+extern "C" void netif_status_changed(struct netif* netif)
 {
     // override the default empty weak function
     for (int i = 0; i < netifStatusChangeListLength; i++)

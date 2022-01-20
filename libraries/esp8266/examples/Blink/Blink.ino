@@ -9,14 +9,12 @@
   Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
 */
 
-void setup()
-{
+void setup() {
   pinMode(LED_BUILTIN, OUTPUT);  // Initialize the LED_BUILTIN pin as an output
 }
 
 // the loop function runs over and over again forever
-void loop()
-{
+void loop() {
   digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on (Note that LOW is the voltage level
   // but actually the LED is on; this is because
   // it is active low on the ESP-01)

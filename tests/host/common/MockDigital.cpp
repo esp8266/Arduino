@@ -33,7 +33,7 @@ extern "C"
     static uint8_t _mode[17];
     static uint8_t _gpio[17];
 
-    extern void    pinMode(uint8_t pin, uint8_t mode)
+    extern void pinMode(uint8_t pin, uint8_t mode)
     {
         if (pin < 17)
         {

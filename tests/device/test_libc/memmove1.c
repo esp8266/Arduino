@@ -108,8 +108,8 @@ void fill(unsigned char dest[MAX * 3])
 
 void memmove_main(void)
 {
-    size_t        i;
-    int           errors = 0;
+    size_t i;
+    int    errors = 0;
 
     /* Leave some room before and after the area tested, so we can detect
      overwrites of up to N bytes, N being the amount tested.  If you

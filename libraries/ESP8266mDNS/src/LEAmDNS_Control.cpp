@@ -113,7 +113,7 @@ namespace MDNSImplementation
                                   IPAddress(m_pUDPContext->getDestAddress()).toString().c_str(), m_pUDPContext->getLocalPort()););
         //DEBUG_EX_INFO(_udpDump(););
 
-        bool              bResult = false;
+        bool bResult = false;
 
         stcMDNS_MsgHeader header;
         if (_readMDNSMsgHeader(header))
@@ -167,7 +167,7 @@ namespace MDNSImplementation
 */
     bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHeader)
     {
-        bool                 bResult = true;
+        bool bResult = true;
 
         stcMDNSSendParameter sendParameter;
         uint8_t              u8HostOrServiceReplies = 0;
@@ -515,7 +515,7 @@ namespace MDNSImplementation
                 sendParameter.m_bResponse    = true;
                 sendParameter.m_bAuthorative = true;
 
-                bResult                      = _sendMDNSMessage(sendParameter);
+                bResult = _sendMDNSMessage(sendParameter);
             }
             DEBUG_EX_INFO(
                 else
@@ -710,7 +710,7 @@ namespace MDNSImplementation
             bool bFoundNewKeyAnswer;
             do
             {
-                bFoundNewKeyAnswer                = false;
+                bFoundNewKeyAnswer = false;
 
                 const stcMDNS_RRAnswer* pRRAnswer = p_pAnswers;
                 while ((pRRAnswer) && (bResult))
@@ -1303,13 +1303,13 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendHostProbe (%s, %lu)\n"), m_pcHostname, millis()););
 
-        bool                 bResult = true;
+        bool bResult = true;
 
         // Requests for host domain
         stcMDNSSendParameter sendParameter;
         sendParameter.m_bCacheFlush = false;  // RFC 6762 10.2
 
-        sendParameter.m_pQuestions  = new stcMDNS_RRQuestion;
+        sendParameter.m_pQuestions = new stcMDNS_RRQuestion;
         if (((bResult = (0 != sendParameter.m_pQuestions))) && ((bResult = _buildDomainForHost(m_pcHostname, sendParameter.m_pQuestions->m_Header.m_Domain))))
         {
             //sendParameter.m_pQuestions->m_bUnicast = true;
@@ -1356,13 +1356,13 @@ namespace MDNSImplementation
     {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendServiceProbe (%s.%s.%s, %lu)\n"), (p_rService.m_pcName ?: m_pcHostname), p_rService.m_pcService, p_rService.m_pcProtocol, millis()););
 
-        bool                 bResult = true;
+        bool bResult = true;
 
         // Requests for service instance domain
         stcMDNSSendParameter sendParameter;
         sendParameter.m_bCacheFlush = false;  // RFC 6762 10.2
 
-        sendParameter.m_pQuestions  = new stcMDNS_RRQuestion;
+        sendParameter.m_pQuestions = new stcMDNS_RRQuestion;
         if (((bResult = (0 != sendParameter.m_pQuestions))) && ((bResult = _buildDomainForService(p_rService, true, sendParameter.m_pQuestions->m_Header.m_Domain))))
         {
             sendParameter.m_pQuestions->m_bUnicast                       = true;
@@ -1370,7 +1370,7 @@ namespace MDNSImplementation
             sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);  // Unicast & INternet
 
             // Add known answers
-            p_rService.m_u8ReplyMask                                     = (ContentFlag_SRV | ContentFlag_PTR_NAME);  // Add SRV and PTR NAME answers
+            p_rService.m_u8ReplyMask = (ContentFlag_SRV | ContentFlag_PTR_NAME);  // Add SRV and PTR NAME answers
         }
         else
         {
@@ -1452,16 +1452,16 @@ namespace MDNSImplementation
     bool MDNSResponder::_announce(bool p_bAnnounce,
                                   bool p_bIncludeServices)
     {
-        bool                 bResult = false;
+        bool bResult = false;
 
         stcMDNSSendParameter sendParameter;
         if (ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus)
         {
-            bResult                         = true;
+            bResult = true;
 
-            sendParameter.m_bResponse       = true;  // Announces are 'Unsolicited authoritative responses'
-            sendParameter.m_bAuthorative    = true;
-            sendParameter.m_bUnannounce     = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
+            sendParameter.m_bResponse    = true;  // Announces are 'Unsolicited authoritative responses'
+            sendParameter.m_bAuthorative = true;
+            sendParameter.m_bUnannounce  = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
 
             // Announce host
             sendParameter.m_u8HostReplyMask = 0;
@@ -1503,20 +1503,20 @@ namespace MDNSImplementation
     bool MDNSResponder::_announceService(stcMDNSService& p_rService,
                                          bool            p_bAnnounce /*= true*/)
     {
-        bool                 bResult = false;
+        bool bResult = false;
 
         stcMDNSSendParameter sendParameter;
         if (ProbingStatus_Done == p_rService.m_ProbeInformation.m_ProbingStatus)
         {
-            sendParameter.m_bResponse       = true;  // Announces are 'Unsolicited authoritative responses'
-            sendParameter.m_bAuthorative    = true;
-            sendParameter.m_bUnannounce     = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
+            sendParameter.m_bResponse    = true;  // Announces are 'Unsolicited authoritative responses'
+            sendParameter.m_bAuthorative = true;
+            sendParameter.m_bUnannounce  = !p_bAnnounce;  // When unannouncing, the TTL is set to '0' while creating the answers
 
             // DON'T announce host
             sendParameter.m_u8HostReplyMask = 0;
 
             // Announce services (service type, name, SRV (location) and TXTs)
-            p_rService.m_u8ReplyMask        = (ContentFlag_PTR_TYPE | ContentFlag_PTR_NAME | ContentFlag_SRV | ContentFlag_TXT);
+            p_rService.m_u8ReplyMask = (ContentFlag_PTR_TYPE | ContentFlag_PTR_NAME | ContentFlag_SRV | ContentFlag_TXT);
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _announceService: Announcing service %s.%s.%s (content 0x%X)\n"), (p_rService.m_pcName ?: m_pcHostname), p_rService.m_pcService, p_rService.m_pcProtocol, p_rService.m_u8ReplyMask););
 
             bResult = true;

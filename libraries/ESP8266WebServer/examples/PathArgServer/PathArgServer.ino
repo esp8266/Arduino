@@ -11,21 +11,19 @@
 #define STAPSK "your-password"
 #endif
 
-const char*      ssid     = STASSID;
-const char*      password = STAPSK;
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
-void             setup(void)
-{
+void setup(void) {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -35,32 +33,27 @@ void             setup(void)
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266"))
-  {
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
-  server.on(F("/"), []()
-            { server.send(200, "text/plain", "hello from esp8266!"); });
+  server.on(F("/"), []() { server.send(200, "text/plain", "hello from esp8266!"); });
 
-  server.on(UriBraces("/users/{}"), []()
-            {
-              String user = server.pathArg(0);
-              server.send(200, "text/plain", "User: '" + user + "'");
-            });
+  server.on(UriBraces("/users/{}"), []() {
+    String user = server.pathArg(0);
+    server.send(200, "text/plain", "User: '" + user + "'");
+  });
 
-  server.on(UriRegex("^\\/users\\/([0-9]+)\\/devices\\/([0-9]+)$"), []()
-            {
-              String user   = server.pathArg(0);
-              String device = server.pathArg(1);
-              server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");
-            });
+  server.on(UriRegex("^\\/users\\/([0-9]+)\\/devices\\/([0-9]+)$"), []() {
+    String user   = server.pathArg(0);
+    String device = server.pathArg(1);
+    server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");
+  });
 
   server.begin();
   Serial.println("HTTP server started");
 }
 
-void loop(void)
-{
+void loop(void) {
   server.handleClient();
 }

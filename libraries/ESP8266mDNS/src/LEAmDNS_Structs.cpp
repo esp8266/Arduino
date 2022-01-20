@@ -374,9 +374,9 @@ namespace MDNSImplementation
 */
     bool MDNSResponder::stcMDNSServiceTxts::removeTempTxts(void)
     {
-        bool               bResult = true;
+        bool bResult = true;
 
-        stcMDNSServiceTxt* pTxt    = m_pTxts;
+        stcMDNSServiceTxt* pTxt = m_pTxts;
         while ((bResult) && (pTxt))
         {
             stcMDNSServiceTxt* pNext = pTxt->m_pNext;
@@ -448,9 +448,9 @@ namespace MDNSImplementation
 */
     uint16_t MDNSResponder::stcMDNSServiceTxts::length(void) const
     {
-        uint16_t           u16Length = 0;
+        uint16_t u16Length = 0;
 
-        stcMDNSServiceTxt* pTxt      = m_pTxts;
+        stcMDNSServiceTxt* pTxt = m_pTxts;
         while (pTxt)
         {
             u16Length += 1;               // Length byte
@@ -479,7 +479,7 @@ namespace MDNSImplementation
 
         if (p_pcBuffer)
         {
-            bResult     = true;
+            bResult = true;
 
             *p_pcBuffer = 0;
             for (stcMDNSServiceTxt* pTxt = m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext)
@@ -527,7 +527,7 @@ namespace MDNSImplementation
 
         if (p_pcBuffer)
         {
-            bResult     = true;
+            bResult = true;
 
             *p_pcBuffer = 0;
             for (stcMDNSServiceTxt* pTxt = m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext)
@@ -684,7 +684,7 @@ namespace MDNSImplementation
     bool MDNSResponder::stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
                                                    bool        p_bPrependUnderline /*= false*/)
     {
-        bool   bResult  = false;
+        bool bResult = false;
 
         size_t stLength = (p_pcLabel
                                ? (strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
@@ -770,7 +770,7 @@ namespace MDNSImplementation
 */
     size_t MDNSResponder::stcMDNS_RRDomain::c_strLength(void) const
     {
-        size_t         stLength       = 0;
+        size_t stLength = 0;
 
         unsigned char* pucLabelLength = (unsigned char*)m_acName;
         while (*pucLabelLength)
@@ -1793,7 +1793,7 @@ namespace MDNSImplementation
 */
     uint32_t MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressCount(void) const
     {
-        uint32_t       u32Count    = 0;
+        uint32_t u32Count = 0;
 
         stcIP4Address* pIP4Address = m_pIP4Addresses;
         while (pIP4Address)
@@ -1920,7 +1920,7 @@ namespace MDNSImplementation
 */
     uint32_t MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressCount(void) const
     {
-        uint32_t       u32Count    = 0;
+        uint32_t u32Count = 0;
 
         stcIP6Address* pIP6Address = m_pIP6Addresses;
         while (pIP6Address)
@@ -2020,9 +2020,9 @@ namespace MDNSImplementation
 */
     uint32_t MDNSResponder::stcMDNSServiceQuery::answerCount(void) const
     {
-        uint32_t   u32Count = 0;
+        uint32_t u32Count = 0;
 
-        stcAnswer* pAnswer  = m_pAnswers;
+        stcAnswer* pAnswer = m_pAnswers;
         while (pAnswer)
         {
             ++u32Count;
@@ -2213,13 +2213,13 @@ namespace MDNSImplementation
         m_u8HostReplyMask = 0;
         m_u16Offset       = 0;
 
-        m_bLegacyQuery    = false;
-        m_bResponse       = false;
-        m_bAuthorative    = false;
-        m_bUnicast        = false;
-        m_bUnannounce     = false;
+        m_bLegacyQuery = false;
+        m_bResponse    = false;
+        m_bAuthorative = false;
+        m_bUnicast     = false;
+        m_bUnannounce  = false;
 
-        m_bCacheFlush     = true;
+        m_bCacheFlush = true;
 
         while (m_pQuestions)
         {
@@ -2265,7 +2265,7 @@ namespace MDNSImplementation
                                                                  bool        p_bAdditionalData,
                                                                  uint16_t    p_u16Offset)
     {
-        bool                bResult  = false;
+        bool bResult = false;
 
         stcDomainCacheItem* pNewItem = 0;
         if ((p_pHostnameOrService) && (p_u16Offset) && ((pNewItem = new stcDomainCacheItem(p_pHostnameOrService, p_bAdditionalData, p_u16Offset))))

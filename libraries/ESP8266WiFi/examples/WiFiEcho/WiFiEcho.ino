@@ -14,10 +14,10 @@
 #define STAPSK "your-password"
 #endif
 
-constexpr int                          port = 23;
+constexpr int port = 23;
 
-WiFiServer                             server(port);
-WiFiClient                             client;
+WiFiServer server(port);
+WiFiClient client;
 
 constexpr size_t                       sizes[]  = { 0, 512, 384, 256, 128, 64, 16, 8, 4 };
 constexpr uint32_t                     breathMs = 200;
@@ -26,8 +26,7 @@ esp8266::polledTimeout::periodicFastMs test(2000);
 int                                    t = 1;  // test (1, 2 or 3, see below)
 int                                    s = 0;  // sizes[] index
 
-void                                   setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println(ESP.getFullVersion());
 
@@ -35,8 +34,7 @@ void                                   setup()
   WiFi.begin(STASSID, STAPSK);
   Serial.print("\nConnecting to ");
   Serial.println(STASSID);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
   }
@@ -55,42 +53,34 @@ void                                   setup()
                 port);
 }
 
-void loop()
-{
+void loop() {
   MDNS.update();
 
   static uint32_t tot = 0;
   static uint32_t cnt = 0;
-  if (test && cnt)
-  {
+  if (test && cnt) {
     Serial.printf("measured-block-size=%u min-free-stack=%u", tot / cnt, ESP.getFreeContStack());
-    if (t == 2 && sizes[s])
-    {
+    if (t == 2 && sizes[s]) {
       Serial.printf(" (blocks: at most %d bytes)", sizes[s]);
     }
-    if (t == 3 && sizes[s])
-    {
+    if (t == 3 && sizes[s]) {
       Serial.printf(" (blocks: exactly %d bytes)", sizes[s]);
     }
-    if (t == 3 && !sizes[s])
-    {
+    if (t == 3 && !sizes[s]) {
       Serial.printf(" (blocks: any size)");
     }
     Serial.printf("\n");
   }
 
   //check if there are any new clients
-  if (server.hasClient())
-  {
+  if (server.hasClient()) {
     client = server.accept();
     Serial.println("New client");
   }
 
-  if (Serial.available())
-  {
+  if (Serial.available()) {
     s = (s + 1) % (sizeof(sizes) / sizeof(sizes[0]));
-    switch (Serial.read())
-    {
+    switch (Serial.read()) {
       case '1':
         if (t != 1)
           s = 0;
@@ -120,11 +110,9 @@ void loop()
 
   enoughMs.reset(breathMs);
 
-  if (t == 1)
-  {
+  if (t == 1) {
     // byte by byte
-    while (client.available() && client.availableForWrite() && !enoughMs)
-    {
+    while (client.available() && client.availableForWrite() && !enoughMs) {
       // working char by char is not efficient
       client.write(client.read());
       cnt++;
@@ -132,18 +120,15 @@ void loop()
     }
   }
 
-  else if (t == 2)
-  {
+  else if (t == 2) {
     // block by block through a local buffer (2 copies)
-    while (client.available() && client.availableForWrite() && !enoughMs)
-    {
+    while (client.available() && client.availableForWrite() && !enoughMs) {
       size_t maxTo = std::min(client.available(), client.availableForWrite());
       maxTo        = std::min(maxTo, sizes[s]);
       uint8_t buf[maxTo];
       size_t  tcp_got  = client.read(buf, maxTo);
       size_t  tcp_sent = client.write(buf, tcp_got);
-      if (tcp_sent != maxTo)
-      {
+      if (tcp_sent != maxTo) {
         Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got, tcp_sent);
       }
       tot += tcp_sent;
@@ -151,21 +136,16 @@ void loop()
     }
   }
 
-  else if (t == 3)
-  {
+  else if (t == 3) {
     // stream to print, possibly with only one copy
-    if (sizes[s])
-    {
+    if (sizes[s]) {
       tot += client.sendSize(&client, sizes[s]);
-    }
-    else
-    {
+    } else {
       tot += client.sendAvailable(&client);
     }
     cnt++;
 
-    switch (client.getLastSendReport())
-    {
+    switch (client.getLastSendReport()) {
       case Stream::Report::Success:
         break;
       case Stream::Report::TimedOut:
@@ -183,14 +163,12 @@ void loop()
     }
   }
 
-  else if (t == 4)
-  {
+  else if (t == 4) {
     // stream to print, possibly with only one copy
     tot += client.sendAll(&client);  // this one might not exit until peer close
     cnt++;
 
-    switch (client.getLastSendReport())
-    {
+    switch (client.getLastSendReport()) {
       case Stream::Report::Success:
         break;
       case Stream::Report::TimedOut:

@@ -56,7 +56,7 @@ namespace MDNSImplementation
                                                const char* p_pcDivider /*= "-"*/,
                                                const char* p_pcDefaultDomain /*= 0*/)
     {
-        bool        bResult   = false;
+        bool bResult = false;
 
         // Ensure a divider exists; use '-' as default
         const char* pcDivider = (p_pcDivider ?: "-");
@@ -83,7 +83,7 @@ namespace MDNSImplementation
                         delete[] p_rpcDomain;
                         p_rpcDomain = pNewHostname;
 
-                        bResult     = true;
+                        bResult = true;
                     }
                     else
                     {
@@ -107,7 +107,7 @@ namespace MDNSImplementation
                     delete[] p_rpcDomain;
                     p_rpcDomain = pNewHostname;
 
-                    bResult     = true;
+                    bResult = true;
                 }
                 else
                 {
@@ -120,8 +120,8 @@ namespace MDNSImplementation
             // No given host domain, use base or default
             const char* cpcDefaultName = (p_pcDefaultDomain ?: "esp8266");
 
-            size_t      stLength       = strlen(cpcDefaultName) + 1;  // '\0'
-            p_rpcDomain                = new char[stLength];
+            size_t stLength = strlen(cpcDefaultName) + 1;  // '\0'
+            p_rpcDomain     = new char[stLength];
             if (p_rpcDomain)
             {
                 strncpy(p_rpcDomain, cpcDefaultName, stLength);
@@ -318,7 +318,7 @@ namespace MDNSImplementation
     {
         stcMDNSServiceQuery* pMatchingServiceQuery = 0;
 
-        stcMDNSServiceQuery* pServiceQuery         = (p_pPrevServiceQuery ? p_pPrevServiceQuery->m_pNext : m_pServiceQueries);
+        stcMDNSServiceQuery* pServiceQuery = (p_pPrevServiceQuery ? p_pPrevServiceQuery->m_pNext : m_pServiceQueries);
         while (pServiceQuery)
         {
             if (p_ServiceTypeDomain == pServiceQuery->m_ServiceTypeDomain)
@@ -399,8 +399,8 @@ namespace MDNSImplementation
             pService->m_u16Port   = p_u16Port;
 
             // Add to list (or start list)
-            pService->m_pNext     = m_pServices;
-            m_pServices           = pService;
+            pService->m_pNext = m_pServices;
+            m_pServices       = pService;
         }
         return pService;
     }

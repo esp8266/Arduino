@@ -132,8 +132,8 @@ size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& a
     struct sockaddr_storage addrbuf;
     socklen_t               addrbufsize = std::min((socklen_t)sizeof(addrbuf), (socklen_t)16);
 
-    size_t                  maxread     = CCBUFSIZE - ccinbufsize;
-    ssize_t                 ret         = ::recvfrom(sock, ccinbuf + ccinbufsize, maxread, 0 /*flags*/, (sockaddr*)&addrbuf, &addrbufsize);
+    size_t  maxread = CCBUFSIZE - ccinbufsize;
+    ssize_t ret     = ::recvfrom(sock, ccinbuf + ccinbufsize, maxread, 0 /*flags*/, (sockaddr*)&addrbuf, &addrbufsize);
     if (ret == -1)
     {
         if (errno != EAGAIN)

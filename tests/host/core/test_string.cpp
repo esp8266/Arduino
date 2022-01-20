@@ -23,8 +23,8 @@ TEST_CASE("String::move", "[core][String]")
 {
     const char buffer[] = "this string goes over the sso limit";
 
-    String     target;
-    String     source(buffer);
+    String target;
+    String source(buffer);
 
     target = std::move(source);
     REQUIRE(source.c_str() != nullptr);
@@ -540,7 +540,7 @@ TEST_CASE("Strings with NULs", "[core][String]")
 
 TEST_CASE("Replace and string expansion", "[core][String]")
 {
-    String      s, l;
+    String s, l;
     // Make these large enough to span SSO and non SSO
     String      whole = "#123456789012345678901234567890";
     const char* res   = "abcde123456789012345678901234567890";

@@ -2,9 +2,9 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 
-const byte DNS_PORT = 53;
-IPAddress apIP(172, 217, 28, 1);
-DNSServer dnsServer;
+const byte       DNS_PORT = 53;
+IPAddress        apIP(172, 217, 28, 1);
+DNSServer        dnsServer;
 ESP8266WebServer webServer(80);
 
 String responseHTML = ""
@@ -24,9 +24,7 @@ void setup() {
   dnsServer.start(DNS_PORT, "*", apIP);
 
   // replay to all requests with same HTML
-  webServer.onNotFound([]() {
-    webServer.send(200, "text/html", responseHTML);
-  });
+  webServer.onNotFound([]() { webServer.send(200, "text/html", responseHTML); });
   webServer.begin();
 }
 

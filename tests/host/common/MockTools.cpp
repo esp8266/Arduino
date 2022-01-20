@@ -39,11 +39,11 @@ extern "C"
     uint32_t lwip_ntohl(uint32_t netlong) { return ntohl(netlong); }
     uint16_t lwip_ntohs(uint16_t netshort) { return ntohs(netshort); }
 
-    char*    ets_strcpy(char* d, const char* s) { return strcpy(d, s); }
-    char*    ets_strncpy(char* d, const char* s, size_t n) { return strncpy(d, s, n); }
-    size_t   ets_strlen(const char* s) { return strlen(s); }
+    char*  ets_strcpy(char* d, const char* s) { return strcpy(d, s); }
+    char*  ets_strncpy(char* d, const char* s, size_t n) { return strncpy(d, s, n); }
+    size_t ets_strlen(const char* s) { return strlen(s); }
 
-    int      ets_printf(const char* fmt, ...)
+    int ets_printf(const char* fmt, ...)
     {
         va_list ap;
         va_start(ap, fmt);
@@ -52,9 +52,9 @@ extern "C"
         return len;
     }
 
-    void     stack_thunk_add_ref() { }
-    void     stack_thunk_del_ref() { }
-    void     stack_thunk_repaint() { }
+    void stack_thunk_add_ref() { }
+    void stack_thunk_del_ref() { }
+    void stack_thunk_repaint() { }
 
     uint32_t stack_thunk_get_refcnt() { return 0; }
     uint32_t stack_thunk_get_stack_top() { return 0; }

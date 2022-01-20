@@ -65,7 +65,7 @@ public:
         return t;
     }
 
-    size_t  length() { return _size; }
+    size_t length() { return _size; }
 
     //uint8_t& operator[](int const address) { return read(address); }
     uint8_t operator[](int address) { return read(address); }

@@ -34,21 +34,19 @@ const char* password = STAPSK;
 // This block is just for putting something on the BearSSL stack
 // to show that it has not been zeroed out before HWDT stack dump
 // gets to runs.
-extern "C"
-{
+extern "C" {
 #if CORE_MOCK
 #define thunk_ets_uart_printf ets_uart_printf
 
 #else
-  int thunk_ets_uart_printf(const char* format, ...) __attribute__((format(printf, 1, 2)));
-  // Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
-  make_stack_thunk(ets_uart_printf);
+int thunk_ets_uart_printf(const char* format, ...) __attribute__((format(printf, 1, 2)));
+// Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
+make_stack_thunk(ets_uart_printf);
 #endif
 };
 ////////////////////////////////////////////////////////////////////
 
-void setup(void)
-{
+void setup(void) {
   WiFi.persistent(false);  // w/o this a flash write occurs at every boot
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
@@ -96,10 +94,8 @@ void setup(void)
   processKey(Serial, '?');
 }
 
-void loop(void)
-{
-  if (Serial.available() > 0)
-  {
+void loop(void) {
+  if (Serial.available() > 0) {
     int hotKey = Serial.read();
     processKey(Serial, hotKey);
   }

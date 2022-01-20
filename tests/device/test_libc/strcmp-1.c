@@ -106,7 +106,7 @@
 #endif
 
 #define TOO_MANY_ERRORS 11
-static int  errors   = 0;
+static int errors = 0;
 
 const char* testname = "strcmp";
 
@@ -179,7 +179,7 @@ void       strcmp_main(void)
                             for (j = 0; j < (int)len; j++)
                                 *p++ = 'x';
                             /* Make dest 0-terminated.  */
-                            *p  = '\0';
+                            *p = '\0';
 
                             ret = strcmp(src + sa, dest + da);
 

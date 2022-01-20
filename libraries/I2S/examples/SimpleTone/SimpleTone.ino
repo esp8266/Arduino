@@ -10,33 +10,29 @@
 
 #include <I2S.h>
 
-const int frequency      = 440;   // frequency of square wave in Hz
-const int amplitude      = 500;   // amplitude of square wave
-const int sampleRate     = 8000;  // sample rate in Hz
+const int frequency  = 440;   // frequency of square wave in Hz
+const int amplitude  = 500;   // amplitude of square wave
+const int sampleRate = 8000;  // sample rate in Hz
 
 const int halfWavelength = (sampleRate / frequency);  // half wavelength of square wave
 
-short     sample         = amplitude;  // current sample value
-int       count          = 0;
+short sample = amplitude;  // current sample value
+int   count  = 0;
 
-void      setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println("I2S simple tone");
 
   // start I2S at the sample rate with 16-bits per sample
-  if (!I2S.begin(I2S_PHILIPS_MODE, sampleRate, 16))
-  {
+  if (!I2S.begin(I2S_PHILIPS_MODE, sampleRate, 16)) {
     Serial.println("Failed to initialize I2S!");
     while (1)
       ;  // do nothing
   }
 }
 
-void loop()
-{
-  if (count % halfWavelength == 0)
-  {
+void loop() {
+  if (count % halfWavelength == 0) {
     // invert the sample every half wavelength count multiple to generate square wave
     sample = -1 * sample;
   }

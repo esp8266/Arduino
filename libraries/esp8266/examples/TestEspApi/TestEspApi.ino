@@ -10,8 +10,7 @@
 */
 
 #ifdef ESP8266
-extern "C"
-{
+extern "C" {
 #include "user_interface.h"
 }
 #endif
@@ -19,7 +18,7 @@ extern "C"
 // Set up output serial port (could be a SoftwareSerial
 // if really wanted).
 
-Stream&           ehConsolePort(Serial);
+Stream& ehConsolePort(Serial);
 
 // Wired to the blue LED on an ESP-01 board, active LOW.
 //
@@ -27,7 +26,7 @@ Stream&           ehConsolePort(Serial);
 // calls, as TX is wired to the same pin.
 //
 // UNLESS: You swap the TX pin using the alternate pinout.
-const uint8_t     LED_PIN       = 1;
+const uint8_t LED_PIN = 1;
 
 const char* const RST_REASONS[] = {
   "REASON_DEFAULT_RST",
@@ -114,13 +113,11 @@ const char* const EVENT_REASONS_200[] {
   "REASON_NO_AP_FOUND"
 };
 
-void wifi_event_handler_cb(System_Event_t* event)
-{
+void wifi_event_handler_cb(System_Event_t* event) {
   ehConsolePort.print(EVENT_NAMES[event->event]);
   ehConsolePort.print(" (");
 
-  switch (event->event)
-  {
+  switch (event->event) {
     case EVENT_STAMODE_CONNECTED:
       break;
     case EVENT_STAMODE_DISCONNECTED:
@@ -130,21 +127,18 @@ void wifi_event_handler_cb(System_Event_t* event)
     case EVENT_STAMODE_GOT_IP:
       break;
     case EVENT_SOFTAPMODE_STACONNECTED:
-    case EVENT_SOFTAPMODE_STADISCONNECTED:
-    {
+    case EVENT_SOFTAPMODE_STADISCONNECTED: {
       char mac[32] = { 0 };
       snprintf(mac, 32, MACSTR ", aid: %d", MAC2STR(event->event_info.sta_connected.mac), event->event_info.sta_connected.aid);
 
       ehConsolePort.print(mac);
-    }
-    break;
+    } break;
   }
 
   ehConsolePort.println(")");
 }
 
-void print_softap_config(Stream& consolePort, softap_config const& config)
-{
+void print_softap_config(Stream& consolePort, softap_config const& config) {
   consolePort.println();
   consolePort.println(F("SoftAP Configuration"));
   consolePort.println(F("--------------------"));
@@ -178,8 +172,7 @@ void print_softap_config(Stream& consolePort, softap_config const& config)
   consolePort.println();
 }
 
-void print_system_info(Stream& consolePort)
-{
+void print_system_info(Stream& consolePort) {
   const rst_info* resetInfo = system_get_rst_info();
   consolePort.print(F("system_get_rst_info() reset reason: "));
   consolePort.println(RST_REASONS[resetInfo->reason]);
@@ -217,8 +210,7 @@ void print_system_info(Stream& consolePort)
   consolePort.println(FLASH_SIZE_MAP_NAMES[system_get_flash_size_map()]);
 }
 
-void print_wifi_general(Stream& consolePort)
-{
+void print_wifi_general(Stream& consolePort) {
   consolePort.print(F("wifi_get_channel(): "));
   consolePort.println(wifi_get_channel());
 
@@ -226,8 +218,7 @@ void print_wifi_general(Stream& consolePort)
   consolePort.println(PHY_MODE_NAMES[wifi_get_phy_mode()]);
 }
 
-void secure_softap_config(softap_config* config, const char* ssid, const char* password)
-{
+void secure_softap_config(softap_config* config, const char* ssid, const char* password) {
   size_t ssidLen     = strlen(ssid) < sizeof(config->ssid) ? strlen(ssid) : sizeof(config->ssid);
   size_t passwordLen = strlen(password) < sizeof(config->password) ? strlen(password) : sizeof(config->password);
 
@@ -237,16 +228,15 @@ void secure_softap_config(softap_config* config, const char* ssid, const char* p
   memset(config->password, 0, sizeof(config->password));
   memcpy(config->password, password, passwordLen);
 
-  config->ssid_len       = ssidLen;
-  config->channel        = 1;
-  config->authmode       = AUTH_WPA2_PSK;
+  config->ssid_len = ssidLen;
+  config->channel  = 1;
+  config->authmode = AUTH_WPA2_PSK;
   //    config->ssid_hidden = 1;
   config->max_connection = 4;
   //    config->beacon_interval = 1000;
 }
 
-void setup()
-{
+void setup() {
   // Reuse default Serial port rate, so the bootloader
   // messages are also readable.
 
@@ -297,8 +287,7 @@ void setup()
   // ESP.deepSleep(15000);
 }
 
-void loop()
-{
+void loop() {
   Serial.print(F("system_get_time(): "));
   Serial.println(system_get_time());
   delay(1000);

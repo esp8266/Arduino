@@ -44,8 +44,8 @@
 #define STAPSK "your-password"
 #endif
 
-const char*        ssid = STASSID;
-const char*        pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
 // A single, global CertStore which can be used by all
 // connections.  Needs to stay live the entire time any of
@@ -53,14 +53,12 @@ const char*        pass = STAPSK;
 BearSSL::CertStore certStore;
 
 // Set time via NTP, as required for x.509 validation
-void               setClock()
-{
+void setClock() {
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2)
-  {
+  while (now < 8 * 3600 * 2) {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -73,17 +71,14 @@ void               setClock()
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump URL
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path)
-{
-  if (!path)
-  {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+  if (!path) {
     path = "/";
   }
 
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
-  if (!client->connected())
-  {
+  if (!client->connected()) {
     Serial.printf("*** Can't connect. ***\n-------\n");
     return;
   }
@@ -95,22 +90,18 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   client->write("\r\nUser-Agent: ESP8266\r\n");
   client->write("\r\n");
   uint32_t to = millis() + 5000;
-  if (client->connected())
-  {
-    do
-    {
+  if (client->connected()) {
+    do {
       char tmp[32];
       memset(tmp, 0, 32);
       int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
       yield();
-      if (rlen < 0)
-      {
+      if (rlen < 0) {
         break;
       }
       // Only print out first line up to \r, then abort connection
       char* nl = strchr(tmp, '\r');
-      if (nl)
-      {
+      if (nl) {
         *nl = 0;
         Serial.print(tmp);
         break;
@@ -122,8 +113,7 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   Serial.printf("\n-------\n");
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -136,8 +126,7 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -151,8 +140,7 @@ void setup()
 
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   Serial.printf("Number of CA certs read: %d\n", numCerts);
-  if (numCerts == 0)
-  {
+  if (numCerts == 0) {
     Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
     return;  // Can't connect to anything w/o certs!
   }
@@ -165,12 +153,10 @@ void setup()
   delete bear;
 }
 
-void loop()
-{
+void loop() {
   Serial.printf("\nPlease enter a website address (www.blah.com) to connect to: ");
   String site;
-  do
-  {
+  do {
     site = Serial.readString();
   } while (site == "");
   // Strip newline if present

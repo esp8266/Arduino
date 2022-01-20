@@ -39,11 +39,11 @@
 
 extern "C"
 {
-    bool           blocking_uart   = true;  // system default
+    bool blocking_uart = true;  // system default
 
-    static int     s_uart_debug_nr = UART1;
+    static int s_uart_debug_nr = UART1;
 
-    static uart_t* UART[2]         = { NULL, NULL };
+    static uart_t* UART[2] = { NULL, NULL };
 
     struct uart_rx_buffer_
     {
@@ -103,7 +103,7 @@ extern "C"
     {
         struct uart_rx_buffer_* rx_buffer = uart->rx_buffer;
 
-        size_t                  nextPos   = (rx_buffer->wpos + 1) % rx_buffer->size;
+        size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
         if (nextPos == rx_buffer->rpos)
         {
             uart->rx_overrun = true;

@@ -26,15 +26,13 @@
 
 File root;
 
-void setup()
-{
+void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(115200);
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(SS))
-  {
+  if (!SD.begin(SS)) {
     Serial.println("initialization failed!");
     return;
   }
@@ -47,33 +45,25 @@ void setup()
   Serial.println("done!");
 }
 
-void loop()
-{
+void loop() {
   // nothing happens after setup finishes.
 }
 
-void printDirectory(File dir, int numTabs)
-{
-  while (true)
-  {
+void printDirectory(File dir, int numTabs) {
+  while (true) {
     File entry = dir.openNextFile();
-    if (!entry)
-    {
+    if (!entry) {
       // no more files
       break;
     }
-    for (uint8_t i = 0; i < numTabs; i++)
-    {
+    for (uint8_t i = 0; i < numTabs; i++) {
       Serial.print('\t');
     }
     Serial.print(entry.name());
-    if (entry.isDirectory())
-    {
+    if (entry.isDirectory()) {
       Serial.println("/");
       printDirectory(entry, numTabs + 1);
-    }
-    else
-    {
+    } else {
       // files have sizes, directories do not
       Serial.print("\t\t");
       Serial.print(entry.size(), DEC);

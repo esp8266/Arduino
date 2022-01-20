@@ -6,8 +6,7 @@
 
 #include <ESP8266WiFi.h>
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println(F("\nESP8266 WiFi scan example"));
 
@@ -19,8 +18,7 @@ void setup()
   delay(100);
 }
 
-void loop()
-{
+void loop() {
   String   ssid;
   int32_t  rssi;
   uint8_t  encryptionType;
@@ -33,17 +31,13 @@ void loop()
 
   scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
 
-  if (scanResult == 0)
-  {
+  if (scanResult == 0) {
     Serial.println(F("No networks found"));
-  }
-  else if (scanResult > 0)
-  {
+  } else if (scanResult > 0) {
     Serial.printf(PSTR("%d networks found:\n"), scanResult);
 
     // Print unsorted scan results
-    for (int8_t i = 0; i < scanResult; i++)
-    {
+    for (int8_t i = 0; i < scanResult; i++) {
       WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
 
       Serial.printf(PSTR("  %02d: [CH %02d] [%02X:%02X:%02X:%02X:%02X:%02X] %ddBm %c %c %s\n"),
@@ -57,9 +51,7 @@ void loop()
                     ssid.c_str());
       yield();
     }
-  }
-  else
-  {
+  } else {
     Serial.printf(PSTR("WiFi scan error %d"), scanResult);
   }
 

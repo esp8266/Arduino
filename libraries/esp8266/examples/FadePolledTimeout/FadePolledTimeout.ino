@@ -28,8 +28,7 @@
 esp8266::polledTimeout::periodicFastUs stepPeriod(50000);
 
 // the setup function runs only once at start
-void                                   setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
 
@@ -48,28 +47,22 @@ void                                   setup()
   digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on (Note that LOW is the voltage level
 
   oneShotMs timeoutOn(2000);
-  while (!timeoutOn)
-  {
+  while (!timeoutOn) {
     yield();
   }
 
   stepPeriod.reset();
 }
 
-void loop()
-{
+void loop() {
   static int val   = 0;
   static int delta = 100;
-  if (stepPeriod)
-  {
+  if (stepPeriod) {
     val += delta;
-    if (val < 0)
-    {
+    if (val < 0) {
       val   = 100;
       delta = 100;
-    }
-    else if (val > 1000)
-    {
+    } else if (val > 1000) {
       val   = 900;
       delta = -100;
     }

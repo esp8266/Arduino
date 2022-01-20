@@ -162,7 +162,7 @@ extern "C"
     netif    netif0;
     uint32_t global_source_address = INADDR_ANY;
 
-    bool     wifi_get_ip_info(uint8 if_index, struct ip_info* info)
+    bool wifi_get_ip_info(uint8 if_index, struct ip_info* info)
     {
         // emulate wifi_get_ip_info()
         // ignore if_index
@@ -223,9 +223,9 @@ extern "C"
 
         if (info)
         {
-            info->ip.addr       = ipv4;
-            info->netmask.addr  = mask;
-            info->gw.addr       = ipv4;
+            info->ip.addr      = ipv4;
+            info->netmask.addr = mask;
+            info->gw.addr      = ipv4;
 
             netif0.ip_addr.addr = ipv4;
             netif0.netmask.addr = mask;
@@ -487,7 +487,7 @@ extern "C"
     ///////////////////////////////////////
     // not user_interface
 
-    void     ets_isr_mask(int intr)
+    void ets_isr_mask(int intr)
     {
         (void)intr;
     }

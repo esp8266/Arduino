@@ -39,11 +39,11 @@ public:
     DhcpServer(netif* netif);
     ~DhcpServer();
 
-    void   setDns(int num, const ipv4_addr_t* dns);
+    void setDns(int num, const ipv4_addr_t* dns);
 
-    bool   begin(ip_info* info);
-    void   end();
-    bool   isRunning();
+    bool begin(ip_info* info);
+    void end();
+    bool isRunning();
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -61,7 +61,7 @@ public:
     uint32 get_dhcps_lease_time(void);
     bool   add_dhcps_lease(uint8* macaddr);
 
-    void   dhcps_set_dns(int num, const ipv4_addr_t* dns);
+    void dhcps_set_dns(int num, const ipv4_addr_t* dns);
 
 protected:
     // legacy C structure and API to eventually turn into C++
@@ -93,24 +93,24 @@ protected:
                struct pbuf*     p,
                const ip_addr_t* addr,
                uint16_t         port);
-    void                kill_oldest_dhcps_pool(void);
-    void                dhcps_coarse_tmr(void);  // CURRENTLY NOT CALLED
-    void                dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force);
-    uint32              dhcps_client_update(u8* bssid, struct ipv4_addr* ip);
+    void   kill_oldest_dhcps_pool(void);
+    void   dhcps_coarse_tmr(void);  // CURRENTLY NOT CALLED
+    void   dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force);
+    uint32 dhcps_client_update(u8* bssid, struct ipv4_addr* ip);
 
-    netif*              _netif;
+    netif* _netif;
 
-    struct udp_pcb*     pcb_dhcps;
-    ip_addr_t           broadcast_dhcps;
-    struct ipv4_addr    server_address;
-    struct ipv4_addr    client_address;
-    struct ipv4_addr    dns_address;
-    uint32              dhcps_lease_time;
+    struct udp_pcb*  pcb_dhcps;
+    ip_addr_t        broadcast_dhcps;
+    struct ipv4_addr server_address;
+    struct ipv4_addr client_address;
+    struct ipv4_addr dns_address;
+    uint32           dhcps_lease_time;
 
-    struct dhcps_lease  dhcps_lease;
-    list_node*          plist;
-    uint8               offer;
-    bool                renew;
+    struct dhcps_lease dhcps_lease;
+    list_node*         plist;
+    uint8              offer;
+    bool               renew;
 
     static const uint32 magic_cookie;
 };

@@ -2,9 +2,9 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 
-const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 1, 1);
-DNSServer dnsServer;
+const byte       DNS_PORT = 53;
+IPAddress        apIP(192, 168, 1, 1);
+DNSServer        dnsServer;
 ESP8266WebServer webServer(80);
 
 void setup() {

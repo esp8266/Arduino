@@ -14,19 +14,16 @@
 // more and possibly updated information can be found at:
 // https://arduinojson.org/v6/example/config/
 
-bool loadConfig()
-{
+bool loadConfig() {
   File configFile = LittleFS.open("/config.json", "r");
-  if (!configFile)
-  {
+  if (!configFile) {
     Serial.println("Failed to open config file");
     return false;
   }
 
   StaticJsonDocument<200> doc;
   auto                    error = deserializeJson(doc, configFile);
-  if (error)
-  {
+  if (error) {
     Serial.println("Failed to parse config file");
     return false;
   }
@@ -44,15 +41,13 @@ bool loadConfig()
   return true;
 }
 
-bool saveConfig()
-{
+bool saveConfig() {
   StaticJsonDocument<200> doc;
   doc["serverName"]  = "api.example.com";
   doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
-  File configFile    = LittleFS.open("/config.json", "w");
-  if (!configFile)
-  {
+  File configFile = LittleFS.open("/config.json", "w");
+  if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
   }
@@ -61,38 +56,29 @@ bool saveConfig()
   return true;
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println("");
   delay(1000);
   Serial.println("Mounting FS...");
 
-  if (!LittleFS.begin())
-  {
+  if (!LittleFS.begin()) {
     Serial.println("Failed to mount file system");
     return;
   }
 
-  if (!saveConfig())
-  {
+  if (!saveConfig()) {
     Serial.println("Failed to save config");
-  }
-  else
-  {
+  } else {
     Serial.println("Config saved");
   }
 
-  if (!loadConfig())
-  {
+  if (!loadConfig()) {
     Serial.println("Failed to load config");
-  }
-  else
-  {
+  } else {
     Serial.println("Config loaded");
   }
 }
 
-void loop()
-{
+void loop() {
 }

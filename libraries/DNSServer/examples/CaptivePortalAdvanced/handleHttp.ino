@@ -1,8 +1,6 @@
 /** Handle root or redirect to captive portal */
-void handleRoot()
-{
-  if (captivePortal())
-  {  // If caprive portal redirect instead of displaying the page.
+void handleRoot() {
+  if (captivePortal()) {  // If caprive portal redirect instead of displaying the page.
     return;
   }
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -15,12 +13,9 @@ void handleRoot()
       "<meta name='viewport' content='width=device-width'>"
       "<title>CaptivePortal</title></head><body>"
       "<h1>HELLO WORLD!!</h1>");
-  if (server.client().localIP() == apIP)
-  {
+  if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
-  }
-  else
-  {
+  } else {
     Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
   }
   Page += F(
@@ -31,10 +26,8 @@ void handleRoot()
 }
 
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
-boolean captivePortal()
-{
-  if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local"))
-  {
+boolean captivePortal() {
+  if (!isIp(server.hostHeader()) && server.hostHeader() != (String(myHostname) + ".local")) {
     Serial.println("Request redirected to captive portal");
     server.sendHeader("Location", String("http://") + toStringIp(server.client().localIP()), true);
     server.send(302, "text/plain", "");  // Empty content inhibits Content-length header so we have to close the socket ourselves.
@@ -45,8 +38,7 @@ boolean captivePortal()
 }
 
 /** Wifi config page handler */
-void handleWifi()
-{
+void handleWifi() {
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");
   server.sendHeader("Expires", "-1");
@@ -57,12 +49,9 @@ void handleWifi()
       "<meta name='viewport' content='width=device-width'>"
       "<title>CaptivePortal</title></head><body>"
       "<h1>Wifi config</h1>");
-  if (server.client().localIP() == apIP)
-  {
+  if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
-  }
-  else
-  {
+  } else {
     Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
   }
   Page += String(F(
@@ -85,15 +74,11 @@ void handleWifi()
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
-  if (n > 0)
-  {
-    for (int i = 0; i < n; i++)
-    {
+  if (n > 0) {
+    for (int i = 0; i < n; i++) {
       Page += String(F("\r\n<tr><td>SSID ")) + WiFi.SSID(i) + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" ") : F(" *")) + F(" (") + WiFi.RSSI(i) + F(")</td></tr>");
     }
-  }
-  else
-  {
+  } else {
     Page += F("<tr><td>No WLAN found</td></tr>");
   }
   Page += F(
@@ -109,8 +94,7 @@ void handleWifi()
 }
 
 /** Handle the WLAN save form and redirect to WLAN config page again */
-void handleWifiSave()
-{
+void handleWifiSave() {
   Serial.println("wifi save");
   server.arg("n").toCharArray(ssid, sizeof(ssid) - 1);
   server.arg("p").toCharArray(password, sizeof(password) - 1);
@@ -124,10 +108,8 @@ void handleWifiSave()
   connect = strlen(ssid) > 0;  // Request WLAN connect with new credentials if there is a SSID
 }
 
-void handleNotFound()
-{
-  if (captivePortal())
-  {  // If caprive portal redirect instead of displaying the error page.
+void handleNotFound() {
+  if (captivePortal()) {  // If caprive portal redirect instead of displaying the error page.
     return;
   }
   String message = F("File Not Found\n\n");
@@ -139,8 +121,7 @@ void handleNotFound()
   message += server.args();
   message += F("\n");
 
-  for (uint8_t i = 0; i < server.args(); i++)
-  {
+  for (uint8_t i = 0; i < server.args(); i++) {
     message += String(F(" ")) + server.argName(i) + F(": ") + server.arg(i) + F("\n");
   }
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");

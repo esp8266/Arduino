@@ -7,8 +7,7 @@
 #include <TFTv2.h>
 #include <SPI.h>
 
-void setup()
-{
+void setup() {
   TFT_BL_ON;      // turn on the background light
   Tft.TFTinit();  // init TFT library
 
@@ -17,8 +16,7 @@ void setup()
   Tft.drawRectangle(100, 170, 120, 60, BLUE);
 }
 
-void loop()
-{
+void loop() {
 }
 /*********************************************************************************************************
   END FILE

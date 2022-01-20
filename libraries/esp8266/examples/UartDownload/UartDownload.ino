@@ -42,24 +42,24 @@
 // state and clear it after it elapses.
 //
 // Change this to false if you do not want ESP_SYNC monitor always on.
-bool             uartDownloadEnable = true;
+bool uartDownloadEnable = true;
 
 // Buffer size to receive an ESP_SYNC packet into, larger than the expected
 // ESP_SYNC packet length.
-constexpr size_t pktBufSz           = 64;
+constexpr size_t pktBufSz = 64;
 
 // Enough time to receive 115 bytes at 115200bps.
 // More than enough to finish receiving an ESP_SYNC packet.
-constexpr size_t kSyncTimeoutMs     = 10;
+constexpr size_t kSyncTimeoutMs = 10;
 
 // The SLIP Frame end character, which is also used to start a frame.
-constexpr char   slipFrameMarker    = '\xC0';
+constexpr char slipFrameMarker = '\xC0';
 
 // General packet format:
 //   <0xC0><cmd><payload length><32 bit cksum><payload data ...><0xC0>
 // Slip packet for ESP_SYNC, minus the frame markers ('\xC0') captured from
 // esptool using the `--trace` option.
-const char       syncPkt[] PROGMEM  = "\x00\x08\x24\x00\x00\x00\x00\x00\x07\x07\x12\x20"
+const char syncPkt[] PROGMEM = "\x00\x08\x24\x00\x00\x00\x00\x00\x07\x07\x12\x20"
                                "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
 
 constexpr size_t syncPktSz = sizeof(syncPkt) - 1;  // Don't compare zero terminator char
@@ -69,10 +69,8 @@ constexpr size_t syncPktSz = sizeof(syncPkt) - 1;  // Don't compare zero termina
 //  Mode. At entry we expect the Serial FIFO to start with the byte following
 //  the slipFrameMarker.
 //
-void             proxyEspSync()
-{
-  if (!uartDownloadEnable)
-  {
+void proxyEspSync() {
+  if (!uartDownloadEnable) {
     return;
   }
 
@@ -85,8 +83,7 @@ void             proxyEspSync()
 
   // To avoid a false trigger, only start UART Download Mode when we get an
   // exact match to the captured esptool ESP_SYNC packet.
-  if (syncPktSz == len && 0 == memcmp_P(buf, syncPkt, len))
-  {
+  if (syncPktSz == len && 0 == memcmp_P(buf, syncPkt, len)) {
     ESP.rebootIntoUartDownloadMode();
     // Does not return
   }
@@ -100,8 +97,7 @@ void             proxyEspSync()
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-void setup()
-{
+void setup() {
   // For `proxyEspSync()` to work, the Serial.begin() speed needs to be
   // 115200bps. This is the data rate used by esptool.py. It expects the Boot
   // ROM to use its "auto-baud" feature to match up. Since `proxyEspSync()` is
@@ -125,10 +121,8 @@ void setup()
   // ...
 }
 
-void cmdLoop(Print& oStream, int key)
-{
-  switch (key)
-  {
+void cmdLoop(Print& oStream, int key) {
+  switch (key) {
     case 'e':
       oStream.println(F("Enable monitor for detecting ESP_SYNC from esptool.py"));
       uartDownloadEnable = true;
@@ -152,8 +146,7 @@ void cmdLoop(Print& oStream, int key)
 
     case '?':
       oStream.println(F("\r\nHot key help:"));
-      if (!uartDownloadEnable)
-      {
+      if (!uartDownloadEnable) {
         oStream.println(F("  e - Enable monitor for detecting ESP_SYNC from esptool.py"));
       }
       oStream.println(F("  D - Boot into UART download mode"));
@@ -168,23 +161,18 @@ void cmdLoop(Print& oStream, int key)
   oStream.println();
 }
 
-void loop()
-{
+void loop() {
   // In this example, we can have Serial data from a user keystroke for our
   // command loop or the esptool trying to SYNC up for flashing.  If the
   // character matches the Slip Frame Marker (the 1st byte of the SYNC packet),
   // we intercept it and call our ESP_SYNC proxy to complete the verification
   // and reboot into the UART Downloader. Otherwise, process the keystroke as
   // normal.
-  if (0 < Serial.available())
-  {
+  if (0 < Serial.available()) {
     int keyPress = Serial.read();
-    if (slipFrameMarker == keyPress)
-    {
+    if (slipFrameMarker == keyPress) {
       proxyEspSync();
-    }
-    else
-    {
+    } else {
       cmdLoop(Serial, keyPress);
     }
   }

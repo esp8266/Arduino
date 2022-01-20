@@ -7,8 +7,7 @@
 #include <stdint.h>
 #include <TFTv2.h>
 #include <SPI.h>
-void setup()
-{
+void setup() {
   TFT_BL_ON;      // turn on the background light
   Tft.TFTinit();  //init TFT library
 
@@ -21,8 +20,7 @@ void setup()
   //start: (30, 60), high: 150, color: blue
 }
 
-void loop()
-{
+void loop() {
 }
 
 /*********************************************************************************************************

@@ -8,7 +8,7 @@
 #include <TypeConversion.h>
 #include <Crypto.h>
 
-namespace TypeCast                 = experimental::TypeConversion;
+namespace TypeCast = experimental::TypeConversion;
 
 /**
    NOTE: Although we could define the strings below as normal String variables,
@@ -23,8 +23,7 @@ namespace TypeCast                 = experimental::TypeConversion;
 */
 constexpr char masterKey[] PROGMEM = "w86vn@rpfA O+S";  // Use 8 random characters or more
 
-void           setup()
-{
+void setup() {
   // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
   // This will however delay node WiFi start-up by about 700 ms. The delay is 900 ms if we otherwise would have stored the WiFi network we want to connect to.
   WiFi.persistent(false);
@@ -35,8 +34,7 @@ void           setup()
   Serial.println();
 }
 
-void loop()
-{
+void loop() {
   // This serves only to demonstrate the library use. See the header file for a full list of functions.
 
   using namespace experimental::crypto;
@@ -44,13 +42,13 @@ void loop()
   String exampleData = F("Hello Crypto World!");
   Serial.println(String(F("This is our example data: ")) + exampleData);
 
-  uint8_t         resultArray[SHA256::NATURAL_LENGTH] { 0 };
-  uint8_t         derivedKey[ENCRYPTION_KEY_LENGTH] { 0 };
+  uint8_t resultArray[SHA256::NATURAL_LENGTH] { 0 };
+  uint8_t derivedKey[ENCRYPTION_KEY_LENGTH] { 0 };
 
   static uint32_t encryptionCounter = 0;
 
   // Generate the salt to use for HKDF
-  uint8_t         hkdfSalt[16] { 0 };
+  uint8_t hkdfSalt[16] { 0 };
   getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
 
   // Generate the key to use for HMAC and encryption
@@ -82,12 +80,9 @@ void loop()
   bool decryptionSucceeded = ChaCha20Poly1305::decrypt(dataToEncrypt.begin(), dataToEncrypt.length(), derivedKey, &encryptionCounter, sizeof encryptionCounter, resultingNonce, resultingTag);
   encryptionCounter++;
 
-  if (decryptionSucceeded)
-  {
+  if (decryptionSucceeded) {
     Serial.print(F("Decryption succeeded. Result: "));
-  }
-  else
-  {
+  } else {
     Serial.print(F("Decryption failed. Result: "));
   }
 

@@ -175,9 +175,9 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what, err) ((err) == ERR_OK)
 #endif
 
-const uint32 DhcpServer::magic_cookie    = 0x63538263;  // https://tools.ietf.org/html/rfc1497
+const uint32 DhcpServer::magic_cookie = 0x63538263;  // https://tools.ietf.org/html/rfc1497
 
-int          fw_has_started_softap_dhcps = 0;
+int fw_has_started_softap_dhcps = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -210,7 +210,7 @@ DhcpServer::DhcpServer(netif* netif) :
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info(uint8_t* mac, struct ipv4_addr*);
 
-void            DhcpServer::dhcps_set_dns(int num, const ipv4_addr_t* dns)
+void DhcpServer::dhcps_set_dns(int num, const ipv4_addr_t* dns)
 {
     (void)num;
     if (!ip4_addr_isany(dns))
@@ -278,7 +278,7 @@ void DhcpServer::node_remove_from_list(list_node** phead, list_node* pdelete)
 {
     list_node* plist = nullptr;
 
-    plist            = *phead;
+    plist = *phead;
     if (plist == nullptr)
     {
         *phead = nullptr;
@@ -316,8 +316,8 @@ bool DhcpServer::add_dhcps_lease(uint8* macaddr)
     struct dhcps_pool* pdhcps_pool = nullptr;
     list_node*         pback_node  = nullptr;
 
-    uint32             start_ip    = dhcps_lease.start_ip.addr;
-    uint32             end_ip      = dhcps_lease.end_ip.addr;
+    uint32 start_ip = dhcps_lease.start_ip.addr;
+    uint32 end_ip   = dhcps_lease.end_ip.addr;
 
     for (pback_node = plist; pback_node != nullptr; pback_node = pback_node->pnext)
     {
@@ -503,12 +503,12 @@ void DhcpServer::create_msg(struct dhcps_msg* m)
 
     client.addr = client_address.addr;
 
-    m->op       = DHCP_REPLY;
-    m->htype    = DHCP_HTYPE_ETHERNET;
-    m->hlen     = 6;
-    m->hops     = 0;
-    m->secs     = 0;
-    m->flags    = htons(BOOTP_BROADCAST);
+    m->op    = DHCP_REPLY;
+    m->htype = DHCP_HTYPE_ETHERNET;
+    m->hlen  = 6;
+    m->hops  = 0;
+    m->secs  = 0;
+    m->flags = htons(BOOTP_BROADCAST);
 
     memcpy((char*)m->yiaddr, (char*)&client.addr, sizeof(m->yiaddr));
     memset((char*)m->ciaddr, 0, sizeof(m->ciaddr));
@@ -539,7 +539,7 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
     end = add_offer_options(end);
     end = add_end(end);
 
-    p   = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
+    p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
 #if DHCPS_DEBUG
     os_printf("udhcp: send_offer>>p->ref = %d\n", p->ref);
 #endif
@@ -602,7 +602,7 @@ void DhcpServer::send_nak(struct dhcps_msg* m)
     end = add_msg_type(&m->options[4], DHCPNAK);
     end = add_end(end);
 
-    p   = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
+    p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
 #if DHCPS_DEBUG
     os_printf("udhcp: send_nak>>p->ref = %d\n", p->ref);
 #endif
@@ -661,7 +661,7 @@ void DhcpServer::send_ack(struct dhcps_msg* m)
     end = add_offer_options(end);
     end = add_end(end);
 
-    p   = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
+    p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
 #if DHCPS_DEBUG
     os_printf("udhcp: send_ack>>p->ref = %d\n", p->ref);
 #endif
@@ -724,10 +724,10 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 
     client.addr = client_address.addr;
 
-    u8_t* end   = optptr + len;
-    u16_t type  = 0;
+    u8_t* end  = optptr + len;
+    u16_t type = 0;
 
-    s.state     = DHCPS_STATE_IDLE;
+    s.state = DHCPS_STATE_IDLE;
 
     while (optptr < end)
     {
@@ -830,7 +830,7 @@ sint16_t DhcpServer::parse_msg(struct dhcps_msg* m, u16_t len)
         memcpy(&ip.addr, m->ciaddr, sizeof(ip.addr));
         client_address.addr = dhcps_client_update(m->chaddr, &ip);
 
-        sint16_t ret        = parse_options(&m->options[4], len);
+        sint16_t ret = parse_options(&m->options[4], len);
 
         if (ret == DHCPS_STATE_RELEASE)
         {
@@ -1071,7 +1071,7 @@ void DhcpServer::end()
 
     udp_disconnect(pcb_dhcps);
     udp_remove(pcb_dhcps);
-    pcb_dhcps                     = nullptr;
+    pcb_dhcps = nullptr;
 
     //udp_remove(pcb_dhcps);
     list_node*         pnode      = nullptr;

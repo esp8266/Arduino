@@ -21,12 +21,12 @@
 #define MAX_BMP 10       // bmp file num
 #define FILENAME_LEN 20  // max file name length
 
-const int  PIN_SD_CS            = 4;  // pin of sd card
+const int PIN_SD_CS = 4;  // pin of sd card
 
-const long __Gnbmp_height       = 320;  // bmp height
-const long __Gnbmp_width        = 240;  // bmp width
+const long __Gnbmp_height = 320;  // bmp height
+const long __Gnbmp_width  = 240;  // bmp width
 
-long       __Gnbmp_image_offset = 0;
+long __Gnbmp_image_offset = 0;
 ;
 
 int  __Gnfile_num = 0;                      // num of file
@@ -35,28 +35,23 @@ char __Gsbmp_files[MAX_BMP][FILENAME_LEN];  // file name
 File bmpFile;
 
 // if bmp file return 1, else return 0
-bool checkBMP(char* _name, char r_name[])
-{
+bool checkBMP(char* _name, char r_name[]) {
   int len = 0;
 
-  if (NULL == _name)
-  {
+  if (NULL == _name) {
     return false;
   }
 
-  while (*_name)
-  {
+  while (*_name) {
     r_name[len++] = *(_name++);
-    if (len > FILENAME_LEN)
-    {
+    if (len > FILENAME_LEN) {
       return false;
     }
   }
 
   r_name[len] = '\0';
 
-  if (len < 5)
-  {
+  if (len < 5) {
     return false;
   }
 
@@ -64,8 +59,7 @@ bool checkBMP(char* _name, char r_name[])
   if (r_name[len - 4] == '.'
       && (r_name[len - 3] == 'b' || (r_name[len - 3] == 'B'))
       && (r_name[len - 2] == 'm' || (r_name[len - 2] == 'M'))
-      && (r_name[len - 1] == 'p' || (r_name[len - 1] == 'P')))
-  {
+      && (r_name[len - 1] == 'p' || (r_name[len - 1] == 'P'))) {
     return true;
   }
 
@@ -73,26 +67,21 @@ bool checkBMP(char* _name, char r_name[])
 }
 
 // search root to find bmp file
-void searchDirectory()
-{
+void searchDirectory() {
   File root = SD.open("/");  // root
-  while (true)
-  {
+  while (true) {
     File entry = root.openNextFile();
 
-    if (!entry)
-    {
+    if (!entry) {
       break;
     }
 
-    if (!entry.isDirectory())
-    {
+    if (!entry.isDirectory()) {
       char* ptmp = entry.name();
 
-      char  __Name[20];
+      char __Name[20];
 
-      if (checkBMP(ptmp, __Name))
-      {
+      if (checkBMP(ptmp, __Name)) {
         Serial.println(__Name);
 
         strcpy(__Gsbmp_files[__Gnfile_num++], __Name);
@@ -105,14 +94,12 @@ void searchDirectory()
   Serial.print(__Gnfile_num);
   Serial.println(" file: ");
 
-  for (int i = 0; i < __Gnfile_num; i++)
-  {
+  for (int i = 0; i < __Gnfile_num; i++) {
     Serial.println(__Gsbmp_files[i]);
   }
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   pinMode(PIN_SD_CS, OUTPUT);
@@ -123,8 +110,7 @@ void setup()
   Sd2Card card;
   card.init(SPI_FULL_SPEED, PIN_SD_CS);
 
-  if (!SD.begin(PIN_SD_CS))
-  {
+  if (!SD.begin(PIN_SD_CS)) {
     Serial.println("failed!");
     while (1)
       ;  // init fail, die here
@@ -137,8 +123,7 @@ void setup()
   TFT_BL_ON;
 }
 
-void loop()
-{
+void loop() {
   /*
       static int dirCtrl = 0;
       for(unsigned char i=0; i<__Gnfile_num; i++)
@@ -166,15 +151,13 @@ void loop()
 
   bmpFile = SD.open("pfvm_1.bmp");
 
-  if (!bmpFile)
-  {
+  if (!bmpFile) {
     Serial.println("didn't find image");
     while (1)
       ;
   }
 
-  if (!bmpReadHeader(bmpFile))
-  {
+  if (!bmpReadHeader(bmpFile)) {
     Serial.println("bad bmp");
     return;
   }
@@ -201,35 +184,29 @@ void loop()
 
 // dir - 1: up to down
 // dir - 2: down to up
-void bmpdraw(File f, int x, int y, int dir)
-{
-  if (bmpFile.seek(__Gnbmp_image_offset))
-  {
+void bmpdraw(File f, int x, int y, int dir) {
+  if (bmpFile.seek(__Gnbmp_image_offset)) {
     Serial.print("pos = ");
     Serial.println(bmpFile.position());
   }
 
   uint32_t time = millis();
 
-  uint8_t  sdbuffer[BUFFPIXEL_X3];  // 3 * pixels to buffer
+  uint8_t sdbuffer[BUFFPIXEL_X3];  // 3 * pixels to buffer
 
-  for (int i = 0; i < __Gnbmp_height; i++)
-  {
-    if (dir)
-    {
+  for (int i = 0; i < __Gnbmp_height; i++) {
+    if (dir) {
       bmpFile.seek(__Gnbmp_image_offset + (__Gnbmp_height - 1 - i) * 240 * 3);
     }
 
-    for (int j = 0; j < (240 / BUFFPIXEL); j++)
-    {
+    for (int j = 0; j < (240 / BUFFPIXEL); j++) {
       bmpFile.read(sdbuffer, BUFFPIXEL_X3);
-      uint8_t      buffidx  = 0;
-      int          offset_x = j * BUFFPIXEL;
+      uint8_t buffidx  = 0;
+      int     offset_x = j * BUFFPIXEL;
 
       unsigned int __color[BUFFPIXEL];
 
-      for (int k = 0; k < BUFFPIXEL; k++)
-      {
+      for (int k = 0; k < BUFFPIXEL; k++) {
         __color[k] = sdbuffer[buffidx + 2] >> 3;                      // read
         __color[k] = __color[k] << 6 | (sdbuffer[buffidx + 1] >> 2);  // green
         __color[k] = __color[k] << 5 | (sdbuffer[buffidx + 0] >> 3);  // blue
@@ -239,12 +216,9 @@ void bmpdraw(File f, int x, int y, int dir)
 
       Tft.setCol(offset_x, offset_x + BUFFPIXEL);
 
-      if (dir)
-      {
+      if (dir) {
         Tft.setPage(i, i);
-      }
-      else
-      {
+      } else {
         Tft.setPage(__Gnbmp_height - i - 1, __Gnbmp_height - i - 1);
       }
 
@@ -253,8 +227,7 @@ void bmpdraw(File f, int x, int y, int dir)
       TFT_DC_HIGH;
       TFT_CS_LOW;
 
-      for (int m = 0; m < BUFFPIXEL; m++)
-      {
+      for (int m = 0; m < BUFFPIXEL; m++) {
         SPI.transfer(__color[m] >> 8);
         SPI.transfer(__color[m]);
 
@@ -269,14 +242,12 @@ void bmpdraw(File f, int x, int y, int dir)
   Serial.println(" ms");
 }
 
-boolean bmpReadHeader(File f)
-{
+boolean bmpReadHeader(File f) {
   // read header
   uint32_t tmp;
   uint8_t  bmpDepth;
 
-  if (read16(f) != 0x4D42)
-  {
+  if (read16(f) != 0x4D42) {
     // magic bytes missing
     return false;
   }
@@ -301,13 +272,11 @@ boolean bmpReadHeader(File f)
   int bmp_width  = read32(f);
   int bmp_height = read32(f);
 
-  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height)
-  {  // if image is not 320x240, return false
+  if (bmp_width != __Gnbmp_width || bmp_height != __Gnbmp_height) {  // if image is not 320x240, return false
     return false;
   }
 
-  if (read16(f) != 1)
-  {
+  if (read16(f) != 1) {
     return false;
   }
 
@@ -315,8 +284,7 @@ boolean bmpReadHeader(File f)
   Serial.print("bitdepth ");
   Serial.println(bmpDepth, DEC);
 
-  if (read32(f) != 0)
-  {
+  if (read32(f) != 0) {
     // compression not supported!
     return false;
   }
@@ -332,8 +300,7 @@ boolean bmpReadHeader(File f)
 // (the data is stored in little endian format!)
 
 // LITTLE ENDIAN!
-uint16_t read16(File f)
-{
+uint16_t read16(File f) {
   uint16_t d;
   uint8_t  b;
   b = f.read();
@@ -344,8 +311,7 @@ uint16_t read16(File f)
 }
 
 // LITTLE ENDIAN!
-uint32_t read32(File f)
-{
+uint32_t read32(File f) {
   uint32_t d;
   uint16_t b;
 

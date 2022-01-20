@@ -18,20 +18,18 @@
 const char* SSID = STASSID;
 const char* PSK  = STAPSK;
 
-IPAddress   staticip(192, 168, 1, 123);
-IPAddress   gateway(192, 168, 1, 254);
-IPAddress   subnet(255, 255, 255, 0);
+IPAddress staticip(192, 168, 1, 123);
+IPAddress gateway(192, 168, 1, 254);
+IPAddress subnet(255, 255, 255, 0);
 
-void        setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PSK);
   Serial.println("connecting");
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -48,16 +46,14 @@ void        setup()
       "WL_DISCONNECTED     = 7\n");
 }
 
-void WiFiOn()
-{
+void WiFiOn() {
   wifi_fpm_do_wakeup();
   wifi_fpm_close();
   wifi_set_opmode(STATION_MODE);
   wifi_station_connect();
 }
 
-void WiFiOff()
-{
+void WiFiOff() {
   wifi_station_disconnect();
   wifi_set_opmode(NULL_MODE);
   wifi_set_sleep_type(MODEM_SLEEP_T);
@@ -65,12 +61,10 @@ void WiFiOff()
   wifi_fpm_do_sleep(0xFFFFFFF);
 }
 
-void loop()
-{
+void loop() {
 #define TEST(name, var, varinit, func)   \
   static decltype(func) var = (varinit); \
-  if ((var) != (func))                   \
-  {                                      \
+  if ((var) != (func)) {                 \
     var = (func);                        \
     Serial.printf("**** %s: ", name);    \
     Serial.println(var);                 \
@@ -86,8 +80,7 @@ void loop()
   TEST("STA-IP", localIp, (uint32_t)0, WiFi.localIP());
   TEST("AP-IP", apIp, (uint32_t)0, WiFi.softAPIP());
 
-  switch (Serial.read())
-  {
+  switch (Serial.read()) {
     case 'F':
       DO(WiFiOff());
     case 'N':

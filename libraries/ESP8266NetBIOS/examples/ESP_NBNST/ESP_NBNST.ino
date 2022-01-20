@@ -7,14 +7,13 @@
 #define STAPSK "your-password"
 #endif
 
-const char*      ssid     = STASSID;
-const char*      password = STAPSK;
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer wwwserver(80);
 String           content;
 
-static void      handleRoot(void)
-{
+static void handleRoot(void) {
   content = F("<!DOCTYPE HTML>\n<html>Hello world from ESP8266");
   content += F("<p>");
   content += F("</html>");
@@ -22,8 +21,7 @@ static void      handleRoot(void)
   wwwserver.send(200, F("text/html"), content);
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   // Connect to WiFi network
@@ -32,8 +30,7 @@ void setup()
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -49,7 +46,6 @@ void setup()
   NBNS.begin("ESP");
 }
 
-void loop()
-{
+void loop() {
   wwwserver.handleClient();
 }

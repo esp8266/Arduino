@@ -21,14 +21,12 @@ const char* pass = STAPSK;
 const char* path = "/";
 
 // Set time via NTP, as required for x.509 validation
-void        setClock()
-{
+void setClock() {
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2)
-  {
+  while (now < 8 * 3600 * 2) {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -41,10 +39,8 @@ void        setClock()
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path)
-{
-  if (!path)
-  {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+  if (!path) {
     path = "/";
   }
 
@@ -52,8 +48,7 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   uint32_t freeStackStart = ESP.getFreeContStack();
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
-  if (!client->connected())
-  {
+  if (!client->connected()) {
     Serial.printf("*** Can't connect. ***\n-------\n");
     return;
   }
@@ -65,22 +60,18 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   client->write("\r\nUser-Agent: ESP8266\r\n");
   client->write("\r\n");
   uint32_t to = millis() + 5000;
-  if (client->connected())
-  {
-    do
-    {
+  if (client->connected()) {
+    do {
       char tmp[32];
       memset(tmp, 0, 32);
       int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
       yield();
-      if (rlen < 0)
-      {
+      if (rlen < 0) {
         break;
       }
       // Only print out first line up to \r, then abort connection
       char* nl = strchr(tmp, '\r');
-      if (nl)
-      {
+      if (nl) {
         *nl = 0;
         Serial.print(tmp);
         break;
@@ -94,8 +85,7 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   Serial.printf("BSSL stack used: %d\n-------\n\n", stack_thunk_get_max_usage());
 }
 
-void fetchNoConfig()
-{
+void fetchNoConfig() {
   Serial.printf(R"EOF(
 If there are no CAs or insecure options specified, BearSSL will not connect.
 Expect the following call to fail as none have been configured.
@@ -104,8 +94,7 @@ Expect the following call to fail as none have been configured.
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
-void fetchInsecure()
-{
+void fetchInsecure() {
   Serial.printf(R"EOF(
 This is absolutely *insecure*, but you can tell BearSSL not to check the
 certificate of the server.  In this mode it will accept ANY certificate,
@@ -116,8 +105,7 @@ which is subject to man-in-the-middle (MITM) attacks.
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
-void fetchFingerprint()
-{
+void fetchFingerprint() {
   Serial.printf(R"EOF(
 The SHA-1 fingerprint of an X.509 certificate can be used to validate it
 instead of the while certificate.  This is not nearly as secure as real
@@ -131,8 +119,7 @@ the root authorities, etc.).
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
-void fetchSelfSigned()
-{
+void fetchSelfSigned() {
   Serial.printf(R"EOF(
 It is also possible to accept *any* self-signed certificate.  This is
 absolutely insecure as anyone can make a self-signed certificate.
@@ -145,8 +132,7 @@ absolutely insecure as anyone can make a self-signed certificate.
   fetchURL(&client, "self-signed.badssl.com", 443, "/");
 }
 
-void fetchKnownKey()
-{
+void fetchKnownKey() {
   Serial.printf(R"EOF(
 The server certificate can be completely ignored and its public key
 hardcoded in your application. This should be secure as the public key
@@ -160,8 +146,7 @@ able to establish communications.
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
-void fetchCertAuthority()
-{
+void fetchCertAuthority() {
   Serial.printf(R"EOF(
 A specific certification authority can be passed in and used to validate
 a chain of certificates from a given server.  These will be validated
@@ -182,8 +167,7 @@ BearSSL does verify the notValidBefore/After fields.
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
-void fetchFaster()
-{
+void fetchFaster() {
   Serial.printf(R"EOF(
 The ciphers used to set up the SSL connection can be configured to
 only support faster but less secure ciphers.  If you care about security
@@ -209,8 +193,7 @@ may make sense
   Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
 }
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
@@ -221,8 +204,7 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
@@ -241,7 +223,6 @@ void setup()
   fetchFaster();
 }
 
-void loop()
-{
+void loop() {
   // Nothing to do here
 }

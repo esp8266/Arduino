@@ -131,7 +131,7 @@ void Wiznet5100::wizchip_send_data(const uint8_t* wizdata, uint16_t len)
     uint16_t dst_mask;
     uint16_t dst_ptr;
 
-    ptr      = getSn_TX_WR();
+    ptr = getSn_TX_WR();
 
     dst_mask = ptr & TxBufferMask;
     dst_ptr  = TxBufferAddress + dst_mask;
@@ -162,7 +162,7 @@ void Wiznet5100::wizchip_recv_data(uint8_t* wizdata, uint16_t len)
     uint16_t src_mask;
     uint16_t src_ptr;
 
-    ptr      = getSn_RX_RD();
+    ptr = getSn_RX_RD();
 
     src_mask = ptr & RxBufferMask;
     src_ptr  = RxBufferAddress + src_mask;

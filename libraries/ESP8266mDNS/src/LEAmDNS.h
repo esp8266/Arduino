@@ -212,27 +212,27 @@ namespace MDNSImplementation
         // the current hostname is used. If the hostname is changed later, the instance names for
         // these 'auto-named' services are changed to the new name also (and probing is restarted).
         // The usual '_' before p_pcService (eg. http) and protocol (eg. tcp) may be given.
-        hMDNSService        addService(const char* p_pcName,
-                                       const char* p_pcService,
-                                       const char* p_pcProtocol,
-                                       uint16_t    p_u16Port);
+        hMDNSService addService(const char* p_pcName,
+                                const char* p_pcService,
+                                const char* p_pcProtocol,
+                                uint16_t    p_u16Port);
         // Removes a service from the MDNS responder
-        bool                removeService(const hMDNSService p_hService);
-        bool                removeService(const char* p_pcInstanceName,
-                                          const char* p_pcServiceName,
-                                          const char* p_pcProtocol);
+        bool removeService(const hMDNSService p_hService);
+        bool removeService(const char* p_pcInstanceName,
+                           const char* p_pcServiceName,
+                           const char* p_pcProtocol);
         // for compatibility...
-        bool                addService(const String& p_strServiceName,
-                                       const String& p_strProtocol,
-                                       uint16_t      p_u16Port);
+        bool addService(const String& p_strServiceName,
+                        const String& p_strProtocol,
+                        uint16_t      p_u16Port);
 
         // Change the services instance name (and restart probing).
-        bool                setServiceName(const hMDNSService p_hService,
-                                           const char*        p_pcInstanceName);
+        bool setServiceName(const hMDNSService p_hService,
+                            const char*        p_pcInstanceName);
         //for compatibility
         //Warning: this has the side effect of changing the hostname.
         //TODO: implement instancename different from hostname
-        void                setInstanceName(const char* p_pcHostname)
+        void setInstanceName(const char* p_pcHostname)
         {
             setHostname(p_pcHostname);
         }
@@ -245,49 +245,49 @@ namespace MDNSImplementation
         /**
         hMDNSTxt (opaque handle to access the TXT items)
     */
-        typedef void*                                              hMDNSTxt;
+        typedef void* hMDNSTxt;
 
         // Add a (static) MDNS TXT item ('key' = 'value') to the service
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 const char*        p_pcValue);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 uint32_t           p_u32Value);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 uint16_t           p_u16Value);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 uint8_t            p_u8Value);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 int32_t            p_i32Value);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 int16_t            p_i16Value);
-        hMDNSTxt                                                   addServiceTxt(const hMDNSService p_hService,
-                                                                                 const char*        p_pcKey,
-                                                                                 int8_t             p_i8Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               const char*        p_pcValue);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               uint32_t           p_u32Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               uint16_t           p_u16Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               uint8_t            p_u8Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               int32_t            p_i32Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               int16_t            p_i16Value);
+        hMDNSTxt addServiceTxt(const hMDNSService p_hService,
+                               const char*        p_pcKey,
+                               int8_t             p_i8Value);
 
         // Remove an existing (static) MDNS TXT item from the service
-        bool                                                       removeServiceTxt(const hMDNSService p_hService,
-                                                                                    const hMDNSTxt     p_hTxt);
-        bool                                                       removeServiceTxt(const hMDNSService p_hService,
-                                                                                    const char*        p_pcKey);
-        bool                                                       removeServiceTxt(const char* p_pcinstanceName,
-                                                                                    const char* p_pcServiceName,
-                                                                                    const char* p_pcProtocol,
-                                                                                    const char* p_pcKey);
+        bool removeServiceTxt(const hMDNSService p_hService,
+                              const hMDNSTxt     p_hTxt);
+        bool removeServiceTxt(const hMDNSService p_hService,
+                              const char*        p_pcKey);
+        bool removeServiceTxt(const char* p_pcinstanceName,
+                              const char* p_pcServiceName,
+                              const char* p_pcProtocol,
+                              const char* p_pcKey);
         // for compatibility...
-        bool                                                       addServiceTxt(const char* p_pcService,
-                                                                                 const char* p_pcProtocol,
-                                                                                 const char* p_pcKey,
-                                                                                 const char* p_pcValue);
-        bool                                                       addServiceTxt(const String& p_strService,
-                                                                                 const String& p_strProtocol,
-                                                                                 const String& p_strKey,
-                                                                                 const String& p_strValue);
+        bool addServiceTxt(const char* p_pcService,
+                           const char* p_pcProtocol,
+                           const char* p_pcKey,
+                           const char* p_pcValue);
+        bool addServiceTxt(const String& p_strService,
+                           const String& p_strProtocol,
+                           const String& p_strKey,
+                           const String& p_strValue);
 
         /**
         MDNSDynamicServiceTxtCallbackFn
@@ -298,62 +298,62 @@ namespace MDNSImplementation
 
         // Set a global callback for dynamic MDNS TXT items. The callback function is called
         // every time, a TXT item is needed for one of the installed services.
-        bool                                                       setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
+        bool setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
         // Set a service specific callback for dynamic MDNS TXT items. The callback function
         // is called every time, a TXT item is needed for the given service.
-        bool                                                       setDynamicServiceTxtCallback(const hMDNSService                p_hService,
-                                                                                                MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
+        bool setDynamicServiceTxtCallback(const hMDNSService                p_hService,
+                                          MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
 
         // Add a (dynamic) MDNS TXT item ('key' = 'value') to the service
         // Dynamic TXT items are removed right after one-time use. So they need to be added
         // every time the value s needed (via callback).
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        const char*  p_pcValue);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        uint32_t     p_u32Value);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        uint16_t     p_u16Value);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        uint8_t      p_u8Value);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        int32_t      p_i32Value);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        int16_t      p_i16Value);
-        hMDNSTxt                                                   addDynamicServiceTxt(hMDNSService p_hService,
-                                                                                        const char*  p_pcKey,
-                                                                                        int8_t       p_i8Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      const char*  p_pcValue);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      uint32_t     p_u32Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      uint16_t     p_u16Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      uint8_t      p_u8Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      int32_t      p_i32Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      int16_t      p_i16Value);
+        hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService,
+                                      const char*  p_pcKey,
+                                      int8_t       p_i8Value);
 
         // Perform a (static) service query. The function returns after p_u16Timeout milliseconds
         // The answers (the number of received answers is returned) can be retrieved by calling
         // - answerHostname (or hostname)
         // - answerIP (or IP)
         // - answerPort (or port)
-        uint32_t                                                   queryService(const char*    p_pcService,
-                                                                                const char*    p_pcProtocol,
-                                                                                const uint16_t p_u16Timeout = MDNS_QUERYSERVICES_WAIT_TIME);
-        bool                                                       removeQuery(void);
+        uint32_t queryService(const char*    p_pcService,
+                              const char*    p_pcProtocol,
+                              const uint16_t p_u16Timeout = MDNS_QUERYSERVICES_WAIT_TIME);
+        bool     removeQuery(void);
         // for compatibility...
-        uint32_t                                                   queryService(const String& p_strService,
-                                                                                const String& p_strProtocol);
+        uint32_t queryService(const String& p_strService,
+                              const String& p_strProtocol);
 
-        const char*                                                answerHostname(const uint32_t p_u32AnswerIndex);
-        IPAddress                                                  answerIP(const uint32_t p_u32AnswerIndex);
-        uint16_t                                                   answerPort(const uint32_t p_u32AnswerIndex);
+        const char* answerHostname(const uint32_t p_u32AnswerIndex);
+        IPAddress   answerIP(const uint32_t p_u32AnswerIndex);
+        uint16_t    answerPort(const uint32_t p_u32AnswerIndex);
         // for compatibility...
-        String                                                     hostname(const uint32_t p_u32AnswerIndex);
-        IPAddress                                                  IP(const uint32_t p_u32AnswerIndex);
-        uint16_t                                                   port(const uint32_t p_u32AnswerIndex);
+        String    hostname(const uint32_t p_u32AnswerIndex);
+        IPAddress IP(const uint32_t p_u32AnswerIndex);
+        uint16_t  port(const uint32_t p_u32AnswerIndex);
 
         /**
         hMDNSServiceQuery (opaque handle to access dynamic service queries)
     */
-        typedef const void*                                        hMDNSServiceQuery;
+        typedef const void* hMDNSServiceQuery;
 
         /**
         enuServiceQueryAnswerType
@@ -394,7 +394,7 @@ namespace MDNSImplementation
                                    AnswerType             answerType,    // flag for the updated answer item
                                    bool                   p_bSetContent  // true: Answer component set, false: component deleted
                                    )>
-                                                    MDNSServiceQueryCallbackFunc;
+            MDNSServiceQueryCallbackFunc;
 
         // Install a dynamic service query. For every received answer (part) the given callback
         // function is called. The query will be updated every time, the TTL for an answer
@@ -407,21 +407,21 @@ namespace MDNSImplementation
         // - hasAnswerIP6Address/answerIP6Address
         // - hasAnswerPort/answerPort
         // - hasAnswerTxts/answerTxts
-        hMDNSServiceQuery                           installServiceQuery(const char*                  p_pcService,
-                                                                        const char*                  p_pcProtocol,
-                                                                        MDNSServiceQueryCallbackFunc p_fnCallback);
+        hMDNSServiceQuery installServiceQuery(const char*                  p_pcService,
+                                              const char*                  p_pcProtocol,
+                                              MDNSServiceQueryCallbackFunc p_fnCallback);
         // Remove a dynamic service query
-        bool                                        removeServiceQuery(hMDNSServiceQuery p_hServiceQuery);
+        bool removeServiceQuery(hMDNSServiceQuery p_hServiceQuery);
 
         uint32_t                                    answerCount(const hMDNSServiceQuery p_hServiceQuery);
         std::vector<MDNSResponder::MDNSServiceInfo> answerInfo(const MDNSResponder::hMDNSServiceQuery p_hServiceQuery);
 
-        const char*                                 answerServiceDomain(const hMDNSServiceQuery p_hServiceQuery,
-                                                                        const uint32_t          p_u32AnswerIndex);
-        bool                                        hasAnswerHostDomain(const hMDNSServiceQuery p_hServiceQuery,
-                                                                        const uint32_t          p_u32AnswerIndex);
-        const char*                                 answerHostDomain(const hMDNSServiceQuery p_hServiceQuery,
-                                                                     const uint32_t          p_u32AnswerIndex);
+        const char* answerServiceDomain(const hMDNSServiceQuery p_hServiceQuery,
+                                        const uint32_t          p_u32AnswerIndex);
+        bool        hasAnswerHostDomain(const hMDNSServiceQuery p_hServiceQuery,
+                                        const uint32_t          p_u32AnswerIndex);
+        const char* answerHostDomain(const hMDNSServiceQuery p_hServiceQuery,
+                                     const uint32_t          p_u32AnswerIndex);
 #ifdef MDNS_IP4_SUPPORT
         bool      hasAnswerIP4Address(const hMDNSServiceQuery p_hServiceQuery,
                                       const uint32_t          p_u32AnswerIndex);
@@ -440,12 +440,12 @@ namespace MDNSImplementation
                                    const uint32_t          p_u32AnswerIndex,
                                    const uint32_t          p_u32AddressIndex);
 #endif
-        bool        hasAnswerPort(const hMDNSServiceQuery p_hServiceQuery,
-                                  const uint32_t          p_u32AnswerIndex);
-        uint16_t    answerPort(const hMDNSServiceQuery p_hServiceQuery,
+        bool     hasAnswerPort(const hMDNSServiceQuery p_hServiceQuery,
                                const uint32_t          p_u32AnswerIndex);
-        bool        hasAnswerTxts(const hMDNSServiceQuery p_hServiceQuery,
-                                  const uint32_t          p_u32AnswerIndex);
+        uint16_t answerPort(const hMDNSServiceQuery p_hServiceQuery,
+                            const uint32_t          p_u32AnswerIndex);
+        bool     hasAnswerTxts(const hMDNSServiceQuery p_hServiceQuery,
+                               const uint32_t          p_u32AnswerIndex);
         // Get the TXT items as a ';'-separated string
         const char* answerTxts(const hMDNSServiceQuery p_hServiceQuery,
                                const uint32_t          p_u32AnswerIndex);
@@ -472,40 +472,40 @@ namespace MDNSImplementation
                                    const char*        p_pcServiceName,
                                    const hMDNSService p_hMDNSService,
                                    bool               p_bProbeResult)>
-                     MDNSServiceProbeFn1;
+            MDNSServiceProbeFn1;
 
         // Set a global callback function for host and service probe results
         // The callback function is called, when the probing for the host domain
         // (or a service domain, which hasn't got a service specific callback)
         // Succeeds or fails.
         // In case of failure, the failed domain name should be changed.
-        bool         setHostProbeResultCallback(MDNSHostProbeFn p_fnCallback);
-        bool         setHostProbeResultCallback(MDNSHostProbeFn1 p_fnCallback);
+        bool setHostProbeResultCallback(MDNSHostProbeFn p_fnCallback);
+        bool setHostProbeResultCallback(MDNSHostProbeFn1 p_fnCallback);
 
         // Set a service specific probe result callback
-        bool         setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
-                                                   MDNSServiceProbeFn                p_fnCallback);
-        bool         setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
-                                                   MDNSServiceProbeFn1               p_fnCallback);
+        bool setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
+                                           MDNSServiceProbeFn                p_fnCallback);
+        bool setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
+                                           MDNSServiceProbeFn1               p_fnCallback);
 
         // Application should call this whenever AP is configured/disabled
-        bool         notifyAPChange(void);
+        bool notifyAPChange(void);
 
         // 'update' should be called in every 'loop' to run the MDNS processing
-        bool         update(void);
+        bool update(void);
 
         // 'announce' can be called every time, the configuration of some service
         // changes. Mainly, this would be changed content of TXT items.
-        bool         announce(void);
+        bool announce(void);
 
         // Enable OTA update
         hMDNSService enableArduino(uint16_t p_u16Port,
                                    bool     p_bAuthUpload = false);
 
         // Domain name helper
-        static bool  indexDomain(char*&      p_rpcDomain,
-                                 const char* p_pcDivider       = "-",
-                                 const char* p_pcDefaultDomain = 0);
+        static bool indexDomain(char*&      p_rpcDomain,
+                                const char* p_pcDivider       = "-",
+                                const char* p_pcDefaultDomain = 0);
 
         /** STRUCTS **/
 
@@ -627,25 +627,25 @@ namespace MDNSImplementation
             stcMDNSServiceTxt& operator=(const stcMDNSServiceTxt& p_Other);
             bool               clear(void);
 
-            char*              allocKey(size_t p_stLength);
-            bool               setKey(const char* p_pcKey,
-                                      size_t      p_stLength);
-            bool               setKey(const char* p_pcKey);
-            bool               releaseKey(void);
+            char* allocKey(size_t p_stLength);
+            bool  setKey(const char* p_pcKey,
+                         size_t      p_stLength);
+            bool  setKey(const char* p_pcKey);
+            bool  releaseKey(void);
 
-            char*              allocValue(size_t p_stLength);
-            bool               setValue(const char* p_pcValue,
-                                        size_t      p_stLength);
-            bool               setValue(const char* p_pcValue);
-            bool               releaseValue(void);
+            char* allocValue(size_t p_stLength);
+            bool  setValue(const char* p_pcValue,
+                           size_t      p_stLength);
+            bool  setValue(const char* p_pcValue);
+            bool  releaseValue(void);
 
-            bool               set(const char* p_pcKey,
-                                   const char* p_pcValue,
-                                   bool        p_bTemp = false);
+            bool set(const char* p_pcKey,
+                     const char* p_pcValue,
+                     bool        p_bTemp = false);
 
-            bool               update(const char* p_pcValue);
+            bool update(const char* p_pcValue);
 
-            size_t             length(void) const;
+            size_t length(void) const;
         };
 
         /**
@@ -659,30 +659,30 @@ namespace MDNSImplementation
             stcMDNSServiceTxts(const stcMDNSServiceTxts& p_Other);
             ~stcMDNSServiceTxts(void);
 
-            stcMDNSServiceTxts&      operator=(const stcMDNSServiceTxts& p_Other);
+            stcMDNSServiceTxts& operator=(const stcMDNSServiceTxts& p_Other);
 
-            bool                     clear(void);
+            bool clear(void);
 
-            bool                     add(stcMDNSServiceTxt* p_pTxt);
-            bool                     remove(stcMDNSServiceTxt* p_pTxt);
+            bool add(stcMDNSServiceTxt* p_pTxt);
+            bool remove(stcMDNSServiceTxt* p_pTxt);
 
-            bool                     removeTempTxts(void);
+            bool removeTempTxts(void);
 
             stcMDNSServiceTxt*       find(const char* p_pcKey);
             const stcMDNSServiceTxt* find(const char* p_pcKey) const;
             stcMDNSServiceTxt*       find(const stcMDNSServiceTxt* p_pTxt);
 
-            uint16_t                 length(void) const;
+            uint16_t length(void) const;
 
-            size_t                   c_strLength(void) const;
-            bool                     c_str(char* p_pcBuffer);
+            size_t c_strLength(void) const;
+            bool   c_str(char* p_pcBuffer);
 
-            size_t                   bufferLength(void) const;
-            bool                     buffer(char* p_pcBuffer);
+            size_t bufferLength(void) const;
+            bool   buffer(char* p_pcBuffer);
 
-            bool                     compare(const stcMDNSServiceTxts& p_Other) const;
-            bool                     operator==(const stcMDNSServiceTxts& p_Other) const;
-            bool                     operator!=(const stcMDNSServiceTxts& p_Other) const;
+            bool compare(const stcMDNSServiceTxts& p_Other) const;
+            bool operator==(const stcMDNSServiceTxts& p_Other) const;
+            bool operator!=(const stcMDNSServiceTxts& p_Other) const;
         };
 
         /**
@@ -691,10 +691,10 @@ namespace MDNSImplementation
         typedef enum _enuContentFlags
         {
             // Host
-            ContentFlag_A        = 0x01,
-            ContentFlag_PTR_IP4  = 0x02,
-            ContentFlag_PTR_IP6  = 0x04,
-            ContentFlag_AAAA     = 0x08,
+            ContentFlag_A       = 0x01,
+            ContentFlag_PTR_IP4 = 0x02,
+            ContentFlag_PTR_IP6 = 0x04,
+            ContentFlag_AAAA    = 0x08,
             // Service
             ContentFlag_PTR_TYPE = 0x10,
             ContentFlag_PTR_NAME = 0x20,
@@ -748,18 +748,18 @@ namespace MDNSImplementation
 
             stcMDNS_RRDomain& operator=(const stcMDNS_RRDomain& p_Other);
 
-            bool              clear(void);
+            bool clear(void);
 
-            bool              addLabel(const char* p_pcLabel,
-                                       bool        p_bPrependUnderline = false);
+            bool addLabel(const char* p_pcLabel,
+                          bool        p_bPrependUnderline = false);
 
-            bool              compare(const stcMDNS_RRDomain& p_Other) const;
-            bool              operator==(const stcMDNS_RRDomain& p_Other) const;
-            bool              operator!=(const stcMDNS_RRDomain& p_Other) const;
-            bool              operator>(const stcMDNS_RRDomain& p_Other) const;
+            bool compare(const stcMDNS_RRDomain& p_Other) const;
+            bool operator==(const stcMDNS_RRDomain& p_Other) const;
+            bool operator!=(const stcMDNS_RRDomain& p_Other) const;
+            bool operator>(const stcMDNS_RRDomain& p_Other) const;
 
-            size_t            c_strLength(void) const;
-            bool              c_str(char* p_pcBuffer);
+            size_t c_strLength(void) const;
+            bool   c_str(char* p_pcBuffer);
         };
 
         /**
@@ -790,7 +790,7 @@ namespace MDNSImplementation
 
             stcMDNS_RRHeader& operator=(const stcMDNS_RRHeader& p_Other);
 
-            bool              clear(void);
+            bool clear(void);
         };
 
         /**
@@ -833,7 +833,7 @@ namespace MDNSImplementation
 
             enuAnswerType answerType(void) const;
 
-            bool          clear(void);
+            bool clear(void);
 
         protected:
             stcMDNS_RRAnswer(enuAnswerType           p_AnswerType,
@@ -953,10 +953,10 @@ namespace MDNSImplementation
             uint8_t                           m_u8SentCount;  // Used for probes and announcements
             esp8266::polledTimeout::oneShotMs m_Timeout;      // Used for probes and announcements
             //clsMDNSTimeFlag                   m_TimeFlag;     // Used for probes and announcements
-            bool                              m_bConflict;
-            bool                              m_bTiebreakNeeded;
-            MDNSHostProbeFn                   m_fnHostProbeResultCallback;
-            MDNSServiceProbeFn                m_fnServiceProbeResultCallback;
+            bool               m_bConflict;
+            bool               m_bTiebreakNeeded;
+            MDNSHostProbeFn    m_fnHostProbeResultCallback;
+            MDNSServiceProbeFn m_fnServiceProbeResultCallback;
 
             stcProbeInformation(void);
 
@@ -1012,14 +1012,14 @@ namespace MDNSImplementation
                     /**
                     timeoutLevel_t
                 */
-                    typedef uint8_t                   timeoutLevel_t;
+                    typedef uint8_t timeoutLevel_t;
                     /**
                     TIMEOUTLEVELs
                 */
-                    const timeoutLevel_t              TIMEOUTLEVEL_UNSET    = 0;
-                    const timeoutLevel_t              TIMEOUTLEVEL_BASE     = 80;
-                    const timeoutLevel_t              TIMEOUTLEVEL_INTERVAL = 5;
-                    const timeoutLevel_t              TIMEOUTLEVEL_FINAL    = 100;
+                    const timeoutLevel_t TIMEOUTLEVEL_UNSET    = 0;
+                    const timeoutLevel_t TIMEOUTLEVEL_BASE     = 80;
+                    const timeoutLevel_t TIMEOUTLEVEL_INTERVAL = 5;
+                    const timeoutLevel_t TIMEOUTLEVEL_FINAL    = 100;
 
                     uint32_t                          m_u32TTL;
                     esp8266::polledTimeout::oneShotMs m_TTLTimeout;
@@ -1028,13 +1028,13 @@ namespace MDNSImplementation
                     using timeoutBase = decltype(m_TTLTimeout);
 
                     stcTTL(void);
-                    bool                  set(uint32_t p_u32TTL);
+                    bool set(uint32_t p_u32TTL);
 
-                    bool                  flagged(void);
-                    bool                  restart(void);
+                    bool flagged(void);
+                    bool restart(void);
 
-                    bool                  prepareDeletion(void);
-                    bool                  finalTimeoutLevel(void) const;
+                    bool prepareDeletion(void);
+                    bool finalTimeoutLevel(void) const;
 
                     timeoutBase::timeType timeout(void) const;
                 };
@@ -1067,7 +1067,7 @@ namespace MDNSImplementation
                 };
 #endif
 
-                stcAnswer*         m_pNext;
+                stcAnswer* m_pNext;
                 // The service domain is the first 'answer' (from PTR answer, using service and protocol) to be set
                 // Defines the key for additional answer, like host domain, etc.
                 stcMDNS_RRDomain   m_ServiceDomain;  // 1. level answer (PTR), eg. MyESP._http._tcp.local
@@ -1091,7 +1091,7 @@ namespace MDNSImplementation
                 stcAnswer(void);
                 ~stcAnswer(void);
 
-                bool  clear(void);
+                bool clear(void);
 
                 char* allocServiceDomain(size_t p_stLength);
                 bool  releaseServiceDomain(void);
@@ -1136,18 +1136,18 @@ namespace MDNSImplementation
             stcMDNSServiceQuery(void);
             ~stcMDNSServiceQuery(void);
 
-            bool             clear(void);
+            bool clear(void);
 
             uint32_t         answerCount(void) const;
             const stcAnswer* answerAtIndex(uint32_t p_u32Index) const;
             stcAnswer*       answerAtIndex(uint32_t p_u32Index);
             uint32_t         indexOfAnswer(const stcAnswer* p_pAnswer) const;
 
-            bool             addAnswer(stcAnswer* p_pAnswer);
-            bool             removeAnswer(stcAnswer* p_pAnswer);
+            bool addAnswer(stcAnswer* p_pAnswer);
+            bool removeAnswer(stcAnswer* p_pAnswer);
 
-            stcAnswer*       findAnswerForServiceDomain(const stcMDNS_RRDomain& p_ServiceDomain);
-            stcAnswer*       findAnswerForHostDomain(const stcMDNS_RRDomain& p_HostDomain);
+            stcAnswer* findAnswerForServiceDomain(const stcMDNS_RRDomain& p_ServiceDomain);
+            stcAnswer* findAnswerForHostDomain(const stcMDNS_RRDomain& p_HostDomain);
         };
 
         /**
@@ -1187,10 +1187,10 @@ namespace MDNSImplementation
             stcMDNSSendParameter(void);
             ~stcMDNSSendParameter(void);
 
-            bool     clear(void);
-            bool     clearCachedNames(void);
+            bool clear(void);
+            bool clearCachedNames(void);
 
-            bool     shiftOffset(uint16_t p_u16Shift);
+            bool shiftOffset(uint16_t p_u16Shift);
 
             bool     addDomainCacheItem(const void* p_pHostnameOrService,
                                         bool        p_bAdditionalData,
@@ -1209,20 +1209,20 @@ namespace MDNSImplementation
 
         /** CONTROL **/
         /* MAINTENANCE */
-        bool                              _process(bool p_bUserContext);
-        bool                              _restart(void);
+        bool _process(bool p_bUserContext);
+        bool _restart(void);
 
         /* RECEIVING */
-        bool                              _parseMessage(void);
-        bool                              _parseQuery(const stcMDNS_MsgHeader& p_Header);
+        bool _parseMessage(void);
+        bool _parseQuery(const stcMDNS_MsgHeader& p_Header);
 
-        bool                              _parseResponse(const stcMDNS_MsgHeader& p_Header);
-        bool                              _processAnswers(const stcMDNS_RRAnswer* p_pPTRAnswers);
-        bool                              _processPTRAnswer(const stcMDNS_RRAnswerPTR* p_pPTRAnswer,
-                                                            bool&                      p_rbFoundNewKeyAnswer);
-        bool                              _processSRVAnswer(const stcMDNS_RRAnswerSRV* p_pSRVAnswer,
-                                                            bool&                      p_rbFoundNewKeyAnswer);
-        bool                              _processTXTAnswer(const stcMDNS_RRAnswerTXT* p_pTXTAnswer);
+        bool _parseResponse(const stcMDNS_MsgHeader& p_Header);
+        bool _processAnswers(const stcMDNS_RRAnswer* p_pPTRAnswers);
+        bool _processPTRAnswer(const stcMDNS_RRAnswerPTR* p_pPTRAnswer,
+                               bool&                      p_rbFoundNewKeyAnswer);
+        bool _processSRVAnswer(const stcMDNS_RRAnswerSRV* p_pSRVAnswer,
+                               bool&                      p_rbFoundNewKeyAnswer);
+        bool _processTXTAnswer(const stcMDNS_RRAnswerTXT* p_pTXTAnswer);
 #ifdef MDNS_IP4_SUPPORT
         bool _processAAnswer(const stcMDNS_RRAnswerA* p_pAAnswer);
 #endif
@@ -1231,34 +1231,34 @@ namespace MDNSImplementation
 #endif
 
         /* PROBING */
-        bool    _updateProbeStatus(void);
-        bool    _resetProbeStatus(bool p_bRestart = true);
-        bool    _hasProbesWaitingForAnswers(void) const;
-        bool    _sendHostProbe(void);
-        bool    _sendServiceProbe(stcMDNSService& p_rService);
-        bool    _cancelProbingForHost(void);
-        bool    _cancelProbingForService(stcMDNSService& p_rService);
+        bool _updateProbeStatus(void);
+        bool _resetProbeStatus(bool p_bRestart = true);
+        bool _hasProbesWaitingForAnswers(void) const;
+        bool _sendHostProbe(void);
+        bool _sendServiceProbe(stcMDNSService& p_rService);
+        bool _cancelProbingForHost(void);
+        bool _cancelProbingForService(stcMDNSService& p_rService);
 
         /* ANNOUNCE */
-        bool    _announce(bool p_bAnnounce,
-                          bool p_bIncludeServices);
-        bool    _announceService(stcMDNSService& p_rService,
-                                 bool            p_bAnnounce = true);
+        bool _announce(bool p_bAnnounce,
+                       bool p_bIncludeServices);
+        bool _announceService(stcMDNSService& p_rService,
+                              bool            p_bAnnounce = true);
 
         /* SERVICE QUERY CACHE */
-        bool    _hasServiceQueriesWaitingForAnswers(void) const;
-        bool    _checkServiceQueryCache(void);
+        bool _hasServiceQueriesWaitingForAnswers(void) const;
+        bool _checkServiceQueryCache(void);
 
         /** TRANSFER **/
         /* SENDING */
-        bool    _sendMDNSMessage(stcMDNSSendParameter& p_SendParameter);
-        bool    _sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter);
-        bool    _prepareMDNSMessage(stcMDNSSendParameter& p_SendParameter,
-                                    IPAddress             p_IPAddress);
-        bool    _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
-        bool    _sendMDNSQuery(const stcMDNS_RRDomain&         p_QueryDomain,
-                               uint16_t                        p_u16QueryType,
-                               stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
+        bool _sendMDNSMessage(stcMDNSSendParameter& p_SendParameter);
+        bool _sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter);
+        bool _prepareMDNSMessage(stcMDNSSendParameter& p_SendParameter,
+                                 IPAddress             p_IPAddress);
+        bool _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
+        bool _sendMDNSQuery(const stcMDNS_RRDomain&         p_QueryDomain,
+                            uint16_t                        p_u16QueryType,
+                            stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
 
         uint8_t _replyMaskForHost(const stcMDNS_RRHeader& p_RRHeader,
                                   bool*                   p_pbFullNameMatch = 0) const;
@@ -1267,8 +1267,8 @@ namespace MDNSImplementation
                                      bool*                   p_pbFullNameMatch = 0) const;
 
         /* RESOURCE RECORD */
-        bool    _readRRQuestion(stcMDNS_RRQuestion& p_rQuestion);
-        bool    _readRRAnswer(stcMDNS_RRAnswer*& p_rpAnswer);
+        bool _readRRQuestion(stcMDNS_RRQuestion& p_rQuestion);
+        bool _readRRAnswer(stcMDNS_RRAnswer*& p_rpAnswer);
 #ifdef MDNS_IP4_SUPPORT
         bool _readRRAnswerA(stcMDNS_RRAnswerA& p_rRRAnswerA,
                             uint16_t           p_u16RDLength);
@@ -1375,68 +1375,68 @@ namespace MDNSImplementation
         bool _writeMDNSAnswer_PTR_IP6(IPAddress             p_IPAddress,
                                       stcMDNSSendParameter& p_rSendParameter);
 #endif
-        bool                     _writeMDNSAnswer_SRV(stcMDNSService&       p_rService,
-                                                      stcMDNSSendParameter& p_rSendParameter);
+        bool _writeMDNSAnswer_SRV(stcMDNSService&       p_rService,
+                                  stcMDNSSendParameter& p_rSendParameter);
 
         /** HELPERS **/
         /* UDP CONTEXT */
-        bool                     _callProcess(void);
-        bool                     _allocUDPContext(void);
-        bool                     _releaseUDPContext(void);
+        bool _callProcess(void);
+        bool _allocUDPContext(void);
+        bool _releaseUDPContext(void);
 
         /* SERVICE QUERY */
-        stcMDNSServiceQuery*     _allocServiceQuery(void);
-        bool                     _removeServiceQuery(stcMDNSServiceQuery* p_pServiceQuery);
-        bool                     _removeLegacyServiceQuery(void);
-        stcMDNSServiceQuery*     _findServiceQuery(hMDNSServiceQuery p_hServiceQuery);
-        stcMDNSServiceQuery*     _findLegacyServiceQuery(void);
-        bool                     _releaseServiceQueries(void);
-        stcMDNSServiceQuery*     _findNextServiceQueryByServiceType(const stcMDNS_RRDomain&    p_ServiceDomain,
-                                                                    const stcMDNSServiceQuery* p_pPrevServiceQuery);
+        stcMDNSServiceQuery* _allocServiceQuery(void);
+        bool                 _removeServiceQuery(stcMDNSServiceQuery* p_pServiceQuery);
+        bool                 _removeLegacyServiceQuery(void);
+        stcMDNSServiceQuery* _findServiceQuery(hMDNSServiceQuery p_hServiceQuery);
+        stcMDNSServiceQuery* _findLegacyServiceQuery(void);
+        bool                 _releaseServiceQueries(void);
+        stcMDNSServiceQuery* _findNextServiceQueryByServiceType(const stcMDNS_RRDomain&    p_ServiceDomain,
+                                                                const stcMDNSServiceQuery* p_pPrevServiceQuery);
 
         /* HOSTNAME */
-        bool                     _setHostname(const char* p_pcHostname);
-        bool                     _releaseHostname(void);
+        bool _setHostname(const char* p_pcHostname);
+        bool _releaseHostname(void);
 
         /* SERVICE */
-        stcMDNSService*          _allocService(const char* p_pcName,
-                                               const char* p_pcService,
-                                               const char* p_pcProtocol,
-                                               uint16_t    p_u16Port);
-        bool                     _releaseService(stcMDNSService* p_pService);
-        bool                     _releaseServices(void);
+        stcMDNSService* _allocService(const char* p_pcName,
+                                      const char* p_pcService,
+                                      const char* p_pcProtocol,
+                                      uint16_t    p_u16Port);
+        bool            _releaseService(stcMDNSService* p_pService);
+        bool            _releaseServices(void);
 
-        stcMDNSService*          _findService(const char* p_pcName,
-                                              const char* p_pcService,
-                                              const char* p_pcProtocol);
-        stcMDNSService*          _findService(const hMDNSService p_hService);
+        stcMDNSService* _findService(const char* p_pcName,
+                                     const char* p_pcService,
+                                     const char* p_pcProtocol);
+        stcMDNSService* _findService(const hMDNSService p_hService);
 
-        size_t                   _countServices(void) const;
+        size_t _countServices(void) const;
 
         /* SERVICE TXT */
-        stcMDNSServiceTxt*       _allocServiceTxt(stcMDNSService* p_pService,
-                                                  const char*     p_pcKey,
-                                                  const char*     p_pcValue,
-                                                  bool            p_bTemp);
-        bool                     _releaseServiceTxt(stcMDNSService*    p_pService,
-                                                    stcMDNSServiceTxt* p_pTxt);
-        stcMDNSServiceTxt*       _updateServiceTxt(stcMDNSService*    p_pService,
-                                                   stcMDNSServiceTxt* p_pTxt,
-                                                   const char*        p_pcValue,
-                                                   bool               p_bTemp);
+        stcMDNSServiceTxt* _allocServiceTxt(stcMDNSService* p_pService,
+                                            const char*     p_pcKey,
+                                            const char*     p_pcValue,
+                                            bool            p_bTemp);
+        bool               _releaseServiceTxt(stcMDNSService*    p_pService,
+                                              stcMDNSServiceTxt* p_pTxt);
+        stcMDNSServiceTxt* _updateServiceTxt(stcMDNSService*    p_pService,
+                                             stcMDNSServiceTxt* p_pTxt,
+                                             const char*        p_pcValue,
+                                             bool               p_bTemp);
 
-        stcMDNSServiceTxt*       _findServiceTxt(stcMDNSService* p_pService,
-                                                 const char*     p_pcKey);
-        stcMDNSServiceTxt*       _findServiceTxt(stcMDNSService* p_pService,
-                                                 const hMDNSTxt  p_hTxt);
+        stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService,
+                                           const char*     p_pcKey);
+        stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService,
+                                           const hMDNSTxt  p_hTxt);
 
-        stcMDNSServiceTxt*       _addServiceTxt(stcMDNSService* p_pService,
-                                                const char*     p_pcKey,
-                                                const char*     p_pcValue,
-                                                bool            p_bTemp);
+        stcMDNSServiceTxt* _addServiceTxt(stcMDNSService* p_pService,
+                                          const char*     p_pcKey,
+                                          const char*     p_pcValue,
+                                          bool            p_bTemp);
 
-        stcMDNSServiceTxt*       _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
-                                                 const uint32_t          p_u32AnswerIndex);
+        stcMDNSServiceTxt* _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
+                                           const uint32_t          p_u32AnswerIndex);
 
         bool                     _collectServiceTxts(stcMDNSService& p_rService);
         bool                     _releaseTempServiceTxts(stcMDNSService& p_rService);

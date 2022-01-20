@@ -34,7 +34,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-FS                     SPIFFS(nullptr);
+FS SPIFFS(nullptr);
 
 SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage)
 {
