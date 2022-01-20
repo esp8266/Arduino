@@ -20,10 +20,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
 void setup() {
+
   Serial.begin(115200);
 
   Serial.println();
@@ -39,17 +40,19 @@ void setup() {
   Serial.println("");
   Serial.print("Connected! IP address: ");
   Serial.println(WiFi.localIP());
+
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED)) {
+
     WiFiClient client;
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
     // configure traged server and url
-    http.begin(client, "http://" SERVER_IP "/postplain/");  //HTTP
+    http.begin(client, "http://" SERVER_IP "/postplain/"); //HTTP
     http.addHeader("Content-Type", "application/json");
 
     Serial.print("[HTTP] POST...\n");

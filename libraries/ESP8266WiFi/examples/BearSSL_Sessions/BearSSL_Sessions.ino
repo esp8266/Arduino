@@ -9,13 +9,13 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* pass = STAPSK;
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
-const char* path = "/";
+const char *   path = "/";
 
 void setup() {
   Serial.begin(115200);
@@ -52,7 +52,7 @@ void setup() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
   if (!path) {
     path = "/";
   }
@@ -81,7 +81,7 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
         break;
       }
       // Only print out first line up to \r, then abort connection
-      char* nl = strchr(tmp, '\r');
+      char *nl = strchr(tmp, '\r');
       if (nl) {
         *nl = 0;
         Serial.print(tmp);
@@ -94,10 +94,11 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
   Serial.printf("\n-------\n\n");
 }
 
+
 void loop() {
-  uint32_t                  start, finish;
+  uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List         cert(cert_DigiCert_High_Assurance_EV_Root_CA);
+  BearSSL::X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
 
   Serial.printf("Connecting without sessions...");
   start = millis();
@@ -129,5 +130,6 @@ void loop() {
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
-  delay(10000);  // Avoid DDOSing github
+  delay(10000); // Avoid DDOSing github
 }
+

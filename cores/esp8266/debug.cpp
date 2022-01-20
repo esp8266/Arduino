@@ -30,7 +30,7 @@ void __iamslow(const char* what)
 #endif
 
 IRAM_ATTR
-void hexdump(const void* mem, uint32_t len, uint8_t cols)
+void hexdump(const void *mem, uint32_t len, uint8_t cols)
 {
     const char* src = (const char*)mem;
     os_printf("\n[HEXDUMP] Address: %p len: 0x%X (%d)", src, len, len);

@@ -1,4 +1,4 @@
-#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY  // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
 
 #include <ESP8266WiFi.h>
 #include <TcpIpMeshBackend.h>
@@ -19,15 +19,15 @@ namespace TypeCast = MeshTypeConversionFunctions;
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-constexpr char exampleMeshName[] PROGMEM     = "MeshNode_";
-constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";  // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleMeshName[] PROGMEM = "MeshNode_";
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
-unsigned int requestNumber  = 0;
+unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
 
-String                 manageRequest(const String& request, MeshBackendBase& meshInstance);
-TransmissionStatusType manageResponse(const String& response, MeshBackendBase& meshInstance);
-void                   networkFilter(int numberOfNetworks, MeshBackendBase& meshInstance);
+String manageRequest(const String &request, MeshBackendBase &meshInstance);
+TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance);
+void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance);
 
 /* Create the mesh node object */
 TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), FPSTR(exampleMeshName), TypeCast::uint64ToString(ESP.getChipId()), true);
@@ -39,13 +39,13 @@ TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, net
    @param meshInstance The MeshBackendBase instance that called the function.
    @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
 */
-String manageRequest(const String& request, MeshBackendBase& meshInstance) {
+String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
     Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
-  } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
-    (void)tcpIpInstance;  // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
+    (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print(F("TCP/IP: "));
   } else {
     Serial.print(F("UNKNOWN!: "));
@@ -69,14 +69,14 @@ String manageRequest(const String& request, MeshBackendBase& meshInstance) {
    @param meshInstance The MeshBackendBase instance that called the function.
    @return The status code resulting from the response, as an int
 */
-TransmissionStatusType manageResponse(const String& response, MeshBackendBase& meshInstance) {
+TransmissionStatusType manageResponse(const String &response, MeshBackendBase &meshInstance) {
   TransmissionStatusType statusCode = TransmissionStatusType::TRANSMISSION_COMPLETE;
 
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
-  if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
+  if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
     Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
-  } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
+  } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     Serial.print(F("TCP/IP: "));
 
     // Getting the sent message like this will work as long as ONLY(!) TCP/IP is used.
@@ -105,20 +105,20 @@ TransmissionStatusType manageResponse(const String& response, MeshBackendBase& m
    @param numberOfNetworks The number of networks found in the WiFi scan.
    @param meshInstance The MeshBackendBase instance that called the function.
 */
-void networkFilter(int numberOfNetworks, MeshBackendBase& meshInstance) {
+void networkFilter(int numberOfNetworks, MeshBackendBase &meshInstance) {
   // Note that the network index of a given node may change whenever a new scan is done.
   for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) {
-    String currentSSID   = WiFi.SSID(networkIndex);
-    int    meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
+    String currentSSID = WiFi.SSID(networkIndex);
+    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
 
     /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
     if (meshNameIndex >= 0) {
       uint64_t targetNodeID = TypeCast::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
       if (targetNodeID < TypeCast::stringToUint64(meshInstance.getNodeID())) {
-        if (EspnowMeshBackend* espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend*>(&meshInstance)) {
+        if (EspnowMeshBackend *espnowInstance = TypeCast::meshBackendCast<EspnowMeshBackend *>(&meshInstance)) {
           espnowInstance->connectionQueue().emplace_back(networkIndex);
-        } else if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
+        } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
           tcpIpInstance->connectionQueue().emplace_back(networkIndex);
         } else {
           Serial.println(F("Invalid mesh backend!"));
@@ -139,10 +139,10 @@ void networkFilter(int numberOfNetworks, MeshBackendBase& meshInstance) {
 
    @return True if attemptTransmission should continue with the next entry in the connectionQueue. False if attemptTransmission should stop.
 */
-bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase& meshInstance) {
+bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
   // The default hook only returns true and does nothing else.
 
-  if (TcpIpMeshBackend* tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend*>(&meshInstance)) {
+  if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     if (tcpIpInstance->latestTransmissionOutcomes().back().transmissionStatus() == TransmissionStatusType::TRANSMISSION_COMPLETE) {
       // Our last request got a response, so time to create a new request.
       meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ")
@@ -174,8 +174,8 @@ void setup() {
 
   /* Initialise the mesh node */
   tcpIpNode.begin();
-  tcpIpNode.activateAP();                             // Each AP requires a separate server port.
-  tcpIpNode.setStaticIP(IPAddress(192, 168, 4, 22));  // Activate static IP mode to speed up connection times.
+  tcpIpNode.activateAP(); // Each AP requires a separate server port.
+  tcpIpNode.setStaticIP(IPAddress(192, 168, 4, 22)); // Activate static IP mode to speed up connection times.
 
   // Storing our message in the TcpIpMeshBackend instance is not required, but can be useful for organizing code, especially when using many TcpIpMeshBackend instances.
   // Note that calling the multi-recipient tcpIpNode.attemptTransmission will replace the stored message with whatever message is transmitted.
@@ -185,9 +185,9 @@ void setup() {
 }
 
 int32_t timeOfLastScan = -10000;
-void    loop() {
-  if (millis() - timeOfLastScan > 3000                                           // Give other nodes some time to connect between data transfers.
-      || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) {  // Scan for networks with two second intervals when not already connected.
+void loop() {
+  if (millis() - timeOfLastScan > 3000 // Give other nodes some time to connect between data transfers.
+      || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) { // Scan for networks with two second intervals when not already connected.
 
     // attemptTransmission(message, scan, scanAllWiFiChannels, concludingDisconnect, initialDisconnect = false)
     tcpIpNode.attemptTransmission(tcpIpNode.getMessage(), true, false, false);
@@ -202,7 +202,7 @@ void    loop() {
     if (tcpIpNode.latestTransmissionOutcomes().empty()) {
       Serial.println(F("No mesh AP found."));
     } else {
-      for (TransmissionOutcome& transmissionOutcome : tcpIpNode.latestTransmissionOutcomes()) {
+      for (TransmissionOutcome &transmissionOutcome : tcpIpNode.latestTransmissionOutcomes()) {
         if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::TRANSMISSION_FAILED) {
           Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionOutcome.SSID());
         } else if (transmissionOutcome.transmissionStatus() == TransmissionStatusType::CONNECTION_FAILED) {

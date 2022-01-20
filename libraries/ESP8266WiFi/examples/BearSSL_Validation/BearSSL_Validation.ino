@@ -12,13 +12,13 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid = STASSID;
-const char* pass = STAPSK;
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
-const char* path = "/";
+const char *   path = "/";
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -39,7 +39,7 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
+void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
   if (!path) {
     path = "/";
   }
@@ -70,7 +70,7 @@ void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_
         break;
       }
       // Only print out first line up to \r, then abort connection
-      char* nl = strchr(tmp, '\r');
+      char *nl = strchr(tmp, '\r');
       if (nl) {
         *nl = 0;
         Serial.print(tmp);
@@ -141,7 +141,7 @@ private and not shared.  A MITM without the private key would not be
 able to establish communications.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  BearSSL::PublicKey        key(pubkey_gitlab_com);
+  BearSSL::PublicKey key(pubkey_gitlab_com);
   client.setKnownKey(&key);
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
@@ -157,7 +157,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List         cert(cert_USERTrust_RSA_Certification_Authority);
+  BearSSL::X509List cert(cert_USERTrust_RSA_Certification_Authority);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, gitlab_host, gitlab_port, path);
@@ -183,7 +183,7 @@ may make sense
   client.setCiphersLessSecure();
   now = millis();
   fetchURL(&client, gitlab_host, gitlab_port, path);
-  uint32_t              delta2       = millis() - now;
+  uint32_t delta2 = millis() - now;
   std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
   client.setInsecure();
   client.setCiphers(myCustomList);
@@ -222,6 +222,7 @@ void setup() {
   fetchCertAuthority();
   fetchFaster();
 }
+
 
 void loop() {
   // Nothing to do here

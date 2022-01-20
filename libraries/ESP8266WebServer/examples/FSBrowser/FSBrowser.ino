@@ -49,44 +49,45 @@
 
 #if defined USE_SPIFFS
 #include <FS.h>
-const char*   fsName           = "SPIFFS";
-FS*           fileSystem       = &SPIFFS;
-SPIFFSConfig  fileSystemConfig = SPIFFSConfig();
+const char* fsName = "SPIFFS";
+FS* fileSystem = &SPIFFS;
+SPIFFSConfig fileSystemConfig = SPIFFSConfig();
 #elif defined USE_LITTLEFS
 #include <LittleFS.h>
-const char*    fsName           = "LittleFS";
-FS*            fileSystem       = &LittleFS;
+const char* fsName = "LittleFS";
+FS* fileSystem = &LittleFS;
 LittleFSConfig fileSystemConfig = LittleFSConfig();
 #elif defined USE_SDFS
 #include <SDFS.h>
-const char* fsName           = "SDFS";
-FS*         fileSystem       = &SDFS;
-SDFSConfig  fileSystemConfig = SDFSConfig();
+const char* fsName = "SDFS";
+FS* fileSystem = &SDFS;
+SDFSConfig fileSystemConfig = SDFSConfig();
 // fileSystemConfig.setCSPin(chipSelectPin);
 #else
 #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
 
+
 #define DBG_OUTPUT_PORT Serial
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
-const char* host     = "fsbrowser";
+const char* host = "fsbrowser";
 
 ESP8266WebServer server(80);
 
 static bool fsOK;
-String      unsupportedFiles = String();
+String unsupportedFiles = String();
 
 File uploadFile;
 
-static const char TEXT_PLAIN[] PROGMEM     = "text/plain";
-static const char FS_INIT_ERROR[] PROGMEM  = "FS INIT ERROR";
+static const char TEXT_PLAIN[] PROGMEM = "text/plain";
+static const char FS_INIT_ERROR[] PROGMEM = "FS INIT ERROR";
 static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 
 ////////////////////////////////
@@ -134,6 +135,7 @@ String checkForUnsupportedPath(String filename) {
 }
 #endif
 
+
 ////////////////////////////////
 // Request handlers
 
@@ -165,6 +167,7 @@ void handleStatus() {
 
   server.send(200, "application/json", json);
 }
+
 
 /*
    Return the list of files in the directory specified by the "dir" query string parameter.
@@ -239,6 +242,7 @@ void handleFileList() {
   server.chunkedResponseFinalize();
 }
 
+
 /*
    Read the given file from the filesystem and stream it back to the client
 */
@@ -275,6 +279,7 @@ bool handleFileRead(String path) {
 
   return false;
 }
+
 
 /*
    As some FS (e.g. LittleFS) delete the parent folder when the last child has been removed,
@@ -340,7 +345,7 @@ void handleFileCreate() {
       // Create a file
       File file = fileSystem->open(path, "w");
       if (file) {
-        file.write((const char*)0);
+        file.write((const char *)0);
         file.close();
       } else {
         return replyServerError(F("CREATE FAILED"));
@@ -374,6 +379,7 @@ void handleFileCreate() {
   }
 }
 
+
 /*
    Delete the file or folder designed by the given path.
    If it's a file, delete it.
@@ -384,7 +390,7 @@ void handleFileCreate() {
    Please don't do this on a production system.
 */
 void deleteRecursive(String path) {
-  File file  = fileSystem->open(path, "r");
+  File file = fileSystem->open(path, "r");
   bool isDir = file.isDirectory();
   file.close();
 
@@ -404,6 +410,7 @@ void deleteRecursive(String path) {
   // Then delete the folder itself
   fileSystem->rmdir(path);
 }
+
 
 /*
    Handle a file deletion request
@@ -470,6 +477,7 @@ void handleFileUpload() {
   }
 }
 
+
 /*
    The "Not Found" handler catches all URI not explicitly declared in code
    First try to find and return the requested file from the filesystem,
@@ -480,7 +488,7 @@ void handleNotFound() {
     return replyServerError(FPSTR(FS_INIT_ERROR));
   }
 
-  String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
+  String uri = ESP8266WebServer::urlDecode(server.uri()); // required to read paths with blanks
 
   if (handleFileRead(uri)) {
     return;
@@ -528,6 +536,7 @@ void handleGetEdit() {
 #else
   replyNotFound(FPSTR(FILE_NOT_FOUND));
 #endif
+
 }
 
 void setup(void) {
@@ -550,7 +559,7 @@ void setup(void) {
   Dir dir = fileSystem->openDir("");
   DBG_OUTPUT_PORT.println(F("List of files at root of filesystem:"));
   while (dir.next()) {
-    String error    = checkForUnsupportedPath(dir.fileName());
+    String error = checkForUnsupportedPath(dir.fileName());
     String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
     DBG_OUTPUT_PORT.println(error + fileInfo);
     if (error.length() > 0) {
@@ -600,15 +609,15 @@ void setup(void) {
   server.on("/edit", HTTP_GET, handleGetEdit);
 
   // Create file
-  server.on("/edit", HTTP_PUT, handleFileCreate);
+  server.on("/edit",  HTTP_PUT, handleFileCreate);
 
   // Delete file
-  server.on("/edit", HTTP_DELETE, handleFileDelete);
+  server.on("/edit",  HTTP_DELETE, handleFileDelete);
 
   // Upload file
   // - first callback is called after the request has ended with all parsed arguments
   // - second callback handles file upload at that location
-  server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
+  server.on("/edit",  HTTP_POST, replyOK, handleFileUpload);
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem
@@ -618,6 +627,7 @@ void setup(void) {
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
 }
+
 
 void loop(void) {
   server.handleClient();

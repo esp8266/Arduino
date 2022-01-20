@@ -31,6 +31,7 @@
 
 */
 
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -42,40 +43,43 @@
    Global defines and vars
 */
 
-#define TIMEZONE_OFFSET 1        // CET
-#define DST_OFFSET 1             // CEST
-#define UPDATE_CYCLE (1 * 1000)  // every second
+#define TIMEZONE_OFFSET     1                                   // CET
+#define DST_OFFSET          1                                   // CEST
+#define UPDATE_CYCLE        (1 * 1000)                          // every second
 
-#define SERVICE_PORT 80  // HTTP port
+#define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid     = STASSID;
-const char* password = STAPSK;
+const char*                   ssid                    = STASSID;
+const char*                   password                = STAPSK;
 
-char*                       pcHostDomain         = 0;      // Negotiated host domain
-bool                        bHostDomainConfirmed = false;  // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService hMDNSService         = 0;      // The handle of the clock service in the MDNS responder
+char*                         pcHostDomain            = 0;        // Negotiated host domain
+bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
-ESP8266WebServer server(SERVICE_PORT);
+ESP8266WebServer              server(SERVICE_PORT);
 
 /*
    getTimeString
 */
 const char* getTimeString(void) {
-  static char acTimeString[32];
-  time_t      now = time(nullptr);
+
+  static char   acTimeString[32];
+  time_t now = time(nullptr);
   ctime_r(&now, acTimeString);
-  size_t stLength;
-  while (((stLength = strlen(acTimeString))) && ('\n' == acTimeString[stLength - 1])) {
-    acTimeString[stLength - 1] = 0;  // Remove trailing line break...
+  size_t    stLength;
+  while (((stLength = strlen(acTimeString))) &&
+         ('\n' == acTimeString[stLength - 1])) {
+    acTimeString[stLength - 1] = 0; // Remove trailing line break...
   }
   return acTimeString;
 }
+
 
 /*
    setClock
@@ -96,16 +100,19 @@ void setClock(void) {
   Serial.printf("Current time: %s\n", getTimeString());
 }
 
+
 /*
    setStationHostname
 */
 bool setStationHostname(const char* p_pcHostname) {
+
   if (p_pcHostname) {
     WiFi.hostname(p_pcHostname);
     Serial.printf("setDeviceHostname: Station hostname is set to '%s'\n", p_pcHostname);
   }
   return true;
 }
+
 
 /*
    MDNSDynamicServiceTxtCallback
@@ -125,6 +132,7 @@ void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService)
   }
 }
 
+
 /*
    MDNSProbeResultCallback
 
@@ -136,6 +144,7 @@ void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService)
 
 */
 void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
+
   Serial.println("MDNSProbeResultCallback");
   Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
   if (true == p_bProbeResult) {
@@ -167,6 +176,7 @@ void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
   }
 }
 
+
 /*
    handleHTTPClient
 */
@@ -176,8 +186,7 @@ void handleHTTPRequest() {
   Serial.println("HTTP Request");
 
   // Get current time
-  time_t now = time(nullptr);
-  ;
+  time_t now = time(nullptr);;
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
 
@@ -222,9 +231,10 @@ void setup(void) {
   // Setup MDNS responder
   MDNS.setHostProbeResultCallback(hostProbeResult);
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) || (!MDNS.begin(pcHostDomain))) {
+  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+      (!MDNS.begin(pcHostDomain))) {
     Serial.println("Error setting up MDNS responder!");
-    while (1) {  // STOP
+    while (1) { // STOP
       delay(1000);
     }
   }
@@ -240,6 +250,7 @@ void setup(void) {
    loop
 */
 void loop(void) {
+
   // Check if a request has come in
   server.handleClient();
   // Allow MDNS processing
@@ -247,6 +258,7 @@ void loop(void) {
 
   static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
+
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item

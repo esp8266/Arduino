@@ -27,6 +27,7 @@
 
 */
 
+
 #ifndef __PPPSERVER_H
 #define __PPPSERVER_H
 
@@ -39,6 +40,7 @@
 class PPPServer
 {
 public:
+
     PPPServer(Stream* sio);
 
     bool begin(const IPAddress& ourAddress, const IPAddress& peer = IPAddress(172, 31, 255, 254));
@@ -54,20 +56,22 @@ public:
     }
 
 protected:
+
     static constexpr size_t _bufsize = 128;
-    Stream*                 _sio;
-    ppp_pcb*                _ppp;
-    netif                   _netif;
+    Stream* _sio;
+    ppp_pcb* _ppp;
+    netif _netif;
     void (*_cb)(netif*);
     uint8_t _buf[_bufsize];
-    bool    _enabled;
+    bool _enabled;
 
     // feed ppp from stream - to call on a regular basis or on interrupt
     bool handlePackets();
 
     static u32_t output_cb_s(ppp_pcb* pcb, u8_t* data, u32_t len, void* ctx);
-    static void  link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx);
-    static void  netif_status_cb_s(netif* nif);
+    static void link_status_cb_s(ppp_pcb* pcb, int err_code, void* ctx);
+    static void netif_status_cb_s(netif* nif);
+
 };
 
-#endif  // __PPPSERVER_H
+#endif // __PPPSERVER_H

@@ -13,6 +13,7 @@
  all copies or substantial portions of the Software.
 */
 
+
 #include "spiffs_mock.h"
 #include "spiffs/spiffs.h"
 #include "debug.h"
@@ -71,18 +72,18 @@ SpiffsMock::~SpiffsMock()
     SPIFFS = FS(FSImplPtr(nullptr));
 }
 
-void SpiffsMock::load()
+void SpiffsMock::load ()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
-
+    
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
     {
         fprintf(stderr, "SPIFFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
-
+    
     off_t flen = lseek(fs, 0, SEEK_END);
     if (flen == (off_t)-1)
     {
@@ -90,7 +91,7 @@ void SpiffsMock::load()
         return;
     }
     lseek(fs, 0, SEEK_SET);
-
+    
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
@@ -111,7 +112,7 @@ void SpiffsMock::load()
     ::close(fs);
 }
 
-void SpiffsMock::save()
+void SpiffsMock::save ()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
@@ -131,3 +132,4 @@ void SpiffsMock::save()
 }
 
 #pragma GCC diagnostic pop
+

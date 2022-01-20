@@ -3,22 +3,20 @@
 
 BS_ENV_DECLARE();
 
+
 int main()
 {
-    while (true)
-    {
-        try
-        {
+    while(true) {
+        try{
             BS_RUN();
             return 0;
-        }
-        catch (...)
-        {
+        }catch(...) {
             printf("Exception\n\n");
         }
     }
     return 1;
 }
+
 
 TEST_CASE("this test runs successfully", "[bluesmoke]")
 {
@@ -40,13 +38,16 @@ TEST_CASE("another test which fails and crashes", "[bluesmoke][fail]")
     REQUIRE(false);
 }
 
+
 TEST_CASE("third test which should be skipped", "[.]")
 {
     FAIL();
 }
 
+
 TEST_CASE("this test also runs successfully", "[bluesmoke]")
 {
+
 }
 
 TEST_CASE("environment variables can be set and read from python", "[bluesmoke]")
@@ -56,3 +57,4 @@ TEST_CASE("environment variables can be set and read from python", "[bluesmoke]"
     CHECK(strcmp(res, "42") == 0);
     setenv("VAR_FROM_TEST", "24", 1);
 }
+

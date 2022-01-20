@@ -8,24 +8,24 @@
 //or #include <W5100lwIP.h>
 //or #include <ENC28J60lwIP.h>
 
-#include <WiFiClient.h>  // WiFiClient (-> TCPClient)
+#include <WiFiClient.h> // WiFiClient (-> TCPClient)
 
-const char*    host = "djxmmx.net";
+const char* host = "djxmmx.net";
 const uint16_t port = 17;
 
 using TCPClient = WiFiClient;
 
-#define CSPIN 16  // wemos/lolin/nodemcu D0
+#define CSPIN 16 // wemos/lolin/nodemcu D0
 Wiznet5500lwIP eth(CSPIN);
 
 void setup() {
   Serial.begin(115200);
 
   SPI.begin();
-  SPI.setClockDivider(SPI_CLOCK_DIV4);  // 4 MHz?
+  SPI.setClockDivider(SPI_CLOCK_DIV4); // 4 MHz?
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  eth.setDefault();  // use ethernet for default route
+  eth.setDefault(); // use ethernet for default route
   if (!eth.begin()) {
     Serial.println("ethernet hardware not found ... sleeping");
     while (1) {
@@ -89,7 +89,7 @@ void loop() {
   client.stop();
 
   if (wait) {
-    delay(300000);  // execute once every 5 minutes, don't flood remote service
+    delay(300000); // execute once every 5 minutes, don't flood remote service
   }
   wait = true;
 }

@@ -22,13 +22,13 @@ bool loadConfig() {
   }
 
   StaticJsonDocument<200> doc;
-  auto                    error = deserializeJson(doc, configFile);
+  auto error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println("Failed to parse config file");
     return false;
   }
 
-  const char* serverName  = doc["serverName"];
+  const char* serverName = doc["serverName"];
   const char* accessToken = doc["accessToken"];
 
   // Real world application would store these values in some variables for
@@ -43,7 +43,7 @@ bool loadConfig() {
 
 bool saveConfig() {
   StaticJsonDocument<200> doc;
-  doc["serverName"]  = "api.example.com";
+  doc["serverName"] = "api.example.com";
   doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 
   File configFile = LittleFS.open("/config.json", "w");
@@ -66,6 +66,7 @@ void setup() {
     Serial.println("Failed to mount file system");
     return;
   }
+
 
   if (!saveConfig()) {
     Serial.println("Failed to save config");

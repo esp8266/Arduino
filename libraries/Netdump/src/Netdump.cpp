@@ -23,8 +23,10 @@
 #include <lwip/init.h>
 #include "Schedule.h"
 
+
 namespace NetCapture
 {
+
 CallBackList<Netdump::LwipCallback> Netdump::lwipCallback;
 
 Netdump::Netdump()
@@ -67,20 +69,24 @@ void Netdump::reset()
 void Netdump::printDump(Print& out, Packet::PacketDetail ndd, const Filter nf)
 {
     out.printf_P(PSTR("netDump starting\r\n"));
-    setCallback([&out, ndd, this](const Packet& ndp)
-                { printDumpProcess(out, ndd, ndp); },
-                nf);
+    setCallback([&out, ndd, this](const Packet & ndp)
+    {
+        printDumpProcess(out, ndd, ndp);
+    }, nf);
 }
 
 void Netdump::fileDump(File& outfile, const Filter nf)
 {
+
     writePcapHeader(outfile);
-    setCallback([&outfile, this](const Packet& ndp)
-                { fileDumpProcess(outfile, ndp); },
-                nf);
+    setCallback([&outfile, this](const Packet & ndp)
+    {
+        fileDumpProcess(outfile, ndp);
+    }, nf);
 }
-bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
+bool Netdump::tcpDump(WiFiServer &tcpDumpServer, const Filter nf)
 {
+
     if (!packetBuffer)
     {
         packetBuffer = new (std::nothrow) char[tcpBufferSize];
@@ -93,7 +99,9 @@ bool Netdump::tcpDump(WiFiServer& tcpDumpServer, const Filter nf)
     bufferIndex = 0;
 
     schedule_function([&tcpDumpServer, this, nf]()
-                      { tcpDumpLoop(tcpDumpServer, nf); });
+    {
+        tcpDumpLoop(tcpDumpServer, nf);
+    });
     return true;
 }
 
@@ -101,7 +109,7 @@ void Netdump::capture(int netif_idx, const char* data, size_t len, int out, int 
 {
     if (lwipCallback.execute(netif_idx, data, len, out, success) == 0)
     {
-        phy_capture = nullptr;  // No active callback/netdump instances, will be set again by new object.
+        phy_capture = nullptr; // No active callback/netdump instances, will be set again by new object.
     }
 }
 
@@ -110,7 +118,7 @@ void Netdump::netdumpCapture(int netif_idx, const char* data, size_t len, int ou
     if (netDumpCallback)
     {
         Packet np(millis(), netif_idx, data, len, out, success);
-        if (netDumpFilter && !netDumpFilter(np))
+        if (netDumpFilter  && !netDumpFilter(np))
         {
             return;
         }
@@ -123,8 +131,8 @@ void Netdump::writePcapHeader(Stream& s) const
     uint32_t pcapHeader[6];
     pcapHeader[0] = 0xa1b2c3d4;     // pcap magic number
     pcapHeader[1] = 0x00040002;     // pcap major/minor version
-    pcapHeader[2] = 0;              // pcap UTC correction in seconds
-    pcapHeader[3] = 0;              // pcap time stamp accuracy
+    pcapHeader[2] = 0;			     // pcap UTC correction in seconds
+    pcapHeader[3] = 0;			     // pcap time stamp accuracy
     pcapHeader[4] = maxPcapLength;  // pcap max packet length per record
     pcapHeader[5] = 1;              // pacp data linkt type = ethernet
     s.write(reinterpret_cast<char*>(pcapHeader), 24);
@@ -137,7 +145,7 @@ void Netdump::printDumpProcess(Print& out, Packet::PacketDetail ndd, const Packe
 
 void Netdump::fileDumpProcess(File& outfile, const Packet& np) const
 {
-    size_t   incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
+    size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
     uint32_t pcapHeader[4];
 
     struct timeval tv;
@@ -146,7 +154,7 @@ void Netdump::fileDumpProcess(File& outfile, const Packet& np) const
     pcapHeader[1] = tv.tv_usec;
     pcapHeader[2] = incl_len;
     pcapHeader[3] = np.getPacketSize();
-    outfile.write(reinterpret_cast<char*>(pcapHeader), 16);  // pcap record header
+    outfile.write(reinterpret_cast<char*>(pcapHeader), 16); // pcap record header
 
     outfile.write(np.rawData(), incl_len);
 }
@@ -160,16 +168,16 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
     size_t incl_len = np.getPacketSize() > maxPcapLength ? maxPcapLength : np.getPacketSize();
 
-    if (bufferIndex + 16 + incl_len < tcpBufferSize)  // only add if enough space available
+    if (bufferIndex + 16 + incl_len < tcpBufferSize) // only add if enough space available
     {
         struct timeval tv;
         gettimeofday(&tv, nullptr);
         uint32_t* pcapHeader = reinterpret_cast<uint32_t*>(&packetBuffer[bufferIndex]);
-        pcapHeader[0]        = tv.tv_sec;  // add pcap record header
-        pcapHeader[1]        = tv.tv_usec;
-        pcapHeader[2]        = incl_len;
-        pcapHeader[3]        = np.getPacketSize();
-        bufferIndex += 16;  // pcap header size
+        pcapHeader[0] = tv.tv_sec;      // add pcap record header
+        pcapHeader[1] = tv.tv_usec;
+        pcapHeader[2] = incl_len;
+        pcapHeader[3] = np.getPacketSize();
+        bufferIndex += 16; // pcap header size
         memcpy(&packetBuffer[bufferIndex], np.rawData(), incl_len);
         bufferIndex += incl_len;
     }
@@ -181,7 +189,7 @@ void Netdump::tcpDumpProcess(const Packet& np)
     }
 }
 
-void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
+void Netdump::tcpDumpLoop(WiFiServer &tcpDumpServer, const Filter nf)
 {
     if (tcpDumpServer.hasClient())
     {
@@ -191,9 +199,10 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
         bufferIndex = 0;
         writePcapHeader(tcpDumpClient);
 
-        setCallback([this](const Packet& ndp)
-                    { tcpDumpProcess(ndp); },
-                    nf);
+        setCallback([this](const Packet & ndp)
+        {
+            tcpDumpProcess(ndp);
+        }, nf);
     }
     if (!tcpDumpClient || !tcpDumpClient.connected())
     {
@@ -208,8 +217,10 @@ void Netdump::tcpDumpLoop(WiFiServer& tcpDumpServer, const Filter nf)
     if (tcpDumpServer.status() != CLOSED)
     {
         schedule_function([&tcpDumpServer, this, nf]()
-                          { tcpDumpLoop(tcpDumpServer, nf); });
+        {
+            tcpDumpLoop(tcpDumpServer, nf);
+        });
     }
 }
 
-}  // namespace NetCapture
+} // namespace NetCapture

@@ -8,16 +8,17 @@
 
 // This example code is in the public domain.
 
+
 #include <Wire.h>
 
 #define SDA_PIN 4
 #define SCL_PIN 5
 const int16_t I2C_MASTER = 0x42;
-const int16_t I2C_SLAVE  = 0x08;
+const int16_t I2C_SLAVE = 0x08;
 
 void setup() {
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE);  // join i2c bus with address #8
-  Wire.onRequest(requestEvent);             // register event
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE);                // join i2c bus with address #8
+  Wire.onRequest(requestEvent); // register event
 }
 
 void loop() {
@@ -26,6 +27,6 @@ void loop() {
 // function that executes whenever data is requested by master
 // this function is registered as an event, see setup()
 void requestEvent() {
-  Wire.write("hello\n");  // respond with message of 6 bytes
+  Wire.write("hello\n"); // respond with message of 6 bytes
   // as expected by master
 }

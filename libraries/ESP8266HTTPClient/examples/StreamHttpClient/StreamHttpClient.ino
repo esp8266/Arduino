@@ -15,6 +15,7 @@
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
+
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -30,13 +31,15 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
+
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
+
     WiFiClient client;
-    HTTPClient http;  //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
+    HTTPClient http; //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
 
     Serial.print("[HTTP] begin...\n");
 
@@ -53,6 +56,7 @@ void loop() {
 
       // file found at server
       if (httpCode == HTTP_CODE_OK) {
+
         // get length of document (is -1 when Server sends no Content-Length header)
         int len = http.getSize();
 
@@ -66,7 +70,7 @@ void loop() {
         // or "by hand"
 
         // get tcp stream
-        WiFiClient* stream = &client;
+        WiFiClient * stream = &client;
 
         // read all data from server
         while (http.connected() && (len > 0 || len == -1)) {

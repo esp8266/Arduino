@@ -11,9 +11,11 @@
 
 namespace NetCapture
 {
+
 class PacketType
 {
 public:
+
     enum PType : int
     {
         ARP,
@@ -37,8 +39,7 @@ public:
     };
 
     PacketType();
-    PacketType(PType pt) :
-        ptype(pt) {};
+    PacketType(PType pt) : ptype(pt) {};
 
     operator PType() const
     {

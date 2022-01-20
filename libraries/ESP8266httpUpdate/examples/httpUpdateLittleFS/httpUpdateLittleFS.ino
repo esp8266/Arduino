@@ -17,10 +17,11 @@ ESP8266WiFiMulti WiFiMulti;
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK "APPSK"
+#define APPSK  "APPSK"
 #endif
 
 void setup() {
+
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -36,11 +37,13 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
+
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
+
     Serial.println("Update LittleFS...");
 
     WiFiClient client;
@@ -74,3 +77,4 @@ void loop() {
     }
   }
 }
+

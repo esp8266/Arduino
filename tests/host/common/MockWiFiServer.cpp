@@ -44,31 +44,32 @@ extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
 
 // lwIP API side of WiFiServer
 
-WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
+WiFiServer::WiFiServer (const IPAddress& addr, uint16_t port)
 {
-    (void)addr;
-    _port = port;
+	(void)addr;
+	_port = port;
 }
 
-WiFiServer::WiFiServer(uint16_t port)
+WiFiServer::WiFiServer (uint16_t port)
 {
-    _port = port;
+	_port = port;
 }
 
-WiFiClient WiFiServer::available(uint8_t* status)
+WiFiClient WiFiServer::available (uint8_t* status)
 {
-    (void)status;
-    return accept();
+	(void)status;
+	return accept();
 }
 
-WiFiClient WiFiServer::accept()
+WiFiClient WiFiServer::accept ()
 {
-    if (hasClient())
-        return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
-    return WiFiClient();
+	if (hasClient())
+		return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
+	return WiFiClient();
 }
 
 // static declaration
 
 #include <include/UdpContext.h>
 uint32_t UdpContext::staticMCastAddr = 0;
+

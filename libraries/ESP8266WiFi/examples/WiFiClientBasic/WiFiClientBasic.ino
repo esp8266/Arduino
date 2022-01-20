@@ -9,13 +9,13 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-const char*    host = "192.168.1.1";
+const char* host = "192.168.1.1";
 const uint16_t port = 3000;
 
 ESP8266WiFiMulti WiFiMulti;
@@ -43,6 +43,7 @@ void setup() {
 
   delay(500);
 }
+
 
 void loop() {
   Serial.print("connecting to ");
@@ -74,3 +75,4 @@ void loop() {
   Serial.println("wait 5 sec...");
   delay(5000);
 }
+

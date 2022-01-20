@@ -13,7 +13,7 @@ public:
     {
     }
 
-    size_t printf(const char* format, ...)
+    size_t printf(const char *format, ...)
     {
         va_list arg;
         va_start(arg, format);
@@ -25,13 +25,11 @@ public:
     size_t read_line(char* dest, size_t dest_size)
     {
         char* res = fgets(dest, dest_size, stdin);
-        if (res == NULL)
-        {
+        if (res == NULL) {
             return 0;
         }
         size_t len = strlen(dest);
-        if (dest[len - 1] == '\n')
-        {
+        if (dest[len - 1] == '\n') {
             dest[len - 1] = 0;
             len--;
         }
@@ -41,11 +39,10 @@ public:
 
 typedef StdIOHelper IOHelper;
 
-inline void fatal()
-{
+inline void fatal() {
     throw std::runtime_error("fatal error");
 }
 
-}  // namespace bs
+} // namespace bs
 
-#endif  //BS_STDIO_H
+#endif //BS_STDIO_H

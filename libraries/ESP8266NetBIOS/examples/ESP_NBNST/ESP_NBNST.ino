@@ -4,14 +4,14 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
 ESP8266WebServer wwwserver(80);
-String           content;
+String content;
 
 static void handleRoot(void) {
   content = F("<!DOCTYPE HTML>\n<html>Hello world from ESP8266");
@@ -39,6 +39,7 @@ void setup() {
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+
 
   wwwserver.on("/", handleRoot);
   wwwserver.begin();

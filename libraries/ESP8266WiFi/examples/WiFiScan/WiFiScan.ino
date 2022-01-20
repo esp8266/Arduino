@@ -19,13 +19,13 @@ void setup() {
 }
 
 void loop() {
-  String   ssid;
-  int32_t  rssi;
-  uint8_t  encryptionType;
+  String ssid;
+  int32_t rssi;
+  uint8_t encryptionType;
   uint8_t* bssid;
-  int32_t  channel;
-  bool     hidden;
-  int      scanResult;
+  int32_t channel;
+  bool hidden;
+  int scanResult;
 
   Serial.println(F("Starting WiFi scan..."));
 

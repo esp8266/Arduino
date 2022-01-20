@@ -10,17 +10,18 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* host     = "esp8266-webupdate";
-const char* ssid     = STASSID;
+const char* host = "esp8266-webupdate";
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
-ESP8266WebServer        httpServer(80);
+ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
 void setup(void) {
+
   Serial.begin(115200);
   Serial.println();
   Serial.println("Booting Sketch...");

@@ -4,15 +4,15 @@
 #include <TFTv2.h>
 #include <SPI.h>
 
-int          ColorPaletteHigh = 30;
-int          color            = WHITE;  //Paint brush color
-unsigned int colors[8]        = { BLACK, RED, GREEN, BLUE, CYAN, YELLOW, WHITE, GRAY1 };
+int ColorPaletteHigh = 30;
+int color = WHITE;  //Paint brush color
+unsigned int colors[8] = {BLACK, RED, GREEN, BLUE, CYAN, YELLOW, WHITE, GRAY1};
 
 // For better pressure precision, we need to know the resistance
 // between X+ and X- Use any multimeter to read it
 // The 2.8" TFT Touch shield has 300 ohms across the X plate
 
-TouchScreen ts = TouchScreen(XP, YP, XM, YM);  //init TouchScreen port pins
+TouchScreen ts = TouchScreen(XP, YP, XM, YM); //init TouchScreen port pins
 
 void setup() {
   Tft.TFTinit();  //init TFT library

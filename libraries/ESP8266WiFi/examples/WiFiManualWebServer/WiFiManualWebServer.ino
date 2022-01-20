@@ -11,10 +11,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
 // Create an instance of the server
@@ -60,7 +60,7 @@ void loop() {
   }
   Serial.println(F("new client"));
 
-  client.setTimeout(5000);  // default is 1000
+  client.setTimeout(5000); // default is 1000
 
   // Read the first line of the request
   String req = client.readStringUntil('\r');

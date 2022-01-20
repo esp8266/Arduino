@@ -27,4 +27,4 @@
 
 #include <lwip/prot/dns.h>  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
-#endif  // MDNS_LWIPDEFS_H
+#endif // MDNS_LWIPDEFS_H

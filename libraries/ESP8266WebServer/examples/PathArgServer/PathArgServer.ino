@@ -8,11 +8,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK "your-password"
+#define STAPSK  "your-password"
 #endif
 
-const char* ssid     = STASSID;
-const char* password = STAPSK;
+const char *ssid = STASSID;
+const char *password = STAPSK;
 
 ESP8266WebServer server(80);
 
@@ -37,7 +37,9 @@ void setup(void) {
     Serial.println("MDNS responder started");
   }
 
-  server.on(F("/"), []() { server.send(200, "text/plain", "hello from esp8266!"); });
+  server.on(F("/"), []() {
+    server.send(200, "text/plain", "hello from esp8266!");
+  });
 
   server.on(UriBraces("/users/{}"), []() {
     String user = server.pathArg(0);
@@ -45,7 +47,7 @@ void setup(void) {
   });
 
   server.on(UriRegex("^\\/users\\/([0-9]+)\\/devices\\/([0-9]+)$"), []() {
-    String user   = server.pathArg(0);
+    String user = server.pathArg(0);
     String device = server.pathArg(1);
     server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");
   });

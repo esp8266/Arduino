@@ -19,16 +19,15 @@
 
 TEST_CASE("strstr_P works as strstr", "[core][pgmspace]")
 {
-    auto t = [](const char* h, const char* n)
-    {
+    auto t = [](const char* h, const char* n) {
         const char* strstr_P_result = strstr_P(h, n);
-        const char* strstr_result   = strstr(h, n);
+        const char* strstr_result = strstr(h, n);
         REQUIRE(strstr_P_result == strstr_result);
     };
 
     // Test case data is from avr-libc, original copyright (c) 2007  Dmitry Xmelkov
     // See avr-libc/tests/simulate/pmstring/strstr_P.c
-    t("", "");
+    t ("", "");
     t("12345", "");
     t("ababac", "abac");
     t("", "a");

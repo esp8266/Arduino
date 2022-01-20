@@ -17,6 +17,7 @@
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
+
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -32,17 +33,20 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
+
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
+
     WiFiClient client;
 
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
     if (http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html")) {  // HTTP
+
 
       Serial.print("[HTTP] GET...\n");
       // start connection and send HTTP header

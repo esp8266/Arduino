@@ -18,7 +18,7 @@
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK "APPSK"
+#define APPSK  "APPSK"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -50,6 +50,7 @@ void setClock() {
 }
 
 void setup() {
+
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -73,17 +74,18 @@ void setup() {
   Serial.println(numCerts);
   if (numCerts == 0) {
     Serial.println(F("No certs found. Did you run certs-from-mozill.py and upload the LittleFS directory before running?"));
-    return;  // Can't connect to anything w/o certs!
+    return; // Can't connect to anything w/o certs!
   }
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
+
     setClock();
 
     BearSSL::WiFiClientSecure client;
-    bool                      mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
+    bool mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
     Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
       client.setBufferSizes(1024, 1024);
@@ -101,6 +103,7 @@ void loop() {
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
     // Or:
     //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
+
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
