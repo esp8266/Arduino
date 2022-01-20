@@ -15,17 +15,16 @@
 
 */
 
-
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 // TCP server at port 80 will respond to HTTP requests
@@ -72,7 +71,6 @@ void setup(void) {
 }
 
 void loop(void) {
-
   MDNS.update();
 
   // Check if a client has connected
@@ -94,7 +92,7 @@ void loop(void) {
   // First line of HTTP request looks like "GET /path HTTP/1.1"
   // Retrieve the "/path" part by finding the spaces
   int addr_start = req.indexOf(' ');
-  int addr_end = req.indexOf(' ', addr_start + 1);
+  int addr_end   = req.indexOf(' ', addr_start + 1);
   if (addr_start == -1 || addr_end == -1) {
     Serial.print("Invalid request: ");
     Serial.println(req);
@@ -107,9 +105,9 @@ void loop(void) {
 
   String s;
   if (req == "/") {
-    IPAddress ip = WiFi.localIP();
-    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
+    IPAddress ip    = WiFi.localIP();
+    String    ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
+    s               = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
     s += ipStr;
     s += "</html>\r\n\r\n";
     Serial.println("Sending 200");
@@ -121,4 +119,3 @@ void loop(void) {
 
   Serial.println("Done with client");
 }
-

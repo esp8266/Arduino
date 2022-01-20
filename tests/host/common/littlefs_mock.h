@@ -27,19 +27,20 @@
 
 #define DEFAULT_LITTLEFS_FILE_NAME "littlefs.bin"
 
-class LittleFSMock {
+class LittleFSMock
+{
 public:
     LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~LittleFSMock();
-    
+
 protected:
-    void load ();
-    void save ();
+    void load();
+    void save();
 
     std::vector<uint8_t> m_fs;
-    String m_storage;
-    bool m_overwrite;
+    String               m_storage;
+    bool                 m_overwrite;
 };
 
 #define LITTLEFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) LittleFSMock littlefs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)

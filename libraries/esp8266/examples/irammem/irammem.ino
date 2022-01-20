@@ -9,7 +9,6 @@
 
 // #define USE_SET_IRAM_HEAP
 
-
 #ifndef ETS_PRINTF
 #define ETS_PRINTF ets_uart_printf
 #endif
@@ -21,9 +20,8 @@
 
 #pragma GCC push_options
 // reference
-#pragma GCC optimize("O0")   // We expect -O0 to generate the correct results
-__attribute__((noinline))
-void aliasTestReference(uint16_t *x) {
+#pragma GCC                    optimize("O0")  // We expect -O0 to generate the correct results
+__attribute__((noinline)) void aliasTestReference(uint16_t* x) {
   // Without adhearance to strict-aliasing, this sequence of code would fail
   // when optimized by GCC Version 10.3
   size_t len = 3;
@@ -35,9 +33,8 @@ void aliasTestReference(uint16_t *x) {
   }
 }
 // Tests
-#pragma GCC optimize("Os")
-__attribute__((noinline))
-void aliasTestOs(uint16_t *x) {
+#pragma GCC                    optimize("Os")
+__attribute__((noinline)) void aliasTestOs(uint16_t* x) {
   size_t len = 3;
   for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
@@ -46,9 +43,8 @@ void aliasTestOs(uint16_t *x) {
     }
   }
 }
-#pragma GCC optimize("O2")
-__attribute__((noinline))
-void aliasTestO2(uint16_t *x) {
+#pragma GCC                    optimize("O2")
+__attribute__((noinline)) void aliasTestO2(uint16_t* x) {
   size_t len = 3;
   for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
@@ -57,9 +53,8 @@ void aliasTestO2(uint16_t *x) {
     }
   }
 }
-#pragma GCC optimize("O3")
-__attribute__((noinline))
-void aliasTestO3(uint16_t *x) {
+#pragma GCC                    optimize("O3")
+__attribute__((noinline)) void aliasTestO3(uint16_t* x) {
   size_t len = 3;
   for (size_t u = 0; u < len; u++) {
     uint16_t x1 = mmu_get_uint16(&x[0]);
@@ -74,7 +69,8 @@ void aliasTestO3(uint16_t *x) {
 // the exception handler. For this case the -O0 version will appear faster.
 #pragma GCC optimize("O0")
 __attribute__((noinline)) IRAM_ATTR
-uint32_t timedRead_Reference(uint8_t *res) {
+    uint32_t
+    timedRead_Reference(uint8_t* res) {
   // This test case was verified with GCC 10.3
   // There is a code case that can result in 32-bit wide IRAM load from memory
   // being optimized down to an 8-bit memory access. In this test case we need
@@ -82,40 +78,43 @@ uint32_t timedRead_Reference(uint8_t *res) {
   // This section verifies that the workaround implimented by the inline
   // function mmu_get_uint8() is preventing this. See comments for function
   // mmu_get_uint8(() in mmu_iram.h for more details.
-  const uint8_t *x = (const uint8_t *)0x40100003ul;
-  uint32_t b = ESP.getCycleCount();
-  *res = mmu_get_uint8(x);
+  const uint8_t* x = (const uint8_t*)0x40100003ul;
+  uint32_t       b = ESP.getCycleCount();
+  *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
 #pragma GCC optimize("Os")
 __attribute__((noinline)) IRAM_ATTR
-uint32_t timedRead_Os(uint8_t *res) {
-  const uint8_t *x = (const uint8_t *)0x40100003ul;
-  uint32_t b = ESP.getCycleCount();
-  *res = mmu_get_uint8(x);
+    uint32_t
+    timedRead_Os(uint8_t* res) {
+  const uint8_t* x = (const uint8_t*)0x40100003ul;
+  uint32_t       b = ESP.getCycleCount();
+  *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
 #pragma GCC optimize("O2")
 __attribute__((noinline)) IRAM_ATTR
-uint32_t timedRead_O2(uint8_t *res) {
-  const uint8_t *x = (const uint8_t *)0x40100003ul;
-  uint32_t b = ESP.getCycleCount();
-  *res = mmu_get_uint8(x);
+    uint32_t
+    timedRead_O2(uint8_t* res) {
+  const uint8_t* x = (const uint8_t*)0x40100003ul;
+  uint32_t       b = ESP.getCycleCount();
+  *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
 #pragma GCC optimize("O3")
 __attribute__((noinline)) IRAM_ATTR
-uint32_t timedRead_O3(uint8_t *res) {
-  const uint8_t *x = (const uint8_t *)0x40100003ul;
-  uint32_t b = ESP.getCycleCount();
-  *res = mmu_get_uint8(x);
+    uint32_t
+    timedRead_O3(uint8_t* res) {
+  const uint8_t* x = (const uint8_t*)0x40100003ul;
+  uint32_t       b = ESP.getCycleCount();
+  *res             = mmu_get_uint8(x);
   return ESP.getCycleCount() - b;
 }
 #pragma GCC pop_options
 
 bool test4_32bit_loads() {
-  bool result = true;
-  uint8_t res;
+  bool     result = true;
+  uint8_t  res;
   uint32_t cycle_count_ref, cycle_count;
   Serial.printf("\r\nFor mmu_get_uint8, verify that 32-bit wide IRAM access is preserved across different optimizations:\r\n");
   cycle_count_ref = timedRead_Reference(&res);
@@ -153,7 +152,7 @@ bool test4_32bit_loads() {
   return result;
 }
 
-void printPunFail(uint16_t *ref, uint16_t *x, size_t sz) {
+void printPunFail(uint16_t* ref, uint16_t* x, size_t sz) {
   Serial.printf("    Expected:");
   for (size_t i = 0; i < sz; i++) {
     Serial.printf(" %3u", ref[i]);
@@ -168,12 +167,12 @@ void printPunFail(uint16_t *ref, uint16_t *x, size_t sz) {
 bool testPunning() {
   bool result = true;
   // Get reference result for verifing test
-  alignas(uint32_t) uint16_t x_ref[] = {1, 2, 3, 0};
+  alignas(uint32_t) uint16_t x_ref[] = { 1, 2, 3, 0 };
   aliasTestReference(x_ref);  // -O0
   Serial.printf("mmu_get_uint16() strict-aliasing tests with different optimizations:\r\n");
 
   {
-    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
     aliasTestOs(x);
     Serial.printf("  Option -Os ");
     if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
@@ -185,7 +184,7 @@ bool testPunning() {
     }
   }
   {
-    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
     aliasTestO2(x);
     Serial.printf("  Option -O2 ");
     if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
@@ -197,7 +196,7 @@ bool testPunning() {
     }
   }
   {
-    alignas(alignof(uint32_t)) uint16_t x[] = {1, 2, 3, 0};
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
     aliasTestO3(x);
     Serial.printf("  Option -O3 ");
     if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
@@ -211,9 +210,8 @@ bool testPunning() {
   return result;
 }
 
-
-uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToRead_nKx32(int n, unsigned int* x, uint32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
@@ -222,8 +220,8 @@ uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx32(int n, unsigned int *x) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToWrite_nKx32(int n, unsigned int* x) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
@@ -232,8 +230,8 @@ uint32_t cyclesToWrite_nKx32(int n, unsigned int *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKx16(int n, unsigned short *x, uint32_t *res) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToRead_nKx16(int n, unsigned short* x, uint32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
@@ -242,8 +240,8 @@ uint32_t cyclesToRead_nKx16(int n, unsigned short *x, uint32_t *res) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx16(int n, unsigned short *x) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToWrite_nKx16(int n, unsigned short* x) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
@@ -252,9 +250,9 @@ uint32_t cyclesToWrite_nKx16(int n, unsigned short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKxs16(int n, short *x, int32_t *res) {
-  uint32_t b = ESP.getCycleCount();
-  int32_t sum = 0;
+uint32_t cyclesToRead_nKxs16(int n, short* x, int32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
+  int32_t  sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
   }
@@ -262,9 +260,9 @@ uint32_t cyclesToRead_nKxs16(int n, short *x, int32_t *res) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKxs16(int n, short *x) {
-  uint32_t b = ESP.getCycleCount();
-  int32_t sum = 0;
+uint32_t cyclesToWrite_nKxs16(int n, short* x) {
+  uint32_t b   = ESP.getCycleCount();
+  int32_t  sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
     *(x++) = sum;
@@ -272,8 +270,8 @@ uint32_t cyclesToWrite_nKxs16(int n, short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKx8(int n, unsigned char*x, uint32_t *res) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToRead_nKx8(int n, unsigned char* x, uint32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += *(x++);
@@ -282,8 +280,8 @@ uint32_t cyclesToRead_nKx8(int n, unsigned char*x, uint32_t *res) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToWrite_nKx8(int n, unsigned char* x) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
@@ -293,18 +291,18 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
 }
 
 // Compare with Inline
-uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short* x, uint32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_uint16(x++); //*(x++);
+    sum += mmu_get_uint16(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx16_viaInline(int n, unsigned short *x) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToWrite_nKx16_viaInline(int n, unsigned short* x) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
@@ -314,19 +312,19 @@ uint32_t cyclesToWrite_nKx16_viaInline(int n, unsigned short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKxs16_viaInline(int n, short *x, int32_t *res) {
-  uint32_t b = ESP.getCycleCount();
-  int32_t sum = 0;
+uint32_t cyclesToRead_nKxs16_viaInline(int n, short* x, int32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
+  int32_t  sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_int16(x++); //*(x++);
+    sum += mmu_get_int16(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKxs16_viaInline(int n, short *x) {
-  uint32_t b = ESP.getCycleCount();
-  int32_t sum = 0;
+uint32_t cyclesToWrite_nKxs16_viaInline(int n, short* x) {
+  uint32_t b   = ESP.getCycleCount();
+  int32_t  sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
     // *(x++) = sum;
@@ -335,18 +333,18 @@ uint32_t cyclesToWrite_nKxs16_viaInline(int n, short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char*x, uint32_t *res) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char* x, uint32_t* res) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_uint8(x++); //*(x++);
+    sum += mmu_get_uint8(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
-  uint32_t b = ESP.getCycleCount();
+uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char* x) {
+  uint32_t b   = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
     sum += i;
@@ -356,14 +354,14 @@ uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
   return ESP.getCycleCount() - b;
 }
 
-
-bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
+bool perfTest_nK(int nK, uint32_t* mem, uint32_t* imem) {
   uint32_t res, verify_res;
   uint32_t t;
-  bool success = true;
-  int sres, verify_sres;
+  bool     success = true;
+  int      sres, verify_sres;
 
-  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception handling for IRAM.\r\n");;
+  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception handling for IRAM.\r\n");
+  ;
   t = cyclesToWrite_nKx16(nK, (uint16_t*)mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx16(nK, (uint16_t*)mem, &verify_res);
@@ -416,7 +414,8 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     success = false;
   }
 
-  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception handling for IRAM access.\r\n");;
+  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception handling for IRAM access.\r\n");
+  ;
   t = cyclesToWrite_nKx8(nK, (uint8_t*)mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx8(nK, (uint8_t*)mem, &verify_res);
@@ -467,7 +466,7 @@ void setup() {
   // IRAM region.  It will continue to use the builtin DRAM until we request
   // otherwise.
   Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
-  uint32_t *mem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
+  uint32_t* mem = (uint32_t*)malloc(2 * 1024 * sizeof(uint32_t));
   Serial.printf("DRAM buffer: Address %p, free %d\r\n", mem, ESP.getFreeHeap());
   if (!mem) {
     return;
@@ -477,12 +476,12 @@ void setup() {
 #ifdef USE_SET_IRAM_HEAP
   ESP.setIramHeap();
   Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
-  uint32_t *imem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
+  uint32_t* imem = (uint32_t*)malloc(2 * 1024 * sizeof(uint32_t));
   Serial.printf("IRAM buffer: Address %p, free %d\r\n", imem, ESP.getFreeHeap());
   // Make sure we go back to the DRAM heap for other allocations.  Don't forget to ESP.resetHeap()!
   ESP.resetHeap();
 #else
-  uint32_t *imem;
+  uint32_t* imem;
   {
     HeapSelectIram ephemeral;
     // This class effectively does this
@@ -491,7 +490,7 @@ void setup() {
     //  ...
     // umm_set_heap_by_id(_heap_id);
     Serial.printf("IRAM free: %6d\r\n", ESP.getFreeHeap());
-    imem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
+    imem = (uint32_t*)malloc(2 * 1024 * sizeof(uint32_t));
     Serial.printf("IRAM buffer: Address %p, free %d\r\n", imem, ESP.getFreeHeap());
   }
 #endif
@@ -501,8 +500,9 @@ void setup() {
 
   uint32_t res;
   uint32_t t;
-  int nK = 1;
-  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros needed.\r\n");;
+  int      nK = 1;
+  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros needed.\r\n");
+  ;
   t = cyclesToWrite_nKx32(nK, mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, mem, &res);
@@ -513,7 +513,6 @@ void setup() {
   t = cyclesToRead_nKx32(nK, imem, &res);
   Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint32, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), res);
   Serial.println();
-
 
   if (perfTest_nK(1, mem, imem) && testPunning() && test4_32bit_loads()) {
     Serial.println();
@@ -549,7 +548,7 @@ void setup() {
   {
     // Let's use IRAM heap to make a big ole' String
     HeapSelectIram ephemeral;
-    String s = "";
+    String         s = "";
     for (int i = 0; i < 100; i++) {
       s += i;
       s += ' ';
@@ -573,7 +572,7 @@ void setup() {
   free(imem);
   free(mem);
   imem = NULL;
-  mem = NULL;
+  mem  = NULL;
 
   Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
 #ifdef USE_SET_IRAM_HEAP
@@ -589,16 +588,16 @@ void setup() {
   {
     ETS_PRINTF("Try and allocate all of the heap in one chunk\n");
     HeapSelectIram ephemeral;
-    size_t free_iram = ESP.getFreeHeap();
+    size_t         free_iram = ESP.getFreeHeap();
     ETS_PRINTF("IRAM free: %6d\n", free_iram);
     uint32_t hfree;
     uint32_t hmax;
-    uint8_t hfrag;
+    uint8_t  hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
     ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
                hfree, hmax, hfrag);
     if (free_iram > UMM_OVERHEAD_ADJUST) {
-      void *all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
+      void* all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
       ETS_PRINTF("%p = malloc(%u)\n", all, free_iram);
       umm_info(NULL, true);
 
@@ -614,26 +613,26 @@ void setup() {
 void processKey(Print& out, int hotKey) {
   switch (hotKey) {
     case 'd': {
-        HeapSelectDram ephemeral;
-        umm_info(NULL, true);
-        break;
-      }
+      HeapSelectDram ephemeral;
+      umm_info(NULL, true);
+      break;
+    }
     case 'i': {
-        HeapSelectIram ephemeral;
-        umm_info(NULL, true);
-        break;
-      }
+      HeapSelectIram ephemeral;
+      umm_info(NULL, true);
+      break;
+    }
     case 'h': {
-        {
-          HeapSelectIram ephemeral;
-          Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
-        }
-        {
-          HeapSelectDram ephemeral;
-          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\r\n"), ESP.getFreeHeap());
-        }
-        break;
+      {
+        HeapSelectIram ephemeral;
+        Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
       }
+      {
+        HeapSelectDram ephemeral;
+        Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\r\n"), ESP.getFreeHeap());
+      }
+      break;
+    }
     case 'R':
       out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
@@ -659,7 +658,6 @@ void processKey(Print& out, int hotKey) {
       break;
   }
 }
-
 
 void loop(void) {
   if (Serial.available() > 0) {

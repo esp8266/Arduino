@@ -23,18 +23,18 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-#define FQDN  F("www.google.com")  // with both IPv4 & IPv6 addresses
-#define FQDN2 F("www.yahoo.com")   // with both IPv4 & IPv6 addresses
-#define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
+#define FQDN F("www.google.com")    // with both IPv4 & IPv6 addresses
+#define FQDN2 F("www.yahoo.com")    // with both IPv4 & IPv6 addresses
+#define FQDN6 F("ipv6.google.com")  // does not resolve in IPv4
 #define STATUSDELAY_MS 10000
 #define TCP_PORT 23
 #define UDP_PORT 23
 
-WiFiServer statusServer(TCP_PORT);
-WiFiUDP udp;
+WiFiServer                         statusServer(TCP_PORT);
+WiFiUDP                            udp;
 esp8266::polledTimeout::periodicMs showStatusOnSerialNow(STATUSDELAY_MS);
 
 void fqdn(Print& out, const String& fqdn) {
@@ -93,7 +93,6 @@ void status(Print& out) {
     }
 
     out.println();
-
   }
 
   // lwIP's dns client will ask for IPv4 first (by default)
@@ -101,8 +100,8 @@ void status(Print& out) {
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
 #if LWIP_IPV4 && LWIP_IPV6
-  fqdn_rt(out, FQDN,  DNSResolveType::DNS_AddrType_IPv4_IPv6); // IPv4 before IPv6
-  fqdn_rt(out, FQDN2, DNSResolveType::DNS_AddrType_IPv6_IPv4); // IPv6 before IPv4
+  fqdn_rt(out, FQDN, DNSResolveType::DNS_AddrType_IPv4_IPv6);   // IPv4 before IPv6
+  fqdn_rt(out, FQDN2, DNSResolveType::DNS_AddrType_IPv6_IPv4);  // IPv6 before IPv4
 #endif
   out.println(F("------------------------------"));
 }
@@ -125,7 +124,7 @@ void setup() {
 
   status(Serial);
 
-#if 0 // 0: legacy connecting loop - 1: wait for IPv6
+#if 0  // 0: legacy connecting loop - 1: wait for IPv6
 
   // legacy loop (still valid with IPv4 only)
 
@@ -146,9 +145,9 @@ void setup() {
   for (bool configured = false; !configured;) {
     for (auto addr : addrList)
       if ((configured = !addr.isLocal()
-                        // && addr.isV6() // uncomment when IPv6 is mandatory
-                        // && addr.ifnumber() == STATION_IF
-          )) {
+           // && addr.isV6() // uncomment when IPv6 is mandatory
+           // && addr.ifnumber() == STATION_IF
+           )) {
         break;
       }
     Serial.print('.');
@@ -173,7 +172,6 @@ void setup() {
 unsigned long statusTimeMs = 0;
 
 void loop() {
-
   if (statusServer.hasClient()) {
     WiFiClient cli = statusServer.accept();
     status(cli);
@@ -188,7 +186,7 @@ void loop() {
     udp.remoteIP().printTo(Serial);
     Serial.print(F(" :"));
     Serial.println(udp.remotePort());
-    int  c;
+    int c;
     while ((c = udp.read()) >= 0) {
       Serial.write(c);
     }
@@ -199,9 +197,7 @@ void loop() {
     udp.endPacket();
   }
 
-
   if (showStatusOnSerialNow) {
     status(Serial);
   }
-
 }

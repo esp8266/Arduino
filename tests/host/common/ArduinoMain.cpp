@@ -30,7 +30,7 @@
 */
 
 #include <Arduino.h>
-#include <user_interface.h> // wifi_get_ip_info()
+#include <user_interface.h>  // wifi_get_ip_info()
 
 #include <signal.h>
 #include <unistd.h>
@@ -41,280 +41,281 @@
 
 #define MOCK_PORT_SHIFTER 9000
 
-bool user_exit = false;
-bool run_once = false;
-const char* host_interface = nullptr;
-size_t spiffs_kb = 1024;
-size_t littlefs_kb = 1024;
-bool ignore_sigint = false;
-bool restore_tty = false;
-bool mockdebug = false;
-int mock_port_shifter = MOCK_PORT_SHIFTER;
-const char* fspath = nullptr;
+bool        user_exit         = false;
+bool        run_once          = false;
+const char* host_interface    = nullptr;
+size_t      spiffs_kb         = 1024;
+size_t      littlefs_kb       = 1024;
+bool        ignore_sigint     = false;
+bool        restore_tty       = false;
+bool        mockdebug         = false;
+int         mock_port_shifter = MOCK_PORT_SHIFTER;
+const char* fspath            = nullptr;
 
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
 
-int mockverbose (const char* fmt, ...)
+int mockverbose(const char* fmt, ...)
 {
-	va_list ap;
-	va_start(ap, fmt);
-	if (mockdebug)
-		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
-	return 0;
+    va_list ap;
+    va_start(ap, fmt);
+    if (mockdebug)
+        return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
+    return 0;
 }
 
 static int mock_start_uart(void)
 {
-	struct termios settings;
+    struct termios settings;
 
-	if (!isatty(STDIN))
-	{
-		perror("setting tty in raw mode: isatty(STDIN)");
-		return -1;
-	}
-	if (tcgetattr(STDIN, &initial_settings) < 0)
-	{
-		perror("setting tty in raw mode: tcgetattr(STDIN)");
-		return -1;
-	}
-	settings = initial_settings;
-	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
-	settings.c_lflag &= ~(ECHO	| ICANON);
-	settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON);
-	settings.c_oflag |=	(ONLCR);
-	settings.c_cc[VMIN]	= 0;
-	settings.c_cc[VTIME] = 0;
-	if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
-	{
-		perror("setting tty in raw mode: tcsetattr(STDIN)");
-		return -1;
-	}
-	restore_tty = true;
-	return 0;
+    if (!isatty(STDIN))
+    {
+        perror("setting tty in raw mode: isatty(STDIN)");
+        return -1;
+    }
+    if (tcgetattr(STDIN, &initial_settings) < 0)
+    {
+        perror("setting tty in raw mode: tcgetattr(STDIN)");
+        return -1;
+    }
+    settings = initial_settings;
+    settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
+    settings.c_lflag &= ~(ECHO | ICANON);
+    settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON);
+    settings.c_oflag |= (ONLCR);
+    settings.c_cc[VMIN]  = 0;
+    settings.c_cc[VTIME] = 0;
+    if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
+    {
+        perror("setting tty in raw mode: tcsetattr(STDIN)");
+        return -1;
+    }
+    restore_tty = true;
+    return 0;
 }
 
 static int mock_stop_uart(void)
 {
-	if (!restore_tty) return 0;
-	if (!isatty(STDIN)) {
-		perror("restoring tty: isatty(STDIN)");
-		return -1;
-	}
-	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
-	{
-		perror("restoring tty: tcsetattr(STDIN)");
-		return -1;
-	}
-	printf("\e[?25h"); // show cursor
-	return (0);
+    if (!restore_tty)
+        return 0;
+    if (!isatty(STDIN))
+    {
+        perror("restoring tty: isatty(STDIN)");
+        return -1;
+    }
+    if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
+    {
+        perror("restoring tty: tcsetattr(STDIN)");
+        return -1;
+    }
+    printf("\e[?25h");  // show cursor
+    return (0);
 }
 
 static uint8_t mock_read_uart(void)
 {
-	uint8_t ch = 0;
-	return (read(STDIN, &ch, 1) == 1) ? ch : 0;
+    uint8_t ch = 0;
+    return (read(STDIN, &ch, 1) == 1) ? ch : 0;
 }
 
-void help (const char* argv0, int exitcode)
+void help(const char* argv0, int exitcode)
 {
-	printf(
-		"%s - compiled with esp8266/arduino emulator\n"
-		"options:\n"
-		"\t-h\n"
-		"\tnetwork:\n"
-		"\t-i <interface> - use this interface for IP address\n"
-		"\t-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
-		"\t-s             - port shifter (default: %d, when root: 0)\n"
+    printf(
+        "%s - compiled with esp8266/arduino emulator\n"
+        "options:\n"
+        "\t-h\n"
+        "\tnetwork:\n"
+        "\t-i <interface> - use this interface for IP address\n"
+        "\t-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+        "\t-s             - port shifter (default: %d, when root: 0)\n"
         "\tterminal:\n"
-		"\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
-		"\t-T             - show timestamp on output\n"
-		"\tFS:\n"
-		"\t-P             - path for fs-persistent files (default: %s-)\n"
-		"\t-S             - spiffs size in KBytes (default: %zd)\n"
-		"\t-L             - littlefs size in KBytes (default: %zd)\n"
-		"\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
+        "\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
+        "\t-T             - show timestamp on output\n"
+        "\tFS:\n"
+        "\t-P             - path for fs-persistent files (default: %s-)\n"
+        "\t-S             - spiffs size in KBytes (default: %zd)\n"
+        "\t-L             - littlefs size in KBytes (default: %zd)\n"
+        "\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
         "\tgeneral:\n"
-		"\t-c             - ignore CTRL-C (send it via Serial)\n"
-		"\t-f             - no throttle (possibly 100%%CPU)\n"
-		"\t-1             - run loop once then exit (for host testing)\n"
-		"\t-v             - verbose\n"
-		, argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
-	exit(exitcode);
+        "\t-c             - ignore CTRL-C (send it via Serial)\n"
+        "\t-f             - no throttle (possibly 100%%CPU)\n"
+        "\t-1             - run loop once then exit (for host testing)\n"
+        "\t-v             - verbose\n",
+        argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
+    exit(exitcode);
 }
 
-static struct option options[] =
-{
-	{ "help",           no_argument,        NULL, 'h' },
-	{ "fast",           no_argument,        NULL, 'f' },
-	{ "local",          no_argument,        NULL, 'l' },
-	{ "sigint",         no_argument,        NULL, 'c' },
-	{ "blockinguart",   no_argument,        NULL, 'b' },
-	{ "verbose",        no_argument,        NULL, 'v' },
-	{ "timestamp",      no_argument,        NULL, 'T' },
-	{ "interface",      required_argument,  NULL, 'i' },
-	{ "fspath",         required_argument,  NULL, 'P' },
-	{ "spiffskb",       required_argument,  NULL, 'S' },
-	{ "littlefskb",     required_argument,  NULL, 'L' },
-	{ "portshifter",    required_argument,  NULL, 's' },
-	{ "once",           no_argument,        NULL, '1' },
+static struct option options[] = {
+    { "help", no_argument, NULL, 'h' },
+    { "fast", no_argument, NULL, 'f' },
+    { "local", no_argument, NULL, 'l' },
+    { "sigint", no_argument, NULL, 'c' },
+    { "blockinguart", no_argument, NULL, 'b' },
+    { "verbose", no_argument, NULL, 'v' },
+    { "timestamp", no_argument, NULL, 'T' },
+    { "interface", required_argument, NULL, 'i' },
+    { "fspath", required_argument, NULL, 'P' },
+    { "spiffskb", required_argument, NULL, 'S' },
+    { "littlefskb", required_argument, NULL, 'L' },
+    { "portshifter", required_argument, NULL, 's' },
+    { "once", no_argument, NULL, '1' },
 };
 
-void cleanup ()
+void cleanup()
 {
-	mock_stop_spiffs();
-	mock_stop_littlefs();
-	mock_stop_uart();
+    mock_stop_spiffs();
+    mock_stop_littlefs();
+    mock_stop_uart();
 }
 
-void make_fs_filename (String& name, const char* fspath, const char* argv0)
+void make_fs_filename(String& name, const char* fspath, const char* argv0)
 {
-	name.clear();
-	if (fspath)
-	{
-		int lastSlash = -1;
-		for (int i = 0; argv0[i]; i++)
-			if (argv0[i] == '/')
-				lastSlash = i;
-		name = fspath;
-		name += '/';
-		name += &argv0[lastSlash + 1];
-	}
-	else
-		name = argv0;
+    name.clear();
+    if (fspath)
+    {
+        int lastSlash = -1;
+        for (int i = 0; argv0[i]; i++)
+            if (argv0[i] == '/')
+                lastSlash = i;
+        name = fspath;
+        name += '/';
+        name += &argv0[lastSlash + 1];
+    }
+    else
+        name = argv0;
 }
 
-void control_c (int sig)
+void control_c(int sig)
 {
-	(void)sig;
+    (void)sig;
 
-	if (user_exit)
-	{
-		fprintf(stderr, MOCK "stuck, killing\n");
-		cleanup();
-		exit(1);
-	}
-	user_exit = true;
+    if (user_exit)
+    {
+        fprintf(stderr, MOCK "stuck, killing\n");
+        cleanup();
+        exit(1);
+    }
+    user_exit = true;
 }
 
-int main (int argc, char* const argv [])
+int main(int argc, char* const argv[])
 {
-	bool fast = false;
-	blocking_uart = false; // global
+    bool fast     = false;
+    blocking_uart = false;  // global
 
-	signal(SIGINT, control_c);
-	signal(SIGTERM, control_c);
-	if (geteuid() == 0)
-		mock_port_shifter = 0;
-	else
-		mock_port_shifter = MOCK_PORT_SHIFTER;
+    signal(SIGINT, control_c);
+    signal(SIGTERM, control_c);
+    if (geteuid() == 0)
+        mock_port_shifter = 0;
+    else
+        mock_port_shifter = MOCK_PORT_SHIFTER;
 
-	for (;;)
-	{
-		int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
-		if (n < 0)
-			break;
-		switch (n)
-		{
-		case 'h':
-			help(argv[0], EXIT_SUCCESS);
-			break;
-		case 'i':
-			host_interface = optarg;
-			break;
-		case 'l':
-			global_ipv4_netfmt = NO_GLOBAL_BINDING;
-			break;
-		case 's':
-			mock_port_shifter = atoi(optarg);
-			break;
-		case 'c':
-			ignore_sigint = true;
-			break;
-		case 'f':
-			fast = true;
-			break;
-		case 'S':
-			spiffs_kb = atoi(optarg);
-			break;
-		case 'L':
-			littlefs_kb = atoi(optarg);
-			break;
-		case 'P':
-			fspath = optarg;
-			break;
-		case 'b':
-			blocking_uart = true;
-			break;
-		case 'v':
-			mockdebug = true;
-			break;
-		case 'T':
-			serial_timestamp = true;
-			break;
-		case '1':
-			run_once = true;
-			break;
-		default:
-			help(argv[0], EXIT_FAILURE);
-		}
-	}
+    for (;;)
+    {
+        int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
+        if (n < 0)
+            break;
+        switch (n)
+        {
+        case 'h':
+            help(argv[0], EXIT_SUCCESS);
+            break;
+        case 'i':
+            host_interface = optarg;
+            break;
+        case 'l':
+            global_ipv4_netfmt = NO_GLOBAL_BINDING;
+            break;
+        case 's':
+            mock_port_shifter = atoi(optarg);
+            break;
+        case 'c':
+            ignore_sigint = true;
+            break;
+        case 'f':
+            fast = true;
+            break;
+        case 'S':
+            spiffs_kb = atoi(optarg);
+            break;
+        case 'L':
+            littlefs_kb = atoi(optarg);
+            break;
+        case 'P':
+            fspath = optarg;
+            break;
+        case 'b':
+            blocking_uart = true;
+            break;
+        case 'v':
+            mockdebug = true;
+            break;
+        case 'T':
+            serial_timestamp = true;
+            break;
+        case '1':
+            run_once = true;
+            break;
+        default:
+            help(argv[0], EXIT_FAILURE);
+        }
+    }
 
-	mockverbose("server port shifter: %d\n", mock_port_shifter);
+    mockverbose("server port shifter: %d\n", mock_port_shifter);
 
-	if (spiffs_kb)
-	{
-		String name;
-		make_fs_filename(name, fspath, argv[0]);
-		name += "-spiffs";
-		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
-		name += "KB";
-		mock_start_spiffs(name, spiffs_kb);
-	}
+    if (spiffs_kb)
+    {
+        String name;
+        make_fs_filename(name, fspath, argv[0]);
+        name += "-spiffs";
+        name += String(spiffs_kb > 0 ? spiffs_kb : -spiffs_kb, DEC);
+        name += "KB";
+        mock_start_spiffs(name, spiffs_kb);
+    }
 
-	if (littlefs_kb)
-	{
-		String name;
-		make_fs_filename(name, fspath, argv[0]);
-		name += "-littlefs";
-		name += String(littlefs_kb > 0? littlefs_kb: -littlefs_kb, DEC);
-		name += "KB";
-		mock_start_littlefs(name, littlefs_kb);
-	}
+    if (littlefs_kb)
+    {
+        String name;
+        make_fs_filename(name, fspath, argv[0]);
+        name += "-littlefs";
+        name += String(littlefs_kb > 0 ? littlefs_kb : -littlefs_kb, DEC);
+        name += "KB";
+        mock_start_littlefs(name, littlefs_kb);
+    }
 
-	// setup global global_ipv4_netfmt
-	wifi_get_ip_info(0, nullptr);
+    // setup global global_ipv4_netfmt
+    wifi_get_ip_info(0, nullptr);
 
-	if (!blocking_uart)
-	{
-		// set stdin to non blocking mode
-		mock_start_uart();
-	}
+    if (!blocking_uart)
+    {
+        // set stdin to non blocking mode
+        mock_start_uart();
+    }
 
-	// install exit handler in case Esp.restart() is called
-	atexit(cleanup);
+    // install exit handler in case Esp.restart() is called
+    atexit(cleanup);
 
-	// first call to millis(): now is millis() and micros() beginning
-	millis();
+    // first call to millis(): now is millis() and micros() beginning
+    millis();
 
-	setup();
-	while (!user_exit)
-	{
-		uint8_t data = mock_read_uart();
+    setup();
+    while (!user_exit)
+    {
+        uint8_t data = mock_read_uart();
 
-		if (data)
-			uart_new_data(UART0, data);
-		if (!fast)
-			usleep(1000); // not 100% cpu, ~1000 loops per second
-		loop();
-		loop_end();
-		check_incoming_udp();
+        if (data)
+            uart_new_data(UART0, data);
+        if (!fast)
+            usleep(1000);  // not 100% cpu, ~1000 loops per second
+        loop();
+        loop_end();
+        check_incoming_udp();
 
-		if (run_once)
-			user_exit = true;
-	}
-	cleanup();
+        if (run_once)
+            user_exit = true;
+    }
+    cleanup();
 
-	return 0;
+    return 0;
 }

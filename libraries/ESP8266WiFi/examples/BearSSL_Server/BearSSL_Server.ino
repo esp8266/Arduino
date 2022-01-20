@@ -39,11 +39,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
 // The HTTPS server
 BearSSL::WiFiServerSecure server(443);
@@ -138,11 +138,11 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 
 #endif
 
-#define CACHE_SIZE 5 // Number of sessions to cache.
+#define CACHE_SIZE 5  // Number of sessions to cache.
 // Caching SSL sessions shortens the length of the SSL handshake.
 // You can see the performance improvement by looking at the
 // Network tab of the developer tools of your browser.
-#define USE_CACHE // Enable SSL session caching.
+#define USE_CACHE  // Enable SSL session caching.
 //#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
 
 #if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
@@ -150,7 +150,7 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 BearSSL::ServerSessions serverCache(CACHE_SIZE);
 #elif defined(USE_CACHE)
 // Statically allocated cache.
-ServerSession store[CACHE_SIZE];
+ServerSession           store[CACHE_SIZE];
 BearSSL::ServerSessions serverCache(store, CACHE_SIZE);
 #endif
 
@@ -176,12 +176,12 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Attach the server private cert/key combo
-  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
-  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
+  BearSSL::X509List*   serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey* serverPrivKey  = new BearSSL::PrivateKey(server_private_key);
 #ifndef USE_EC
   server.setRSACert(serverCertList, serverPrivKey);
 #else
-  server.setECCert(serverCertList, BR_KEYTYPE_KEYX|BR_KEYTYPE_SIGN, serverPrivKey);
+  server.setECCert(serverCertList, BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN, serverPrivKey);
 #endif
 
   // Set the server's cache
@@ -193,31 +193,30 @@ void setup() {
   server.begin();
 }
 
-static const char *HTTP_RES =
-        "HTTP/1.0 200 OK\r\n"
-        "Connection: close\r\n"
-        "Content-Length: 62\r\n"
-        "Content-Type: text/html; charset=iso-8859-1\r\n"
-        "\r\n"
-        "<html>\r\n"
-        "<body>\r\n"
-        "<p>Hello from ESP8266!</p>\r\n"
-        "</body>\r\n"
-        "</html>\r\n";
+static const char* HTTP_RES = "HTTP/1.0 200 OK\r\n"
+                              "Connection: close\r\n"
+                              "Content-Length: 62\r\n"
+                              "Content-Type: text/html; charset=iso-8859-1\r\n"
+                              "\r\n"
+                              "<html>\r\n"
+                              "<body>\r\n"
+                              "<p>Hello from ESP8266!</p>\r\n"
+                              "</body>\r\n"
+                              "</html>\r\n";
 
 void loop() {
-  static int cnt;
+  static int                cnt;
   BearSSL::WiFiClientSecure incoming = server.accept();
   if (!incoming) {
     return;
   }
-  Serial.printf("Incoming connection...%d\n",cnt++);
-  
+  Serial.printf("Incoming connection...%d\n", cnt++);
+
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
-  uint32_t timeout=millis() + 1000;
-  int lcwn = 0;
+  uint32_t timeout = millis() + 1000;
+  int      lcwn    = 0;
   for (;;) {
-    unsigned char x=0;
+    unsigned char x = 0;
     if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
       incoming.stop();
       Serial.printf("Connection error, closed\n");

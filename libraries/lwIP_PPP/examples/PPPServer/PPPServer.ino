@@ -25,7 +25,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 #define LOGGERBAUD 115200
@@ -34,12 +34,12 @@
 #define NAPT 200
 #define NAPT_PORT 3
 
-#define RX 13 // d1mini D7
-#define TX 15 // d1mini D8
+#define RX 13  // d1mini D7
+#define TX 15  // d1mini D8
 
-SoftwareSerial ppplink(RX, TX);
+SoftwareSerial  ppplink(RX, TX);
 HardwareSerial& logger = Serial;
-PPPServer ppp(&ppplink);
+PPPServer       ppp(&ppplink);
 
 void PPPConnectedCallback(netif* nif) {
   logger.printf("ppp: ip=%s/mask=%s/gw=%s\n",
@@ -96,7 +96,6 @@ void setup() {
   bool ret = ppp.begin(WiFi.localIP());
   logger.printf("ppp: %d\n", ret);
 }
-
 
 #else
 

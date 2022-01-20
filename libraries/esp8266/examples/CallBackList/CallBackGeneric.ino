@@ -6,24 +6,24 @@ using namespace experimental::CBListImplentation;
 
 class exampleClass {
   public:
-    exampleClass() {};
+  exampleClass() {};
 
-    using exCallBack = std::function<void(int)>;
-    using exHandler  = CallBackList<exCallBack>::CallBackHandler;
+  using exCallBack = std::function<void(int)>;
+  using exHandler  = CallBackList<exCallBack>::CallBackHandler;
 
-    CallBackList<exCallBack> myHandlers;
+  CallBackList<exCallBack> myHandlers;
 
-    exHandler setHandler(exCallBack cb) {
-      return myHandlers.add(cb);
-    }
+  exHandler setHandler(exCallBack cb) {
+    return myHandlers.add(cb);
+  }
 
-    void removeHandler(exHandler hnd) {
-      myHandlers.remove(hnd);
-    }
+  void removeHandler(exHandler hnd) {
+    myHandlers.remove(hnd);
+  }
 
-    void trigger(int t) {
-      myHandlers.execute(t);
-    }
+  void trigger(int t) {
+    myHandlers.execute(t);
+  }
 };
 
 exampleClass myExample;
@@ -40,7 +40,7 @@ void cb3(int in, int s) {
   Serial.printf("Callback 3, in = %d, s = %d\n", in, s);
 }
 
-Ticker tk, tk2, tk3;
+Ticker                  tk, tk2, tk3;
 exampleClass::exHandler e1 = myExample.setHandler(cb1);
 exampleClass::exHandler e2 = myExample.setHandler(cb2);
 exampleClass::exHandler e3 = myExample.setHandler(std::bind(cb3, std::placeholders::_1, 10));

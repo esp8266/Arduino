@@ -39,12 +39,12 @@ void setup() {
   // PWM-Locked generator:   https://github.com/esp8266/Arduino/pull/7231
   enablePhaseLockedWaveform();
 
-  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(LED_BUILTIN, OUTPUT);  // Initialize the LED_BUILTIN pin as an output
   analogWriteRange(1000);
 
-  using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
+  using esp8266::polledTimeout::oneShotMs;  //import the type to the local namespace
 
-  digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  digitalWrite(LED_BUILTIN, LOW);  // Turn the LED on (Note that LOW is the voltage level
 
   oneShotMs timeoutOn(2000);
   while (!timeoutOn) {
@@ -54,17 +54,16 @@ void setup() {
   stepPeriod.reset();
 }
 
-
 void loop() {
-  static int val = 0;
+  static int val   = 0;
   static int delta = 100;
   if (stepPeriod) {
     val += delta;
     if (val < 0) {
-      val = 100;
+      val   = 100;
       delta = 100;
     } else if (val > 1000) {
-      val = 900;
+      val   = 900;
       delta = -100;
     }
     analogWrite(LED_BUILTIN, val);

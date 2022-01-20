@@ -20,22 +20,22 @@
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 #ifndef APSSID
 #define APSSID "ESP_ap"
-#define APPSK  "12345678"
+#define APPSK "12345678"
 #endif
 
-const char *softAP_ssid = APSSID;
-const char *softAP_password = APPSK;
+const char* softAP_ssid     = APSSID;
+const char* softAP_password = APPSK;
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
-const char *myHostname = "esp8266";
+const char* myHostname = "esp8266";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
-char ssid[33] = "";
+char ssid[33]     = "";
 char password[65] = "";
 
 // DNS server
 const byte DNS_PORT = 53;
-DNSServer dnsServer;
+DNSServer  dnsServer;
 
 // Web server
 ESP8266WebServer server(80);
@@ -43,7 +43,6 @@ ESP8266WebServer server(80);
 /* Soft AP network parameters */
 IPAddress apIP(172, 217, 28, 1);
 IPAddress netMsk(255, 255, 255, 0);
-
 
 /** Should I connect to WLAN asap? */
 boolean connect;
@@ -62,7 +61,7 @@ void setup() {
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(softAP_ssid, softAP_password);
-  delay(500); // Without delay I've seen the IP address blank
+  delay(500);  // Without delay I've seen the IP address blank
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
 
@@ -75,12 +74,12 @@ void setup() {
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
   server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot);        //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.onNotFound(handleNotFound);
-  server.begin(); // Web server start
+  server.begin();  // Web server start
   Serial.println("HTTP server started");
-  loadCredentials(); // Load WLAN credentials from network
-  connect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+  loadCredentials();           // Load WLAN credentials from network
+  connect = strlen(ssid) > 0;  // Request WLAN connect if there is a SSID
 }
 
 void connectWifi() {
@@ -106,7 +105,7 @@ void loop() {
       /* Don't set retry time too low as retry interfere the softAP operation */
       connect = true;
     }
-    if (status != s) { // WLAN status change
+    if (status != s) {  // WLAN status change
       Serial.print("Status: ");
       Serial.println(s);
       status = s;

@@ -22,7 +22,8 @@
     Modified January 2017 by Bjorn Hammarberg (bjoham@esp8266.com) - i2c slave support
 */
 
-extern "C" {
+extern "C"
+{
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -30,7 +31,6 @@ extern "C" {
 
 #include "twi.h"
 #include "Wire.h"
-
 
 //Some boards don't have these pins available, and hence don't support Wire.
 //Check here for compile-time error.
@@ -41,13 +41,13 @@ extern "C" {
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[I2C_BUFFER_LENGTH];
-size_t TwoWire::rxBufferIndex = 0;
-size_t TwoWire::rxBufferLength = 0;
+size_t  TwoWire::rxBufferIndex  = 0;
+size_t  TwoWire::rxBufferLength = 0;
 
 uint8_t TwoWire::txAddress = 0;
 uint8_t TwoWire::txBuffer[I2C_BUFFER_LENGTH];
-size_t TwoWire::txBufferIndex = 0;
-size_t TwoWire::txBufferLength = 0;
+size_t  TwoWire::txBufferIndex  = 0;
+size_t  TwoWire::txBufferLength = 0;
 
 uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
@@ -58,7 +58,7 @@ static int default_scl_pin = SCL;
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-TwoWire::TwoWire() {}
+TwoWire::TwoWire() { }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -126,8 +126,8 @@ size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
     {
         size = I2C_BUFFER_LENGTH;
     }
-    size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0) ? size : 0;
-    rxBufferIndex = 0;
+    size_t read    = (twi_readFrom(address, rxBuffer, size, sendStop) == 0) ? size : 0;
+    rxBufferIndex  = 0;
     rxBufferLength = read;
     return read;
 }
@@ -154,9 +154,9 @@ uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
 
 void TwoWire::beginTransmission(uint8_t address)
 {
-    transmitting = 1;
-    txAddress = address;
-    txBufferIndex = 0;
+    transmitting   = 1;
+    txAddress      = address;
+    txBufferIndex  = 0;
     txBufferLength = 0;
 }
 
@@ -167,10 +167,10 @@ void TwoWire::beginTransmission(int address)
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop)
 {
-    int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
-    txBufferIndex = 0;
+    int8_t ret     = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
+    txBufferIndex  = 0;
     txBufferLength = 0;
-    transmitting = 0;
+    transmitting   = 0;
     return ret;
 }
 
@@ -199,7 +199,7 @@ size_t TwoWire::write(uint8_t data)
     return 1;
 }
 
-size_t TwoWire::write(const uint8_t *data, size_t quantity)
+size_t TwoWire::write(const uint8_t* data, size_t quantity)
 {
     if (transmitting)
     {
@@ -255,9 +255,9 @@ int TwoWire::peek(void)
 
 void TwoWire::flush(void)
 {
-    rxBufferIndex = 0;
+    rxBufferIndex  = 0;
     rxBufferLength = 0;
-    txBufferIndex = 0;
+    txBufferIndex  = 0;
     txBufferLength = 0;
 }
 
@@ -283,7 +283,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
     }
 
     // set rx iterator vars
-    rxBufferIndex = 0;
+    rxBufferIndex  = 0;
     rxBufferLength = numBytes;
 
     // alert user program
@@ -300,7 +300,7 @@ void TwoWire::onRequestService(void)
 
     // reset tx buffer iterator vars
     // !!! this will kill any pending pre-master sendTo() activity
-    txBufferIndex = 0;
+    txBufferIndex  = 0;
     txBufferLength = 0;
 
     // alert user program
@@ -312,7 +312,7 @@ void TwoWire::onReceive(void (*function)(int))
     // arduino api compatibility fixer:
     // really hope size parameter will not exceed 2^31 :)
     static_assert(sizeof(int) == sizeof(size_t), "something is wrong in Arduino kingdom");
-    user_onReceive = reinterpret_cast<void(*)(size_t)>(function);
+    user_onReceive = reinterpret_cast<void (*)(size_t)>(function);
 }
 
 void TwoWire::onReceive(void (*function)(size_t))

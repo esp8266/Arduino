@@ -13,17 +13,17 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid         = STASSID;
 const char* ssidPassword = STAPSK;
 
-const char *username = "admin";
-const char *password = "admin";
+const char* username = "admin";
+const char* password = "admin";
 
-const char *server = "http://httpbin.org";
-const char *uri = "/digest-auth/auth/admin/admin/MD5";
+const char* server = "http://httpbin.org";
+const char* uri    = "/digest-auth/auth/admin/admin/MD5";
 
 String exractParam(String& authReq, const String& param, const char delimit) {
   int _begin = authReq.indexOf(param);
@@ -34,10 +34,9 @@ String exractParam(String& authReq, const String& param, const char delimit) {
 }
 
 String getCNonce(const int len) {
-  static const char alphanum[] =
-    "0123456789"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz";
+  static const char alphanum[] = "0123456789"
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                 "abcdefghijklmnopqrstuvwxyz";
   String s = "";
 
   for (int i = 0; i < len; ++i) {
@@ -49,8 +48,8 @@ String getCNonce(const int len) {
 
 String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
   // extracting required parameters for RFC 2069 simpler Digest
-  String realm = exractParam(authReq, "realm=\"", '"');
-  String nonce = exractParam(authReq, "nonce=\"", '"');
+  String realm  = exractParam(authReq, "realm=\"", '"');
+  String nonce  = exractParam(authReq, "nonce=\"", '"');
   String cNonce = getCNonce(8);
 
   char nc[9];
@@ -73,8 +72,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   md5.calculate();
   String response = md5.toString();
 
-  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce +
-                         "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
+  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
   Serial.println(authorization);
 
   return authorization;
@@ -100,15 +98,14 @@ void setup() {
 
 void loop() {
   WiFiClient client;
-  HTTPClient http; //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
+  HTTPClient http;  //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
 
   Serial.print("[HTTP] begin...\n");
 
   // configure traged server and url
   http.begin(client, String(server) + String(uri));
 
-
-  const char *keys[] = {"WWW-Authenticate"};
+  const char* keys[] = { "WWW-Authenticate" };
   http.collectHeaders(keys, 1);
 
   Serial.print("[HTTP] GET...\n");

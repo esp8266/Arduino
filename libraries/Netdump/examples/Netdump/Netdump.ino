@@ -12,10 +12,10 @@ using namespace NetCapture;
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 Netdump nd;
@@ -37,25 +37,23 @@ enum class SerialOption : uint8_t {
 
 void startSerial(SerialOption option) {
   switch (option) {
-    case SerialOption::AllFull : //All Packets, show packet summary.
+    case SerialOption::AllFull:  //All Packets, show packet summary.
       nd.printDump(Serial, Packet::PacketDetail::FULL);
       break;
 
-    case SerialOption::LocalNone : // Only local IP traffic, full details
+    case SerialOption::LocalNone:  // Only local IP traffic, full details
       nd.printDump(Serial, Packet::PacketDetail::NONE,
-      [](Packet n) {
-        return (n.hasIP(WiFi.localIP()));
-      }
-                  );
+                   [](Packet n) {
+                     return (n.hasIP(WiFi.localIP()));
+                   });
       break;
-    case SerialOption::HTTPChar : // Only HTTP traffic, show packet content as chars
+    case SerialOption::HTTPChar:  // Only HTTP traffic, show packet content as chars
       nd.printDump(Serial, Packet::PacketDetail::CHAR,
-      [](Packet n) {
-        return (n.isHTTP());
-      }
-                  );
+                   [](Packet n) {
+                     return (n.isHTTP());
+                   });
       break;
-    default :
+    default:
       Serial.printf("No valid SerialOption provided\r\n");
   };
 }
@@ -92,37 +90,34 @@ void setup(void) {
   filesystem->begin();
 
   webServer.on("/list",
-  []() {
-    Dir dir = filesystem->openDir("/");
-    String d = "<h1>File list</h1>";
-    while (dir.next()) {
-      d.concat("<li>" + dir.fileName() + "</li>");
-    }
-    webServer.send(200, "text.html", d);
-  }
-              );
+               []() {
+                 Dir    dir = filesystem->openDir("/");
+                 String d   = "<h1>File list</h1>";
+                 while (dir.next()) {
+                   d.concat("<li>" + dir.fileName() + "</li>");
+                 }
+                 webServer.send(200, "text.html", d);
+               });
 
   webServer.on("/req",
-  []() {
-    static int rq = 0;
-    String a = "<h1>You are connected, Number of requests = " + String(rq++) + "</h1>";
-    webServer.send(200, "text/html", a);
-  }
-              );
+               []() {
+                 static int rq = 0;
+                 String     a  = "<h1>You are connected, Number of requests = " + String(rq++) + "</h1>";
+                 webServer.send(200, "text/html", a);
+               });
 
   webServer.on("/reset",
-  []() {
-    nd.reset();
-    tracefile.close();
-    tcpServer.close();
-    webServer.send(200, "text.html", "<h1>Netdump session reset</h1>");
-  }
-              );
+               []() {
+                 nd.reset();
+                 tracefile.close();
+                 tcpServer.close();
+                 webServer.send(200, "text.html", "<h1>Netdump session reset</h1>");
+               });
 
   webServer.serveStatic("/", *filesystem, "/");
   webServer.begin();
 
-  startSerial(SerialOption::AllFull); // Serial output examples, use enum SerialOption for selection
+  startSerial(SerialOption::AllFull);  // Serial output examples, use enum SerialOption for selection
 
   //  startTcpDump();     // tcpdump option
   //  startTracefile();  // output to SPIFFS or LittleFS
@@ -153,4 +148,3 @@ void loop(void) {
   webServer.handleClient();
   MDNS.update();
 }
-

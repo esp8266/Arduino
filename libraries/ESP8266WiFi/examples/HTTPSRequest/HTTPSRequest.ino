@@ -17,10 +17,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
@@ -74,10 +74,7 @@ void setup() {
   Serial.print("Requesting URL: ");
   Serial.println(url);
 
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + github_host + "\r\n" +
-               "User-Agent: BuildFailureDetectorESP8266\r\n" +
-               "Connection: close\r\n\r\n");
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + github_host + "\r\n" + "User-Agent: BuildFailureDetectorESP8266\r\n" + "Connection: close\r\n\r\n");
 
   Serial.println("Request sent");
   while (client.connected()) {

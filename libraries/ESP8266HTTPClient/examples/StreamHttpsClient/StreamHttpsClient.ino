@@ -15,7 +15,6 @@
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
-
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -31,13 +30,11 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
-
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
-
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
     bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
@@ -50,14 +47,13 @@ void loop() {
     Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
-    const uint8_t fingerprint[20] = {0x15, 0x77, 0xdc, 0x04, 0x7c, 0x00, 0xf8, 0x70, 0x09, 0x34, 0x24, 0xf4, 0xd3, 0xa1, 0x7a, 0x6c, 0x1e, 0xa3, 0xe0, 0x2a};
+    const uint8_t fingerprint[20] = { 0x15, 0x77, 0xdc, 0x04, 0x7c, 0x00, 0xf8, 0x70, 0x09, 0x34, 0x24, 0xf4, 0xd3, 0xa1, 0x7a, 0x6c, 0x1e, 0xa3, 0xe0, 0x2a };
 
     client->setFingerprint(fingerprint);
 
     HTTPClient https;
 
     if (https.begin(*client, "https://tls.mbed.org/")) {
-
       Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
       int httpCode = https.GET();
@@ -67,7 +63,6 @@ void loop() {
 
         // file found at server
         if (httpCode == HTTP_CODE_OK) {
-
           // get length of document (is -1 when Server sends no Content-Length header)
           int len = https.getSize();
 
@@ -95,7 +90,6 @@ void loop() {
 
           Serial.println();
           Serial.print("[HTTPS] connection closed or file end.\n");
-
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());

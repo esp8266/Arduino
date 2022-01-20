@@ -4,10 +4,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 ESP8266WebServer server(80);
@@ -45,7 +45,7 @@ void handleLogin() {
     return;
   }
   if (server.hasArg("USERNAME") && server.hasArg("PASSWORD")) {
-    if (server.arg("USERNAME") == "admin" &&  server.arg("PASSWORD") == "admin") {
+    if (server.arg("USERNAME") == "admin" && server.arg("PASSWORD") == "admin") {
       server.sendHeader("Location", "/");
       server.sendHeader("Cache-Control", "no-cache");
       server.sendHeader("Set-Cookie", "ESPSESSIONID=1");
@@ -114,7 +114,6 @@ void setup(void) {
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-
 
   server.on("/", handleRoot);
   server.on("/login", handleLogin);

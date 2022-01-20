@@ -14,7 +14,7 @@
 #include <lwip/dns.h>
 #include <lwip/apps/sntp.h>
 
-#include <user_interface.h>	// wifi_get_macaddr()
+#include <user_interface.h>  // wifi_get_macaddr()
 
 #include "SPI.h"
 #include "Schedule.h"
@@ -28,10 +28,8 @@
 template <class RawDev>
 class LwipIntfDev: public LwipIntf, public RawDev
 {
-
 public:
-
-    LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1):
+    LwipIntfDev(int8_t cs = SS, SPIClass& spi = SPI, int8_t intr = -1) :
         RawDev(cs, spi, intr),
         _mtu(DEFAULT_MTU),
         _intrPin(intr),
@@ -44,22 +42,22 @@ public:
     boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
     // default mac-address is inferred from esp8266's STA interface
-    boolean begin(const uint8_t *macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
+    boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
 
     const netif* getNetIf() const
     {
         return &_netif;
     }
 
-    IPAddress    localIP() const
+    IPAddress localIP() const
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr)));
     }
-    IPAddress    subnetMask() const
+    IPAddress subnetMask() const
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.netmask)));
     }
-    IPAddress    gatewayIP() const
+    IPAddress gatewayIP() const
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
     }
@@ -77,12 +75,11 @@ public:
     wl_status_t status();
 
 protected:
-
     err_t netif_init();
     void  netif_status_callback();
 
     static err_t netif_init_s(netif* netif);
-    static err_t linkoutput_s(netif *netif, struct pbuf *p);
+    static err_t linkoutput_s(netif* netif, struct pbuf* p);
     static void  netif_status_callback_s(netif* netif);
 
     // called on a regular basis or on interrupt
@@ -90,14 +87,13 @@ protected:
 
     // members
 
-    netif       _netif;
+    netif _netif;
 
-    uint16_t    _mtu;
-    int8_t      _intrPin;
-    uint8_t     _macAddress[6];
-    bool        _started;
-    bool        _default;
-
+    uint16_t _mtu;
+    int8_t   _intrPin;
+    uint8_t  _macAddress[6];
+    bool     _started;
+    bool     _default;
 };
 
 template <class RawDev>
@@ -162,9 +158,9 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
         memset(_macAddress, 0, 6);
         _macAddress[0] = 0xEE;
 #endif
-        _macAddress[3] += _netif.num;   // alter base mac address
-        _macAddress[0] &= 0xfe;         // set as locally administered, unicast, per
-        _macAddress[0] |= 0x02;         // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
+        _macAddress[3] += _netif.num;  // alter base mac address
+        _macAddress[0] &= 0xfe;        // set as locally administered, unicast, per
+        _macAddress[0] |= 0x02;        // https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
     }
 
     if (!RawDev::begin(_macAddress))
@@ -222,10 +218,11 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     }
 
     if (_intrPin < 0 && !schedule_recurrent_function_us([&]()
-{
-    this->handlePackets();
-        return true;
-    }, 100))
+                                                        {
+                                                            this->handlePackets();
+                                                            return true;
+                                                        },
+                                                        100))
     {
         netif_remove(&_netif);
         return false;
@@ -241,7 +238,7 @@ wl_status_t LwipIntfDev<RawDev>::status()
 }
 
 template <class RawDev>
-err_t LwipIntfDev<RawDev>::linkoutput_s(netif *netif, struct pbuf *pbuf)
+err_t LwipIntfDev<RawDev>::linkoutput_s(netif* netif, struct pbuf* pbuf)
 {
     LwipIntfDev* ths = (LwipIntfDev*)netif->state;
 
@@ -255,7 +252,7 @@ err_t LwipIntfDev<RawDev>::linkoutput_s(netif *netif, struct pbuf *pbuf)
 #if PHY_HAS_CAPTURE
     if (phy_capture)
     {
-        phy_capture(ths->_netif.num, (const char*)pbuf->payload, pbuf->len, /*out*/1, /*success*/len == pbuf->len);
+        phy_capture(ths->_netif.num, (const char*)pbuf->payload, pbuf->len, /*out*/ 1, /*success*/ len == pbuf->len);
     }
 #endif
 
@@ -277,12 +274,11 @@ void LwipIntfDev<RawDev>::netif_status_callback_s(struct netif* netif)
 template <class RawDev>
 err_t LwipIntfDev<RawDev>::netif_init()
 {
-    _netif.name[0] = 'e';
-    _netif.name[1] = '0' + _netif.num;
-    _netif.mtu = _mtu;
+    _netif.name[0]      = 'e';
+    _netif.name[1]      = '0' + _netif.num;
+    _netif.mtu          = _mtu;
     _netif.chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-    _netif.flags =
-        NETIF_FLAG_ETHARP
+    _netif.flags        = NETIF_FLAG_ETHARP
         | NETIF_FLAG_IGMP
         | NETIF_FLAG_BROADCAST
         | NETIF_FLAG_LINK_UP;
@@ -328,7 +324,7 @@ err_t LwipIntfDev<RawDev>::handlePackets()
     while (1)
     {
         if (++pkt == 10)
-            // prevent starvation
+        // prevent starvation
         {
             return ERR_OK;
         }
@@ -374,7 +370,7 @@ err_t LwipIntfDev<RawDev>::handlePackets()
 #if PHY_HAS_CAPTURE
         if (phy_capture)
         {
-            phy_capture(_netif.num, (const char*)pbuf->payload, tot_len, /*out*/0, /*success*/err == ERR_OK);
+            phy_capture(_netif.num, (const char*)pbuf->payload, tot_len, /*out*/ 0, /*success*/ err == ERR_OK);
         }
 #endif
 
@@ -384,7 +380,6 @@ err_t LwipIntfDev<RawDev>::handlePackets()
             return err;
         }
         // (else) allocated pbuf is now lwIP's responsibility
-
     }
 }
 
@@ -398,4 +393,4 @@ void LwipIntfDev<RawDev>::setDefault()
     }
 }
 
-#endif // _LWIPINTFDEV_H
+#endif  // _LWIPINTFDEV_H

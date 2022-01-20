@@ -8,10 +8,10 @@
 #include <TFTv2.h>
 #include <SPI.h>
 void setup() {
-  TFT_BL_ON;                                  // turn on the background light
-  Tft.TFTinit();                              //init TFT library
+  TFT_BL_ON;      // turn on the background light
+  Tft.TFTinit();  //init TFT library
 
-  Tft.drawLine(0, 0, 239, 319, RED);          //start: (0, 0) end: (239, 319), color : RED
+  Tft.drawLine(0, 0, 239, 319, RED);  //start: (0, 0) end: (239, 319), color : RED
 
   Tft.drawVerticalLine(60, 100, 100, GREEN);  // Draw a vertical line
   // start: (60, 100) length: 100 color: green
@@ -21,7 +21,6 @@ void setup() {
 }
 
 void loop() {
-
 }
 
 /*********************************************************************************************************

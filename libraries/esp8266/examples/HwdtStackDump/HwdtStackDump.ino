@@ -19,15 +19,15 @@
 #include <ESP8266WiFi.h>
 #include <Esp.h>
 #include <user_interface.h>
-#include <coredecls.h> // g_pcont - only needed for this debug demo
+#include <coredecls.h>  // g_pcont - only needed for this debug demo
 #include <StackThunk.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 ////////////////////////////////////////////////////////////////////
@@ -39,18 +39,18 @@ extern "C" {
 #define thunk_ets_uart_printf ets_uart_printf
 
 #else
-  int thunk_ets_uart_printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
-  // Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
-  make_stack_thunk(ets_uart_printf);
+int thunk_ets_uart_printf(const char* format, ...) __attribute__((format(printf, 1, 2)));
+// Second stack thunked helper - this macro creates the global function thunk_ets_uart_printf
+make_stack_thunk(ets_uart_printf);
 #endif
 };
 ////////////////////////////////////////////////////////////////////
 
 void setup(void) {
-  WiFi.persistent(false); // w/o this a flash write occurs at every boot
+  WiFi.persistent(false);  // w/o this a flash write occurs at every boot
   WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
-  delay(20);    // This delay helps when using the 'Modified Serial monitor' otherwise it is not needed.
+  delay(20);  // This delay helps when using the 'Modified Serial monitor' otherwise it is not needed.
   Serial.println();
   Serial.println();
   Serial.println(F("The Hardware Watchdog Timer Demo is starting ..."));
@@ -93,7 +93,6 @@ void setup(void) {
   Serial.println();
   processKey(Serial, '?');
 }
-
 
 void loop(void) {
   if (Serial.available() > 0) {

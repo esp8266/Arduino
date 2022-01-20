@@ -36,12 +36,12 @@
 
 #ifndef APSSID
 #define APSSID "ESPap"
-#define APPSK  "thereisnospoon"
+#define APPSK "thereisnospoon"
 #endif
 
 /* Set these to your desired credentials. */
-const char *ssid = APSSID;
-const char *password = APPSK;
+const char* ssid     = APSSID;
+const char* password = APPSK;
 
 ESP8266WebServer server(80);
 

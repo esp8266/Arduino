@@ -41,11 +41,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char *ssid = STASSID;
-const char *pass = STAPSK;
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 
 // A single, global CertStore which can be used by all
 // connections.  Needs to stay live the entire time any of
@@ -71,7 +71,7 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump URL
-void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
+void fetchURL(BearSSL::WiFiClientSecure* client, const char* host, const uint16_t port, const char* path) {
   if (!path) {
     path = "/";
   }
@@ -100,7 +100,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
         break;
       }
       // Only print out first line up to \r, then abort connection
-      char *nl = strchr(tmp, '\r');
+      char* nl = strchr(tmp, '\r');
       if (nl) {
         *nl = 0;
         Serial.print(tmp);
@@ -136,16 +136,16 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  setClock(); // Required for X.509 validation
+  setClock();  // Required for X.509 validation
 
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
     Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
-    return; // Can't connect to anything w/o certs!
+    return;  // Can't connect to anything w/o certs!
   }
 
-  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
+  BearSSL::WiFiClientSecure* bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   Serial.printf("Attempting to fetch https://github.com/...\n");
@@ -164,10 +164,9 @@ void loop() {
   site.replace(String("\n"), emptyString);
   Serial.printf("https://%s/\n", site.c_str());
 
-  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
+  BearSSL::WiFiClientSecure* bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   fetchURL(bear, site.c_str(), 443, "/");
   delete bear;
 }
-

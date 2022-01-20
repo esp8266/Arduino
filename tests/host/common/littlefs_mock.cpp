@@ -16,7 +16,6 @@
  all copies or substantial portions of the Software.
 */
 
-
 #include "littlefs_mock.h"
 #include "spiffs_mock.h"
 #include "spiffs/spiffs.h"
@@ -73,18 +72,18 @@ LittleFSMock::~LittleFSMock()
     LittleFS = FS(FSImplPtr(nullptr));
 }
 
-void LittleFSMock::load ()
+void LittleFSMock::load()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
-    
+
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
     {
         fprintf(stderr, "LittleFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
-    
+
     off_t flen = lseek(fs, 0, SEEK_END);
     if (flen == (off_t)-1)
     {
@@ -92,7 +91,7 @@ void LittleFSMock::load ()
         return;
     }
     lseek(fs, 0, SEEK_SET);
-    
+
     if (flen != (off_t)m_fs.size())
     {
         fprintf(stderr, "LittleFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
@@ -113,7 +112,7 @@ void LittleFSMock::load ()
     ::close(fs);
 }
 
-void LittleFSMock::save ()
+void LittleFSMock::save()
 {
     if (!m_fs.size() || !m_storage.length())
         return;

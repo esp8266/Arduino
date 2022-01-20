@@ -5,16 +5,16 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
-const char* host = "OTA-LEDS";
+const char* host     = "OTA-LEDS";
 
 int led_pin = 13;
 #define N_DIMMERS 3
-int dimmer_pin[] = {14, 5, 15};
+int dimmer_pin[] = { 14, 5, 15 };
 
 void setup() {
   Serial.begin(115200);
@@ -45,14 +45,14 @@ void setup() {
   }
 
   ArduinoOTA.setHostname(host);
-  ArduinoOTA.onStart([]() { // switch off all the PWMs during upgrade
+  ArduinoOTA.onStart([]() {  // switch off all the PWMs during upgrade
     for (int i = 0; i < N_DIMMERS; i++) {
       analogWrite(dimmer_pin[i], 0);
     }
     analogWrite(led_pin, 0);
   });
 
-  ArduinoOTA.onEnd([]() { // do a fancy thing with our board led at end
+  ArduinoOTA.onEnd([]() {  // do a fancy thing with our board led at end
     for (int i = 0; i < 30; i++) {
       analogWrite(led_pin, (i * 100) % 1001);
       delay(50);
@@ -67,7 +67,6 @@ void setup() {
   /* setup the OTA server */
   ArduinoOTA.begin();
   Serial.println("Ready");
-
 }
 
 void loop() {

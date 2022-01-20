@@ -26,7 +26,7 @@ class WiFiClient;
 
 #include <assert.h>
 
-bool getDefaultPrivateGlobalSyncValue ();
+bool getDefaultPrivateGlobalSyncValue();
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
@@ -39,19 +39,19 @@ public:
     {
         (void)pcb;
     }
-    
-    ClientContext (int sock) :
+
+    ClientContext(int sock) :
         _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr),
         _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
     {
     }
-    
+
     err_t abort()
     {
         if (_sock >= 0)
         {
             ::close(_sock);
-	    mockverbose("socket %d closed\n", _sock);
+            mockverbose("socket %d closed\n", _sock);
         }
         _sock = -1;
         return ERR_ABRT;
@@ -88,11 +88,12 @@ public:
     void unref()
     {
         DEBUGV(":ur %d\r\n", _refcnt);
-        if(--_refcnt == 0) {
+        if (--_refcnt == 0)
+        {
             discard_received();
             close();
             if (_discard_cb)
-                 _discard_cb(_discard_cb_arg, this);
+                _discard_cb(_discard_cb_arg, this);
             DEBUGV(":del\r\n");
             delete this;
         }
@@ -172,10 +173,10 @@ public:
     int read()
     {
         char c;
-        return read(&c, 1)? (unsigned char)c: -1;
+        return read(&c, 1) ? (unsigned char)c : -1;
     }
 
-    size_t read (char* dst, size_t size)
+    size_t read(char* dst, size_t size)
     {
         ssize_t ret = mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
         if (ret < 0)
@@ -189,10 +190,10 @@ public:
     int peek()
     {
         char c;
-        return peekBytes(&c, 1)? c: -1;
+        return peekBytes(&c, 1) ? c : -1;
     }
 
-    size_t peekBytes(char *dst, size_t size)
+    size_t peekBytes(char* dst, size_t size)
     {
         ssize_t ret = mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
         if (ret < 0)
@@ -216,60 +217,60 @@ public:
 
     uint8_t state()
     {
-	(void)getSize(); // read on socket to force detect closed peer
-        return _sock >= 0? ESTABLISHED: CLOSED;
+        (void)getSize();  // read on socket to force detect closed peer
+        return _sock >= 0 ? ESTABLISHED : CLOSED;
     }
 
     size_t write(const char* data, size_t size)
     {
-	ssize_t ret = mockWrite(_sock, (const uint8_t*)data, size, _timeout_ms);
-	if (ret < 0)
-	{
-	    abort();
-	    return 0;
-	}
-	return ret;
+        ssize_t ret = mockWrite(_sock, (const uint8_t*)data, size, _timeout_ms);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
-    void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
     {
-        (void) idle_sec;
-        (void) intv_sec;
-        (void) count;
+        (void)idle_sec;
+        (void)intv_sec;
+        (void)count;
         mockverbose("TODO ClientContext::keepAlive()\n");
     }
 
-    bool isKeepAliveEnabled () const
+    bool isKeepAliveEnabled() const
     {
         mockverbose("TODO ClientContext::isKeepAliveEnabled()\n");
         return false;
     }
 
-    uint16_t getKeepAliveIdle () const
+    uint16_t getKeepAliveIdle() const
     {
         mockverbose("TODO ClientContext::getKeepAliveIdle()\n");
         return 0;
     }
 
-    uint16_t getKeepAliveInterval () const
+    uint16_t getKeepAliveInterval() const
     {
         mockverbose("TODO ClientContext::getKeepAliveInternal()\n");
         return 0;
     }
 
-    uint8_t getKeepAliveCount () const
+    uint8_t getKeepAliveCount() const
     {
         mockverbose("TODO ClientContext::getKeepAliveCount()\n");
         return 0;
     }
 
-    bool getSync () const
+    bool getSync() const
     {
         mockverbose("TODO ClientContext::getSync()\n");
         return _sync;
     }
 
-    void setSync (bool sync)
+    void setSync(bool sync)
     {
         mockverbose("TODO ClientContext::setSync()\n");
         _sync = sync;
@@ -277,13 +278,13 @@ public:
 
     // return a pointer to available data buffer (size = peekAvailable())
     // semantic forbids any kind of read() before calling peekConsume()
-    const char* peekBuffer ()
+    const char* peekBuffer()
     {
         return _inbuf;
     }
 
     // return number of byte accessible by peekBuffer()
-    size_t peekAvailable ()
+    size_t peekAvailable()
     {
         ssize_t ret = mockPeekBytes(_sock, nullptr, 0, 0, _inbuf, _inbufsize);
         if (ret < 0)
@@ -295,7 +296,7 @@ public:
     }
 
     // consume bytes after use (see peekBuffer)
-    void peekConsume (size_t consume)
+    void peekConsume(size_t consume)
     {
         assert(consume <= _inbufsize);
         memmove(_inbuf, _inbuf + consume, _inbufsize - consume);
@@ -303,22 +304,21 @@ public:
     }
 
 private:
+    discard_cb_t _discard_cb     = nullptr;
+    void*        _discard_cb_arg = nullptr;
 
-    discard_cb_t _discard_cb = nullptr;
-    void* _discard_cb_arg = nullptr;
-
-    int8_t _refcnt;
+    int8_t         _refcnt;
     ClientContext* _next;
-    
+
     bool _sync;
-    
+
     // MOCK
-    
-    int _sock = -1;
+
+    int _sock       = -1;
     int _timeout_ms = 5000;
 
-    char _inbuf [CCBUFSIZE];
+    char   _inbuf[CCBUFSIZE];
     size_t _inbufsize = 0;
 };
 
-#endif //CLIENTCONTEXT_H
+#endif  //CLIENTCONTEXT_H

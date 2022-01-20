@@ -14,19 +14,19 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // Set your network here
-const char *SSID = STASSID;
-const char *PASS = STAPSK;
+const char* SSID = STASSID;
+const char* PASS = STAPSK;
 
 WiFiUDP udp;
 // Set your listener PC's IP here:
 const IPAddress listener = { 192, 168, 1, 2 };
-const int port = 8266;
+const int       port     = 8266;
 
-int16_t buffer[100][2]; // Temp staging for samples
+int16_t buffer[100][2];  // Temp staging for samples
 
 void setup() {
   Serial.begin(115200);
@@ -48,7 +48,7 @@ void setup() {
   Serial.print("My IP: ");
   Serial.println(WiFi.localIP());
 
-  i2s_rxtx_begin(true, false); // Enable I2S RX
+  i2s_rxtx_begin(true, false);  // Enable I2S RX
   i2s_set_rate(11025);
 
   Serial.print("\nStart the listener on ");
@@ -60,7 +60,6 @@ void setup() {
   udp.beginPacket(listener, port);
   udp.write("I2S Receiver\r\n");
   udp.endPacket();
-
 }
 
 void loop() {

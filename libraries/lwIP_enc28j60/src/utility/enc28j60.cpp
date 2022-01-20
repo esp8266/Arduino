@@ -42,10 +42,9 @@
 
 #include "enc28j60.h"
 
-
-void serial_printf(const char *fmt, ...)
+void serial_printf(const char* fmt, ...)
 {
-    char buf[128];
+    char    buf[128];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 128, fmt, args);
@@ -57,11 +56,15 @@ void serial_printf(const char *fmt, ...)
 #if DEBUG
 #define PRINTF(...) printf(__VA_ARGS__)
 #else
-#define PRINTF(...) do { (void)0; } while (0)
+#define PRINTF(...) \
+    do              \
+    {               \
+        (void)0;    \
+    } while (0)
 #endif
 
-#define EIE   0x1b
-#define EIR   0x1c
+#define EIE 0x1b
+#define EIR 0x1c
 #define ESTAT 0x1d
 #define ECON2 0x1e
 #define ECON1 0x1f
@@ -69,13 +72,13 @@ void serial_printf(const char *fmt, ...)
 #define ESTAT_CLKRDY 0x01
 #define ESTAT_TXABRT 0x02
 
-#define ECON1_RXEN   0x04
-#define ECON1_TXRTS  0x08
+#define ECON1_RXEN 0x04
+#define ECON1_TXRTS 0x08
 
 #define ECON2_AUTOINC 0x80
-#define ECON2_PKTDEC  0x40
+#define ECON2_PKTDEC 0x40
 
-#define EIR_TXIF      0x08
+#define EIR_TXIF 0x08
 
 #define ERXTX_BANK 0x00
 
@@ -95,19 +98,19 @@ void serial_printf(const char *fmt, ...)
 #define ERXRDPTH 0x0d
 
 #define RX_BUF_START 0x0000
-#define RX_BUF_END   0x0fff
+#define RX_BUF_END 0x0fff
 
 #define TX_BUF_START 0x1200
 
 /* MACONx registers are in bank 2 */
 #define MACONX_BANK 0x02
 
-#define MACON1  0x00
-#define MACON3  0x02
-#define MACON4  0x03
+#define MACON1 0x00
+#define MACON3 0x02
+#define MACON4 0x03
 #define MABBIPG 0x04
-#define MAIPGL  0x06
-#define MAIPGH  0x07
+#define MAIPGL 0x06
+#define MAIPGH 0x07
 #define MAMXFLL 0x0a
 #define MAMXFLH 0x0b
 
@@ -116,9 +119,9 @@ void serial_printf(const char *fmt, ...)
 #define MACON1_MARXEN 0x01
 
 #define MACON3_PADCFG_FULL 0xe0
-#define MACON3_TXCRCEN     0x10
-#define MACON3_FRMLNEN     0x02
-#define MACON3_FULDPX      0x01
+#define MACON3_TXCRCEN 0x10
+#define MACON3_FRMLNEN 0x02
+#define MACON3_FULDPX 0x01
 
 #define MAX_MAC_LENGTH 1518
 
@@ -136,35 +139,32 @@ void serial_printf(const char *fmt, ...)
 #define ERXFCON 0x18
 #define EPKTCNT 0x19
 
-#define ERXFCON_UCEN  0x80
+#define ERXFCON_UCEN 0x80
 #define ERXFCON_ANDOR 0x40
 #define ERXFCON_CRCEN 0x20
-#define ERXFCON_MCEN  0x02
-#define ERXFCON_BCEN  0x01
+#define ERXFCON_MCEN 0x02
+#define ERXFCON_BCEN 0x01
 
 // The ENC28J60 SPI Interface supports clock speeds up to 20 MHz
 static const SPISettings spiSettings(20000000, MSBFIRST, SPI_MODE0);
 
-ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr):
+ENC28J60::ENC28J60(int8_t cs, SPIClass& spi, int8_t intr) :
     _bank(ERXTX_BANK), _cs(cs), _spi(spi)
 {
     (void)intr;
 }
 
-void
-ENC28J60::enc28j60_arch_spi_select(void)
+void ENC28J60::enc28j60_arch_spi_select(void)
 {
     SPI.beginTransaction(spiSettings);
     digitalWrite(_cs, LOW);
 }
 
-void
-ENC28J60::enc28j60_arch_spi_deselect(void)
+void ENC28J60::enc28j60_arch_spi_deselect(void)
 {
     digitalWrite(_cs, HIGH);
     SPI.endTransaction();
 }
-
 
 /*---------------------------------------------------------------------------*/
 uint8_t
@@ -200,8 +200,7 @@ ENC28J60::readreg(uint8_t reg)
     return r;
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::writereg(uint8_t reg, uint8_t data)
+void ENC28J60::writereg(uint8_t reg, uint8_t data)
 {
     enc28j60_arch_spi_select();
     SPI.transfer(0x40 | (reg & 0x1f));
@@ -209,8 +208,7 @@ ENC28J60::writereg(uint8_t reg, uint8_t data)
     enc28j60_arch_spi_deselect();
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::setregbitfield(uint8_t reg, uint8_t mask)
+void ENC28J60::setregbitfield(uint8_t reg, uint8_t mask)
 {
     if (is_mac_mii_reg(reg))
     {
@@ -225,8 +223,7 @@ ENC28J60::setregbitfield(uint8_t reg, uint8_t mask)
     }
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::clearregbitfield(uint8_t reg, uint8_t mask)
+void ENC28J60::clearregbitfield(uint8_t reg, uint8_t mask)
 {
     if (is_mac_mii_reg(reg))
     {
@@ -241,15 +238,13 @@ ENC28J60::clearregbitfield(uint8_t reg, uint8_t mask)
     }
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::setregbank(uint8_t new_bank)
+void ENC28J60::setregbank(uint8_t new_bank)
 {
     writereg(ECON1, (readreg(ECON1) & 0xfc) | (new_bank & 0x03));
     _bank = new_bank;
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::writedata(const uint8_t *data, int datalen)
+void ENC28J60::writedata(const uint8_t* data, int datalen)
 {
     int i;
     enc28j60_arch_spi_select();
@@ -262,14 +257,12 @@ ENC28J60::writedata(const uint8_t *data, int datalen)
     enc28j60_arch_spi_deselect();
 }
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::writedatabyte(uint8_t byte)
+void ENC28J60::writedatabyte(uint8_t byte)
 {
     writedata(&byte, 1);
 }
 /*---------------------------------------------------------------------------*/
-int
-ENC28J60::readdata(uint8_t *buf, int len)
+int ENC28J60::readdata(uint8_t* buf, int len)
 {
     int i;
     enc28j60_arch_spi_select();
@@ -292,8 +285,7 @@ ENC28J60::readdatabyte(void)
 }
 
 /*---------------------------------------------------------------------------*/
-void
-ENC28J60::softreset(void)
+void ENC28J60::softreset(void)
 {
     enc28j60_arch_spi_select();
     /* The System Command (soft reset) is 1 1 1 1 1 1 1 1 */
@@ -324,8 +316,7 @@ ENC28J60::readrev(void)
 
 /*---------------------------------------------------------------------------*/
 
-bool
-ENC28J60::reset(void)
+bool ENC28J60::reset(void)
 {
     PRINTF("enc28j60: resetting chip\n");
 
@@ -398,7 +389,7 @@ ENC28J60::reset(void)
 
     /* Wait for OST */
     PRINTF("waiting for ESTAT_CLKRDY\n");
-    while ((readreg(ESTAT) & ESTAT_CLKRDY) == 0) {};
+    while ((readreg(ESTAT) & ESTAT_CLKRDY) == 0) { };
     PRINTF("ESTAT_CLKRDY\n");
 
     setregbank(ERXTX_BANK);
@@ -470,8 +461,7 @@ ENC28J60::reset(void)
     setregbitfield(MACON1, MACON1_MARXEN | MACON1_TXPAUS | MACON1_RXPAUS);
 
     /* Set padding, crc, full duplex */
-    setregbitfield(MACON3, MACON3_PADCFG_FULL | MACON3_TXCRCEN | MACON3_FULDPX |
-                   MACON3_FRMLNEN);
+    setregbitfield(MACON3, MACON3_PADCFG_FULL | MACON3_TXCRCEN | MACON3_FULDPX | MACON3_FRMLNEN);
 
     /* Don't modify MACON4 */
 
@@ -532,11 +522,11 @@ ENC28J60::reset(void)
 }
 /*---------------------------------------------------------------------------*/
 boolean
-ENC28J60::begin(const uint8_t *address)
+ENC28J60::begin(const uint8_t* address)
 {
     _localMac = address;
 
-    bool ret = reset();
+    bool    ret = reset();
     uint8_t rev = readrev();
 
     PRINTF("ENC28J60 rev. B%d\n", rev);
@@ -547,7 +537,7 @@ ENC28J60::begin(const uint8_t *address)
 /*---------------------------------------------------------------------------*/
 
 uint16_t
-ENC28J60::sendFrame(const uint8_t *data, uint16_t datalen)
+ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
 {
     uint16_t dataend;
 
@@ -598,13 +588,14 @@ ENC28J60::sendFrame(const uint8_t *data, uint16_t datalen)
 
     /* Send the packet */
     setregbitfield(ECON1, ECON1_TXRTS);
-    while ((readreg(ECON1) & ECON1_TXRTS) > 0);
+    while ((readreg(ECON1) & ECON1_TXRTS) > 0)
+        ;
 
 #if DEBUG
     if ((readreg(ESTAT) & ESTAT_TXABRT) != 0)
     {
         uint16_t erdpt;
-        uint8_t tsv[7];
+        uint8_t  tsv[7];
         erdpt = (readreg(ERDPTH) << 8) | readreg(ERDPTL);
         writereg(ERDPTL, (dataend + 1) & 0xff);
         writereg(ERDPTH, (dataend + 1) >> 8);
@@ -612,7 +603,8 @@ ENC28J60::sendFrame(const uint8_t *data, uint16_t datalen)
         writereg(ERDPTL, erdpt & 0xff);
         writereg(ERDPTH, erdpt >> 8);
         PRINTF("enc28j60: tx err: %d: %02x:%02x:%02x:%02x:%02x:%02x\n"
-               "                  tsv: %02x%02x%02x%02x%02x%02x%02x\n", datalen,
+               "                  tsv: %02x%02x%02x%02x%02x%02x%02x\n",
+               datalen,
                0xff & data[0], 0xff & data[1], 0xff & data[2],
                0xff & data[3], 0xff & data[4], 0xff & data[5],
                tsv[6], tsv[5], tsv[4], tsv[3], tsv[2], tsv[1], tsv[0]);
@@ -633,7 +625,7 @@ ENC28J60::sendFrame(const uint8_t *data, uint16_t datalen)
 /*---------------------------------------------------------------------------*/
 
 uint16_t
-ENC28J60::readFrame(uint8_t *buffer, uint16_t bufsize)
+ENC28J60::readFrame(uint8_t* buffer, uint16_t bufsize)
 {
     readFrameSize();
     return readFrameData(buffer, bufsize);
@@ -662,13 +654,13 @@ ENC28J60::readFrameSize()
     /* Read the next packet pointer */
     nxtpkt[0] = readdatabyte();
     nxtpkt[1] = readdatabyte();
-    _next = (nxtpkt[1] << 8) + nxtpkt[0];
+    _next     = (nxtpkt[1] << 8) + nxtpkt[0];
 
     PRINTF("enc28j60: nxtpkt 0x%02x%02x\n", _nxtpkt[1], _nxtpkt[0]);
 
     length[0] = readdatabyte();
     length[1] = readdatabyte();
-    _len = (length[1] << 8) + length[0];
+    _len      = (length[1] << 8) + length[0];
 
     PRINTF("enc28j60: length 0x%02x%02x\n", length[1], length[0]);
 
@@ -682,19 +674,17 @@ ENC28J60::readFrameSize()
     return _len;
 }
 
-void
-ENC28J60::discardFrame(uint16_t framesize)
+void ENC28J60::discardFrame(uint16_t framesize)
 {
     (void)framesize;
     (void)readFrameData(nullptr, 0);
 }
 
 uint16_t
-ENC28J60::readFrameData(uint8_t *buffer, uint16_t framesize)
+ENC28J60::readFrameData(uint8_t* buffer, uint16_t framesize)
 {
     if (framesize < _len)
     {
-
         buffer = nullptr;
 
         /* flush rx fifo */

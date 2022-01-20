@@ -5,8 +5,8 @@
 
 #define NETIF_STATUS_CB_SIZE 3
 
-static int netifStatusChangeListLength = 0;
-LwipIntf::CBType netifStatusChangeList [NETIF_STATUS_CB_SIZE];
+static int       netifStatusChangeListLength = 0;
+LwipIntf::CBType netifStatusChangeList[NETIF_STATUS_CB_SIZE];
 
 extern "C" void netif_status_changed(struct netif* netif)
 {
@@ -33,12 +33,10 @@ bool LwipIntf::stateChangeSysCB(LwipIntf::CBType&& cb)
 
 bool LwipIntf::stateUpCB(LwipIntf::CBType&& cb)
 {
-    return stateChangeSysCB([cb](netif * nif)
-    {
-        if (netif_is_up(nif))
-            schedule_function([cb, nif]()
-        {
-            cb(nif);
-        });
-    });
+    return stateChangeSysCB([cb](netif* nif)
+                            {
+                                if (netif_is_up(nif))
+                                    schedule_function([cb, nif]()
+                                                      { cb(nif); });
+                            });
 }

@@ -28,7 +28,7 @@ Stream& ehConsolePort(Serial);
 // UNLESS: You swap the TX pin using the alternate pinout.
 const uint8_t LED_PIN = 1;
 
-const char * const RST_REASONS[] = {
+const char* const RST_REASONS[] = {
   "REASON_DEFAULT_RST",
   "REASON_WDT_RST",
   "REASON_EXCEPTION_RST",
@@ -38,7 +38,7 @@ const char * const RST_REASONS[] = {
   "REASON_EXT_SYS_RST"
 };
 
-const char * const FLASH_SIZE_MAP_NAMES[] = {
+const char* const FLASH_SIZE_MAP_NAMES[] = {
   "FLASH_SIZE_4M_MAP_256_256",
   "FLASH_SIZE_2M",
   "FLASH_SIZE_8M_MAP_512_512",
@@ -48,14 +48,14 @@ const char * const FLASH_SIZE_MAP_NAMES[] = {
   "FLASH_SIZE_32M_MAP_1024_1024"
 };
 
-const char * const OP_MODE_NAMES[] {
+const char* const OP_MODE_NAMES[] {
   "NULL_MODE",
   "STATION_MODE",
   "SOFTAP_MODE",
   "STATIONAP_MODE"
 };
 
-const char * const AUTH_MODE_NAMES[] {
+const char* const AUTH_MODE_NAMES[] {
   "AUTH_OPEN",
   "AUTH_WEP",
   "AUTH_WPA_PSK",
@@ -64,14 +64,14 @@ const char * const AUTH_MODE_NAMES[] {
   "AUTH_MAX"
 };
 
-const char * const PHY_MODE_NAMES[] {
+const char* const PHY_MODE_NAMES[] {
   "",
   "PHY_MODE_11B",
   "PHY_MODE_11G",
   "PHY_MODE_11N"
 };
 
-const char * const EVENT_NAMES[] {
+const char* const EVENT_NAMES[] {
   "EVENT_STAMODE_CONNECTED",
   "EVENT_STAMODE_DISCONNECTED",
   "EVENT_STAMODE_AUTHMODE_CHANGE",
@@ -81,7 +81,7 @@ const char * const EVENT_NAMES[] {
   "EVENT_MAX"
 };
 
-const char * const EVENT_REASONS[] {
+const char* const EVENT_REASONS[] {
   "",
   "REASON_UNSPECIFIED",
   "REASON_AUTH_EXPIRE",
@@ -108,12 +108,12 @@ const char * const EVENT_REASONS[] {
   "REASON_CIPHER_SUITE_REJECTED",
 };
 
-const char * const EVENT_REASONS_200[] {
+const char* const EVENT_REASONS_200[] {
   "REASON_BEACON_TIMEOUT",
   "REASON_NO_AP_FOUND"
 };
 
-void wifi_event_handler_cb(System_Event_t * event) {
+void wifi_event_handler_cb(System_Event_t* event) {
   ehConsolePort.print(EVENT_NAMES[event->event]);
   ehConsolePort.print(" (");
 
@@ -128,27 +128,26 @@ void wifi_event_handler_cb(System_Event_t * event) {
       break;
     case EVENT_SOFTAPMODE_STACONNECTED:
     case EVENT_SOFTAPMODE_STADISCONNECTED: {
-        char mac[32] = {0};
-        snprintf(mac, 32, MACSTR ", aid: %d", MAC2STR(event->event_info.sta_connected.mac), event->event_info.sta_connected.aid);
+      char mac[32] = { 0 };
+      snprintf(mac, 32, MACSTR ", aid: %d", MAC2STR(event->event_info.sta_connected.mac), event->event_info.sta_connected.aid);
 
-        ehConsolePort.print(mac);
-      }
-      break;
+      ehConsolePort.print(mac);
+    } break;
   }
 
   ehConsolePort.println(")");
 }
 
-void print_softap_config(Stream & consolePort, softap_config const& config) {
+void print_softap_config(Stream& consolePort, softap_config const& config) {
   consolePort.println();
   consolePort.println(F("SoftAP Configuration"));
   consolePort.println(F("--------------------"));
 
   consolePort.print(F("ssid:            "));
-  consolePort.println((char *) config.ssid);
+  consolePort.println((char*)config.ssid);
 
   consolePort.print(F("password:        "));
-  consolePort.println((char *) config.password);
+  consolePort.println((char*)config.password);
 
   consolePort.print(F("ssid_len:        "));
   consolePort.println(config.ssid_len);
@@ -173,8 +172,8 @@ void print_softap_config(Stream & consolePort, softap_config const& config) {
   consolePort.println();
 }
 
-void print_system_info(Stream & consolePort) {
-  const rst_info * resetInfo = system_get_rst_info();
+void print_system_info(Stream& consolePort) {
+  const rst_info* resetInfo = system_get_rst_info();
   consolePort.print(F("system_get_rst_info() reset reason: "));
   consolePort.println(RST_REASONS[resetInfo->reason]);
 
@@ -211,7 +210,7 @@ void print_system_info(Stream & consolePort) {
   consolePort.println(FLASH_SIZE_MAP_NAMES[system_get_flash_size_map()]);
 }
 
-void print_wifi_general(Stream & consolePort) {
+void print_wifi_general(Stream& consolePort) {
   consolePort.print(F("wifi_get_channel(): "));
   consolePort.println(wifi_get_channel());
 
@@ -219,8 +218,8 @@ void print_wifi_general(Stream & consolePort) {
   consolePort.println(PHY_MODE_NAMES[wifi_get_phy_mode()]);
 }
 
-void secure_softap_config(softap_config * config, const char * ssid, const char * password) {
-  size_t ssidLen     = strlen(ssid)     < sizeof(config->ssid)     ? strlen(ssid)     : sizeof(config->ssid);
+void secure_softap_config(softap_config* config, const char* ssid, const char* password) {
+  size_t ssidLen     = strlen(ssid) < sizeof(config->ssid) ? strlen(ssid) : sizeof(config->ssid);
   size_t passwordLen = strlen(password) < sizeof(config->password) ? strlen(password) : sizeof(config->password);
 
   memset(config->ssid, 0, sizeof(config->ssid));
@@ -293,4 +292,3 @@ void loop() {
   Serial.println(system_get_time());
   delay(1000);
 }
-

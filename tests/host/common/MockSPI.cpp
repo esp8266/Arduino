@@ -35,13 +35,13 @@
 SPIClass SPI;
 #endif
 
-SPIClass::SPIClass ()
+SPIClass::SPIClass()
 {
 }
 
 uint8_t SPIClass::transfer(uint8_t data)
 {
-	return data;
+    return data;
 }
 
 void SPIClass::begin()
@@ -54,10 +54,10 @@ void SPIClass::end()
 
 void SPIClass::setFrequency(uint32_t freq)
 {
-	(void)freq;
+    (void)freq;
 }
 
 void SPIClass::setHwCs(bool use)
 {
-	(void)use;
+    (void)use;
 }

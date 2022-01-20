@@ -9,15 +9,15 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* host = "esp8266-webupdate";
-const char* ssid = STASSID;
+const char* host     = "esp8266-webupdate";
+const char* ssid     = STASSID;
 const char* password = STAPSK;
 
 ESP8266WebServer server(80);
-const char* serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
+const char*      serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
 
 void setup(void) {
   Serial.begin(115200);
@@ -31,11 +31,11 @@ void setup(void) {
       server.sendHeader("Connection", "close");
       server.send(200, "text/html", serverIndex);
     });
-    server.on("/update", HTTP_POST, []() {
+    server.on(
+        "/update", HTTP_POST, []() {
       server.sendHeader("Connection", "close");
       server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-      ESP.restart();
-    }, []() {
+      ESP.restart(); }, []() {
       HTTPUpload& upload = server.upload();
       if (upload.status == UPLOAD_FILE_START) {
         Serial.setDebugOutput(true);
@@ -57,8 +57,7 @@ void setup(void) {
         }
         Serial.setDebugOutput(false);
       }
-      yield();
-    });
+      yield(); });
     server.begin();
     MDNS.addService("http", "tcp", 80);
 

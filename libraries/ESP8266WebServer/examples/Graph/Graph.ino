@@ -38,27 +38,26 @@
 
 #if defined USE_SPIFFS
 #include <FS.h>
-FS* fileSystem = &SPIFFS;
-SPIFFSConfig fileSystemConfig = SPIFFSConfig();
+FS*           fileSystem       = &SPIFFS;
+SPIFFSConfig  fileSystemConfig = SPIFFSConfig();
 #elif defined USE_LITTLEFS
 #include <LittleFS.h>
-FS* fileSystem = &LittleFS;
+FS*            fileSystem       = &LittleFS;
 LittleFSConfig fileSystemConfig = LittleFSConfig();
 #elif defined USE_SDFS
 #include <SDFS.h>
-FS* fileSystem = &SDFS;
+FS*        fileSystem       = &SDFS;
 SDFSConfig fileSystemConfig = SDFSConfig();
 // fileSystemConfig.setCSPin(chipSelectPin);
 #else
 #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
 #endif
 
-
 #define DBG_OUTPUT_PORT Serial
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // Indicate which digital I/Os should be displayed on the chart.
@@ -66,14 +65,14 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 // e.g. 0b11111000000111111
 unsigned int gpioMask;
 
-const char* ssid = STASSID;
+const char* ssid     = STASSID;
 const char* password = STAPSK;
-const char* host = "graph";
+const char* host     = "graph";
 
 ESP8266WebServer server(80);
 
-static const char TEXT_PLAIN[] PROGMEM = "text/plain";
-static const char FS_INIT_ERROR[] PROGMEM = "FS INIT ERROR";
+static const char TEXT_PLAIN[] PROGMEM     = "text/plain";
+static const char FS_INIT_ERROR[] PROGMEM  = "FS INIT ERROR";
 static const char FILE_NOT_FOUND[] PROGMEM = "FileNotFound";
 
 ////////////////////////////////
@@ -132,14 +131,13 @@ bool handleFileRead(String path) {
   return false;
 }
 
-
 /*
    The "Not Found" handler catches all URI not explicitly declared in code
    First try to find and return the requested file from the filesystem,
    and if it fails, return a 404 page with debug information
 */
 void handleNotFound() {
-  String uri = ESP8266WebServer::urlDecode(server.uri()); // required to read paths with blanks
+  String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
 
   if (handleFileRead(uri)) {
     return;
@@ -240,7 +238,6 @@ void setup(void) {
   // Use it to read files from filesystem
   server.onNotFound(handleNotFound);
 
-
   // Start server
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
@@ -249,7 +246,6 @@ void setup(void) {
   DBG_OUTPUT_PORT.println(" 0 (OFF):    outputs are off and hidden from chart");
   DBG_OUTPUT_PORT.println(" 1 (AUTO):   outputs are rotated automatically every second");
   DBG_OUTPUT_PORT.println(" 2 (MANUAL): outputs can be toggled from the web page");
-
 }
 
 // Return default GPIO mask, that is all I/Os except SD card ones
@@ -263,10 +259,10 @@ unsigned int defaultMask() {
   return mask;
 }
 
-int rgbMode = 1; // 0=off - 1=auto - 2=manual
-int rgbValue = 0;
+int                                rgbMode  = 1;  // 0=off - 1=auto - 2=manual
+int                                rgbValue = 0;
 esp8266::polledTimeout::periodicMs timeToChange(1000);
-bool modeChangeRequested = false;
+bool                               modeChangeRequested = false;
 
 void loop(void) {
   server.handleClient();
@@ -295,11 +291,11 @@ void loop(void) {
 
   // act according to mode
   switch (rgbMode) {
-    case 0: // off
+    case 0:  // off
       gpioMask = defaultMask();
-      gpioMask &= ~(1 << 12); // Hide GPIO 12
-      gpioMask &= ~(1 << 13); // Hide GPIO 13
-      gpioMask &= ~(1 << 15); // Hide GPIO 15
+      gpioMask &= ~(1 << 12);  // Hide GPIO 12
+      gpioMask &= ~(1 << 13);  // Hide GPIO 13
+      gpioMask &= ~(1 << 15);  // Hide GPIO 15
 
       // reset outputs
       digitalWrite(12, 0);
@@ -307,7 +303,7 @@ void loop(void) {
       digitalWrite(15, 0);
       break;
 
-    case 1: // auto
+    case 1:  // auto
       gpioMask = defaultMask();
 
       // increment value (reset after 7)
@@ -322,11 +318,10 @@ void loop(void) {
       digitalWrite(15, rgbValue & 0b100);
       break;
 
-    case 2: // manual
+    case 2:  // manual
       gpioMask = defaultMask();
 
       // keep outputs unchanged
       break;
   }
 }
-

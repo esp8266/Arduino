@@ -18,9 +18,9 @@
 #if defined(UMM_HEAP_IRAM)
 
 #if defined(CORE_MOCK)
-#define XCHAL_INSTRAM1_VADDR		0x40100000
+#define XCHAL_INSTRAM1_VADDR 0x40100000
 #else
-#include <sys/config.h> // For config/core-isa.h
+#include <sys/config.h>  // For config/core-isa.h
 #endif
 
 // durable - as in long life, persisting across reboots.
@@ -28,7 +28,6 @@ struct durable {
   uint32_t bootCounter;
   uint32_t chksum;
 };
-
 
 // Leave a durable block of IRAM after the 2nd heap.
 
@@ -39,7 +38,7 @@ struct durable {
 #define IRAM_RESERVE ((uintptr_t)XCHAL_INSTRAM1_VADDR + 0xC000UL - IRAM_RESERVE_SZ)
 
 // Define a reference with the right properties to make access easier.
-#define DURABLE ((struct durable *)IRAM_RESERVE)
+#define DURABLE ((struct durable*)IRAM_RESERVE)
 #define INCREMENT_BOOTCOUNT() (DURABLE->bootCounter)++
 
 extern struct rst_info resetInfo;
@@ -58,10 +57,8 @@ extern struct rst_info resetInfo;
   XOR sum on the IRAM data (or just a section of the IRAM data).
 */
 inline bool is_iram_valid(void) {
-  return (REASON_WDT_RST      <= resetInfo.reason &&
-          REASON_SOFT_RESTART >= resetInfo.reason);
+  return (REASON_WDT_RST <= resetInfo.reason && REASON_SOFT_RESTART >= resetInfo.reason);
 }
-
 
 void setup() {
   WiFi.persistent(false);
@@ -79,7 +76,6 @@ void setup() {
   Serial.printf("Number of reboots at %u\r\n", DURABLE->bootCounter);
   Serial.printf("\r\nSome less than direct, ways to restart:\r\n");
   processKey(Serial, '?');
-
 }
 
 void loop(void) {
@@ -109,10 +105,9 @@ extern "C" void umm_init_iram(void) {
   uintptr_t sec_heap = (uintptr_t)_text_end + 32;
   sec_heap &= ~7;
   size_t sec_heap_sz = 0xC000UL - (sec_heap - (uintptr_t)XCHAL_INSTRAM1_VADDR);
-  sec_heap_sz -= IRAM_RESERVE_SZ; // Shrink IRAM heap
+  sec_heap_sz -= IRAM_RESERVE_SZ;  // Shrink IRAM heap
   if (0xC000UL > sec_heap_sz) {
-
-    umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
+    umm_init_iram_ex((void*)sec_heap, sec_heap_sz, true);
   }
 }
 

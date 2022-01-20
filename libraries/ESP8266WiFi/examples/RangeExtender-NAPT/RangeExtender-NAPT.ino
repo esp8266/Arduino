@@ -7,7 +7,7 @@
 
 #ifndef STASSID
 #define STASSID "mynetwork"
-#define STAPSK  "mynetworkpassword"
+#define STAPSK "mynetworkpassword"
 #endif
 
 #include <ESP8266WiFi.h>
@@ -61,9 +61,9 @@ void setup() {
   dhcpSoftAP.dhcps_set_dns(1, WiFi.dnsIP(1));
 
   WiFi.softAPConfig(  // enable AP, with android-compatible google domain
-    IPAddress(172, 217, 28, 254),
-    IPAddress(172, 217, 28, 254),
-    IPAddress(255, 255, 255, 0));
+      IPAddress(172, 217, 28, 254),
+      IPAddress(172, 217, 28, 254),
+      IPAddress(255, 255, 255, 0));
   WiFi.softAP(STASSID "extender", STAPSK);
   Serial.printf("AP: %s\n", WiFi.softAPIP().toString().c_str());
 
@@ -94,4 +94,3 @@ void setup() {
 
 void loop() {
 }
-
