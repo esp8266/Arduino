@@ -22,8 +22,7 @@ class ESPMaster {
 
   public:
   ESPMaster(uint8_t pin)
-      : _ss_pin(pin) {
-  }
+      : _ss_pin(pin) { }
   void begin() {
     pinMode(_ss_pin, OUTPUT);
     digitalWrite(_ss_pin, HIGH);

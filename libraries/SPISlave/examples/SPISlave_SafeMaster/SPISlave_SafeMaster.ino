@@ -28,8 +28,7 @@ class ESPSafeMaster {
 
   public:
   ESPSafeMaster(uint8_t pin)
-      : _ss_pin(pin) {
-  }
+      : _ss_pin(pin) { }
   void begin() {
     pinMode(_ss_pin, OUTPUT);
     _pulseSS();

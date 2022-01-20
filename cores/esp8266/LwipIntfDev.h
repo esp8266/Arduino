@@ -278,7 +278,10 @@ err_t LwipIntfDev<RawDev>::netif_init()
     _netif.name[1] = '0' + _netif.num;
     _netif.mtu = _mtu;
     _netif.chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-    _netif.flags = NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP;
+    _netif.flags = NETIF_FLAG_ETHARP
+        | NETIF_FLAG_IGMP
+        | NETIF_FLAG_BROADCAST
+        | NETIF_FLAG_LINK_UP;
 
     // lwIP's doc: This function typically first resolves the hardware
     // address, then sends the packet.  For ethernet physical layer, this is

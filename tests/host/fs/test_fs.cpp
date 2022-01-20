@@ -59,7 +59,7 @@ TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
 }
 #pragma GCC diagnostic pop
 
-};  // namespace spiffs_test
+};
 
 namespace littlefs_test
 {
@@ -93,7 +93,7 @@ TEST_CASE("LittleFS checks the config object passed in", "[fs]")
     REQUIRE(LittleFS.setConfig(l));
 }
 
-};  // namespace littlefs_test
+};
 
 namespace sdfs_test
 {
@@ -101,11 +101,10 @@ namespace sdfs_test
 #define TESTPRE "SDFS - "
 #define TESTPAT "[sdfs]"
 // SDFS supports long paths (MAXPATH)
-#define TOOLONGFILENAME                                                                                    \
-    "/"                                                                                                    \
-    "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
-    "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
-    "12345678901234567890123456789012345678901234567890123456"
+#define TOOLONGFILENAME "/"                                                                                                    \
+                        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+                        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+                        "12345678901234567890123456789012345678901234567890123456"
 #define FS_MOCK_DECLARE SDFS_MOCK_DECLARE
 #define FS_MOCK_RESET SDFS_MOCK_RESET
 #define FS_HAS_DIRS
@@ -164,4 +163,4 @@ TEST_CASE("SD.h FILE_WRITE macro is append", "[fs]")
     REQUIRE(u == 0);
 }
 
-};  // namespace sdfs_test
+};

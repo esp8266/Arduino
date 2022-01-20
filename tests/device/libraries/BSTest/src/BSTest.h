@@ -225,7 +225,7 @@ inline void require(bool condition, size_t line)
     }
 }
 
-}  // namespace bs
+}  // ::bs
 
 #define BS_NAME_LINE2(name, line) name##line
 #define BS_NAME_LINE(name, line) BS_NAME_LINE2(name, line)

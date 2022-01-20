@@ -65,7 +65,8 @@ int errors = 0;
 
 void mymemmove(unsigned char* dest, unsigned char* src, size_t n)
 {
-    if ((src <= dest && src + n <= dest) || src >= dest)
+    if ((src <= dest && src + n <= dest)
+        || src >= dest)
         while (n-- > 0)
             *dest++ = *src++;
     else
@@ -153,9 +154,8 @@ void memmove_main(void)
             if (memcmp(to_known, to_test, sizeof(to_known)) != 0)
             {
                 errors++;
-                DEBUGP(
-                    "memmove failed for %d bytes,"
-                    " with src %d bytes before dest\n",
+                DEBUGP("memmove failed for %d bytes,"
+                       " with src %d bytes before dest\n",
                     i, j);
             }
         }
@@ -176,9 +176,8 @@ void memmove_main(void)
             if (memcmp(to_known, to_test, sizeof(to_known)) != 0)
             {
                 errors++;
-                DEBUGP(
-                    "memmove failed when moving %d bytes,"
-                    " with src %d bytes after dest\n",
+                DEBUGP("memmove failed when moving %d bytes,"
+                       " with src %d bytes after dest\n",
                     i, j);
             }
         }

@@ -983,7 +983,8 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
         {
             /*config ip information must be in the same segment as the local ip*/
             softap_ip >>= 8;
-            if (((start_ip >> 8 != softap_ip) || (end_ip >> 8 != softap_ip)) || (end_ip - start_ip > DHCPS_MAX_LEASE))
+            if (((start_ip >> 8 != softap_ip) || (end_ip >> 8 != softap_ip))
+                || (end_ip - start_ip > DHCPS_MAX_LEASE))
             {
                 dhcps_lease.enable = false;
             }
@@ -1146,7 +1147,8 @@ bool DhcpServer::set_dhcps_lease(struct dhcps_lease* please)
 
         /*config ip information must be in the same segment as the local ip*/
         softap_ip >>= 8;
-        if ((start_ip >> 8 != softap_ip) || (end_ip >> 8 != softap_ip))
+        if ((start_ip >> 8 != softap_ip)
+            || (end_ip >> 8 != softap_ip))
         {
             return false;
         }

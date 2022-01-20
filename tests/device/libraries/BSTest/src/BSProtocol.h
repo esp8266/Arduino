@@ -121,7 +121,7 @@ namespace protocol
         return true;
     }
 
-}  // namespace protocol
-}  // namespace bs
+}  // ::protocol
+}  // ::bs
 
 #endif  //BS_PROTOCOL_H

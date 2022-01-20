@@ -23,7 +23,8 @@ public:
     // arg3     | dns1       netmask
     //
     // result stored into gateway/netmask/dns1
-    static bool ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
+    static bool ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
+        IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
 
     String hostname();
     bool hostname(const String& aHostname)

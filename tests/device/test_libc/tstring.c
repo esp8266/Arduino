@@ -93,7 +93,8 @@ void tstring_main(void)
         test_failed = 1;
     }
 
-    if (strcmp(target, "A") || strlen(target) != 1 || memchr(target, 'A', 0) != NULL || memcmp(target, "J", 0) || strncmp(target, "A", 1) || strncmp(target, "J", 0) || tmp2[0] != 'Z' || tmp2[1] != '\0')
+    if (strcmp(target, "A") || strlen(target) != 1 || memchr(target, 'A', 0) != NULL
+        || memcmp(target, "J", 0) || strncmp(target, "A", 1) || strncmp(target, "J", 0) || tmp2[0] != 'Z' || tmp2[1] != '\0')
     {
         eprintf(__LINE__, target, "A", 0);
         test_failed = 1;

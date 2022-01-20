@@ -170,8 +170,8 @@ namespace protocol
         return argc;
     }
 
-}  // namespace protocol
-
 }  // namespace bs
+
+}  // namespace protocol
 
 #endif  //BS_ARGS_H

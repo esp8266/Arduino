@@ -185,7 +185,8 @@ extern "C"
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
+            if (ifa->ifa_addr
+                && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
             )
             {
                 auto test_ipv4 = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);

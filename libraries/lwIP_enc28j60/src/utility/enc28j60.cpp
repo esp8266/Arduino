@@ -391,9 +391,7 @@ bool ENC28J60::reset(void)
 
     /* Wait for OST */
     PRINTF("waiting for ESTAT_CLKRDY\n");
-    while ((readreg(ESTAT) & ESTAT_CLKRDY) == 0)
-    {
-    };
+    while ((readreg(ESTAT) & ESTAT_CLKRDY) == 0) { };
     PRINTF("ESTAT_CLKRDY\n");
 
     setregbank(ERXTX_BANK);
@@ -606,9 +604,8 @@ ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
         readdata(tsv, sizeof(tsv));
         writereg(ERDPTL, erdpt & 0xff);
         writereg(ERDPTH, erdpt >> 8);
-        PRINTF(
-            "enc28j60: tx err: %d: %02x:%02x:%02x:%02x:%02x:%02x\n"
-            "                  tsv: %02x%02x%02x%02x%02x%02x%02x\n",
+        PRINTF("enc28j60: tx err: %d: %02x:%02x:%02x:%02x:%02x:%02x\n"
+               "                  tsv: %02x%02x%02x%02x%02x%02x%02x\n",
             datalen,
             0xff & data[0], 0xff & data[1], 0xff & data[2],
             0xff & data[3], 0xff & data[4], 0xff & data[5],

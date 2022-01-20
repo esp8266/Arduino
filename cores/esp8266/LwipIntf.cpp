@@ -25,7 +25,8 @@ extern "C"
 //
 // result stored into gateway/netmask/dns1
 
-bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3, IPAddress& gateway, IPAddress& netmask, IPAddress& dns1)
+bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
+    IPAddress& gateway, IPAddress& netmask, IPAddress& dns1)
 {
     //To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
     gateway = arg1;

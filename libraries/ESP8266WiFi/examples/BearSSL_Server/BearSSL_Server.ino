@@ -139,10 +139,10 @@ GBEnkz4KpKv7TkHoW+j7F5EMcLcSrUIpyw==
 #endif
 
 #define CACHE_SIZE 5 // Number of sessions to cache.
-#define USE_CACHE // Enable SSL session caching.                      \
-    // Caching SSL sessions shortens the length of the SSL handshake. \
-    // You can see the performance improvement by looking at the      \
-    // Network tab of the developer tools of your browser.
+// Caching SSL sessions shortens the length of the SSL handshake.
+// You can see the performance improvement by looking at the
+// Network tab of the developer tools of your browser.
+#define USE_CACHE // Enable SSL session caching.
 //#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
 
 #if defined(USE_CACHE) && defined(DYNAMIC_CACHE)

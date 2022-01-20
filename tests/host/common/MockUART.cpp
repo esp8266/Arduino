@@ -494,14 +494,8 @@ extern "C"
     }
 };
 
-size_t uart_peek_available(uart_t* uart)
-{
-    return 0;
-}
-const char* uart_peek_buffer(uart_t* uart)
-{
-    return nullptr;
-}
+size_t uart_peek_available(uart_t* uart) { return 0; }
+const char* uart_peek_buffer(uart_t* uart) { return nullptr; }
 void uart_peek_consume(uart_t* uart, size_t consume)
 {
     (void)uart;
