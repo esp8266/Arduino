@@ -818,7 +818,7 @@ void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
 #define dbg_heap_free(p) free(p)
 #endif
 
-#elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) // #elif for #ifdef DEBUG_ESP_OOM
 #include <pgmspace.h>
 void *IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char *file, int line);
 #define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
