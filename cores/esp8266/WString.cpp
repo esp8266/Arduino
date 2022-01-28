@@ -682,14 +682,9 @@ int String::lastIndexOf(char ch) const {
 int String::lastIndexOf(char ch, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
-    char *writeTo = wbuffer();
-    char tempchar = writeTo[fromIndex + 1]; // save the replaced character
-    writeTo[fromIndex + 1] = '\0';
-    char *temp = strrchr(writeTo, ch);
-    writeTo[fromIndex + 1] = tempchar; // restore character
-    if (temp == NULL)
-        return -1;
-    return temp - writeTo;
+    int index = fromIndex + 1;
+    while (index-- > 0 && buffer()[index] != ch);
+    return index;
 }
 
 int String::lastIndexOf(const String &s2) const {
@@ -732,11 +727,7 @@ String String::substring(unsigned int left, unsigned int right) const {
         return out;
     if (right > len())
         right = len();
-    char *writeTo = wbuffer();
-    char tempchar = writeTo[right]; // save the replaced character
-    writeTo[right] = '\0';
-    out = writeTo + left; // pointer arithmetic
-    writeTo[right] = tempchar; // restore character
+    out.concat(buffer() + left, right - left);
     return out;
 }
 
