@@ -48,12 +48,22 @@ size_t spiffs_kb = 1024;
 size_t littlefs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
+bool mockdebug = false;
 int mock_port_shifter = MOCK_PORT_SHIFTER;
 const char* fspath = nullptr;
 
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
+
+int mockverbose (const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	if (mockdebug)
+		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
+	return 0;
+}
 
 static int mock_start_uart(void)
 {

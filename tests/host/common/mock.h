@@ -112,7 +112,6 @@ extern bool serial_timestamp;
 extern int mock_port_shifter;
 extern bool blocking_uart;
 extern uint32_t global_source_address; // 0 = INADDR_ANY by default
-extern bool mockdebug;
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
