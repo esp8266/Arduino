@@ -20,16 +20,20 @@
 #include "c_types.h"
 
 /*
- * -DUMM_INIT_USE_ICACHE
+ * -DUMM_INIT_USE_IRAM
  *
- * Historically, the umm_init() call path has been in IRAM. This build option,
- * UMM_INIT_USE_ICACHE, moves it to IROM (flash). When this option is used,
- * changes are needed in functions app_entry_redefinable() for the way it calls
- * umm_init() to enable/disable ICACHE.
+ * Historically, the umm_init() call path has been in IRAM. The umm_init() call
+ * path is now in ICACHE (flash). Use the build option UMM_INIT_USE_IRAM to
+ * restore the legacy behavor.
  *
- * The default is to preserve the historical IRAM use case.
+ * If you have your own app_entry_redefinable() function, see
+ * app_entry_redefinable() in core_esp8266_app_entry_noextra4k.cpp for an
+ * example of how to toggle between ICACHE and IRAM in your build.
+ *
+ * The default is to use ICACHE.
  */
-// #define UMM_INIT_USE_ICACHE
+// #define UMM_INIT_USE_IRAM 1
+
 
 /*
  * Start addresses and the size of the heap

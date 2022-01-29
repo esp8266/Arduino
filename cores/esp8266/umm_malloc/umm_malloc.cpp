@@ -426,12 +426,13 @@ static uint16_t umm_assimilate_down(umm_heap_context_t *_context, uint16_t c, ui
 }
 
 /* ------------------------------------------------------------------------- */
-#ifdef UMM_INIT_USE_ICACHE
-// Freeup IRAM
-#define ICACHE_MAYBE ICACHE_FLASH_ATTR
-#else
+#undef ICACHE_MAYBE
+#ifdef UMM_INIT_USE_IRAM
 // umm_init(), ... stays in IRAM
 #define ICACHE_MAYBE
+#else
+// Freeup IRAM
+#define ICACHE_MAYBE ICACHE_FLASH_ATTR
 #endif
 /*
  * In this port, we split the upstream version of umm_init_heap() into two

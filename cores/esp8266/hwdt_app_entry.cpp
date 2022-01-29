@@ -1167,11 +1167,11 @@ asm  (
      * improvements could possibly use hwdt_pre_sdk_init() to run other early
      * diagnostic tools.
      */
-#ifdef UMM_INIT_USE_ICACHE
+#ifdef UMM_INIT_USE_IRAM
+    "l32r     a0, .umm_init\n\t"
+#else
     "l32r     a0, .mmu_wrap_irom_fn\n\t"
     "l32r     a2, .umm_init\n\t"
-#else
-    "l32r     a0, .umm_init\n\t"
 #endif
     "callx0   a0\n\t"
 
