@@ -260,7 +260,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     DEBUG_UPDATER.printf("\n");
 #endif
 
-    uint8_t *sig = 0; // Safe to free if we don't actually malloc
+    uint8_t *sig = nullptr; // Safe to free if we don't actually malloc
     if (expectedSigLen > 0) {
       sig = (uint8_t*)malloc(sigLen);
       if (!sig) {
