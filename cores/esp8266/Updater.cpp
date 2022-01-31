@@ -224,13 +224,17 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-  uint32_t sigLen = 0;
   if (_verify) {
-    ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    const uint32_t expectedSigLen = _verify->length();
+    uint32_t sigLen = 0;
+
+    if (expectedSigLen > 0) {
+      ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    }
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
 #endif
-    if (sigLen != _verify->length()) {
+    if (sigLen != expectedSigLen) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
@@ -255,20 +259,24 @@ bool UpdaterClass::end(bool evenIfRemaining){
     for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
     DEBUG_UPDATER.printf("\n");
 #endif
-    uint8_t *sig = (uint8_t*)malloc(sigLen);
-    if (!sig) {
-      _setError(UPDATE_ERROR_SIGN);
-      _reset();
-      return false;
-    }
-    ESP.flashRead(_startAddress + binSize, sig, sigLen);
+
+    uint8_t *sig = 0; // Safe to free if we don't actually malloc
+    if (expectedSigLen > 0) {
+      sig = (uint8_t*)malloc(sigLen);
+      if (!sig) {
+        _setError(UPDATE_ERROR_SIGN);
+        _reset();
+        return false;
+      }
+      ESP.flashRead(_startAddress + binSize, sig, sigLen);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
-    for (size_t i=0; i<sigLen; i++) {
-      DEBUG_UPDATER.printf(" %02x", sig[i]);
-    }
-    DEBUG_UPDATER.printf("\n");
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
+      for (size_t i=0; i<sigLen; i++) {
+        DEBUG_UPDATER.printf(" %02x", sig[i]);
+      }
+      DEBUG_UPDATER.printf("\n");
 #endif
+    }
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       free(sig);
       _setError(UPDATE_ERROR_SIGN);
