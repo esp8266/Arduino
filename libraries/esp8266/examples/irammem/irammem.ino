@@ -592,7 +592,7 @@ void setup() {
     size_t free_iram = ESP.getFreeHeap();
     ETS_PRINTF("IRAM free: %6d\n", free_iram);
     uint32_t hfree;
-    uint16_t hmax;
+    uint32_t hmax;
     uint8_t hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
     ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
