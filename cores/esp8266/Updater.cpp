@@ -226,6 +226,9 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if (_verify) {
     const uint32_t expectedSigLen = _verify->length();
+      // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
+      // contain a matching length field, preceded by the bytes of the signature itself.
+      // But if expectedSigLen is zero, we expect neither a signature nor a length field;
     uint32_t sigLen = 0;
 
     if (expectedSigLen > 0) {
@@ -240,7 +243,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
 
-    int binSize = _size - sigLen - sizeof(uint32_t) /* The siglen word */;
+    int binSize = _size;
+    if (expectedSigLen > 0) {
+      _size -= (sigLen + sizeof(uint32_t) /* The siglen word */);
+    }
     _hash->begin();
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
