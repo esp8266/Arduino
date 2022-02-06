@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
 #include <FlashMap.h>
 
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
@@ -56,7 +56,7 @@ extern const flash_map_s __flashdesc[];
 #define FS_block     (__flashdesc[__flashindex].fs_block_size)
 #define FS_page      (__flashdesc[__flashindex].fs_page_size)
 
-#else // !AUTOFLASHSIZE
+#else // !FLASH_MAP_SUPPORT
 
 extern uint32_t _FS_start;
 extern uint32_t _FS_end;
@@ -69,7 +69,7 @@ extern uint32_t _EEPROM_start;
 #define FS_page ((uint32_t)&_FS_page)
 #define FS_block ((uint32_t)&_FS_block)
 
-#endif // AUTOFLASHSIZE
+#endif // FLASH_MAP_SUPPORT
 
 #define FS_PHYS_ADDR ((uint32_t)FS_start - 0x40200000)
 #define FS_PHYS_SIZE ((uint32_t)(FS_end - FS_start))

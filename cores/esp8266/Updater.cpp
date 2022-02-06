@@ -461,7 +461,7 @@ bool UpdaterClass::_verifyEnd() {
 
 // it makes no sense to check flash size in auto flash mode
 // (sketch size would have to be set in bin header, instead of flash size)
-#if !AUTOFLASHSIZE
+#if !FLASH_MAP_SUPPORT
         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
         // check if new bin fits to SPI flash

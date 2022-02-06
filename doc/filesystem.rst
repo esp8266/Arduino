@@ -26,7 +26,7 @@ Another option called ``Mapping defined by Hardware and Sketch`` is available.
 It allows a sketch, not the user, to select FS configuration at boot
 according to flash chip size.
 
-This option is also enabled with this compilation define: ``-DAUTOFLASHSIZE=1``.
+This option is also enabled with this compilation define: ``-DFLASH_MAP_SUPPORT=1``.
 
 There are three possible configurations:
 

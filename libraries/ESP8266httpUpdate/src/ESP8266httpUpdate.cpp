@@ -292,7 +292,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
 // it makes no sense to check flash size in auto flash mode
 // (sketch size would have to be set in bin header, instead of flash size)
-#if !AUTOFLASHSIZE
+#if !FLASH_MAP_SUPPORT
                     if (buf[0] == 0xe9) {
                         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 

@@ -291,7 +291,7 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
     return getFlashChipRealSize();
 #else
     uint32_t data;
@@ -327,7 +327,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
-#if !AUTOFLASHSIZE
+#if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)

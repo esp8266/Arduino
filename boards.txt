@@ -486,7 +486,7 @@ generic.menu.baud.3000000.upload.speed=3000000
 generic.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 generic.menu.eesz.autoflash.build.flash_size=16M
 generic.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-generic.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+generic.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 generic.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -831,7 +831,7 @@ esp8285.menu.baud.3000000.upload.speed=3000000
 esp8285.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 esp8285.menu.eesz.autoflash.build.flash_size=16M
 esp8285.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-esp8285.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+esp8285.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp8285.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -1099,7 +1099,7 @@ gen4iod.menu.baud.3000000.upload.speed=3000000
 gen4iod.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 gen4iod.menu.eesz.autoflash.build.flash_size=16M
 gen4iod.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-gen4iod.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+gen4iod.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 gen4iod.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -1311,7 +1311,7 @@ huzzah.menu.baud.3000000.upload.speed=3000000
 huzzah.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 huzzah.menu.eesz.autoflash.build.flash_size=16M
 huzzah.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-huzzah.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+huzzah.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 huzzah.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -1617,7 +1617,7 @@ wifi_slot.menu.baud.3000000.upload.speed=3000000
 wifi_slot.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 wifi_slot.menu.eesz.autoflash.build.flash_size=16M
 wifi_slot.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-wifi_slot.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+wifi_slot.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_slot.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -1841,7 +1841,7 @@ arduino-esp8266.menu.baud.3000000.upload.speed=3000000
 arduino-esp8266.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 arduino-esp8266.menu.eesz.autoflash.build.flash_size=16M
 arduino-esp8266.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-arduino-esp8266.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+arduino-esp8266.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 arduino-esp8266.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -2086,7 +2086,7 @@ espmxdevkit.menu.baud.3000000.upload.speed=3000000
 espmxdevkit.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espmxdevkit.menu.eesz.autoflash.build.flash_size=16M
 espmxdevkit.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espmxdevkit.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espmxdevkit.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espmxdevkit.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -2299,7 +2299,7 @@ oak.menu.baud.3000000.upload.speed=3000000
 oak.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 oak.menu.eesz.autoflash.build.flash_size=16M
 oak.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-oak.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+oak.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 oak.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -2519,7 +2519,7 @@ espduino.menu.baud.3000000.upload.speed=3000000
 espduino.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espduino.menu.eesz.autoflash.build.flash_size=16M
 espduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espduino.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espduino.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -2731,7 +2731,7 @@ espectro.menu.baud.3000000.upload.speed=3000000
 espectro.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espectro.menu.eesz.autoflash.build.flash_size=16M
 espectro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espectro.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espectro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espectro.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -2946,7 +2946,7 @@ espino.menu.baud.3000000.upload.speed=3000000
 espino.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espino.menu.eesz.autoflash.build.flash_size=16M
 espino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espino.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espino.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -3161,7 +3161,7 @@ espresso_lite_v1.menu.baud.3000000.upload.speed=3000000
 espresso_lite_v1.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espresso_lite_v1.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espresso_lite_v1.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espresso_lite_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v1.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -3376,7 +3376,7 @@ espresso_lite_v2.menu.baud.3000000.upload.speed=3000000
 espresso_lite_v2.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espresso_lite_v2.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espresso_lite_v2.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espresso_lite_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v2.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -3629,7 +3629,7 @@ sonoff.menu.baud.3000000.upload.speed=3000000
 sonoff.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 sonoff.menu.eesz.autoflash.build.flash_size=16M
 sonoff.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-sonoff.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+sonoff.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 sonoff.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -3841,7 +3841,7 @@ inventone.menu.baud.3000000.upload.speed=3000000
 inventone.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 inventone.menu.eesz.autoflash.build.flash_size=16M
 inventone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-inventone.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+inventone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 inventone.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -4053,7 +4053,7 @@ d1_mini.menu.baud.3000000.upload.speed=3000000
 d1_mini.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 d1_mini.menu.eesz.autoflash.build.flash_size=16M
 d1_mini.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-d1_mini.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+d1_mini.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -4282,7 +4282,7 @@ d1_mini_clone.menu.baud.3000000.upload.speed=3000000
 d1_mini_clone.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 d1_mini_clone.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_clone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-d1_mini_clone.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+d1_mini_clone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_clone.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -4526,7 +4526,7 @@ d1_mini_lite.menu.baud.3000000.upload.speed=3000000
 d1_mini_lite.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 d1_mini_lite.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_lite.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-d1_mini_lite.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+d1_mini_lite.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_lite.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -4730,7 +4730,7 @@ d1_mini_pro.menu.baud.3000000.upload.speed=3000000
 d1_mini_pro.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 d1_mini_pro.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_pro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-d1_mini_pro.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+d1_mini_pro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_pro.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -4942,7 +4942,7 @@ d1.menu.baud.3000000.upload.speed=3000000
 d1.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 d1.menu.eesz.autoflash.build.flash_size=16M
 d1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-d1.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+d1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -5170,7 +5170,7 @@ agruminolemon.menu.baud.3000000.upload.speed=3000000
 agruminolemon.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 agruminolemon.menu.eesz.autoflash.build.flash_size=16M
 agruminolemon.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-agruminolemon.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+agruminolemon.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 agruminolemon.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -5382,7 +5382,7 @@ nodemcu.menu.baud.3000000.upload.speed=3000000
 nodemcu.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 nodemcu.menu.eesz.autoflash.build.flash_size=16M
 nodemcu.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-nodemcu.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+nodemcu.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcu.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -5598,7 +5598,7 @@ nodemcuv2.menu.baud.3000000.upload.speed=3000000
 nodemcuv2.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 nodemcuv2.menu.eesz.autoflash.build.flash_size=16M
 nodemcuv2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-nodemcuv2.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+nodemcuv2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcuv2.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -5841,7 +5841,7 @@ modwifi.menu.baud.3000000.upload.speed=3000000
 modwifi.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 modwifi.menu.eesz.autoflash.build.flash_size=16M
 modwifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-modwifi.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+modwifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 modwifi.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -6056,7 +6056,7 @@ phoenix_v1.menu.baud.3000000.upload.speed=3000000
 phoenix_v1.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 phoenix_v1.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-phoenix_v1.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+phoenix_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v1.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -6271,7 +6271,7 @@ phoenix_v2.menu.baud.3000000.upload.speed=3000000
 phoenix_v2.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 phoenix_v2.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-phoenix_v2.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+phoenix_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v2.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -6483,7 +6483,7 @@ eduinowifi.menu.baud.3000000.upload.speed=3000000
 eduinowifi.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 eduinowifi.menu.eesz.autoflash.build.flash_size=16M
 eduinowifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-eduinowifi.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+eduinowifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 eduinowifi.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -6695,7 +6695,7 @@ wiolink.menu.baud.3000000.upload.speed=3000000
 wiolink.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 wiolink.menu.eesz.autoflash.build.flash_size=16M
 wiolink.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-wiolink.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+wiolink.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wiolink.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -6907,7 +6907,7 @@ blynk.menu.baud.3000000.upload.speed=3000000
 blynk.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 blynk.menu.eesz.autoflash.build.flash_size=16M
 blynk.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-blynk.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+blynk.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 blynk.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -7119,7 +7119,7 @@ thing.menu.baud.3000000.upload.speed=3000000
 thing.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 thing.menu.eesz.autoflash.build.flash_size=16M
 thing.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-thing.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+thing.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thing.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -7331,7 +7331,7 @@ thingdev.menu.baud.3000000.upload.speed=3000000
 thingdev.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 thingdev.menu.eesz.autoflash.build.flash_size=16M
 thingdev.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-thingdev.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+thingdev.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thingdev.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -7543,7 +7543,7 @@ esp210.menu.baud.3000000.upload.speed=3000000
 esp210.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 esp210.menu.eesz.autoflash.build.flash_size=16M
 esp210.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-esp210.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+esp210.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp210.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -7755,7 +7755,7 @@ espinotee.menu.baud.3000000.upload.speed=3000000
 espinotee.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 espinotee.menu.eesz.autoflash.build.flash_size=16M
 espinotee.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-espinotee.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+espinotee.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espinotee.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -7967,7 +7967,7 @@ wifi_kit_8.menu.baud.3000000.upload.speed=3000000
 wifi_kit_8.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 wifi_kit_8.menu.eesz.autoflash.build.flash_size=16M
 wifi_kit_8.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-wifi_kit_8.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+wifi_kit_8.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_kit_8.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -8179,7 +8179,7 @@ wifiduino.menu.baud.3000000.upload.speed=3000000
 wifiduino.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 wifiduino.menu.eesz.autoflash.build.flash_size=16M
 wifiduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-wifiduino.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+wifiduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifiduino.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -8447,7 +8447,7 @@ wifinfo.menu.baud.3000000.upload.speed=3000000
 wifinfo.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 wifinfo.menu.eesz.autoflash.build.flash_size=16M
 wifinfo.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-wifinfo.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+wifinfo.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifinfo.menu.eesz.autoflash.upload.maximum_size=1044464
 
 ##############################################################
@@ -8662,6 +8662,6 @@ cw01.menu.baud.3000000.upload.speed=3000000
 cw01.menu.eesz.autoflash=Mapping defined by Hardware and Sketch
 cw01.menu.eesz.autoflash.build.flash_size=16M
 cw01.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
-cw01.menu.eesz.autoflash.build.extra_flags=-DAUTOFLASHSIZE=1
+cw01.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 cw01.menu.eesz.autoflash.upload.maximum_size=1044464
 

@@ -393,7 +393,7 @@ extern "C" void __disableWiFiAtBootTime (void)
     wifi_fpm_do_sleep(0xFFFFFFF);
 }
 
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
 #include "flash_hal.h"
 extern "C" void flashinit (void);
 uint32_t __flashindex;
@@ -428,7 +428,7 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
     flashinit();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.

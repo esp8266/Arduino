@@ -69,7 +69,7 @@ int32_t flash_hal_erase(uint32_t addr, uint32_t size) {
     return FLASH_HAL_OK;
 }
 
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
 
 // default weak configuration:
 FLASH_MAP_SETUP_CONFIG_ATTR(__attribute__((weak)), FLASH_MAP_OTA_FS)

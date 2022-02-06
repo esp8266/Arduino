@@ -1604,7 +1604,7 @@ def all_flash_map ():
             '.menu.eesz.autoflash': 'Mapping defined by Hardware and Sketch',
             '.menu.eesz.autoflash.build.flash_size': '16M',
             '.menu.eesz.autoflash.build.flash_ld': 'eagle.flash.auto.ld',
-            '.menu.eesz.autoflash.build.extra_flags': '-DAUTOFLASHSIZE=1',
+            '.menu.eesz.autoflash.build.extra_flags': '-DFLASH_MAP_SUPPORT=1',
             '.menu.eesz.autoflash.upload.maximum_size': '1044464',
         },
         '512K': f512,

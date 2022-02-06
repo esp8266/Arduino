@@ -186,7 +186,7 @@ void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 void attachInterruptArg(uint8_t pin, void (*)(void*), void* arg, int mode);
 
-#if AUTOFLASHSIZE
+#if FLASH_MAP_SUPPORT
 #include <flash_hal.h>
 #endif
 void preinit(void);
