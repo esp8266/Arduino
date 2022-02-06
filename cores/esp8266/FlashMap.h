@@ -20,7 +20,7 @@ typedef struct
 /*
   Following definitions map the above structure, one per line.
   FLASH_MAP_* is a user choice in sketch:
-      `FLASHMAPCONFIG(FLASH_MAP_OTA_FS)`
+      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`
   Configuration is made at boot with detected flash chip size (last argument 512..16384)
   Other values are defined from `tools/boards.txt.py`.
 */

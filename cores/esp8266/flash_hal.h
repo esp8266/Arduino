@@ -37,8 +37,8 @@ extern void flashinit(void);
 extern uint32_t __flashindex;
 extern const flash_map_s __flashdesc[];
 
-#define FLASHMAPCONFIG(conf) FLASHMAPCONFIGATTR(,conf)
-#define FLASHMAPCONFIGATTR(attr, conf...) \
+#define FLASH_MAP_SETUP_CONFIG(conf) FLASH_MAP_SETUP_CONFIG_ATTR(,conf)
+#define FLASH_MAP_SETUP_CONFIG_ATTR(attr, conf...) \
   const flash_map_s __flashdesc[] PROGMEM = conf; \
   void flashinit (void) attr; \
   void flashinit (void) \

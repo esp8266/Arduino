@@ -1581,7 +1581,7 @@ def all_flash_map ():
         define += '/*\n'
         define += '  Following definitions map the above structure, one per line.\n'
         define += '  FLASH_MAP_* is a user choice in sketch:\n'
-        define += '      `FLASHMAPCONFIG(FLASH_MAP_OTA_FS)`\n'
+        define += '      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`\n'
         define += '  Configuration is made at boot with detected flash chip size (last argument 512..16384)\n'
         define += '  Other values are defined from `tools/boards.txt.py`.\n'
         define += '*/\n'

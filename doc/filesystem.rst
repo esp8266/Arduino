@@ -38,7 +38,7 @@ Sketch can invoke a particular configuration by adding this line:
 
 .. code:: cpp
 
-    FLASHMAPCONFIG(FLASH_MAP_OTA_FS)
+    FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)
     void setup () { ... }
     void loop () { ... }
 
