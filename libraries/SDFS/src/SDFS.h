@@ -101,7 +101,7 @@ public:
         info.pageSize = 0; // TODO ?
         info.maxPathLength = 255; // TODO ?
         info.totalBytes =_fs.vol()->clusterCount() * info.blockSize;
-        info.usedBytes = info.totalBytes - (_fs.vol()->freeClusterCount() * _fs.vol()->bytesPerCluster());
+        info.usedBytes = (_fs.vol()->clusterCount() - _fs.vol()->freeClusterCount()) * info.blockSize;
         return true;
     }
 

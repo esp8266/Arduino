@@ -353,9 +353,11 @@ void ArduinoOTAClass::end() {
     _initialized = false;
     _udp_ota->unref();
     _udp_ota = 0;
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
     if(_useMDNS){
         MDNS.end();
     }
+#endif
     _state = OTA_IDLE;
     #ifdef OTA_DEBUG
     OTA_DEBUG.printf("OTA server stopped.\n");

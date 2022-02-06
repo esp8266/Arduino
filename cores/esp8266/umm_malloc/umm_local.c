@@ -192,15 +192,15 @@ void umm_print_stats(int force) {
     umm_heap_context_t *_context = umm_get_current_heap();
 
     DBGLOG_FORCE(force, "umm heap statistics:\n");
-    DBGLOG_FORCE(force,   "  Heap ID           %5u\n", _context->id);
-    DBGLOG_FORCE(force,   "  Free Space        %5u\n", _context->UMM_FREE_BLOCKS * sizeof(umm_block));
-    DBGLOG_FORCE(force,   "  OOM Count         %5u\n", _context->UMM_OOM_COUNT);
+    DBGLOG_FORCE(force,   "  Heap ID           %7u\n", _context->id);
+    DBGLOG_FORCE(force,   "  Free Space        %7u\n", _context->UMM_FREE_BLOCKS * sizeof(umm_block));
+    DBGLOG_FORCE(force,   "  OOM Count         %7u\n", _context->UMM_OOM_COUNT);
     #if defined(UMM_STATS_FULL)
-    DBGLOG_FORCE(force,   "  Low Watermark     %5u\n", _context->stats.free_blocks_min * sizeof(umm_block));
-    DBGLOG_FORCE(force,   "  Low Watermark ISR %5u\n", _context->stats.free_blocks_isr_min * sizeof(umm_block));
-    DBGLOG_FORCE(force,   "  MAX Alloc Request %5u\n", _context->stats.alloc_max_size);
+    DBGLOG_FORCE(force,   "  Low Watermark     %7u\n", _context->stats.free_blocks_min * sizeof(umm_block));
+    DBGLOG_FORCE(force,   "  Low Watermark ISR %7u\n", _context->stats.free_blocks_isr_min * sizeof(umm_block));
+    DBGLOG_FORCE(force,   "  MAX Alloc Request %7u\n", _context->stats.alloc_max_size);
     #endif
-    DBGLOG_FORCE(force,   "  Size of umm_block %5u\n", sizeof(umm_block));
+    DBGLOG_FORCE(force,   "  Size of umm_block %7u\n", sizeof(umm_block));
     DBGLOG_FORCE(force, "+--------------------------------------------------------------+\n");
 }
 #endif

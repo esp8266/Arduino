@@ -263,8 +263,8 @@ class String {
         void setCapacity(int cap) { if (!isSSO()) ptr.cap = cap; }
         void setBuffer(char *buff) { if (!isSSO()) ptr.buff = buff; }
         // Buffer accessor functions
-        const char *buffer() const { return wbuffer(); }
-        char *wbuffer() const { return isSSO() ? const_cast<char *>(sso.buff) : ptr.buff; } // Writable version of buffer
+        const char *buffer() const { return isSSO() ? sso.buff : ptr.buff; }
+        char *wbuffer() { return const_cast<char *>(buffer()); } // Writable version of buffer
 
         // concatenation is done via non-member functions
         // make sure we still have access to internal methods, since we optimize based on capacity of both sides and want to manipulate internal buffers directly
