@@ -15,9 +15,9 @@ environment:
 
 ::
 
-    |--------------|-------|---------------------|--|--|--|--|--|
-    ^              ^       ^                     ^     ^
-    Sketch    OTA update   Onboard File system   EEPROM  WiFi config (SDK)
+    |--------------|-------|---------------|--|--|--|--|--|
+    ^              ^       ^               ^     ^
+    Sketch    OTA update   File system   EEPROM  WiFi config (SDK)
 
 File system size depends on the flash chip size. Depending on the board
 which is selected in IDE, the following table shows options for flash size.
