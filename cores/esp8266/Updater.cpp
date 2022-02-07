@@ -24,7 +24,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-#include "flash_hal.h"
+#include <flash_hal.h> // not "flash_hal.h": can use hijacked MOCK version
 
 UpdaterClass::UpdaterClass()
 {
