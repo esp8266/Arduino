@@ -40,9 +40,6 @@ EEPROMClass::EEPROMClass(uint32_t sector)
 
 EEPROMClass::EEPROMClass(void)
 : _sector(((EEPROM_start - 0x40200000) / SPI_FLASH_SEC_SIZE))
-, _data(0)
-, _size(0)
-, _dirty(false)
 {
 }
 
