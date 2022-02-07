@@ -187,7 +187,7 @@ void detachInterrupt(uint8_t pin);
 void attachInterruptArg(uint8_t pin, void (*)(void*), void* arg, int mode);
 
 #if FLASH_MAP_SUPPORT
-#include <flash_hal.h>
+#include "flash_hal.h"
 #endif
 void preinit(void);
 void setup(void);
