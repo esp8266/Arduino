@@ -24,7 +24,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-#include <flash_hal.h>
+#include "flash_hal.h"
 
 UpdaterClass::UpdaterClass()
 {
