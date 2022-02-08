@@ -296,7 +296,7 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
 }
 #endif // UMM_STATS_FULL
 
-
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 /*
  * Saturated unsigned add
  * Poison added to allocation size requires overflow protection.
@@ -308,6 +308,7 @@ static size_t umm_uadd_sat(const size_t a, const size_t b) {
     }
     return r;
 }
+#endif
 
 /*
  * Use platform-specific functions to protect against unsigned overflow/wrap by
