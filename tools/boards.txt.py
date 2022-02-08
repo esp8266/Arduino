@@ -1371,7 +1371,7 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
+def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
 
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
@@ -1405,15 +1405,57 @@ def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
     fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start
 
     max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
+
+    if fs_kb == 0:
+        fs_start = fs_end
+        page = 0
+        fs_blocksize = 0
+    else:
+        page = 0x100
+
+    # menu output
+
+    #d.update(collections.OrderedDict([
+    #    ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
+    #    ]))
+
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
     strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
     ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
+
     menu = '.menu.eesz.' + strsize + strfs_strip
     menub = menu + '.build.'
     desc = 'none' if (fs_kb == 0) else strfs + 'B'
-    d = collections.OrderedDict([
+
+    return {
+        "confname": confname,
+        "flashsize_kb": flashsize_kb,
+        "ld": ld,
+        "menu": menu,
+        "menub": menub,
+        "desc": desc,
+        "spi": spi,
+        "strsize": strsize,
+        "fs_start": fs_start,
+        "max_upload_size": max_upload_size,
+        "max_ota_size": max_ota_size,
+        "fs_start": fs_start,
+        "fs_end": fs_end,
+        "fs_pagesize": page,
+        "fs_blocksize": fs_blocksize,
+        "fs_kb": fs_kb,
+        "eeprom_start": eeprom_start,
+        "eeprom_size_kb": eeprom_size_kb,
+        "rfcal_addr": rfcal_addr,
+        "rfcal_size_kb": rfcal_size_kb,
+        "sdkwifi_size_kb": sdkwifi_size_kb
+    }
+
+
+def menu_generate (*, ld, menu, strsize, desc, max_ota_size, menub, rfcal_addr, fs_start, fs_end, fs_blocksize, fs_kb, **kwargs):
+    out = collections.OrderedDict([
         ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
         #( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
@@ -1424,196 +1466,209 @@ def flash_map (flashsize_kb, fs_kb = 0, conf_name = ''):
         ])
 
     if fs_kb > 0:
-        d.update(collections.OrderedDict([
+        out.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % fs_start ),
             ( menub + 'spiffs_end', "0x%05X" % fs_end ),
             ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
             ]))
 
-    #d.update(collections.OrderedDict([
-    #    ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
-    #    ]))
+    return out
 
-    if ldshow:
-        if ldgen:
 
-            checkdir()
-
-            ldbackupdir = lddir + "backup/"
-            if not os.path.isdir(ldbackupdir):
-                os.mkdir(ldbackupdir)
-            if os.path.isfile(lddir + ld) and not os.path.isfile(ldbackupdir + ld):
-                os.rename(lddir + ld, ldbackupdir + ld)
-            realstdout = sys.stdout
-            sys.stdout = open(lddir + ld, 'w')
-
-        if fs_kb == 0:
-            fs_start = fs_end
-            page = 0
-            fs_blocksize = 0
-        else:
-            page = 0x100
-
-        if not conf_name == '':
-            if not conf_name in c_flash_map:
-                c_flash_map[conf_name] = collections.OrderedDict([])
-            c_flash_map[conf_name][flashsize_kb] = \
-                  '.eeprom_start = ' + hex(spi + eeprom_start) + ', ' \
-                + '.fs_start = ' + hex(spi + fs_start) + ', ' \
-                + '.fs_end = ' + hex(spi + fs_end) + ', ' \
-                + '.fs_block_size = ' + hex(fs_blocksize)+ ', ' \
-                + '.fs_page_size = ' + hex(page) + ', ' \
-
-        print("/* Flash Split for %s chips */" % strsize)
-        print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        empty_size = fs_start - max_upload_size
-        if empty_size > 0:
-            print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
-        print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-        print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
-        print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
-        print("")
-        print("MEMORY")
-        print("{")
-        print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
-        print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        # Moved to ld/eagle.app.v6.common.ld.h as a 2nd MEMORY command.
-        # print("  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE")
-        print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
-        print("}")
-        print("")
-        print("PROVIDE ( _FS_start = 0x%08X );" % (spi + fs_start))
-        print("PROVIDE ( _FS_end = 0x%08X );" % (spi + fs_end))
-        print("PROVIDE ( _FS_page = 0x%X );" % page)
-        print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
-        print("PROVIDE ( _EEPROM_start = 0x%08x );" % (spi + eeprom_start))
-        # Re-add deprecated symbols pointing to the same address as the new standard ones
-        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
-        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (spi + fs_start))
-        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (spi + fs_end))
-        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-        print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
-        print("")
-        print('INCLUDE "local.eagle.app.v6.common.ld"')
-
-        if ldgen:
-            sys.stdout.close()
-            sys.stdout = realstdout
-
-    return d
-
-def all_flash_map ():
-
-    f512 = collections.OrderedDict([])
-    f1m  = collections.OrderedDict([])
-    f2m  = collections.OrderedDict([])
-    f4m  = collections.OrderedDict([])
-    f8m  = collections.OrderedDict([])
-    f16m = collections.OrderedDict([])
-
-    global c_flash_map
-    c_flash_map = collections.OrderedDict([])
-
-    #                      flash(KB) spiffs(KB) confname(C)
-
-    f1m.update( flash_map(    1024,      64, 'OTA_FS' ))
-    f1m.update( flash_map(    1024,     128 ))
-    f1m.update( flash_map(    1024,     144 ))
-    f1m.update( flash_map(    1024,     160 ))
-    f1m.update( flash_map(    1024,     192 ))
-    f1m.update( flash_map(    1024,     256 ))
-    f1m.update( flash_map(    1024,     512, 'MAX_FS' ))
-    f1m.update( flash_map(    1024,       0, 'NO_FS'  ))
-
-    f2m.update( flash_map(  2*1024,      64 ))
-    f2m.update( flash_map(  2*1024,     128 ))
-    f2m.update( flash_map(  2*1024,     256, 'OTA_FS' ))
-    f2m.update( flash_map(  2*1024,     512 ))
-    f2m.update( flash_map(  2*1024,    1024, 'MAX_FS' ))
-    f2m.update( flash_map(  2*1024,       0, 'NO_FS'  ))
-
-    f4m.update( flash_map(  4*1024,  2*1024, 'OTA_FS' ))
-    f4m.update( flash_map(  4*1024,  3*1024, 'MAX_FS' ))
-    f4m.update( flash_map(  4*1024,    1024 ))
-    f4m.update( flash_map(  4*1024,       0, 'NO_FS'  ))
-
-    f8m.update( flash_map(  8*1024,  6*1024, 'OTA_FS' ))
-    f8m.update( flash_map(  8*1024,  7*1024, 'MAX_FS' ))
-    f8m.update( flash_map(  8*1024,       0, 'NO_FS'  ))
-
-    f16m.update(flash_map( 16*1024, 14*1024, 'OTA_FS' ))
-    f16m.update(flash_map( 16*1024, 15*1024, 'MAX_FS' ))
-    f16m.update(flash_map( 16*1024,       0, 'NO_FS'  ))
-
-    f512.update(flash_map(     512,      32, 'OTA_FS' ))
-    f512.update(flash_map(     512,      64 ))
-    f512.update(flash_map(     512,     128, 'MAX_FS' ))
-    f512.update(flash_map(     512,       0, 'NO_FS'  ))
-
-    if ldgen:
-        print("generated: ldscripts (in %s)" % lddir)
-
-    if ldshow:
-        if ldgen:
-            realstdout = sys.stdout
-            sys.stdout = open('cores/esp8266/FlashMap.h', 'w')
-
-        define = '\n'
-        define += '// - do not edit - autogenerated by boards.txt.py\n'
-        define += '\n'
-        define += '#ifndef __FLASH_MAP_H\n'
-        define += '#define __FLASH_MAP_H\n'
-        define += '\n'
-        define += '#include <stdint.h>\n'
-        define += '#include <stddef.h>\n'
-        define += '\n'
-        define += 'typedef struct\n'
-        define += '{\n'
-        define += '    uint32_t eeprom_start;\n'
-        define += '    uint32_t fs_start;\n'
-        define += '    uint32_t fs_end;\n'
-        define += '    uint32_t fs_block_size;\n'
-        define += '    uint32_t fs_page_size;\n'
-        define += '    uint32_t flash_size_kb;\n'
-        define += '} flash_map_s;\n'
-        define += '\n'
-        define += '/*\n'
-        define += '  Following definitions map the above structure, one per line.\n'
-        define += '  FLASH_MAP_* is a user choice in sketch:\n'
-        define += '      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`\n'
-        define += '  Configuration is made at boot with detected flash chip size (last argument 512..16384)\n'
-        define += '  Other values are defined from `tools/boards.txt.py`.\n'
-        define += '*/\n'
-        for i in c_flash_map:
-            define += '\n#define FLASH_MAP_' + i + ' \\\n    { \\\n'
-            for d in c_flash_map[i]:
-                define += '        { ' + c_flash_map[i][d] + '.flash_size_kb = ' + str(d) + ' }, \\\n'
-            define += '    }\n'
-        define += '\n#endif // __FLASH_MAP_H\n'
-
-        print(define)
-
-        if ldgen:
-            sys.stdout.close()
-            sys.stdout = realstdout
-            print("generated: flash map config file (in cores/esp8266/FlashMap.h)")
-
-    return {
+def all_menu_generate (mapping):
+    d = {
         'autoflash': {
             '.menu.eesz.autoflash': 'Mapping defined by Hardware and Sketch',
             '.menu.eesz.autoflash.build.flash_size': '16M',
             '.menu.eesz.autoflash.build.flash_ld': 'eagle.flash.auto.ld',
             '.menu.eesz.autoflash.build.extra_flags': '-DFLASH_MAP_SUPPORT=1',
             '.menu.eesz.autoflash.upload.maximum_size': '1044464',
-        },
-        '512K': f512,
-          '1M':  f1m,
-          '2M':  f2m,
-          '4M':  f4m,
-          '8M':  f8m,
-         '16M': f16m
         }
+    }
+
+    for k, values in mapping.items():
+        items = collections.OrderedDict([])
+        for v in values:
+            items.update(menu_generate(**v))
+        d[k] = items
+
+    return d
+
+
+def ldscript_generate (*, ld, strsize, spi, max_upload_size, fs_start, fs_end, fs_pagesize, fs_blocksize, rfcal_addr, rfcal_size_kb, sdkwifi_size_kb, eeprom_start, eeprom_size_kb, **kwargs):
+    if ldgen:
+        checkdir()
+
+        ldbackupdir = lddir + "backup/"
+        if not os.path.isdir(ldbackupdir):
+            os.mkdir(ldbackupdir)
+        if os.path.isfile(lddir + ld) and not os.path.isfile(ldbackupdir + ld):
+            os.rename(lddir + ld, ldbackupdir + ld)
+        realstdout = sys.stdout
+        sys.stdout = open(lddir + ld, 'w')
+
+    print("/* Flash Split for %s chips */" % strsize)
+    print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
+    empty_size = fs_start - max_upload_size
+    if empty_size > 0:
+        print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+    print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
+    print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+    print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+    print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+    print("")
+    print("MEMORY")
+    print("{")
+    print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
+    print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
+    # Moved to ld/eagle.app.v6.common.ld.h as a 2nd MEMORY command.
+    # print("  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE")
+    print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
+    print("}")
+    print("")
+    print("PROVIDE ( _FS_start = 0x%08X );" % (spi + fs_start))
+    print("PROVIDE ( _FS_end = 0x%08X );" % (spi + fs_end))
+    print("PROVIDE ( _FS_page = 0x%X );" % fs_pagesize)
+    print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+    print("PROVIDE ( _EEPROM_start = 0x%08x );" % (spi + eeprom_start))
+    # Re-add deprecated symbols pointing to the same address as the new standard ones
+    print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+    print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (spi + fs_start))
+    print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (spi + fs_end))
+    print("PROVIDE ( _SPIFFS_page = 0x%X );" % fs_pagesize)
+    print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
+    print("")
+    print('INCLUDE "local.eagle.app.v6.common.ld"')
+
+    if ldgen:
+        sys.stdout.close()
+        sys.stdout = realstdout
+        print("generated: %s" % (lddir + ld))
+
+
+def all_ldscript_generate (mapping):
+    for v in mapping.values():
+        for i in v:
+            ldscript_generate(**i)
+
+
+def all_flashmap_generate (mapping):
+    if flashmapgen:
+        realstdout = sys.stdout
+        sys.stdout = open(flashmap_h, "w")
+
+    def as_address(value, mapping):
+        return "0x%08x" % (value + mapping["spi"])
+
+    def as_hex(value, _):
+        return "0x%x" % value
+
+    def as_dec(value, _):
+        return "%d" % value
+
+    fields = [
+        ["fs_start",     as_address],
+        ["fs_end",       as_address],
+        ["fs_blocksize", as_hex],
+        ["fs_pagesize",  as_hex],
+        ["eeprom_start", as_address],
+        ["flashsize_kb", as_dec],
+    ]
+
+    print("// - DO NOT EDIT - autogenerated by boards.txt.py")
+    print()
+    print("#pragma once")
+    print()
+    print("#include <stdint.h>")
+    print("#include <stddef.h>")
+    print()
+    print("typedef struct")
+    print("{")
+    for field, _ in fields:
+        print("    uint32_t %s;" % field)
+    print("} flash_map_s;")
+    print()
+    print("/*")
+    print("  Following definitions map the above structure, one per line.")
+    print("  FLASH_MAP_* is a user choice in sketch:")
+    print("      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`")
+    print("  Configuration is made at boot with detected flash chip size (last argument 512..16384)")
+    print("  Other values are defined from `tools/boards.txt.py`.")
+    print("*/")
+    print()
+
+    conflines = collections.OrderedDict([])
+    for _, flash_maps in mapping.items():
+        for flash_map in flash_maps:
+            confname = flash_map.get("confname")
+            if not confname:
+                continue
+
+            if not conflines.get(confname):
+                conflines[confname] = []
+
+            line = ", ".join(".%s = %s" % ((f, mod(flash_map[f], flash_map))
+                if mod else flash_map[f]) for f, mod in fields)
+            conflines[confname].append("{ %s }, \\" % line)
+
+    for confname, lines in conflines.items():
+        print("#define FLASH_MAP_%s \\" % confname)
+        print("    { \\")
+        for line in lines:
+            print("        %s" % line)
+        print("    }")
+        print()
+
+    if flashmapgen:
+        sys.stdout.close()
+        sys.stdout = realstdout
+        print("generated: flash map config file %s" % flashmap_h)
+
+
+def all_flash_map ():
+    #                flash(KB)   fs(KB) flashmap(optional)
+    return collections.OrderedDict([
+        ["1M", [
+            flash_map(    1024,      64, "OTA_FS" ),
+            flash_map(    1024,     128 ),
+            flash_map(    1024,     144 ),
+            flash_map(    1024,     160 ),
+            flash_map(    1024,     192 ),
+            flash_map(    1024,     256 ),
+            flash_map(    1024,     512, "MAX_FS" ),
+            flash_map(    1024,       0, "NO_FS"  ),
+        ]],
+        ["2M", [
+            flash_map(  2*1024,      64 ),
+            flash_map(  2*1024,     128 ),
+            flash_map(  2*1024,     256, "OTA_FS" ),
+            flash_map(  2*1024,     512 ),
+            flash_map(  2*1024,    1024, "MAX_FS" ),
+            flash_map(  2*1024,       0, "NO_FS" ),
+        ]],
+        ["4M", [
+            flash_map(  4*1024,  2*1024, "OTA_FS" ),
+            flash_map(  4*1024,  3*1024, "MAX_FS" ),
+            flash_map(  4*1024,    1024 ),
+            flash_map(  4*1024,       0, "NO_FS"),
+        ]],
+        ["8M", [
+            flash_map(  8*1024,  6*1024, "OTA_FS" ),
+            flash_map(  8*1024,  7*1024, "MAX_FS" ),
+            flash_map(  8*1024,       0, "NO_FS" ),
+        ]],
+        ["16M", [
+            flash_map( 16*1024, 14*1024, "OTA_FS" ),
+            flash_map( 16*1024, 15*1024, "MAX_FS" ),
+            flash_map( 16*1024,       0, "NO_FS" ),
+        ]],
+        ["512K", [
+            flash_map(     512,      32, "OTA_FS" ),
+            flash_map(     512,      64 ),
+            flash_map(     512,     128, "MAX_FS" ),
+            flash_map(     512,       0, "NO_FS" ),
+        ]]
+    ])
 
 ################################################################
 # builtin led
@@ -1678,7 +1733,7 @@ def all_boards ():
             realstdout = sys.stdout
             sys.stdout = open("boards.local.txt", 'w')
 
-    macros.update(all_flash_map())
+    macros.update(all_menu_generate(all_flash_map()))
     macros.update(all_debug())
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
@@ -1902,6 +1957,8 @@ def usage (name,ret):
     print(" --boardnames      - prints a list of board names, one per line")
     print(" --ld              - show ldscripts")
     print(" --ldgen           - replace ldscripts")
+    print(" --flashmap        - shows FlashMap.h")
+    print(" --flashmapgen     - replace FlashMap.h")
     print(" --package         - show package")
     print(" --packagegen      - replace board:[] in package")
     print(" --doc             - shows doc/boards.rst")
@@ -1939,6 +1996,8 @@ led_max = 16
 nofloat = False
 ldgen = False
 ldshow = False
+flashmapshow = False
+flashmapgen = False
 boardsgen = False
 boardsshow = False
 
@@ -1954,7 +2013,9 @@ packagegen = False
 docshow = False
 docgen = False
 customspeeds = []
+
 lddir = "tools/sdk/ld/"
+flashmap_h = "cores/esp8266/FlashMap.h"
 
 #### vvvv cmdline parsing starts
 
@@ -1963,7 +2024,11 @@ try:
         [ "help", "led=", "speed=", "board=", "customspeed=", "nofloat",
           "noextra4kheap", "allowWPS",
           "boardslocalgen", "filter=", "xfilter=", "boardnames",
-          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
+          "ld", "ldgen",
+          "flashmap", "flashmapgen",
+          "boards", "boardsgen",
+          "package", "packagegen",
+          "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
     print(str(err)) # will print something like "option -a not recognized"
@@ -2024,6 +2089,13 @@ for o, a in opts:
         ldshow = True
         ldgen = True
 
+    elif o in ("--flashmap"):
+        flashmapshow = True
+
+    elif o in ("--flashmapgen"):
+        flashmapshow = True
+        flashmapgen = True
+
     elif o in ("--boardsshow"):
         boardsshow = True
 
@@ -2052,6 +2124,8 @@ for o, a in opts:
     elif o in ("--allgen"):
         ldshow = True
         ldgen = True
+        flashmapshow = True
+        flashmapgen = True
         boardsshow = True
         boardsgen = True
         packageshow = True
@@ -2106,7 +2180,11 @@ if boardfilteropt or excludeboards:
 did = False
 
 if ldshow:
-    all_flash_map()
+    all_ldscript_generate(all_flash_map())
+    did = True
+
+if flashmapshow:
+    all_flashmap_generate(all_flash_map())
     did = True
 
 if boardsshow:
