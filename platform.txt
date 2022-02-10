@@ -52,11 +52,17 @@ build.sdk=NONOSDK22x_190703
 #build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
+# These are not overriden when FS is not configured
+build.eeprom_start=
+build.spiffs_start=
+build.spiffs_end=
+build.spiffs_blocksize=
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 # support precompiled libraries in IDE v1.8.6+
 compiler.libraries.ldflags=
@@ -86,7 +92,7 @@ compiler.elf2hex.flags=
 compiler.size.cmd=xtensa-lx106-elf-size
 
 # This can be overridden in boards.txt
-build.extra_flags=-DESP8266
+build.extra_flags=
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=

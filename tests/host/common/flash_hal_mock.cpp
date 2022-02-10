@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "flash_hal.h"
+
 extern "C"
 {
     uint32_t s_phys_addr = 0;
