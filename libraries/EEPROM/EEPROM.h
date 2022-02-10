@@ -41,30 +41,16 @@ public:
   uint8_t const * getConstDataPtr() const;
 
   template<typename T> 
-  T &get(int const address, T &t) {
-    if (address < 0 || address + sizeof(T) > _size)
-      return t;
-
-    memcpy((uint8_t*) &t, _data + address, sizeof(T));
-    return t;
-  }
+  T& get(int const address, T& t);
 
   template<typename T> 
-  const T &put(int const address, const T &t) {
-    if (address < 0 || address + sizeof(T) > _size)
-      return t;
-    if (memcmp(_data + address, (const uint8_t*)&t, sizeof(T)) != 0) {
-      _dirty = true;
-      memcpy(_data + address, (const uint8_t*)&t, sizeof(T));
-    }
+  const T& put(int const address, const T& t);
 
-    return t;
-  }
+  size_t length();
 
-  size_t length() {return _size;}
+  uint8_t& operator[](int const address);
+  uint8_t const& operator[](int const address) const;
 
-  uint8_t& operator[](int const address) {return getDataPtr()[address];}
-  uint8_t const & operator[](int const address) const {return getConstDataPtr()[address];}
 
 protected:
   uint32_t _sector;

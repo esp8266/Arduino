@@ -151,6 +151,32 @@ uint8_t const * EEPROMClass::getConstDataPtr() const {
   return &_data[0];
 }
 
+template<typename T>
+T& EEPROMClass::get(int const address, T& t) {
+    if (address < 0 || address + sizeof(T) > _size)
+        return t;
+
+    memcpy((uint8_t*)&t, _data + address, sizeof(T));
+    return t;
+}
+
+template<typename T>
+const T& EEPROMClass::put(int const address, const T& t) {
+    if (address < 0 || address + sizeof(T) > _size)
+        return t;
+    if (memcmp(_data + address, (const uint8_t*)&t, sizeof(T)) != 0) {
+        _dirty = true;
+        memcpy(_data + address, (const uint8_t*)&t, sizeof(T));
+    }
+
+    return t;
+}
+
+size_t EEPROMClass::length() { return _size; }
+
+uint8_t& EEPROMClass::operator[](int const address) { return getDataPtr()[address]; }
+uint8_t const& EEPROMClass::operator[](int const address) const { return getConstDataPtr()[address]; }
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
 EEPROMClass EEPROM;
 #endif
