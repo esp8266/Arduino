@@ -258,7 +258,7 @@ String &String::operator =(String &&rval) noexcept {
 }
 
 String &String::operator =(const char *cstr) {
-    if (cstr)
+    if (cstr && cstr[0])
         copy(cstr, strlen(cstr));
     else
         invalidate();

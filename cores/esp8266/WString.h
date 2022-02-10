@@ -88,7 +88,7 @@ class String {
             return buffer() ? len() : 0;
         }
         void clear(void) {
-            setLen(0);
+            invalidate();
         }
         bool isEmpty(void) const {
             return length() == 0;
