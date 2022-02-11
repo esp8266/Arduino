@@ -26,7 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
-
+#include "flash_hal.h"
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
 #include <pgmspace.h>
@@ -291,6 +291,9 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
+#if FLASH_MAP_SUPPORT
+    return getFlashChipRealSize();
+#else
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
@@ -298,6 +301,7 @@ uint32_t EspClass::getFlashChipSize(void)
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
+#endif
 }
 
 uint32_t EspClass::getFlashChipSpeed(void)
@@ -323,6 +327,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
+#if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
@@ -343,6 +348,7 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return 0;
     }
 }
+#endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
     switch(byte & 0x0F) {
@@ -612,14 +618,12 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _FS_start;
-
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
