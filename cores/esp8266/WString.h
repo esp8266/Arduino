@@ -649,43 +649,8 @@ class String {
             return ptr - buffer();
         }
 
-        int _lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
-        {
-            size_t len;
-            if (!find || !(len = length())) {
-                return -1;
-            }
-            if (fromIndex == ~0U) {
-                fromIndex = len;
-            }
-            else if (fromIndex < findLen || fromIndex > len) {
-                return -1;
-            }
-            auto ptr = __strrstr_P(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
-            if (!ptr) {
-                return -1;
-            }
-            return ptr - buffer();
-        }
-
-        int _lastIndexOf(const char *find, size_t fromIndex, size_t findLen) const
-        {
-            size_t len;
-            if (!find || !(len = length())) {
-                return -1;
-            }
-            if (fromIndex == ~0U) {
-                fromIndex = len;
-            }
-            else if (fromIndex < findLen || fromIndex > len) {
-                return -1;
-            }
-            auto ptr = __strrstr(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
-            if (!ptr) {
-                return -1;
-            }
-            return ptr - buffer();
-        }
+        int _lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const;
+        int _lastIndexOf(const char *find, size_t fromIndex, size_t findLen) const;
 
 
     // additional indexOf methods with ignore case and support for char, const char *, const __FlashStringHelper * and String
@@ -752,7 +717,7 @@ class String {
     protected:
         bool _replace(PGM_P find, size_t findLen, PGM_P replace, size_t replaceLen);
 
-    // public replace function with return type if bool for success
+    // public replace function with return type bool for success
     public:
         inline bool replace(const char *find, const char *replace) {
             return _replace(find, strlen(find), replace, strlen(replace));

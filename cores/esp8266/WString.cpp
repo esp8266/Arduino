@@ -599,7 +599,48 @@ int String::indexOf(const String &s2, unsigned int fromIndex) const {
     return found - buffer();
 }
 
-String String::substring(unsigned int left, unsigned int right) const {
+// TODO write test cases, there might be issues with this method
+int String::_lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
+{
+    size_t len;
+    if (!find || !(len = length())) {
+        return -1;
+    }
+    if (fromIndex == ~0U) {
+        fromIndex = len;
+    }
+    else if (fromIndex > len) {
+        return -1;
+    }
+    auto ptr = __strrstr_P(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
+    if (!ptr) {
+        return -1;
+    }
+    return ptr - buffer();
+}
+
+// TODO write test cases, there might be issues with this method
+int String::_lastIndexOf(const char *find, size_t fromIndex, size_t findLen) const
+{
+    size_t len;
+    if (!find || !(len = length())) {
+        return -1;
+    }
+    if (fromIndex == ~0U) {
+        fromIndex = len;
+    }
+    else if (fromIndex > len) {
+        return -1;
+    }
+    auto ptr = __strrstr(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
+    if (!ptr) {
+        return -1;
+    }
+    return ptr - buffer();
+}
+
+String String::substring(unsigned int left, unsigned int right) const
+{
     if (left > right) {
         unsigned int temp = right;
         right = left;
