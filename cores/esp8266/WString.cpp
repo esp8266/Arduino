@@ -599,7 +599,7 @@ int String::indexOf(const String &s2, unsigned int fromIndex) const {
     return found - buffer();
 }
 
-// TODO write test cases, there might be issues with this method
+// TODO write test cases to verify this is working correctly
 int String::_lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
 {
     size_t len;
@@ -609,9 +609,9 @@ int String::_lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
     if (fromIndex == ~0U) {
         fromIndex = len;
     }
-    else if (fromIndex > len) {
-        return -1;
-    }
+    // else if (fromIndex < findLen || fromIndex > len) {
+    //     return -1;
+    // }
     auto ptr = __strrstr_P(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
     if (!ptr) {
         return -1;
@@ -619,7 +619,8 @@ int String::_lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
     return ptr - buffer();
 }
 
-// TODO write test cases, there might be issues with this method
+// TODO write test cases to verify this is working correctly
+// same method as String::_lastIndexOf_P(PGM_P find, size_t fromIndex, size_t findLen) const
 int String::_lastIndexOf(const char *find, size_t fromIndex, size_t findLen) const
 {
     size_t len;
@@ -629,9 +630,9 @@ int String::_lastIndexOf(const char *find, size_t fromIndex, size_t findLen) con
     if (fromIndex == ~0U) {
         fromIndex = len;
     }
-    else if (fromIndex > len) {
-        return -1;
-    }
+    // else if (fromIndex < findLen || fromIndex > len) {
+    //     return -1;
+    // }
     auto ptr = __strrstr(const_cast<char *>(buffer()), fromIndex + findLen, find, findLen);
     if (!ptr) {
         return -1;
@@ -679,6 +680,7 @@ bool String::replace(char find, char replace)
     return true;
 }
 
+// TODO write test cases to verify this is working correctly
 bool String::_replace(PGM_P find, size_t findLen, PGM_P replace, size_t replaceLen)
 {
     if (length() == 0 || findLen == 0 || !find) {
@@ -718,7 +720,10 @@ bool String::_replace(PGM_P find, size_t findLen, PGM_P replace, size_t replaceL
         if (size > capacity() && !changeBuffer(size)) {
             return false;
         }
-        int index = len() - 1;
+        int index = len();
+        //TODO
+        // int index = len() - 1; // this will not replace strings that are longer than the original string
+        // could be an issue in the method lastIndexOf()
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
             readFrom = wbuffer() + index + findLen;
             memmove(readFrom + diff, readFrom, len() - (readFrom - buffer()));
