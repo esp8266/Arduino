@@ -137,7 +137,7 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) 
 
     ptr = get_unpoisoned_check_neighbors(ptr, file, line);
 
-    size += poison_size(size);
+    add_poison_size(&size);
     ret = umm_realloc(ptr, size);
 
     ret = get_poisoned(ret, size);
@@ -295,5 +295,33 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
     return _context->stats.id_free_null_count;
 }
 #endif // UMM_STATS_FULL
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+/*
+ * Saturated unsigned add
+ * Poison added to allocation size requires overflow protection.
+ */
+static size_t umm_uadd_sat(const size_t a, const size_t b) {
+    size_t r = a + b;
+    if (r < a) {
+        return SIZE_MAX;
+    }
+    return r;
+}
+#endif
+
+/*
+ * Use platform-specific functions to protect against unsigned overflow/wrap by
+ * implementing saturated unsigned multiply.
+ * The function umm_calloc requires a saturated multiply function.
+ */
+size_t umm_umul_sat(const size_t a, const size_t b) {
+    size_t r;
+    if (__builtin_mul_overflow(a, b, &r)) {
+        return SIZE_MAX;
+    }
+    return r;
+}
+
 
 #endif // BUILD_UMM_MALLOC_C
