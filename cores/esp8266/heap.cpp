@@ -154,7 +154,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
+    PTR_CHECK__LOG_LAST_FAIL(ret, umm_umul_sat(count, size));
     return ret;
 }
 
