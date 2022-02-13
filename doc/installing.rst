@@ -114,7 +114,6 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd esp8266/tools
        python3 get.py
 
 -  Restart Arduino
@@ -194,7 +193,6 @@ Instructions - Other OS
 
    .. code:: bash
 
-       cd esp8266/tools
        python3 get.py
 
    If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
