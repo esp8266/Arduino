@@ -114,6 +114,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
+       cd tools 
        python3 get.py
 
 -  Restart Arduino
@@ -192,7 +193,8 @@ Instructions - Other OS
 -  Download binary tools
 
    .. code:: bash
-
+       
+       cd tools
        python3 get.py
 
    If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
