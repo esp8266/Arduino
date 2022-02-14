@@ -1371,7 +1371,7 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
+def flash_map (flash_size_kb, fs_kb = 0, name = ''):
 
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
@@ -1382,36 +1382,36 @@ def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
     eeprom_size_kb = 4
     rfcal_size_kb = 4
     sdkwifi_size_kb = 12
-    fs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+    fs_end = (flash_size_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
 
     # For legacy reasons (#6531), the EEPROM sector needs to be at the old
     # FS_end calculated without regards to block size
     eeprom_start = fs_end
 
-    rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
-    if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
+    rfcal_addr = (flash_size_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
+    if flash_size_kb <= 1024:
+        max_upload_size = (flash_size_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
         fs_start = fs_end - fs_kb * 1024
     else:
         max_upload_size = 1024 * 1024 - reserved
-        fs_start = (flashsize_kb - fs_kb) * 1024
+        fs_start = (flash_size_kb - fs_kb) * 1024
 
     if fs_kb < 512:
-        fs_blocksize = 4096
+        fs_block_size = 4096
     else:
-        fs_blocksize = 8192
+        fs_block_size = 8192
 
     # Adjust FS_end to be a multiple of the block size
-    fs_end = fs_blocksize * (int)((fs_end - fs_start)/fs_blocksize) + fs_start
+    fs_end = fs_block_size * (int)((fs_end - fs_start)/fs_block_size) + fs_start
 
     max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
 
     if fs_kb == 0:
         fs_start = fs_end
-        page = 0
-        fs_blocksize = 0
+        fs_page_size = 0
+        fs_block_size = 0
     else:
-        page = 0x100
+        fs_page_size = 0x100
 
     # menu output
 
@@ -1419,7 +1419,7 @@ def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
     #    ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
     #    ]))
 
-    strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
+    strsize = str(int(flash_size_kb / 1024)) + 'M' if (flash_size_kb >= 1024) else str(flash_size_kb) + 'K'
     strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
     strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
 
@@ -1430,8 +1430,7 @@ def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
     desc = 'none' if (fs_kb == 0) else strfs + 'B'
 
     return {
-        "confname": confname,
-        "flashsize_kb": flashsize_kb,
+        "flash_map_name": name,
         "ld": ld,
         "menu": menu,
         "menub": menub,
@@ -1443,22 +1442,23 @@ def flash_map (flashsize_kb, fs_kb = 0, confname = ''):
         "max_ota_size": max_ota_size,
         "fs_start": fs_start,
         "fs_end": fs_end,
-        "fs_pagesize": page,
-        "fs_blocksize": fs_blocksize,
+        "fs_page_size": fs_page_size,
+        "fs_block_size": fs_block_size,
         "fs_kb": fs_kb,
         "eeprom_start": eeprom_start,
         "eeprom_size_kb": eeprom_size_kb,
         "rfcal_addr": rfcal_addr,
         "rfcal_size_kb": rfcal_size_kb,
-        "sdkwifi_size_kb": sdkwifi_size_kb
+        "sdkwifi_size_kb": sdkwifi_size_kb,
+        "flash_size_kb": flash_size_kb,
     }
 
 
-def menu_generate (*, ld, menu, strsize, desc, max_ota_size, menub, rfcal_addr, fs_start, fs_end, fs_blocksize, fs_kb, **kwargs):
+def menu_generate (*, ld, menu, strsize, desc, max_ota_size, menub, rfcal_addr, fs_start, fs_end, fs_block_size, fs_kb, **kwargs):
     out = collections.OrderedDict([
         ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
         ( menub + 'flash_size', strsize ),
-        #( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
+        #( menub + 'flash_size_bytes', "0x%X" % (flash_size_kb * 1024)),
         ( menub + 'flash_ld', ld ),
         ( menub + 'spiffs_pagesize', '256' ),
         #( menu + '.upload.maximum_size', "%i" % max_upload_size ),
@@ -1469,7 +1469,7 @@ def menu_generate (*, ld, menu, strsize, desc, max_ota_size, menub, rfcal_addr, 
         out.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % fs_start ),
             ( menub + 'spiffs_end', "0x%05X" % fs_end ),
-            ( menub + 'spiffs_blocksize', "%i" % fs_blocksize ),
+            ( menub + 'spiffs_blocksize', "%i" % fs_block_size ),
             ]))
 
     return out
@@ -1495,7 +1495,7 @@ def all_menu_generate (mapping):
     return d
 
 
-def ldscript_generate (*, ld, strsize, spi, max_upload_size, fs_start, fs_end, fs_pagesize, fs_blocksize, rfcal_addr, rfcal_size_kb, sdkwifi_size_kb, eeprom_start, eeprom_size_kb, **kwargs):
+def ldscript_generate (*, ld, strsize, spi, max_upload_size, fs_start, fs_end, fs_page_size, fs_block_size, rfcal_addr, rfcal_size_kb, sdkwifi_size_kb, eeprom_start, eeprom_size_kb, **kwargs):
     if ldgen:
         checkdir()
 
@@ -1528,15 +1528,15 @@ def ldscript_generate (*, ld, strsize, spi, max_upload_size, fs_start, fs_end, f
     print("")
     print("PROVIDE ( _FS_start = 0x%08X );" % (spi + fs_start))
     print("PROVIDE ( _FS_end = 0x%08X );" % (spi + fs_end))
-    print("PROVIDE ( _FS_page = 0x%X );" % fs_pagesize)
-    print("PROVIDE ( _FS_block = 0x%X );" % fs_blocksize)
+    print("PROVIDE ( _FS_page = 0x%X );" % fs_page_size)
+    print("PROVIDE ( _FS_block = 0x%X );" % fs_block_size)
     print("PROVIDE ( _EEPROM_start = 0x%08x );" % (spi + eeprom_start))
     # Re-add deprecated symbols pointing to the same address as the new standard ones
     print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
     print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (spi + fs_start))
     print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (spi + fs_end))
-    print("PROVIDE ( _SPIFFS_page = 0x%X );" % fs_pagesize)
-    print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_blocksize)
+    print("PROVIDE ( _SPIFFS_page = 0x%X );" % fs_page_size)
+    print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_block_size)
     print("")
     print('INCLUDE "local.eagle.app.v6.common.ld"')
 
@@ -1552,7 +1552,7 @@ def all_ldscript_generate (mapping):
             ldscript_generate(**i)
 
 
-def all_flashmap_generate (mapping):
+def all_flashmap_generate (flash_map_groups):
     if flashmapgen:
         realstdout = sys.stdout
         sys.stdout = open(flashmap_h, "w")
@@ -1567,12 +1567,12 @@ def all_flashmap_generate (mapping):
         return "%d" % value
 
     fields = [
-        ["fs_start",     as_address],
-        ["fs_end",       as_address],
-        ["fs_blocksize", as_hex],
-        ["fs_pagesize",  as_hex],
-        ["eeprom_start", as_address],
-        ["flashsize_kb", as_dec],
+        ["eeprom_start",  as_address],
+        ["fs_start",      as_address],
+        ["fs_end",        as_address],
+        ["fs_block_size", as_hex],
+        ["fs_page_size",  as_hex],
+        ["flash_size_kb", as_dec],
     ]
 
     print("// - DO NOT EDIT - autogenerated by boards.txt.py")
@@ -1597,22 +1597,22 @@ def all_flashmap_generate (mapping):
     print("*/")
     print()
 
-    conflines = collections.OrderedDict([])
-    for _, flash_maps in mapping.items():
+    ordered_maps = collections.OrderedDict([])
+    for _, flash_maps in flash_map_groups.items():
         for flash_map in flash_maps:
-            confname = flash_map.get("confname")
-            if not confname:
+            name = flash_map.get("flash_map_name")
+            if not name:
                 continue
 
-            if not conflines.get(confname):
-                conflines[confname] = []
+            if not ordered_maps.get(name):
+                ordered_maps[name] = []
 
             line = ", ".join(".%s = %s" % ((f, mod(flash_map[f], flash_map))
                 if mod else flash_map[f]) for f, mod in fields)
-            conflines[confname].append("{ %s }, \\" % line)
+            ordered_maps[name].append("{ %s }, \\" % line)
 
-    for confname, lines in conflines.items():
-        print("#define FLASH_MAP_%s \\" % confname)
+    for name, lines in ordered_maps.items():
+        print("#define FLASH_MAP_%s \\" % name.upper())
         print("    { \\")
         for line in lines:
             print("        %s" % line)
@@ -1626,7 +1626,7 @@ def all_flashmap_generate (mapping):
 
 
 def all_flash_map ():
-    #                flash(KB)   fs(KB) flashmap(optional)
+    #                flash(KB)   fs(KB)  name(optional)
     return collections.OrderedDict([
         ["1M", [
             flash_map(    1024,      64, "OTA_FS" ),
