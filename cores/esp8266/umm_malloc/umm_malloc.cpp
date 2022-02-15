@@ -1237,10 +1237,14 @@ void *umm_realloc(void *ptr, size_t size) {
 void *umm_calloc(size_t num, size_t item_size) {
     void *ret;
 
-    ret = umm_malloc((size_t)(item_size * num));
+    // Use saturated multiply.
+    // Rely on umm_malloc to supply the fail response as needed.
+    size_t size = umm_umul_sat(num, item_size);
+
+    ret = umm_malloc(size);
 
     if (ret) {
-        memset(ret, 0x00, (size_t)(item_size * num));
+        memset(ret, 0x00, size);
     }
 
     return ret;
