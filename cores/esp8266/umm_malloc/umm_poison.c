@@ -227,7 +227,7 @@ bool umm_poison_check(void) {
     bool ok = true;
     uint16_t cur;
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     UMM_CRITICAL_ENTRY(id_poison);
     umm_heap_context_t *_context = umm_get_current_heap();
