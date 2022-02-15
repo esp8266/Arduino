@@ -80,6 +80,24 @@ DBG_MMU_FLUSH(0)
 #define DBG_MMU_PRINTF(...) do {} while(false)
 #endif    // defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
 
+/*
+ * This wrapper is for running code from IROM (flash) before the SDK starts.
+ *
+ * Wraps a `void fn(void)` call with calls to enable and disable iCACHE.
+ * Allows a function that resides in IROM to run before the SDK starts.
+ *
+ * Do not use once the SDK has started.
+ *
+ * Because the SDK initialization code has not run, nearly all the SDK functions
+ * are not safe to call.
+ *
+ * Note printing at this early stage is complicated. To gain more insight,
+ * review DEV_DEBUG_PRINT build path in mmu_iram.cpp. To handle strings stored
+ * in IROM, review printing method and comments in hwdt_app_entry.cpp.
+ *
+ */
+void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void));
+
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {
   const uintptr_t iram_start = (uintptr_t)XCHAL_INSTRAM1_VADDR;
