@@ -72,7 +72,7 @@ SDFSConfig fileSystemConfig = SDFSConfig();
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -122,15 +122,9 @@ void replyServerError(String msg) {
 */
 String checkForUnsupportedPath(String filename) {
   String error = String();
-  if (!filename.startsWith("/")) {
-    error += F("!NO_LEADING_SLASH! ");
-  }
-  if (filename.indexOf("//") != -1) {
-    error += F("!DOUBLE_SLASH! ");
-  }
-  if (filename.endsWith("/")) {
-    error += F("!TRAILING_SLASH! ");
-  }
+  if (!filename.startsWith("/")) { error += F("!NO_LEADING_SLASH! "); }
+  if (filename.indexOf("//") != -1) { error += F("!DOUBLE_SLASH! "); }
+  if (filename.endsWith("/")) { error += F("!TRAILING_SLASH! "); }
   return error;
 }
 #endif
@@ -174,18 +168,12 @@ void handleStatus() {
    Also demonstrates the use of chunked responses.
 */
 void handleFileList() {
-  if (!fsOK) {
-    return replyServerError(FPSTR(FS_INIT_ERROR));
-  }
+  if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
 
-  if (!server.hasArg("dir")) {
-    return replyBadRequest(F("DIR ARG MISSING"));
-  }
+  if (!server.hasArg("dir")) { return replyBadRequest(F("DIR ARG MISSING")); }
 
   String path = server.arg("dir");
-  if (path != "/" && !fileSystem->exists(path)) {
-    return replyBadRequest("BAD PATH");
-  }
+  if (path != "/" && !fileSystem->exists(path)) { return replyBadRequest("BAD PATH"); }
 
   DBG_OUTPUT_PORT.println(String("handleFileList: ") + path);
   Dir dir = fileSystem->openDir(path);
@@ -253,9 +241,7 @@ bool handleFileRead(String path) {
     return true;
   }
 
-  if (path.endsWith("/")) {
-    path += "index.htm";
-  }
+  if (path.endsWith("/")) { path += "index.htm"; }
 
   String contentType;
   if (server.hasArg("download")) {
@@ -270,9 +256,7 @@ bool handleFileRead(String path) {
   }
   if (fileSystem->exists(path)) {
     File file = fileSystem->open(path, "r");
-    if (server.streamFile(file, contentType) != file.size()) {
-      DBG_OUTPUT_PORT.println("Sent less data than expected!");
-    }
+    if (server.streamFile(file, contentType) != file.size()) { DBG_OUTPUT_PORT.println("Sent less data than expected!"); }
     file.close();
     return true;
   }
@@ -309,27 +293,17 @@ String lastExistingParent(String path) {
    Move folder    | parent of source folder, or remaining ancestor
 */
 void handleFileCreate() {
-  if (!fsOK) {
-    return replyServerError(FPSTR(FS_INIT_ERROR));
-  }
+  if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
 
   String path = server.arg("path");
-  if (path.isEmpty()) {
-    return replyBadRequest(F("PATH ARG MISSING"));
-  }
+  if (path.isEmpty()) { return replyBadRequest(F("PATH ARG MISSING")); }
 
 #ifdef USE_SPIFFS
-  if (checkForUnsupportedPath(path).length() > 0) {
-    return replyServerError(F("INVALID FILENAME"));
-  }
+  if (checkForUnsupportedPath(path).length() > 0) { return replyServerError(F("INVALID FILENAME")); }
 #endif
 
-  if (path == "/") {
-    return replyBadRequest("BAD PATH");
-  }
-  if (fileSystem->exists(path)) {
-    return replyBadRequest(F("PATH FILE EXISTS"));
-  }
+  if (path == "/") { return replyBadRequest("BAD PATH"); }
+  if (fileSystem->exists(path)) { return replyBadRequest(F("PATH FILE EXISTS")); }
 
   String src = server.arg("src");
   if (src.isEmpty()) {
@@ -338,43 +312,29 @@ void handleFileCreate() {
     if (path.endsWith("/")) {
       // Create a folder
       path.remove(path.length() - 1);
-      if (!fileSystem->mkdir(path)) {
-        return replyServerError(F("MKDIR FAILED"));
-      }
+      if (!fileSystem->mkdir(path)) { return replyServerError(F("MKDIR FAILED")); }
     } else {
       // Create a file
       File file = fileSystem->open(path, "w");
       if (file) {
-        file.write((const char *)0);
+        file.write((const char*)0);
         file.close();
       } else {
         return replyServerError(F("CREATE FAILED"));
       }
     }
-    if (path.lastIndexOf('/') > -1) {
-      path = path.substring(0, path.lastIndexOf('/'));
-    }
+    if (path.lastIndexOf('/') > -1) { path = path.substring(0, path.lastIndexOf('/')); }
     replyOKWithMsg(path);
   } else {
     // Source specified: rename
-    if (src == "/") {
-      return replyBadRequest("BAD SRC");
-    }
-    if (!fileSystem->exists(src)) {
-      return replyBadRequest(F("SRC FILE NOT FOUND"));
-    }
+    if (src == "/") { return replyBadRequest("BAD SRC"); }
+    if (!fileSystem->exists(src)) { return replyBadRequest(F("SRC FILE NOT FOUND")); }
 
     DBG_OUTPUT_PORT.println(String("handleFileCreate: ") + path + " from " + src);
 
-    if (path.endsWith("/")) {
-      path.remove(path.length() - 1);
-    }
-    if (src.endsWith("/")) {
-      src.remove(src.length() - 1);
-    }
-    if (!fileSystem->rename(src, path)) {
-      return replyServerError(F("RENAME FAILED"));
-    }
+    if (path.endsWith("/")) { path.remove(path.length() - 1); }
+    if (src.endsWith("/")) { src.remove(src.length() - 1); }
+    if (!fileSystem->rename(src, path)) { return replyServerError(F("RENAME FAILED")); }
     replyOKWithMsg(lastExistingParent(src));
   }
 }
@@ -403,9 +363,7 @@ void deleteRecursive(String path) {
   // Otherwise delete its contents first
   Dir dir = fileSystem->openDir(path);
 
-  while (dir.next()) {
-    deleteRecursive(path + '/' + dir.fileName());
-  }
+  while (dir.next()) { deleteRecursive(path + '/' + dir.fileName()); }
 
   // Then delete the folder itself
   fileSystem->rmdir(path);
@@ -420,19 +378,13 @@ void deleteRecursive(String path) {
    Delete folder  | parent of deleted folder, or remaining ancestor
 */
 void handleFileDelete() {
-  if (!fsOK) {
-    return replyServerError(FPSTR(FS_INIT_ERROR));
-  }
+  if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
 
   String path = server.arg(0);
-  if (path.isEmpty() || path == "/") {
-    return replyBadRequest("BAD PATH");
-  }
+  if (path.isEmpty() || path == "/") { return replyBadRequest("BAD PATH"); }
 
   DBG_OUTPUT_PORT.println(String("handleFileDelete: ") + path);
-  if (!fileSystem->exists(path)) {
-    return replyNotFound(FPSTR(FILE_NOT_FOUND));
-  }
+  if (!fileSystem->exists(path)) { return replyNotFound(FPSTR(FILE_NOT_FOUND)); }
   deleteRecursive(path);
 
   replyOKWithMsg(lastExistingParent(path));
@@ -442,37 +394,25 @@ void handleFileDelete() {
    Handle a file upload request
 */
 void handleFileUpload() {
-  if (!fsOK) {
-    return replyServerError(FPSTR(FS_INIT_ERROR));
-  }
-  if (server.uri() != "/edit") {
-    return;
-  }
+  if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
+  if (server.uri() != "/edit") { return; }
   HTTPUpload& upload = server.upload();
   if (upload.status == UPLOAD_FILE_START) {
     String filename = upload.filename;
     // Make sure paths always start with "/"
-    if (!filename.startsWith("/")) {
-      filename = "/" + filename;
-    }
+    if (!filename.startsWith("/")) { filename = "/" + filename; }
     DBG_OUTPUT_PORT.println(String("handleFileUpload Name: ") + filename);
     uploadFile = fileSystem->open(filename, "w");
-    if (!uploadFile) {
-      return replyServerError(F("CREATE FAILED"));
-    }
+    if (!uploadFile) { return replyServerError(F("CREATE FAILED")); }
     DBG_OUTPUT_PORT.println(String("Upload: START, filename: ") + filename);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     if (uploadFile) {
       size_t bytesWritten = uploadFile.write(upload.buf, upload.currentSize);
-      if (bytesWritten != upload.currentSize) {
-        return replyServerError(F("WRITE FAILED"));
-      }
+      if (bytesWritten != upload.currentSize) { return replyServerError(F("WRITE FAILED")); }
     }
     DBG_OUTPUT_PORT.println(String("Upload: WRITE, Bytes: ") + upload.currentSize);
   } else if (upload.status == UPLOAD_FILE_END) {
-    if (uploadFile) {
-      uploadFile.close();
-    }
+    if (uploadFile) { uploadFile.close(); }
     DBG_OUTPUT_PORT.println(String("Upload: END, Size: ") + upload.totalSize);
   }
 }
@@ -484,15 +424,11 @@ void handleFileUpload() {
    and if it fails, return a 404 page with debug information
 */
 void handleNotFound() {
-  if (!fsOK) {
-    return replyServerError(FPSTR(FS_INIT_ERROR));
-  }
+  if (!fsOK) { return replyServerError(FPSTR(FS_INIT_ERROR)); }
 
-  String uri = ESP8266WebServer::urlDecode(server.uri()); // required to read paths with blanks
+  String uri = ESP8266WebServer::urlDecode(server.uri());  // required to read paths with blanks
 
-  if (handleFileRead(uri)) {
-    return;
-  }
+  if (handleFileRead(uri)) { return; }
 
   // Dump debug data
   String message;
@@ -526,9 +462,7 @@ void handleNotFound() {
    Otherwise, fails with a 404 page with debug information
 */
 void handleGetEdit() {
-  if (handleFileRead(F("/edit/index.htm"))) {
-    return;
-  }
+  if (handleFileRead(F("/edit/index.htm"))) { return; }
 
 #ifdef INCLUDE_FALLBACK_INDEX_HTM
   server.sendHeader(F("Content-Encoding"), "gzip");
@@ -536,7 +470,6 @@ void handleGetEdit() {
 #else
   replyNotFound(FPSTR(FILE_NOT_FOUND));
 #endif
-
 }
 
 void setup(void) {
@@ -562,9 +495,7 @@ void setup(void) {
     String error = checkForUnsupportedPath(dir.fileName());
     String fileInfo = dir.fileName() + (dir.isDirectory() ? " [DIR]" : String(" (") + dir.fileSize() + "b)");
     DBG_OUTPUT_PORT.println(error + fileInfo);
-    if (error.length() > 0) {
-      unsupportedFiles += error + fileInfo + '\n';
-    }
+    if (error.length() > 0) { unsupportedFiles += error + fileInfo + '\n'; }
   }
   DBG_OUTPUT_PORT.println();
 
@@ -609,15 +540,15 @@ void setup(void) {
   server.on("/edit", HTTP_GET, handleGetEdit);
 
   // Create file
-  server.on("/edit",  HTTP_PUT, handleFileCreate);
+  server.on("/edit", HTTP_PUT, handleFileCreate);
 
   // Delete file
-  server.on("/edit",  HTTP_DELETE, handleFileDelete);
+  server.on("/edit", HTTP_DELETE, handleFileDelete);
 
   // Upload file
   // - first callback is called after the request has ended with all parsed arguments
   // - second callback handles file upload at that location
-  server.on("/edit",  HTTP_POST, replyOK, handleFileUpload);
+  server.on("/edit", HTTP_POST, replyOK, handleFileUpload);
 
   // Default handler for all URIs not defined above
   // Use it to read files from filesystem

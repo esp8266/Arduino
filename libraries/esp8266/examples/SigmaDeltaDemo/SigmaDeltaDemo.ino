@@ -5,16 +5,15 @@
 void setup() {
 
   Serial.begin(115200);
-  pinMode(LED_BUILTIN, OUTPUT); // blinkie & sigma-delta mix
+  pinMode(LED_BUILTIN, OUTPUT);  // blinkie & sigma-delta mix
   uint32_t reqFreq = 1000;
   uint32_t realFreq;
 
-  realFreq = sigmaDeltaSetup(0, reqFreq); // chose a low frequency
+  realFreq = sigmaDeltaSetup(0, reqFreq);  // chose a low frequency
 
   Serial.println();
   Serial.println("Start Sigma Delta Example\n");
   Serial.printf("Frequency = %u\n", realFreq);
-
 }
 
 void loop() {
@@ -36,7 +35,6 @@ void loop() {
       sigmaDeltaWrite(0, duty);
       delay(10);
     }
-
   }
 
   Serial.println("Detaching builtin led & playing a blinkie\n");

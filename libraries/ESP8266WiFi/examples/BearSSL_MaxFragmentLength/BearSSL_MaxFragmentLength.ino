@@ -9,7 +9,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -22,13 +22,11 @@ void fetch(BearSSL::WiFiClientSecure *client) {
   oneShot timeout(5000);
   do {
     char tmp[32];
-    int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+    int rlen = client->read((uint8_t *)tmp, sizeof(tmp) - 1);
     yield();
-    if (rlen < 0) {
-      break;
-    }
+    if (rlen < 0) { break; }
     if (rlen == 0) {
-      delay(10); // Give background processes some time
+      delay(10);  // Give background processes some time
       continue;
     }
     tmp[rlen] = '\0';
@@ -82,9 +80,7 @@ int fetchMaxFragmentLength() {
   bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 512);
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
   Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
-  if (mfln) {
-    client.setBufferSizes(512, 512);
-  }
+  if (mfln) { client.setBufferSizes(512, 512); }
   client.connect("tls.mbed.org", 443);
   if (client.connected()) {
     Serial.printf("MFLN status: %s\n", client.getMFLNStatus() ? "true" : "false");

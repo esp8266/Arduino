@@ -21,7 +21,7 @@ namespace TypeCast = experimental::TypeConversion;
    https://github.com/esp8266/Arduino/issues/1143
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
-constexpr char masterKey[] PROGMEM = "w86vn@rpfA O+S"; // Use 8 random characters or more
+constexpr char masterKey[] PROGMEM = "w86vn@rpfA O+S";  // Use 8 random characters or more
 
 void setup() {
   // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
@@ -42,18 +42,18 @@ void loop() {
   String exampleData = F("Hello Crypto World!");
   Serial.println(String(F("This is our example data: ")) + exampleData);
 
-  uint8_t resultArray[SHA256::NATURAL_LENGTH] { 0 };
-  uint8_t derivedKey[ENCRYPTION_KEY_LENGTH] { 0 };
+  uint8_t resultArray[SHA256::NATURAL_LENGTH]{ 0 };
+  uint8_t derivedKey[ENCRYPTION_KEY_LENGTH]{ 0 };
 
   static uint32_t encryptionCounter = 0;
 
 
   // Generate the salt to use for HKDF
-  uint8_t hkdfSalt[16] { 0 };
+  uint8_t hkdfSalt[16]{ 0 };
   getNonceGenerator()(hkdfSalt, sizeof hkdfSalt);
 
   // Generate the key to use for HMAC and encryption
-  HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt); // (sizeof masterKey) - 1 removes the terminating null value of the c-string
+  HKDF hkdfInstance(FPSTR(masterKey), (sizeof masterKey) - 1, hkdfSalt, sizeof hkdfSalt);  // (sizeof masterKey) - 1 removes the terminating null value of the c-string
   hkdfInstance.produce(derivedKey, sizeof derivedKey);
 
   // Hash
@@ -71,8 +71,8 @@ void loop() {
 
   // Authenticated Encryption with Associated Data (AEAD)
   String dataToEncrypt = F("This data is not encrypted.");
-  uint8_t resultingNonce[12] { 0 }; // The nonce is always 12 bytes
-  uint8_t resultingTag[16] { 0 }; // The tag is always 16 bytes
+  uint8_t resultingNonce[12]{ 0 };  // The nonce is always 12 bytes
+  uint8_t resultingTag[16]{ 0 };    // The tag is always 16 bytes
 
   Serial.println(String(F("\nThis is the data to encrypt: ")) + dataToEncrypt);
 
