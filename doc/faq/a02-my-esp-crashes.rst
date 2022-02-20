@@ -79,8 +79,13 @@ Enable compilation warnings
 
 Most common issues may be resolved by enabling compilation warnings and fixing them.
 
-For Arduino IDE, select ``File -> Preferences`` and select ``Show verbose output during: compilation``
-For PlatformIO, all warnings should be enabled by default.
+For Arduino IDE:
+
+- Select ``File -> Preferences``
+- Make sure ``Show verbose output during: compilation`` is enabled
+- Set ``Compiler warnings`` to ``More`` or ``All``
+
+For PlatformIO, all warnings should already be enabled by default.
 
 Notice that the default configuration of Arduino IDE inhibits **all** compilation warnings.
 For the ESP8266 platform, some warnings should be treated as errors, otherwise it may cause unexpected issues at runtime:
