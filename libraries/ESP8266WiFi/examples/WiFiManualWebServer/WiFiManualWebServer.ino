@@ -11,7 +11,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -55,12 +55,10 @@ void setup() {
 void loop() {
   // Check if a client has connected
   WiFiClient client = server.accept();
-  if (!client) {
-    return;
-  }
+  if (!client) { return; }
   Serial.println(F("new client"));
 
-  client.setTimeout(5000); // default is 1000
+  client.setTimeout(5000);  // default is 1000
 
   // Read the first line of the request
   String req = client.readStringUntil('\r');

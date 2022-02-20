@@ -36,7 +36,7 @@
 
 #ifndef APSSID
 #define APSSID "ESPap"
-#define APPSK  "thereisnospoon"
+#define APPSK "thereisnospoon"
 #endif
 
 /* Set these to your desired credentials. */

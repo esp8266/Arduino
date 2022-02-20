@@ -1,4 +1,4 @@
-#define TIMEOUT (10000UL)     // Maximum time to wait for serial activity to start
+#define TIMEOUT (10000UL)  // Maximum time to wait for serial activity to start
 
 void setup() {
   // put your setup code here, to run once:
@@ -13,9 +13,7 @@ void setup() {
     Serial.printf("\nDetected baudrate is %lu, switching to that baudrate now...\n", detectedBaudrate);
 
     // Wait for printf to finish
-    while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) {
-      yield();
-    }
+    while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) { yield(); }
 
     // Clear Tx buffer to avoid extra characters being printed
     Serial.flush();
@@ -29,6 +27,4 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
 }
-
