@@ -234,20 +234,20 @@ protected:
     static uint8_t _getFlags(fs::OpenMode openMode, fs::AccessMode accessMode) {
         uint8_t mode = 0;
         if (openMode & fs::OM_CREATE) {
-            mode |= fs::O_CREAT;
+            mode |= O_CREAT;
         }
         if (openMode & fs::OM_APPEND) {
-            mode |= fs::O_AT_END;
+            mode |= O_AT_END;
         }
         if (openMode & fs::OM_TRUNCATE) {
-            mode |= fs::O_TRUNC;
+            mode |= O_TRUNC;
         }
         if ((accessMode & (fs::AM_READ | fs::AM_WRITE)) == (fs::AM_READ | fs::AM_WRITE)) {
-            mode |= fs::O_RDWR;
+            mode |= O_RDWR;
         } else if (accessMode & fs::AM_READ) {
-            mode |= fs::O_READ;
+            mode |= O_READ;
         } else if (accessMode & fs::AM_WRITE) {
-            mode |= fs::O_WRITE;
+            mode |= O_WRITE;
         }
         return mode;
     }
