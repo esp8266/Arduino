@@ -111,3 +111,11 @@ cont_t* g_pcont = NULL;
 extern "C" void cont_suspend(cont_t*)
 {
 }
+
+extern "C" int __mockverbose (const char* fmt, ...)
+{
+    (void)fmt;
+    return 0;
+}
+
+int mockverbose (const char* fmt, ...) __attribute__ ((weak, alias("__mockverbose"), format (printf, 1, 2)));
