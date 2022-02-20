@@ -79,9 +79,8 @@ Enable compilation warnings
 
 Most common issues may be resolved by enabling compilation warnings and fixing them.
 
-For Arduino IDE:
+For Arduino IDE, select ``File -> Preferences``:
 
-- Select ``File -> Preferences``
 - Make sure ``Show verbose output during: compilation`` is enabled
 - Set ``Compiler warnings`` to ``More`` or ``All``
 
