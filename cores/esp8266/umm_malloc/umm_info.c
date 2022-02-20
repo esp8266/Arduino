@@ -28,7 +28,7 @@
 void *umm_info(void *ptr, bool force) {
     UMM_CRITICAL_DECL(id_info);
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     uint16_t blockNo = 0;
 
