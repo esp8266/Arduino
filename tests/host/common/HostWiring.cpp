@@ -37,6 +37,11 @@
 #define VERBOSE(x...) mockverbose(x)
 #endif
 
+#define GPIONUM 17
+
+static uint8_t _mode[GPIONUM];
+static uint8_t _gpio[GPIONUM];
+
 void pinMode (uint8_t pin, uint8_t mode)
 {
 	#define xxx(mode) case mode: m=STRHELPER(mode); break
@@ -53,11 +58,19 @@ void pinMode (uint8_t pin, uint8_t mode)
 	default: m="(special)";
 	}
 	VERBOSE("gpio%d: mode='%s'\n", pin, m);
+
+    if (pin < GPIONUM)
+    {
+      _mode[pin] = mode;
+    }
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
 	VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val);
+    if (pin < GPIONUM) {
+        _gpio[pin] = val;
+    }
 }
 
 void analogWrite(uint8_t pin, int val)
@@ -80,6 +93,9 @@ int digitalRead(uint8_t pin)
 {
 	VERBOSE("digitalRead(%d)\n", pin);
 
-	// pin 0 is most likely a low active input
-	return pin ? 0 : 1;
+    if (pin < GPIONUM) {
+      return _gpio[pin] != 0;
+    } else {
+      return 0;
+    }
 }

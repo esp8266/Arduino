@@ -14,9 +14,12 @@
 */
 
 #include <sys/time.h>
-#include "Arduino.h"
-
 #include <unistd.h>
+
+#include <functional>
+
+#include <Arduino.h>
+#include <Schedule.h>
 
 static struct timeval gtod0 = { 0, 0 };
 
@@ -41,6 +44,13 @@ extern "C" unsigned long micros()
 
 extern "C" void yield()
 {
+    run_scheduled_recurrent_functions();
+}
+
+extern "C" void loop_end()
+{
+    run_scheduled_functions();
+    run_scheduled_recurrent_functions();
 }
 
 extern "C" bool can_yield()
@@ -53,10 +63,31 @@ extern "C" void optimistic_yield (uint32_t interval_us)
     (void)interval_us;
 }
 
+extern "C" void esp_suspend()
+{
+}
+
+extern "C" void esp_schedule()
+{
+}
+
 extern "C" void esp_yield()
 {
 }
 
+extern "C" void esp_delay (unsigned long ms)
+{
+    usleep(ms * 1000);
+}
+
+bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms) {
+    uint32_t expired = millis() - start_ms;
+    if (expired >= timeout_ms) {
+        return true;
+    }
+    esp_delay(std::min((timeout_ms - expired), intvl_ms));
+    return false;
+}
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
     (void)file;
@@ -67,7 +98,7 @@ extern "C" void __panic_func(const char* file, int line, const char* func) {
 
 extern "C" void delay(unsigned long ms)
 {
-    usleep(ms * 1000);
+    esp_delay(ms);
 }
 
 extern "C" void delayMicroseconds(unsigned int us)
@@ -77,6 +108,14 @@ extern "C" void delayMicroseconds(unsigned int us)
 
 #include "cont.h"
 cont_t* g_pcont = NULL;
-extern "C" void cont_yield(cont_t*)
+extern "C" void cont_suspend(cont_t*)
 {
 }
+
+extern "C" int __mockverbose (const char* fmt, ...)
+{
+    (void)fmt;
+    return 0;
+}
+
+int mockverbose (const char* fmt, ...) __attribute__ ((weak, alias("__mockverbose"), format (printf, 1, 2)));

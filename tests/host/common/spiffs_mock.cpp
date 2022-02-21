@@ -28,8 +28,6 @@
 #include <unistd.h>
 #include <cerrno>
 
-#include "flash_hal_mock.h"
-
 #define SPIFFS_FILE_NAME "spiffs.bin"
 
 #pragma GCC diagnostic push

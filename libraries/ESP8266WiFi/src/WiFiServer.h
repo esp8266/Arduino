@@ -65,7 +65,7 @@ extern "C" {
 class ClientContext;
 class WiFiClient;
 
-class WiFiServer : public Server {
+class WiFiServer {
   // Secure server needs access to all the private entries here
 protected:
   uint16_t _port;
@@ -80,21 +80,26 @@ public:
   WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
-  WiFiClient available(uint8_t* status = NULL);
+  WiFiClient accept(); // https://www.arduino.cc/en/Reference/EthernetServerAccept
+  WiFiClient available(uint8_t* status = NULL) __attribute__((deprecated("Renamed to accept().")));
   bool hasClient();
+  // hasClientData():
+  // returns the amount of data available from the first client
+  // or 0 if there is none
+  size_t hasClientData();
+  // hasMaxPendingClients():
+  // returns true if the queue of pending clients is full
+  bool hasMaxPendingClients();
   void begin();
   void begin(uint16_t port);
   void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
   uint8_t status();
   uint16_t port() const;
   void close();
   void stop();
 
-  using Print::write;
   using ClientType = WiFiClient;
 
 protected:

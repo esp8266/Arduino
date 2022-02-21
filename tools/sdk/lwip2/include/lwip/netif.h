@@ -386,6 +386,10 @@ struct netif {
 #if LWIP_LOOPBACK_MAX_PBUFS
   u16_t loop_cnt_current;
 #endif /* LWIP_LOOPBACK_MAX_PBUFS */
+#if LWIP_NETIF_LOOPBACK_MULTITHREADING
+  /* Used if the original scheduling failed. */
+  u8_t reschedule_poll;
+#endif /* LWIP_NETIF_LOOPBACK_MULTITHREADING */
 #endif /* ENABLE_LOOPBACK */
 #if LWIP_IPV4 && IP_NAPT
   u8_t napt;
@@ -454,7 +458,7 @@ void netif_set_gw(struct netif *netif, const ip4_addr_t *gw);
 
 #define netif_set_flags(netif, set_flags)     do { (netif)->flags = (u8_t)((netif)->flags |  (set_flags)); } while(0)
 #define netif_clear_flags(netif, clr_flags)   do { (netif)->flags = (u8_t)((netif)->flags & (u8_t)(~(clr_flags) & 0xff)); } while(0)
-#define netif_is_flag_set(nefif, flag)        (((netif)->flags & (flag)) != 0)
+#define netif_is_flag_set(netif, flag)        (((netif)->flags & (flag)) != 0)
 
 void netif_set_up(struct netif *netif);
 void netif_set_down(struct netif *netif);

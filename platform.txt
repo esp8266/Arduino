@@ -52,11 +52,20 @@ build.sdk=NONOSDK22x_190703
 #build.sdk=NONOSDK22x_191024
 #build.sdk=NONOSDK22x_191105
 
+# These are not overriden when FS is not configured
+build.eeprom_start=
+build.spiffs_start=
+build.spiffs_end=
+build.spiffs_blocksize=
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+
+# support precompiled libraries in IDE v1.8.6+
+compiler.libraries.ldflags=
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c {compiler.warning_flags} -std=gnu17 {build.stacksmash_flags} -Os -g -free -fipa-pta -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags}
@@ -83,7 +92,7 @@ compiler.elf2hex.flags=
 compiler.size.cmd=xtensa-lx106-elf-size
 
 # This can be overridden in boards.txt
-build.extra_flags=-DESP8266
+build.extra_flags=
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
@@ -119,7 +128,7 @@ recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.fla
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group "-L{build.path}"
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} {compiler.libraries.ldflags} -Wl,--end-group "-L{build.path}"
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=

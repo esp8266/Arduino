@@ -227,7 +227,7 @@ static const char *HTTP_RES =
         "</html>\r\n";
 
 void loop() {
-  BearSSL::WiFiClientSecure incoming = server.available();
+  BearSSL::WiFiClientSecure incoming = server.accept();
   if (!incoming) {
     return;
   }

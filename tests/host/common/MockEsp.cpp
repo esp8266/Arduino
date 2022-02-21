@@ -108,7 +108,7 @@ uint32_t EspClass::getFreeHeap()
 	return 30000;
 }
 
-uint16_t EspClass::getMaxFreeBlockSize()
+uint32_t EspClass::getMaxFreeBlockSize()
 {
 	return 20000;
 }
@@ -134,6 +134,15 @@ uint32_t EspClass::getFlashChipSpeed()
 }
 
 void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag) {
+  uint32_t hf = 10 * 1024;
+  float hm = 1 * 1024;
+
+  if (hfree) *hfree = hf;
+  if (hmax) *hmax = hm;
+  if (hfrag) *hfrag = 100 - (sqrt(hm) * 100) / hf;
+}
+
+void EspClass::getHeapStats(uint32_t* hfree, uint32_t* hmax, uint8_t* hfrag) {
   uint32_t hf = 10 * 1024;
   float hm = 1 * 1024;
 
@@ -262,4 +271,9 @@ void EspClass::setExternalHeap()
 
 void EspClass::resetHeap()
 {
+}
+
+void EspClass::reset ()
+{
+    abort();
 }

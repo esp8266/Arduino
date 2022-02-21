@@ -61,6 +61,7 @@ class Stream: public Print {
         virtual int peek() = 0;
 
         Stream() {}
+        virtual ~Stream() {}
 
 // parsing methods
 
