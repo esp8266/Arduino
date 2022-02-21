@@ -55,92 +55,116 @@ void serial_printf(const char *fmt, ...)
 
 #define DEBUG 0
 #if DEBUG
-#define PRINTF(...) printf(__VA_ARGS__)
+    #define PRINTF(...)     printf(__VA_ARGS__)
 #else
-#define PRINTF(...) do { (void)0; } while (0)
+    #define PRINTF(...)     do { (void)0; } while (0)
 #endif
 
-#define EIE   0x1b
-#define EIR   0x1c
-#define ESTAT 0x1d
-#define ECON2 0x1e
-#define ECON1 0x1f
+#define EIE                 0x1b
+#define EIR                 0x1c
+#define ESTAT               0x1d
+#define ECON2               0x1e
+#define ECON1               0x1f
 
-#define ESTAT_CLKRDY 0x01
-#define ESTAT_TXABRT 0x02
+#define ESTAT_CLKRDY        0x01
+#define ESTAT_TXABRT        0x02
 
-#define ECON1_RXEN   0x04
-#define ECON1_TXRTS  0x08
+#define ECON1_RXEN          0x04
+#define ECON1_TXRTS         0x08
 
-#define ECON2_AUTOINC 0x80
-#define ECON2_PKTDEC  0x40
+#define ECON2_AUTOINC       0x80
+#define ECON2_PKTDEC        0x40
 
-#define EIR_TXIF      0x08
+#define EIR_TXIF            0x08
 
-#define ERXTX_BANK 0x00
+#define ERXTX_BANK          0x00
 
-#define ERDPTL 0x00
-#define ERDPTH 0x01
-#define EWRPTL 0x02
-#define EWRPTH 0x03
-#define ETXSTL 0x04
-#define ETXSTH 0x05
-#define ETXNDL 0x06
-#define ETXNDH 0x07
-#define ERXSTL 0x08
-#define ERXSTH 0x09
-#define ERXNDL 0x0a
-#define ERXNDH 0x0b
-#define ERXRDPTL 0x0c
-#define ERXRDPTH 0x0d
+#define ERDPTL              0x00
+#define ERDPTH              0x01
+#define EWRPTL              0x02
+#define EWRPTH              0x03
+#define ETXSTL              0x04
+#define ETXSTH              0x05
+#define ETXNDL              0x06
+#define ETXNDH              0x07
+#define ERXSTL              0x08
+#define ERXSTH              0x09
+#define ERXNDL              0x0a
+#define ERXNDH              0x0b
+#define ERXRDPTL            0x0c
+#define ERXRDPTH            0x0d
 
-#define RX_BUF_START 0x0000
-#define RX_BUF_END   0x0fff
+#define RX_BUF_START        0x0000
+#define RX_BUF_END          0x0fff
 
-#define TX_BUF_START 0x1200
+#define TX_BUF_START        0x1200
 
 /* MACONx registers are in bank 2 */
-#define MACONX_BANK 0x02
+#define MACONX_BANK         0x02
 
-#define MACON1  0x00
-#define MACON3  0x02
-#define MACON4  0x03
-#define MABBIPG 0x04
-#define MAIPGL  0x06
-#define MAIPGH  0x07
-#define MAMXFLL 0x0a
-#define MAMXFLH 0x0b
+#define MACON1              0x00
+#define MACON3              0x02
+#define MACON4              0x03
+#define MABBIPG             0x04
+#define MAIPGL              0x06
+#define MAIPGH              0x07
+#define MAMXFLL             0x0a
+#define MAMXFLH             0x0b
 
-#define MACON1_TXPAUS 0x08
-#define MACON1_RXPAUS 0x04
-#define MACON1_MARXEN 0x01
+#define MACON1_TXPAUS       0x08
+#define MACON1_RXPAUS       0x04
+#define MACON1_MARXEN       0x01
 
-#define MACON3_PADCFG_FULL 0xe0
-#define MACON3_TXCRCEN     0x10
-#define MACON3_FRMLNEN     0x02
-#define MACON3_FULDPX      0x01
+#define MACON3_PADCFG_FULL  0xe0
+#define MACON3_TXCRCEN      0x10
+#define MACON3_FRMLNEN      0x02
+#define MACON3_FULDPX       0x01
 
-#define MAX_MAC_LENGTH 1518
+#define MAX_MAC_LENGTH      1518
 
-#define MAADRX_BANK 0x03
-#define MAADR1 0x04 /* MAADR<47:40> */
-#define MAADR2 0x05 /* MAADR<39:32> */
-#define MAADR3 0x02 /* MAADR<31:24> */
-#define MAADR4 0x03 /* MAADR<23:16> */
-#define MAADR5 0x00 /* MAADR<15:8> */
-#define MAADR6 0x01 /* MAADR<7:0> */
-#define MISTAT 0x0a
-#define EREVID 0x12
+#define MAADRX_BANK         0x03
+#define MAADR1              0x04 /* MAADR<47:40> */
+#define MAADR2              0x05 /* MAADR<39:32> */
+#define MAADR3              0x02 /* MAADR<31:24> */
+#define MAADR4              0x03 /* MAADR<23:16> */
+#define MAADR5              0x00 /* MAADR<15:8> */
+#define MAADR6              0x01 /* MAADR<7:0> */
+#define MISTAT              0x0a
+#define EREVID              0x12
 
-#define EPKTCNT_BANK 0x01
-#define ERXFCON 0x18
-#define EPKTCNT 0x19
+#define EPKTCNT_BANK        0x01
+#define ERXFCON             0x18
+#define EPKTCNT             0x19
 
-#define ERXFCON_UCEN  0x80
-#define ERXFCON_ANDOR 0x40
-#define ERXFCON_CRCEN 0x20
-#define ERXFCON_MCEN  0x02
-#define ERXFCON_BCEN  0x01
+#define ERXFCON_UCEN        0x80
+#define ERXFCON_ANDOR       0x40
+#define ERXFCON_CRCEN       0x20
+#define ERXFCON_MCEN        0x02
+#define ERXFCON_BCEN        0x01
+
+#define REG_BANK_0          0x00
+#define REG_BANK_1          0x01
+#define REG_BANK_2          0x02
+#define REG_BANK_3          0x03
+
+// for PHY registers!
+#define MICMD               0x12
+#define MIREGADR            0x14
+#define MIWRL               0x16
+#define MIWRH               0x17
+#define MIRDL               0x18
+#define MIRDH               0x19
+
+// PHY registers
+#define PHCON1              0x00
+#define PHSTAT1             0x01
+#define PHHID1              0x02
+#define PHHID2              0x03
+#define PHCON2              0x10
+#define PHSTAT2             0x11
+#define PHIE                0x12
+#define PHIR                0x13
+#define PHLCON              0x14
 
 // The ENC28J60 SPI Interface supports clock speeds up to 20 MHz
 static const SPISettings spiSettings(20000000, MSBFIRST, SPI_MODE0);
@@ -741,4 +765,107 @@ ENC28J60::readFrameData(uint8_t *buffer, uint16_t framesize)
     //PRINTF("enc28j60: received_packets %d\n", received_packets);
 
     return _len;
+}
+
+/*---------------------------------------------------------------------------*/
+uint16_t
+ENC28J60::phyRead(uint8_t address)
+{
+    unsigned int            timeout = 15;
+
+    setregbank(REG_BANK_2);
+    
+    // set the PHY register address
+    writereg(MIREGADR, address);
+    setregbitfield(MICMD, 0x01);                // MII Read Enable [MIIRD]
+    
+    setregbank(REG_BANK_3);
+	
+    // wait until the PHY read completes
+    while(readreg(MISTAT) & 0x01){
+        delay(10);
+        wdt_reset();
+        if(--timeout ==0)       return 0;
+    }
+    
+    setregbank(REG_BANK_2);
+    
+    clearregbitfield(MICMD, 0x01);              // MII Read Disable [MIIRD]
+    
+    // read the PHY data
+    return (readreg(MIRDL) | readreg(MIRDH) << 8);
+}
+
+void
+ENC28J60::phyWrite(uint8_t address, uint16_t data)
+{
+    unsigned int            timeout = 15;
+    
+    setregbank(REG_BANK_2);
+    
+    // set the PHY register address
+    writereg(MIREGADR, address);
+    
+    // write the PHY data
+    writereg(MIWRL, data & 0xff);
+    writereg(MIWRH, data >> 8);
+    
+    setregbank(REG_BANK_3);
+    
+    // wait until the PHY write completes
+    while(readreg(MISTAT) & 0x01){
+        delay(10);
+        wdt_reset();
+        if(--timeout ==0)       return;
+    }
+}
+
+//--------------------------------------------------------
+void
+ENC28J60::init(void)
+{
+    pinMode(_cs, OUTPUT);
+    digitalWrite(_cs, HIGH);
+    SPI.begin();
+}
+
+void
+ENC28J60::LEDsConfig(LEDScfg_CONFIG LEDAcfg, LEDScfg_CONFIG LEDBcfg)
+{
+    uint16_t                temp  = phyRead(PHLCON);
+    
+    if(LEDAcfg)             temp &= LEDA_MASK;
+    if(LEDBcfg)             temp &= LEDB_MASK;
+	
+    phyWrite(PHLCON, (temp |(uint16_t)(LEDAcfg <<4) |LEDBcfg |0x3006));
+}
+
+//--------------------------------------------------------
+bool
+ENC28J60::resetEther(void)
+{
+    return reset();
+}
+
+uint8_t
+ENC28J60::hardwareStatus(void)
+{
+    uint8_t rev;
+    setregbank(MAADRX_BANK);
+    rev = readreg(EREVID);          /* 0xFF = Hardware Error */
+    switch (rev)
+    {
+        case 2:
+            return 1;
+        case 6:
+            return 7;
+        default:
+            return rev;
+    }
+}
+
+bool
+ENC28J60::linkStatus(void)
+{
+    return (phyRead(PHSTAT2) & 0x0400);
 }

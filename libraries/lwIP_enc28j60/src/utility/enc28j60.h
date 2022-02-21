@@ -41,6 +41,35 @@
 
 #include <SPI.h>
 
+// PHLCON: PHY module LED control register
+//
+//      R R R R    L  L  L  L    L  L  L  L             R
+//      E E E E    A  A  A  A    B  B  B  B    L  L  S  E
+//      S S S S    C  C  C  C    C  C  C  C    F  F  T  S
+//      E E E E    F  F  F  F    F  F  F  F    R  R  R  E
+//      R R R R    G  G  G  G    G  G  G  G    Q  Q  C  R
+//      V V V V    3  2  1  0    3  2  1  0    1  0  H  V
+	
+typedef enum {
+    LED_NO_CHANGE               = 0x00,
+    LED_TRANSMIT                = 0x10,
+    LED_RECEIVE                 = 0x20,
+    LED_COLLISION               = 0x30,
+    LED_LINK_STATUS             = 0x40,
+    LED_DUPLEX_STATUS           = 0x50,
+    LED_TRANS_RECV              = 0x70,
+    LED_BLINK_ON                = 0x80,
+    LED_BLINK_OFF               = 0x90,
+    LED_BLINK_FAST              = 0xA0,
+    LED_BLINK_SLOW              = 0xB0,
+    LED_LINK_RXD_STATUS         = 0xC0,
+    LED_LINK_TXD_RXD_STATUS     = 0xD0,
+    LED_DPLX_COLL_STATUS        = 0xE0,
+    
+    LEDA_MASK                   = 0xF0F0,
+    LEDB_MASK                   = 0xFF00
+} LEDScfg_CONFIG;
+
 /**
     Send and receive Ethernet frames directly using a ENC28J60 controller.
 */
@@ -79,6 +108,14 @@ public:
                or 0 if no packet was received
     */
     virtual uint16_t readFrame(uint8_t *buffer, uint16_t bufsize);
+    
+    /******/
+    void init(void);
+    void LEDsConfig(LEDScfg_CONFIG LEDAcfg, LEDScfg_CONFIG LEDBcfg);
+    
+    bool resetEther(void);
+    uint8_t hardwareStatus(void);
+    bool linkStatus(void);
 
 protected:
 
@@ -126,7 +163,10 @@ private:
     void softreset(void);
     uint8_t readrev(void);
     bool reset(void);
-
+    
+    uint16_t phyRead(uint8_t address);
+    void phyWrite(uint8_t address, uint16_t data);
+    
     void enc28j60_arch_spi_init(void);
     uint8_t enc28j60_arch_spi_write(uint8_t data);
     uint8_t enc28j60_arch_spi_read(void);
