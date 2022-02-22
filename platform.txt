@@ -21,8 +21,8 @@ runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
 runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 
-compiler.warning_flags=-w -Werror=return-type
-compiler.warning_flags.none=-w -Werror=return-type
+compiler.warning_flags=@{runtime.platform.path}/tools/gcc-no-warnings -Werror=return-type
+compiler.warning_flags.none=@{runtime.platform.path}/tools/gcc-no-warnings -Werror=return-type
 compiler.warning_flags.default=-Werror=return-type
 compiler.warning_flags.more=-Wall -Werror=return-type
 compiler.warning_flags.all=-Wall -Wextra -Werror=return-type
