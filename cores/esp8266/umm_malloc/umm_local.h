@@ -16,6 +16,14 @@
 
 
 /*
+ * Saturated unsigned add and unsigned multiply
+ */
+size_t umm_umul_sat(const size_t a, const size_t b);  // share with heap.cpp
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+static size_t umm_uadd_sat(const size_t a, const size_t b);
+#endif
+
+/*
  * This redefines DBGLOG_FORCE defined in dbglog/dbglog.h
  * Just for printing from umm_info() which is assumed to always be called from
  * non-ISR. Thus SPI bus is available to handle cache-miss and reading a flash
