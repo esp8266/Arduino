@@ -260,11 +260,13 @@ bool WiFiClientSecureCtx::_engineConnected() {
 }
 
 uint8_t WiFiClientSecureCtx::connected() {
-  if (!_clientConnected()) {
+  if (!_engineConnected()) {
     return false;
   }
 
-  return (_updateRecvBuffer() || _engineConnected());
+  _pollRecvBuffer();
+
+  return _engineConnected();
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
@@ -353,7 +355,7 @@ int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {
 
   // will either check the internal buffer, or try to wait for some data
   // *may* attempt to write some pending ::write() data b/c of _run_until
-  int avail = _updateRecvBuffer();
+  int avail = _pollRecvBuffer();
 
   // internal buffer might still be available for some time
   bool engine = _engineConnected();
@@ -412,7 +414,7 @@ int WiFiClientSecureCtx::read() {
   return -1;
 }
 
-int WiFiClientSecureCtx::_updateRecvBuffer() {
+int WiFiClientSecureCtx::_pollRecvBuffer() {
   if (_recvapp_buf) {
     return _recvapp_len;  // Anything from last call?
   }
@@ -434,11 +436,11 @@ int WiFiClientSecureCtx::_updateRecvBuffer() {
 }
 
 int WiFiClientSecureCtx::available() {
-  return _updateRecvBuffer();
+  return _pollRecvBuffer();
 }
 
 int WiFiClientSecureCtx::peek() {
-  if (!ctx_present() || !_updateRecvBuffer()) {
+  if (!ctx_present() || (0 == _pollRecvBuffer())) {
     DEBUG_BSSL("peek: Not connected, none left available\n");
     return -1;
   }
@@ -457,7 +459,7 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   }
 
   _startMillis = millis();
-  while ((_updateRecvBuffer() < (int) length) && ((millis() - _startMillis) < 5000)) {
+  while ((_pollRecvBuffer() < (int) length) && ((millis() - _startMillis) < 5000)) {
     yield();
   }
 

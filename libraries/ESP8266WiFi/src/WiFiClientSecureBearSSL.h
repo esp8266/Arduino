@@ -192,10 +192,12 @@ class WiFiClientSecureCtx : public WiFiClient {
     uint32_t _tls_min;
     uint32_t _tls_max;
 
-    // Pending received data buffer, used internally & as available()
-    int _updateRecvBuffer();
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
+
+    int _pollRecvBuffer(); // If there's a buffer with some pending data, return it's length
+                           // If there's no buffer, poll the engine and store any received data there and return the length
+                           // (which also may change the internal state, e.g. make us disconnected)
 
     bool _clientConnected(); // Is the underlying socket alive?
     bool _engineConnected(); // Are both socket and the bearssl engine alive?
