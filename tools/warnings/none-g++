@@ -38,7 +38,6 @@
 -Wno-prio-ctor-dtor
 -Wno-psabi
 -Wno-return-local-addr
--Wno-return-type
 -Wno-shift-count-negative
 -Wno-shift-count-overflow
 -Wno-shift-negative-value
