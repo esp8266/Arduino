@@ -18,7 +18,13 @@ void setup() {
 
   Serial.println("\nEthernet\n");
 
-  eth.setDefault(true); // default route set through this interface
+  // Uncomment to force routing through this interface.
+  // Default is set to false. In this case lwIP searches for
+  // the best suited output interface matching the destination address.
+  // If several interfaces match, the first one is picked.
+  // On esp8266/Arduno: WiFi interfaces are checked first.
+  // eth.setDefault(true); // default route set through this interface
+
   if (!ethInitDHCP(eth)) {
     Serial.printf("no hardware found\n");
     while (1) {

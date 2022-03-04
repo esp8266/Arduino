@@ -190,7 +190,6 @@ void handleHTTPRequest() {
 
   // Get current time
   time_t now = time(nullptr);
-  ;
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
 

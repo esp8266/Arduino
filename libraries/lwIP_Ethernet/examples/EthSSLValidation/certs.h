@@ -33,7 +33,7 @@ pwIDAQAB
 // CN: Sectigo RSA Domain Validation Secure Server CA => name: Sectigo_RSA_Domain_Validation_Secure_Server_CA
 // not valid before: 2018-11-02 00:00:00
 // not valid after:  2030-12-31 23:59:59
-const char cert_Sectigo_RSA_Domain_Validation_Secure_Server_CA [] PROGMEM = R"CERT(
+const char cert_Sectigo_RSA_Domain_Validation_Secure_Server_CA[] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIGEzCCA/ugAwIBAgIQfVtRJrR2uhHbdBYLvFMNpzANBgkqhkiG9w0BAQwFADCB
 iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl
