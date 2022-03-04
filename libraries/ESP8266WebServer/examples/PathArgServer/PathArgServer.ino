@@ -8,7 +8,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -33,9 +33,7 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+  if (MDNS.begin("esp8266")) { Serial.println("MDNS responder started"); }
 
   server.on(F("/"), []() {
     server.send(200, "text/plain", "hello from esp8266!");

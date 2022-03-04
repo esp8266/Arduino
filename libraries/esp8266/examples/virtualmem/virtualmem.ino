@@ -2,9 +2,7 @@
 uint32_t cyclesToRead1Kx32(unsigned int *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
@@ -23,9 +21,7 @@ uint32_t cyclesToWrite1Kx32(unsigned int *x) {
 uint32_t cyclesToRead1Kx16(unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
@@ -40,17 +36,15 @@ uint32_t cyclesToWrite1Kx16(unsigned short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead1Kx8(unsigned char*x, uint32_t *res) {
+uint32_t cyclesToRead1Kx8(unsigned char *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite1Kx8(unsigned char*x) {
+uint32_t cyclesToWrite1Kx8(unsigned char *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < 1024; i++) {
@@ -88,24 +82,24 @@ void setup() {
   t = cyclesToRead1Kx32(mem, &res);
   Serial.printf("Physical Memory Read:  %d cycles for 4K (sum %08x)\n", t, res);
 
-  t = cyclesToWrite1Kx16((uint16_t*)vm);
+  t = cyclesToWrite1Kx16((uint16_t *)vm);
   Serial.printf("Virtual Memory Write:   %d cycles for 2K by 16\n", t);
-  t = cyclesToWrite1Kx16((uint16_t*)mem);
+  t = cyclesToWrite1Kx16((uint16_t *)mem);
   Serial.printf("Physical Memory Write:  %d cycles for 2K by 16\n", t);
 
-  t = cyclesToRead1Kx16((uint16_t*)vm, &res);
+  t = cyclesToRead1Kx16((uint16_t *)vm, &res);
   Serial.printf("Virtual Memory Read:   %d cycles for 2K by 16 (sum %08x)\n", t, res);
-  t = cyclesToRead1Kx16((uint16_t*)mem, &res);
+  t = cyclesToRead1Kx16((uint16_t *)mem, &res);
   Serial.printf("Physical Memory Read:  %d cycles for 2K by 16 (sum %08x)\n", t, res);
 
-  t = cyclesToWrite1Kx8((uint8_t*)vm);
+  t = cyclesToWrite1Kx8((uint8_t *)vm);
   Serial.printf("Virtual Memory Write:   %d cycles for 1K by 8\n", t);
-  t = cyclesToWrite1Kx8((uint8_t*)mem);
+  t = cyclesToWrite1Kx8((uint8_t *)mem);
   Serial.printf("Physical Memory Write:  %d cycles for 1K by 8\n", t);
 
-  t = cyclesToRead1Kx8((uint8_t*)vm, &res);
+  t = cyclesToRead1Kx8((uint8_t *)vm, &res);
   Serial.printf("Virtual Memory Read:   %d cycles for 1K by 8 (sum %08x)\n", t, res);
-  t = cyclesToRead1Kx8((uint8_t*)mem, &res);
+  t = cyclesToRead1Kx8((uint8_t *)mem, &res);
   Serial.printf("Physical Memory Read:  %d cycles for 1K by 8 (sum %08x)\n", t, res);
 
   // Let's use external heap to make a big ole' String
@@ -133,6 +127,4 @@ void setup() {
   ESP.resetHeap();
 }
 
-void loop() {
-
-}
+void loop() {}

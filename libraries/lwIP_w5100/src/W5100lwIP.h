@@ -7,4 +7,4 @@
 
 using Wiznet5100lwIP = LwipIntfDev<Wiznet5100>;
 
-#endif // _W5500LWIP_H
+#endif  // _W5500LWIP_H
