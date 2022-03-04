@@ -391,7 +391,7 @@ err_t LwipIntfDev<RawDev>::handlePackets()
     }
 }
 
-template <class RawDev>
+template<class RawDev>
 void LwipIntfDev<RawDev>::setDefault(bool deflt)
 {
     _default = deflt;

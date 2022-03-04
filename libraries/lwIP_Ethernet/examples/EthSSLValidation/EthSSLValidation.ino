@@ -9,14 +9,14 @@
 
 #include <LwipEthernet.h>
 
-Wiznet5500lwIP eth(/*SS*/16);     // <== adapt to your hardware
+Wiznet5500lwIP eth(/*SS*/ 16);  // <== adapt to your hardware
 
 #include <WiFiClientSecure.h>
 #include <StackThunk.h>
 #include <time.h>
 #include "certs.h"
 
-const char *   path = "/";
+const char *path = "/";
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -62,7 +62,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     do {
       char tmp[32];
       memset(tmp, 0, 32);
-      int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+      int rlen = client->read((uint8_t *)tmp, sizeof(tmp) - 1);
       yield();
       if (rlen < 0) {
         break;
@@ -198,7 +198,7 @@ void setup() {
 
   Serial.println("\nEthernet\n");
 
-  eth.setDefault(true); // default route set through this interface
+  eth.setDefault(true);  // default route set through this interface
   if (!ethInitDHCP(eth)) {
     Serial.printf("no hardware found\n");
     while (1)
@@ -211,7 +211,7 @@ void setup() {
   }
 
   Serial.printf("Ethernet: IP Address: %s\n",
-    eth.localIP().toString().c_str());
+                eth.localIP().toString().c_str());
 
   fetchNoConfig();
   fetchInsecure();

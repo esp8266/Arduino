@@ -1,6 +1,5 @@
 
-#include <ESP8266WiFi.h>    // tcp API
-#include <SPI.h>
+#include <ESP8266WiFi.h>  // tcp API
 #include <debug.h>
 
 #include <W5100lwIP.h>
@@ -9,13 +8,13 @@
 
 // One of them is to be declared in the main sketch
 // and passed to ethInitDHCP() or ethInitStatic():
-//Wiznet5500lwIP eth(CSPIN);
-//Wiznet5100lwIP eth(CSPIN);
-//ENC28J60lwIP eth(CSPIN);
+// Wiznet5500lwIP eth(CSPIN);
+// Wiznet5100lwIP eth(CSPIN);
+// ENC28J60lwIP eth(CSPIN);
 
 void SPI4EthInit();
 
-template <class EthImpl>
+template<class EthImpl>
 bool ethInitDHCP(EthImpl& eth)
 {
     SPI4EthInit();
@@ -30,8 +29,9 @@ bool ethInitDHCP(EthImpl& eth)
     return true;
 }
 
-template <class EthImpl>
-bool ethInitStatic(EthImpl& eth, IPAddress IP, IPAddress gateway, IPAddress netmask, IPAddress dns1, IPAddress dns2 = IPADDR_NONE)
+template<class EthImpl>
+bool ethInitStatic(EthImpl& eth, IPAddress IP, IPAddress gateway, IPAddress netmask, IPAddress dns1,
+                   IPAddress dns2 = IPADDR_NONE)
 {
     SPI4EthInit();
 

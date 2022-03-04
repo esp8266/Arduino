@@ -8,7 +8,7 @@
 
 #include <LwipEthernet.h>
 
-Wiznet5500lwIP eth(/*SS*/16);     // <== adapt to your hardware
+Wiznet5500lwIP eth(/*SS*/ 16);  // <== adapt to your hardware
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
@@ -68,7 +68,7 @@ void loop() {
 
   // Read all the lines of the reply from server and print them to Serial
   Serial.println("receiving from remote server");
-  client.sendAll(Serial); // this peer closes once all data are sent
+  client.sendAll(Serial);  // this peer closes once all data are sent
 
   // Close the connection
   Serial.println();

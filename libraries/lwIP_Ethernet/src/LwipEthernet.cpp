@@ -1,8 +1,9 @@
 
 #include <LwipEthernet.h>
+#include <SPI.h>
 
 #ifndef ETHERNET_SPI_CLOCK_DIV
-#define ETHERNET_SPI_CLOCK_DIV SPI_CLOCK_DIV4 // 4MHz (SPI.h)
+#define ETHERNET_SPI_CLOCK_DIV SPI_CLOCK_DIV4  // 4MHz (SPI.h)
 #endif
 
 void SPI4EthInit()

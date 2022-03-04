@@ -9,14 +9,15 @@
 ////////////////////////////////////////////////////////////
 // certificate chain for www.gitlab.com:443
 
-const char* gitlab_host = "www.gitlab.com";
+const char*    gitlab_host = "www.gitlab.com";
 const uint16_t gitlab_port = 443;
 
 // CN: gitlab.com => name: gitlab_com
 // not valid before: 2021-04-12 00:00:00
 // not valid after:  2022-05-11 23:59:59
-const char fingerprint_gitlab_com [] PROGMEM = "71:55:5e:29:68:99:43:98:c8:85:35:bd:4c:10:4c:f5:cf:17:09:e6";
-const char pubkey_gitlab_com [] PROGMEM = R"PUBKEY(
+const char fingerprint_gitlab_com[] PROGMEM
+    = "71:55:5e:29:68:99:43:98:c8:85:35:bd:4c:10:4c:f5:cf:17:09:e6";
+const char pubkey_gitlab_com[] PROGMEM = R"PUBKEY(
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1eeFy86Xbz3ygyCVprHp
 sPP3zyg0yldkIfqwjsXPH0b+KwQ85s3pzI/5+MVrR2/BGY4ed6mTZ6hvNwQJ2B0E
@@ -74,7 +75,7 @@ yOGBQMkKW+ESPMFgKuOXwIlCypTPRpgSabuY0MLTDXJLR27lk8QyKGOHQ+SwMj4K
 // CN: USERTrust RSA Certification Authority => name: USERTrust_RSA_Certification_Authority
 // not valid before: 2019-03-12 00:00:00
 // not valid after:  2028-12-31 23:59:59
-const char cert_USERTrust_RSA_Certification_Authority [] PROGMEM = R"CERT(
+const char cert_USERTrust_RSA_Certification_Authority[] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIFgTCCBGmgAwIBAgIQOXJEOvkit1HX02wQ3TE1lTANBgkqhkiG9w0BAQwFADB7
 MQswCQYDVQQGEwJHQjEbMBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
@@ -109,7 +110,5 @@ vGp4z7h/jnZymQyd/teRCBaho1+V
 -----END CERTIFICATE-----
 )CERT";
 
-
 // end of certificate chain for www.gitlab.com:443
 ////////////////////////////////////////////////////////////
-
