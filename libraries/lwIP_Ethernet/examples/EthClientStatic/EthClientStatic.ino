@@ -1,57 +1,51 @@
 /*
     This sketch establishes a TCP connection to a "quote of the day" service.
     It sends a "hello" message, and then prints received data.
+
+    This is Ethernet version of:
+    https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino
 */
 
-#include <SPI.h>
-#include <W5500lwIP.h>
-//or #include <W5100lwIP.h>
-//or #include <ENC28J60lwIP.h>
+#include <LwipEthernet.h>
 
-#include <WiFiClient.h> // WiFiClient (-> TCPClient)
+#define LOCAL_IP   IPAddress(192,168,0,233)
+#define LOCAL_GW   IPAddress(192,168,0,254)   // <== adapt to your network
+#define LOCAL_MASK IPAddress(255,255,255,0)
+#define DNS        IPAddress(8,8,8,8)
+
+Wiznet5500lwIP eth(/*SS*/16);                 // <== adapt to your hardware
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
 
-using TCPClient = WiFiClient;
-
-#define CSPIN 16 // wemos/lolin/nodemcu D0
-Wiznet5500lwIP eth(CSPIN);
-
 void setup() {
   Serial.begin(115200);
 
-  SPI.begin();
-  SPI.setClockDivider(SPI_CLOCK_DIV4); // 4 MHz?
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  eth.setDefault(); // use ethernet for default route
-  if (!eth.begin()) {
-    Serial.println("ethernet hardware not found ... sleeping");
+  Serial.println("\nEthernet\n");
+
+  eth.setDefault(true); // default route set through this interface
+  if (!ethInitStatic(eth, LOCAL_IP, LOCAL_GW, LOCAL_MASK, DNS)) {
+    // enabling debug message will show the real cause
+    Serial.printf("no hardware found or bad network configuration\n");
     while (1) {
       delay(1000);
     }
-  } else {
-    Serial.print("connecting ethernet");
-    while (!eth.connected()) {
-      Serial.print(".");
-      delay(1000);
-    }
   }
-  Serial.println();
-  Serial.print("ethernet IP address: ");
-  Serial.println(eth.localIP());
+
+  Serial.printf("Ethernet: IP Address: %s\n",
+                eth.localIP().toString().c_str());
 }
 
 void loop() {
-  static bool wait = false;
 
   Serial.print("connecting to ");
   Serial.print(host);
   Serial.print(':');
   Serial.println(port);
 
-  TCPClient client;
+  // Use WiFiClient class to create TCP connections
+  // (this class could have been named TCPClient)
+  WiFiClient client;
   if (!client.connect(host, port)) {
     Serial.println("connection failed");
     delay(5000);
@@ -77,19 +71,12 @@ void loop() {
 
   // Read all the lines of the reply from server and print them to Serial
   Serial.println("receiving from remote server");
-  // not testing 'client.connected()' since we do not need to send data here
-  while (client.available()) {
-    char ch = static_cast<char>(client.read());
-    Serial.print(ch);
-  }
+  client.sendAll(Serial); // this peer closes once all data are sent
 
   // Close the connection
   Serial.println();
   Serial.println("closing connection");
   client.stop();
 
-  if (wait) {
-    delay(300000); // execute once every 5 minutes, don't flood remote service
-  }
-  wait = true;
+  delay(600000); // execute once every 10 minutes, don't flood remote service
 }
