@@ -59,6 +59,11 @@ public:
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
     }
 
+    // Use `::setDefault()` to force routing through this interface.
+    // Default is set to false. In this case lwIP selects the best suited
+    // output interface matching the destination address.
+    // If several interfaces match, the first one is picked.
+    // On esp8266/Arduno: WiFi interfaces are checked first.
     void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
