@@ -183,6 +183,11 @@ import sys
 import filecmp
 from shutil import copyfile
 
+# Need to work on signature line used for match to avoid conflicts with
+# existing embedded documentation methods.
+build_opt_signature = "/*@create-file:build.opt@"
+
+
 def print_msg(*args, **kwargs):
     print(*args, flush=True, **kwargs)
 
@@ -233,13 +238,13 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     path/core/build.opt. The subdirectory path must already exist as well as the
     copy of SketchName.ino.globals.h.
     """
+    global build_opt_signature
+
     build_opt = open(build_opt_fqfn, 'w')
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
         return
-    # Need to work on signature line used for match to avoid conflicts with
-    # existing embedded documentation methods.
-    build_opt_signature = "/*@create-file:build.opt@"
+
     complete_comment = False
     build_opt_error = False
     line_no = 0
@@ -296,42 +301,42 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
             # Don't let the failure get hidden by a spew of nonsensical error
             # messages that will follow. Bring things to a halt.
             sys.exit(1)
-            return
+            return False
     elif complete_comment:
         print_msg("Created compiler command-line options file " + build_opt_fqfn)
     build_opt.close()
+    return complete_comment
 
-
-def get_sketchbook_globals(build_path, sketchbook_globals_path, rebuild_opt_file, build_opt_fqfn):
+def get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn):
     """
     Construct path to sketchbook globals using relative path from users home directory.
-    Append to build options only if recomposing build options.
+    Append to build options.
     """
     source_fqfn = os.path.expanduser('~/' + sketchbook_globals_path)
     notused, file_name = os.path.split(source_fqfn)
     build_target_fqfn = os.path.join(build_path, file_name)
     copy_create_build_file(source_fqfn, build_target_fqfn)
-    # The old build.opt will be fine since we did a add_include last time.
-    if rebuild_opt_file:
-        add_include_line(build_opt_fqfn, build_target_fqfn)
+    add_include_line(build_opt_fqfn, build_target_fqfn)
 
 
 def main():
+    global build_opt_signature
+
     if len(sys.argv) >= 4:
-        source_globals_h_fqfn = sys.argv[1]
+        source_globals_h_fqfn = os.path.normpath(sys.argv[1])
         globals_name = os.path.basename(source_globals_h_fqfn)
-        globals_h_fqfn = sys.argv[2]
+        globals_h_fqfn = os.path.normpath(sys.argv[2])
         build_path = os.path.dirname(globals_h_fqfn)
-        build_opt_fqfn = sys.argv[3]
+        build_opt_fqfn = os.path.normpath(sys.argv[3])
         # Assumption: globals_h_fqfn and build_opt_fqfn have the same dirname
 
         if len(sys.argv) >= 5:
-            # Hidden option for more advanced programmers
+            # Hidden option for advanced programmers
             # Very few things need to be made available globaly to *all* Sketches
             # This option can create obfuscation when not used wisely.
             # Omit from documentation, assume that only an advanced programmer
             # will discover and use this.
-            sketchbook_globals_path = sys.argv[4]
+            sketchbook_globals_path = os.path.normpath(sys.argv[4])
             num_include_lines = 2
         else:
             sketchbook_globals_path = ""
@@ -349,42 +354,30 @@ def main():
             if os.path.getsize(globals_h_fqfn) and len(os.listdir(build_path)) < 20:
                 print_err("Aggressive caching of core.a might be enabled. This may create build errors.")
                 print_err("Suggest turning off in preferences.txt: \"compiler.cache_core=false\"")
-                # TODO Revise message with proper URL
-                print_err("Add URL to topic in docs.")
         else:
             # Info: When platform.txt, platform.local.txt, or IDE Tools are
             # changed, our build path directory was cleaned. Note,
             # makecorever.py may have run before us and recreaded the directory.
             if not os.path.exists(build_path):
                 os.makedirs(build_path)
-                print_msg("Clean build, created dir " + build_path) # dev debug print
+                print_msg("Clean build, created dir " + build_path)
 
         if os.path.exists(source_globals_h_fqfn):
             print_msg("Using global defines from " + source_globals_h_fqfn)
 
-        extract_fallback_build_opt = \
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
-        # At this point we have a SketchName.ino.globals.h and build.opt file in
-        # build path/core/ directory. They may be empty at this stage.
-        # Reuse old build.opt or extract new one from SketchName.ino.globals.h
-        if extract_fallback_build_opt:
-            extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
-        elif os.path.exists(globals_h_fqfn) and os.path.getsize(globals_h_fqfn):
-            num_lines = sum(1 for line in open(build_opt_fqfn))
-            if num_lines > num_include_lines:
-                print_msg("Using extracted compiler command-line options in " + build_opt_fqfn)
-        else:
-            # SketchName.ino.globals.h may have been deleted in the sketch
-            # directory or is just empty. Recompose build.opt
-            open(build_opt_fqfn, 'w').close()
-            extract_fallback_build_opt = True
+        # globals_h_fqfn timestamp was only updated if the source changed. This
+        # controls the rebuild on change. We can always extact a new build.opt
+        # w/o triggering a needless rebuild.
+        embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
+        if not embedded_options and os.path.exists(source_globals_h_fqfn):
+            print_msg("To add embedded compiler options, include them in a block comment starting with '" + build_opt_signature + "'." )
 
-        if extract_fallback_build_opt:
-            add_include_line(build_opt_fqfn, globals_h_fqfn)
+        add_include_line(build_opt_fqfn, globals_h_fqfn)
 
         if len(sketchbook_globals_path):
-            get_sketchbook_globals(build_path, sketchbook_globals_path, extract_fallback_build_opt, build_opt_fqfn)
+            get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn)
 
     else:
         print_err("Too few arguments. Required arguments:")
