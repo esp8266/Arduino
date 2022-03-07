@@ -187,6 +187,7 @@ from shutil import copyfile
 # existing embedded documentation methods.
 build_opt_signature = "/*@create-file:build.opt@"
 
+docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html"
 
 def print_msg(*args, **kwargs):
     print(*args, flush=True, **kwargs)
@@ -307,6 +308,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     build_opt.close()
     return complete_comment
 
+
 def get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn):
     """
     Construct path to sketchbook globals using relative path from users home directory.
@@ -321,6 +323,7 @@ def get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn):
 
 def main():
     global build_opt_signature
+    global docs_url
 
     if len(sys.argv) >= 4:
         source_globals_h_fqfn = os.path.normpath(sys.argv[1])
@@ -353,7 +356,9 @@ def main():
             # positives. Only report when globals.h is being used.
             if os.path.getsize(globals_h_fqfn) and len(os.listdir(build_path)) < 20:
                 print_err("Aggressive caching of core.a might be enabled. This may create build errors.")
-                print_err("Suggest turning off in preferences.txt: \"compiler.cache_core=false\"")
+                print_err("  Suggest turning off in preferences.txt: \"compiler.cache_core=false\"")
+                print_err("  Read more at " + docs_url)
+
         else:
             # Info: When platform.txt, platform.local.txt, or IDE Tools are
             # changed, our build path directory was cleaned. Note,
@@ -371,8 +376,18 @@ def main():
         # controls the rebuild on change. We can always extact a new build.opt
         # w/o triggering a needless rebuild.
         embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
-        if not embedded_options and os.path.exists(source_globals_h_fqfn):
-            print_msg("To add embedded compiler options, include them in a block comment starting with '" + build_opt_signature + "'." )
+
+        # Provide context help for build option support.
+        source_build_opt_h_fqfn = os.path.join(os.path.dirname(source_globals_h_fqfn), "build_opt.h")
+        if os.path.exists(source_build_opt_h_fqfn) and not embedded_options:
+            print_err("Build options file '" + source_build_opt_h_fqfn + "' not supported.")
+            print_err("  Add build option content to '" + source_globals_h_fqfn + "'.")
+            print_err("  Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
+            print_err("  Read more at " + docs_url)
+        elif os.path.exists(source_globals_h_fqfn):
+            if not embedded_options:
+                print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
+                print_msg("  Read more at " + docs_url)
 
         add_include_line(build_opt_fqfn, globals_h_fqfn)
 
@@ -380,7 +395,7 @@ def main():
             get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn)
 
     else:
-        print_err("Too few arguments. Required arguments:")
+        print_err("Too few arguments. Add arguments:")
         print_err("  Source FQFN SketchName.ino.globals.h, Build FQFN SketchName.ino.globals.h, Build FQFN build.opt")
 
 if __name__ == '__main__':

@@ -2,8 +2,8 @@ How to specify global build defines and options
 ===============================================
 
 To create global defines for a Sketch, create a file with a name based
- on your sketch’s file name followed by ``.globals.h`` in the Sketch folder.
- For example, if the main Sketch file is named
+on your sketch’s file name followed by ``.globals.h`` in the Sketch
+folder. For example, if the main Sketch file is named
 ``LowWatermark.ino``, its global defines file would be
 ``LowWatermark.ino.globals.h``. This file will be implicitly included
 with every module built for your Sketch. Do not directly include it in
@@ -21,9 +21,10 @@ command option.
 Actions taken in processing comment block to create ``build.opt`` \* for
 each line, white space is trimmed \* blank lines are skipped \* lines
 starting with ``*``, ``//``, or ``#`` are skipped \* the remaining
-results are written to build tree\ ``/core/build.opt`` \* ``build.opt``
-is finished with a ``-include ...`` command, which references the global
-.h its contents were extracted from.
+results are written to build tree\ ``/core/build.opt`` \* multiple
+``/*@create-file:build.opt@`` ``*/`` comment blocks are not allowed \*
+``build.opt`` is finished with a ``-include ...`` command, which
+references the global .h its contents were extracted from.
 
 Example Sketch: ``LowWatermark.ino``
 
@@ -72,7 +73,7 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
    #endif
 
    #if defined(__cplusplus)
-   // Defines kept private to .cpp modules
+   // Defines kept private to .cpp and .ino modules
    //#pragma message("__cplusplus has been seen")
    #define MYTITLE2 "Empty"
    #endif
@@ -93,14 +94,14 @@ Aggressive Caching of ``core.a``
 
 Using global defines or compiler command-line options will lead to bad
 builds when the **Aggressively cache compiled core** feature is enabled.
-When ``#define`` changes require ``core.a`` to be recompiled, and
-multiple Sketches are open, they can no longer reliably share one cached
+When ``#define`` changes require rebuilding ``core.a`` and multiple
+Sketches are open, they can no longer reliably share one cached
 ``core.a``. In a simple case: The 1st Sketch to be built has its version
 of ``core.a`` cached. Other sketches will use this cached version for
 their builds.
 
 To turn this off, you need to find the location of ``preferences.txt``.
-Using the Arduino IDE, go to *File->Preferences*. Make note of the path
+From the Arduino IDE, go to *File->Preferences*. Make note of the path
 to ``prefereces.txt``. You cannot edit the file while the Arduino IDE is
 running. Close all Arduino IDE windows and edit the file
 ``preferences.txt``. Change ``compiler.cache_core=true`` to
@@ -113,11 +114,12 @@ Sketch that uses global defines.
 Other build confusion
 =====================
 
-1. Renaming files does not change the last modified timestamp, possibly
-   causing issues when replacing files by renaming and rebuilding. A good
+1. Renaming a file does not change the last modified timestamp, possibly
+   causing issues when adding a file by renaming and rebuilding. A good
    example of this problem would be to have then fixed a typo in file
    name ``LowWatermark.ino.globals.h``. You need to touch (update
    timestamp) the file so a “rebuild all” is performed.
+
 2. When a ``.h`` file is renamed in the sketch folder, a copy of the old
    file remains in the build sketch folder. This can create confusion if
    you missed an edit in updating an ``#include`` in one or more of your
