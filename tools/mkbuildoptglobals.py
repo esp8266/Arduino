@@ -228,7 +228,7 @@ def add_include_line(build_opt_fqfn, include_fqfn):
         # If file is missing, we need an place holder
         open(include_fqfn, 'w').close()
     build_opt = open(build_opt_fqfn, 'a')
-    build_opt.write('-include "' + include_fqfn + '"\n')
+    build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
     build_opt.close()
 
 
