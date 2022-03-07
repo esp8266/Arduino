@@ -214,12 +214,16 @@ void setup(void) {
 
   Serial.println("\nEthernet\n");
 
-  // Uncomment `eth.setDefault(true)` to force routing through this interface.
-  // Default is set to false. In this case lwIP selects the best suited
-  // output interface matching the destination address.
-  // If several interfaces match, the first one is picked.
-  // On esp8266/Arduno: WiFi interfaces are checked first.
-  // eth.setDefault(true); // default route set through this interface
+  // 1. Currently when no default is set, esp8266-Arduino uses the first
+  //    DHCP client interface receiving a valid address and gateway to
+  //    become the new lwIP default interface.
+  // 2. Otherwise - when using static addresses - lwIP for every packets by
+  //    defaults selects automatically the best suited output interface
+  //    matching the destination address.  If several interfaces match,
+  //    the first one is picked.  On esp8266/Arduno: WiFi interfaces are
+  //    checked first.
+  // 3. Or, use `::setDefault()` to force routing through this interface.
+  // eth.setDefault(); // default route set through this interface
 
   if (!ethInitDHCP(eth)) {
     Serial.printf("no hardware found\n");
