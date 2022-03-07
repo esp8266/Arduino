@@ -78,9 +78,8 @@ globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
 build.globals.path={build.path}/core
 globals.h.fqfn={build.globals.path}/{build.project_name}.globals.h
 build.opt.fqfn={build.globals.path}/build.opt
-sketchbook.globals.h.rfn=
 
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{sketchbook.globals.h.rfn}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}"
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.path} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 """
@@ -181,6 +180,7 @@ Build does not work as expected. This does not fail often. Maybe PIC NIC.
 import os
 import sys
 import filecmp
+import time
 from shutil import copyfile
 
 # Need to work on signature line used for match to avoid conflicts with
@@ -228,6 +228,7 @@ def add_include_line(build_opt_fqfn, include_fqfn):
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
         open(include_fqfn, 'w').close()
+        print("add_include_line: Created " + include_fqfn)
     build_opt = open(build_opt_fqfn, 'a')
     build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
     build_opt.close()
@@ -309,41 +310,49 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     return complete_comment
 
 
-def get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn):
-    """
-    Construct path to sketchbook globals using relative path from users home directory.
-    Append to build options.
-    """
-    source_fqfn = os.path.expanduser('~/' + sketchbook_globals_path)
-    notused, file_name = os.path.split(source_fqfn)
-    build_target_fqfn = os.path.join(build_path, file_name)
-    copy_create_build_file(source_fqfn, build_target_fqfn)
-    add_include_line(build_opt_fqfn, build_target_fqfn)
+def enable_override(enable, commonhfile_fqfn):
+    file=open(commonhfile_fqfn, 'w')
+    if enable:
+        file.write("//Override aggressive caching\n")
+    file.close()
+    # enabled when getsize(commonhfile_fqfn) is non-zero, disabled when zero
+
+
+def touch(fname, times=None):
+    with open(fname, 'a'):
+        os.utime(fname, times)
+
+
+def time_sync(globals_h_fqfn, commonhfile_fqfn):
+    ts = time.time()
+    touch(globals_h_fqfn, (ts, ts))
+    touch(commonhfile_fqfn, (ts, ts))
 
 
 def main():
     global build_opt_signature
     global docs_url
+    num_include_lines = 1
+    use_aggressive_caching_workaround = True
+    # Enhancement: read preferences.txt and set use_aggressive_caching_workaround
+    # https://www.arduino.cc/en/hacking/preferences
+    # :( it can be in 9 different locations
 
-    if len(sys.argv) >= 4:
+    if len(sys.argv) >= 5:
         source_globals_h_fqfn = os.path.normpath(sys.argv[1])
         globals_name = os.path.basename(source_globals_h_fqfn)
         globals_h_fqfn = os.path.normpath(sys.argv[2])
         build_path = os.path.dirname(globals_h_fqfn)
         build_opt_fqfn = os.path.normpath(sys.argv[3])
         # Assumption: globals_h_fqfn and build_opt_fqfn have the same dirname
+        commonhfile_fqfn = os.path.normpath(sys.argv[4])
 
-        if len(sys.argv) >= 5:
-            # Hidden option for advanced programmers
-            # Very few things need to be made available globaly to *all* Sketches
-            # This option can create obfuscation when not used wisely.
-            # Omit from documentation, assume that only an advanced programmer
-            # will discover and use this.
-            sketchbook_globals_path = os.path.normpath(sys.argv[4])
-            num_include_lines = 2
+        if os.path.exists(commonhfile_fqfn):
+            if os.path.getsize(commonhfile_fqfn) and \
+            not use_aggressive_caching_workaround:
+                enable_override(False, commonhfile_fqfn)
         else:
-            sketchbook_globals_path = ""
-            num_include_lines = 1
+            enable_override(False, commonhfile_fqfn)
 
         if os.path.exists(globals_h_fqfn):
             # Check for signs of "Aggressive Caching core.a"
@@ -354,14 +363,15 @@ def main():
             # report often enough to draw attention to the issue. Some aborted
             # builds with incomplete ./core compiles may later produce false
             # positives. Only report when globals.h is being used.
-            if os.path.getsize(globals_h_fqfn) and len(os.listdir(build_path)) < 20:
+            if not use_aggressive_caching_workaround and \
+            os.path.getsize(globals_h_fqfn) and \
+            len(os.listdir(build_path)) < 20:
                 print_err("Aggressive caching of core.a might be enabled. This may create build errors.")
                 print_err("  Suggest turning off in preferences.txt: \"compiler.cache_core=false\"")
                 print_err("  Read more at " + docs_url)
-
         else:
-            # Info: When platform.txt, platform.local.txt, or IDE Tools are
-            # changed, our build path directory was cleaned. Note,
+            # Info: When platform.txt, platform.local.txt, or IDE Tools board
+            # settings are changed, our build path directory was cleaned. Note,
             # makecorever.py may have run before us and recreaded the directory.
             if not os.path.exists(build_path):
                 os.makedirs(build_path)
@@ -377,6 +387,21 @@ def main():
         # w/o triggering a needless rebuild.
         embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
 
+        if use_aggressive_caching_workaround:
+            if os.path.getsize(commonhfile_fqfn):
+                print("os.path.getmtime(globals_h_fqfn)   " + str(os.path.getmtime(globals_h_fqfn)))
+                print("os.path.getmtime(commonhfile_fqfn) " + str(os.path.getmtime(commonhfile_fqfn)))
+                if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
+                    # Need to rebuild core.a
+                    # touching commonhfile_fqfn in the source core tree will cause rebuild.
+                    time_sync(globals_h_fqfn, commonhfile_fqfn)
+            elif os.path.getsize(globals_h_fqfn):
+                enable_override(True, commonhfile_fqfn)
+                time_sync(globals_h_fqfn, commonhfile_fqfn)
+
+        add_include_line(build_opt_fqfn, commonhfile_fqfn)
+        add_include_line(build_opt_fqfn, globals_h_fqfn)
+
         # Provide context help for build option support.
         source_build_opt_h_fqfn = os.path.join(os.path.dirname(source_globals_h_fqfn), "build_opt.h")
         if os.path.exists(source_build_opt_h_fqfn) and not embedded_options:
@@ -388,11 +413,6 @@ def main():
             if not embedded_options:
                 print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
                 print_msg("  Read more at " + docs_url)
-
-        add_include_line(build_opt_fqfn, globals_h_fqfn)
-
-        if len(sketchbook_globals_path):
-            get_sketchbook_globals(build_path, sketchbook_globals_path, build_opt_fqfn)
 
     else:
         print_err("Too few arguments. Add arguments:")

@@ -92,24 +92,29 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 Aggressive Caching of ``core.a``
 ================================
 
-Using global defines or compiler command-line options will lead to bad
-builds when the **Aggressively cache compiled core** feature is enabled.
-When ``#define`` changes require rebuilding ``core.a`` and multiple
-Sketches are open, they can no longer reliably share one cached
-``core.a``. In a simple case: The 1st Sketch to be built has its version
-of ``core.a`` cached. Other sketches will use this cached version for
-their builds.
+Without mediation, using global defines or compiler command-line options
+could lead to bad builds when the “Aggressively cache compiled core”
+feature is enabled. When ``#define`` changes require rebuilding
+``core.a`` and multiple Sketches are open, they can no longer reliably
+share one cached ``core.a``. In a simple case: The 1st Sketch to be
+built has its version of ``core.a`` cached. Other sketches will use this
+cached version for their builds.
 
-To turn this off, you need to find the location of ``preferences.txt``.
-From the Arduino IDE, go to *File->Preferences*. Make note of the path
-to ``prefereces.txt``. You cannot edit the file while the Arduino IDE is
-running. Close all Arduino IDE windows and edit the file
-``preferences.txt``. Change ``compiler.cache_core=true`` to
-``compiler.cache_core=false`` and save. Then each sketch will maintain
-its *own* copy of ``core.a``. The alternative when using
-``compiler.cache_core=true``, is to close all Arduino IDE sketch
-windows. Start and run *only* one instance of the IDE, while building a
-Sketch that uses global defines.
+When the “Aggressively cache compiled core” feature is enabled and a
+global define file is detected, a workaround will turn on and stay on.
+When you switch between Sketch windows, core will be recompiled and
+cache updated.
+
+To turn the “Aggressively cache compiled core” feature off, you need to
+find the location of ``preferences.txt``. From the Arduino IDE, go to
+*File->Preferences*. Make note of the path to ``prefereces.txt``. You
+cannot edit the file while the Arduino IDE is running. Close all Arduino
+IDE windows and edit the file ``preferences.txt``. Change
+``compiler.cache_core=true`` to ``compiler.cache_core=false`` and save.
+Then each sketch will maintain its *own* copy of ``core.a``. The
+alternative when using ``compiler.cache_core=true``, is to close all
+Arduino IDE sketch windows. Start and run *only* one instance of the
+IDE, while building a Sketch that uses global defines.
 
 Other build confusion
 =====================
@@ -126,6 +131,6 @@ Other build confusion
    modules. That module will continue to use the stale version of the
    ``.h`` until you restart the IDE or other major changes that would
    cause the IDE to delete and recopy the contents from the source
-   Sketch directory. Changes on the IDE Tools selection may cause a
+   Sketch directory. Changes on the IDE Tools board settings may cause a
    complete rebuild, clearing the problem. This may be the culprit for
    “What! It built fine last night!”

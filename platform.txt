@@ -64,7 +64,7 @@ globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
 build.globals.path={build.path}/core
 globals.h.fqfn={build.globals.path}/{build.project_name}.globals.h
 build.opt.fqfn={build.globals.path}/build.opt
-sketchbook.globals.h.rfn=
+commonhfile.fqfn={build.core.path}/CommonHFile.h
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
@@ -118,7 +118,7 @@ recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "
 recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 # Handle processing sketch global options
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{sketchbook.globals.h.rfn}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{commonhfile.fqfn}"
 
 
 ## Build the app.ld linker file
