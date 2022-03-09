@@ -181,6 +181,7 @@ import os
 import sys
 import filecmp
 import time
+import platform
 from shutil import copyfile
 
 # Need to work on signature line used for match to avoid conflicts with
@@ -317,6 +318,50 @@ def enable_override(enable, commonhfile_fqfn):
     file.close()
     # enabled when getsize(commonhfile_fqfn) is non-zero, disabled when zero
 
+def find_preferences_txt():
+    platform_name = platform.system()
+    # OS Path list from:
+    #   https://www.arduino.cc/en/hacking/preferences
+    if "Windows" == platform_name:
+        fqfn = os.path.expanduser("\Arduino15\preferences.txt") # Windows
+        if os.path.exists(fqfn):
+            return fqfn
+        fqfn = os.path.expanduser("\Documents\ArduinoData\preferences.txt") # Windows app version
+        if os.path.exists(fqfn):
+            return fqfn
+    elif "Darwin" == platform_name:
+        fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt") # Max OS X
+        if os.path.exists(fqfn):
+            return fqfn
+    elif "Linux" == platform_name:
+        fqfn = os.path.expanduser("~/.arduino15/preferences.txt") # Linux - works
+        if os.path.exists(fqfn):
+            return fqfn
+    # Where and how would I find this?
+    #  <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
+    return ""
+
+
+def get_preferences_txt(file_fqfn, key):
+    with open(file_fqfn) as fd:
+        for line in fd:
+            name, value = line.partition("=")[::2]
+            if name.strip().lower() == key:
+                if value.strip().lower() == 'true':
+                    print_msg("found compiler.cache_core " + value.strip()) #D debug
+                    return True
+                else:
+                    return False
+    return True     # If we don't find it just assume it is set True
+
+
+def check_preferences_txt():
+    file_fqfn = find_preferences_txt()
+    if file_fqfn == "":
+        return True     # cannot find file assume enabled
+    print_msg("\nfound preferences " + file_fqfn)   #D debug
+    return get_preferences_txt(file_fqfn, "compiler.cache_core")
+
 
 def touch(fname, times=None):
     with open(fname, 'a'):
@@ -333,10 +378,7 @@ def main():
     global build_opt_signature
     global docs_url
     num_include_lines = 1
-    use_aggressive_caching_workaround = True
-    # Enhancement: read preferences.txt and set use_aggressive_caching_workaround
-    # https://www.arduino.cc/en/hacking/preferences
-    # :( it can be in 9 different locations
+    use_aggressive_caching_workaround = check_preferences_txt() #? preliminary
 
     if len(sys.argv) >= 5:
         source_globals_h_fqfn = os.path.normpath(sys.argv[1])
