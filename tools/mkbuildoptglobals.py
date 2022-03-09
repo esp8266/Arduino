@@ -173,6 +173,9 @@ I think these, 6a and 6b, are resolved by setting `compiler.cache_core=false`
 in ~/.arduino15/preferences.txt, to disable the aggressive caching feature:
   https://forum.arduino.cc/t/no-aggressively-cache-compiled-core-in-ide-1-8-15/878954/2
 
+Added workaround for `compiler.cache_core=true` case.
+See `if use_aggressive_caching_workaround:` in main().
+
 7) Suspected but not confirmed. A quick edit and rebuild don't always work well.
 Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
@@ -191,11 +194,19 @@ build_opt_signature = "/*@create-file:build.opt@"
 docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html"
 
 def print_msg(*args, **kwargs):
-    print(*args, flush=True, **kwargs)
+    print(*args, **kwargs)
 
 
+# I prefer error messages to stand out; however, using stderr for a different
+# color does not work on the new Arduino IDE 2.0 RC4. Also,  separate pipes,
+# buffering, and multiple threads with output can create mixed-up messages.
+# Bring attention to errors with a blank line and lines starting with "*** ".
+# Let multiple prints buffer to aid them in staying together.
 def print_err(*args, **kwargs):
-    print(*args, flush=True, file=sys.stderr, **kwargs) # file=sys.stderr,
+    if (args[0])[0] != ' ':
+        print("")
+    print("*** ", end='')
+    print(*args, **kwargs)
 
 
 def copy_create_build_file(source_fqfn, build_target_fqfn):
@@ -221,18 +232,19 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
         else:
             # Place holder - Must have an empty file to satisfy parameter list
             # specifications in platform.txt.
-            open(build_target_fqfn, 'w').close()
+            with open(build_target_fqfn, 'w'):
+                pass
     return True     # file changed
 
 
 def add_include_line(build_opt_fqfn, include_fqfn):
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
-        open(include_fqfn, 'w').close()
+        with open(include_fqfn, 'w'):
+            pass
         print("add_include_line: Created " + include_fqfn)
-    build_opt = open(build_opt_fqfn, 'a')
-    build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
-    build_opt.close()
+    with open(build_opt_fqfn, 'a') as build_opt:
+        build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
 
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
@@ -261,7 +273,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
             if line == build_opt_signature:
                 if complete_comment:
                     build_opt_error = True
-                    print_err("Multiple embedded build.opt blocks in " + file_name + ":" + str(line_no))
+                    print_err("  Multiple embedded build.opt blocks in " + file_name + ":" + str(line_no))
                     continue
                 print_msg("Extracting embedded compiler command-line options from " +  file_name + ":" + str(line_no))
                 for line in src:
@@ -280,27 +292,26 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
                         continue
                     # some consistency checking before writing - give some hints about what is wrong
                     elif line == build_opt_signature:
-                        print_err("Double begin before end for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  Double begin before end for embedded build.opt block in " + file_name + ":" + str(line_no))
                         build_opt_error = True
                     elif line.startswith(build_opt_signature):
-                        print_err("build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
                         build_opt_error = True
                     elif "/*" in line or "*/" in line :
-                        print_err("Nesting issue for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  Nesting issue for embedded build.opt block in " + file_name + ":" + str(line_no))
                         build_opt_error = True
                     else:
                         build_opt.write(line + "\n")
             elif line.startswith(build_opt_signature):
-                print_err("build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
+                print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
                 build_opt_error = True
-    src.close()
     if not complete_comment or build_opt_error:
         build_opt.truncate(0)
         build_opt.close()
         if build_opt_error:
             # this will help the script start over when the issue is fixed
             os.remove(globals_h_fqfn)
-            print_err("Extraction failed")
+            print_err("  Extraction failed")
             # Don't let the failure get hidden by a spew of nonsensical error
             # messages that will follow. Bring things to a halt.
             sys.exit(1)
@@ -312,46 +323,58 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
 
 
 def enable_override(enable, commonhfile_fqfn):
-    file=open(commonhfile_fqfn, 'w')
-    if enable:
-        file.write("//Override aggressive caching\n")
-    file.close()
+    with open(commonhfile_fqfn, 'w') as file:
+        if enable:
+            file.write("//Override aggressive caching\n")
     # enabled when getsize(commonhfile_fqfn) is non-zero, disabled when zero
+
 
 def find_preferences_txt():
     platform_name = platform.system()
     # OS Path list from:
     #   https://www.arduino.cc/en/hacking/preferences
-    if "Windows" == platform_name:
-        fqfn = os.path.expanduser("\Arduino15\preferences.txt") # Windows
+    if "Linux" == platform_name:
+        # Test for portable 1ST
+        # <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
+        # For more on portable mode see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
+        # Working directory must be set to the location of the Arduino IDE executable.
+        fqfn = "./portable/preferences.txt" # Linux portable - verified
         if os.path.exists(fqfn):
             return fqfn
-        fqfn = os.path.expanduser("\Documents\ArduinoData\preferences.txt") # Windows app version
+        fqfn = os.path.expanduser("~/.arduino15/preferences.txt") # Linux - verified
+        if os.path.exists(fqfn):
+            return fqfn
+    elif "Windows" == platform_name:
+        fqfn = ".\portable\preferences.txt"
+        if os.path.exists(fqfn):
+            return fqfn
+        fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt") # Windows app version - verified
+        if os.path.exists(fqfn):
+            return fqfn
+        fqfn = os.path.expanduser("~\Arduino15\preferences.txt") # Windows
         if os.path.exists(fqfn):
             return fqfn
     elif "Darwin" == platform_name:
+        # Skip portable on Macs. Portable is not compatable with Macs
+        # see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
         fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt") # Max OS X
         if os.path.exists(fqfn):
             return fqfn
-    elif "Linux" == platform_name:
-        fqfn = os.path.expanduser("~/.arduino15/preferences.txt") # Linux - works
-        if os.path.exists(fqfn):
-            return fqfn
-    # Where and how would I find this?
-    #  <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
+
+    print_err("File preferences.txt not found on " + platform_name)
     return ""
 
 
 def get_preferences_txt(file_fqfn, key):
-    with open(file_fqfn) as fd:
-        for line in fd:
+    with open(file_fqfn) as file:
+        for line in file:
             name, value = line.partition("=")[::2]
             if name.strip().lower() == key:
                 if value.strip().lower() == 'true':
-                    print_msg("found compiler.cache_core " + value.strip()) #D debug
                     return True
                 else:
                     return False
+    print_err("Key " + key + " not found in preferences.txt. Default to true.")
     return True     # If we don't find it just assume it is set True
 
 
@@ -359,7 +382,7 @@ def check_preferences_txt():
     file_fqfn = find_preferences_txt()
     if file_fqfn == "":
         return True     # cannot find file assume enabled
-    print_msg("\nfound preferences " + file_fqfn)   #D debug
+    print_msg("Using preferences from " + file_fqfn)
     return get_preferences_txt(file_fqfn, "compiler.cache_core")
 
 
@@ -368,25 +391,27 @@ def touch(fname, times=None):
         os.utime(fname, times)
 
 
-def time_sync(globals_h_fqfn, commonhfile_fqfn):
-    ts = time.time()
-    touch(globals_h_fqfn, (ts, ts))
-    touch(commonhfile_fqfn, (ts, ts))
+def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
+    with open(globals_h_fqfn, 'a'):
+        os.utime(globals_h_fqfn)
+        ts = os.stat(globals_h_fqfn)
+        with open(commonhfile_fqfn, 'a'):
+            os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
 
 def main():
     global build_opt_signature
     global docs_url
     num_include_lines = 1
-    use_aggressive_caching_workaround = check_preferences_txt() #? preliminary
+    use_aggressive_caching_workaround = check_preferences_txt()
 
     if len(sys.argv) >= 5:
         source_globals_h_fqfn = os.path.normpath(sys.argv[1])
         globals_name = os.path.basename(source_globals_h_fqfn)
         globals_h_fqfn = os.path.normpath(sys.argv[2])
         build_path = os.path.dirname(globals_h_fqfn)
-        build_opt_fqfn = os.path.normpath(sys.argv[3])
         # Assumption: globals_h_fqfn and build_opt_fqfn have the same dirname
+        build_opt_fqfn = os.path.normpath(sys.argv[3])
         commonhfile_fqfn = os.path.normpath(sys.argv[4])
 
         if os.path.exists(commonhfile_fqfn):
@@ -425,21 +450,26 @@ def main():
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
         # globals_h_fqfn timestamp was only updated if the source changed. This
-        # controls the rebuild on change. We can always extact a new build.opt
+        # controls the rebuild on change. We can always extract a new build.opt
         # w/o triggering a needless rebuild.
         embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
 
         if use_aggressive_caching_workaround:
+            # When a Sketch owns a "Sketch.ino.globals.h" file in the build tree
+            # that exactly matches the timestamp of "CommonHFile.h" in the
+            # platform source tree, it owns the core cache. If not, or
+            # "Sketch.ino.globals.h" has changed, rebuild core.
             if os.path.getsize(commonhfile_fqfn):
-                print("os.path.getmtime(globals_h_fqfn)   " + str(os.path.getmtime(globals_h_fqfn)))
-                print("os.path.getmtime(commonhfile_fqfn) " + str(os.path.getmtime(commonhfile_fqfn)))
                 if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
                     # Need to rebuild core.a
                     # touching commonhfile_fqfn in the source core tree will cause rebuild.
-                    time_sync(globals_h_fqfn, commonhfile_fqfn)
+                    # Looks like touching or writing unrelated files in the source core tree will cause rebuild.
+                    synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
+                    print_msg("Using 'aggressive caching' workaround.")
             elif os.path.getsize(globals_h_fqfn):
                 enable_override(True, commonhfile_fqfn)
-                time_sync(globals_h_fqfn, commonhfile_fqfn)
+                synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
+                print_msg("Using 'aggressive caching' workaround.")
 
         add_include_line(build_opt_fqfn, commonhfile_fqfn)
         add_include_line(build_opt_fqfn, globals_h_fqfn)
