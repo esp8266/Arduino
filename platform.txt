@@ -118,7 +118,7 @@ recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "
 recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 # Handle processing sketch global options
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{commonhfile.fqfn}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{commonhfile.fqfn}" "{runtime.ide.path}"
 
 
 ## Build the app.ld linker file

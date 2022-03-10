@@ -92,6 +92,13 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 Aggressive Caching of ``core.a``
 ================================
 
+The feature “Aggressive Caching of core.a” refers to sharing a single
+copy of ``core.a`` across all Arduino IDE Sketch windows. This feature
+is on by default. ``core.a`` is an archive file containing the compiled
+objects of ``./core/esp8266/*``. Created after your 1ST successful
+compilation. All other open sketch builds use this shared file. When you
+close all Arduino IDE windows, the core archive file is deleted.
+
 Without mediation, using global defines or compiler command-line options
 could lead to bad builds when the “Aggressively cache compiled core”
 feature is enabled. When ``#define`` changes require rebuilding
@@ -102,19 +109,19 @@ cached version for their builds.
 
 When the “Aggressively cache compiled core” feature is enabled and a
 global define file is detected, a workaround will turn on and stay on.
-When you switch between Sketch windows, core will be recompiled and
+When you switch between Sketch windows, core will be recompiled and the
 cache updated.
 
-To turn the “Aggressively cache compiled core” feature off, you need to
-find the location of ``preferences.txt``. From the Arduino IDE, go to
-*File->Preferences*. Make note of the path to ``prefereces.txt``. You
-cannot edit the file while the Arduino IDE is running. Close all Arduino
-IDE windows and edit the file ``preferences.txt``. Change
-``compiler.cache_core=true`` to ``compiler.cache_core=false`` and save.
-Then each sketch will maintain its *own* copy of ``core.a``. The
-alternative when using ``compiler.cache_core=true``, is to close all
-Arduino IDE sketch windows. Start and run *only* one instance of the
-IDE, while building a Sketch that uses global defines.
+If you think your workflow performance would benefit from keeping a per
+Sketch copy of ``core.a``, you can turn off the “Aggressively cache
+compiled core” feature. You need to find the location of
+``preferences.txt``. From the Arduino IDE, go to *File->Preferences*.
+Make note of the path to ``prefereces.txt``. You cannot edit the file
+while the Arduino IDE is running. Close all Arduino IDE windows and edit
+the file ``preferences.txt``. Change ``compiler.cache_core=true`` to
+``compiler.cache_core=false`` and save. Then each sketch will maintain
+its *own* copy of ``core.a`` built with the customization expressed by
+their respective ``build.opt`` file.
 
 Other build confusion
 =====================

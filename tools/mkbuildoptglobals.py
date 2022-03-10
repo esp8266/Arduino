@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # This script manages the use of a file with a unique name, like
-# `SketchName.ino.globals.h`, in the Sketch source directory to provide compiler
+# `Sketch.ino.globals.h`, in the Sketch source directory to provide compiler
 # command-line options (build options) and sketch global defines. The build
 # option data is encapsulated in a unique "C" comment block and extracted into
 # the build tree during prebuild.
@@ -31,13 +31,13 @@
 """
 Operation
 
-"SketchName.ino.globals.h" - A global h file in the Source Sketch directory. The
-string SketchName is the actual name of the sketch. A matching copy is kept in
-the build path/core directory. The file is empty when it does not exist in the
-source directory.
+"Sketch.ino.globals.h" - A global h file in the Source Sketch directory. The
+string Sketch.ino is the actual name of the sketch program. A matching copy is
+kept in the build path/core directory. The file is empty when it does not exist
+in the source directory.
 
-Using SketchName.ino.globals.h as a container to hold build.opt, gives implicit
-dependency tracking for build.opt by way of SketchName.ino.globals.h's
+Using Sketch.ino.globals.h as a container to hold build.opt, gives implicit
+dependency tracking for build.opt by way of Sketch.ino.globals.h's
 dependencies.
 Example:
   gcc ... @{build.path}/core/build.opt -include "{build.path}/core/{build.project_name}.globals.h" ...
@@ -48,12 +48,12 @@ component is added to the build.opt file.
 
 At each build cycle, "{build.project_name}.globals.h" is conditoinally copied to
 "{build.path}/core/" at prebuild, and build.opt is extraction as needed. The
-SketchName.ino.globals.h's dependencies will trigger "rebuild all" as needed.
+Sketch.ino.globals.h's dependencies will trigger "rebuild all" as needed.
 
-If SketchName.ino.globals.h is not in the source sketch folder, an empty
+If Sketch.ino.globals.h is not in the source sketch folder, an empty
 versions is created in the build tree. The file build.opt always contains a
 "-include ..." entry so that file dependencies are generated for
-SketchName.ino.globals.h. This allows for change detection when the file is
+Sketch.ino.globals.h. This allows for change detection when the file is
 added.
 """
 
@@ -136,11 +136,11 @@ changing a file with an established dependency.
 issues when replacing files by renaming and rebuilding.
 
 A good example of this problem is when you correct the spelling of file
-SketchName.ino.globals.h. You need to touch (update time stampt) the file so a
+Sketch.ino.globals.h. You need to touch (update time stampt) the file so a
 rebuild all is performed.
 
-3) During the build two identical copies of SketchName.ino.globals.h will exist.
-#ifndef fencing will be needed for non comment blocks in SketchName.ino.globals.h.
+3) During the build two identical copies of Sketch.ino.globals.h will exist.
+#ifndef fencing will be needed for non comment blocks in Sketch.ino.globals.h.
 
 4) By using a .h file to encapsulate "build.opt" options, the information is not
 lost after a save-as. Before with an individual "build.opt" file, the file was
@@ -249,9 +249,9 @@ def add_include_line(build_opt_fqfn, include_fqfn):
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     """
-    Extract the embedded build.opt from SketchName.ino.globals.h into build
+    Extract the embedded build.opt from Sketch.ino.globals.h into build
     path/core/build.opt. The subdirectory path must already exist as well as the
-    copy of SketchName.ino.globals.h.
+    copy of Sketch.ino.globals.h.
     """
     global build_opt_signature
 
@@ -263,7 +263,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     complete_comment = False
     build_opt_error = False
     line_no = 0
-    # If the source sketch did not have the file SketchName.ino.globals.h, an empty
+    # If the source sketch did not have the file Sketch.ino.globals.h, an empty
     # file was created in the ./core/ folder.
     # By using the copy, open will always succeed.
     with open(globals_h_fqfn, 'r') as src:
@@ -329,35 +329,53 @@ def enable_override(enable, commonhfile_fqfn):
     # enabled when getsize(commonhfile_fqfn) is non-zero, disabled when zero
 
 
-def find_preferences_txt():
+def find_preferences_txt(runtime_ide_path):
     platform_name = platform.system()
-    # OS Path list from:
-    #   https://www.arduino.cc/en/hacking/preferences
+    # OS Path list for Arduino IDE 1.6.0 and newer
+    # from: https://www.arduino.cc/en/hacking/preferences
     if "Linux" == platform_name:
         # Test for portable 1ST
         # <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
         # For more on portable mode see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        # Working directory must be set to the location of the Arduino IDE executable.
-        fqfn = "./portable/preferences.txt" # Linux portable - verified
+        fqfn = os.path.normpath(runtime_ide_path + "/portable/preferences.txt")
+        # Linux - verified with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
             return fqfn
-        fqfn = os.path.expanduser("~/.arduino15/preferences.txt") # Linux - verified
+        fqfn = os.path.expanduser("~/.arduino15/preferences.txt")
+        # Linux - verified with Arduino IDE 1.8.18 and 2.0 RC5 64bit and AppImage
         if os.path.exists(fqfn):
             return fqfn
     elif "Windows" == platform_name:
-        fqfn = ".\portable\preferences.txt"
+        fqfn = os.path.normpath(runtime_ide_path + "\portable\preferences.txt")
+        # verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
             return fqfn
-        fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt") # Windows app version - verified
+        # It is never simple. Arduino from the Windows APP store or the download
+        # Windows 8 and up option will save "preferences.txt" in one location.
+        # The downloaded Windows 7 (and up version) will put "preferences.txt"
+        # in a different location. When both are present due to various possible
+        # scenarios, use the more modern.
+        # Note, I am ignoring any permutations you might get into with storing
+        # and running applications off Network servers.
+        fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt")
+        # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19
+        fqfn2 = os.path.expanduser("~\AppData\local\Arduino15\preferences.txt")
+        # Path for Windows 7 and up - verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
-            return fqfn
-        fqfn = os.path.expanduser("~\Arduino15\preferences.txt") # Windows
-        if os.path.exists(fqfn):
-            return fqfn
+            if os.path.exists(fqfn2):
+                print_err("Multiple 'preferences.txt' files found:")
+                print_err("  " + fqfn)
+                print_err("  " + fqfn2)
+                return fqfn
+            else:
+                return fqfn
+        elif os.path.exists(fqfn2):
+            return fqfn2
     elif "Darwin" == platform_name:
-        # Skip portable on Macs. Portable is not compatable with Macs
+        # Portable is not compatable with Mac OS X
         # see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt") # Max OS X
+        fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt")
+        # Mac OS X - unverified
         if os.path.exists(fqfn):
             return fqfn
 
@@ -378,8 +396,8 @@ def get_preferences_txt(file_fqfn, key):
     return True     # If we don't find it just assume it is set True
 
 
-def check_preferences_txt():
-    file_fqfn = find_preferences_txt()
+def check_preferences_txt(runtime_ide_path):
+    file_fqfn = find_preferences_txt(runtime_ide_path)
     if file_fqfn == "":
         return True     # cannot find file assume enabled
     print_msg("Using preferences from " + file_fqfn)
@@ -403,9 +421,8 @@ def main():
     global build_opt_signature
     global docs_url
     num_include_lines = 1
-    use_aggressive_caching_workaround = check_preferences_txt()
 
-    if len(sys.argv) >= 5:
+    if len(sys.argv) >= 6:
         source_globals_h_fqfn = os.path.normpath(sys.argv[1])
         globals_name = os.path.basename(source_globals_h_fqfn)
         globals_h_fqfn = os.path.normpath(sys.argv[2])
@@ -413,6 +430,8 @@ def main():
         # Assumption: globals_h_fqfn and build_opt_fqfn have the same dirname
         build_opt_fqfn = os.path.normpath(sys.argv[3])
         commonhfile_fqfn = os.path.normpath(sys.argv[4])
+        runtime_ide_path = os.path.normpath(sys.argv[5])
+        use_aggressive_caching_workaround = check_preferences_txt(runtime_ide_path)
 
         if os.path.exists(commonhfile_fqfn):
             if os.path.getsize(commonhfile_fqfn) and \
@@ -488,7 +507,7 @@ def main():
 
     else:
         print_err("Too few arguments. Add arguments:")
-        print_err("  Source FQFN SketchName.ino.globals.h, Build FQFN SketchName.ino.globals.h, Build FQFN build.opt")
+        print_err("  Source FQFN Sketch.ino.globals.h, Build FQFN Sketch.ino.globals.h, Build FQFN build.opt")
 
 if __name__ == '__main__':
     sys.exit(main())
