@@ -22,9 +22,7 @@ void loop() {
   sha1("test", &hash[0]);
 
   Serial.print("SHA1:");
-  for (uint16_t i = 0; i < 20; i++) {
-    Serial.printf("%02x", hash[i]);
-  }
+  for (uint16_t i = 0; i < 20; i++) { Serial.printf("%02x", hash[i]); }
   Serial.println();
 
   delay(1000);
