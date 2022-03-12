@@ -110,7 +110,16 @@ cached version for their builds.
 When the “Aggressively cache compiled core” feature is enabled and a
 global define file is detected, a workaround will turn on and stay on.
 When you switch between Sketch windows, core will be recompiled and the
-cache updated.
+cache updated. The workaround logic is reset when Arduino IDE is
+completely shutdown and restarted. Some operating systems are better at
+cleaning up their temp space than others at reboot after a crash. At
+least for Windows you may need to manually delete the Arduino temp files
+and directories after a crash. Otherwise the workaround logic may be
+left on.
+
+For some Windows systems the temp directory can be found near
+``C:\Users\<user id>\AppData\Local\Temp\arduino*``. Note ``AppData`` is
+a hidden directory.
 
 If you think your workflow performance would benefit from keeping a per
 Sketch copy of ``core.a``, you can turn off the “Aggressively cache

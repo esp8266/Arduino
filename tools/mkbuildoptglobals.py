@@ -73,13 +73,12 @@ https://forum.arduino.cc/t/no-aggressively-cache-compiled-core-in-ide-1-8-15/878
 
 runtime.tools.mkbuildoptglobals={runtime.platform.path}/tools/mkbuildoptglobals.py
 
-# Fully qualified and relative file names for processing sketch global options
+# Fully qualified file names for processing sketch global options
 globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
-build.globals.path={build.path}/core
-globals.h.fqfn={build.globals.path}/{build.project_name}.globals.h
-build.opt.fqfn={build.globals.path}/build.opt
+commonhfile.fqfn={build.core.path}/CommonHFile.h
+build.opt.fqfn={build.path}/core/build.opt
 
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}"
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.path} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 """
@@ -180,12 +179,12 @@ See `if use_aggressive_caching_workaround:` in main().
 Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
 
-import os
-import sys
-import filecmp
-import time
-import platform
 from shutil import copyfile
+import glob
+import os
+import platform
+import sys
+import time
 
 # Need to work on signature line used for match to avoid conflicts with
 # existing embedded documentation methods.
@@ -323,10 +322,36 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
 
 
 def enable_override(enable, commonhfile_fqfn):
+    # Reduce disk IO writes
+    if os.path.exists(commonhfile_fqfn):
+        if os.path.getsize(commonhfile_fqfn): # workaround active
+            if enable:
+                return
+        elif not enable:
+            return
     with open(commonhfile_fqfn, 'w') as file:
         if enable:
             file.write("//Override aggressive caching\n")
-    # enabled when getsize(commonhfile_fqfn) is non-zero, disabled when zero
+    # enable workaround when getsize(commonhfile_fqfn) is non-zero, disabled when zero
+
+
+def discover_1st_time_run(build_path):
+    # Need to know if this is the 1ST compile of the Arduino IDE starting.
+    # Use empty cache directory as an indicator for 1ST compile.
+    # Arduino IDE 2.0 RC5 does not cleanup on exist like 1.6.19. Probably for
+    # debugging like the irregular version number 10607. For RC5 this indicator
+    # will be true after a reboot instead of a 1ST compile of the IDE starting.
+    tmp_path, build = os.path.split(build_path)
+    ide_2_0 = 'arduino-sketch-'
+    if ide_2_0 == build[:len(ide_2_0)]:
+        search_path =  os.path.join(tmp_path, 'arduino-core-cache/*') # Arduino IDE 2.0
+    else:
+        search_path = os.path.join(tmp_path, 'arduino_cache_*/*') # Arduino IDE 1.6.x and up
+
+    count = 0
+    for dirname in glob.glob(search_path):
+        count += 1
+    return 0 == count
 
 
 def find_preferences_txt(runtime_ide_path):
@@ -423,45 +448,27 @@ def main():
     num_include_lines = 1
 
     if len(sys.argv) >= 6:
-        source_globals_h_fqfn = os.path.normpath(sys.argv[1])
-        globals_name = os.path.basename(source_globals_h_fqfn)
-        globals_h_fqfn = os.path.normpath(sys.argv[2])
-        build_path = os.path.dirname(globals_h_fqfn)
-        # Assumption: globals_h_fqfn and build_opt_fqfn have the same dirname
+        runtime_ide_path = os.path.normpath(sys.argv[1])
+        build_path = os.path.normpath(sys.argv[2])
         build_opt_fqfn = os.path.normpath(sys.argv[3])
-        commonhfile_fqfn = os.path.normpath(sys.argv[4])
-        runtime_ide_path = os.path.normpath(sys.argv[5])
+        source_globals_h_fqfn = os.path.normpath(sys.argv[4])
+        commonhfile_fqfn = os.path.normpath(sys.argv[5])
+
+        globals_name = os.path.basename(source_globals_h_fqfn)
+        build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
+        globals_h_fqfn = os.path.join(build_path_core, globals_name)
+
+        first_time = discover_1st_time_run(build_path)
         use_aggressive_caching_workaround = check_preferences_txt(runtime_ide_path)
 
-        if os.path.exists(commonhfile_fqfn):
-            if os.path.getsize(commonhfile_fqfn) and \
-            not use_aggressive_caching_workaround:
-                enable_override(False, commonhfile_fqfn)
-        else:
+        if first_time or \
+        not use_aggressive_caching_workaround or \
+        not os.path.exists(commonhfile_fqfn):
             enable_override(False, commonhfile_fqfn)
 
-        if os.path.exists(globals_h_fqfn):
-            # Check for signs of "Aggressive Caching core.a"
-            # 1ST time run, build path/core will not exist or be nearly empty,
-            # nothing can be learned. The presence of globals_h_fqfn in the
-            # build path/core helps distinguish 1st time run from rebuild.
-            # This method does not report in all scenarios; however, it does
-            # report often enough to draw attention to the issue. Some aborted
-            # builds with incomplete ./core compiles may later produce false
-            # positives. Only report when globals.h is being used.
-            if not use_aggressive_caching_workaround and \
-            os.path.getsize(globals_h_fqfn) and \
-            len(os.listdir(build_path)) < 20:
-                print_err("Aggressive caching of core.a might be enabled. This may create build errors.")
-                print_err("  Suggest turning off in preferences.txt: \"compiler.cache_core=false\"")
-                print_err("  Read more at " + docs_url)
-        else:
-            # Info: When platform.txt, platform.local.txt, or IDE Tools board
-            # settings are changed, our build path directory was cleaned. Note,
-            # makecorever.py may have run before us and recreaded the directory.
-            if not os.path.exists(build_path):
-                os.makedirs(build_path)
-                print_msg("Clean build, created dir " + build_path)
+        if not os.path.exists(build_path_core):
+            os.makedirs(build_path_core)
+            print_msg("Clean build, created dir " + build_path_core)
 
         if os.path.exists(source_globals_h_fqfn):
             print_msg("Using global defines from " + source_globals_h_fqfn)
@@ -478,6 +485,8 @@ def main():
             # that exactly matches the timestamp of "CommonHFile.h" in the
             # platform source tree, it owns the core cache. If not, or
             # "Sketch.ino.globals.h" has changed, rebuild core.
+            # A non-zero file size for commonhfile_fqfn, means we have seen a
+            # globals.h file before and workaround is active.
             if os.path.getsize(commonhfile_fqfn):
                 if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
                     # Need to rebuild core.a

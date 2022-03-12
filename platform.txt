@@ -59,12 +59,10 @@ build.spiffs_start=
 build.spiffs_end=
 build.spiffs_blocksize=
 
-# Fully qualified and relative file names for processing sketch global options
+# Fully qualified file names for processing sketch global options
 globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
-build.globals.path={build.path}/core
-globals.h.fqfn={build.globals.path}/{build.project_name}.globals.h
-build.opt.fqfn={build.globals.path}/build.opt
 commonhfile.fqfn={build.core.path}/CommonHFile.h
+build.opt.fqfn={build.path}/core/build.opt
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
@@ -118,7 +116,7 @@ recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "
 recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
 
 # Handle processing sketch global options
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{globals.h.source.fqfn}" "{globals.h.fqfn}" "{build.opt.fqfn}" "{commonhfile.fqfn}" "{runtime.ide.path}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}"
 
 
 ## Build the app.ld linker file
