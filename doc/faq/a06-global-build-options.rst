@@ -1,18 +1,18 @@
 How to specify global build defines and options
 ===============================================
 
-To create global defines for a Sketch, create a file with a name based
-on your sketch’s file name followed by ``.globals.h`` in the Sketch
-folder. For example, if the main Sketch file is named
-``LowWatermark.ino``, its global defines file would be
+To create globally usable macro definitions for a Sketch, create a file
+with a name based on your Sketch’s file name followed by ``.globals.h``
+in the Sketch folder. For example, if the main Sketch file is named
+``LowWatermark.ino``, its global ``.h`` file would be
 ``LowWatermark.ino.globals.h``. This file will be implicitly included
 with every module built for your Sketch. Do not directly include it in
 any of your sketch files or in any other source files. There is no need
 to create empty/dummy files, when not used.
 
-This global define ``.h`` also supports embedding compiler command-line
-options in a unique “C” block comment. Compiler options are placed in a
-“C” block comment starting with ``/*@create-file:build.opt@``. This
+This global ``.h`` also supports embedding compiler command-line options
+in a unique “C” block comment. Compiler options are placed in a “C”
+block comment starting with ``/*@create-file:build.opt@``. This
 signature line must be alone on a single line. The block comment ending
 ``*/`` should also be alone on a single line. In between, place your
 compiler command-line options just as you would have for the GCC @file
@@ -113,13 +113,15 @@ When you switch between Sketch windows, core will be recompiled and the
 cache updated. The workaround logic is reset when Arduino IDE is
 completely shutdown and restarted. Some operating systems are better at
 cleaning up their temp space than others at reboot after a crash. At
-least for Windows you may need to manually delete the Arduino temp files
-and directories after a crash. Otherwise the workaround logic may be
-left on.
+least for Windows®, you may need to manually delete the Arduino temp
+files and directories after a crash. Otherwise, the workaround logic may
+be left on.
 
-For some Windows systems the temp directory can be found near
+For some Windows® systems the temp directory can be found near
 ``C:\Users\<user id>\AppData\Local\Temp\arduino*``. Note ``AppData`` is
-a hidden directory.
+a hidden directory. For help with this do an Internet search on
+``windows disk cleanup``. Or, type ``disk cleanup`` in the Windows®
+taskbar search box.
 
 If you think your workflow performance would benefit from keeping a per
 Sketch copy of ``core.a``, you can turn off the “Aggressively cache

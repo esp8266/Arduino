@@ -2,7 +2,7 @@
 
 # This script manages the use of a file with a unique name, like
 # `Sketch.ino.globals.h`, in the Sketch source directory to provide compiler
-# command-line options (build options) and sketch global defines. The build
+# command-line options (build options) and sketch global macros. The build
 # option data is encapsulated in a unique "C" comment block and extracted into
 # the build tree during prebuild.
 #
@@ -60,7 +60,8 @@ added.
 """
 Arduino `preferences.txt` changes
 
-"Aggressively cache compiled core" must be turned off for a reliable build process.
+"Aggressively cache compiled core" ideally should be turned off; however,
+a workaround has been implimented.
 In ~/.arduino15/preferences.txt, to disable the feature:
   compiler.cache_core=false
 
@@ -341,6 +342,7 @@ def discover_1st_time_run(build_path):
     # Arduino IDE 2.0 RC5 does not cleanup on exist like 1.6.19. Probably for
     # debugging like the irregular version number 10607. For RC5 this indicator
     # will be true after a reboot instead of a 1ST compile of the IDE starting.
+    # Another issue for this technique, Windows does not clear the Temp directory. :(
     tmp_path, build = os.path.split(build_path)
     ide_2_0 = 'arduino-sketch-'
     if ide_2_0 == build[:len(ide_2_0)]:
@@ -380,10 +382,8 @@ def find_preferences_txt(runtime_ide_path):
         # The downloaded Windows 7 (and up version) will put "preferences.txt"
         # in a different location. When both are present due to various possible
         # scenarios, use the more modern.
-        # Note, I am ignoring any permutations you might get into with storing
-        # and running applications off Network servers.
         fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt")
-        # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19
+        # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19 from APP store
         fqfn2 = os.path.expanduser("~\AppData\local\Arduino15\preferences.txt")
         # Path for Windows 7 and up - verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
@@ -422,9 +422,10 @@ def get_preferences_txt(file_fqfn, key):
 
 
 def check_preferences_txt(runtime_ide_path):
+    # return the state of "compiler.cache_core" in preferences.txt
     file_fqfn = find_preferences_txt(runtime_ide_path)
     if file_fqfn == "":
-        return True     # cannot find file assume enabled
+        return True     # cannot find file - assume enabled
     print_msg("Using preferences from " + file_fqfn)
     return get_preferences_txt(file_fqfn, "compiler.cache_core")
 
@@ -435,6 +436,7 @@ def touch(fname, times=None):
 
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
+    # touch both files with the same timestamp
     with open(globals_h_fqfn, 'a'):
         os.utime(globals_h_fqfn)
         ts = os.stat(globals_h_fqfn)
@@ -481,9 +483,9 @@ def main():
         embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
 
         if use_aggressive_caching_workaround:
-            # When a Sketch owns a "Sketch.ino.globals.h" file in the build tree
-            # that exactly matches the timestamp of "CommonHFile.h" in the
-            # platform source tree, it owns the core cache. If not, or
+            # When the sketch build has a "Sketch.ino.globals.h" file in the
+            # build tree that exactly matches the timestamp of "CommonHFile.h"
+            # in the platform source tree, it owns the core cache. If not, or
             # "Sketch.ino.globals.h" has changed, rebuild core.
             # A non-zero file size for commonhfile_fqfn, means we have seen a
             # globals.h file before and workaround is active.
@@ -516,7 +518,7 @@ def main():
 
     else:
         print_err("Too few arguments. Add arguments:")
-        print_err("  Source FQFN Sketch.ino.globals.h, Build FQFN Sketch.ino.globals.h, Build FQFN build.opt")
+        print_err("  Runtime IDE path, Build path, Build FQFN build.opt, Source FQFN Sketch.ino.globals.h, Core Source FQFN CommonHFile.h")
 
 if __name__ == '__main__':
     sys.exit(main())

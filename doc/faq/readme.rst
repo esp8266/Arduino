@@ -195,8 +195,8 @@ Please read `flash layout <../filesystem.rst>`__ documentation entry.
 How to specify global build defines and options?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using a unique named `.h` file a `#define` value can be globally accessed.
-Additionally, compiler command-line options can be embedded in this file as a
-unique block comment.
+By using a uniquely named `.h` file, macro definitions can be created and
+globally used. Additionally, compiler command-line options can be embedded in
+this file as a unique block comment.
 
 `Read more <a06-global-build-options.rst>`__.
