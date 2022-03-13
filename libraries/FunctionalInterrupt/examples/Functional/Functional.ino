@@ -15,36 +15,37 @@
 #endif
 
 class Button {
-  public:
-    Button(uint8_t reqPin) : PIN(reqPin) {
-      pinMode(PIN, INPUT_PULLUP);
-      attachInterrupt(PIN, std::bind(buttonIsr_static, this), FALLING);
-    };
-    ~Button() {
-      detachInterrupt(PIN);
-    }
+public:
+  Button(uint8_t reqPin)
+    : PIN(reqPin) {
+    pinMode(PIN, INPUT_PULLUP);
+    attachInterrupt(PIN, std::bind(buttonIsr_static, this), FALLING);
+  };
+  ~Button() {
+    detachInterrupt(PIN);
+  }
 
-    void IRAM_ATTR buttonIsr() {
-      numberKeyPresses += 1;
-      pressed = true;
-    }
+  void IRAM_ATTR buttonIsr() {
+    numberKeyPresses += 1;
+    pressed = true;
+  }
 
-    static void IRAM_ATTR buttonIsr_static(void* const self) {
-      static_cast<Button*>(self)->buttonIsr();
-    }
+  static void IRAM_ATTR buttonIsr_static(void* const self) {
+    static_cast<Button*>(self)->buttonIsr();
+  }
 
-    uint32_t checkPressed() {
-      if (pressed) {
-        Serial.printf("Button on pin %u has been pressed %u times\n", PIN, numberKeyPresses);
-        pressed = false;
-      }
-      return numberKeyPresses;
+  uint32_t checkPressed() {
+    if (pressed) {
+      Serial.printf("Button on pin %u has been pressed %u times\n", PIN, numberKeyPresses);
+      pressed = false;
     }
+    return numberKeyPresses;
+  }
 
-  private:
-    const uint8_t PIN;
-    volatile uint32_t numberKeyPresses = 0;
-    volatile bool pressed = false;
+private:
+  const uint8_t PIN;
+  volatile uint32_t numberKeyPresses = 0;
+  volatile bool pressed = false;
 };
 
 Button* button1;

@@ -12,32 +12,35 @@
 #endif
 
 class Button {
-  public:
-    Button(uint8_t reqPin) : PIN(reqPin) {
-      pinMode(PIN, INPUT_PULLUP);
-      attachScheduledInterrupt(PIN, [this](const InterruptInfo & ii) {
+public:
+  Button(uint8_t reqPin)
+    : PIN(reqPin) {
+    pinMode(PIN, INPUT_PULLUP);
+    attachScheduledInterrupt(
+      PIN, [this](const InterruptInfo& ii) {
         Serial.print("Pin ");
         Serial.println(ii.pin);
         numberKeyPresses += 1;
         pressed = true;
-      }, FALLING); // works on ESP8266
-    };
-    ~Button() {
-      detachInterrupt(PIN);
-    }
+      },
+      FALLING);  // works on ESP8266
+  };
+  ~Button() {
+    detachInterrupt(PIN);
+  }
 
-    uint32_t checkPressed() {
-      if (pressed) {
-        Serial.printf("Button on pin %u has been pressed %u times\n", PIN, numberKeyPresses);
-        pressed = false;
-      }
-      return numberKeyPresses;
+  uint32_t checkPressed() {
+    if (pressed) {
+      Serial.printf("Button on pin %u has been pressed %u times\n", PIN, numberKeyPresses);
+      pressed = false;
     }
+    return numberKeyPresses;
+  }
 
-  private:
-    const uint8_t PIN;
-    volatile uint32_t numberKeyPresses = 0;
-    volatile bool pressed = false;
+private:
+  const uint8_t PIN;
+  volatile uint32_t numberKeyPresses = 0;
+  volatile bool pressed = false;
 };
 
 Button* button1;
