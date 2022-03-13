@@ -303,6 +303,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
                         print_err("  Nesting issue for embedded build.opt block in " + file_name + ":" + str(line_no))
                         build_opt_error = True
                     else:
+                        print_msg("--- additional command-line option: " + line)
                         build_opt.write(line + "\n")
             elif line.startswith(build_opt_signature):
                 print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
