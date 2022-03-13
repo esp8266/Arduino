@@ -35,9 +35,10 @@ void wakeupCallback() {
 
 void setup() {
   Serial.begin(74880);
-  while (!Serial);
+  while (!Serial)
+    ;
   delay(100);
-  pinMode(LED_BUILTIN, OUTPUT);  // activity and status indicator
+  pinMode(LED_BUILTIN, OUTPUT);    // activity and status indicator
   digitalWrite(LED_BUILTIN, LOW);  // turn on the LED
 }
 

@@ -35,9 +35,9 @@
 
 // enter your WiFi configuration below
 const char* AP_SSID = "SSID";  // your router's SSID here
-const char* AP_PASS = "PSK";  // your router's password here
+const char* AP_PASS = "PSK";   // your router's password here
 
-uint32_t timeout = 30E3;  // 30 second timeout on the WiFi connection
+uint32_t timeout = 30E3;                                 // 30 second timeout on the WiFi connection
 esp8266::polledTimeout::oneShotMs wifiTimeout(timeout);  // 30 second timeout on WiFi connection
 
 ESP8266WebServer server(80);
@@ -63,7 +63,8 @@ void handleNotFound() {
 
 void setup() {
   Serial.begin(74880);
-  while (!Serial);
+  while (!Serial)
+    ;
   delay(100);
   Serial.println();
   WiFi.mode(WIFI_STA);
@@ -83,9 +84,9 @@ void setup() {
   }
   WiFi.setAutoReconnect(true);
 
-  //if (MDNS.begin("esp8266")) {
-  //    Serial.println("MDNS responder started");
-  //}
+  // if (MDNS.begin("esp8266")) {
+  //     Serial.println("MDNS responder started");
+  // }
 
   server.on("/", handleRoot);
 

@@ -100,9 +100,7 @@ bool EspClass::forcedModemSleep(uint32_t duration_us, void (*wakeupCb)())
     return true;
 }
 
-void EspClass::forcedModemSleepOff()
-{
-}
+void EspClass::forcedModemSleepOff() { }
 
 bool EspClass::forcedLightSleepBegin(uint32_t duration_us, void (*wakeupCb)())
 {
@@ -116,21 +114,15 @@ void EspClass::forcedLightSleepEnd(bool cancel)
     (void)cancel;
 }
 
-void EspClass::autoModemSleep() {
-}
+void EspClass::autoModemSleep() { }
 
-void EspClass::autoLightSleep() {
-}
+void EspClass::autoLightSleep() { }
 
-void EspClass::autoSleepOff() {
-}
+void EspClass::autoSleepOff() { }
 
-void EspClass::neverSleep() {
-}
+void EspClass::neverSleep() { }
 
-void EspClass::neverSleepOff() {
-}
-
+void EspClass::neverSleepOff() { }
 
 void EspClass::restart()
 {
