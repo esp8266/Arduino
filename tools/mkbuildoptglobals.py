@@ -226,6 +226,8 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
             # files copied by `arduino-builder`.
             copyfile(source_fqfn, build_target_fqfn)
     else:
+        print_msg("Note: optional global include file '" + source_fqfn + "' does not exist");
+        print_msg("      (please check " + docs_url + ")");
         if os.path.exists(build_target_fqfn) and \
         os.path.getsize(build_target_fqfn) == 0:
             return False
