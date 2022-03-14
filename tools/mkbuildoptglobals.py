@@ -477,7 +477,7 @@ def main():
             print_msg("Using global include from " + source_globals_h_fqfn)
         else:
             print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
-            print_msg("      (please check " + docs_url + ")")
+            print_msg("  Read more at " + docs_url)
 
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
@@ -487,10 +487,26 @@ def main():
         embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
 
         if use_aggressive_caching_workaround:
+            # commonhfile_fqfn encodes the following information
+            # 1. When touched, it causes a rebuild of core.a
+            # 2. When file size is non-zero, it indicates we are using the
+            #    aggressive cache workaround. The workaround is set to true
+            #    (active) when we discover a non-zero length global .h file in
+            #    any sketch. The aggressive workaround is cleared on the 1ST
+            #    compile by the Arduino IDE after starting.
+            # 3. When the timestamp matches the build copy of globals.h
+            #    (globals_h_fqfn), we know one two things:
+            #    * The cached core.a matches up to the current build.opt and
+            #      globals.h. The current sketch owns the cached copy of core.a.
+            #    * globals.h has not changed, and no need to rebuild core.a
+            # 4. When core.a's timestamp does not match the build copy of
+            #    the global .h file, we only know we need to rebuild core.a, and
+            #    that is enough.
+            #
             # When the sketch build has a "Sketch.ino.globals.h" file in the
             # build tree that exactly matches the timestamp of "CommonHFile.h"
-            # in the platform source tree, it owns the core cache. If not, or
-            # "Sketch.ino.globals.h" has changed, rebuild core.
+            # in the platform source tree, it owns the core.a cache copy. If
+            # not, or "Sketch.ino.globals.h" has changed, rebuild core.
             # A non-zero file size for commonhfile_fqfn, means we have seen a
             # globals.h file before and workaround is active.
             if os.path.getsize(commonhfile_fqfn):
