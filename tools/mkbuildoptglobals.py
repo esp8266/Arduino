@@ -476,8 +476,8 @@ def main():
         if os.path.exists(source_globals_h_fqfn):
             print_msg("Using global include from " + source_globals_h_fqfn)
         else:
-            print_msg("Note: optional global include file '" + source_fqfn + "' does not exist");
-            print_msg("      (please check " + docs_url + ")");
+            print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
+            print_msg("      (please check " + docs_url + ")")
 
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
