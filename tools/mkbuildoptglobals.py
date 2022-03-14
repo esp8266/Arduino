@@ -226,8 +226,6 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
             # files copied by `arduino-builder`.
             copyfile(source_fqfn, build_target_fqfn)
     else:
-        print_msg("Note: optional global include file '" + source_fqfn + "' does not exist");
-        print_msg("      (please check " + docs_url + ")");
         if os.path.exists(build_target_fqfn) and \
         os.path.getsize(build_target_fqfn) == 0:
             return False
@@ -303,7 +301,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
                         print_err("  Nesting issue for embedded build.opt block in " + file_name + ":" + str(line_no))
                         build_opt_error = True
                     else:
-                        print_msg("--- additional command-line option: " + line)
+                        print_msg("  Add command-line option: " + line)
                         build_opt.write(line + "\n")
             elif line.startswith(build_opt_signature):
                 print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
@@ -320,7 +318,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
             sys.exit(1)
             return False
     elif complete_comment:
-        print_msg("Created compiler command-line options file " + build_opt_fqfn)
+        print_msg("  Created compiler command-line options file " + build_opt_fqfn)
     build_opt.close()
     return complete_comment
 
@@ -476,7 +474,10 @@ def main():
             print_msg("Clean build, created dir " + build_path_core)
 
         if os.path.exists(source_globals_h_fqfn):
-            print_msg("Using global defines from " + source_globals_h_fqfn)
+            print_msg("Using global include from " + source_globals_h_fqfn)
+        else:
+            print_msg("Note: optional global include file '" + source_fqfn + "' does not exist");
+            print_msg("      (please check " + docs_url + ")");
 
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
