@@ -193,20 +193,58 @@ build_opt_signature = "/*@create-file:build.opt@"
 
 docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html"
 
+
+err_print_flag = False
+msg_print_buf = ""
+
+# Issues trying to address through buffered printing
+# 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
+#    not stand out from stdout messages.
+# 2. Separate pipes, buffering, and multiple threads with output can create
+#    mixed-up messages. "flush" helped but did not resolve. The Arduino IDE 2.0
+#    somehow makes the problem worse.
+# 3. With Arduino IDE preferences set for "no verbose output", you only see
+#    stderr messages. Prior related prints are missing.
+#
+# Locally buffer and merge both stdout and stderr prints. This allows us to
+# print a complete context when there is an error. When any buffered prints
+# are targeted to stderr, print the whole buffer to stderr.
+
 def print_msg(*args, **kwargs):
-    print(*args, **kwargs)
+    global msg_print_buf
+    # At this time, we can only handle one args value.
+    msg_print_buf += args[0]
+    if 'end' in kwargs:
+        msg_print_buf += kwargs['end']
+    else:
+        msg_print_buf += '\n'
 
 
-# I prefer error messages to stand out; however, using stderr for a different
-# color does not work on the new Arduino IDE 2.0 RC4. Also,  separate pipes,
-# buffering, and multiple threads with output can create mixed-up messages.
 # Bring attention to errors with a blank line and lines starting with "*** ".
-# Let multiple prints buffer to aid them in staying together.
 def print_err(*args, **kwargs):
+    global err_print_flag
     if (args[0])[0] != ' ':
-        print("")
-    print("*** ", end='')
-    print(*args, **kwargs)
+        print_msg("")
+    print_msg("*** ", end='')
+    print_msg(*args, **kwargs)
+    err_print_flag = True
+
+
+def handle_error(err_no):
+    # on err_no 0, commit print buffer to stderr or stdout
+    # on err_no != 0, commit print buffer to stderr and sys exist with err_no
+    global msg_print_buf
+    global err_print_flag
+    if len(msg_print_buf):
+        if err_no or err_print_flag:
+            fd = sys.stderr
+        else:
+            fd = sys.stdout
+        print(msg_print_buf, file=fd, end='', flush=True)
+        msg_print_buf = ""
+        err_print_flag = False
+    if err_no:
+        sys.exit(err_no)
 
 
 def copy_create_build_file(source_fqfn, build_target_fqfn):
@@ -258,7 +296,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     build_opt = open(build_opt_fqfn, 'w')
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
-        return
+        return False
 
     complete_comment = False
     build_opt_error = False
@@ -315,8 +353,8 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
             print_err("  Extraction failed")
             # Don't let the failure get hidden by a spew of nonsensical error
             # messages that will follow. Bring things to a halt.
-            sys.exit(1)
-            return False
+            handle_error(1)
+            return False    # not reached
     elif complete_comment:
         print_msg("  Created compiler command-line options file " + build_opt_fqfn)
     build_opt.close()
@@ -475,9 +513,6 @@ def main():
 
         if os.path.exists(source_globals_h_fqfn):
             print_msg("Using global include from " + source_globals_h_fqfn)
-        else:
-            print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
-            print_msg("  Read more at " + docs_url)
 
         copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
@@ -535,10 +570,16 @@ def main():
             if not embedded_options:
                 print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
                 print_msg("  Read more at " + docs_url)
+        else:
+            print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
+            print_msg("  Read more at " + docs_url)
 
     else:
         print_err("Too few arguments. Add arguments:")
         print_err("  Runtime IDE path, Build path, Build FQFN build.opt, Source FQFN Sketch.ino.globals.h, Core Source FQFN CommonHFile.h")
+        handle_error(1)
+
+    handle_error(0)   # commit print buffer
 
 if __name__ == '__main__':
     sys.exit(main())
