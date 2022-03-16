@@ -72,7 +72,7 @@ def update_progress(progress):
 def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, command = FLASH):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  server_address = (localAddr, localPort)
+  server_address = ("", localPort)
   logging.info('Starting on %s:%s', str(server_address[0]), str(server_address[1]))
   try:
     sock.bind(server_address)
@@ -94,8 +94,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   file_md5 = hashlib.md5(f.read()).hexdigest()
   f.close()
   logging.info('Upload size: %d', content_size)
-  message = '%d %d %d %s\n' % (command, localPort, content_size, file_md5)
 
+  message = '%d %d %d %s\n%s\n' % (command, localPort, content_size, file_md5, localAddr)
   # Wait for a connection
   logging.info('Sending invitation to: %s', remoteAddr)
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
