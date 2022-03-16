@@ -90,6 +90,7 @@ class ArduinoOTAClass
     uint16_t _ota_port = 0;
     uint16_t _ota_udp_port = 0;
     IPAddress _ota_ip;
+    IPAddress _ota_ip2;
     String _md5;
 
     THandlerFunction _start_callback = nullptr;
