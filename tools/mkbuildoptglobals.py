@@ -212,8 +212,16 @@ msg_print_buf = ""
 
 def print_msg(*args, **kwargs):
     global msg_print_buf
-    # At this time, we can only handle one args value.
+    if 'sep' in kwargs:
+        sep = kwargs['sep']
+    else:
+        sep = ' '
+
     msg_print_buf += args[0]
+    for arg in args[1:]:
+        msg_print_buf += sep
+        msg_print_buf += arg
+
     if 'end' in kwargs:
         msg_print_buf += kwargs['end']
     else:
@@ -225,8 +233,7 @@ def print_err(*args, **kwargs):
     global err_print_flag
     if (args[0])[0] != ' ':
         print_msg("")
-    print_msg("*** ", end='')
-    print_msg(*args, **kwargs)
+    print_msg("***", *args, **kwargs)
     err_print_flag = True
 
 
@@ -311,9 +318,9 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
             if line == build_opt_signature:
                 if complete_comment:
                     build_opt_error = True
-                    print_err("  Multiple embedded build.opt blocks in " + file_name + ":" + str(line_no))
+                    print_err("  Multiple embedded build.opt blocks in", f'{file_name}:{line_no}')
                     continue
-                print_msg("Extracting embedded compiler command-line options from " +  file_name + ":" + str(line_no))
+                print_msg("Extracting embedded compiler command-line options from", f'{file_name}:{line_no}')
                 for line in src:
                     line = line.strip()
                     line_no += 1
@@ -330,19 +337,19 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
                         continue
                     # some consistency checking before writing - give some hints about what is wrong
                     elif line == build_opt_signature:
-                        print_err("  Double begin before end for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  Double begin before end for embedded build.opt block in", f'{file_name}:{line_no}')
                         build_opt_error = True
                     elif line.startswith(build_opt_signature):
-                        print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in", f'{file_name}:{line_no}')
                         build_opt_error = True
                     elif "/*" in line or "*/" in line :
-                        print_err("  Nesting issue for embedded build.opt block in " + file_name + ":" + str(line_no))
+                        print_err("  Nesting issue for embedded build.opt block in", f'{file_name}:{line_no}')
                         build_opt_error = True
                     else:
-                        print_msg("  Add command-line option: " + line)
+                        print_msg("  ", f'{line_no:2}, Add command-line option: {line}', sep='')
                         build_opt.write(line + "\n")
             elif line.startswith(build_opt_signature):
-                print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in " + file_name + ":" + str(line_no))
+                print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in", f'{file_name}:{line_no}')
                 build_opt_error = True
     if not complete_comment or build_opt_error:
         build_opt.truncate(0)
@@ -506,6 +513,10 @@ def main():
         not use_aggressive_caching_workaround or \
         not os.path.exists(commonhfile_fqfn):
             enable_override(False, commonhfile_fqfn)
+
+        if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
+            print_err(f"Neutralize future timestamp on build file: {commonhfile_fqfn}")
+            touch(commonhfile_fqfn)
 
         if not os.path.exists(build_path_core):
             os.makedirs(build_path_core)

@@ -123,6 +123,16 @@ a hidden directory. For help with this do an Internet search on
 ``windows disk cleanup``. Or, type ``disk cleanup`` in the Windows®
 taskbar search box.
 
+You can run multiple Arduino IDE windows as long as you run one version
+of the Arduino IDE at a time. When testing different versions,
+completely exit one before starting the next version. For example,
+Arduino IDE 1.8.19 and Arduino IDE 2.0 work with different temp and
+build paths. With this combination, the workaround logic sometimes fails
+to enable. At the time of this writing, when Arduino IDE 2.0 rc5 exits,
+it leaves the temp space dirty. This keeps the workaround active the
+next time the IDE is started. If this is an issue, manually delete the
+temp files.
+
 If you think your workflow performance would benefit from keeping a per
 Sketch copy of ``core.a``, you can turn off the “Aggressively cache
 compiled core” feature. You need to find the location of
