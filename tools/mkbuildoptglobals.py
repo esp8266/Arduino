@@ -180,11 +180,13 @@ See `if use_aggressive_caching_workaround:` in main().
 Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
 
+import argparse
 from shutil import copyfile
 import glob
 import os
 import platform
 import sys
+import textwrap
 import time
 
 # Need to work on signature line used for match to avoid conflicts with
@@ -262,8 +264,8 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
     return     True when file change detected.
     """
     if os.path.exists(source_fqfn):
-        if (os.path.exists(build_target_fqfn)) and \
-        (os.path.getmtime(build_target_fqfn) >= os.path.getmtime(source_fqfn)):
+        if os.path.exists(build_target_fqfn) and \
+        os.path.getmtime(build_target_fqfn) >= os.path.getmtime(source_fqfn):
             # only copy newer files - do nothing, all is good
             return False
         else:
@@ -459,19 +461,25 @@ def get_preferences_txt(file_fqfn, key):
         for line in file:
             name, value = line.partition("=")[::2]
             if name.strip().lower() == key:
-                if value.strip().lower() == 'true':
-                    return True
-                else:
-                    return False
-    print_err("Key " + key + " not found in preferences.txt. Default to true.")
+                val = value.strip().lower()
+                if val != 'true':
+                    val = False
+                print_msg(f"  preferences.txt: {key}={val}")
+                return val
+    print_err("  Key " + key + " not found in preferences.txt. Default to true.")
     return True     # If we don't find it just assume it is set True
 
 
-def check_preferences_txt(runtime_ide_path):
-    # return the state of "compiler.cache_core" in preferences.txt
-    file_fqfn = find_preferences_txt(runtime_ide_path)
-    if file_fqfn == "":
-        return True     # cannot find file - assume enabled
+def check_preferences_txt(runtime_ide_path, preferences_file):
+    # return the state of "compiler.cache_core" found in preferences.txt
+    file_fqfn = preferences_file
+    if file_fqfn != None and os.path.exists(file_fqfn):
+        pass
+    else:
+        file_fqfn = find_preferences_txt(runtime_ide_path)
+        if file_fqfn == "":
+            return True     # cannot find file - assume enabled
+
     print_msg("Using preferences from " + file_fqfn)
     return get_preferences_txt(file_fqfn, "compiler.cache_core")
 
@@ -489,34 +497,118 @@ def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
         with open(commonhfile_fqfn, 'a'):
             os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
+def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
+    if args.runtime_ide_version < 10802:
+        return False
+    elif args.cache_core != None:
+        print_msg(f"Preferences override, this prebuild script assumes the 'compiler.cache_core' parameter is set to {args.cache_core}")
+        print_msg(f"To change, modify 'mkbuildoptglobals.extra_flags=(--cache_core | --no_cache_core)' in 'platform.local.txt'")
+        return args.cache_core
+    else:
+        preferences_fqfn = None
+        if args.preferences_file != None:
+            preferences_fqfn = args.preferences_file
+        elif args.preferences_sketch != None:
+            preferences_fqfn = os.path.normpath(
+                os.path.join(
+                    os.path.dirname(source_globals_h_fqfn),
+                    args.preferences_sketch))
+        elif args.preferences_env != None:
+            preferences_fqfn = os.getenv(args.preferences_env)
+    return check_preferences_txt(runtime_ide_path, preferences_fqfn)
+
+
+"""
+TODO sort out which of these are viable solutions
+
+Possible options for handling problems caused by:
+    ./arduino --preferences-file other-preferences.txt
+    ./arduino --pref compiler.cache_core=false
+
+--cache_core
+--no_cache_core
+--preferences_file (relative to IDE or full path)
+--preferences_sketch (default looks for preferences.txt or specify path relative to sketch folder)
+--preferences_env, only works on Linux
+
+ export ARDUINO15_PREFERENCES_FILE=$(realpath other-name-than-default-preferences.txt )
+ ./arduino --preferences-file other-name-than-default-preferences.txt
+
+ platform.local.txt: mkbuildoptglobals.extra_flags=--preferences_env
+
+ Tested with:
+ export ARDUINO15_PREFERENCES_FILE=$(realpath ~/projects/arduino/arduino-1.8.19/portable/preferences.txt)
+ ~/projects/arduino/arduino-1.8.18/arduino
+
+
+ Future Issues
+ * "--preferences-file" does not work for Arduino IDE 2.0, they plan to address at a future release
+ * Arduino IDE 2.0 does not support portable, they plan to address at a future release
+
+"""
+
+
+def parse_args():
+    extra_txt = '''\
+       Use platform.local.txt 'mkbuildoptglobals.extra_flags=...' to supply override options:
+         --cache_core | --no_cache_core | --preferences_file PREFERENCES_FILE | ...
+
+       more help at {}
+       '''.format(docs_url)
+    parser = argparse.ArgumentParser(
+        description='Prebuild processing for globals.h and build.opt file',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+              epilog=textwrap.dedent(extra_txt))
+    parser.add_argument('runtime_ide_path', help='Runtime IDE path, {runtime.ide.path}')
+    parser.add_argument('runtime_ide_version', type=int, help='Runtime IDE Version, {runtime.ide.version}')
+    parser.add_argument('build_path', help='Build path, {build.path}')
+    parser.add_argument('build_opt_fqfn', help="Build FQFN to build.opt")
+    parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
+    parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
+    group.add_argument('--no_cache_core', dest='cache_core', action='store_false', help='Assume a "compiler.cache_core" value of false')
+    group.add_argument('--preferences_file', help='Full path to preferences file')
+    group.add_argument('--preferences_sketch', nargs='?', action='store', const="preferences.txt", help='Sketch relative path to preferences file')
+    if "Linux" == platform.system():
+        group.add_argument('--preferences_env', nargs='?', action='store', const="ARDUINO15_PREFERENCES_FILE", help='Use environment variable for path to preferences file')
+    return parser.parse_args()
+    # ref epilog, https://stackoverflow.com/a/50021771
+    # ref nargs='*'', https://stackoverflow.com/a/4480202
+    # ref no '--n' parameter, https://stackoverflow.com/a/21998252
 
 def main():
     global build_opt_signature
     global docs_url
     num_include_lines = 1
 
-    if len(sys.argv) >= 6:
-        runtime_ide_path = os.path.normpath(sys.argv[1])
-        build_path = os.path.normpath(sys.argv[2])
-        build_opt_fqfn = os.path.normpath(sys.argv[3])
-        source_globals_h_fqfn = os.path.normpath(sys.argv[4])
-        commonhfile_fqfn = os.path.normpath(sys.argv[5])
+    args = parse_args()
+    runtime_ide_path = os.path.normpath(args.runtime_ide_path)
+    build_path = os.path.normpath(args.build_path)
+    build_opt_fqfn = os.path.normpath(args.build_opt_fqfn)
+    source_globals_h_fqfn = os.path.normpath(args.source_globals_h_fqfn)
+    commonhfile_fqfn = os.path.normpath(args.commonhfile_fqfn)
 
+    if commonhfile_fqfn != None and len(commonhfile_fqfn):
         globals_name = os.path.basename(source_globals_h_fqfn)
         build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
         globals_h_fqfn = os.path.join(build_path_core, globals_name)
 
         first_time = discover_1st_time_run(build_path)
-        use_aggressive_caching_workaround = check_preferences_txt(runtime_ide_path)
+
+        use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
 
         if first_time or \
         not use_aggressive_caching_workaround or \
         not os.path.exists(commonhfile_fqfn):
             enable_override(False, commonhfile_fqfn)
 
+        # A future timestamp on commonhfile_fqfn will cause everything to
+        # rebuild. This occurred during development and may happen after
+        # changing the system time.
         if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
-            print_err(f"Neutralize future timestamp on build file: {commonhfile_fqfn}")
             touch(commonhfile_fqfn)
+            print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
 
         if not os.path.exists(build_path_core):
             os.makedirs(build_path_core)
@@ -561,11 +653,11 @@ def main():
                     # touching commonhfile_fqfn in the source core tree will cause rebuild.
                     # Looks like touching or writing unrelated files in the source core tree will cause rebuild.
                     synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
-                    print_msg("Using 'aggressive caching' workaround.")
+                    print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
             elif os.path.getsize(globals_h_fqfn):
                 enable_override(True, commonhfile_fqfn)
                 synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
-                print_msg("Using 'aggressive caching' workaround.")
+                print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
 
         add_include_line(build_opt_fqfn, commonhfile_fqfn)
         add_include_line(build_opt_fqfn, globals_h_fqfn)
@@ -586,8 +678,9 @@ def main():
             print_msg("  Read more at " + docs_url)
 
     else:
-        print_err("Too few arguments. Add arguments:")
-        print_err("  Runtime IDE path, Build path, Build FQFN build.opt, Source FQFN Sketch.ino.globals.h, Core Source FQFN CommonHFile.h")
+        print_err(parser.parse_args('-h'.split()))
+        # print_err("Too few arguments. Add arguments:")
+        # print_err("  Runtime IDE path, Build path, Build FQFN build.opt, Source FQFN Sketch.ino.globals.h, Core Source FQFN CommonHFile.h")
         handle_error(1)
 
     handle_error(0)   # commit print buffer

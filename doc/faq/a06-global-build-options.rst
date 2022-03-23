@@ -89,33 +89,79 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
    #endif
 
-Aggressive Caching of ``core.a``
+Aggressively Cache Compiled core
 ================================
 
-The feature “Aggressive Caching of core.a” refers to sharing a single
-copy of ``core.a`` across all Arduino IDE Sketch windows. This feature
-is on by default. ``core.a`` is an archive file containing the compiled
-objects of ``./core/esp8266/*``. Created after your 1ST successful
-compilation. All other open sketch builds use this shared file. When you
-close all Arduino IDE windows, the core archive file is deleted.
+This feature appeared with the release of Arduino IDE 1.8.2. The feature
+“Aggressively Cache Compiled core” refers to sharing a single copy of
+``core.a`` across all Arduino IDE Sketch windows. This feature is on by
+default. ``core.a`` is an archive file containing the compiled objects
+of ``./core/esp8266/*``. Created after your 1ST successful compilation.
+All other open sketch builds use this shared file. When you close all
+Arduino IDE windows, the core archive file is deleted.
 
-Without mediation, using global defines or compiler command-line options
-could lead to bad builds when the “Aggressively cache compiled core”
-feature is enabled. When ``#define`` changes require rebuilding
-``core.a`` and multiple Sketches are open, they can no longer reliably
-share one cached ``core.a``. In a simple case: The 1st Sketch to be
-built has its version of ``core.a`` cached. Other sketches will use this
-cached version for their builds.
+This feature is not compatible with using global defines or compiler
+command-line options. Without mediation, bad builds could result, when
+left enabled. When ``#define`` changes require rebuilding ``core.a`` and
+multiple Sketches are open, they can no longer reliably share one cached
+``core.a``. In a simple case: The 1st Sketch to be built has its version
+of ``core.a`` cached. Other sketches will use this cached version for
+their builds.
 
-When the “Aggressively cache compiled core” feature is enabled and a
+There are two solutions to this issue: 1. Turn off the “Aggressively
+Cache Compiled core” feature, by setting ``compiler.cache_core=false``.
+2. Rely on the not ideal fail-safe, aggressive cache workaround built
+into the script.
+
+Using “compiler.cache_core=false”
+---------------------------------
+
+There are two ways to turn off the “Aggressively Cache Compiled core”
+feature: This can be done with the Arduino IDE command-line or a text
+editor.
+
+Using the Arduino IDE command-line from a system command line, enter the
+following:
+
+::
+
+   arduino --pref compiler.cache_core=false --save-prefs
+
+For the text editor, you need to find the location of
+``preferences.txt``. From the Arduino IDE, go to *File->Preferences*.
+Make note of the path to ``prefereces.txt``. You *cannot* edit the file
+while the Arduino IDE is running. Close all Arduino IDE windows and edit
+the file ``preferences.txt``. Change ``compiler.cache_core=true`` to
+``compiler.cache_core=false`` and save. Then each sketch will maintain
+its *own* copy of ``core.a`` built with the customization expressed by
+their respective ``build.opt`` file.
+
+The “workaround”
+----------------
+
+When the “Aggressively Cache Compiled core” feature is enabled and the
 global define file is detected, a workaround will turn on and stay on.
 When you switch between Sketch windows, core will be recompiled and the
 cache updated. The workaround logic is reset when Arduino IDE is
-completely shutdown and restarted. Some operating systems are better at
-cleaning up their temp space than others at reboot after a crash. At
-least for Windows®, you may need to manually delete the Arduino temp
-files and directories after a crash. Otherwise, the workaround logic may
-be left on.
+completely shutdown and restarted.
+
+The workaround is not perfect. These issues may be of concern: 1. Dirty
+temp space. Arduino build cache files left over from a previous run or
+boot. 2. Arduino command-line options: \* override default
+preferences.txt file. \* override a preference, specifically
+``compiler.cache_core``. 3. Multiple versions of the Arduino IDE running
+
+**Dirty temp space**
+
+A minor concern, the workaround is always on. Not an issue for build
+accuracy, but ``core.a`` maybe rebuild more often than necessary.
+
+Some operating systems are better at cleaning up their temp space than
+others at reboot after a crash. At least for Windows®, you may need to
+manually delete the Arduino temp files and directories after a crash.
+Otherwise, the workaround logic may be left on. There is no harm in the
+workaround being stuck on, the build will be correct; however, the core
+files will occasionally be recompiled when not needed.
 
 For some Windows® systems the temp directory can be found near
 ``C:\Users\<user id>\AppData\Local\Temp\arduino*``. Note ``AppData`` is
@@ -123,26 +169,52 @@ a hidden directory. For help with this do an Internet search on
 ``windows disk cleanup``. Or, type ``disk cleanup`` in the Windows®
 taskbar search box.
 
+With Linux, this problem could occur after an Arduino IDE crash. The
+problem would be cleared after a reboot. Or you can manually cleanup the
+``/tmp/`` directory before restarting the Arduino IDE.
+
+**Arduino command-line option overrides**
+
+The script needs to know the working value of ``compiler.cache_core``
+that the Arduino IDE uses when building. This script can learn the state
+through documented locations; however, the Arduino IDE has two
+command-line options that can alter the results the Arduino IDE uses
+internally. And, the Arduino IDE does not provide a means for a script
+to learn the override value.
+
+These two command-line options are the problem:
+
+::
+
+   ./arduino --preferences-file other-preferences.txt
+   ./arduino --pref compiler.cache_core=false
+
+Hints for discovering the value of ``compiler.cache_core`` use can be
+provided by specifying ``mkbuildoptglobals.extra_flags=...`` in
+``platform.local.txt``.
+
+Examples of hints:
+
+::
+
+   mkbuildoptglobals.extra_flags=--preferences_sketch          # assume file preferences.txt in the sketch folder
+   mkbuildoptglobals.extra_flags=--preferences_sketch pref.txt # is relative to the sketch folder
+   mkbuildoptglobals.extra_flags=--no_cache_core
+   mkbuildoptglobals.extra_flags=--cache_core
+   mkbuildoptglobals.extra_flags=--preferences_file other-preferences.txt # relative to IDE or full path
+
+**Multiple versions of the Arduino IDE running**
+
 You can run multiple Arduino IDE windows as long as you run one version
 of the Arduino IDE at a time. When testing different versions,
 completely exit one before starting the next version. For example,
 Arduino IDE 1.8.19 and Arduino IDE 2.0 work with different temp and
 build paths. With this combination, the workaround logic sometimes fails
-to enable. At the time of this writing, when Arduino IDE 2.0 rc5 exits,
-it leaves the temp space dirty. This keeps the workaround active the
-next time the IDE is started. If this is an issue, manually delete the
-temp files.
+to enable.
 
-If you think your workflow performance would benefit from keeping a per
-Sketch copy of ``core.a``, you can turn off the “Aggressively cache
-compiled core” feature. You need to find the location of
-``preferences.txt``. From the Arduino IDE, go to *File->Preferences*.
-Make note of the path to ``prefereces.txt``. You cannot edit the file
-while the Arduino IDE is running. Close all Arduino IDE windows and edit
-the file ``preferences.txt``. Change ``compiler.cache_core=true`` to
-``compiler.cache_core=false`` and save. Then each sketch will maintain
-its *own* copy of ``core.a`` built with the customization expressed by
-their respective ``build.opt`` file.
+At the time of this writing, when Arduino IDE 2.0 rc5 exits, it leaves
+the temp space dirty. This keeps the workaround active the next time the
+IDE is started. If this is an issue, manually delete the temp files.
 
 Other build confusion
 =====================
