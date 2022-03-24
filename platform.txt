@@ -5,14 +5,14 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
 
-name=ESP8266 Boards (3.1.0-dev)
-version=3.1.0-dev
+name=ESP8266 Boards (3.0.1)
+version=3.0.1
 
 # These will be removed by the packager script when doing a JSON release
-runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
-runtime.tools.python3.path={runtime.platform.path}/tools/python3
 
-runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
+
+
+
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.sizes={runtime.platform.path}/tools/sizes.py
@@ -154,10 +154,10 @@ tools.esptool.path=
 # Because the variable expansion doesn't allow one tool to find another, the following lines
 # will point to "{runtime.platform.path}/tools/python3/python3" in GIT and
 # "{runtime.tools.python3.path}/python3" for JSON board manager releases.
-#tools.esptool.cmd={runtime.tools.python3.path}/python3
-#tools.esptool.network_cmd={runtime.tools.python3.path}/python3
-tools.esptool.cmd={runtime.platform.path}/tools/python3/python3
-tools.esptool.network_cmd={runtime.platform.path}/tools/python3/python3
+tools.esptool.cmd={runtime.tools.python3.path}/python3
+tools.esptool.network_cmd={runtime.tools.python3.path}/python3
+
+
 
 tools.esptool.upload.protocol=esp
 # esptool.py --trace option is a debug option, not a verbose option
@@ -172,7 +172,7 @@ tools.esptool.upload.network_pattern="{network_cmd}" -I "{runtime.platform.path}
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
-tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
+tools.mkspiffs.path={runtime.tools.mkspiffs.path}
 
 tools.mklittlefs.cmd=mklittlefs
 tools.mklittlefs.cmd.windows=mklittlefs.exe

@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <pgmspace.h>
 #include <limits>
 #include "stdlib_noniso.h"
 
@@ -44,11 +45,11 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
 
     if (isnan(number)) {
-        strcpy(s, "nan");
+        strcpy_P(s, PSTR("nan"));
         return s;
     }
     if (isinf(number)) {
-        strcpy(s, "inf");
+        strcpy_P(s, PSTR("inf"));
         return s;
     }
 

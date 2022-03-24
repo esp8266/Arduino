@@ -1325,64 +1325,77 @@ namespace MDNSImplementation
         bool _writeMDNSAnswer_PTR_IP6(IPAddress             p_IPAddress,
                                       stcMDNSSendParameter& p_rSendParameter);
 #endif
-        bool _writeMDNSAnswer_SRV(stcMDNSService&       p_rService,
-                                  stcMDNSSendParameter& p_rSendParameter);
+    bool _writeMDNSAnswer_SRV(stcMDNSService& p_rService,
+                              stcMDNSSendParameter& p_rSendParameter);
 
-        /** HELPERS **/
-        /* UDP CONTEXT */
-        bool _callProcess(void);
-        bool _allocUDPContext(void);
-        bool _releaseUDPContext(void);
+    /** HELPERS **/
+    /* UDP CONTEXT */
+    bool _callProcess(void);
+    bool _allocUDPContext(void);
+    bool _releaseUDPContext(void);
 
-        /* SERVICE QUERY */
-        stcMDNSServiceQuery* _allocServiceQuery(void);
-        bool                 _removeServiceQuery(stcMDNSServiceQuery* p_pServiceQuery);
-        bool                 _removeLegacyServiceQuery(void);
-        stcMDNSServiceQuery* _findServiceQuery(hMDNSServiceQuery p_hServiceQuery);
-        stcMDNSServiceQuery* _findLegacyServiceQuery(void);
-        bool                 _releaseServiceQueries(void);
-        stcMDNSServiceQuery*
-        _findNextServiceQueryByServiceType(const stcMDNS_RRDomain&    p_ServiceDomain,
-                                           const stcMDNSServiceQuery* p_pPrevServiceQuery);
+    /* SERVICE QUERY */
+    stcMDNSServiceQuery* _allocServiceQuery(void);
+    bool _removeServiceQuery(stcMDNSServiceQuery* p_pServiceQuery);
+    bool _removeLegacyServiceQuery(void);
+    stcMDNSServiceQuery* _findServiceQuery(hMDNSServiceQuery p_hServiceQuery);
+    stcMDNSServiceQuery* _findLegacyServiceQuery(void);
+    bool _releaseServiceQueries(void);
+    stcMDNSServiceQuery* _findNextServiceQueryByServiceType(const stcMDNS_RRDomain& p_ServiceDomain,
+            const stcMDNSServiceQuery* p_pPrevServiceQuery);
 
-        /* HOSTNAME */
-        bool _setHostname(const char* p_pcHostname);
-        bool _releaseHostname(void);
+    /* HOSTNAME */
+    bool _setHostname(const char* p_pcHostname);
+    bool _releaseHostname(void);
 
-        /* SERVICE */
-        stcMDNSService* _allocService(const char* p_pcName, const char* p_pcService,
-                                      const char* p_pcProtocol, uint16_t p_u16Port);
-        bool            _releaseService(stcMDNSService* p_pService);
-        bool            _releaseServices(void);
+    /* SERVICE */
+    stcMDNSService* _allocService(const char* p_pcName,
+                                  const char* p_pcService,
+                                  const char* p_pcProtocol,
+                                  uint16_t p_u16Port);
+    bool _releaseService(stcMDNSService* p_pService);
+    bool _releaseServices(void);
 
-        stcMDNSService* _findService(const char* p_pcName, const char* p_pcService,
-                                     const char* p_pcProtocol);
-        stcMDNSService* _findService(const hMDNSService p_hService);
+    stcMDNSService* _findService(const char* p_pcName,
+                                 const char* p_pcService,
+                                 const char* p_pcProtocol);
+    stcMDNSService* _findService(const hMDNSService p_hService);
 
-        size_t _countServices(void) const;
+    size_t _countServices(void) const;
 
-        /* SERVICE TXT */
-        stcMDNSServiceTxt* _allocServiceTxt(stcMDNSService* p_pService, const char* p_pcKey,
-                                            const char* p_pcValue, bool p_bTemp);
-        bool _releaseServiceTxt(stcMDNSService* p_pService, stcMDNSServiceTxt* p_pTxt);
-        stcMDNSServiceTxt* _updateServiceTxt(stcMDNSService* p_pService, stcMDNSServiceTxt* p_pTxt,
-                                             const char* p_pcValue, bool p_bTemp);
+    /* SERVICE TXT */
+    stcMDNSServiceTxt* _allocServiceTxt(stcMDNSService* p_pService,
+                                        const char* p_pcKey,
+                                        const char* p_pcValue,
+                                        bool p_bTemp);
+    bool _releaseServiceTxt(stcMDNSService* p_pService,
+                            stcMDNSServiceTxt* p_pTxt);
+    stcMDNSServiceTxt* _updateServiceTxt(stcMDNSService* p_pService,
+                                         stcMDNSServiceTxt* p_pTxt,
+                                         const char* p_pcValue,
+                                         bool p_bTemp);
 
-        stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService, const char* p_pcKey);
-        stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService, const hMDNSTxt p_hTxt);
+    stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService,
+                                       const char* p_pcKey);
+    stcMDNSServiceTxt* _findServiceTxt(stcMDNSService* p_pService,
+                                       const hMDNSTxt p_hTxt);
 
-        stcMDNSServiceTxt* _addServiceTxt(stcMDNSService* p_pService, const char* p_pcKey,
-                                          const char* p_pcValue, bool p_bTemp);
+    stcMDNSServiceTxt* _addServiceTxt(stcMDNSService* p_pService,
+                                      const char* p_pcKey,
+                                      const char* p_pcValue,
+                                      bool p_bTemp);
 
-        stcMDNSServiceTxt* _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
-                                           const uint32_t          p_u32AnswerIndex);
+public:
+    stcMDNSServiceTxt* _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
+                                       const uint32_t p_u32AnswerIndex);
 
-        bool                     _collectServiceTxts(stcMDNSService& p_rService);
-        bool                     _releaseTempServiceTxts(stcMDNSService& p_rService);
-        const stcMDNSServiceTxt* _serviceTxts(const char* p_pcName, const char* p_pcService,
-                                              const char* p_pcProtocol);
+    bool _collectServiceTxts(stcMDNSService& p_rService);
+    bool _releaseTempServiceTxts(stcMDNSService& p_rService);
+    const stcMDNSServiceTxt* _serviceTxts(const char* p_pcName,
+                                          const char* p_pcService,
+                                          const char* p_pcProtocol);
 
-        /* MISC */
+    /* MISC */
 #if not defined ESP_8266_MDNS_INCLUDE || defined DEBUG_ESP_MDNS_RESPONDER
         bool _printRRDomain(const stcMDNS_RRDomain& p_rRRDomain) const;
         bool _printRRAnswer(const MDNSResponder::stcMDNS_RRAnswer& p_RRAnswer) const;

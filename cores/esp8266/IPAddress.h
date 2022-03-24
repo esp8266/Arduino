@@ -152,11 +152,35 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
-        IPAddress(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr; }
-        IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
+        IPAddress(const ipv4_addr& fw_addr) {
+            setV4();
+            v4() = fw_addr.addr;
+        }
+        IPAddress(const ipv4_addr* fw_addr) {
+            setV4();
+            if (fw_addr) {
+                v4() = fw_addr->addr;
+            }
+            else {
+                _ip = *IP_ANY_TYPE;
+            }
+        }
 
-        IPAddress& operator=(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr;  return *this; }
-        IPAddress& operator=(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; return *this; }
+        IPAddress& operator=(const ipv4_addr& fw_addr) {
+            setV4();
+            v4() = fw_addr.addr;
+            return *this;
+        }
+        IPAddress& operator=(const ipv4_addr* fw_addr) {
+            setV4();
+            if (fw_addr) {
+                v4() = fw_addr->addr;
+            }
+            else {
+                _ip = *IP_ANY_TYPE;
+            }
+            return *this;
+        }
 
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }

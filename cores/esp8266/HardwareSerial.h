@@ -233,7 +233,9 @@ protected:
     size_t _rx_size;
 };
 
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
+#if defined(HAVE_KFC_FIRMWARE_VERSION)
+extern Stream &Serial;
+#elif !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 extern HardwareSerial Serial;
 #endif
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
