@@ -78,8 +78,9 @@ runtime.tools.mkbuildoptglobals={runtime.platform.path}/tools/mkbuildoptglobals.
 globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
 commonhfile.fqfn={build.core.path}/CommonHFile.h
 build.opt.fqfn={build.path}/core/build.opt
+mkbuildoptglobals.extra_flags=
 
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}"
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.path} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 """
@@ -198,6 +199,7 @@ docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-buil
 
 err_print_flag = False
 msg_print_buf = ""
+debug_enabled = False
 
 # Issues trying to address through buffered printing
 # 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
@@ -237,6 +239,13 @@ def print_err(*args, **kwargs):
         print_msg("")
     print_msg("***", *args, **kwargs)
     err_print_flag = True
+
+def print_dbg(*args, **kwargs):
+    global debug_enabled
+    global err_print_flag
+    if debug_enabled:
+        print_msg("DEBUG:", *args, **kwargs)
+        err_print_flag = True
 
 
 def handle_error(err_no):
@@ -405,9 +414,19 @@ def discover_1st_time_run(build_path):
 
 
 def find_preferences_txt(runtime_ide_path):
+    """
+    Check for perferences.txt in well-known locations. Most OSs have two
+    possibilities. When "portable" is present, it takes priority. Otherwise, the
+    remaining path wins. However, Windows has two. Depending on the install
+    source, the APP store or website download, both may appear and create an
+    ambiguous result.
+
+    Return two item list - Two non "None" items indicate an ambiguous state.
+
+    OS Path list for Arduino IDE 1.6.0 and newer
+      from: https://www.arduino.cc/en/hacking/preferences
+    """
     platform_name = platform.system()
-    # OS Path list for Arduino IDE 1.6.0 and newer
-    # from: https://www.arduino.cc/en/hacking/preferences
     if "Linux" == platform_name:
         # Test for portable 1ST
         # <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
@@ -415,16 +434,16 @@ def find_preferences_txt(runtime_ide_path):
         fqfn = os.path.normpath(runtime_ide_path + "/portable/preferences.txt")
         # Linux - verified with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
-            return fqfn
+            return [fqfn, None]
         fqfn = os.path.expanduser("~/.arduino15/preferences.txt")
         # Linux - verified with Arduino IDE 1.8.18 and 2.0 RC5 64bit and AppImage
         if os.path.exists(fqfn):
-            return fqfn
+            return [fqfn, None]
     elif "Windows" == platform_name:
         fqfn = os.path.normpath(runtime_ide_path + "\portable\preferences.txt")
         # verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
-            return fqfn
+            return [fqfn, None]
         # It is never simple. Arduino from the Windows APP store or the download
         # Windows 8 and up option will save "preferences.txt" in one location.
         # The downloaded Windows 7 (and up version) will put "preferences.txt"
@@ -439,24 +458,27 @@ def find_preferences_txt(runtime_ide_path):
                 print_err("Multiple 'preferences.txt' files found:")
                 print_err("  " + fqfn)
                 print_err("  " + fqfn2)
-                return fqfn
+                return [fqfn, None]
             else:
-                return fqfn
+                return [fqfn, fqfn2]
         elif os.path.exists(fqfn2):
-            return fqfn2
+            return [fqfn2, None]
     elif "Darwin" == platform_name:
         # Portable is not compatable with Mac OS X
         # see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
         fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt")
         # Mac OS X - unverified
         if os.path.exists(fqfn):
-            return fqfn
+            return [fqfn, None]
 
     print_err("File preferences.txt not found on " + platform_name)
-    return ""
+    return [None, None]
 
 
 def get_preferences_txt(file_fqfn, key):
+    # Get Key Value, key is allowed to be missing.
+    # We assume file file_fqfn exists
+    basename = os.path.basename(file_fqfn)
     with open(file_fqfn) as file:
         for line in file:
             name, value = line.partition("=")[::2]
@@ -464,24 +486,42 @@ def get_preferences_txt(file_fqfn, key):
                 val = value.strip().lower()
                 if val != 'true':
                     val = False
-                print_msg(f"  preferences.txt: {key}={val}")
+                print_msg(f"  {basename}: {key}={val}")
                 return val
-    print_err("  Key " + key + " not found in preferences.txt. Default to true.")
+    print_err(f"  Key '{key}' not found in file {basename}. Default to true.")
     return True     # If we don't find it just assume it is set True
 
 
 def check_preferences_txt(runtime_ide_path, preferences_file):
+    key = "compiler.cache_core"
     # return the state of "compiler.cache_core" found in preferences.txt
-    file_fqfn = preferences_file
-    if file_fqfn != None and os.path.exists(file_fqfn):
-        pass
-    else:
-        file_fqfn = find_preferences_txt(runtime_ide_path)
-        if file_fqfn == "":
-            return True     # cannot find file - assume enabled
+    if preferences_file != None:
+        if os.path.exists(preferences_file):
+            print_msg(f"Using preferences from '{preferences_file}'")
+            return get_preferences_txt(preferences_file, key)
+        else:
+            print_err(f"Override preferences file '{preferences_file}' not found.")
 
-    print_msg("Using preferences from " + file_fqfn)
-    return get_preferences_txt(file_fqfn, "compiler.cache_core")
+    elif runtime_ide_path != None:
+        # For a particular install, search the expected locations for platform.txt
+        # This should never fail.
+        file_fqfn = find_preferences_txt(runtime_ide_path)
+        if file_fqfn[0] != None:
+            print_msg(f"Using preferences from '{file_fqfn[0]}'")
+            val0 = get_preferences_txt(file_fqfn[0], key)
+            val1 = val0
+            if file_fqfn[1] != None:
+                val1 = get_preferences_txt(file_fqfn[1], key)
+            if val0 == val1:    # We can safely ignore that there were two preferences.txt files
+                return val0
+            else:
+                print_err(f"Found too many preferences.txt files with different values for '{key}'")
+                raise UserWarning
+        else:
+            # Something is wrong with the installation or our understanding of the installation.
+            print_err("'preferences.txt' file missing from well known locations.")
+
+    return None
 
 
 def touch(fname, times=None):
@@ -497,29 +537,75 @@ def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
         with open(commonhfile_fqfn, 'a'):
             os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
+
 def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
-    if args.runtime_ide_version < 10802:
+    global docs_url
+    print_dbg(f"runtime_ide_version: {args.runtime_ide_version}")
+    if args.runtime_ide_version < 10802: # CI also has version 10607 --  and args.runtime_ide_version != 10607:
+        # Aggresive core caching - not implemented before version 1.8.2
+        # Note, Arduino IDE 2.0 rc5 has version 1.6.7 and has aggressive caching.
+        print_dbg(f"Old version ({args.runtime_ide_version}) of Arduino IDE no aggressive caching option")
         return False
     elif args.cache_core != None:
         print_msg(f"Preferences override, this prebuild script assumes the 'compiler.cache_core' parameter is set to {args.cache_core}")
         print_msg(f"To change, modify 'mkbuildoptglobals.extra_flags=(--cache_core | --no_cache_core)' in 'platform.local.txt'")
         return args.cache_core
     else:
+        ide_path = None
         preferences_fqfn = None
-        if args.preferences_file != None:
-            preferences_fqfn = args.preferences_file
-        elif args.preferences_sketch != None:
-            preferences_fqfn = os.path.normpath(
-                os.path.join(
-                    os.path.dirname(source_globals_h_fqfn),
-                    args.preferences_sketch))
-        elif args.preferences_env != None:
-            preferences_fqfn = os.getenv(args.preferences_env)
-    return check_preferences_txt(runtime_ide_path, preferences_fqfn)
+        if args.preferences_sketch != None:
+            preferences_fqfn = os.path.join(
+                os.path.dirname(source_globals_h_fqfn),
+                os.path.normpath(args.preferences_sketch))
+        else:
+            if args.preferences_file != None:
+                preferences_fqfn = args.preferences_file
+            elif args.preferences_env != None:
+                preferences_fqfn = args.preferences_env
+            else:
+                ide_path = runtime_ide_path
+
+            if preferences_fqfn != None:
+                preferences_fqfn = os.path.normpath(preferences_fqfn)
+                root = False
+                if 'Windows' == platform.system():
+                    if preferences_fqfn[1:2] == ':\\':
+                        root = True
+                else:
+                    if preferences_fqfn[0] == '/':
+                        root = True
+                if not root:
+                    if preferences_fqfn[0] != '~':
+                        preferences_fqfn = os.path.join("~", preferences_fqfn)
+                    preferences_fqfn = os.path.expanduser(preferences_fqfn)
+                print_dbg(f"determine_cache_state: preferences_fqfn: {preferences_fqfn}")
+
+    try:
+        caching_enabled = check_preferences_txt(ide_path, preferences_fqfn)
+    except UserWarning:
+        if os.path.exists(source_globals_h_fqfn):
+            caching_enabled = None
+            print_err(f"  runtime_ide_version: {args.runtime_ide_version}")
+            print_err(f"  This must be resolved to use '{globals_name}'")
+            print_err(f"  Read more at {docs_url}")
+        else:
+            # We can quietly ignore the problem because we are not needed.
+            caching_enabled = True
+
+    return caching_enabled
 
 
 """
-TODO sort out which of these are viable solutions
+TODO
+
+aggressive caching workaround
+========== ======= ==========
+The question needs to be asked, is it a good idea?
+With all this effort to aid in determining the cache state, it is rendered
+usless when arduino command line switches are used that contradict our
+settings.
+
+Sort out which of these are imperfect solutions should stay in
 
 Possible options for handling problems caused by:
     ./arduino --preferences-file other-preferences.txt
@@ -548,6 +634,18 @@ Possible options for handling problems caused by:
 """
 
 
+def check_env(env):
+    system = platform.system()
+    val = os.getenv(env)
+    if val == None:
+        if "Linux" == system or "Windows" == system:
+            raise argparse.ArgumentTypeError(f'Missing environment variable: {env}')
+        else:
+            # OS/Library limitation
+            raise argparse.ArgumentTypeError('Not supported')
+    return val
+
+
 def parse_args():
     extra_txt = '''\
        Use platform.local.txt 'mkbuildoptglobals.extra_flags=...' to supply override options:
@@ -565,13 +663,15 @@ def parse_args():
     parser.add_argument('build_opt_fqfn', help="Build FQFN to build.opt")
     parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
     parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
+    parser.add_argument('--debug', action='store_true', required=False, default=False)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
     group.add_argument('--no_cache_core', dest='cache_core', action='store_false', help='Assume a "compiler.cache_core" value of false')
     group.add_argument('--preferences_file', help='Full path to preferences file')
     group.add_argument('--preferences_sketch', nargs='?', action='store', const="preferences.txt", help='Sketch relative path to preferences file')
-    if "Linux" == platform.system():
-        group.add_argument('--preferences_env', nargs='?', action='store', const="ARDUINO15_PREFERENCES_FILE", help='Use environment variable for path to preferences file')
+    # Since the docs say most versions of Windows and Linux support the os.getenv method, suppress the help message.
+    group.add_argument('--preferences_env', nargs='?', action='store', type=check_env, const="ARDUINO15_PREFERENCES_FILE", help=argparse.SUPPRESS)
+    # ..., help='Use environment variable for path to preferences file')
     return parser.parse_args()
     # ref epilog, https://stackoverflow.com/a/50021771
     # ref nargs='*'', https://stackoverflow.com/a/4480202
@@ -580,108 +680,120 @@ def parse_args():
 def main():
     global build_opt_signature
     global docs_url
+    global debug_enabled
     num_include_lines = 1
 
     args = parse_args()
+    debug_enabled = args.debug
     runtime_ide_path = os.path.normpath(args.runtime_ide_path)
     build_path = os.path.normpath(args.build_path)
     build_opt_fqfn = os.path.normpath(args.build_opt_fqfn)
     source_globals_h_fqfn = os.path.normpath(args.source_globals_h_fqfn)
     commonhfile_fqfn = os.path.normpath(args.commonhfile_fqfn)
 
-    if commonhfile_fqfn != None and len(commonhfile_fqfn):
-        globals_name = os.path.basename(source_globals_h_fqfn)
-        build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
-        globals_h_fqfn = os.path.join(build_path_core, globals_name)
+    globals_name = os.path.basename(source_globals_h_fqfn)
+    build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
+    globals_h_fqfn = os.path.join(build_path_core, globals_name)
 
-        first_time = discover_1st_time_run(build_path)
+    first_time = discover_1st_time_run(build_path)
+    if first_time:
+        print_dbg("First run since Arduino IDE started.")
 
-        use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
+    use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
+    if use_aggressive_caching_workaround == None:
+        # Specific rrror messages already buffered
+        handle_error(1)
 
-        if first_time or \
-        not use_aggressive_caching_workaround or \
-        not os.path.exists(commonhfile_fqfn):
-            enable_override(False, commonhfile_fqfn)
+    if first_time or \
+    not use_aggressive_caching_workaround or \
+    not os.path.exists(commonhfile_fqfn):
+        enable_override(False, commonhfile_fqfn)
 
-        # A future timestamp on commonhfile_fqfn will cause everything to
-        # rebuild. This occurred during development and may happen after
-        # changing the system time.
-        if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
-            touch(commonhfile_fqfn)
-            print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
+    # A future timestamp on commonhfile_fqfn will cause everything to
+    # rebuild. This occurred during development and may happen after
+    # changing the system time.
+    if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
+        touch(commonhfile_fqfn)
+        print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
 
-        if not os.path.exists(build_path_core):
-            os.makedirs(build_path_core)
-            print_msg("Clean build, created dir " + build_path_core)
+    if not os.path.exists(build_path_core):
+        os.makedirs(build_path_core)
+        print_msg("Clean build, created dir " + build_path_core)
 
-        if os.path.exists(source_globals_h_fqfn):
-            print_msg("Using global include from " + source_globals_h_fqfn)
+    if os.path.exists(source_globals_h_fqfn):
+        print_msg("Using global include from " + source_globals_h_fqfn)
 
-        copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
+    copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
 
-        # globals_h_fqfn timestamp was only updated if the source changed. This
-        # controls the rebuild on change. We can always extract a new build.opt
-        # w/o triggering a needless rebuild.
-        embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
+    # globals_h_fqfn timestamp was only updated if the source changed. This
+    # controls the rebuild on change. We can always extract a new build.opt
+    # w/o triggering a needless rebuild.
+    embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
 
-        if use_aggressive_caching_workaround:
-            # commonhfile_fqfn encodes the following information
-            # 1. When touched, it causes a rebuild of core.a
-            # 2. When file size is non-zero, it indicates we are using the
-            #    aggressive cache workaround. The workaround is set to true
-            #    (active) when we discover a non-zero length global .h file in
-            #    any sketch. The aggressive workaround is cleared on the 1ST
-            #    compile by the Arduino IDE after starting.
-            # 3. When the timestamp matches the build copy of globals.h
-            #    (globals_h_fqfn), we know one two things:
-            #    * The cached core.a matches up to the current build.opt and
-            #      globals.h. The current sketch owns the cached copy of core.a.
-            #    * globals.h has not changed, and no need to rebuild core.a
-            # 4. When core.a's timestamp does not match the build copy of
-            #    the global .h file, we only know we need to rebuild core.a, and
-            #    that is enough.
-            #
-            # When the sketch build has a "Sketch.ino.globals.h" file in the
-            # build tree that exactly matches the timestamp of "CommonHFile.h"
-            # in the platform source tree, it owns the core.a cache copy. If
-            # not, or "Sketch.ino.globals.h" has changed, rebuild core.
-            # A non-zero file size for commonhfile_fqfn, means we have seen a
-            # globals.h file before and workaround is active.
-            if os.path.getsize(commonhfile_fqfn):
-                if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
-                    # Need to rebuild core.a
-                    # touching commonhfile_fqfn in the source core tree will cause rebuild.
-                    # Looks like touching or writing unrelated files in the source core tree will cause rebuild.
-                    synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
-                    print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
-            elif os.path.getsize(globals_h_fqfn):
-                enable_override(True, commonhfile_fqfn)
+    if use_aggressive_caching_workaround:
+        # commonhfile_fqfn encodes the following information
+        # 1. When touched, it causes a rebuild of core.a
+        # 2. When file size is non-zero, it indicates we are using the
+        #    aggressive cache workaround. The workaround is set to true
+        #    (active) when we discover a non-zero length global .h file in
+        #    any sketch. The aggressive workaround is cleared on the 1ST
+        #    compile by the Arduino IDE after starting.
+        # 3. When the timestamp matches the build copy of globals.h
+        #    (globals_h_fqfn), we know one two things:
+        #    * The cached core.a matches up to the current build.opt and
+        #      globals.h. The current sketch owns the cached copy of core.a.
+        #    * globals.h has not changed, and no need to rebuild core.a
+        # 4. When core.a's timestamp does not match the build copy of
+        #    the global .h file, we only know we need to rebuild core.a, and
+        #    that is enough.
+        #
+        # When the sketch build has a "Sketch.ino.globals.h" file in the
+        # build tree that exactly matches the timestamp of "CommonHFile.h"
+        # in the platform source tree, it owns the core.a cache copy. If
+        # not, or "Sketch.ino.globals.h" has changed, rebuild core.
+        # A non-zero file size for commonhfile_fqfn, means we have seen a
+        # globals.h file before and workaround is active.
+        if debug_enabled:
+            ts = os.stat(globals_h_fqfn)
+            print_dbg(f"globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
+            print_dbg(f"getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
+            ts = os.stat(commonhfile_fqfn)
+            print_dbg(f"commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
+            print_dbg(f"getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
+
+        if os.path.getsize(commonhfile_fqfn):
+            if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
+                # Need to rebuild core.a
+                # touching commonhfile_fqfn in the source core tree will cause rebuild.
+                # Looks like touching or writing unrelated files in the source core tree will cause rebuild.
                 synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
                 print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
-
-        add_include_line(build_opt_fqfn, commonhfile_fqfn)
-        add_include_line(build_opt_fqfn, globals_h_fqfn)
-
-        # Provide context help for build option support.
-        source_build_opt_h_fqfn = os.path.join(os.path.dirname(source_globals_h_fqfn), "build_opt.h")
-        if os.path.exists(source_build_opt_h_fqfn) and not embedded_options:
-            print_err("Build options file '" + source_build_opt_h_fqfn + "' not supported.")
-            print_err("  Add build option content to '" + source_globals_h_fqfn + "'.")
-            print_err("  Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
-            print_err("  Read more at " + docs_url)
-        elif os.path.exists(source_globals_h_fqfn):
-            if not embedded_options:
-                print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
-                print_msg("  Read more at " + docs_url)
+            else:
+                print_dbg(f"Using old cached 'core.a'")
+        elif os.path.getsize(globals_h_fqfn):
+            enable_override(True, commonhfile_fqfn)
+            synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
+            print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
         else:
-            print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
-            print_msg("  Read more at " + docs_url)
+            print_dbg(f"Workaround not active/needed")
 
+    add_include_line(build_opt_fqfn, commonhfile_fqfn)
+    add_include_line(build_opt_fqfn, globals_h_fqfn)
+
+    # Provide context help for build option support.
+    source_build_opt_h_fqfn = os.path.join(os.path.dirname(source_globals_h_fqfn), "build_opt.h")
+    if os.path.exists(source_build_opt_h_fqfn) and not embedded_options:
+        print_err("Build options file '" + source_build_opt_h_fqfn + "' not supported.")
+        print_err("  Add build option content to '" + source_globals_h_fqfn + "'.")
+        print_err("  Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
+        print_err("  Read more at " + docs_url)
+    elif os.path.exists(source_globals_h_fqfn):
+        if not embedded_options:
+            print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
+            print_msg("  Read more at " + docs_url)
     else:
-        print_err(parser.parse_args('-h'.split()))
-        # print_err("Too few arguments. Add arguments:")
-        # print_err("  Runtime IDE path, Build path, Build FQFN build.opt, Source FQFN Sketch.ino.globals.h, Core Source FQFN CommonHFile.h")
-        handle_error(1)
+        print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
+        print_msg("  Read more at " + docs_url)
 
     handle_error(0)   # commit print buffer
 
