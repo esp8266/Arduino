@@ -197,11 +197,13 @@ Examples of hints:
 
 ::
 
-   mkbuildoptglobals.extra_flags=--preferences_sketch          # assume file preferences.txt in the sketch folder
-   mkbuildoptglobals.extra_flags=--preferences_sketch pref.txt # is relative to the sketch folder
+   mkbuildoptglobals.extra_flags=--preferences_sketch            # assume file preferences.txt in the sketch folder
+   mkbuildoptglobals.extra_flags=--preferences_sketch "pref.txt" # is relative to the sketch folder
    mkbuildoptglobals.extra_flags=--no_cache_core
    mkbuildoptglobals.extra_flags=--cache_core
-   mkbuildoptglobals.extra_flags=--preferences_file other-preferences.txt # relative to IDE or full path
+   mkbuildoptglobals.extra_flags=--preferences_file "other-preferences.txt" # relative to IDE or full path
+
+If required, remember to quote file or file paths.
 
 **Multiple versions of the Arduino IDE running**
 

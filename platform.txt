@@ -63,13 +63,14 @@ build.spiffs_blocksize=
 globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
 commonhfile.fqfn={build.core.path}/CommonHFile.h
 build.opt.fqfn={build.path}/core/build.opt
+build.opt.flags="@{build.opt.fqfn}"
 mkbuildoptglobals.extra_flags=
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.fqfn} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 {build.opt.flags} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 # support precompiled libraries in IDE v1.8.6+
 compiler.libraries.ldflags=

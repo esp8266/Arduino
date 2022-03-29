@@ -615,7 +615,7 @@ Possible options for handling problems caused by:
 --no_cache_core
 --preferences_file (relative to IDE or full path)
 --preferences_sketch (default looks for preferences.txt or specify path relative to sketch folder)
---preferences_env, only works on Linux
+--preferences_env, python docs say "Availability: most flavors of Unix, Windows."
 
  export ARDUINO15_PREFERENCES_FILE=$(realpath other-name-than-default-preferences.txt )
  ./arduino --preferences-file other-name-than-default-preferences.txt
@@ -636,6 +636,11 @@ Possible options for handling problems caused by:
 
 def check_env(env):
     system = platform.system()
+    # From the docs:
+    #   Availability: most flavors of Unix, Windows.
+    #   “Availability: Unix” are supported on macOS
+    # Because of the soft commitment, I used "help=argparse.SUPPRESS" to keep
+    # the claim out of the help. The unavailable case is untested.
     val = os.getenv(env)
     if val == None:
         if "Linux" == system or "Windows" == system:
