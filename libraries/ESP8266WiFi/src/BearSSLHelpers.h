@@ -59,6 +59,21 @@ class PublicKey {
     // Disable the copy constructor, we're pointer based
     PublicKey(const PublicKey& that) = delete;
 
+    // Allow moves
+    PublicKey(PublicKey&& that) {
+        _key = that._key;
+        that._key = nullptr;
+    }
+
+    PublicKey& operator=(PublicKey&& that) {
+        if (this != &that) {
+            free(_key);
+            _key = that._key;
+            that._key = nullptr;
+        }
+        return *this;
+    }
+
   private:
     brssl::public_key *_key;
 };
@@ -86,6 +101,21 @@ class PrivateKey {
 
     // Disable the copy constructor, we're pointer based
     PrivateKey(const PrivateKey& that) = delete;
+
+    // Allow moves
+    PrivateKey(PrivateKey&& that) {
+        _key = that._key;
+        that._key = nullptr;
+    }
+
+    PrivateKey& operator=(PrivateKey&& that) {
+        if (this != &that) {
+            free(_key);
+            _key = that._key;
+            that._key = nullptr;
+        }
+        return *this;
+    }
 
   private:
     brssl::private_key *_key;
@@ -122,6 +152,30 @@ class X509List {
 
     // Disable the copy constructor, we're pointer based
     X509List(const X509List& that) = delete;
+
+    // Allow moves
+    X509List(X509List&& that) {
+        _count = that._count;
+        _cert = that._cert;
+        _ta = that._ta;
+        that._count = 0;
+        that._cert = nullptr;
+        that._ta = nullptr;
+    }
+
+    X509List& operator=(X509List&& that) {
+        if (this != &that) {
+            free(_cert);
+            free(_ta);
+            _count = that._count;
+            _cert = that._cert;
+            _ta = that._ta;
+            that._count = 0;
+            that._cert = nullptr;
+            that._ta = nullptr;
+        }
+        return *this;
+    }
 
   private:
     size_t _count;
@@ -169,6 +223,32 @@ class ServerSessions {
 
     // Returns the number of sessions the cache can hold.
     uint32_t size() { return _size; }
+
+    // Disable the copy constructor, we're pointer based
+    ServerSessions(const ServerSessions& that) = delete;
+
+    // Allow moves
+    ServerSessions(ServerSessions&& that) {
+        _size = that._size;
+        _store = that._store;
+        _isDynamic = that._isDynamic;
+        _cache = that._cache;
+        that._size = 0;
+        that._store = nullptr;
+    }
+
+    ServerSessions& operator=(ServerSessions&& that) {
+        if (this != &that) {
+            free(_store);
+            _size = that._size;
+            _store = that._store;
+            _isDynamic = that._isDynamic;
+            _cache = that._cache;
+            that._size = 0;
+            that._store = nullptr;
+        }
+        return *this;
+    }
 
   private:
     ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic);
