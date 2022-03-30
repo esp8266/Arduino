@@ -202,51 +202,49 @@ String::String(String &&rval) noexcept {
     move(rval);
 }
 
-// placement new is safe enough, but be wary when `this` has something in the hierarchy
+String::String(unsigned char value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned char value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(int value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(int value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(unsigned int value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned int value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(long value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(unsigned long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned long value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(long long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(long long value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(long long value) :
+    String(toString(value))
+{}
 
-String::String(long long value) {
-    new (this) String(toString(value));
-}
+String::String(unsigned long long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned long long value, unsigned char base) {
-    new (this) String(toString(value, base));
-}
+String::String(unsigned long long value) :
+    String(toString(value))
+{}
 
-String::String(unsigned long long value) {
-    new (this) String(toString(value));
-}
+String::String(float value, unsigned char decimalPlaces) :
+    String(toString(value, decimalPlaces))
+{}
 
-String::String(float value, unsigned char decimalPlaces) {
-    new (this) String(toString(value, decimalPlaces));
-}
-
-String::String(double value, unsigned char decimalPlaces) {
-    new (this) String(toString(value, decimalPlaces));
-}
+String::String(double value, unsigned char decimalPlaces) :
+    String(toString(value, decimalPlaces))
+{}
 
 /*********************************************/
 /*  Memory Management                        */
