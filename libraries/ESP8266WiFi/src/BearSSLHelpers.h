@@ -291,6 +291,24 @@ class SigningVerifier : public UpdaterVerifyClass {
     SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; stack_thunk_add_ref(); }
     ~SigningVerifier() { stack_thunk_del_ref(); }
 
+    // Disable the copy constructor, we're pointer based
+    SigningVerifier(const SigningVerifier& that) = delete;
+
+    // Allow moves
+    SigningVerifier(SigningVerifier&& that) {
+        _pubKey = that._pubKey;
+        that._pubKey = nullptr;
+    }
+
+    SigningVerifier& operator=(SigningVerifier&& that) {
+        if (this != &that) {
+            free(_pubKey);
+            _pubKey = that._pubKey;
+            that._pubKey = nullptr;
+        }
+        return *this;
+    }
+
   private:
     PublicKey *_pubKey;
 };
