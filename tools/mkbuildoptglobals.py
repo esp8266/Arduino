@@ -525,18 +525,26 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
 
 
 def touch(fname, times=None):
-    with open(fname, 'a'):
-        os.utime(fname, times)
-
+    with open(fname, "a") as file:
+        os.utime(file.fileno(), times)
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
+    global debug_enabled
     # touch both files with the same timestamp
-    with open(globals_h_fqfn, 'a'):
-        os.utime(globals_h_fqfn)
-        ts = os.stat(globals_h_fqfn)
-        with open(commonhfile_fqfn, 'a'):
-            os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
+    touch(globals_h_fqfn)
+    with open(globals_h_fqfn, 'r') as file:
+        ts = os.stat(file.fileno())
+        with open(commonhfile_fqfn, 'a') as file2:
+            os.utime(file2.fileno(), ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
+    if debug_enabled:
+        print_dbg("After synchronous_touch")
+        ts = os.stat(globals_h_fqfn)
+        print_dbg(f"  globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
+        print_dbg(f"  getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
+        ts = os.stat(commonhfile_fqfn)
+        print_dbg(f"  commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
+        print_dbg(f"  getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
 
 def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
     global docs_url
@@ -700,6 +708,16 @@ def main():
     build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
     globals_h_fqfn = os.path.join(build_path_core, globals_name)
 
+    print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
+    print_dbg(f"runtime_ide_version:    {args.runtime_ide_version}")
+    print_dbg(f"build_path:             {build_path}")
+    print_dbg(f"build_opt_fqfn:         {build_opt_fqfn}")
+    print_dbg(f"source_globals_h_fqfn:  {source_globals_h_fqfn}")
+    print_dbg(f"commonhfile_fqfn:       {commonhfile_fqfn}")
+    print_dbg(f"globals_name:           {globals_name}")
+    print_dbg(f"build_path_core:        {build_path_core}")
+    print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
+
     first_time = discover_1st_time_run(build_path)
     if first_time:
         print_dbg("First run since Arduino IDE started.")
@@ -708,6 +726,9 @@ def main():
     if use_aggressive_caching_workaround == None:
         # Specific rrror messages already buffered
         handle_error(1)
+
+    print_dbg(f"first_time:             {first_time}")
+    print_dbg(f"use_aggressive_caching_workaround: {use_aggressive_caching_workaround}")
 
     if first_time or \
     not use_aggressive_caching_workaround or \
@@ -759,12 +780,13 @@ def main():
         # A non-zero file size for commonhfile_fqfn, means we have seen a
         # globals.h file before and workaround is active.
         if debug_enabled:
+            print_dbg("Timestamps at start of check aggressive caching workaround")
             ts = os.stat(globals_h_fqfn)
-            print_dbg(f"globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
-            print_dbg(f"getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
+            print_dbg(f"  globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
+            print_dbg(f"  getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
             ts = os.stat(commonhfile_fqfn)
-            print_dbg(f"commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
-            print_dbg(f"getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
+            print_dbg(f"  commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
+            print_dbg(f"  getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
 
         if os.path.getsize(commonhfile_fqfn):
             if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):

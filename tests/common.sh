@@ -197,7 +197,7 @@ function install_ide()
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
     echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
     echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
-    echo "mkbuildoptglobals.extra_flags=--cache_core" >> esp8266/platform.local.txt
+    echo "mkbuildoptglobals.extra_flags=--debug --cache_core" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
