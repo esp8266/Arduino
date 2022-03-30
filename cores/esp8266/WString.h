@@ -94,22 +94,33 @@ class String {
             return length() == 0;
         }
 
-        // creates a copy of the assigned value.  if the value is null or
-        // invalid, or if the memory allocation fails, the string will be
-        // marked as invalid ("if (s)" will be false).
+        // assign string types as well as built-in numeric types
         String &operator =(const String &rhs);
+        String &operator =(String &&rval) noexcept;
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
-        String &operator =(String &&rval) noexcept;
-        String &operator =(char c);
 
-        // concatenate (works w/ built-in types)
+        String &operator =(char c);
+        String &operator =(unsigned char c);
+        String &operator =(int num);
+        String &operator =(unsigned int num);
+        String &operator =(long num);
+        String &operator =(unsigned long num);
+        String &operator =(long long num);
+        String &operator =(unsigned long long num);
+        String &operator =(float num);
+        String &operator =(double num);
+
+        // concatenate (works w/ built-in types, same as assignment)
 
         // returns true on success, false on failure (in which case, the string
         // is left unchanged).  if the argument is null or invalid, the
         // concatenation is considered unsuccessful.
         bool concat(const String &str);
         bool concat(const char *cstr);
+        bool concat(const char *cstr, unsigned int length);
+        bool concat(const __FlashStringHelper *str);
+
         bool concat(char c);
         bool concat(unsigned char c);
         bool concat(int num);
@@ -120,8 +131,6 @@ class String {
         bool concat(unsigned long long num);
         bool concat(float num);
         bool concat(double num);
-        bool concat(const __FlashStringHelper *str);
-        bool concat(const char *cstr, unsigned int length);
 
         // if there's not enough memory for the concatenated value, the string
         // will be left unchanged (but this isn't signalled in any way)
@@ -131,6 +140,8 @@ class String {
             return *this;
         }
 
+        // checks whether the internal buffer pointer is set.
+        // (should not be the case for us, since we always reset the pointer to the SSO buffer instead of setting it to nullptr)
         explicit operator bool() const {
             return buffer() != nullptr;
         }
@@ -292,6 +303,8 @@ class String {
             // Unfortunately, GCC seems not to re-evaluate the cost of inlining after the store-merging optimizer stage,
             // `always_inline` attribute is necessary in order to keep inlining.
         }
+
+        // resets the string storage to the initial state
         void invalidate(void);
         bool changeBuffer(unsigned int maxStrLen);
 

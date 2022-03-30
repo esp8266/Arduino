@@ -32,6 +32,152 @@
 #define STR(x) __STRHELPER(x) // stringifier
 
 /*********************************************/
+/*  Conversion helpers                       */
+/*********************************************/
+
+static String toString(unsigned char value, unsigned char base) {
+    String out;
+
+    char buf[1 + 8 * sizeof(unsigned char)];
+    utoa(value, buf, base);
+    out = buf;
+
+    return out;
+}
+
+static String toString(unsigned char value) {
+    return toString(value, 10);
+}
+
+static String toString(int value, unsigned char base) {
+    String out;
+
+    char buf[2 + 8 * sizeof(int)];
+    if (base == 10) {
+        sprintf(buf, "%d", value);
+    } else {
+        itoa(value, buf, base);
+    }
+    out = buf;
+
+    return out;
+}
+
+static String toString(int value) {
+    return toString(value, 10);
+}
+
+static String toString(unsigned int value, unsigned char base) {
+    String out;
+
+    char buf[1 + 8 * sizeof(unsigned int)];
+    utoa(value, buf, base);
+    out = buf;
+
+    return out;
+}
+
+static String toString(unsigned int value) {
+    return toString(value, 10);
+}
+
+static String toString(long value, unsigned char base) {
+    String out;
+
+    char buf[2 + 8 * sizeof(long)];
+    if (base == 10) {
+        sprintf(buf, "%ld", value);
+    } else {
+        ltoa(value, buf, base);
+    }
+    out = buf;
+
+    return out;
+}
+
+static String toString(long value) {
+    return toString(value, 10);
+}
+
+static String toString(unsigned long value, unsigned char base) {
+    String out;
+
+    char buf[1 + 8 * sizeof(unsigned long)];
+    ultoa(value, buf, base);
+    out = buf;
+
+    return out;
+}
+
+static String toString(unsigned long value) {
+    return toString(value, 10);
+}
+
+static String toString(long long value, unsigned char base) {
+    String out;
+
+    char buf[2 + 8 * sizeof(long long)];
+    out = lltoa(value, buf, sizeof(buf), base);
+
+    return out;
+}
+
+static String toString(long long value) {
+    String out;
+
+    char buf[2 + 8 * sizeof(long long)];
+    sprintf(buf, "%lld", value);
+    out = buf;
+
+    return out;
+}
+
+static String toString(unsigned long long value, unsigned char base) {
+    String out;
+
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    out = ulltoa(value, buf, sizeof(buf), base);
+
+    return out;
+}
+
+static String toString(unsigned long long value) {
+    String out;
+
+    char buf[1 + 8 * sizeof(unsigned long long)];
+    sprintf(buf, "%llu", value);
+    out = buf;
+
+    return out;
+}
+
+static String toString(float value, unsigned char decimalPlaces) {
+    String out;
+
+    char buf[33];
+    out = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+
+    return out;
+}
+
+static String toString(float value) {
+    return toString(value, 2);
+}
+
+static String toString(double value, unsigned char decimalPlaces) {
+    String out;
+
+    char buf[33];
+    out = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+
+    return out;
+}
+
+static String toString(double value) {
+    return toString(value, 2);
+}
+
+/*********************************************/
 /*  Constructors                             */
 /*********************************************/
 
@@ -57,84 +203,47 @@ String::String(String &&rval) noexcept {
 }
 
 String::String(unsigned char value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned char)];
-    utoa(value, buf, base);
-    *this = buf;
+    *this = toString(value, base);
 }
 
 String::String(int value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(int)];
-    if (base == 10) {
-        sprintf(buf, "%d", value);
-    } else {
-        itoa(value, buf, base);
-    }
-    *this = buf;
+    *this = toString(value, base);
 }
 
 String::String(unsigned int value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned int)];
-    utoa(value, buf, base);
-    *this = buf;
+    *this = toString(value, base);
 }
 
 String::String(long value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(long)];
-    if (base == 10) {
-        sprintf(buf, "%ld", value);
-    } else {
-        ltoa(value, buf, base);
-    }
-    *this = buf;
+    *this = toString(value, base);
 }
 
 String::String(unsigned long value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long)];
-    ultoa(value, buf, base);
-    *this = buf;
-}
-
-String::String(long long value) {
-    init();
-    char buf[2 + 8 * sizeof(long long)];
-    sprintf(buf, "%lld", value);
-    *this = buf;
-}
-
-String::String(unsigned long long value) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    sprintf(buf, "%llu", value);
-    *this = buf;
+    *this = toString(value, base);
 }
 
 String::String(long long value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(long long)];
-    *this = lltoa(value, buf, sizeof(buf), base);
+    *this = toString(value, base);
+}
+
+String::String(long long value) {
+    *this = toString(value);
 }
 
 String::String(unsigned long long value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    *this = ulltoa(value, buf, sizeof(buf), base);
+    *this = toString(value, base);
+}
+
+String::String(unsigned long long value) {
+    *this = toString(value);
 }
 
 String::String(float value, unsigned char decimalPlaces) {
-    init();
-    char buf[33];
-    *this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+    *this = toString(value, decimalPlaces);
 }
 
 String::String(double value, unsigned char decimalPlaces) {
-    init();
-    char buf[33];
-    *this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+    *this = toString(value, decimalPlaces);
 }
 
 /*********************************************/
@@ -279,6 +388,50 @@ String &String::operator =(char c) {
     return *this;
 }
 
+String &String::operator =(unsigned char value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(int value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(unsigned int value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(long value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(unsigned long value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(long long value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(unsigned long long value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(float value) {
+    *this = toString(value);
+    return *this;
+}
+
+String &String::operator =(double value) {
+    *this = toString(value);
+    return *this;
+}
 
 /*********************************************/
 /*  concat                                   */
@@ -329,52 +482,39 @@ bool String::concat(char c) {
 }
 
 bool String::concat(unsigned char num) {
-    char buf[1 + 3 * sizeof(unsigned char)];
-    return concat(buf, sprintf(buf, "%d", num));
+    return concat(toString(num));
 }
 
 bool String::concat(int num) {
-    char buf[2 + 3 * sizeof(int)];
-    return concat(buf, sprintf(buf, "%d", num));
+    return concat(toString(num));
 }
 
 bool String::concat(unsigned int num) {
-    char buf[1 + 3 * sizeof(unsigned int)];
-    utoa(num, buf, 10);
-    return concat(buf, strlen(buf));
+    return concat(toString(num));
 }
 
 bool String::concat(long num) {
-    char buf[2 + 3 * sizeof(long)];
-    return concat(buf, sprintf(buf, "%ld", num));
+    return concat(toString(num));
 }
 
 bool String::concat(unsigned long num) {
-    char buf[1 + 3 * sizeof(unsigned long)];
-    ultoa(num, buf, 10);
-    return concat(buf, strlen(buf));
+    return concat(toString(num));
 }
 
 bool String::concat(long long num) {
-    char buf[2 + 3 * sizeof(long long)];
-    return concat(buf, sprintf(buf, "%lld", num));
+    return concat(toString(num));
 }
 
 bool String::concat(unsigned long long num) {
-    char buf[1 + 3 * sizeof(unsigned long long)];
-    return concat(buf, sprintf(buf, "%llu", num));
+    return concat(toString(num));
 }
 
 bool String::concat(float num) {
-    char buf[20];
-    char *string = dtostrf(num, 4, 2, buf);
-    return concat(string, strlen(string));
+    return concat(toString(num));
 }
 
 bool String::concat(double num) {
-    char buf[20];
-    char *string = dtostrf(num, 4, 2, buf);
-    return concat(string, strlen(string));
+    return concat(toString(num));
 }
 
 bool String::concat(const __FlashStringHelper *str) {
