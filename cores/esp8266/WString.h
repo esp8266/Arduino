@@ -286,6 +286,8 @@ class String {
         friend String operator +(const __FlashStringHelper *lhs, String &&rhs);
 
     protected:
+        // TODO: replace init() with a union constructor, so it's called implicitly
+
         void init(void) __attribute__((always_inline)) {
             sso.buff[0] = 0;
             sso.len     = 0;
