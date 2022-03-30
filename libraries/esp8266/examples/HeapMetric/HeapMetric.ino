@@ -52,53 +52,40 @@ void tryit(int blocksize) {
     calculation of multiple elements combined with the rounding up for the
     8-byte alignment of each allocation can make for some tricky calculations.
   */
-  int rawMemoryMaxFreeBlockSize =  ESP.getMaxFreeBlockSize();
+  int rawMemoryMaxFreeBlockSize = ESP.getMaxFreeBlockSize();
   // Remove the space for overhead component of the blocks*sizeof(void*) array.
   int maxFreeBlockSize = rawMemoryMaxFreeBlockSize - UMM_OVERHEAD_ADJUST;
   // Initial estimate to use all of the MaxFreeBlock with multiples of 8 rounding up.
-  blocks = maxFreeBlockSize /
-           (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
+  blocks = maxFreeBlockSize / (((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + sizeof(void*));
   /*
     While we allowed for the 8-byte alignment overhead for blocks*blocksize we
     were unable to compensate in advance for the later 8-byte aligning needed
     for the blocks*sizeof(void*) allocation. Thus blocks may be off by one count.
     We now validate the estimate and adjust as needed.
   */
-  int rawMemoryEstimate =
-    blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) +
-    ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
-  if (rawMemoryMaxFreeBlockSize < rawMemoryEstimate) {
-    --blocks;
-  }
+  int rawMemoryEstimate = blocks * ((blocksize + UMM_OVERHEAD_ADJUST + 7) & ~7) + ((blocks * sizeof(void*) + UMM_OVERHEAD_ADJUST + 7) & ~7);
+  if (rawMemoryMaxFreeBlockSize < rawMemoryEstimate) { --blocks; }
   Serial.printf("\nFilling memory with blocks of %d bytes each\n", blocksize);
   stats("before");
 
   p = (void**)malloc(sizeof(void*) * blocks);
-  for (int i = 0; i < blocks; i++) {
-    p[i] = malloc(blocksize);
-  }
+  for (int i = 0; i < blocks; i++) { p[i] = malloc(blocksize); }
   stats("array and blocks allocation");
 
   for (int i = 0; i < blocks; i += 2) {
-    if (p[i]) {
-      free(p[i]);
-    }
+    if (p[i]) { free(p[i]); }
     p[i] = nullptr;
   }
   stats("freeing every other blocks");
 
   for (int i = 0; i < (blocks - 1); i += 4) {
-    if (p[i + 1]) {
-      free(p[i + 1]);
-    }
+    if (p[i + 1]) { free(p[i + 1]); }
     p[i + 1] = nullptr;
   }
   stats("freeing every other remaining blocks");
 
   for (int i = 0; i < blocks; i++) {
-    if (p[i]) {
-      free(p[i]);
-    }
+    if (p[i]) { free(p[i]); }
   }
   stats("freeing array");
 
@@ -158,5 +145,4 @@ void setup() {
 #endif
 }
 
-void loop() {
-}
+void loop() {}

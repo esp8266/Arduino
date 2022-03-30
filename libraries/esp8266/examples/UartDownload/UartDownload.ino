@@ -59,11 +59,10 @@ constexpr char slipFrameMarker = '\xC0';
 //   <0xC0><cmd><payload length><32 bit cksum><payload data ...><0xC0>
 // Slip packet for ESP_SYNC, minus the frame markers ('\xC0') captured from
 // esptool using the `--trace` option.
-const char syncPkt[] PROGMEM =
-  "\x00\x08\x24\x00\x00\x00\x00\x00\x07\x07\x12\x20"
-  "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
+const char syncPkt[] PROGMEM = "\x00\x08\x24\x00\x00\x00\x00\x00\x07\x07\x12\x20"
+                               "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU";
 
-constexpr size_t syncPktSz = sizeof(syncPkt) - 1; // Don't compare zero terminator char
+constexpr size_t syncPktSz = sizeof(syncPkt) - 1;  // Don't compare zero terminator char
 
 //
 //  Use the discovery of an ESP_SYNC packet, to trigger calling UART Download
@@ -71,9 +70,7 @@ constexpr size_t syncPktSz = sizeof(syncPkt) - 1; // Don't compare zero terminat
 //  the slipFrameMarker.
 //
 void proxyEspSync() {
-  if (!uartDownloadEnable) {
-    return;
-  }
+  if (!uartDownloadEnable) { return; }
 
   byte buf[pktBufSz];
 
@@ -90,7 +87,7 @@ void proxyEspSync() {
   }
 
   // Assume RX FIFO data is garbled and flush all RX data.
-  while (0 <= Serial.read()) {} // Clear FIFO
+  while (0 <= Serial.read()) {}  // Clear FIFO
 
   // If your Serial requirements need a specific timeout value, you would
   // restore those here.
@@ -111,8 +108,7 @@ void setup() {
   // stub, then both devices shift their UART speeds to the command line value.
   Serial.begin(115200);
 
-  Serial.println(F(
-                   "\r\n\r\n"
+  Serial.println(F("\r\n\r\n"
                    "Boot UART Download Demo - initialization started.\r\n"
                    "\r\n"
                    "For a quick test to see the UART Download work,\r\n"
@@ -143,20 +139,17 @@ void cmdLoop(Print& oStream, int key) {
       ESP.restart();
       break;
 
-    // ...
+      // ...
 
     case '?':
       oStream.println(F("\r\nHot key help:"));
-      if (!uartDownloadEnable) {
-        oStream.println(F("  e - Enable monitor for detecting ESP_SYNC from esptool.py"));
-      }
+      if (!uartDownloadEnable) { oStream.println(F("  e - Enable monitor for detecting ESP_SYNC from esptool.py")); }
       oStream.println(F("  D - Boot into UART download mode"));
       oStream.println(F("  R - Restart"));
       oStream.println(F("  ? - This help message\r\n"));
       break;
 
-    default:
-      break;
+    default: break;
   }
 
   oStream.println();
