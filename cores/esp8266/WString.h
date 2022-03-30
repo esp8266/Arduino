@@ -64,17 +64,52 @@ class String {
             sso.len     = 1;
             sso.isHeap  = 0;
         }
-        explicit String(unsigned char, unsigned char base = 10);
-        explicit String(int, unsigned char base = 10);
-        explicit String(unsigned int, unsigned char base = 10);
-        explicit String(long, unsigned char base = 10);
-        explicit String(unsigned long, unsigned char base = 10);
-        explicit String(long long /* base 10 */);
-        explicit String(long long, unsigned char base);
-        explicit String(unsigned long long /* base 10 */);
-        explicit String(unsigned long long, unsigned char base);
-        explicit String(float, unsigned char decimalPlaces = 2);
-        explicit String(double, unsigned char decimalPlaces = 2);
+
+        String(unsigned char, unsigned char base);
+        explicit String(unsigned char value) :
+            String(value, 10)
+        {}
+
+        String(int, unsigned char base);
+        explicit String(int value) :
+            String(value, 10)
+        {}
+
+        String(unsigned int, unsigned char base);
+        explicit String(unsigned int value) :
+            String(value, 10)
+        {}
+
+        String(long, unsigned char base);
+        explicit String(long value) :
+            String(value, 10)
+        {}
+
+        String(unsigned long, unsigned char base);
+        explicit String(unsigned long value) :
+            String(value, 10)
+        {}
+
+        String(long long, unsigned char base);
+        explicit String(long long value) :
+            String(value, 10)
+        {}
+
+        String(unsigned long long, unsigned char base);
+        explicit String(unsigned long long value) :
+            String(value, 10)
+        {}
+
+        String(float, unsigned char decimalPlaces);
+        explicit String(float value) :
+            String(value, 2)
+        {}
+
+        String(double, unsigned char decimalPlaces);
+        explicit String(double value) :
+            String(value, 2)
+        {}
+
         ~String() {
             invalidate();
         }
@@ -99,17 +134,52 @@ class String {
         String &operator =(String &&rval) noexcept;
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
-
         String &operator =(char c);
-        String &operator =(unsigned char c);
-        String &operator =(int num);
-        String &operator =(unsigned int num);
-        String &operator =(long num);
-        String &operator =(unsigned long num);
-        String &operator =(long long num);
-        String &operator =(unsigned long long num);
-        String &operator =(float num);
-        String &operator =(double num);
+
+        String &operator =(unsigned char value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(int value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(unsigned int value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(long value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(unsigned long value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(long long value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(unsigned long long value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(float value) {
+            *this = String(value);
+            return *this;
+        }
+
+        String &operator =(double value) {
+            *this = String(value);
+            return *this;
+        }
 
         // concatenate (works w/ built-in types, same as assignment)
 
@@ -120,8 +190,8 @@ class String {
         bool concat(const char *cstr);
         bool concat(const char *cstr, unsigned int length);
         bool concat(const __FlashStringHelper *str);
-
         bool concat(char c);
+
         bool concat(unsigned char c);
         bool concat(int num);
         bool concat(unsigned int num);
