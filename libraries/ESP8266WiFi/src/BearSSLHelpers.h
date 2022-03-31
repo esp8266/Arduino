@@ -26,6 +26,7 @@
 #include <bearssl/bearssl.h>
 #include <StackThunk.h>
 #include <Updater.h>
+#include <memory>
 
 // Internal opaque structures, not needed by user applications
 namespace brssl {
@@ -56,26 +57,8 @@ class PublicKey {
     const br_rsa_public_key *getRSA() const;
     const br_ec_public_key *getEC() const;
 
-    // Disable the copy constructor, we're pointer based
-    PublicKey(const PublicKey& that) = delete;
-
-    // Allow moves
-    PublicKey(PublicKey&& that) {
-        _key = that._key;
-        that._key = nullptr;
-    }
-
-    PublicKey& operator=(PublicKey&& that) {
-        if (this != &that) {
-            free(_key);
-            _key = that._key;
-            that._key = nullptr;
-        }
-        return *this;
-    }
-
   private:
-    brssl::public_key *_key;
+    std::shared_ptr<brssl::public_key> _key = nullptr;
 };
 
 // Holds either a single private RSA or EC key for use when BearSSL wants a secretkey.
@@ -99,26 +82,8 @@ class PrivateKey {
     const br_rsa_private_key *getRSA() const;
     const br_ec_private_key *getEC() const;
 
-    // Disable the copy constructor, we're pointer based
-    PrivateKey(const PrivateKey& that) = delete;
-
-    // Allow moves
-    PrivateKey(PrivateKey&& that) {
-        _key = that._key;
-        that._key = nullptr;
-    }
-
-    PrivateKey& operator=(PrivateKey&& that) {
-        if (this != &that) {
-            free(_key);
-            _key = that._key;
-            that._key = nullptr;
-        }
-        return *this;
-    }
-
   private:
-    brssl::private_key *_key;
+    std::shared_ptr<brssl::private_key> _key = nullptr;
 };
 
 // Holds one or more X.509 certificates and associated trust anchors for
@@ -144,43 +109,29 @@ class X509List {
       return _count;
     }
     const br_x509_certificate *getX509Certs() const {
-      return _cert;
+      return _cert.get();
     }
     const br_x509_trust_anchor *getTrustAnchors() const {
-      return _ta;
+      return _ta.get();
     }
 
-    // Disable the copy constructor, we're pointer based
-    X509List(const X509List& that) = delete;
-
-    // Allow moves
-    X509List(X509List&& that) {
-        _count = that._count;
-        _cert = that._cert;
-        _ta = that._ta;
-        that._count = 0;
-        that._cert = nullptr;
-        that._ta = nullptr;
-    }
-
+    // Enable move with the unique_ptr members
     X509List& operator=(X509List&& that) {
-        if (this != &that) {
-            free(_cert);
-            free(_ta);
-            _count = that._count;
-            _cert = that._cert;
-            _ta = that._ta;
-            that._count = 0;
-            that._cert = nullptr;
-            that._ta = nullptr;
-        }
-        return *this;
+      if (this != &that) {
+        _count = that._count;
+        _cert.reset(that._cert.get());
+        _ta.reset(that._ta.get());
+        that._count = 0;
+        that._cert.release();
+        that._ta.release();
+      }
+      return *this;
     }
 
   private:
-    size_t _count;
-    br_x509_certificate *_cert;
-    br_x509_trust_anchor *_ta;
+    size_t _count = 0;
+    std::unique_ptr<br_x509_certificate> _cert = nullptr;
+    std::unique_ptr<br_x509_trust_anchor> _ta = nullptr;
 };
 
 // Opaque object which wraps the BearSSL SSL session to make repeated connections
@@ -224,32 +175,6 @@ class ServerSessions {
     // Returns the number of sessions the cache can hold.
     uint32_t size() { return _size; }
 
-    // Disable the copy constructor, we're pointer based
-    ServerSessions(const ServerSessions& that) = delete;
-
-    // Allow moves
-    ServerSessions(ServerSessions&& that) {
-        _size = that._size;
-        _store = that._store;
-        _isDynamic = that._isDynamic;
-        _cache = that._cache;
-        that._size = 0;
-        that._store = nullptr;
-    }
-
-    ServerSessions& operator=(ServerSessions&& that) {
-        if (this != &that) {
-            free(_store);
-            _size = that._size;
-            _store = that._store;
-            _isDynamic = that._isDynamic;
-            _cache = that._cache;
-            that._size = 0;
-            that._store = nullptr;
-        }
-        return *this;
-    }
-
   private:
     ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic);
 
@@ -257,9 +182,9 @@ class ServerSessions {
     const br_ssl_session_cache_class **getCache();
 
     // Size of the store in sessions.
-    uint32_t _size;
+    uint32_t _size = 0;
     // Store where the information for the sessions are stored.
-    ServerSession *_store;
+    std::unique_ptr<ServerSession> _store = nullptr;
     // Whether the store is dynamically allocated.
     // If this is true, the store needs to be freed in the destructor.
     bool _isDynamic;
@@ -288,29 +213,17 @@ class SigningVerifier : public UpdaterVerifyClass {
     virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
 
   public:
-    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; stack_thunk_add_ref(); }
-    ~SigningVerifier() { stack_thunk_del_ref(); }
-
-    // Disable the copy constructor, we're pointer based
-    SigningVerifier(const SigningVerifier& that) = delete;
-
-    // Allow moves
-    SigningVerifier(SigningVerifier&& that) {
-        _pubKey = that._pubKey;
-        that._pubKey = nullptr;
+    SigningVerifier(PublicKey *pubKey) {
+      std::shared_ptr<PublicKey> newKey (pubKey);
+      _pubKey = newKey;
+      stack_thunk_add_ref();
     }
-
-    SigningVerifier& operator=(SigningVerifier&& that) {
-        if (this != &that) {
-            free(_pubKey);
-            _pubKey = that._pubKey;
-            that._pubKey = nullptr;
-        }
-        return *this;
+    ~SigningVerifier() {
+      stack_thunk_del_ref();
     }
 
   private:
-    PublicKey *_pubKey;
+    std::shared_ptr<PublicKey> _pubKey = nullptr;
 };
 
 // Stack thunked versions of calls

@@ -651,21 +651,17 @@ namespace BearSSL {
 // ----- Public Key -----
 
 PublicKey::PublicKey() {
-  _key = nullptr;
 }
 
 PublicKey::PublicKey(const char *pemKey) {
-  _key = nullptr;
   parse(pemKey);
 }
 
 PublicKey::PublicKey(const uint8_t *derKey, size_t derLen) {
-  _key = nullptr;
   parse(derKey, derLen);
 }
 
 PublicKey::PublicKey(Stream &stream, size_t size) {
-  _key = nullptr;
   auto buff = brssl::loadStream(stream, size);
   if (buff) {
     parse(buff, size);
@@ -674,9 +670,6 @@ PublicKey::PublicKey(Stream &stream, size_t size) {
 }
 
 PublicKey::~PublicKey() {
-  if (_key) {
-    brssl::free_public_key(_key);
-  }
 }
 
 bool PublicKey::parse(const char *pemKey) {
@@ -684,11 +677,8 @@ bool PublicKey::parse(const char *pemKey) {
 }
 
 bool PublicKey::parse(const uint8_t *derKey, size_t derLen) {
-  if (_key) {
-    brssl::free_public_key(_key);
-    _key = nullptr;
-  }
-  _key = brssl::read_public_key((const char *)derKey, derLen);
+  std::shared_ptr<brssl::public_key> parsed (brssl::read_public_key((const char *)derKey, derLen), [](brssl::public_key *v){ brssl::free_public_key(v); } );
+  _key = parsed;
   return _key ? true : false;
 }
 
@@ -723,21 +713,17 @@ const br_ec_public_key *PublicKey::getEC() const {
 // ----- Private Key -----
 
 PrivateKey::PrivateKey() {
-  _key = nullptr;
 }
 
 PrivateKey::PrivateKey(const char *pemKey) {
-  _key = nullptr;
   parse(pemKey);
 }
 
 PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen) {
-  _key = nullptr;
   parse(derKey, derLen);
 }
 
 PrivateKey::PrivateKey(Stream &stream, size_t size) {
-  _key = nullptr;
   auto buff = brssl::loadStream(stream, size);
   if (buff) {
     parse(buff, size);
@@ -746,9 +732,6 @@ PrivateKey::PrivateKey(Stream &stream, size_t size) {
 }
 
 PrivateKey::~PrivateKey() {
-  if (_key) {
-    brssl::free_private_key(_key);
-  }
 }
 
 bool PrivateKey::parse(const char *pemKey) {
@@ -756,11 +739,8 @@ bool PrivateKey::parse(const char *pemKey) {
 }
 
 bool PrivateKey::parse(const uint8_t *derKey, size_t derLen) {
-  if (_key) {
-    brssl::free_private_key(_key);
-    _key = nullptr;
-  }
-  _key = brssl::read_private_key((const char *)derKey, derLen);
+  std::shared_ptr<brssl::private_key> parsed (brssl::read_private_key((const char *)derKey, derLen), [](brssl::private_key *v){ brssl::free_private_key(v); } );
+  _key = parsed;
   return _key ? true : false;
 }
 
@@ -795,30 +775,18 @@ const br_ec_private_key *PrivateKey::getEC() const {
 // ----- Certificate Lists -----
 
 X509List::X509List() {
-  _count = 0;
-  _cert = nullptr;
-  _ta = nullptr;
 }
 
 X509List::X509List(const char *pemCert) {
-  _count = 0;
-  _cert = nullptr;
-  _ta = nullptr;
   append(pemCert);
 }
 
 
 X509List::X509List(const uint8_t *derCert, size_t derLen) {
-  _count = 0;
-  _cert = nullptr;
-  _ta = nullptr;
   append(derCert, derLen);
 }
 
 X509List::X509List(Stream &stream, size_t size) {
-  _count = 0;
-  _cert = nullptr;
-  _ta = nullptr;
   auto buff = brssl::loadStream(stream, size);
   if (buff) {
     append(buff, size);
@@ -827,11 +795,13 @@ X509List::X509List(Stream &stream, size_t size) {
 }
 
 X509List::~X509List() {
-  brssl::free_certificates(_cert, _count); // also frees cert
+  brssl::free_certificates(_cert.get(), _count); // also frees cert
   for (size_t i = 0; i < _count; i++) {
-    brssl::free_ta_contents(&_ta[i]);
+    brssl::free_ta_contents(&_ta.get()[i]);
   }
-  free(_ta);
+  free(_ta.get());
+  _cert.release();
+  _ta.release();
 }
 
 bool X509List::append(const char *pemCert) {
@@ -846,47 +816,48 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   }
 
   // Add in the certificates
-  br_x509_certificate *saveCert = _cert;
-  _cert = (br_x509_certificate*)realloc(_cert, (numCerts + _count) * sizeof(br_x509_certificate));
-  if (!_cert) {
+  auto newCert = (br_x509_certificate*)realloc(_cert.get(), (numCerts + _count) * sizeof(br_x509_certificate));
+  if (!newCert) {
     free(newCerts);
-    _cert = saveCert;
     return false;
   }
-  memcpy(&_cert[_count], newCerts, numCerts * sizeof(br_x509_certificate));
+  memcpy(&newCert[_count], newCerts, numCerts * sizeof(br_x509_certificate));
   free(newCerts);
+  _cert.release();
+  _cert.reset(newCert);
 
   // Build TAs for each certificate
-  br_x509_trust_anchor *saveTa = _ta;
-  _ta = (br_x509_trust_anchor*)realloc(_ta, (numCerts + _count) * sizeof(br_x509_trust_anchor));
-  if (!_ta) {
-    _ta = saveTa;
+  auto newTa = (br_x509_trust_anchor*)realloc(_ta.get(), (numCerts + _count) * sizeof(br_x509_trust_anchor));
+  if (!newTa) {
     return false;
   }
   for (size_t i = 0; i < numCerts; i++) {
-    br_x509_trust_anchor *newTa = brssl::certificate_to_trust_anchor(&_cert[_count + i]);
+    br_x509_trust_anchor *aTa = brssl::certificate_to_trust_anchor(&_cert.get()[_count + i]);
     if (newTa) {
-      _ta[_count + i ] = *newTa;
-      free(newTa);
+      newTa[_count + i ] = *aTa;
+      free(aTa);
     } else {
       return false; // OOM
     }
   }
+  _ta.release();
+  _ta.reset(newTa);
   _count += numCerts;
 
   return true;
 }
 
 ServerSessions::~ServerSessions() {
-  if (_isDynamic && _store != nullptr)
-    delete _store;
+  if (!_isDynamic) {
+    _store.release();
+  }
 }
 
 ServerSessions::ServerSessions(ServerSession *sessions, uint32_t size, bool isDynamic) :
   _size(sessions != nullptr ? size : 0),
   _store(sessions), _isDynamic(isDynamic) {
     if (_size > 0)
-      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store, size * sizeof(ServerSession));
+      br_ssl_session_cache_lru_init(&_cache, (uint8_t*)_store.get(), size * sizeof(ServerSession));
 }
 
 const br_ssl_session_cache_class **ServerSessions::getCache() {
@@ -961,9 +932,9 @@ extern "C" bool thunk_SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClas
 bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
 #if !CORE_MOCK
-    return thunk_SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+    return thunk_SigningVerifier_verify(_pubKey.get(), hash, signature, signatureLen);
 #else
-    return SigningVerifier_verify(_pubKey, hash, signature, signatureLen);
+    return SigningVerifier_verify(_pubKey.get(), hash, signature, signatureLen);
 #endif
 }
 
