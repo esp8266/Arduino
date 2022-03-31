@@ -23,7 +23,7 @@ void setup() {
   Serial.println("ERROR:  MYTITLE1 not present");
 #endif
 
-#if defined(UMM_STATS_FULL) && !defined(CORE_MOCK)
+#if defined(UMM_STATS_FULL) && !defined(HOST_MOCK)
   Serial.printf("Heap Low Watermark %u\r\n", umm_free_heap_size_min());
 #endif
 }
