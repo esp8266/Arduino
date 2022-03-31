@@ -722,7 +722,7 @@ def main():
     print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
 
     if args.ci:
-        # Requires CommonHFile to never be checked in.
+        # Requires CommonHFile.h to never be checked in.
         if os.path.exists(commonhfile_fqfn):
             first_time = False
         else:
