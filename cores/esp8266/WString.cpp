@@ -49,8 +49,7 @@ static String toString(int value, unsigned char base) {
 
     char buf[2 + 8 * sizeof(int)];
     if (base == 10) {
-        sprintf(buf, "%d", value);
-        out = buf;
+        out.concat(buf, sprintf(buf, "%d", value));
     } else {
         out = itoa(value, buf, base);
     }
@@ -72,8 +71,7 @@ static String toString(long value, unsigned char base) {
 
     char buf[2 + 8 * sizeof(long)];
     if (base == 10) {
-        sprintf(buf, "%ld", value);
-        out = buf;
+        out.concat(buf, sprintf(buf, "%ld", value));
     } else {
         out = ltoa(value, buf, base);
     }
@@ -97,8 +95,7 @@ static String toString(long long value, unsigned char base) {
 
     char buf[2 + 8 * sizeof(long long)];
     if (base == 10) {
-        sprintf(buf, "%lld", value);
-        out = buf;
+        out.concat(buf, sprintf(buf, "%lld", value));
     } else {
         out = lltoa(value, buf, sizeof(buf), base);
     }
@@ -111,8 +108,7 @@ static String toString(unsigned long long value, unsigned char base) {
 
     char buf[1 + 8 * sizeof(unsigned long long)];
     if (base == 10) {
-        sprintf(buf, "%llu", value);
-        out = buf;
+        out.concat(buf, sprintf(buf, "%llu", value));
     } else {
         out = ulltoa(value, buf, sizeof(buf), base);
     }
