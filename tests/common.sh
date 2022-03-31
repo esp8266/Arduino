@@ -54,9 +54,9 @@ function build_sketches()
     local arduino=$1
     local srcpath=$2
     local build_arg=$3
-    local build_dir=build.tmp
     local build_mod=$4
     local build_rem=$5
+    local build_dir=build.tmp.$build_rem.$build_mod
     local lwip=$6
     mkdir -p $build_dir
     local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p ./$build_dir -n $lwip $build_arg "

@@ -276,11 +276,13 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
         if os.path.exists(build_target_fqfn) and \
         os.path.getmtime(build_target_fqfn) >= os.path.getmtime(source_fqfn):
             # only copy newer files - do nothing, all is good
+            print_dbg(f"up to date os.path.exists({source_fqfn}) ")
             return False
         else:
             # The new copy gets stamped with the current time, just as other
             # files copied by `arduino-builder`.
             copyfile(source_fqfn, build_target_fqfn)
+            print_dbg(f"copyfile({source_fqfn}, {build_target_fqfn})")
     else:
         if os.path.exists(build_target_fqfn) and \
         os.path.getsize(build_target_fqfn) == 0:
