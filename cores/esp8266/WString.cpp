@@ -39,8 +39,7 @@ static String toString(unsigned char value, unsigned char base) {
     String out;
 
     char buf[1 + 8 * sizeof(unsigned char)];
-    utoa(value, buf, base);
-    out = buf;
+    out = utoa(value, buf, base);
 
     return out;
 }
@@ -51,10 +50,10 @@ static String toString(int value, unsigned char base) {
     char buf[2 + 8 * sizeof(int)];
     if (base == 10) {
         sprintf(buf, "%d", value);
+        out = buf;
     } else {
-        itoa(value, buf, base);
+        out = itoa(value, buf, base);
     }
-    out = buf;
 
     return out;
 }
@@ -63,8 +62,7 @@ static String toString(unsigned int value, unsigned char base) {
     String out;
 
     char buf[1 + 8 * sizeof(unsigned int)];
-    utoa(value, buf, base);
-    out = buf;
+    out = utoa(value, buf, base);
 
     return out;
 }
@@ -75,10 +73,10 @@ static String toString(long value, unsigned char base) {
     char buf[2 + 8 * sizeof(long)];
     if (base == 10) {
         sprintf(buf, "%ld", value);
+        out = buf;
     } else {
-        ltoa(value, buf, base);
+        out = ltoa(value, buf, base);
     }
-    out = buf;
 
     return out;
 }
@@ -87,8 +85,7 @@ static String toString(unsigned long value, unsigned char base) {
     String out;
 
     char buf[1 + 8 * sizeof(unsigned long)];
-    ultoa(value, buf, base);
-    out = buf;
+    out = ultoa(value, buf, base);
 
     return out;
 }
