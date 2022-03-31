@@ -679,6 +679,7 @@ def parse_args():
     parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
     parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
     parser.add_argument('--debug', action='store_true', required=False, default=False)
+    parser.add_argument('--ci', action='store_true', required=False, default=False)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
     group.add_argument('--no_cache_core', dest='cache_core', action='store_false', help='Assume a "compiler.cache_core" value of false')
@@ -720,9 +721,16 @@ def main():
     print_dbg(f"build_path_core:        {build_path_core}")
     print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
 
-    first_time = discover_1st_time_run(build_path)
-    if first_time:
-        print_dbg("First run since Arduino IDE started.")
+    if args.ci:
+        # Requires CommonHFile to never be checked in.
+        if os.path.exists(commonhfile_fqfn):
+            first_time = False
+        else:
+            first_time = True
+    else:
+        first_time = discover_1st_time_run(build_path)
+        if first_time:
+            print_dbg("First run since Arduino IDE started.")
 
     use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
     if use_aggressive_caching_workaround == None:

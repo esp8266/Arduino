@@ -14,17 +14,17 @@
 #include <umm_malloc/umm_malloc.h>  // has prototype for umm_free_heap_size_min()
 
 void setup() {
-   Serial.begin(115200);
-   delay(200);
+  Serial.begin(115200);
+  delay(200);
 
 #ifdef MYTITLE1
-   Serial.printf("\r\n" MYTITLE1 MYTITLE2 "\r\n");
+  Serial.printf("\r\n" MYTITLE1 MYTITLE2 "\r\n");
 #else
-   Serial.println("ERROR:  MYTITLE1 not present");
+  Serial.println("ERROR:  MYTITLE1 not present");
 #endif
 
 #ifdef UMM_STATS_FULL
-   Serial.printf("Heap Low Watermark %u\r\n", umm_free_heap_size_min());
+  Serial.printf("Heap Low Watermark %u\r\n", umm_free_heap_size_min());
 #endif
 }
 

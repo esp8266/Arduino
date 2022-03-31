@@ -57,9 +57,11 @@ function build_sketches()
     local build_mod=$4
     local build_rem=$5
     local build_dir=build.tmp.$build_rem.$build_mod
+    local lcache_dir=$cache_dir/vm$build_rem.$build_mod
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p ./$build_dir -n $lwip $build_arg "
+    mkdir -p $lcache_dir
+    local build_cmd="python3 tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $lcache_dir -p ./$build_dir -n $lwip $build_arg "
     if [ "$WINDOWS" = "1" ]; then
         # Paths to the arduino builder need to be / referenced, not our native ones
         build_cmd=$(echo $build_cmd --ide_path $arduino | sed 's/ \/c\// \//g' ) # replace '/c/' with '/'
@@ -74,14 +76,14 @@ function build_sketches()
             continue  # Not ours to do
         fi
 
-        if [ -e $cache_dir/core/*.a ]; then
+        if [ -e $lcache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
             # with this sketch's ino file, or builder will throw everything away.
             jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json > $build_dir/build.options.json.tmp
             mv $build_dir/build.options.json.tmp $build_dir/build.options.json
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
-            touch -d 'now + 1 day' $cache_dir/core/*.a
+            touch -d 'now + 1 day' $lcache_dir/core/*.a
         fi
 
         # Clear out the last built sketch, map, elf, bin files, but leave the compiled
@@ -197,7 +199,7 @@ function install_ide()
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
     echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
     echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
-    echo "mkbuildoptglobals.extra_flags=--debug --cache_core" >> esp8266/platform.local.txt
+    echo "mkbuildoptglobals.extra_flags=--debug --ci --cache_core" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
