@@ -67,11 +67,33 @@ function build_sketches()
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
+    local k_partial_core_cleanup=("build.opt" "*.ino.globals.h")
+    local mk_clean_core=1
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
         if [ $testcnt -ne $build_rem ]; then
             continue  # Not ours to do
+        fi
+
+        # mkbuildoptglobals.py is optimized around the Arduino IDE 1.x
+        # behaviour. One way the CI differs from the Arduino IDE is in the
+        # handling of core and caching core. With the Arduino IDE, each sketch
+        # has a private copy of core and contributes to a core cache. With the
+        # CI, there is one shared copy of core for all sketches. When global
+        # options are used, the shared copy of core and cache are removed before
+        # and after the build.
+        #
+        # Do we need a clean core build? $build_dir/core/* cannot be shared
+        # between sketches when global options are present.
+        if [ -s ${sketch}.globals.h ]; then
+            mk_clean_core=1
+        fi
+        if [ $mk_clean_core -ne 0 ]; then
+            rm -rf rm $build_dir/core/*
+        else
+            # Remove sketch specific files from ./core/ between builds.
+            rm -rf $build_dir/core/build.opt $build_dir/core/*.ino.globals.h
         fi
 
         if [ -e $cache_dir/core/*.a ]; then
@@ -82,6 +104,17 @@ function build_sketches()
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
             touch -d 'now + 1 day' $cache_dir/core/*.a
+            if [ $mk_clean_core -ne 0 ]; then
+                # Hack workaround for CI not handling core rebuild for global options
+                rm $cache_dir/core/*.a
+            fi
+        fi
+
+        if [ -s ${sketch}.globals.h ]; then
+            # Set to cleanup core at the start of the next build.
+            mk_clean_core=1
+        else
+            mk_clean_core=0
         fi
 
         # Clear out the last built sketch, map, elf, bin files, but leave the compiled
