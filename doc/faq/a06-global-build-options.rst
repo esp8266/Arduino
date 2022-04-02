@@ -89,7 +89,7 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
    #endif
 
-Aggressively Cache Compiled core
+Aggressively cache compiled core
 ================================
 
 This feature appeared with the release of Arduino IDE 1.8.2. The feature
@@ -189,7 +189,7 @@ These two command-line options are the problem:
    ./arduino --preferences-file other-preferences.txt
    ./arduino --pref compiler.cache_core=false
 
-Hints for discovering the value of ``compiler.cache_core`` use can be
+Hints for discovering the value of ``compiler.cache_core``, can be
 provided by specifying ``mkbuildoptglobals.extra_flags=...`` in
 ``platform.local.txt``.
 
@@ -217,6 +217,20 @@ to enable.
 At the time of this writing, when Arduino IDE 2.0 rc5 exits, it leaves
 the temp space dirty. This keeps the workaround active the next time the
 IDE is started. If this is an issue, manually delete the temp files.
+
+Custom build environments
+=========================
+
+Some custom build environments may have already addressed this issue by
+other means. If you have a custom build environment that does not
+require this feature and would like to turn it off, you can add the
+following lines to the ``platform.local.txt`` used in your build
+environment:
+
+::
+
+   recipe.hooks.prebuild.2.pattern=
+   build.opt.flags=
 
 Other build confusion
 =====================
