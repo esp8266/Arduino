@@ -611,3 +611,92 @@ TEST_CASE("String concat OOB #8198", "[core][String]")
     REQUIRE(!strcmp(s.c_str(), "abcdxxxxxxxxxxxxxxxx"));
     free(p);
 }
+
+TEST_CASE("String operator =(value) #8430", "[core][String]")
+{
+    // just like String(char), replace the string with a single char
+    {
+        String str { "123456789" };
+        str = '\n';
+        REQUIRE(str.length() == 1);
+        REQUIRE(str[0] == '\n');
+    }
+
+    // just like String(..., 10) where ... is a numeric type
+    // (base10 implicitly, since we don't expect an operator call with a 2nd argument)
+    {
+        String str { "99u3pokaposdas" };
+        str = static_cast<unsigned char>(123);
+        REQUIRE(str.length() == 3);
+        REQUIRE(str == "123");
+    }
+
+    {
+        String str { "adaj019j310923" };
+
+        unsigned int a { 8712373 };
+        str = a;
+        REQUIRE(str.length() == 7);
+        REQUIRE(str == "8712373");
+
+        unsigned long b { 4231235 };
+        str = b;
+        REQUIRE(str.length() == 7);
+        REQUIRE(str == "4231235");
+    }
+
+    {
+        String str { "123123124" };
+
+        int a { 123456 };
+        str = a;
+        REQUIRE(str.length() == 6);
+        REQUIRE(str == "123456");
+
+        long b { 7654321 };
+        str = b;
+        REQUIRE(str.length() == 7);
+        REQUIRE(str == "7654321");
+    }
+
+    {
+        String str { "adaj019j310923" };
+
+        long long a { 1234567890123456 };
+        str = a;
+        REQUIRE(str.length() == 16);
+        REQUIRE(str == "1234567890123456");
+    }
+
+    {
+        String str { "lkojqwlekmas" };
+
+        unsigned long long a { 851238718912 };
+        str = a;
+        REQUIRE(str.length() == 12);
+        REQUIRE(str == "851238718912");
+    }
+
+    // floating-point are specifically base10
+    // expected to work like String(..., 2)
+    //
+    // may not be the best idea though, due to the dtostrf implementation
+    // and it's rounding logic may change at any point
+    {
+        String str { "qaje09`sjdsas" };
+
+        float a { 5.123 };
+        str = a;
+        REQUIRE(str.length() == 4);
+        REQUIRE(str == "5.12");
+    }
+
+    {
+        String str { "9u1omasldmas" };
+
+        double a { 123.45 };
+        str = a;
+        REQUIRE(str.length() == 6);
+        REQUIRE(str == "123.45");
+    }
+}
