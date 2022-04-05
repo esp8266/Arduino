@@ -84,6 +84,19 @@ extern uint32_t UMM_MALLOC_CFG_HEAP_SIZE;
  * CRT0 init.
  */
 
+#if 0 // Must be zero at release
+#warning "Macro NON_NULL_CONTEXT_ASSERT() is active!"
+/*
+ * Keep for future debug/maintenance of umm_malloc. Not needed in a
+ * regular/debug build. Call paths that use NON_NULL_CONTEXT_ASSERT logically
+ * guard against returning NULL. This macro double-checks that assumption during
+ * development.
+ */
+#define NON_NULL_CONTEXT_ASSERT() assert((NULL != _context))
+#else
+#define NON_NULL_CONTEXT_ASSERT() (void)0
+#endif
+
 #include "umm_local.h"      // target-dependent supplemental
 
 /* ------------------------------------------------------------------------- */
@@ -213,21 +226,41 @@ int umm_get_heap_stack_index(void) {
  * realloc or free since you may not be in the right heap to handle it.
  *
  */
-static bool test_ptr_context(size_t which, void *ptr) {
+static bool test_ptr_context(const size_t which, const void *const ptr) {
     return
         heap_context[which].heap &&
         ptr >= (void *)heap_context[which].heap &&
         ptr < heap_context[which].heap_end;
 }
 
-static umm_heap_context_t *umm_get_ptr_context(void *ptr) {
+/*
+ * Find Heap context by allocation address - may return NULL
+ */
+umm_heap_context_t *_umm_get_ptr_context(const void *const ptr) {
     for (size_t i = 0; i < UMM_NUM_HEAPS; i++) {
         if (test_ptr_context(i, ptr)) {
             return umm_get_heap_by_id(i);
         }
     }
 
-    panic();
+    return NULL;
+}
+
+/*
+ * Find Heap context by allocation address - must either succeed or abort
+ */
+static umm_heap_context_t *umm_get_ptr_context(const void *const ptr) {
+    umm_heap_context_t *const _context = _umm_get_ptr_context(ptr);
+    if (_context) {
+        return _context;
+    }
+
+    [[maybe_unused]] uintptr_t sketch_ptr = (uintptr_t)ptr;
+    #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+    sketch_ptr += sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
+    #endif
+    DBGLOG_ERROR("\nPointer %p is not a Heap address.\n", (void *)sketch_ptr);
+    abort();
     return NULL;
 }
 
@@ -579,10 +612,7 @@ static void umm_free_core(umm_heap_context_t *_context, void *ptr) {
 
     uint16_t c;
 
-    if (NULL == _context) {
-        panic();
-        return;
-    }
+    NON_NULL_CONTEXT_ASSERT();
 
     STATS__FREE_REQUEST(id_free);
     /*
@@ -672,12 +702,9 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size) {
 
     uint16_t cf;
 
-    STATS__ALLOC_REQUEST(id_malloc, size);
+    NON_NULL_CONTEXT_ASSERT();
 
-    if (NULL == _context) {
-        panic();
-        return NULL;
-    }
+    STATS__ALLOC_REQUEST(id_malloc, size);
 
     blocks = umm_blocks(size);
 
@@ -925,10 +952,7 @@ void *umm_realloc(void *ptr, size_t size) {
 
     /* Need to be in the heap in which this block lives */
     umm_heap_context_t *_context = umm_get_ptr_context(ptr);
-    if (NULL == _context) {
-        panic();
-        return NULL;
-    }
+    NON_NULL_CONTEXT_ASSERT();
 
     if (0 == size) {
         DBGLOG_DEBUG("realloc to 0 size, just free the block\n");

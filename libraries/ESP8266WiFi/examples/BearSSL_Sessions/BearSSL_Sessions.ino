@@ -1,5 +1,12 @@
 // Example of using SSL sessions to speed up SSL connection initiation
 //
+// Note that sessions are a function of individual HTTPS servers, so if you
+// are connecting to a service through a load abalncer (i.e. Azure, AWS, GitHub)
+// two connections to the same IP address will generally connect to two
+// different web servers, meaning that sessions won't work.  If you are
+// connecting to a single server not behind a load balancer/etc., however,
+// there should be a significant speedup.
+//
 // September 2018 by Earle F. Philhower, III
 // Released to the public domain
 
@@ -94,12 +101,14 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
 void loop() {
   uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
+  BearSSL::X509List cert(certForum);
+  const char *host = "esp8266.com";
+  const int port = 443;
 
   Serial.printf("Connecting without sessions...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
@@ -108,21 +117,21 @@ void loop() {
   Serial.printf("Connecting with an uninitialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting with the just initialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting again with the initialized session...");
   start = millis();
   client.setTrustAnchors(&cert);
-  fetchURL(&client, github_host, github_port, path);
+  fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
