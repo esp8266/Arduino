@@ -12,23 +12,13 @@ RANLIB ?= ranlib
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
-define find_tool
-	$(shell for name in $(@); do which $$name > /dev/null && { echo $$name; break; } done)
-endef
+# Prefer named GCC (and, specifically, GCC10), same as platform.txt / platformio_build.py
+find_tool = $(shell for name in $(1) $(2); do which $$name && break; done 2>/dev/null)
+CXX  = $(call find_tool,g++-10,g++)
+CC   = $(call find_tool,gcc-10,gcc)
+GCOV = $(call find_tool,gcov-10,gcov)
 
-# I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
-ifeq ($(shell uname -s),Darwin)
-CC   ?= gcc
-CXX  ?= g++
-GCOV ?= gcov
-else
-# Prefer GCC10, same as platform.txt / platformio_build.py
-CXX  ?= $(find_tool g++-10 g++)
-CC   ?= $(find_tool gcc-10 gcc)
-GCOV ?= $(find_tool gcov-10 gcov)
-endif
-
-$(warning using $(CXX))
+$(warning using $(CXX) and $(CC))
 
 GCOV     ?= gcov
 VALGRIND ?= valgrind
