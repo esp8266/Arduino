@@ -58,6 +58,7 @@ class PublicKey {
 
     // Disable the copy constructor, we're pointer based
     PublicKey(const PublicKey& that) = delete;
+    PublicKey& operator=(const PublicKey& that) = delete;
 
   private:
     brssl::public_key *_key;
@@ -86,6 +87,7 @@ class PrivateKey {
 
     // Disable the copy constructor, we're pointer based
     PrivateKey(const PrivateKey& that) = delete;
+    PrivateKey& operator=(const PrivateKey& that) = delete;
 
   private:
     brssl::private_key *_key;
@@ -122,6 +124,7 @@ class X509List {
 
     // Disable the copy constructor, we're pointer based
     X509List(const X509List& that) = delete;
+    X509List& operator=(const X509List& that) = delete;
 
   private:
     size_t _count;
