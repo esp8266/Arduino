@@ -58,6 +58,7 @@ class String {
         String(const String &str);
         String(const __FlashStringHelper *str);
         String(String &&rval) noexcept;
+
         explicit String(char c) {
             sso.buff[0] = c;
             sso.buff[1] = 0;

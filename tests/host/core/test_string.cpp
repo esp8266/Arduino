@@ -13,11 +13,13 @@
  all copies or substantial portions of the Software.
  */
 
-#include <catch.hpp>
-#include <string.h>
-#include <WString.h>
-#include <limits.h>
+#include <ArduinoCatch.hpp>
 #include <StreamString.h>
+
+#include <string>
+#include <cstring>
+#include <limits>
+#include <climits>
 
 TEST_CASE("String::move", "[core][String]")
 {
@@ -117,8 +119,10 @@ TEST_CASE("String concantenation", "[core][String]")
     str += "bcde";
     str += str;
     str += 987;
-    str += (int)INT_MAX;
-    str += (int)INT_MIN;
+    REQUIRE(str == "abcdeabcde987");
+    str += std::numeric_limits<int>::max();
+    REQUIRE(str == "abcdeabcde9872147483647");
+    str += std::numeric_limits<int>::min();
     REQUIRE(str == "abcdeabcde9872147483647-2147483648");
     str += (unsigned char)69;
     REQUIRE(str == "abcdeabcde9872147483647-214748364869");

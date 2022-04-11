@@ -25,6 +25,8 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#include <limits>
+
 #define OOM_STRING_BORDER_DISPLAY           10
 #define OOM_STRING_THRESHOLD_REALLOC_WARN  128
 
@@ -38,7 +40,7 @@
 static String toString(unsigned char value, unsigned char base) {
     String out;
 
-    char buf[1 + 8 * sizeof(unsigned char)];
+    char buf[1 + std::numeric_limits<unsigned char>::digits];
     out = utoa(value, buf, base);
 
     return out;
@@ -47,12 +49,8 @@ static String toString(unsigned char value, unsigned char base) {
 static String toString(int value, unsigned char base) {
     String out;
 
-    char buf[2 + 8 * sizeof(int)];
-    if (base == 10) {
-        out.concat(buf, sprintf(buf, "%d", value));
-    } else {
-        out = itoa(value, buf, base);
-    }
+    char buf[2 + std::numeric_limits<int>::digits];
+    out = itoa(value, buf, base);
 
     return out;
 }
@@ -60,7 +58,7 @@ static String toString(int value, unsigned char base) {
 static String toString(unsigned int value, unsigned char base) {
     String out;
 
-    char buf[1 + 8 * sizeof(unsigned int)];
+    char buf[1 + std::numeric_limits<unsigned int>::digits];
     out = utoa(value, buf, base);
 
     return out;
@@ -69,12 +67,8 @@ static String toString(unsigned int value, unsigned char base) {
 static String toString(long value, unsigned char base) {
     String out;
 
-    char buf[2 + 8 * sizeof(long)];
-    if (base == 10) {
-        out.concat(buf, sprintf(buf, "%ld", value));
-    } else {
-        out = ltoa(value, buf, base);
-    }
+    char buf[2 + std::numeric_limits<long>::digits];
+    out = ltoa(value, buf, base);
 
     return out;
 }
@@ -82,7 +76,7 @@ static String toString(long value, unsigned char base) {
 static String toString(unsigned long value, unsigned char base) {
     String out;
 
-    char buf[1 + 8 * sizeof(unsigned long)];
+    char buf[1 + std::numeric_limits<unsigned long>::digits];
     out = ultoa(value, buf, base);
 
     return out;
@@ -93,12 +87,8 @@ static String toString(unsigned long value, unsigned char base) {
 static String toString(long long value, unsigned char base) {
     String out;
 
-    char buf[2 + 8 * sizeof(long long)];
-    if (base == 10) {
-        out.concat(buf, sprintf(buf, "%lld", value));
-    } else {
-        out = lltoa(value, buf, sizeof(buf), base);
-    }
+    char buf[2 + std::numeric_limits<long long>::digits];
+    out = lltoa(value, buf, sizeof(buf), base);
 
     return out;
 }
@@ -106,21 +96,8 @@ static String toString(long long value, unsigned char base) {
 static String toString(unsigned long long value, unsigned char base) {
     String out;
 
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    if (base == 10) {
-        out.concat(buf, sprintf(buf, "%llu", value));
-    } else {
-        out = ulltoa(value, buf, sizeof(buf), base);
-    }
-
-    return out;
-}
-
-static String toString(float value, unsigned char decimalPlaces) {
-    String out;
-
-    char buf[33];
-    out = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+    char buf[1 + std::numeric_limits<unsigned long long>::digits];
+    out = ulltoa(value, buf, sizeof(buf), base);
 
     return out;
 }
@@ -132,6 +109,10 @@ static String toString(double value, unsigned char decimalPlaces) {
     out = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
 
     return out;
+}
+
+static String toString(float value, unsigned char decimalPlaces) {
+    return toString(static_cast<double>(value), decimalPlaces);
 }
 
 /*********************************************/
