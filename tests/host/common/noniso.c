@@ -65,29 +65,24 @@ char* itoa(int value, char* result, int base)
         *result = 0;
         return result;
     }
-    if (base != 10)
+
+    unsigned uvalue;
+    char*    out = result;
+
+    // after this point we convert the value to unsigned and go to the utoa
+    // only base10 gets minus sign in the front, adhering to the newlib implementation
+    if ((base == 10) && (value < 0))
     {
-        return utoa((unsigned)value, result, base);
+        *result++ = '-';
+        uvalue    = (unsigned)-value;
+    }
+    else
+    {
+        uvalue = (unsigned)value;
     }
 
-    char* out      = result;
-    int   quotient = abs(value);
-
-    do
-    {
-        const int tmp = quotient / base;
-        *out          = "0123456789abcdef"[quotient - (tmp * base)];
-        ++out;
-        quotient = tmp;
-    } while (quotient);
-
-    // Apply negative sign
-    if (value < 0)
-        *out++ = '-';
-
-    reverse(result, out);
-    *out = 0;
-    return result;
+    utoa(uvalue, result, base);
+    return out;
 }
 
 int atoi(const char* s)

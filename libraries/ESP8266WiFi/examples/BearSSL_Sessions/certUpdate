@@ -1,2 +1,0 @@
-cd ${0%/*} 2>/dev/null
-python3 ../../../../tools/cert.py -s api.github.com -n github > certs.h

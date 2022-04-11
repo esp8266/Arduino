@@ -13,26 +13,24 @@
  all copies or substantial portions of the Software.
 */
 
-#define CATCH_CONFIG_MAIN
-#include "ArduinoCatch.hpp"
+#include <Arduino.h>
+#include <sys/time.h>
 
-std::ostream& operator<<(std::ostream& out, const String& str)
-{
-    out.write(str.c_str(), str.length());
-    return out;
-}
+#include <ostream>
 
-namespace Catch
-{
+#include "catch.hpp"
 
-std::string toString(const String& str)
-{
-    return std::string(str.begin(), str.length());
-}
+// Since Catch does not know about Arduino types, help it out so we could have these displayed in the tests output
 
-std::string StringMaker<String>::convert(String const& str)
-{
-    return toString(str);
-}
+std::ostream& operator<<(std::ostream&, const String&);
 
-}  // namespace Catch
+namespace Catch {
+
+std::string toString(const String&);
+
+template<>
+struct StringMaker<String> {
+    static std::string convert(const String&);
+};
+
+} // namespace Catch
