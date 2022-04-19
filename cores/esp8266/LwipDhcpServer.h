@@ -28,8 +28,7 @@
 // nearly as-is. This is an initial version to guaranty legacy behavior
 // with same default values.
 
-#ifndef __DHCPS_H__
-#define __DHCPS_H__
+#pragma once
 
 #include <lwip/init.h>  // LWIP_VERSION
 
@@ -114,5 +113,3 @@ protected:
     uint8              offer;
     bool               renew;
 };
-
-#endif  // __DHCPS_H__
