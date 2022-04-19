@@ -1,8 +1,11 @@
+#include <Arduino.h>
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
 #include <PolledTimeout.h>
 #include "StackThunk.h"
+
+#include <memory>
 
 //#define DEBUG_UPDATER Serial
 
@@ -224,71 +227,87 @@ bool UpdaterClass::end(bool evenIfRemaining){
   }
 
   if (_verify) {
+    // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
+    // contain a matching length field, preceded by the bytes of the signature itself.
+    // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    static constexpr uint32_t sigSize = 4;
     const uint32_t expectedSigLen = _verify->length();
-      // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
-      // contain a matching length field, preceded by the bytes of the signature itself.
-      // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    const uint32_t sigLenAddr = _startAddress + _size - sigSize;
     uint32_t sigLen = 0;
 
-    if (expectedSigLen > 0) {
-      ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
-    }
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] expected sigLen: %lu\n"), expectedSigLen);
 #endif
+    if (expectedSigLen > 0) {
+      ESP.flashRead(sigLenAddr, &sigLen, sigSize);
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen from flash: %lu\n"), sigLen);
+#endif
+    }
+
     if (sigLen != expectedSigLen) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
 
-    int binSize = _size;
+    auto binSize = _size;
     if (expectedSigLen > 0) {
-      _size -= (sigLen + sizeof(uint32_t) /* The siglen word */);
-    }
-    _hash->begin();
+      if (binSize < (sigLen + sigSize)) {
+        _setError(UPDATE_ERROR_SIGN);
+        _reset();
+        return false;
+      }
+      binSize -= (sigLen + sigSize);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted size (without the signature and sigLen): %lu\n"), binSize);
 #endif
-      // Calculate the MD5 and hash using proper size
-    uint8_t buff[128] __attribute__((aligned(4)));
-    for(int i = 0; i < binSize; i += sizeof(buff)) {
-      ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
-      size_t read = std::min((int)sizeof(buff), binSize - i);
-      _hash->add(buff, read);
+    }
+
+    // Calculate hash of the payload, 128 bytes at a time
+    alignas(alignof(uint32_t)) uint8_t buff[128];
+
+    _hash->begin();
+    for (uint32_t offset = 0; offset < binSize; offset += sizeof(buff)) {
+      auto len = std::min(sizeof(buff), binSize - offset);
+      ESP.flashRead(_startAddress + offset, reinterpret_cast<uint32_t *>(&buff[0]), len);
+      _hash->add(buff, len);
     }
     _hash->end();
+
 #ifdef DEBUG_UPDATER
-    unsigned char *ret = (unsigned char *)_hash->hash();
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Computed Hash:"));
-    for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
-    DEBUG_UPDATER.printf("\n");
+    auto debugByteArray = [](const char *name, const unsigned char *hash, int len) {
+        DEBUG_UPDATER.printf_P("[Updater] %s:", name);
+        for (int i = 0; i < len; ++i) {
+            DEBUG_UPDATER.printf(" %02x", hash[i]);
+        }
+        DEBUG_UPDATER.printf("\n");
+    };
+    debugByteArray(PSTR("Computed Hash"),
+        reinterpret_cast<const unsigned char *>(_hash->hash()),
+        _hash->len());
 #endif
 
-    uint8_t *sig = nullptr; // Safe to free if we don't actually malloc
+    std::unique_ptr<uint8_t[]> sig;
     if (expectedSigLen > 0) {
-      sig = (uint8_t*)malloc(sigLen);
+      const uint32_t sigAddr = _startAddress + binSize;
+      sig.reset(new (std::nothrow) uint8_t[sigLen]);
       if (!sig) {
         _setError(UPDATE_ERROR_SIGN);
         _reset();
         return false;
       }
-      ESP.flashRead(_startAddress + binSize, sig, sigLen);
+      ESP.flashRead(sigAddr, sig.get(), sigLen);
 #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
-      for (size_t i=0; i<sigLen; i++) {
-        DEBUG_UPDATER.printf(" %02x", sig[i]);
-      }
-      DEBUG_UPDATER.printf("\n");
+      debugByteArray(PSTR("Received Signature"), sig.get(), sigLen);
 #endif
     }
-    if (!_verify->verify(_hash, (void *)sig, sigLen)) {
-      free(sig);
+    if (!_verify->verify(_hash, sig.get(), sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
-    free(sig);
+
     _size = binSize; // Adjust size to remove signature, not part of bin payload
 
 #ifdef DEBUG_UPDATER
@@ -301,7 +320,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
 #ifdef DEBUG_UPDATER
-    else DEBUG_UPDATER.printf_P(PSTR("MD5 Success: %s\n"), _target_md5.c_str());
+    else DEBUG_UPDATER.printf_P(PSTR("[Updater] MD5 Success: %s\n"), _target_md5.c_str());
 #endif
   }
 
