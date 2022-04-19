@@ -27,6 +27,7 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 
+#include <LwipDhcpServer-NonOS.h>
 
 class ESP8266WiFiAPClass {
 
