@@ -35,7 +35,7 @@ void setup() {
   WiFi.forceSleepBegin();
   delay(500);
 
-  i2s_rxtx_begin(true, false); // Enable I2S RX
+  i2s_rxtx_begin(true, false);  // Enable I2S RX
   i2s_set_rate(11025);
 
   delay(1000);

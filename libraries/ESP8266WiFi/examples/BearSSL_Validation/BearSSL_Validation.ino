@@ -12,13 +12,13 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
 const char *pass = STAPSK;
 
-const char *   path = "/";
+const char *path = "/";
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -40,9 +40,7 @@ void setClock() {
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
 void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
-  if (!path) {
-    path = "/";
-  }
+  if (!path) { path = "/"; }
 
   ESP.resetFreeContStack();
   uint32_t freeStackStart = ESP.getFreeContStack();
@@ -64,11 +62,9 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     do {
       char tmp[32];
       memset(tmp, 0, 32);
-      int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+      int rlen = client->read((uint8_t *)tmp, sizeof(tmp) - 1);
       yield();
-      if (rlen < 0) {
-        break;
-      }
+      if (rlen < 0) { break; }
       // Only print out first line up to \r, then abort connection
       char *nl = strchr(tmp, '\r');
       if (nl) {

@@ -31,7 +31,6 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
-
 }
 
 void loop() {
@@ -43,14 +42,12 @@ void loop() {
     bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
     Serial.printf("\nConnecting to https://tls.mbed.org\n");
     Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
-    if (mfln) {
-      client->setBufferSizes(1024, 1024);
-    }
+    if (mfln) { client->setBufferSizes(1024, 1024); }
 
     Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
-    const uint8_t fingerprint[20] = {0x15, 0x77, 0xdc, 0x04, 0x7c, 0x00, 0xf8, 0x70, 0x09, 0x34, 0x24, 0xf4, 0xd3, 0xa1, 0x7a, 0x6c, 0x1e, 0xa3, 0xe0, 0x2a};
+    const uint8_t fingerprint[20] = { 0x15, 0x77, 0xdc, 0x04, 0x7c, 0x00, 0xf8, 0x70, 0x09, 0x34, 0x24, 0xf4, 0xd3, 0xa1, 0x7a, 0x6c, 0x1e, 0xa3, 0xe0, 0x2a };
 
     client->setFingerprint(fingerprint);
 
@@ -86,16 +83,13 @@ void loop() {
               // write it to Serial
               Serial.write(buff, c);
 
-              if (len > 0) {
-                len -= c;
-              }
+              if (len > 0) { len -= c; }
             }
             delay(1);
           }
 
           Serial.println();
           Serial.print("[HTTPS] connection closed or file end.\n");
-
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());

@@ -18,7 +18,7 @@
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK  "APPSK"
+#define APPSK "APPSK"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -74,7 +74,7 @@ void setup() {
   Serial.println(numCerts);
   if (numCerts == 0) {
     Serial.println(F("No certs found. Did you run certs-from-mozill.py and upload the LittleFS directory before running?"));
-    return; // Can't connect to anything w/o certs!
+    return;  // Can't connect to anything w/o certs!
   }
 }
 
@@ -87,9 +87,7 @@ void loop() {
     BearSSL::WiFiClientSecure client;
     bool mfln = client.probeMaxFragmentLength("server", 443, 1024);  // server must be the same as in ESPhttpUpdate.update()
     Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
-    if (mfln) {
-      client.setBufferSizes(1024, 1024);
-    }
+    if (mfln) { client.setBufferSizes(1024, 1024); }
     client.setCertStore(&certStore);
 
     // The line below is optional. It can be used to blink the LED on the board during flashing
@@ -102,21 +100,15 @@ void loop() {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
     // Or:
-    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
+    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
 
 
     switch (ret) {
-      case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-        break;
+      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
 
-      case HTTP_UPDATE_NO_UPDATES:
-        Serial.println("HTTP_UPDATE_NO_UPDATES");
-        break;
+      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
 
-      case HTTP_UPDATE_OK:
-        Serial.println("HTTP_UPDATE_OK");
-        break;
+      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
     }
   }
 }

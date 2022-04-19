@@ -23,7 +23,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -73,11 +73,11 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(STASSID, STAPSK);
 
-  #if MANUAL_SIGNING
+#if MANUAL_SIGNING
   signPubKey = new BearSSL::PublicKey(pubkey);
   hash = new BearSSL::HashSHA256();
   sign = new BearSSL::SigningVerifier(signPubKey);
-  #endif
+#endif
 }
 
 
@@ -87,10 +87,10 @@ void loop() {
 
     WiFiClient client;
 
-    #if MANUAL_SIGNING
+#if MANUAL_SIGNING
     // Ensure all updates are signed appropriately.  W/o this call, all will be accepted.
     Update.installSignature(hash, sign);
-    #endif
+#endif
     // If the key files are present in the build directory, signing will be
     // enabled using them automatically
 
@@ -99,19 +99,12 @@ void loop() {
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://192.168.1.8/esp8266.bin");
 
     switch (ret) {
-      case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-        break;
+      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
 
-      case HTTP_UPDATE_NO_UPDATES:
-        Serial.println("HTTP_UPDATE_NO_UPDATES");
-        break;
+      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
 
-      case HTTP_UPDATE_OK:
-        Serial.println("HTTP_UPDATE_OK");
-        break;
+      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
     }
   }
   delay(10000);
 }
-

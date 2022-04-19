@@ -24,9 +24,9 @@ void setup() {
   // data has been received from the master. Beware that len is always 32
   // and the buffer is autofilled with zeroes if data is less than 32 bytes long
   // It's up to the user to implement protocol for handling data length
-  SPISlave.onData([](uint8_t * data, size_t len) {
+  SPISlave.onData([](uint8_t *data, size_t len) {
     String message = String((char *)data);
-    (void) len;
+    (void)len;
     if (message.equals("Hello Slave!")) {
       SPISlave.setData("Hello Master!");
     } else if (message.equals("Are you alive?")) {
@@ -50,7 +50,7 @@ void setup() {
   // Can be used to exchange small data or status information
   SPISlave.onStatus([](uint32_t data) {
     Serial.printf("Status: %u\n", data);
-    SPISlave.setStatus(millis()); //set next status
+    SPISlave.setStatus(millis());  // set next status
   });
 
   // The master has read the status register

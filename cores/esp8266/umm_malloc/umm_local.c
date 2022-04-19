@@ -98,17 +98,20 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
         UMM_CRITICAL_DECL(id_poison);
         uint16_t c;
         bool poison = false;
-        umm_heap_context_t *_context = umm_get_ptr_context(vptr);
-        if (NULL == _context) {
-            panic();
-            return NULL;
-        }
-        /* Figure out which block we're in. Note the use of truncated division... */
-        c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
+        umm_heap_context_t *_context = _umm_get_ptr_context((void *)ptr);
+        if (_context) {
 
-        UMM_CRITICAL_ENTRY(id_poison);
-        poison = check_poison_block(&UMM_BLOCK(c)) && check_poison_neighbors(_context, c);
-        UMM_CRITICAL_EXIT(id_poison);
+            /* Figure out which block we're in. Note the use of truncated division... */
+            c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
+
+            UMM_CRITICAL_ENTRY(id_poison);
+            poison =
+                check_poison_block(&UMM_BLOCK(c)) &&
+                check_poison_neighbors(_context, c);
+            UMM_CRITICAL_EXIT(id_poison);
+        } else {
+            DBGLOG_ERROR("\nPointer %p is not a Heap address.\n", vptr);
+        }
 
         if (!poison) {
             if (file) {
@@ -137,7 +140,7 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) 
 
     ptr = get_unpoisoned_check_neighbors(ptr, file, line);
 
-    size += poison_size(size);
+    add_poison_size(&size);
     ret = umm_realloc(ptr, size);
 
     ret = get_poisoned(ret, size);
@@ -166,7 +169,7 @@ size_t umm_block_size(void) {
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 // Keep complete call path in IRAM
 size_t umm_free_heap_size_lw(void) {
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     umm_heap_context_t *_context = umm_get_current_heap();
     return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);
@@ -295,5 +298,33 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
     return _context->stats.id_free_null_count;
 }
 #endif // UMM_STATS_FULL
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+/*
+ * Saturated unsigned add
+ * Poison added to allocation size requires overflow protection.
+ */
+static size_t umm_uadd_sat(const size_t a, const size_t b) {
+    size_t r = a + b;
+    if (r < a) {
+        return SIZE_MAX;
+    }
+    return r;
+}
+#endif
+
+/*
+ * Use platform-specific functions to protect against unsigned overflow/wrap by
+ * implementing saturated unsigned multiply.
+ * The function umm_calloc requires a saturated multiply function.
+ */
+size_t umm_umul_sat(const size_t a, const size_t b) {
+    size_t r;
+    if (__builtin_mul_overflow(a, b, &r)) {
+        return SIZE_MAX;
+    }
+    return r;
+}
+
 
 #endif // BUILD_UMM_MALLOC_C

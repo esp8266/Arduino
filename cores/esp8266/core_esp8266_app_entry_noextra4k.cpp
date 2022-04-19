@@ -39,7 +39,19 @@ extern "C" void app_entry_redefinable(void)
 {
     g_pcont = &g_cont;
 
+    #ifdef UMM_INIT_USE_IRAM
+    /*
+     * Legacy option: the umm_init() call path must reside in IRAM.
+     */
     umm_init();
+    #else
+    /*
+     * Instruction cache is enabled/disabled around running umm_init().
+     * Allows the use of IROM (flash) to store umm_init().
+     */
+    mmu_wrap_irom_fn(umm_init);
+    #endif
+
     /* Call the entry point of the SDK code. */
     call_user_start();
 }

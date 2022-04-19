@@ -21,7 +21,7 @@ void checksketch(const char* what, const char* res1, const char* res2) {
 #endif
 
 void testStringPtrProgmem() {
-  static const char inProgmem [] PROGMEM = "I am in progmem";
+  static const char inProgmem[] PROGMEM = "I am in progmem";
   auto inProgmem2 = F("I am too in progmem");
 
   int heap = (int)ESP.getFreeHeap();
@@ -110,7 +110,7 @@ void testStreamString() {
     result.clear();
     S2Stream input(inputString);
     // reading stream will consume the string
-    input.setConsume(); // can be omitted, this is the default
+    input.setConsume();  // can be omitted, this is the default
 
     input.sendSize(result, 1);
     input.sendSize(result, 2);
@@ -181,8 +181,7 @@ void setup() {
 
   testStreamString();
 
-  Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n",
-                (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
+  Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n", (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
 }
 
 #endif
