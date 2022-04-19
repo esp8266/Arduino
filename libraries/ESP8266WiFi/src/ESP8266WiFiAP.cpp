@@ -37,7 +37,9 @@ extern "C" {
 }
 
 #include "debug.h"
-#include "LwipDhcpServer.h"
+
+#include <LwipDhcpServer.h>
+#include <LwipDhcpServer-NonOS.h>
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -166,7 +168,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
-    dhcpSoftAP.end();
+    auto& server = dhcpSoftAP();
+    server.end();
 
     // check IP config
     struct ip_info ip;
@@ -186,7 +189,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         ret = false;
     }
 
-    dhcpSoftAP.begin(&ip);
+    server.begin();
 
     return ret;
 }
@@ -244,21 +247,22 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    if(!dhcpSoftAP.set_dhcps_lease(&dhcp_lease))
+    auto& server = dhcpSoftAP();
+    if(!server.set_dhcps_lease(&dhcp_lease))
     {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
     }
 
     // set lease time to 720min --> 12h
-    if(!dhcpSoftAP.set_dhcps_lease_time(720))
+    if(!server.set_dhcps_lease_time(720))
     {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
         ret = false;
     }
 
     uint8 mode = info.gw.addr ? 1 : 0;
-    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode))
+    if(!server.set_dhcps_offer_option(OFFER_ROUTER, &mode))
     {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;

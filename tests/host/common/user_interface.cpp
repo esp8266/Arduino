@@ -64,15 +64,13 @@ bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
 
 void DhcpServer::end() { }
 
-bool DhcpServer::begin(struct ip_info* info)
+bool DhcpServer::begin()
 {
-    (void)info;
     return false;
 }
 
-DhcpServer::DhcpServer(netif* netif)
+DhcpServer::DhcpServer(netif*)
 {
-    (void)netif;
 }
 
 DhcpServer::~DhcpServer()
@@ -80,7 +78,11 @@ DhcpServer::~DhcpServer()
     end();
 }
 
-DhcpServer dhcpSoftAP(nullptr);
+DhcpServer& dhcpSoftAP()
+{
+    static DhcpServer server(nullptr);
+    return server;
+}
 
 extern "C"
 {

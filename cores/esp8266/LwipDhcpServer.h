@@ -36,14 +36,23 @@
 class DhcpServer
 {
 public:
-    DhcpServer(netif* netif);
+    static constexpr int DefaultLeaseTime = 120 /* seconds */;
+    static constexpr ip_info DefaultIpConfig = {
+        .ip      { 0x0104a8c0 },  // 192.168.4.1
+        .netmask { 0x00ffffff },  // 255.255.255.0
+        .gw      { 0 }            // 0.0.0.0
+    };
+
+    static const uint32 magic_cookie;
+
+    DhcpServer(netif*);
     ~DhcpServer();
 
     void setDns(int num, const ipv4_addr_t* dns);
 
-    bool begin(ip_info* info);
+    bool begin();
     void end();
-    bool isRunning();
+    bool isRunning() const;
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -91,25 +100,19 @@ protected:
     void   dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force);
     uint32 dhcps_client_update(u8* bssid, struct ipv4_addr* ip);
 
-    netif* _netif;
+    netif* _netif = nullptr;
 
-    struct udp_pcb*  pcb_dhcps;
-    ip_addr_t        broadcast_dhcps;
-    struct ipv4_addr server_address;
-    struct ipv4_addr client_address;
-    struct ipv4_addr dns_address;
-    uint32           dhcps_lease_time;
+    udp_pcb*  pcb_dhcps = nullptr;
+    ip_addr_t broadcast_dhcps{};
+    ipv4_addr server_address{};
+    ipv4_addr client_address{};
+    ipv4_addr dns_address{};
+    uint32           dhcps_lease_time = DefaultLeaseTime;
 
     struct dhcps_lease dhcps_lease;
     list_node*         plist;
     uint8              offer;
     bool               renew;
-
-    static const uint32 magic_cookie;
 };
-
-// SoftAP DHCP server always exists and is started on boot
-extern DhcpServer dhcpSoftAP;
-extern "C" int    fw_has_started_softap_dhcps;
 
 #endif  // __DHCPS_H__
