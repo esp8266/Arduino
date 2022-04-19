@@ -938,9 +938,12 @@ uint32_t SigningVerifier::length()
 extern "C" bool SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (_pubKey->isRSA()) {
     bool ret;
-    unsigned char vrf[hash->len()];
+    unsigned char vrf[64];
+    if (hash->len() > 64) {
+      return false;
+    }
     br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
-    ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), sizeof(vrf), _pubKey->getRSA(), vrf);
+    ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), hash->len(), _pubKey->getRSA(), vrf);
     if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
       return false;
     } else {
