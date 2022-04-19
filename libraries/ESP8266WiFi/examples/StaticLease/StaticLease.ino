@@ -76,8 +76,9 @@ void setup() {
      ...
      any client not listed will use next IP address available from the range (here 192.168.0.102 and more)
   */
-  dhcpSoftAP.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
-  dhcpSoftAP.add_dhcps_lease(mac_PC);   // always 192.168.0.101
+  auto& server = dhcpSoftAP();
+  server.add_dhcps_lease(mac_CAM);  // always 192.168.0.100
+  server.add_dhcps_lease(mac_PC);   // always 192.168.0.101
   /* Start Access Point. You can remove the password parameter if you want the AP to be open. */
   WiFi.softAP(ssid, password);
   Serial.print("AP IP address: ");
