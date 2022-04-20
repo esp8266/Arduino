@@ -382,7 +382,10 @@ void wifi_softap_free_station_info(void);
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
 
-// these dhcp functions were moved to LwipDhcpServer-NonOS.cpp, and are no longer provided by the lwip lib
+// esp8266/Arduino notice:
+// these dhcp functions are no longer provided by the lwip lib
+// only way to include them is to build our NonOS LwipDhcpServer helpers
+// (ref. cores/esp8266/LwipDhcpServer-NonOS.cpp)
 
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
 bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
