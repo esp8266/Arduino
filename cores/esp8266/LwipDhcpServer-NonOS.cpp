@@ -31,8 +31,9 @@
 // (since the netif object never goes away, even when AP is disabled)
 // Initial version fully emulates nonos-sdk api in DhcpServer class,
 // before trying to further change it and possibly break legacy behaviour
-DhcpServer& dhcpSoftAP() {
-    extern netif netif_git[2];
+DhcpServer& dhcpSoftAP()
+{
+    extern netif      netif_git[2];
     static DhcpServer server(&netif_git[SOFTAP_IF]);
     return server;
 }
@@ -41,10 +42,11 @@ extern "C"
 {
     // `ip_info` is useless, since we get the information from the netif directly
     // `netif` would be netif_git[SOFTAP_IF], which we get from the lwip2 glue
-    void dhcps_start(ip_info *, netif *)
+    void dhcps_start(ip_info*, netif*)
     {
         auto& server = dhcpSoftAP();
-        if (!server.isRunning()) {
+        if (!server.isRunning())
+        {
             server.begin();
         }
     }
@@ -52,20 +54,21 @@ extern "C"
     void dhcps_stop()
     {
         auto& server = dhcpSoftAP();
-        if (server.isRunning()) {
+        if (server.isRunning())
+        {
             server.end();
         }
     }
 
     // providing the rest of the nonos-sdk API, which was originally removed in 3.0.0
 
-    bool wifi_softap_set_dhcps_lease(dhcps_lease *please)
+    bool wifi_softap_set_dhcps_lease(dhcps_lease* please)
     {
         auto& server = dhcpSoftAP();
         return server.set_dhcps_lease(please);
     }
 
-    bool wifi_softap_get_dhcps_lease(dhcps_lease *please)
+    bool wifi_softap_get_dhcps_lease(dhcps_lease* please)
     {
         auto& server = dhcpSoftAP();
         return server.get_dhcps_lease(please);
@@ -89,7 +92,7 @@ extern "C"
         return server.reset_dhcps_lease_time();
     }
 
-    bool wifi_softap_add_dhcps_lease(uint8 *macaddr)
+    bool wifi_softap_add_dhcps_lease(uint8* macaddr)
     {
         auto& server = dhcpSoftAP();
         return server.add_dhcps_lease(macaddr);

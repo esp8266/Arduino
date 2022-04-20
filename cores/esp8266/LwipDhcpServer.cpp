@@ -177,9 +177,7 @@ const uint32 DhcpServer::magic_cookie = 0x63538263;  // https://tools.ietf.org/h
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-DhcpServer::DhcpServer(netif* netif) : _netif(netif)
-{
-}
+DhcpServer::DhcpServer(netif* netif) : _netif(netif) { }
 
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info(uint8_t* mac, struct ipv4_addr*);

@@ -69,9 +69,7 @@ bool DhcpServer::begin()
     return false;
 }
 
-DhcpServer::DhcpServer(netif*)
-{
-}
+DhcpServer::DhcpServer(netif*) { }
 
 DhcpServer::~DhcpServer()
 {
