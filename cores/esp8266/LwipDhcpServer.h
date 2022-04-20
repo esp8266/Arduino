@@ -35,14 +35,8 @@
 class DhcpServer
 {
 public:
-    static constexpr int     DefaultLeaseTime = 120 /* seconds */;
-    static constexpr ip_info DefaultIpConfig  = {
-         .ip { 0x0104a8c0 },       // 192.168.4.1
-         .netmask { 0x00ffffff },  // 255.255.255.0
-         .gw { 0 }                 // 0.0.0.0
-    };
-
-    static const uint32 magic_cookie;
+    static constexpr int    DefaultLeaseTime = 120;         // seconds
+    static constexpr uint32 MagicCookie      = 0x63538263;  // https://tools.ietf.org/html/rfc1497
 
     DhcpServer(netif*);
     ~DhcpServer();

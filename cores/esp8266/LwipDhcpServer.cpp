@@ -173,8 +173,6 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #define LWIP_IS_OK(what, err) ((err) == ERR_OK)
 #endif
 
-const uint32 DhcpServer::magic_cookie = 0x63538263;  // https://tools.ietf.org/html/rfc1497
-
 ////////////////////////////////////////////////////////////////////////////////////
 
 DhcpServer::DhcpServer(netif* netif) : _netif(netif) { }
@@ -489,7 +487,7 @@ void DhcpServer::create_msg(struct dhcps_msg* m)
     memset((char*)m->sname, 0, sizeof(m->sname));
     memset((char*)m->file, 0, sizeof(m->file));
     memset((char*)m->options, 0, sizeof(m->options));
-    memcpy((char*)m->options, &magic_cookie, sizeof(magic_cookie));
+    memcpy((char*)m->options, &MagicCookie, sizeof(MagicCookie));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 /*
@@ -794,7 +792,7 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 ///////////////////////////////////////////////////////////////////////////////////
 sint16_t DhcpServer::parse_msg(struct dhcps_msg* m, u16_t len)
 {
-    if (memcmp((char*)m->options, &magic_cookie, sizeof(magic_cookie)) == 0)
+    if (memcmp((char*)m->options, &MagicCookie, sizeof(MagicCookie)) == 0)
     {
         struct ipv4_addr ip;
         memcpy(&ip.addr, m->ciaddr, sizeof(ip.addr));
