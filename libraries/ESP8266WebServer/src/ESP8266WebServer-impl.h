@@ -108,13 +108,12 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
 
       String raw;
       raw.reserve(username_len + password_len + 1);
-      if(!raw.length()) {
-        return false;
-      }
-
       raw.concat(username, username_len);
       raw += ':';
       raw.concat(password, password_len);
+      if(!raw.length()) {
+        return false;
+      }
 
       String encoded = base64::encode(raw, false);
       if(!encoded.length()){
