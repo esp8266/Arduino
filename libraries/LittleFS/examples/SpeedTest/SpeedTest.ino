@@ -44,9 +44,7 @@ void DoTest(FS *fs) {
   }
 
   uint8_t data[256];
-  for (int i = 0; i < 256; i++) {
-    data[i] = (uint8_t) i;
-  }
+  for (int i = 0; i < 256; i++) { data[i] = (uint8_t)i; }
 
   Serial.printf("Creating %dKB file, may take a while...\n", TESTSIZEKB);
   unsigned long start = millis();
@@ -56,9 +54,7 @@ void DoTest(FS *fs) {
     return;
   }
   for (int i = 0; i < TESTSIZEKB; i++) {
-    for (int j = 0; j < 4; j++) {
-      f.write(data, 256);
-    }
+    for (int j = 0; j < 4; j++) { f.write(data, 256); }
   }
   f.close();
   unsigned long stop = millis();
@@ -72,9 +68,7 @@ void DoTest(FS *fs) {
   start = millis();
   f = fs->open("/testwrite.bin", "r");
   for (int i = 0; i < TESTSIZEKB; i++) {
-    for (int j = 0; j < 4; j++) {
-      f.read(data, 256);
-    }
+    for (int j = 0; j < 4; j++) { f.read(data, 256); }
   }
   f.close();
   stop = millis();
@@ -85,9 +79,7 @@ void DoTest(FS *fs) {
   f = fs->open("/testwrite.bin", "r");
   f.read();
   for (int i = 0; i < TESTSIZEKB; i++) {
-    for (int j = 0; j < 4; j++) {
-      f.read(data + 1, 256);
-    }
+    for (int j = 0; j < 4; j++) { f.read(data + 1, 256); }
   }
   f.close();
   stop = millis();
@@ -115,9 +107,7 @@ void DoTest(FS *fs) {
   Serial.printf("Writing 64K file in 1-byte chunks\n");
   start = millis();
   f = fs->open("/test1b.bin", "w");
-  for (int i = 0; i < 65536; i++) {
-    f.write((uint8_t*)&i, 1);
-  }
+  for (int i = 0; i < 65536; i++) { f.write((uint8_t *)&i, 1); }
   f.close();
   stop = millis();
   Serial.printf("==> Time to write 64KB in 1b chunks = %lu milliseconds = %s\n", stop - start, rate(start, stop, 65536));
@@ -127,7 +117,7 @@ void DoTest(FS *fs) {
   f = fs->open("/test1b.bin", "r");
   for (int i = 0; i < 65536; i++) {
     char c;
-    f.read((uint8_t*)&c, 1);
+    f.read((uint8_t *)&c, 1);
   }
   f.close();
   stop = millis();

@@ -5,32 +5,30 @@
 
 #include <SPI.h>
 #include <W5500lwIP.h>
-//or #include <W5100lwIP.h>
-//or #include <ENC28J60lwIP.h>
+// or #include <W5100lwIP.h>
+// or #include <ENC28J60lwIP.h>
 
-#include <WiFiClient.h> // WiFiClient (-> TCPClient)
+#include <WiFiClient.h>  // WiFiClient (-> TCPClient)
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
 
 using TCPClient = WiFiClient;
 
-#define CSPIN 16 // wemos/lolin/nodemcu D0
+#define CSPIN 16  // wemos/lolin/nodemcu D0
 Wiznet5500lwIP eth(CSPIN);
 
 void setup() {
   Serial.begin(115200);
 
   SPI.begin();
-  SPI.setClockDivider(SPI_CLOCK_DIV4); // 4 MHz?
+  SPI.setClockDivider(SPI_CLOCK_DIV4);  // 4 MHz?
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
-  eth.setDefault(); // use ethernet for default route
+  eth.setDefault();  // use ethernet for default route
   if (!eth.begin()) {
     Serial.println("ethernet hardware not found ... sleeping");
-    while (1) {
-      delay(1000);
-    }
+    while (1) { delay(1000); }
   } else {
     Serial.print("connecting ethernet");
     while (!eth.connected()) {
@@ -60,9 +58,7 @@ void loop() {
 
   // This will send a string to the server
   Serial.println("sending data to server");
-  if (client.connected()) {
-    client.println("hello from ESP8266");
-  }
+  if (client.connected()) { client.println("hello from ESP8266"); }
 
   // wait for data to be available
   unsigned long timeout = millis();
@@ -89,7 +85,7 @@ void loop() {
   client.stop();
 
   if (wait) {
-    delay(300000); // execute once every 5 minutes, don't flood remote service
+    delay(300000);  // execute once every 5 minutes, don't flood remote service
   }
   wait = true;
 }
