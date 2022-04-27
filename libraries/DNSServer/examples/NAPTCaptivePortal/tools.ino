@@ -8,7 +8,7 @@
   Returns a descriptive string for WiFi.status() value
 */
 String getWiFiStatusString(uint32_t status) {
-  const __FlashStringHelper *r;
+  const __FlashStringHelper* r;
   switch (status) {
     case WL_IDLE_STATUS:
       r = F("WL_IDLE_STATUS");
@@ -55,11 +55,11 @@ String getWiFiStatusString(uint32_t status) {
 char getPhyModeChar(WiFiPhyMode_t i) {
   switch (i) {
     case WIFI_PHY_MODE_11B:
-      return 'b'; // = 1
+      return 'b';  // = 1
     case WIFI_PHY_MODE_11G:
-      return 'g'; // = 2,
+      return 'g';  // = 2,
     case WIFI_PHY_MODE_11N:
-      return 'n'; // = 3,
+      return 'n';  // = 3,
     default:
       break;
   }
@@ -81,4 +81,4 @@ String macToString(const unsigned char* mac) {
   return String(buf);
 }
 
-#endif // LWIP_FEATURES && !LWIP_IPV6
+#endif  // LWIP_FEATURES && !LWIP_IPV6

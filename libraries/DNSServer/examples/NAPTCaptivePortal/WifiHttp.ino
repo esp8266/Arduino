@@ -1,6 +1,3 @@
-#ifndef WIFIHTTP_H_
-#define WIFIHTTP_H_
-
 
 // #define DEBUG_VIEW
 // The idea here is to debug HTML with DEBUG_VIEW defined then, when finished,
@@ -325,6 +322,4 @@ static const char configEnd2[] PROGMEM = R"EOF(
 )EOF";
 #else
 static const char configEnd[] PROGMEM = R"EOF(</table> <br /><form method='POST' action='wifisave'><h4>Connect to Network:</h4> <input id='s' class='lg' type='text' size=32 maxlength=32 placeholder='Network Name/SSID' name='n' spellcheck='false' data-gramm_editor='false'/> <br /><br /> <input id='p' class='lg' type='password' size=32 maxlength=64 placeholder='password' name='p' spellcheck='false' data-gramm_editor='false'/> &nbsp;&nbsp;<a class='lg' onclick='pv();'>&#x1f441;</a> <br /><br /><input type='submit' value='Connect/Disconnect'/></form> <br /><p>You may want to <a href='/'>return to the home page</a>.</p><p></p></div></div></body></html>)EOF";
-#endif
-
 #endif

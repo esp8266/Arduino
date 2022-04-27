@@ -94,26 +94,34 @@
 #endif
 
 #define _PRINTF(a, ...) printf_P(PSTR(a), ##__VA_ARGS__)
-#define _PRINT(a)       print(String(F(a)))
-#define _PRINTLN(a)     println(String(F(a)))
-#define _PRINTLN2(a, b) println(String(F(a)) + b )
+#define _PRINT(a) print(String(F(a)))
+#define _PRINTLN(a) println(String(F(a)))
+#define _PRINTLN2(a, b) println(String(F(a)) + b)
 
-#define CONSOLE_PRINTF   CONSOLE._PRINTF
-#define CONSOLE_PRINT    CONSOLE._PRINT
-#define CONSOLE_PRINTLN  CONSOLE._PRINTLN
+#define CONSOLE_PRINTF CONSOLE._PRINTF
+#define CONSOLE_PRINT CONSOLE._PRINT
+#define CONSOLE_PRINTLN CONSOLE._PRINTLN
 #define CONSOLE_PRINTLN2 CONSOLE._PRINTLN2
 
 #ifdef DEBUG_SKETCH
-#define DEBUG_PRINTF    CONSOLE_PRINTF
-#define DEBUG_PRINT     CONSOLE_PRINT
-#define DEBUG_PRINTLN   CONSOLE_PRINTLN
-#define DEBUG_PRINTLN2  CONSOLE_PRINTLN2
+#define DEBUG_PRINTF CONSOLE_PRINTF
+#define DEBUG_PRINT CONSOLE_PRINT
+#define DEBUG_PRINTLN CONSOLE_PRINTLN
+#define DEBUG_PRINTLN2 CONSOLE_PRINTLN2
 
 #else
-#define DEBUG_PRINTF(...) do { } while(false)
-#define DEBUG_PRINT(...) do { } while(false)
-#define DEBUG_PRINTLN(...) do { } while(false)
-#define DEBUG_PRINTLN2(...) do { } while(false)
+#define DEBUG_PRINTF(...) \
+  do { \
+  } while (false)
+#define DEBUG_PRINT(...) \
+  do { \
+  } while (false)
+#define DEBUG_PRINTLN(...) \
+  do { \
+  } while (false)
+#define DEBUG_PRINTLN2(...) \
+  do { \
+  } while (false)
 #endif
 
 
@@ -121,7 +129,7 @@
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 #ifndef APSSID
 #define APSSID "MagicPortal"
-#define APPSK  "ShowTime"
+#define APPSK "ShowTime"
 #endif
 
 const char *softAP_ssid = APSSID;
@@ -154,7 +162,7 @@ bool connect = false;
 
 /** Set to true to start WiFi STA at setup time when credentials loaded successfuly from EEPROM */
 /** Set to false to defer WiFi STA until configured through web interface. */
-bool staReady = false; // Don't connect right away
+bool staReady = false;  // Don't connect right away
 
 /** Last time I tried to connect to WLAN */
 unsigned long lastConnectTry = 0;
@@ -163,28 +171,28 @@ unsigned long lastConnectTry = 0;
 unsigned int status = WL_IDLE_STATUS;
 
 void setup() {
-  WiFi.persistent(false); // w/o this a flash write occurs at every boot
-  WiFi.mode(WIFI_OFF);    // Prevent use of SDK stored credentials
+  WiFi.persistent(false);  // w/o this a flash write occurs at every boot
+  WiFi.mode(WIFI_OFF);     // Prevent use of SDK stored credentials
   CONSOLE.begin(115200);
   CONSOLE_PRINTLN("\r\n\r\nNAPT with Configuration Portal ...");
 
   staModeConnectedHandler = WiFi.onStationModeConnected(
-  [](WiFiEventStationModeConnected data) {
-    // Keep a copy of the BSSID for the AP that WLAN connects to.
-    // This is used in the WLAN report on WiFi Details page.
-    memcpy(bssid, data.bssid, sizeof(bssid));
-  });
+    [](WiFiEventStationModeConnected data) {
+      // Keep a copy of the BSSID for the AP that WLAN connects to.
+      // This is used in the WLAN report on WiFi Details page.
+      memcpy(bssid, data.bssid, sizeof(bssid));
+    });
 
   staModeDisconnectedHandler = WiFi.onStationModeDisconnected(
-  [](WiFiEventStationModeDisconnected data) {
-    (void)data;
-    if (dnsServer.isForwarding()) {
-      dnsServer.disableForwarder("*");
-      dnsServer.setTTL(0);
-      // Reminder, Serial.println() will not work from these callbacks.
-      // For debug printf use ets_uart_printf().
-    }
-  });
+    [](WiFiEventStationModeDisconnected data) {
+      (void)data;
+      if (dnsServer.isForwarding()) {
+        dnsServer.disableForwarder("*");
+        dnsServer.setTTL(0);
+        // Reminder, Serial.println() will not work from these callbacks.
+        // For debug printf use ets_uart_printf().
+      }
+    });
 
   /*
     While you can remove the password parameter to make the AP open.
@@ -240,13 +248,13 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/generate_204", handleRoot);  // Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot);        // Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.onNotFound(handleNotFound);
-  server.begin(); // Web server start
+  server.begin();  // Web server start
   CONSOLE_PRINTLN("HTTP server started");
-  loadCredentials(); // Load WLAN credentials from network
-  connect = (strlen(ssid) > 0 && staReady); // Request WLAN connect if there is a SSID and we want to connect at startup
+  loadCredentials();                         // Load WLAN credentials from network
+  connect = (strlen(ssid) > 0 && staReady);  // Request WLAN connect if there is a SSID and we want to connect at startup
 }
 
 void connectWifi() {
@@ -286,7 +294,7 @@ void loop() {
       /* Don't set retry time too low as retry interfere the softAP operation */
       connect = true;
     }
-    if (status != s) { // WLAN status change
+    if (status != s) {  // WLAN status change
       CONSOLE_PRINTF("WLAN Status changed:\r\n");
       CONSOLE_PRINTF("  new status:      %s, %d\r\n", getWiFiStatusString(s).c_str(), s);
       CONSOLE_PRINTF("  previous status: %s, %d\r\n", getWiFiStatusString(status).c_str(), status);
@@ -318,7 +326,7 @@ void loop() {
           Setup the DNSServer to respond only to request for our hostname and
           forward other name request to the DNS configured to the WLAN.
         */
-        dnsServer.setTTL(600); // 10 minutes
+        dnsServer.setTTL(600);  // 10 minutes
         dnsServer.enableForwarder(myHostname, WiFi.dnsIP(0));
         CONSOLE_PRINTF("DNSServer changes/status:\r\n");
         CONSOLE_PRINTF("  DNS Forwarding is %s\r\n", dnsServer.isForwarding() ? "on" : "off");
@@ -331,7 +339,7 @@ void loop() {
         }
         CONSOLE_PRINTF("  TTL set to %u\r\n", dnsServer.getTTL());
 
-      } else  {
+      } else {
         /* Captive portals will usually use a TTL of 0 to avoid DNS cache poisoning. */
         dnsServer.setTTL(0);
         /* Setup the DNSServer to redirect all the domain lookups to the apIP */
@@ -363,9 +371,9 @@ void loop() {
     }
   }
   // Do work:
-  //DNS
+  // DNS
   dnsServer.processNextRequest();
-  //HTTP
+  // HTTP
   server.handleClient();
 }
 
@@ -382,4 +390,4 @@ void setup() {
 void loop() {
 }
 
-#endif // LWIP_FEATURES && !LWIP_IPV6
+#endif  // LWIP_FEATURES && !LWIP_IPV6

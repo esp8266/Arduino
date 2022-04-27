@@ -30,4 +30,4 @@ void saveCredentials() {
   EEPROM.end();
 }
 
-#endif // LWIP_FEATURES && !LWIP_IPV6
+#endif  // LWIP_FEATURES && !LWIP_IPV6

@@ -45,4 +45,4 @@ void sendPortalRedirect(String path, String targetName) {
   server.send(302, "text/html", reply);
 }
 
-#endif // LWIP_FEATURES && !LWIP_IPV6
+#endif  // LWIP_FEATURES && !LWIP_IPV6

@@ -7,7 +7,7 @@
 // https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.txt
 #ifndef IANA_DNS_PORT
 #define IANA_DNS_PORT 53        // AKA domain
-constexpr uint16_t kIanaDnsPort = 53;
+constexpr inline uint16_t kIanaDnsPort = 53;
 #endif
 
 #define DNS_QR_QUERY 0
@@ -53,14 +53,14 @@ struct DNSHeader
   uint16_t ARCount;          // number of resource entries
 };
 
-constexpr size_t kDNSSQueSizeAddrBits = 3; // The number of bits used to address que entries
-constexpr size_t kDNSSQueSize = BIT(kDNSSQueSizeAddrBits);
+constexpr inline size_t kDNSSQueSizeAddrBits = 3; // The number of bits used to address que entries
+constexpr inline size_t kDNSSQueSize = BIT(kDNSSQueSizeAddrBits);
 
-typedef struct DNSS_REQUESTER {
+struct DNSS_REQUESTER {
   uint32_t ip;
   uint16_t port;
   uint16_t id;
-} dnss_requester_t;
+};
 
 class DNSServer
 {
@@ -110,7 +110,7 @@ class DNSServer
     WiFiUDP _udp;
     String _domainName;
     IPAddress _dns;
-    std::unique_ptr<dnss_requester_t[]> _que;
+    std::unique_ptr<struct DNSS_REQUESTER[]> _que;
     uint32_t _ttl;
 #ifdef DEBUG_DNSSERVER
     // There are 2 possiblities for OverFlow:

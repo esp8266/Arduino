@@ -1,15 +1,13 @@
 #if LWIP_FEATURES && !LWIP_IPV6
 
-#include "WifiHttp.h"
-
 #ifndef TCP_MSS
 #define TCP_MSS 1460
 #endif
 /*
   Use kMaxChunkSize to limit size of chuncks
 */
-constexpr size_t kMaxChunkSize = TCP_MSS;
-String& sendIfOver(String & str, size_t threshold = kMaxChunkSize / 2);
+constexpr inline size_t kMaxChunkSize = TCP_MSS;
+String& sendIfOver(String& str, size_t threshold = kMaxChunkSize / 2);
 size_t sendAsChunks_P(PGM_P content, size_t chunkSize = kMaxChunkSize);
 
 size_t maxPage = 0;
@@ -21,7 +19,7 @@ void addNoCacheHeader() {
 }
 
 
-String& sendIfOver(String & str, size_t threshold) {
+String& sendIfOver(String& str, size_t threshold) {
   size_t len = str.length();
   if (len > threshold) {
     // Use later to determine if we reserved enough room in page to avoid realloc
@@ -54,19 +52,19 @@ void handleRoot() {
 
   String Page;
   Page += F(
-            "<!DOCTYPE html>"
-            "<html lang='en'><head><meta name='viewport' content='width=device-width'>"
-            "<title>ADV CAP Portal Example</title>"
-            "</head><body>"
-            "<h1>HELLO WORLD!!</h1>");
+    "<!DOCTYPE html>"
+    "<html lang='en'><head><meta name='viewport' content='width=device-width'>"
+    "<title>ADV CAP Portal Example</title>"
+    "</head><body>"
+    "<h1>HELLO WORLD!!</h1>");
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
     Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
   }
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the wifi connection</a>.</p>"
-            "</body></html>");
+    "<p>You may want to <a href='/wifi'>config the wifi connection</a>.</p>"
+    "</body></html>");
 
   server.send(200, F("text/html"), Page);
 }
@@ -90,9 +88,8 @@ boolean captivePortal() {
     return false;
   }
 
-  if (hAddr.isSet() ||
-      (server.hostHeader() != (String(myHostname) + ".local") && // arrived here by mDNS
-       server.hostHeader() != String(myHostname))) { // arrived here by local router DNS
+  if (hAddr.isSet() || (server.hostHeader() != (String(myHostname) + ".local") &&  // arrived here by mDNS
+                        server.hostHeader() != String(myHostname))) {              // arrived here by local router DNS
     String whereTo = String("http://") + server.client().localIP().toString();
     sendPortalRedirect(whereTo, F("Captive Portal Example"));
     return true;
@@ -159,7 +156,7 @@ void handleWifi() {
     sendIfOver(page);
     if (sta_cnt) {
       page += String(F("\r\n<PRE>\r\n"));
-      struct station_info *info = wifi_softap_get_station_info();
+      struct station_info* info = wifi_softap_get_station_info();
       IPAddress addr;
       while (info != NULL) {
         addr = info->ip;
@@ -213,7 +210,7 @@ void handleWifi() {
   } else {
     page += FPSTR(configNoAPs);
   }
-  sendIfOver(page, 0); // send what we have buffered before next direct send.
+  sendIfOver(page, 0);  // send what we have buffered before next direct send.
   sendAsChunks_P(configEnd);
 
   CONSOLE_PRINTLN2("MAX String memory used: ", (maxPage));
@@ -227,11 +224,11 @@ void handleWifiSave() {
   server.arg("p").toCharArray(password, sizeof(password) - 1);
   sendPortalRedirect(F("wifi"), F("Wifi Config"));
   saveCredentials();
-  connect = strlen(ssid) > 0; // Request WLAN connect with new credentials if there is a SSID
+  connect = strlen(ssid) > 0;  // Request WLAN connect with new credentials if there is a SSID
 }
 
 void handleNotFound() {
-  if (captivePortal()) { // If captive portal redirect instead of displaying the error page.
+  if (captivePortal()) {  // If captive portal redirect instead of displaying the error page.
     return;
   }
   String message = F("File Not Found\r\n\r\n");
@@ -250,4 +247,4 @@ void handleNotFound() {
   server.send(404, F("text/plain"), message);
 }
 
-#endif // LWIP_FEATURES && !LWIP_IPV6
+#endif  // LWIP_FEATURES && !LWIP_IPV6
