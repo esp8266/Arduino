@@ -24,49 +24,64 @@ import sys
 import contextlib
 
 
-def get_segment_hints():
-    return {
-        "ICACHE": "flash instruction cache",
-        "IROM": "code in flash (default, ICACHE_FLASH_ATTR)",
-        "IRAM": "code in IRAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
-        "DATA": "initialized variables (global, static) in RAM",
-        "RODATA": "constants (global, static) in RAM",
-        "BSS": "zeroed variables (global, static) in RAM",
-    }
+HINTS = {
+    "ICACHE": "configured flash instruction cache",
+    "IROM": "code in flash (default, ICACHE_FLASH_ATTR)",
+    "IRAM": "code in IRAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
+    "DATA": "initialized variables (global, static)",
+    "RODATA": "constants (global, static)",
+    "BSS": "zeroed variables (global, static)",
+}
 
 
 def get_segment_sizes(elf, path, mmu):
-    sizes = {
-        "ICACHE": [32768, 32768],
-        "IROM": [0, 1048576],
-        "IRAM": [0, 32768],
-        "DATA": [0, 81920],
-        "RODATA": [0, 81920],
-        "BSS": [0, 81920],
-    }
+    iram_size = 0
+    icache_size = 32168
+
+    for line in mmu.split():
+        words = line.split("=")
+        if line.startswith("-DMMU_IRAM_SIZE"):
+            iram_size = int(words[1], 16)
+        elif line.startswith("-DMMU_ICACHE_SIZE"):
+            icache_size = int(words[1], 16)
+
+    sizes = [
+        ["Variables and constants in RAM", [{
+            "DATA": 0,
+            "RODATA": 0,
+            "BSS": 0,
+        }, 80192]],
+        ["Instruction cache", [{
+            "ICACHE": icache_size,
+        }, icache_size]],
+        ["Instruction RAM", [{
+            "IRAM": 0,
+        }, iram_size]],
+        ["Code in flash", [{
+            "IROM": 0
+        }, 1048576]],
+    ]
+
+    mapping = [
+        [".irom0.text", "IROM"],
+        [".text", "IRAM"],
+        [".data", "DATA"],
+        [".rodata", "RODATA"],
+        [".bss", "BSS"],
+    ]
 
     cmd = [os.path.join(path, "xtensa-lx106-elf-size"), "-A", elf]
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True) as proc:
         lines = proc.stdout.readlines()
         for line in lines:
             words = line.split()
-            if line.startswith(".irom0.text"):
-                sizes["IROM"][0] += int(words[1])
-            elif line.startswith(".text"):
-                sizes["IRAM"][0] += int(words[1])
-            elif line.startswith(".data"):
-                sizes["DATA"][0] += int(words[1])
-            elif line.startswith(".rodata"):
-                sizes["RODATA"][0] += int(words[1])
-            elif line.startswith(".bss"):
-                sizes["BSS"][0] += int(words[1])
-
-    for line in mmu.split():
-        words = line.split("=")
-        if line.startswith("-DMMU_IRAM_SIZE"):
-            sizes["IRAM"][1] = int(words[1], 16)
-        elif line.startswith("-DMMU_ICACHE_SIZE"):
-            sizes["ICACHE"][0] = sizes["ICACHE"][1] = int(words[1], 16)
+            for section, target in mapping:
+                if not line.startswith(section):
+                    continue
+                for group, (segments, total) in sizes:
+                    if target in segments:
+                        segments[target] += int(words[1])
+                        assert segments[target] <= total
 
     return sizes
 
@@ -99,20 +114,15 @@ def main():
 
     args = parser.parse_args()
     sizes = get_segment_sizes(args.elf, args.path, args.mmu)
-    hints = get_segment_hints()
 
-    template = "{:<8} {:<8} {:<8} {:<8} {:<16}"
-    header = template.format("SEGMENT", "USED", "TOTAL", "PERCENT", "DESCRIPTION")
-
-    with contextlib.redirect_stdout(sys.stderr):
-        print(header)
-        print(len(header) * "-")
-        for key, (used, total) in sizes.items():
-            print(
-                template.format(key, used, total, percentage(used, total), hints[key])
-            )
-
-    return 0
+    for group, (segments, total) in sizes:
+        print(f". {group:<8} (total {total} bytes)")
+        for n, (segment, size) in enumerate(segments.items(), start=1):
+            if n == len(segments):
+                prefix = "└──"
+            else:
+                prefix = "├──"
+            print(f"{prefix} {segment:<8} {size:<8} - {HINTS[segment]:<16}")
 
 
 if __name__ == "__main__":
