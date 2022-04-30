@@ -1828,28 +1828,24 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     # ref. elf2bin.py, 1st flash sector is
     # - 8 bytes of header
     # - bootloader until the end of the sector
-    bootloader_header = Region.fromStart(layout.region, Bytes(8))
-    bootloader = Region.after(bootloader_header, SPI_SECTOR - Bytes(8))
-
     # 2nd flash sector starts with
     # - 8 bytes of header
     # - 4 bytes of crc len
     # - 4 bytes of crc value
-    app_header = Region.after(bootloader, Bytes(8))
-    crc = Region.after(app_header, Bytes(4) + Bytes(4))
+    reserved = SPI_SECTOR + Bytes(8) + Bytes(4) + Bytes(4)
+    sketch = layout.add("Sketch", nearest.start - (layout.start + reserved))
 
-    reserved = Region("Bootloader + CRC", bootloader_header.start, crc.end)
-
-    sketch = Region("Sketch", layout.start + reserved.size, nearest.start)
-    layout.push(sketch)
-    layout.push(reserved)
+    layout.add("", Bytes(8))
+    layout.add("CRC", Bytes(4) + Bytes(4))
+    layout.add("Bootloader", SPI_SECTOR - Bytes(8))
+    layout.add("", Bytes(8))
 
     assert(layout.free == 0)
 
     ld = f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
     menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
 
-    max_upload_size = Megabytes(1) - reserved.size
+    max_upload_size = Megabytes(1) - reserved
     if empty:
         max_ota_size = empty.size
     else:
