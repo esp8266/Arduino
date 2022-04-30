@@ -32,36 +32,38 @@
 #            512K/1M/2M/4M/8M/16M:       menus for flash & FS size
 #            lwip                        menus for available lwip versions
 
-from __future__ import print_function
+import argparse
+import doctest
 import os
 import sys
 import collections
-import getopt
-import re
+import operator
+import itertools
 import json
-
-requiredboards = [ 'generic', 'esp8285' ]
+import contextlib
 
 ################################################################
-# serial upload speed order in menu
-# default is 115 for every board unless specified with 'serial' in board
-# or by user command line
+# serial upload speed order in menu, in kibibauds
+# default is 115 for every board
+# (unless, "serial" field from BOARDS below overrides it)
 
-speeds = collections.OrderedDict([
-    (  '57',  [ 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' ]),
-    ( '115',  [ 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' ]),
-    ( '230',  [ 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' ]),
-    ( '256',  [ 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' ]),
-    ( '460',  [ 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' ]),
-    ( '512',  [ 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' ]),
-    ( '921',  [ 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' ]),
-    ( '3000', [ 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  ]),
-    ])
+SERIAL_SPEEDS = collections.OrderedDict([
+    (  '57',  ( 's57',  's115', 's230', 's256', 's460', 's512', 's921', 's3000' )),
+    ( '115',  ( 's115', 's57',  's230', 's256', 's460', 's512', 's921', 's3000' )),
+    ( '230',  ( 's230', 's57',  's115', 's256', 's460', 's512', 's921', 's3000' )),
+    ( '256',  ( 's256', 's57',  's115', 's230', 's460', 's512', 's921', 's3000' )),
+    ( '460',  ( 's460', 's57',  's115', 's230', 's256', 's512', 's921', 's3000' )),
+    ( '512',  ( 's512', 's57',  's115', 's230', 's256', 's460', 's921', 's3000' )),
+    ( '921',  ( 's921', 's57',  's115', 's230', 's256', 's460', 's512', 's3000' )),
+    ( '3000', ( 's3000','s57',  's115', 's230', 's256', 's460', 's512', 's921'  )),
+])
+
+DEFAULT_SERIAL_SPEED = '115'
 
 ################################################################
 # boards list
 
-boards = collections.OrderedDict([
+BOARDS = collections.OrderedDict([
     ( 'generic', {
         'name': 'Generic ESP8266 Module',
         'opts': {
@@ -840,7 +842,6 @@ boards = collections.OrderedDict([
         'opts': {
             '.build.board': 'ESP8266_OAK',
             '.build.variant': 'oak',
-            '.upload.maximum_size': '1040368',
             },
         'macro': [
             'resetmethod_none',
@@ -1015,10 +1016,11 @@ boards = collections.OrderedDict([
     })
 	])
 
+REQUIRED_BOARDS = ( 'generic', 'esp8285' )
 
 ################################################################
 
-macros = {
+MACROS = {
     'defaults': collections.OrderedDict([
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
@@ -1286,52 +1288,78 @@ macros = {
     }
 
 ################################################################
-# defs
+# file writer helpers, we need these for *gen functions
 
-def checkdir ():
-    if not os.path.isfile("boards.txt"):
-        print("please run me from boards.txt directory (like: ./tools/boards.txt.py -...)")
-        sys.exit(1)
+
+class OpenWithBackupDir:
+    def __init__(self, path):
+        self.path = path
+        self.backup = os.path.join(
+            os.path.dirname(path),
+            "backup")
+
+    def __enter__(self):
+        if not os.path.isdir(self.backup):
+            os.mkdir(self.backup)
+
+        backup_path = os.path.join(self.backup, os.path.basename(self.path))
+        if os.path.isfile(self.path) and not os.path.isfile(backup_path):
+            os.rename(self.path, backup_path)
+
+        self._stdout = sys.stdout
+        sys.stdout = open(self.path, "w", newline="\n")
+
+        return self
+
+    def __exit__(self, *exc):
+        sys.stdout.close()
+        sys.stdout = self._stdout
+        if not any(exc):
+            print(f'wrote: {self.path}')
+
+
+class OpenWithBackupFile:
+    def __init__(self, path):
+        self.path = path
+        self.orig = f'{self.path}.orig'
+
+    def __enter__(self):
+        if os.path.isfile(self.orig):
+            os.remove(self.orig)
+
+        if os.path.isfile(self.path):
+            os.rename(self.path, self.orig)
+
+        self._stdout = sys.stdout
+        sys.stdout = open(self.path, "w", newline="\n")
+
+        return self
+
+    def __exit__(self, *exc):
+        sys.stdout.close()
+        sys.stdout = self._stdout
+        if not any(exc):
+            print(f'wrote: {self.path}')
+
 
 ################################################################
 # debug options
 
-# https://rosettacode.org/wiki/Combinations#Python
-def comb (m, lst):
-    if m == 0: return [[]]
-    return [[x] + suffix for i, x in enumerate(lst) for suffix in comb(m - 1, lst[i + 1:])]
+def subslices(values):
+    """Generate a combinations list for each possible length of the provided list.
+    Useful for build defines combinations, where we would like to generate
+    multiple menu entries for both specific flags and a combinations of them.
 
-def combn (lst):
-    all = []
-    for i in range(0, len(lst)):
-        all += comb(i + 1, lst)
-    return all
-
-def comb1 (lst, lstplusone):
-    all = []
-    for i in range(0, len(lst)):
-        all += [ [ lst[i] ] ]
-    if len(lstplusone):
-        for i in range(0, len(lstplusone)):
-            all += [ [ lstplusone[i] ] ]
-        all += [ lst ]
-        for i in range(0, len(lstplusone)):
-            all += [ lst + [ lstplusone[i] ] ]
-    else:
-        all += [ lst ]
-    return all
+    >>> list(subslices(["A", "B"]))
+    [('A',), ('B',), ('A', 'B')]
+    >>> list(subslices(["A", "B", "C"]))
+    [('A',), ('B',), ('C',), ('A', 'B'), ('A', 'C'), ('B', 'C'), ('A', 'B', 'C')]
+    """
+    for n, _ in enumerate(values, start=1):
+        for combination in itertools.combinations(values, n):
+            yield combination
 
 def all_debug ():
-    listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
-    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' ]
-    listplusone = [ 'HWDT', 'HWDT_NOEXTRA4K' ]
-    listsingle = [ 'NoAssert-NDEBUG' ]
-    options = combn(listcomb)
-    options += comb1(listnocomb, listplusone)
-    options += [ listcomb + listnocomb ]
-    for i in range(0, len(listplusone)):
-        options += [ listcomb + listnocomb + [ listplusone[i] ] ]
-    options += [ listsingle ]
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),
             ( '.menu.dbg.Disabled.build.debug_port', '' ),
@@ -1343,228 +1371,668 @@ def all_debug ():
             ( '.menu.lvl.None____.build.debug_level', '' ),
         ])
 
+    options = []
+
+    # since IDE does not allow to flag multiple options, these are split
+    # into two sort-of related groups. first ones end up as 'subslice' combinations
+    a = ( 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' )
+
+    options.extend(subslices(a))
+
+    # these end up as standalone options and a combined one
+    b = ( 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' )
+    for flag in b:
+        options.append((flag,))
+    options.append(b)
+
+    # and these could only happen on their own or with grouped options
+    for flag in ( 'HWDT', 'HWDT_NOEXTRA4K' ):
+        options.append((flag,))
+        options.append(b + (flag,))
+        options.append(a + b + (flag,))
+
+    def add_menu_entry(name, menuname, flags):
+        debugmenu.update(((
+            ( f'.menu.lvl.{name}', menuname ),
+            ( f'.menu.lvl.{name}.build.debug_level', " {}".format(" ".join(flags)) )
+            )))
+
+    add_menu_entry('NoAssert-NDEBUG', 'NoAssert-NDEBUG', ['-DNDEBUG'])
+
+    # TODO make sure to prepend with space
     for optlist in options:
-        debugname = ''
-        debugmenuname = ''
-        debugdefs = ''
-        for opt in optlist:
-            space = opt.find(" ")
-            if space > 0:
-                # remove subsequent associated gcc cmdline option
-                simpleopt = opt[0:space]
-            else:
-                simpleopt = opt
-            debugname += simpleopt
-            if debugmenuname != '':
-                debugmenuname += '+'
-            debugmenuname += simpleopt
-            if opt == 'NoAssert-NDEBUG':
-                debugdefs += ' -DNDEBUG'
-            else:
-                debugdefs += ' -DDEBUG_ESP_' + opt
-        debugmenu.update(collections.OrderedDict([
-            ( '.menu.lvl.' + debugname, debugmenuname ),
-            ( '.menu.lvl.' + debugname + '.build.debug_level', debugdefs )
-            ]))
+        add_menu_entry(
+            "".join(optlist),
+            "+".join(optlist),
+            [f'-DDEBUG_ESP_{opt}' for opt in optlist])
+
     return { 'debug_menu': debugmenu }
 
 ################################################################
 # flash size
 
-def flash_map (flash_size_kb, fs_kb = 0, name = ''):
+# TODO well, actually... it's kibi and mibi. update menu and .ld comment to use KiB and MiB?
+# menu selectors remain as 1 char suffixes, still
 
-    # mapping:
-    # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
+BYTES = 1
+KILOBYTES = 1024
+MEGABYTES = 1024 * 1024
 
-    spi = 0x40200000 # https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
 
-    reserved = 4112
-    eeprom_size_kb = 4
-    rfcal_size_kb = 4
-    sdkwifi_size_kb = 12
-    fs_end = (flash_size_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+def Bytes(size):
+    """Just bytes
+    >>> Bytes(1)
+    1
+    >>> Bytes(1024)
+    1024
+    """
+    return size
 
-    # For legacy reasons (#6531), the EEPROM sector needs to be at the old
-    # FS_end calculated without regards to block size
-    eeprom_start = fs_end
 
-    rfcal_addr = (flash_size_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
-    if flash_size_kb <= 1024:
-        max_upload_size = (flash_size_kb - (fs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
-        fs_start = fs_end - fs_kb * 1024
+def Kilobytes(size):
+    """Represent N kilobytes as bytes
+    >>> Kilobytes(1)
+    1024
+    >>> Kilobytes(1024)
+    1048576
+    """
+    return size * KILOBYTES
+
+
+def Megabytes(size):
+    """Represent N megabytes as bytes
+    >>> Megabytes(1)
+    1048576
+    >>> Megabytes(1024)
+    1073741824
+    """
+    return size * MEGABYTES
+
+
+def humanize(size, *, decimal=False, convert=None):
+    """Print something intelligible instead of just the value as-is.
+    To use with .ld and menu, also support custom suffixes for ratios
+    as [RATIO, SUFFIX] pairs.
+
+    >>> humanize(Bytes(8))
+    '8B'
+    >>> humanize(Megabytes(1))
+    '1MB'
+    >>> humanize(Megabytes(1) - Bytes(10))
+    '1023KB'
+    >>> humanize(Megabytes(1) + Bytes(10))
+    '1MB'
+    >>> humanize(Megabytes(1) + Kilobytes(512))
+    '1536KB'
+
+    """
+
+    if not convert:
+        convert = [
+            [Bytes(1), 'B'],
+            [Kilobytes(1), 'KB'],
+            [Megabytes(1), 'MB'],
+        ]
+
+    for ratio, suffix in reversed(convert):
+        if size >= ratio:
+            if size % ratio > (size / 4):
+                continue
+
+            size = f'{size / ratio:.02f}'
+            if not decimal:
+                size = size[:-3]
+
+            size = size.replace(".00", "")
+
+            return f'{size}{suffix}'
+
+    return ""
+
+
+class Region:
+    """Represent certain start and end addresses (in bytes).
+
+    >>> a = Region("", 0, 0)
+    >>> a.size == 0
+    True
+
+    >>> b = Region("", 0, 1024)
+    >>> b.start == 0
+    True
+    >>> b.end == 1024
+    True
+    >>> b.size == 1024
+    True
+
+    >>> Region("", 1024, 0)
+    Traceback (most recent call last):
+        ...
+    ValueError: start=1024 cannot be larger than end=0
+    """
+
+    def __init__(self, name, start, end):
+        if start > end:
+            raise ValueError(f'{start=} cannot be larger than {end=}')
+        self.name = name
+        self.start = start
+        self.end = end
+        self.size = Bytes(end - start)
+
+    def distance(self, other):
+        if self.end <= other.start:
+            return other.start - self.end
+        elif self.start >= other.end:
+            return other.end - self.start
+
+        return None
+
+    def __repr__(self):
+        return f'<Region {self.name=} {self.size=} at [0x{self.start:08x}:0x{self.end:08x})>'
+
+    def copy(self):
+        return Region(self.name, self.start, self.end)
+
+    @staticmethod
+    def after(region, size):
+        """
+        >>> a = Region("", 0, 1024)
+        >>> b = Region.after(a, 1024)
+        >>> b.start
+        1024
+        >>> b.end
+        2048
+        >>> b.size
+        1024
+        """
+        return Region("", region.end, region.end + size)
+
+    @staticmethod
+    def fromEnd(region, size):
+        """
+        >>> a = Region("", 0, 1024)
+        >>> b = Region.fromEnd(a, 256)
+        >>> b.start
+        768
+        >>> b.end
+        1024
+        >>> b.size
+        256
+        """
+        return Region("", region.end - size, region.end)
+
+    @staticmethod
+    def fromStart(region, size):
+        """
+        >>> a = Region("", 0, 1024)
+        >>> b = Region.fromStart(a, 512)
+        >>> b.start
+        0
+        >>> b.end
+        512
+        >>> b.size
+        512
+        """
+        return Region("", region.start, region.start + size)
+
+
+class Layout:
+    def __init__(self, region):
+        self.region = region
+        self.free = self.region.size
+        self.subregions = []
+
+    def __repr__(self):
+        return f'<Flash at {self.region} with {len(self.subregions)} subregions>'
+
+    def __getitem__(self, name):
+        for region in self.subregions:
+            if name == region.name:
+                return region
+
+        return None
+
+    @property
+    def name(self):
+        return self.region.name
+
+    @property
+    def size(self):
+        return self.region.size
+
+    @property
+    def used(self):
+        size = Bytes(0)
+        for region in self.subregions:
+            size += region.size
+
+        return size
+
+    @property
+    def start(self):
+        return self.region.start
+
+    @property
+    def end(self):
+        return self.region.end
+
+    @property
+    def edge(self):
+        return self.subregions[-1] if self.subregions else Region("", self.end, self.end)
+
+    def push(self, region):
+        """
+        >>> x = Layout(Region("", 0, 1024))
+        >>> x.push(Region("", 1024, 2048))
+        Traceback (most recent call last):
+            ...
+        ValueError: Out of bounds of <Region self.name='' self.size=1024 at [0x00000000:0x00000400)>
+        >>> x.push(Region("", -512, 0))
+        Traceback (most recent call last):
+            ...
+        ValueError: Out of bounds of <Region self.name='' self.size=1024 at [0x00000000:0x00000400)>
+        >>> x.add("", 512)
+        <Region self.name='' self.size=512 at [0x00000200:0x00000400)>
+        >>> x.push(Region("", 512, 768))
+        Traceback (most recent call last):
+            ...
+        ValueError: Region is located before self.edge=<Region self.name='' self.size=512 at [0x00000200:0x00000400)>
+        >>> x.add("", 1024)
+        Traceback (most recent call last):
+            ...
+        ValueError: No space left
+        """
+        if self.free < region.size:
+            raise ValueError(f'No space left')
+        elif self.start > region.start or self.end < region.end:
+            raise ValueError(f'Out of bounds of {self.region}')
+        elif self.subregions and region.end > self.edge.start:
+            raise ValueError(f'Region is located before {self.edge=}')
+
+        self.free = self.free - region.size
+        self.subregions.append(region)
+
+        return region
+
+    def add(self, name, size):
+        """
+        >>> x = Layout(Region("", 0, 1024))
+        >>> x.add("zero", 0)
+        <Region self.name='zero' self.size=0 at [0x00000400:0x00000400)>
+        >>> x.add("one", 512)
+        <Region self.name='one' self.size=512 at [0x00000200:0x00000400)>
+        >>> x.add("two", 512)
+        <Region self.name='two' self.size=512 at [0x00000000:0x00000200)>
+        >>> x.add("three", 512)
+        Traceback (most recent call last):
+            ...
+        ValueError: No space left
+        """
+        if self.subregions:
+            region = Region(name, self.edge.start - size, self.edge.start)
+        else:
+            region = Region(name, self.end - size, self.end)
+
+        return self.push(region)
+
+    def add_aligned(self, name, size, alignment):
+        """
+        >>> x = Layout(Region("", 0, Megabytes(1)))
+        >>> x.add("", Kilobytes(20))
+        <Region self.name='' self.size=20480 at [0x000fb000:0x00100000)>
+        >>> r = x.add_aligned("", Kilobytes(512), Kilobytes(8))
+        >>> r
+        <Region self.name='' self.size=524288 at [0x0007b000:0x000fb000)>
+        >>> r.size % Kilobytes(8)
+        0
+        >>> x.add("", Kilobytes(1))
+        <Region self.name='' self.size=1024 at [0x0007ac00:0x0007b000)>
+        >>> x.add_aligned("", Kilobytes(20), Kilobytes(8))
+        <Region self.name='' self.size=16384 at [0x00075c00:0x00079c00)>
+        """
+        end = self.edge.copy()
+
+        remainder = size % alignment
+        if remainder:
+            self.add("", remainder)
+            size -= remainder
+
+        return self.add(name, size)
+
+
+class Filesystem:
+    """Simple wrapper around Region to supply block and page sizes."""
+
+    def __init__(self, region, block_size, page_size):
+        self.region = region
+        self.block_size = block_size
+        self.page_size = page_size
+
+    def __bool__(self):
+        return self.region.size > 0
+
+    @property
+    def size(self):
+        return self.region.size
+
+    @property
+    def start(self):
+        return self.region.start
+
+    @property
+    def end(self):
+        return self.region.end
+
+    def __repr__(self):
+        return f'<Filesystem at {self.region} block {self.block_size} page {self.page_size}>'
+
+# - menu properties *will* be used in scripts, so these suffixes *must* remain the same
+#   flash size uses short uppercase suffix (without the B)
+#   fs size only adds suffix when >= 1M, no string when no fs
+#   plus, if must be >0, otherwise things won't work :)
+# - .ld script *names* could be used in scripts, so suffixes *must* remain the same
+#   flash size uses short lowercase suffix (without the b)
+#   fs size only adds suffix when >= 1M, no string when no fs
+
+
+def humanize_fs(size):
+    convert = [
+        [Bytes(1), ""],
+        [Kilobytes(1), ""],
+        [Megabytes(1), "M"],
+    ]
+
+    return humanize(size, convert=convert)
+
+
+def humanize_flash(size):
+    convert = [
+        [Bytes(1), ""],
+        [Kilobytes(1), "K"],
+        [Megabytes(1), "M"],
+    ]
+
+    return humanize(size, convert=convert)
+
+
+SPI_START = 0x40200000
+SPI_SECTOR = Kilobytes(4)
+
+
+# ref. https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
+# bootloader | crc | sketch | empty | fs | eeprom | rf-cal | sdk-wifi-settings
+def common_layout(name, flash_size):
+    # notice that we start from 0 instead of SPI start, menu needs relative addresses
+    # (which we then simply add where it is populated)
+    layout = Layout(Region(name, 0, flash_size))
+
+    # these are *always* at the end of the flash, so layout is populated backwards
+    sdkwifi = layout.add("SDK + WiFi", (SPI_SECTOR * 3))
+    rfcal = layout.add("RFCAL", SPI_SECTOR)
+
+    # eeprom sector is always there, since we don't know whether it is used or not
+    eeprom = layout.add("EEPROM", SPI_SECTOR)
+
+    return layout
+
+
+def flash_map (flash_size, fs_size = Bytes(0), name = ''):
+    """Generate template variables for the specified flash and filesystem sizes.
+    Name is optional and is simply passed through.
+
+    >>> x = flash_map(Megabytes(2), Kilobytes(64), 'Test')
+    >>> x['flash_map_name']
+    'Test'
+    >>> x['ld']
+    'eagle.flash.2m64.ld'
+    >>> x['menu']
+    '.menu.eesz.2M64'
+    >>> x['layout']['Filesystem'].size
+    45056
+
+    """
+
+    layout = common_layout(name, flash_size)
+
+    if fs_size:
+        if fs_size < Kilobytes(512):
+            fs_block_size = Kilobytes(4)
+        else:
+            fs_block_size = Kilobytes(8)
+        fs_page_size = Bytes(256)
     else:
-        max_upload_size = 1024 * 1024 - reserved
-        fs_start = (flash_size_kb - fs_kb) * 1024
+        fs_page_size = Bytes(0)
+        fs_block_size = Bytes(0)
 
-    if fs_kb < 512:
-        fs_block_size = 4096
+    # maintaining backwards compatibility, address is based
+    # on the *end of flash*, not using available space at the edge
+    # (e.g. with 2M64, we end up with only 44K of space)
+    expected_fs_size = fs_size
+    if fs_size and flash_size > Megabytes(1):
+        fs_size = fs_size - layout.used
+
+    if fs_size:
+        fs = Filesystem(
+            layout.add_aligned("Filesystem", fs_size, fs_block_size),
+            fs_block_size, fs_page_size)
     else:
-        fs_block_size = 8192
+        fs = None
 
-    # Adjust FS_end to be a multiple of the block size
-    fs_end = fs_block_size * (int)((fs_end - fs_start)/fs_block_size) + fs_start
-
-    max_ota_size = min(max_upload_size, fs_start / 2) # =(max_upload_size+empty_size)/2
-
-    if fs_kb == 0:
-        fs_start = fs_end
-        fs_page_size = 0
-        fs_block_size = 0
+    # at this point, we either left with empty + app or just the app space
+    # we could create an app up-most to 1mb, so the rest of the space is empty
+    nearest = layout.edge
+    if layout.free > Megabytes(1):
+        empty = layout.push(Region("Empty", layout.start + Megabytes(1), nearest.start))
+        nearest = empty
     else:
-        fs_page_size = 0x100
+        empty = None
 
-    # menu output
+    # ref. elf2bin.py, 1st flash sector + 16bytes off crc size + 4 bytes crc
+    bootloader = Region.fromStart(layout.region, SPI_SECTOR)
+    crc = Region.after(bootloader, Bytes(20))
 
-    #d.update(collections.OrderedDict([
-    #    ( menub + 'eeprom_start', "0x%05X" % eeprom_start ),
-    #    ]))
+    reserved = Region("Bootloader + CRC", bootloader.start, crc.end)
 
-    strsize = str(int(flash_size_kb / 1024)) + 'M' if (flash_size_kb >= 1024) else str(flash_size_kb) + 'K'
-    strfs = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) + 'K'
-    strfs_strip = str(int(fs_kb / 1024)) + 'M' if (fs_kb >= 1024) else str(fs_kb) if (fs_kb > 0) else ''
+    sketch = Region("Sketch", layout.start + reserved.size, nearest.start)
+    layout.push(sketch)
+    layout.push(reserved)
 
-    ld = 'eagle.flash.' + strsize.lower() + strfs_strip.lower() + '.ld'
+    assert(layout.free == 0)
 
-    menu = '.menu.eesz.' + strsize + strfs_strip
-    menub = menu + '.build.'
-    desc = 'none' if (fs_kb == 0) else strfs + 'B'
+    ld = f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
+    menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
+
+    max_upload_size = layout.size - reserved.size
+    if empty:
+        max_ota_size = empty.size
+    else:
+        max_ota_size = min(Megabytes(1) - reserved.size, int(sketch.size / 2))
 
     return {
-        "flash_map_name": name,
-        "ld": ld,
-        "menu": menu,
-        "menub": menub,
-        "desc": desc,
-        "spi": spi,
-        "strsize": strsize,
-        "fs_start": fs_start,
+        "layout": layout,
+        "flash_size": layout.region.size,
+        "flash_map_name": layout.region.name,
+        "sdkwifi": layout["SDK + WiFi"],
+        "rfcal": layout["RFCAL"],
+        "eeprom": layout["EEPROM"],
+        "empty": empty,
+        "fs": fs,
+        "sketch": sketch,
         "max_upload_size": max_upload_size,
         "max_ota_size": max_ota_size,
-        "fs_start": fs_start,
-        "fs_end": fs_end,
-        "fs_page_size": fs_page_size,
-        "fs_block_size": fs_block_size,
-        "fs_kb": fs_kb,
-        "eeprom_start": eeprom_start,
-        "eeprom_size_kb": eeprom_size_kb,
-        "rfcal_addr": rfcal_addr,
-        "rfcal_size_kb": rfcal_size_kb,
-        "sdkwifi_size_kb": sdkwifi_size_kb,
-        "flash_size_kb": flash_size_kb,
+        "ld": ld,
+        "menu": menu,
     }
 
 
-def menu_generate (*, ld, menu, strsize, desc, max_ota_size, menub, rfcal_addr, fs_start, fs_end, fs_block_size, fs_kb, **kwargs):
-    out = collections.OrderedDict([
-        ( menu, strsize + 'B (FS:' + desc + ' OTA:~%iKB)' % (max_ota_size / 1024)),
-        ( menub + 'flash_size', strsize ),
-        #( menub + 'flash_size_bytes', "0x%X" % (flash_size_kb * 1024)),
-        ( menub + 'flash_ld', ld ),
-        ( menub + 'spiffs_pagesize', '256' ),
-        #( menu + '.upload.maximum_size', "%i" % max_upload_size ),
-        ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
+def menu_generate (*, ld, menu, max_ota_size, max_upload_size, rfcal, flash_size, fs, **kwargs):
+    out = [
+        ( menu, f'{humanize_flash(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
+        ( f'{menu}.build.flash_size', humanize_flash(flash_size) ),
+        ( f'{menu}.build.flash_ld', ld ),
+        ( f'{menu}.build.rfcal_addr', f'0x{rfcal.start:05X}' ),
+    ]
+
+    out.append(
+        ( f'{menu}.upload.maximum_size', f'{max_upload_size}' )
+    )
+
+    if fs:
+        out.extend((
+            ( f'{menu}.build.spiffs_start', f'0x{fs.start:05X}' ),
+            ( f'{menu}.build.spiffs_end', f'0x{fs.end:05X}' ),
+            ( f'{menu}.build.spiffs_blocksize', fs.block_size ),
+            ( f'{menu}.build.spiffs_pagesize', fs.page_size ),
+        ))
+
+    return collections.OrderedDict(out)
+
+
+def all_menu_generate (flash_maps):
+    output = {
+        'autoflash': collections.OrderedDict([
+            ( '.menu.eesz.autoflash', 'Mapping defined by Hardware and Sketch' ),
+            ( '.menu.eesz.autoflash.build.flash_size', '16M' ),
+            ( '.menu.eesz.autoflash.build.flash_ld', 'eagle.flash.auto.ld' ),
+            ( '.menu.eesz.autoflash.build.extra_flags', '-DFLASH_MAP_SUPPORT=1' ),
+            ( '.menu.eesz.autoflash.upload.maximum_size', '1044464' ),
         ])
-
-    if fs_kb > 0:
-        out.update(collections.OrderedDict([
-            ( menub + 'spiffs_start', "0x%05X" % fs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % fs_end ),
-            ( menub + 'spiffs_blocksize', "%i" % fs_block_size ),
-            ]))
-
-    return out
-
-
-def all_menu_generate (mapping):
-    d = {
-        'autoflash': {
-            '.menu.eesz.autoflash': 'Mapping defined by Hardware and Sketch',
-            '.menu.eesz.autoflash.build.flash_size': '16M',
-            '.menu.eesz.autoflash.build.flash_ld': 'eagle.flash.auto.ld',
-            '.menu.eesz.autoflash.build.extra_flags': '-DFLASH_MAP_SUPPORT=1',
-            '.menu.eesz.autoflash.upload.maximum_size': '1044464',
-        }
     }
 
-    for k, values in mapping.items():
-        items = collections.OrderedDict([])
-        for v in values:
-            items.update(menu_generate(**v))
-        d[k] = items
+    for flash_map in flash_maps:
+        size = humanize_flash(flash_map["layout"].size)
+        menu = menu_generate(**flash_map)
 
-    return d
+        if size in output:
+            output[size].update(menu)
+        else:
+            output[size] = collections.OrderedDict(menu)
 
-
-def ldscript_generate (*, ld, strsize, spi, max_upload_size, fs_start, fs_end, fs_page_size, fs_block_size, rfcal_addr, rfcal_size_kb, sdkwifi_size_kb, eeprom_start, eeprom_size_kb, **kwargs):
-    if ldgen:
-        checkdir()
-
-        ldbackupdir = lddir + "backup/"
-        if not os.path.isdir(ldbackupdir):
-            os.mkdir(ldbackupdir)
-        if os.path.isfile(lddir + ld) and not os.path.isfile(ldbackupdir + ld):
-            os.rename(lddir + ld, ldbackupdir + ld)
-        realstdout = sys.stdout
-        sys.stdout = open(lddir + ld, 'w')
-
-    print("/* Flash Split for %s chips */" % strsize)
-    print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-    empty_size = fs_start - max_upload_size
-    if empty_size > 0:
-        print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-    print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + fs_start, ((fs_end - fs_start) / 1024), fs_end - fs_start))
-    print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-    print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
-    print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
-    print("")
-    print("MEMORY")
-    print("{")
-    print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
-    print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-    # Moved to ld/eagle.app.v6.common.ld.h as a 2nd MEMORY command.
-    # print("  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE")
-    print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
-    print("}")
-    print("")
-    print("PROVIDE ( _FS_start = 0x%08X );" % (spi + fs_start))
-    print("PROVIDE ( _FS_end = 0x%08X );" % (spi + fs_end))
-    print("PROVIDE ( _FS_page = 0x%X );" % fs_page_size)
-    print("PROVIDE ( _FS_block = 0x%X );" % fs_block_size)
-    print("PROVIDE ( _EEPROM_start = 0x%08x );" % (spi + eeprom_start))
-    # Re-add deprecated symbols pointing to the same address as the new standard ones
-    print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
-    print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (spi + fs_start))
-    print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (spi + fs_end))
-    print("PROVIDE ( _SPIFFS_page = 0x%X );" % fs_page_size)
-    print("PROVIDE ( _SPIFFS_block = 0x%X );" % fs_block_size)
-    print("")
-    print('INCLUDE "local.eagle.app.v6.common.ld"')
-
-    if ldgen:
-        sys.stdout.close()
-        sys.stdout = realstdout
-        print("generated: %s" % (lddir + ld))
+    return output
 
 
-def all_ldscript_generate (mapping):
-    for v in mapping.values():
-        for i in v:
-            ldscript_generate(**i)
+def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, eeprom, fs, empty, sketch, **kwargs):
+    context = contextlib.nullcontext
+    if output:
+        context = OpenWithBackupDir
+
+    def address(value):
+        return f'{SPI_START + value.start:08X}'
+
+    def size(value):
+        return f'{humanize(value.size)}'
+
+    if not fs:
+        fs = Filesystem(Region("", eeprom.start, eeprom.start), 0, 0)
+
+    with context(os.path.join(output, ld)):
+        print(f'/* Flash Split for {size(layout)} chips */')
+        print(f'/* sketch @0x{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
+        if empty:
+            print(f'/* empty  @0x{address(empty)} (~{size(empty)}) ({empty.size}B) */')
+        if fs:
+            print(f'/* fs     @0x{address(fs)} (~{size(fs)}) ({fs.size}B) */')
+        print(f'/* eeprom @0x{address(eeprom)} ({eeprom.size}B) */')
+        print(f'/* rfcal  @0x{address(rfcal)} ({rfcal.size}B) */')
+        print(f'/* wifi   @0x{address(sdkwifi)} ({sdkwifi.size}B) */')
+        print()
+        print("MEMORY")
+        print("{")
+        print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
+        print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
+        print(f'  irom0_0_seg :                         org = 0x40201010, len = {hex(int(max_upload_size))}')
+        print("}")
+        print()
+        print(f'PROVIDE ( _FS_start = 0x{fs.start:08X} );')
+        print(f'PROVIDE ( _FS_end = 0x{fs.end:08X} );')
+        print(f'PROVIDE ( _FS_page = 0x{int(fs.page_size):08X} );')
+        print(f'PROVIDE ( _FS_block = 0x{int(fs.block_size):08X} );')
+        print(f'PROVIDE ( _EEPROM_start = 0x{fs.start:08X} );')
+        # Re-add deprecated symbols pointing to the same address as the new standard ones
+        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
+        print(f'PROVIDE ( _SPIFFS_start = 0x{fs.start:08X} );')
+        print(f'PROVIDE ( _SPIFFS_end = 0x{fs.end:08X} );')
+        print(f'PROVIDE ( _SPIFFS_page = 0x{int(fs.page_size):08X} );')
+        print(f'PROVIDE ( _SPIFFS_block = 0x{int(fs.block_size):08X} );')
+        print()
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
 
-def all_flashmap_generate (flash_map_groups):
-    if flashmapgen:
-        realstdout = sys.stdout
-        sys.stdout = open(flashmap_h, "w")
+def all_ldscript_generate (output, flash_maps):
+    for flash_map in flash_maps:
+        ldscript_generate(output, **flash_map)
 
-    def as_address(value, mapping):
-        return "0x%08x" % (value + mapping["spi"])
 
-    def as_hex(value, _):
-        return "0x%x" % value
+def flashmap_generate (output, flash_maps):
+    """
+    >>> flashmap_generate(None, (flash_map(Megabytes(1), Kilobytes(512), 'TEST'), ))
+    // - DO NOT EDIT - autogenerated by boards.txt.py
+    <BLANKLINE>
+    #pragma once
+    <BLANKLINE>
+    #include <stdint.h>
+    #include <stddef.h>
+    <BLANKLINE>
+    typedef struct
+    {
+        uint32_t eeprom_start;
+        uint32_t fs_start;
+        uint32_t fs_end;
+        uint32_t fs_block_size;
+        uint32_t fs_page_size;
+        uint32_t flash_size_kb;
+    } flash_map_s;
+    <BLANKLINE>
+    /*
+      Following definitions map the above structure, one per line.
+      FLASH_MAP_* is a user choice in sketch:
+          `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`
+      Configuration is made at boot with detected flash chip size (last argument 512..16384)
+      Other values are defined from `tools/boards.txt.py`.
+    */
+    <BLANKLINE>
+    #define FLASH_MAP_TEST \\
+        { \\
+            { .eeprom_start = 0x402fb000, .fs_start = 0x4027b000, .fs_end = 0x402fb000, .fs_block_size = 0x2000, .fs_page_size = 0x100, .flash_size_kb = 1024 }, \\
+        }
+    <BLANKLINE>
+    """
 
-    def as_dec(value, _):
-        return "%d" % value
+    def as_address(value):
+        return f'0x{SPI_START + value:08x}'
+
+    def as_hex(value):
+        return f'0x{value:x}'
+
+    def as_dec(value):
+        return f'{value:d}'
+
+    # note that the current header version *only* has the values
+    # previously PROVIDEd by the .ld script
+    # forward those names to the correct object values
+    def field_values(*, layout, eeprom, fs, **kwards):
+        values = {
+            "name": layout.name,
+            "eeprom_start": eeprom.start,
+            "flash_size_kb": int(layout.size / KILOBYTES),
+        }
+
+        if fs:
+            values.update({
+                "fs_start": fs.start,
+                "fs_end": fs.end,
+                "fs_block_size": fs.block_size,
+                "fs_page_size": fs.page_size,
+            })
+        else:
+            values.update({
+                "fs_start": eeprom.start,
+                "fs_end": eeprom.start,
+                "fs_block_size": 0,
+                "fs_page_size": 0,
+            })
+
+        return values
 
     fields = [
         ["eeprom_start",  as_address],
@@ -1575,117 +2043,110 @@ def all_flashmap_generate (flash_map_groups):
         ["flash_size_kb", as_dec],
     ]
 
-    print("// - DO NOT EDIT - autogenerated by boards.txt.py")
-    print()
-    print("#pragma once")
-    print()
-    print("#include <stdint.h>")
-    print("#include <stddef.h>")
-    print()
-    print("typedef struct")
-    print("{")
-    for field, _ in fields:
-        print("    uint32_t %s;" % field)
-    print("} flash_map_s;")
-    print()
-    print("/*")
-    print("  Following definitions map the above structure, one per line.")
-    print("  FLASH_MAP_* is a user choice in sketch:")
-    print("      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`")
-    print("  Configuration is made at boot with detected flash chip size (last argument 512..16384)")
-    print("  Other values are defined from `tools/boards.txt.py`.")
-    print("*/")
-    print()
+    context = contextlib.nullcontext
+    if output:
+        context = OpenWithBackupFile
 
-    ordered_maps = collections.OrderedDict([])
-    for _, flash_maps in flash_map_groups.items():
+    with context(output):
+        print("// - DO NOT EDIT - autogenerated by boards.txt.py")
+        print()
+        print("#pragma once")
+        print()
+        print("#include <stdint.h>")
+        print("#include <stddef.h>")
+        print()
+        print("typedef struct")
+        print("{")
+        for field, _ in fields:
+            print(f'    uint32_t {field};')
+        print("} flash_map_s;")
+        print()
+        print("/*")
+        print("  Following definitions map the above structure, one per line.")
+        print("  FLASH_MAP_* is a user choice in sketch:")
+        print("      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`")
+        print("  Configuration is made at boot with detected flash chip size (last argument 512..16384)")
+        print("  Other values are defined from `tools/boards.txt.py`.")
+        print("*/")
+        print()
+
+        ordered_maps = collections.OrderedDict([])
         for flash_map in flash_maps:
-            name = flash_map.get("flash_map_name")
-            if not name:
+            values = field_values(**flash_map)
+            if not values["name"]:
                 continue
 
+            name = values["name"]
             if not ordered_maps.get(name):
                 ordered_maps[name] = []
 
-            line = ", ".join(".%s = %s" % ((f, mod(flash_map[f], flash_map))
-                if mod else flash_map[f]) for f, mod in fields)
-            ordered_maps[name].append("{ %s }, \\" % line)
+            line = ", ".join(f'.{field} = {mod(values[field])}' if mod
+                             else values[field] for field, mod in fields)
+            ordered_maps[name].append(f'{{ {line} }}, \\')
 
-    for name, lines in ordered_maps.items():
-        print("#define FLASH_MAP_%s \\" % name.upper())
-        print("    { \\")
-        for line in lines:
-            print("        %s" % line)
-        print("    }")
-        print()
-
-    if flashmapgen:
-        sys.stdout.close()
-        sys.stdout = realstdout
-        print("generated: flash map config file %s" % flashmap_h)
+        for name, lines in ordered_maps.items():
+            print(f'#define FLASH_MAP_{name.upper()} \\')
+            print("    { \\")
+            for line in lines:
+                print(f'        {line}')
+            print("    }")
+            print()
 
 
-def all_flash_map ():
-    #                flash(KB)   fs(KB)  name(optional)
-    return collections.OrderedDict([
-        ["1M", [
-            flash_map(    1024,      64, "OTA_FS" ),
-            flash_map(    1024,     128 ),
-            flash_map(    1024,     144 ),
-            flash_map(    1024,     160 ),
-            flash_map(    1024,     192 ),
-            flash_map(    1024,     256 ),
-            flash_map(    1024,     512, "MAX_FS" ),
-            flash_map(    1024,       0, "NO_FS"  ),
-        ]],
-        ["2M", [
-            flash_map(  2*1024,      64 ),
-            flash_map(  2*1024,     128 ),
-            flash_map(  2*1024,     256, "OTA_FS" ),
-            flash_map(  2*1024,     512 ),
-            flash_map(  2*1024,    1024, "MAX_FS" ),
-            flash_map(  2*1024,       0, "NO_FS" ),
-        ]],
-        ["4M", [
-            flash_map(  4*1024,  2*1024, "OTA_FS" ),
-            flash_map(  4*1024,  3*1024, "MAX_FS" ),
-            flash_map(  4*1024,    1024 ),
-            flash_map(  4*1024,       0, "NO_FS"),
-        ]],
-        ["8M", [
-            flash_map(  8*1024,  6*1024, "OTA_FS" ),
-            flash_map(  8*1024,  7*1024, "MAX_FS" ),
-            flash_map(  8*1024,       0, "NO_FS" ),
-        ]],
-        ["16M", [
-            flash_map( 16*1024, 14*1024, "OTA_FS" ),
-            flash_map( 16*1024, 15*1024, "MAX_FS" ),
-            flash_map( 16*1024,       0, "NO_FS" ),
-        ]],
-        ["512K", [
-            flash_map(     512,      32, "OTA_FS" ),
-            flash_map(     512,      64 ),
-            flash_map(     512,     128, "MAX_FS" ),
-            flash_map(     512,       0, "NO_FS" ),
-        ]]
-    ])
+def all_flash_maps ():
+    # flash_map(name=...) is optional. when it is set,
+    # we will generate a named FlashMap.h entry
+    return (
+        flash_map( Megabytes(1), Kilobytes(64), "OTA_FS" ),
+        flash_map( Megabytes(1), Kilobytes(128) ),
+        flash_map( Megabytes(1), Kilobytes(144) ),
+        flash_map( Megabytes(1), Kilobytes(160) ),
+        flash_map( Megabytes(1), Kilobytes(192) ),
+        flash_map( Megabytes(1), Kilobytes(256) ),
+        flash_map( Megabytes(1), Kilobytes(512), "MAX_FS" ),
+        flash_map( Megabytes(1), Kilobytes(0),  "NO_FS" ),
+
+        flash_map( Megabytes(2), Kilobytes(64) ),
+        flash_map( Megabytes(2), Kilobytes(128) ),
+        flash_map( Megabytes(2), Kilobytes(256), "OTA_FS" ),
+        flash_map( Megabytes(2), Kilobytes(512) ),
+        flash_map( Megabytes(2), Megabytes(1), "MAX_FS" ),
+        flash_map( Megabytes(2), Kilobytes(0), "NO_FS" ),
+
+        flash_map( Megabytes(4), Megabytes(2), "OTA_FS" ),
+        flash_map( Megabytes(4), Megabytes(3), "MAX_FS" ),
+        flash_map( Megabytes(4), Megabytes(1) ),
+        flash_map( Megabytes(4), Kilobytes(0), "NO_FS"),
+
+        flash_map( Megabytes(8), Megabytes(6), "OTA_FS" ),
+        flash_map( Megabytes(8), Megabytes(7), "MAX_FS" ),
+        flash_map( Megabytes(8), Kilobytes(0), "NO_FS" ),
+
+        flash_map( Megabytes(16), Megabytes(14), "OTA_FS" ),
+        flash_map( Megabytes(16), Megabytes(15), "MAX_FS" ),
+        flash_map( Megabytes(16), Kilobytes(0), "NO_FS" ),
+
+        flash_map( Kilobytes(512), Kilobytes(32), "OTA_FS" ),
+        flash_map( Kilobytes(512), Kilobytes(64) ),
+        flash_map( Kilobytes(512), Kilobytes(128), "MAX_FS" ),
+        flash_map( Kilobytes(512), Kilobytes(0), "NO_FS" ),
+    )
 
 ################################################################
 # builtin led
 
 def led (name, default, ledList):
-    led = collections.OrderedDict([
-                ('.menu.led.' + str(default), str(default)),
-                ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
-          ])
-    for i in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
-        if not i == default:
-            led.update(
-                collections.OrderedDict([
-                    ('.menu.led.' + str(i), str(i)),
-                    ('.menu.led.' + str(i) + '.build.led', '-DLED_BUILTIN=' + str(i)),
-                ]))
-    return { name: led }
+    menu = collections.OrderedDict((
+        (f'.menu.led.{default}', str(default)),
+        (f'.menu.led.{default}.build.led', f'-DLED_BUILTIN={default}'),
+        ))
+    for led in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
+        if not led == default:
+            menu.update((
+                (f'.menu.led.{led}', str(led)),
+                (f'.menu.led.{led}.build.led', f'-DLED_BUILTIN={led}'),
+                ))
+    return { name: menu }
 
 ################################################################
 # sdk selection
@@ -1711,502 +2172,293 @@ def sdk ():
 
 ################################################################
 
-def all_boards ():
+def abridged_boards_txt (filtered, boards, cmdline):
+    def handler(path):
+        if filtered:
+            print('#')
+            print(f'# Abridged file created by: {cmdline}')
+            print('# The following boards were included: {}'.format(" ".join(boards.keys())))
+            print('#')
 
-    if boardsgen or boardslocalgen:
+    return handler
 
-        checkdir()
+def customspeeds_boards_txt (speeds):
+    def handler(name):
+        for speed in speeds:
+            print(f'{name}.menu.baud.{speed}={speed}')
+            print(f'{name}.menu.baud.{speed}.upload.speed={speed}')
 
-        if boardsgen:
-            # check if backup already exists
-            if not os.path.isfile("boards.txt.orig"):
-                os.rename("boards.txt", "boards.txt.orig")
+    return handler
 
-            realstdout = sys.stdout
-            sys.stdout = open("boards.txt", 'w')
-        else:
-            # make backup of boards.local.txt
-            if os.path.isfile("boards.local.txt"):
-                if not os.path.isfile("boards.local.txt.orig"):
-                    os.rename("boards.local.txt", "boards.local.txt.orig")
 
-            realstdout = sys.stdout
-            sys.stdout = open("boards.local.txt", 'w')
+def nofloat_boards_txt (disabled):
+    def handler(name):
+        if disabled:
+            print(f'{name}.build.float=')
 
-    macros.update(all_menu_generate(all_flash_map()))
+    return handler
+
+
+def prepare_macros (defaults, flashmap, builtinled):
+    macros = defaults
+    macros.update(all_menu_generate(flashmap))
     macros.update(all_debug())
-    macros.update(led('led',    led_default, range(0,led_max+1)))
-    macros.update(led('led216', 2,           { 16 }))
+    macros.update(led('led', builtinled, range(0, 17)))
+    macros.update(led('led216', 2, (16, )))
     macros.update(sdk())
 
-    if boardfilteropt or excludeboards:
+    return macros
+
+
+def all_boards_generate (output, boards, macros, extra_header=[], extra_board=[]):
+
+    context = contextlib.nullcontext
+    if output:
+        context = OpenWithBackupFile
+
+    with context(output):
+        print("// - DO NOT EDIT - autogenerated by boards.txt.py")
+        print('# Instead, modify {cmdname} and run `{cmdname} --boards --generate`'.format(
+            cmdname=os.path.basename(sys.argv[0])))
         print('#')
-        print('# Do not create pull-requests with this abridged file!')
-        print('# Do as instructed further down.')
-        print('#')
+        for func in extra_header:
+            func(output)
+        print()
+        # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
+        print('menu.BoardModel=Model')
+        print('menu.ESPModule=Module')
+        print('menu.UploadTool=Upload Tool')
+        print('menu.led=Builtin Led')
+        print('menu.baud=Upload Speed')
+        print('menu.xtal=CPU Frequency')
+        print('menu.CrystalFreq=Crystal Frequency')
+        print('menu.eesz=Flash Size')
+        print('menu.FlashMode=Flash Mode')
+        print('menu.FlashFreq=Flash Frequency')
+        print('menu.ResetMethod=Reset Method')
+        print('menu.dbg=Debug port')
+        print('menu.lvl=Debug Level')
+        print('menu.ip=lwIP Variant')
+        print('menu.vt=VTables')
+        print('menu.exception=C++ Exceptions')
+        print('menu.stacksmash=Stack Protection')
+        print('menu.wipe=Erase Flash')
+        print('menu.sdk=Espressif FW')
+        print('menu.ssl=SSL Support')
+        print('menu.mmu=MMU')
+        print('menu.non32xfer=Non-32-Bit Access')
+        print()
 
-        out = ""
-        for a in sys.argv:
-            out += " " + a
-        print('# Abridged boards.txt or boards.local.txt created by:' + out)
-        out = ""
-        for a in boardlist:
-            out += " " + a
-        print('# The following boards were included: ' + out)
-        print('#')
+        for name, board in boards.items():
+            print('##############################################################')
+            print(f'{name}.name={board["name"]}')
+
+            # standalone options
+            if 'opts' in board:
+                for optname in sorted(board['opts']):
+                    print(f'{name}{optname}={board["opts"][optname]}')
+
+            # macros
+            macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
+            if 'macro' in board:
+                macrolist += board['macro']
+            macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
+
+            macrolist += SERIAL_SPEEDS[board.get("serial", DEFAULT_SERIAL_SPEED)]
+            macrolist += [ 'autoflash' ]
+
+            for func in extra_board:
+                func(name)
+
+            for block in macrolist:
+                for optname in macros[block]:
+                    if not ('opts' in board) or not (optname in board['opts']):
+                        print(f'{name}{optname}={macros[block][optname]}')
+
+            print()
 
 
-    print('#')
-    print('# Do not create pull-requests for this file only, CI will not accept them.')
-    print('# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.')
-    print('# All modified files after running with option "--allgen" must be included in the pull-request.')
-    print('#')
-    print('')
-    # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
-    print('menu.BoardModel=Model')
-    print('menu.ESPModule=Module')
-    print('menu.UploadTool=Upload Tool')
-    print('menu.led=Builtin Led')
-    print('menu.baud=Upload Speed')
-    print('menu.xtal=CPU Frequency')
-    print('menu.CrystalFreq=Crystal Frequency')
-    print('menu.eesz=Flash Size')
-    print('menu.FlashMode=Flash Mode')
-    print('menu.FlashFreq=Flash Frequency')
-    print('menu.ResetMethod=Reset Method')
-    print('menu.dbg=Debug port')
-    print('menu.lvl=Debug Level')
-    print('menu.ip=lwIP Variant')
-    print('menu.vt=VTables')
-    print('menu.exception=C++ Exceptions')
-    print('menu.stacksmash=Stack Protection')
-    print('menu.wipe=Erase Flash')
-    print('menu.sdk=Espressif FW')
-    print('menu.ssl=SSL Support')
-    print('menu.mmu=MMU')
-    print('menu.non32xfer=Non-32-Bit Access')
-    print('')
+def filtered_boards(boards, path, action=operator.sub):
+    filters = set()
 
-    missingboards = []
-    boardlistsortedbydisplayedname = [ k for k in sorted(boardlist, key = lambda item: boards[item]['name']) ]
-    sortedrequiredfirst = requiredboards + [ item for item in boardlistsortedbydisplayedname if item not in requiredboards ]
-    for id in sortedrequiredfirst:
-        if id not in boards:
-            missingboards += [ id ]
-            continue
+    with open(path, "r") as f:
+        for line in f:
+            if line.startswith("#"):
+                continue
+            board, _, desc = line.partition("#")
+            board = board.strip()
+            filters.add(board)
 
-        print('##############################################################')
-        board = boards[id]
-        print(id + '.name=' + board['name'])
+    filtered = action(set(boards.keys()), filters)
 
-        # standalone options
-        if 'opts' in board:
-            for optname in sorted(board['opts']):
-                print(id + optname + '=' + board['opts'][optname])
+    print('Filtered boards list:')
+    print(" ".join(filtered))
+    print()
 
-        # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
-        if 'macro' in board:
-            macrolist += board['macro']
-        macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
-
-        for cs in customspeeds:
-            print(id + cs)
-
-        if 'serial' in board:
-            macrolist += speeds[board['serial']]
-        else:
-            macrolist += speeds[default_speed]
-
-        macrolist += [ 'autoflash' ]
-
-        for block in macrolist:
-            for optname in macros[block]:
-                if not ('opts' in board) or not (optname in board['opts']):
-                    print(id + optname + '=' + macros[block][optname])
-
-        if nofloat:
-            print(id + '.build.float=')
-
-        print('')
-
-    if boardsgen or boardslocalgen:
-        sys.stdout.close()
-        sys.stdout = realstdout
-
-    if missingboards:
+    missing = [name for name in filtered if name not in boards.keys()]
+    if missing:
         print("No board definitions were found for the following boards:")
-        print(missingboards)
+        print(" ".join(missing))
         print("")
 
-    if boardsgen:
-        print("generated: boards.txt")
-    else:
-        print("generated: boards.local.txt")
+    result = collections.OrderedDict()
+    for name, board in boards.items():
+        if name in filtered:
+            result[name] = board
 
-################################################################
+    return result
 
-def package ():
 
-    pkgfname = "package/package_esp8266com_index.template.json"
-    pkgfname_read = pkgfname
+def prepare_boards (boards, required_boards):
+    boardslist = set(required_boards) | set(boards.keys())
+    boardslist = boardslist - set(required_boards)
+    boardslist = required_boards + tuple(sorted(boardslist, key=lambda x: boards[x]["name"]))
 
-    checkdir()
+    out = collections.OrderedDict()
+    for name in boardslist:
+        out[name] = boards[name]
 
-    if packagegen:
-        pkgfname_read = pkgfname + '.orig'
-        if os.path.isfile(pkgfname_read):
-            os.remove(pkgfname_read)
-        os.rename(pkgfname, pkgfname_read)
+    return out
 
-    # read package file
-    with open (pkgfname_read, "r") as package_file:
-        filestr = package_file.read()
 
-    substitution = '"boards": [\n'
-    board_items = ['            {\n              "name": "%s"\n            }' % boards[id]['name']
-                    for id in boards]
-    substitution += ',\n'.join(board_items)
-    substitution += '\n          ],'
-
-    newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
-
-    # To get consistent indent/formatting read the JSON and write it out programmatically
-    if packagegen:
-        with open(pkgfname, 'w') as package_file:
-            filejson = json.loads(newfilestr, object_pairs_hook=collections.OrderedDict)
-            package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
-        print("updated:   %s" % pkgfname)
-    else:
-        sys.stdout.write(newfilestr)
-
-################################################################
-
-def doc ():
-
-    if docgen:
-
-        checkdir()
-
-        # check if backup already exists
-        if not os.path.isfile("doc/boards.rst.orig"):
-            os.rename("doc/boards.rst", "doc/boards.rst.orig")
-
-        realstdout = sys.stdout
-        sys.stdout = open("doc/boards.rst", 'w')
-
-    print('Boards')
-    print('======')
-    print('')
-
-    for id in boards:
-        board = boards[id]
-        print(board['name'])
-        dash = ""
-        for i in range(len(board['name'])):
-            dash += '-'
-        print(dash)
-
-        print('')
-        if 'desc' in board:
-            for line in board['desc']:
-                print(line)
-        else:
-            print('No description')
-        print('')
-
-    if docgen:
-        sys.stdout.close()
-        sys.stdout = realstdout
-        print("generated: doc/boards.rst")
-
-################################################################
-
-def boardnames ():
+def boardnames (boards):
     print('# Available board names. Delete or comment out the boards you do not need:')
+    for name, board in boards.items():
+        print(f'{name: <20s} # {board["name"]}')
 
-    for id in boards:
-        print('{: <20s} # {}'.format(id, boards[id]['name']))
-
-    sys.exit(0)
 
 ################################################################
-# help / usage
 
-def usage (name,ret):
-    print("")
-    print("boards.txt generator for esp8266/Arduino")
-    print("")
-    print("usage: %s [options]" % name)
-    print("")
-    print(" -h, --help")
-    print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
-    print(" --board <b>       - board to modify:")
-    print(" --filter <file>   - create a short boards.txt based on the boards listed in <file>")
-    print(" --xfilter <file>  - create a short boards.txt excluding the boards listed in <file>")
-    print("                     (For --filter or --xfilter use only one)")
-    print(" --speed <s>       - change default serial speed")
-    print(" --customspeed <s> - new serial speed for all boards")
-    print(" --nofloat         - disable float support in printf/scanf")
-    print("")
-    print(" mandatory option (at least one):")
-    print("")
-    print(" --boards          - show boards.txt")
-    print(" --boardsgen       - replace boards.txt")
-    print(" --boardslocalgen  - replace boards.local.txt instead of boards.txt")
-    print(" --boardnames      - prints a list of board names, one per line")
-    print(" --ld              - show ldscripts")
-    print(" --ldgen           - replace ldscripts")
-    print(" --flashmap        - shows FlashMap.h")
-    print(" --flashmapgen     - replace FlashMap.h")
-    print(" --package         - show package")
-    print(" --packagegen      - replace board:[] in package")
-    print(" --doc             - shows doc/boards.rst")
-    print(" --docgen          - replace doc/boards.rst")
-    print(" --allgen          - generate and replace everything")
-    print("                     (useful for pushing on github)")
-    print("")
+def package_generate (output, boards):
+    with open(output, "r") as f:
+        data = json.load(f, object_pairs_hook=collections.OrderedDict)
 
-    out = ""
-    for s in speeds:
-        out += s + ' '
-    print("available serial speed options (kbps):", out)
+    target = None
+    for package in data["packages"]:
+        for platform in package["platforms"]:
+            if platform["name"] == "esp8266":
+                target = platform["boards"]
 
-    out = ""
-    for b in boards:
-        out += b + '('
-        if 'serial' in boards[b]:
-            out += boards[b]['serial']
-        else:
-            out += default_speed
-        out += 'k) '
-    print("available board names:", out)
+    if not target:
+        raise ValueError('no "boards" field found for the platform')
 
-    print("")
-
-    sys.exit(ret)
+    with OpenWithBackupFile(output):
+        target = [{"name": board["name"]} for board in boards.values()]
+        print(json.dumps(data, indent=3, separators=(",", ": ")))
 
 ################################################################
+
+def doc_generate (output, boards):
+    context = contextlib.nullcontext
+    if output:
+        context = OpenWithBackupFile
+
+    with context(output):
+        print('Boards')
+        print('======')
+        print()
+
+        for board in boards.values():
+            print(board['name'])
+            print("-" * len(board["name"]))
+            print()
+            for line in board.get("desc", []):
+                print(line)
+            print()
+
 ################################################################
-# entry point
+# entrypoint
 
-default_speed = '115'
-led_default = 2
-led_max = 16
-nofloat = False
-ldgen = False
-ldshow = False
-flashmapshow = False
-flashmapgen = False
-boardsgen = False
-boardsshow = False
+def parse_cmdline ():
+    parser = argparse.ArgumentParser(description="File generator for esp8266/Arduino")
 
-boardlist = []
-boardfilterfile = ""
-boardfilteropt = False
-excludeboardlist = []
-excludeboards = False
-boardslocalgen = False
+    parser.add_argument("--test", action="store_true", help=argparse.SUPPRESS)
 
-packageshow = False
-packagegen = False
-docshow = False
-docgen = False
-customspeeds = []
+    parser.add_argument("--led", type=int, default=2, help="default builtin led specified for generic boards")
+    parser.add_argument("--nofloat", action="store_true", help="disable float support in printf and scanf")
+    parser.add_argument("--customspeed", action="append", default=[], help="additional serial speed option for all boards")
 
-lddir = "tools/sdk/ld/"
-flashmap_h = "cores/esp8266/FlashMap.h"
+    parser.add_argument("--boardnames", action="store_true", help="prints a list of board names")
 
-#### vvvv cmdline parsing starts
+    filters = parser.add_mutually_exclusive_group()
+    filters.add_argument("--include", nargs="?", help="resulting BOARDSFILE will include *only* the boards listed in the INCLUDE file")
+    filters.add_argument("--exclude", nargs="?", help="resulting BOARDSFILE will *not* include boards listed in the EXCLUDE file")
 
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "h",
-        [ "help", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "noextra4kheap", "allowWPS",
-          "boardslocalgen", "filter=", "xfilter=", "boardnames",
-          "ld", "ldgen",
-          "flashmap", "flashmapgen",
-          "boards", "boardsgen",
-          "package", "packagegen",
-          "doc", "docgen",
-          "allgen"] )
-except getopt.GetoptError as err:
-    print(str(err)) # will print something like "option -a not recognized"
-    usage(sys.argv[0], 1)
+    generators = [
+        ["boards", "boardsfile", "boards.txt", "boards.txt"],
+        ["ld", "lddir", "tools/sdk/ld", ".ld scripts"],
+        ["flashmap", "flashmapfile", "cores/esp8266/FlashMap.h", "FlashMap header"],
+        ["package", "packagefile", "package/package_esp8266com_index.template.json", "package template .json"],
+        ["doc", "docfile", "doc/boards.rst", "boards documentation"],
+    ]
 
-no = '(not set)'
-board = no
+    for name, output, default, title in generators:
+        sub = parser.add_argument_group(title=title)
+        sub.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
+        sub.add_argument(f'--{output}', default=default)
 
-for o, a in opts:
+    parser.add_argument("--all", dest="generators", action="store_const", const=[
+        name for name, _, _, _ in generators
+    ], help="Select all available generators")
 
-    if o in ("-h", "--help"):
-        usage(sys.argv[0], 0)
+    parser.add_argument("--generate", action="store_true", help="Generate and write to selected files")
 
-    elif o in ("--boardnames"):
-       boardnames()
+    return parser.parse_args()
 
-    elif o in ("--led"):
-        led_default = int(a)
 
-    elif o in ("--customspeed"):
-        customspeeds += [
-            '.menu.baud.' + a + '=' + a,
-            '.menu.baud.' + a + '.upload.speed' + '=' + a ]
+def main ():
+    args = parse_cmdline()
+    if args.test:
+        doctest.testmod()
+        return
 
-    elif o in ("--board"):
-        if not a in boards:
-            print("board %s not available" % a)
-            usage(sys.argv[0], 1)
-        board = a
+    boards = prepare_boards(BOARDS, REQUIRED_BOARDS)
 
-    elif o in ("--filter"):
-        boardfilteropt = True
-        boardfilterfile = a
+    filter_path = args.include or args.exclude
+    if filter_path:
+        action = operator.and_ if args.include else operator.sub
+        boards = filtered_boards(boards, filter_path, action)
 
-    elif o in ("--xfilter"):
-        excludeboards = True
-        boardfilterfile = a
+    if args.boardnames:
+        boardnames(boards)
+        return
 
-    elif o in ("--speed"):
-        if board == no:
-            print("board not set")
-            usage(sys.argv[0], 1)
-        if not a in speeds:
-            print("speed %s not available" % a)
-            usage(sys.argv[0], 1)
-        boards[board]['serial'] = a
+    generators = set(name for name in args.generators or [])
 
-    elif o in ("--nofloat"):
-        nofloat=True
+    if "boards" in generators:
+        all_boards_generate(
+            args.boardsfile if args.generate else None,
+            boards,
+            macros=prepare_macros(MACROS, all_flash_maps(), args.led),
+            extra_header=[
+                abridged_boards_txt(filter_path, boards,
+                                    cmdline=" ".join(sys.argv))
+            ],
+            extra_board=[
+                nofloat_boards_txt(args.nofloat),
+                customspeeds_boards_txt(args.customspeed)
+            ])
 
-    elif o in ("--noextra4kheap", "--allowWPS"):
-        print('option ' + o + ' is now deprecated, without effect, and will be removed')
+    if "ld" in generators:
+        all_ldscript_generate(
+            args.lddir if args.generate else None,
+            all_flash_maps())
 
-    elif o in ("--ld"):
-        ldshow = True
+    if "flashmap" in generators:
+        flashmap_generate(
+            args.flashmapfile if args.generate else None,
+            all_flash_maps())
 
-    elif o in ("--ldgen"):
-        ldshow = True
-        ldgen = True
+    if "package" in generators:
+        package_generate(
+            args.packagefile if args.generate else None,
+            boards)
 
-    elif o in ("--flashmap"):
-        flashmapshow = True
+    if "doc" in generators:
+        doc_generate(
+            args.docfile if args.generate else None,
+            boards)
 
-    elif o in ("--flashmapgen"):
-        flashmapshow = True
-        flashmapgen = True
 
-    elif o in ("--boardsshow"):
-        boardsshow = True
-
-    elif o in ("--boardsgen"):
-        boardsshow = True
-        boardsgen = True
-
-    elif o in ("--boardslocalgen"):
-        boardsshow = True
-        boardslocalgen = True
-
-    elif o in ("--package"):
-        packageshow = True
-
-    elif o in ("--packagegen"):
-        packageshow = True
-        packagegen = True
-
-    elif o in ("--doc"):
-        docshow = True
-
-    elif o in ("--docgen"):
-        docshow = True
-        docgen = True
-
-    elif o in ("--allgen"):
-        ldshow = True
-        ldgen = True
-        flashmapshow = True
-        flashmapgen = True
-        boardsshow = True
-        boardsgen = True
-        packageshow = True
-        packagegen = True
-        docshow = True
-        docgen = True
-
-    else:
-        assert False, "unhandled option"
-
-#### ^^^^ cmdline parsing ends
-
-#### vvvv Filter file processing if we have one
-
-if boardfilteropt and excludeboards:
-    print('Specify either --filter or --xfilter, not both.')
-    usage(sys.argv[0], 1)
-
-if boardfilteropt or excludeboards:
-    if not os.path.isfile(boardfilterfile):
-        print('Filter file missing: ', boardfilterfile)
-        usage(sys.argv[0], 1)
-
-    f = open(boardfilterfile, 'r')
-    for line in f:
-        a = line.split('#', 1)[0].strip()
-        if a != '':
-            boardlist += [ a ]
-    f.close()
-
-    if not boardslocalgen:
-        if boardfilteropt:
-            for name in requiredboards:
-                if name not in boardlist:
-                    boardlist.append(name)
-        else:
-            # excludeboards:
-            for name in requiredboards:
-                if name in boardlist:
-                    boardlist.remove(name)
-
-    if boardfilteropt:
-        print('Applying keep filter list:')
-    else:
-        print('Applying exclude filter list:')
-
-    print(boardlist)
-    print('')
-
-#### ^^^^ Filter file processing finished
-
-did = False
-
-if ldshow:
-    all_ldscript_generate(all_flash_map())
-    did = True
-
-if flashmapshow:
-    all_flashmap_generate(all_flash_map())
-    did = True
-
-if boardsshow:
-    ldshow = False
-    ldgen = False
-    if not boardfilteropt:
-        if excludeboards:
-            excludeboardlist = boardlist
-        boardlist = []
-        for b in boards:
-            if b not in excludeboardlist:
-                boardlist += [ b ]
-    all_boards()
-    did = True
-
-if packageshow:
-    package()
-    did = True
-
-if docshow:
-    doc()
-    did = True
-
-if not did:
-    usage(sys.argv[0], 0)
+if __name__ == "__main__":
+    main()
