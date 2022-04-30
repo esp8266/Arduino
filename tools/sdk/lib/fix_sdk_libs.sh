@@ -17,10 +17,10 @@ patchFile() {
 	LENGTH=$3 # DO NOT PASS AS HEX!
 	EXPECTED=$4
 	REPLACEWITH=$5
-	if [[ "$(dd if=eap.o bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$EXPECTED" ]]; then
+	if [[ "$(dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$EXPECTED" ]]; then
 		echo "Patching $1..."
-		echo $5 | base64 -d | dd of=eap.o bs=1 count=$LENGTH seek=$ADDRESS conv=notrunc
-	elif ! [[ "$(dd if=eap.o bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$REPLACEWITH" ]]; then
+		echo $5 | base64 -d | dd of=$FILE bs=1 count=$LENGTH seek=$ADDRESS conv=notrunc
+	elif ! [[ "$(dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$REPLACEWITH" ]]; then
 		echo "PATCH FAILED!"
 		exit 0
 	fi
