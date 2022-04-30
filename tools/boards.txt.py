@@ -1359,7 +1359,7 @@ def subslices(values):
         for combination in itertools.combinations(values, n):
             yield combination
 
-def all_debug ():
+def debug_macros ():
     debugmenu = collections.OrderedDict([
             ( '.menu.dbg.Disabled', 'Disabled' ),
             ( '.menu.dbg.Disabled.build.debug_port', '' ),
@@ -1902,7 +1902,7 @@ def menu_generate (*, ld, menu, max_ota_size, max_upload_size, rfcal, flash_size
     return collections.OrderedDict(out)
 
 
-def all_menu_generate (flash_maps):
+def menu_macros (flash_maps):
     output = {
         'autoflash': collections.OrderedDict([
             ( '.menu.eesz.autoflash', 'Mapping defined by Hardware and Sketch' ),
@@ -2168,7 +2168,7 @@ def led (name, default, ledList):
 ################################################################
 # sdk selection
 
-def sdk ():
+def sdk_macros ():
     return { 'sdk': collections.OrderedDict([
                         ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
                         ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
@@ -2218,11 +2218,11 @@ def nofloat_boards_txt (disabled):
 
 def prepare_macros (defaults, flashmap, builtinled):
     macros = defaults
-    macros.update(all_menu_generate(flashmap))
-    macros.update(all_debug())
+    macros.update(menu_macros(flashmap))
+    macros.update(debug_macros())
     macros.update(led('led', builtinled, range(0, 17)))
     macros.update(led('led216', 2, (16, )))
-    macros.update(sdk())
+    macros.update(sdk_macros())
 
     return macros
 
