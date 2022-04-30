@@ -1856,7 +1856,7 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     ld = f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
     menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
 
-    max_upload_size = Megabytes(1) - reserved
+    max_upload_size = min(Megabytes(1), flash_size) - reserved
     if empty:
         max_ota_size = empty.size
     else:
