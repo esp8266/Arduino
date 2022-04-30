@@ -1494,17 +1494,15 @@ class Region:
     """Represent certain start and end addresses (in bytes).
 
     >>> a = Region("", 0, 0)
-    >>> a.size == 0
-    True
-
+    >>> a.size
+    0
     >>> b = Region("", 0, 1024)
-    >>> b.start == 0
-    True
-    >>> b.end == 1024
-    True
-    >>> b.size == 1024
-    True
-
+    >>> b.start
+    0
+    >>> b.end
+    1024
+    >>> b.size
+    1024
     >>> Region("", 1024, 0)
     Traceback (most recent call last):
         ...
