@@ -1787,7 +1787,18 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     '.menu.eesz.2M64'
     >>> x['layout']['Filesystem'].size
     45056
-
+    >>> import pprint
+    >>> pprint.pprint(x['layout'].subregions)
+    [<Region self.name='SDK + WiFi' self.size=12288 at [0x001fd000:0x00200000)>,
+     <Region self.name='RFCAL' self.size=4096 at [0x001fc000:0x001fd000)>,
+     <Region self.name='EEPROM' self.size=4096 at [0x001fb000:0x001fc000)>,
+     <Region self.name='Filesystem' self.size=45056 at [0x001f0000:0x001fb000)>,
+     <Region self.name='Empty' self.size=983040 at [0x00100000:0x001f0000)>,
+     <Region self.name='Sketch' self.size=1044464 at [0x00001010:0x00100000)>,
+     <Region self.name='' self.size=8 at [0x00001008:0x00001010)>,
+     <Region self.name='CRC' self.size=8 at [0x00001000:0x00001008)>,
+     <Region self.name='Bootloader' self.size=4088 at [0x00000008:0x00001000)>,
+     <Region self.name='' self.size=8 at [0x00000000:0x00000008)>]
     """
 
     layout = common_layout(name, flash_size)
