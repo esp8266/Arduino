@@ -1915,7 +1915,10 @@ def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, e
         context = OpenWithBackupDir
 
     def address(value):
-        return f'{SPI_START + value.start:08X}'
+        return f'0x{SPI_START + value.start:08X}'
+
+    def symbol(value):
+        return f'0x{SPI_START + value:08X}'
 
     def size(value):
         return f'{humanize(value.size)}'
@@ -1925,33 +1928,33 @@ def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, e
 
     with context(os.path.join(output, ld)):
         print(f'/* Flash Split for {size(layout)} chips */')
-        print(f'/* sketch @0x{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
+        print(f'/* sketch @{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
         if empty:
-            print(f'/* empty  @0x{address(empty)} (~{size(empty)}) ({empty.size}B) */')
+            print(f'/* empty  @{address(empty)} (~{size(empty)}) ({empty.size}B) */')
         if fs:
-            print(f'/* fs     @0x{address(fs)} (~{size(fs)}) ({fs.size}B) */')
-        print(f'/* eeprom @0x{address(eeprom)} ({eeprom.size}B) */')
-        print(f'/* rfcal  @0x{address(rfcal)} ({rfcal.size}B) */')
-        print(f'/* wifi   @0x{address(sdkwifi)} ({sdkwifi.size}B) */')
+            print(f'/* fs     @{address(fs)} (~{size(fs)}) ({fs.size}B) */')
+        print(f'/* eeprom @{address(eeprom)} ({eeprom.size}B) */')
+        print(f'/* rfcal  @{address(rfcal)} ({rfcal.size}B) */')
+        print(f'/* wifi   @{address(sdkwifi)} ({sdkwifi.size}B) */')
         print()
         print("MEMORY")
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print(f'  irom0_0_seg :                         org = 0x40201010, len = {hex(int(max_upload_size))}')
+        print(f'  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}')
         print("}")
         print()
-        print(f'PROVIDE ( _FS_start = 0x{fs.start:08X} );')
-        print(f'PROVIDE ( _FS_end = 0x{fs.end:08X} );')
-        print(f'PROVIDE ( _FS_page = 0x{int(fs.page_size):08X} );')
-        print(f'PROVIDE ( _FS_block = 0x{int(fs.block_size):08X} );')
-        print(f'PROVIDE ( _EEPROM_start = 0x{fs.start:08X} );')
+        print(f'PROVIDE ( _FS_start = {symbol(fs.start)} );')
+        print(f'PROVIDE ( _FS_end = {symbol(fs.end)} );')
+        print(f'PROVIDE ( _FS_page = 0x{fs.page_size:X} );')
+        print(f'PROVIDE ( _FS_block = 0x{fs.block_size:X} );')
+        print(f'PROVIDE ( _EEPROM_start = {symbol(eeprom.start)} );')
         # Re-add deprecated symbols pointing to the same address as the new standard ones
         print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
-        print(f'PROVIDE ( _SPIFFS_start = 0x{fs.start:08X} );')
-        print(f'PROVIDE ( _SPIFFS_end = 0x{fs.end:08X} );')
-        print(f'PROVIDE ( _SPIFFS_page = 0x{int(fs.page_size):08X} );')
-        print(f'PROVIDE ( _SPIFFS_block = 0x{int(fs.block_size):08X} );')
+        print(f'PROVIDE ( _SPIFFS_start = {symbol(fs.start)} );')
+        print(f'PROVIDE ( _SPIFFS_end = {symbol(fs.end)} );')
+        print(f'PROVIDE ( _SPIFFS_page = 0x{fs.page_size:X} );')
+        print(f'PROVIDE ( _SPIFFS_block = 0x{fs.block_size:X} );')
         print()
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
