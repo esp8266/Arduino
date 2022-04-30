@@ -1827,7 +1827,7 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
 
     # ref. elf2bin.py, 1st flash sector + 16bytes off crc size + 4 bytes crc
     bootloader = Region.fromStart(layout.region, SPI_SECTOR)
-    crc = Region.after(bootloader, Bytes(20))
+    crc = Region.after(bootloader, Bytes(16))
 
     reserved = Region("Bootloader + CRC", bootloader.start, crc.end)
 
