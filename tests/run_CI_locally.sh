@@ -115,7 +115,7 @@ elif [ "$BUILD_TYPE" = host ]; then
     tests/ci/host_test.sh
 
 elif [ "$BUILD_TYPE" = style ]; then
-    tests/ci/check_restyle.sh
+    tests/ci/style_check.sh
     tests/restyle.sh
 
 else
