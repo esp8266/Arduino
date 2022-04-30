@@ -1293,7 +1293,7 @@ MACROS = {
 
 class OpenWithBackupDir:
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.normpath(path)
         self.backup = os.path.join(
             os.path.dirname(path),
             "backup")
@@ -1320,7 +1320,7 @@ class OpenWithBackupDir:
 
 class OpenWithBackupFile:
     def __init__(self, path):
-        self.path = path
+        self.path = os.path.normpath(path)
         self.orig = f'{self.path}.orig'
 
     def __enter__(self):
