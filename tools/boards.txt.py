@@ -1825,11 +1825,20 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     else:
         empty = None
 
-    # ref. elf2bin.py, 1st flash sector + 16bytes off crc size + 4 bytes crc
-    bootloader = Region.fromStart(layout.region, SPI_SECTOR)
-    crc = Region.after(bootloader, Bytes(16))
+    # ref. elf2bin.py, 1st flash sector is
+    # - 8 bytes of header
+    # - bootloader until the end of the sector
+    bootloader_header = Region.fromStart(layout.region, Bytes(8))
+    bootloader = Region.after(bootloader_header, SPI_SECTOR - Bytes(8))
 
-    reserved = Region("Bootloader + CRC", bootloader.start, crc.end)
+    # 2nd flash sector starts with
+    # - 8 bytes of header
+    # - 4 bytes of crc len
+    # - 4 bytes of crc value
+    app_header = Region.after(bootloader, Bytes(8))
+    crc = Region.after(app_header, Bytes(4) + Bytes(4))
+
+    reserved = Region("Bootloader + CRC", bootloader_header.start, crc.end)
 
     sketch = Region("Sketch", layout.start + reserved.size, nearest.start)
     layout.push(sketch)
