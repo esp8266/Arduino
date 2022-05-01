@@ -103,7 +103,7 @@ bool DNSServer::enableForwarder(const String &domainName, const IPAddress &dns)
 
   if (_dns.isSet()) {
     if (!_que) {
-      _que = std::unique_ptr<struct DNSS_REQUESTER[]> (new (std::nothrow) struct DNSS_REQUESTER[kDNSSQueSize]);
+      _que = std::unique_ptr<DNSS_REQUESTER[]> (new (std::nothrow) DNSS_REQUESTER[kDNSSQueSize]);
       DEBUG_PRINTF("Created new _que\r\n");
       if (_que) {
         for (size_t i = 0; i < kDNSSQueSize; i++) {
