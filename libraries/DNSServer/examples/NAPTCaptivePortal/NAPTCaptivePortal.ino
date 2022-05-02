@@ -183,7 +183,7 @@ void setup() {
     });
 
   staModeDisconnectedHandler = WiFi.onStationModeDisconnected(
-    [](const WiFiEventStationModeDisconnected) {
+    [](const WiFiEventStationModeDisconnected&) {
       if (dnsServer.isForwarding()) {
         dnsServer.disableForwarder("*");
         dnsServer.setTTL(0);
