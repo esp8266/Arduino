@@ -176,7 +176,7 @@ void setup() {
   CONSOLE_PRINTLN("\r\n\r\nNAPT with Configuration Portal ...");
 
   staModeConnectedHandler = WiFi.onStationModeConnected(
-    [](const WiFiEventStationModeConnected data) {
+    [](const WiFiEventStationModeConnected& data) {
       // Keep a copy of the BSSID for the AP that WLAN connects to.
       // This is used in the WLAN report on WiFi Details page.
       memcpy(bssid, data.bssid, sizeof(bssid));
