@@ -23,7 +23,6 @@ import subprocess
 import sys
 import contextlib
 
-
 HINTS = {
     "ICACHE": "reserved space for flash instruction cache",
     "IRAM": "code in IRAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
@@ -88,6 +87,24 @@ def percentage(lhs, rhs):
     return "{}%".format(int(100.0 * float(lhs) / float(rhs)))
 
 
+def prefix(n, segments):
+    if n == len(segments):
+        out = "└──"
+    else:
+        out = "├──"
+
+    return out
+
+
+def safe_prefix(n, segments):
+    if n == len(segments):
+        out = "|__"
+    else:
+        out = "|--"
+
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Report the different segment sizes of a compiled ELF file"
@@ -115,13 +132,18 @@ def main():
 
     for group, (segments, total) in sizes:
         used = sum(segments.values())
-        print(f". {group:<8}, total {total} bytes, used {used} bytes ({percentage(used, total)})")
+        print(
+            f". {group:<8}, total {total} bytes, used {used} bytes ({percentage(used, total)})"
+        )
         for n, (segment, size) in enumerate(segments.items(), start=1):
-            if n == len(segments):
-                prefix = "└──"
-            else:
-                prefix = "├──"
-            print(f"{prefix} {segment:<8} {size:<8} {HINTS[segment]:<16}")
+            try:
+                print(
+                    f"{prefix(n, segments)} {segment:<8} {size:<8} {HINTS[segment]:<16}"
+                )
+            except UnicodeEncodeError:
+                print(
+                    f"{safe_prefix(n, segments)} {segment:<8} {size:<8} {HINTS[segment]:<16}"
+                )
 
 
 if __name__ == "__main__":
