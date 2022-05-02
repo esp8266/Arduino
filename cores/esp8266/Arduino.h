@@ -187,6 +187,9 @@ void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 void attachInterruptArg(uint8_t pin, void (*)(void*), void* arg, int mode);
 
+#if FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+#endif
 void preinit(void);
 void setup(void);
 void loop(void);
@@ -279,6 +282,8 @@ inline void configTzTime(const char* tz, const char* server1,
 {
     configTime(tz, server1, server2, server3);
 }
+
+bool getLocalTime(struct tm * info, uint32_t ms = 5000);
 
 // Everything we expect to be implicitly loaded for the sketch
 #include <pgmspace.h>

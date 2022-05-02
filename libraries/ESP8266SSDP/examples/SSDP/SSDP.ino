@@ -4,7 +4,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -46,9 +46,7 @@ void setup() {
     Serial.printf("Ready!\n");
   } else {
     Serial.printf("WiFi Failed\n");
-    while (1) {
-      delay(100);
-    }
+    while (1) { delay(100); }
   }
 }
 

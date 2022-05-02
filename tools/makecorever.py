@@ -70,7 +70,7 @@ def generate(path, platform_path, version="unspecified", release = False):
         text += "#define ARDUINO_ESP8266_RELEASE   \"{}\"\n".format(git_desc)
         text += "#define ARDUINO_ESP8266_RELEASE_{}\n".format(git_desc.replace("-","_").replace(".","_"))
     else:
-        text += "#define ARDUINO_ESP8266_DEV       1 // developpment version\n"
+        text += "#define ARDUINO_ESP8266_DEV       1 // development version\n"
 
     try:
         with open(path, "r") as inp:

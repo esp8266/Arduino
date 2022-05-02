@@ -10,8 +10,7 @@
 class LwipIntf
 {
 public:
-
-    using CBType = std::function <void(netif*)>;
+    using CBType = std::function<void(netif*)>;
 
     static bool stateUpCB(LwipIntf::CBType&& cb);
 
@@ -24,12 +23,12 @@ public:
     // arg3     | dns1       netmask
     //
     // result stored into gateway/netmask/dns1
-    static
-    bool ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2, const IPAddress& arg3,
-                          IPAddress& gateway, IPAddress& netmask, IPAddress& dns1);
+    static bool ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1,
+                                 const IPAddress& arg2, const IPAddress& arg3, IPAddress& gateway,
+                                 IPAddress& netmask, IPAddress& dns1);
 
     String hostname();
-    bool hostname(const String& aHostname)
+    bool   hostname(const String& aHostname)
     {
         return hostname(aHostname.c_str());
     }
@@ -42,8 +41,7 @@ public:
     const char* getHostname();
 
 protected:
-
     static bool stateChangeSysCB(LwipIntf::CBType&& cb);
 };
 
-#endif // _LWIPINTF_H
+#endif  // _LWIPINTF_H

@@ -379,7 +379,12 @@ extern "C" void app_entry_redefinable(void)
 
     /* Doing umm_init just once before starting the SDK, allowed us to remove
        test and init calls at each malloc API entry point, saving IRAM. */
+#ifdef UMM_INIT_USE_IRAM
     umm_init();
+#else
+    // umm_init() is in IROM
+    mmu_wrap_irom_fn(umm_init);
+#endif
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -406,6 +411,12 @@ extern "C" void __disableWiFiAtBootTime (void)
     wifi_fpm_open();
     wifi_fpm_do_sleep(0xFFFFFFF);
 }
+
+#if FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+extern "C" void flashinit (void);
+uint32_t __flashindex;
+#endif
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -441,6 +452,9 @@ extern "C" void user_init(void) {
 
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
+#endif
+#if FLASH_MAP_SUPPORT
+    flashinit();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi

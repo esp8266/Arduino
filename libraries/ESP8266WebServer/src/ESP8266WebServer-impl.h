@@ -102,31 +102,31 @@ bool ESP8266WebServerTemplate<ServerType>::authenticate(const char * username, c
     if(authReq.startsWith(F("Basic"))){
       authReq = authReq.substring(6);
       authReq.trim();
-      char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new (std::nothrow) char[toencodeLen + 1];
-      if(toencode == NULL){
-        authReq = "";
+
+      const size_t username_len = strlen(username);
+      const size_t password_len = strlen(password);
+
+      String raw;
+      raw.reserve(username_len + password_len + 1);
+      raw.concat(username, username_len);
+      raw += ':';
+      raw.concat(password, password_len);
+      if(!raw.length()) {
         return false;
       }
-      sprintf(toencode, "%s:%s", username, password);
-      String encoded = base64::encode((uint8_t *)toencode, toencodeLen, false);
-      if(!encoded){
-        authReq = "";
-        delete[] toencode;
+
+      String encoded = base64::encode(raw, false);
+      if(!encoded.length()){
         return false;
       }
       if(authReq.equalsConstantTime(encoded)) {
-        authReq = "";
-        delete[] toencode;
         return true;
       }
-      delete[] toencode;
     } else if(authReq.startsWith(F("Digest"))) {
       String _realm    = _extractParam(authReq, F("realm=\""));
-      String _H1 = credentialHash((String)username,_realm,(String)password);
-      return authenticateDigest((String)username,_H1);
+      String _H1 = credentialHash(username,_realm,password);
+      return authenticateDigest(username,_H1);
     }
-    authReq = "";
   }
   return false;
 }
@@ -281,7 +281,7 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::handleClient() {
   if (_currentStatus == HC_NONE) {
-    ClientType client = _server.available();
+    ClientType client = _server.accept();
     if (!client) {
       return;
     }

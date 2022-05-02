@@ -186,3 +186,8 @@ indeed off at boot and is powered on only when starting to be used with the
 regular API.
 
 Read more at `former WiFi persistent mode <../esp8266wifi/generic-class.rst#persistent>`__.
+
+How to resolve "undefined reference to ``flashinit`'" error ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please read `flash layout <../filesystem.rst>`__ documentation entry.

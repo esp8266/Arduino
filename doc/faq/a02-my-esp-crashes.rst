@@ -6,6 +6,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Introduction <#introduction>`__
 -  `What ESP has to Say <#what-esp-has-to-say>`__
 -  `Get Your H/W Right <#get-your-hw-right>`__
+-  `Enable compilation warnings <#enable-compilation-warnings>`__
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
@@ -72,6 +73,43 @@ usually it is enough to connect it to an USB hub that provides standard
 In any case, make sure that your module is able to stably run standard
 example sketches that establish Wi-Fi connection like, e.g.,
 `HelloServer.ino <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer/examples/HelloServer>`__.
+
+Enable compilation warnings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most common issues may be resolved by enabling compilation warnings and fixing them.
+
+For Arduino IDE, select ``File -> Preferences``:
+
+- Make sure ``Show verbose output during: compilation`` is enabled
+- Set ``Compiler warnings`` to ``More`` or ``All``
+
+For PlatformIO, all warnings should already be enabled by default.
+
+Notice that the default configuration of Arduino IDE inhibits **all** compilation warnings.
+For the ESP8266 platform, some warnings should be treated as errors, otherwise it may cause unexpected issues at runtime:
+
+.. code:: cpp
+
+    int func() {
+    }
+
+    int other() {
+      return func();
+    }
+
+Should fail to build with the following message:
+
+.. code:: console
+
+    return-value.cpp: In function ‘int func()’:
+    return-value.cpp:2:1: error: no return statement in function returning non-void [-Werror=return-type]
+        2 | }
+          | ^
+    compilation terminated due to -Wfatal-errors.
+    cc1plus: some warnings being treated as errors
+
+Notice that ``-Werror=return-type`` is the default starting with Core 3.0.2 w/ GCC 10.3
 
 What is the Cause of Restart?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

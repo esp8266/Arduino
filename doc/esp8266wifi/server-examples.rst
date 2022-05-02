@@ -92,7 +92,7 @@ Serving of this web page will be done in the ``loop()`` where server is waiting 
 
     void loop()
     {
-      WiFiClient client = server.available();
+      WiFiClient client = server.accept();
       if (client)
       {
         // we have a new client sending some request
@@ -196,7 +196,7 @@ Complete sketch is presented below.
 
     void loop()
     {
-      WiFiClient client = server.available();
+      WiFiClient client = server.accept();
       // wait for a client (web browser) to connect
       if (client)
       {

@@ -41,7 +41,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -72,9 +72,7 @@ void setClock() {
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump URL
 void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
-  if (!path) {
-    path = "/";
-  }
+  if (!path) { path = "/"; }
 
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
@@ -94,11 +92,9 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     do {
       char tmp[32];
       memset(tmp, 0, 32);
-      int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+      int rlen = client->read((uint8_t *)tmp, sizeof(tmp) - 1);
       yield();
-      if (rlen < 0) {
-        break;
-      }
+      if (rlen < 0) { break; }
       // Only print out first line up to \r, then abort connection
       char *nl = strchr(tmp, '\r');
       if (nl) {
@@ -136,13 +132,13 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  setClock(); // Required for X.509 validation
+  setClock();  // Required for X.509 validation
 
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
     Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
-    return; // Can't connect to anything w/o certs!
+    return;  // Can't connect to anything w/o certs!
   }
 
   BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
@@ -156,9 +152,7 @@ void setup() {
 void loop() {
   Serial.printf("\nPlease enter a website address (www.blah.com) to connect to: ");
   String site;
-  do {
-    site = Serial.readString();
-  } while (site == "");
+  do { site = Serial.readString(); } while (site == "");
   // Strip newline if present
   site.replace(String("\r"), emptyString);
   site.replace(String("\n"), emptyString);
@@ -170,4 +164,3 @@ void loop() {
   fetchURL(bear, site.c_str(), 443, "/");
   delete bear;
 }
-
