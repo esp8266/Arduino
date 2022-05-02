@@ -25,9 +25,9 @@ import contextlib
 
 
 HINTS = {
-    "ICACHE": "configured flash instruction cache",
-    "IROM": "code in flash (default, ICACHE_FLASH_ATTR)",
+    "ICACHE": "reserved space for flash instruction cache",
     "IRAM": "code in IRAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
+    "IROM": "code in flash (default, ICACHE_FLASH_ATTR)",
     "DATA": "initialized variables (global, static)",
     "RODATA": "constants (global, static)",
     "BSS": "zeroed variables (global, static)",
@@ -51,12 +51,10 @@ def get_segment_sizes(elf, path, mmu):
             "RODATA": 0,
             "BSS": 0,
         }, 80192]],
-        ["Instruction cache", [{
-            "ICACHE": icache_size,
-        }, icache_size]],
         ["Instruction RAM", [{
+            "ICACHE": icache_size,
             "IRAM": 0,
-        }, iram_size]],
+        }, 65536]],
         ["Code in flash", [{
             "IROM": 0
         }, 1048576]],
@@ -116,13 +114,14 @@ def main():
     sizes = get_segment_sizes(args.elf, args.path, args.mmu)
 
     for group, (segments, total) in sizes:
-        print(f". {group:<8} (total {total} bytes)")
+        used = sum(segments.values())
+        print(f". {group:<8}, total {total} bytes, used {used} bytes ({percentage(used, total)})")
         for n, (segment, size) in enumerate(segments.items(), start=1):
             if n == len(segments):
                 prefix = "└──"
             else:
                 prefix = "├──"
-            print(f"{prefix} {segment:<8} {size:<8} - {HINTS[segment]:<16}")
+            print(f"{prefix} {segment:<8} {size:<8} {HINTS[segment]:<16}")
 
 
 if __name__ == "__main__":
