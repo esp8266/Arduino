@@ -20,21 +20,11 @@
 import argparse
 import os
 import subprocess
-import sys
-import contextlib
-
-HINTS = {
-    "ICACHE": "reserved space for flash instruction cache",
-    "IRAM": "code in IRAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
-    "IROM": "code in flash (default, ICACHE_FLASH_ATTR)",
-    "DATA": "initialized variables (global, static)",
-    "RODATA": "constants (global, static)",
-    "BSS": "zeroed variables (global, static)",
-}
 
 
 def get_segment_sizes(elf, path, mmu):
     iram_size = 0
+    iheap_size = 0
     icache_size = 32168
 
     for line in mmu.split():
@@ -43,36 +33,49 @@ def get_segment_sizes(elf, path, mmu):
             iram_size = int(words[1], 16)
         elif line.startswith("-DMMU_ICACHE_SIZE"):
             icache_size = int(words[1], 16)
+        elif line.startswith("-DMMU_SEC_HEAP_SIZE"):
+            iheap_size = int(words[1], 16)
 
     sizes = [
-        ["Variables and constants in RAM", [{
-            "DATA": 0,
-            "RODATA": 0,
-            "BSS": 0,
-        }, 80192]],
-        ["Instruction RAM", [{
-            "ICACHE": icache_size,
-            "IRAM": 0,
-        }, 65536]],
-        ["Code in flash", [{
-            "IROM": 0
-        }, 1048576]],
+        [
+            "Variables and constants in RAM (global, static)",
+            [
+                {
+                    "DATA": 0,
+                    "RODATA": 0,
+                    "BSS": 0,
+                },
+                80192,
+            ],
+        ],
+        [
+            "Instruction RAM (IRAM_ATTR, ICACHE_RAM_ATTR)",
+            [
+                {
+                    "ICACHE": icache_size,
+                    "IHEAP": iheap_size,
+                    "IRAM": 0,
+                },
+                65536,
+            ],
+        ],
+        ["Code in flash (default, ICACHE_FLASH_ATTR)", [{"IROM": 0}, 1048576]],
     ]
 
-    mapping = [
-        [".irom0.text", "IROM"],
-        [".text", "IRAM"],
-        [".data", "DATA"],
-        [".rodata", "RODATA"],
-        [".bss", "BSS"],
-    ]
+    section_mapping = (
+        (".irom0.text", "IROM"),
+        (".text", "IRAM"),
+        (".data", "DATA"),
+        (".rodata", "RODATA"),
+        (".bss", "BSS"),
+    )
 
     cmd = [os.path.join(path, "xtensa-lx106-elf-size"), "-A", elf]
     with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True) as proc:
         lines = proc.stdout.readlines()
         for line in lines:
             words = line.split()
-            for section, target in mapping:
+            for section, target in section_mapping:
                 if not line.startswith(section):
                     continue
                 for group, (segments, total) in sizes:
@@ -87,22 +90,44 @@ def percentage(lhs, rhs):
     return "{}%".format(int(100.0 * float(lhs) / float(rhs)))
 
 
-def prefix(n, segments):
-    if n == len(segments):
-        out = "└──"
-    else:
-        out = "├──"
+HINTS = {
+    "ICACHE": "reserved space for flash instruction cache",
+    "IRAM": "code in IRAM",
+    "IHEAP": "secondary heap space",
+    "IROM": "code in flash",
+    "DATA": "initialized variables",
+    "RODATA": "constants",
+    "BSS": "zeroed variables",
+}
 
-    return out
+
+def safe_prefix(n, length):
+    if n == length:
+        return "`--"
+
+    return "|--"
 
 
-def safe_prefix(n, segments):
-    if n == len(segments):
-        out = "|__"
-    else:
-        out = "|--"
+def prefix(n, length):
+    if n == length:
+        return "└──"
 
-    return out
+    return "├──"
+
+
+def filter_segments(segments):
+    used = 0
+    number = 0
+    available = []
+
+    for (segment, size) in segments.items():
+        if not size:
+            continue
+        used += size
+        number += 1
+        available.append((number, segment, size))
+
+    return (number, used, available)
 
 
 def main():
@@ -131,19 +156,16 @@ def main():
     sizes = get_segment_sizes(args.elf, args.path, args.mmu)
 
     for group, (segments, total) in sizes:
-        used = sum(segments.values())
-        print(
-            f". {group:<8}, total {total} bytes, used {used} bytes ({percentage(used, total)})"
-        )
-        for n, (segment, size) in enumerate(segments.items(), start=1):
+        number, used, segments = filter_segments(segments)
+
+        print(f". {group:<8}, used {used} / {total} bytes ({percentage(used, total)})")
+        print("|   SEGMENT  BYTES    DESCRIPTION")
+        for n, segment, size in segments:
             try:
-                print(
-                    f"{prefix(n, segments)} {segment:<8} {size:<8} {HINTS[segment]:<16}"
-                )
+                print(f"{prefix(n, number)} ", end="")
             except UnicodeEncodeError:
-                print(
-                    f"{safe_prefix(n, segments)} {segment:<8} {size:<8} {HINTS[segment]:<16}"
-                )
+                print(f"{safe_prefix(n, number)} ", end="")
+            print(f"{segment:<8} {size:<8} {HINTS[segment]:<16}")
 
 
 if __name__ == "__main__":
