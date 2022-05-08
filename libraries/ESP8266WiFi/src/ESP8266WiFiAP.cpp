@@ -38,8 +38,6 @@ extern "C" {
 
 #include "debug.h"
 
-#include <LwipDhcpServer.h>
-
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -167,7 +165,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
-    auto& server = dhcpSoftAP();
+    auto& server = softAPDhcpServer();
     server.end();
 
     // check IP config
@@ -247,7 +245,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    auto& server = dhcpSoftAP();
+    auto& server = softAPDhcpServer();
     if(!server.set_dhcps_lease(&dhcp_lease))
     {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");

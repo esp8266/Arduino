@@ -76,12 +76,6 @@ DhcpServer::~DhcpServer()
     end();
 }
 
-DhcpServer& dhcpSoftAP()
-{
-    static DhcpServer server(nullptr);
-    return server;
-}
-
 extern "C"
 {
 #include <user_interface.h>
