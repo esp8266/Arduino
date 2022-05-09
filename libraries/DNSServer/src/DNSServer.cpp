@@ -2,7 +2,7 @@
 #include "DNSServer.h"
 #include <lwip/def.h>
 #include <Arduino.h>
-#include <memory>
+
 extern struct rst_info resetInfo;
 
 #ifdef DEBUG_ESP_PORT
@@ -60,10 +60,15 @@ DNSServer::DNSServer()
   // They will then report connected.
   _ttl = lwip_htonl(60);
 
+#if !CORE_MOCK
+
   if (REASON_DEFAULT_RST      == resetInfo.reason ||
       REASON_DEEP_SLEEP_AWAKE <= resetInfo.reason) {
     _ids = random(0, BIT(16) - 1);
   }
+
+#endif // !CORE_MOCK
+
   _ids += kDNSSQueSize;   // for the case of restart, ignore any inflight responses
 
   _errorReplyCode = DNSReplyCode::NonExistentDomain;
