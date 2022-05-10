@@ -2,7 +2,7 @@
 #include "DNSServer.h"
 #include <lwip/def.h>
 #include <Arduino.h>
-#include <memory>
+
 extern struct rst_info resetInfo;
 
 #ifdef DEBUG_ESP_PORT

@@ -1,5 +1,7 @@
 #ifndef DNSServer_h
 #define DNSServer_h
+
+#include <memory>
 #include <WiFiUdp.h>
 
 // #define DEBUG_DNSSERVER
