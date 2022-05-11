@@ -59,7 +59,7 @@ void check_incoming_udp()
     }
 }
 
-void mock_stop_udp ()
+void mock_stop_udp()
 {
     udps.clear();
 }
