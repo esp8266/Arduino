@@ -69,6 +69,7 @@ class IPAddress: public Printable {
         IPAddress(const IPAddress& from);
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address) { ctor32(address); }
+        IPAddress(unsigned long address) { ctor32(address); }
         IPAddress(int address) { ctor32(address); }
         IPAddress(const uint8_t *address);
 
@@ -97,8 +98,14 @@ class IPAddress: public Printable {
         bool operator==(uint32_t addr) const {
             return isV4() && v4() == addr;
         }
+        bool operator==(unsigned long addr) const {
+            return isV4() && v4() == (uint32_t)addr;
+        }
         bool operator!=(uint32_t addr) const {
             return !(isV4() && v4() == addr);
+        }
+        bool operator!=(unsigned long addr) const {
+            return isV4() && v4() != (uint32_t)addr;
         }
         bool operator==(const uint8_t* addr) const;
 
