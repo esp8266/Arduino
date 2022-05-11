@@ -85,7 +85,16 @@ typedef uint32_t sys_prot_t;
 ///////////////////////////////
 //// MISSING 
 
-#define sys_now millis		// arduino wire millis() definition returns 32 bits like sys_now() does
+// transparent wrapper for millis()'s return value type from ulong to u32
+#if __cplusplus
+extern "C" {
+#endif
+extern unsigned long millis();
+inline __attribute__((always_inline)) u32_t sys_now () { return (u32_t)millis(); }
+#if __cplusplus
+}
+#endif
+
 #define LWIP_RAND r_rand	// old lwip uses this useful undocumented function
 #define IPSTR "%d.%d.%d.%d"
 #define IP2STR(ipaddr) ip4_addr1_16(ipaddr), \
