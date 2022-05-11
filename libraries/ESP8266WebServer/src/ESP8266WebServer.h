@@ -171,7 +171,9 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
   void send(int code, const char* content_type, Stream* stream, size_t content_length = 0);
-  void send(int code, const char* content_type, Stream& stream, size_t content_length = 0);
+  void send(int code, const char* content_type, Stream& stream, size_t content_length = 0) {
+    send(code, content_type, &stream, content_length);
+  }
 
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);

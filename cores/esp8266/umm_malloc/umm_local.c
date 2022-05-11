@@ -98,17 +98,20 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
         UMM_CRITICAL_DECL(id_poison);
         uint16_t c;
         bool poison = false;
-        umm_heap_context_t *_context = umm_get_ptr_context(vptr);
-        if (NULL == _context) {
-            panic();
-            return NULL;
-        }
-        /* Figure out which block we're in. Note the use of truncated division... */
-        c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
+        umm_heap_context_t *_context = _umm_get_ptr_context((void *)ptr);
+        if (_context) {
 
-        UMM_CRITICAL_ENTRY(id_poison);
-        poison = check_poison_block(&UMM_BLOCK(c)) && check_poison_neighbors(_context, c);
-        UMM_CRITICAL_EXIT(id_poison);
+            /* Figure out which block we're in. Note the use of truncated division... */
+            c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
+
+            UMM_CRITICAL_ENTRY(id_poison);
+            poison =
+                check_poison_block(&UMM_BLOCK(c)) &&
+                check_poison_neighbors(_context, c);
+            UMM_CRITICAL_EXIT(id_poison);
+        } else {
+            DBGLOG_ERROR("\nPointer %p is not a Heap address.\n", vptr);
+        }
 
         if (!poison) {
             if (file) {
