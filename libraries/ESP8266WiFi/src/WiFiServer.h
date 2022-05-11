@@ -23,13 +23,14 @@
 #define wifiserver_h
 
 extern "C" {
-  #include "wl_definitions.h"
+  #include <wl_definitions.h>
 
   struct tcp_pcb;
 }
 
-#include "Server.h"
-#include "IPAddress.h"
+#include <Server.h>
+#include <IPAddress.h>
+#include <lwip/err.h>
 
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
 // maximum number of incoming *pending clients*.  Default number of possibly
@@ -106,7 +107,7 @@ protected:
   long _accept(tcp_pcb* newpcb, long err);
   void   _discard(ClientContext* client);
 
-  static long _s_accept(void *arg, tcp_pcb* newpcb, long err);
+  static err_t _s_accept(void *arg, tcp_pcb* newpcb, err_t err);
   static void _s_discard(void* server, ClientContext* ctx);
 };
 
