@@ -86,12 +86,12 @@ typedef uint32_t sys_prot_t;
 //// MISSING 
 
 // transparent wrapper for millis()'s return value type from ulong to u32
-#if __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
-extern unsigned long millis();
-inline __attribute__((always_inline)) u32_t sys_now () { return (u32_t)millis(); }
-#if __cplusplus
+extern unsigned long millis(void); // arduino definition
+inline __attribute__((always_inline)) u32_t sys_now (void) { return (u32_t)millis(); }
+#ifdef __cplusplus
 }
 #endif
 
