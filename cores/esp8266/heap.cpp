@@ -173,7 +173,7 @@ void IRAM_ATTR print_loc(size_t size, const char* file, int line)
         DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
 
         bool inISR = ETS_INTR_WITHINISR();
-        if (inISR && (uint32_t)file >= 0x40200000) {
+        if (NULL == file || (inISR && (uint32_t)file >= 0x40200000)) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
             char buf[strlen_P(file) + 1];
