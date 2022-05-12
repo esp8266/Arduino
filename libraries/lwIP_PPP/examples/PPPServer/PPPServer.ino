@@ -25,7 +25,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 #define LOGGERBAUD 115200
@@ -34,18 +34,15 @@
 #define NAPT 200
 #define NAPT_PORT 3
 
-#define RX 13 // d1mini D7
-#define TX 15 // d1mini D8
+#define RX 13  // d1mini D7
+#define TX 15  // d1mini D8
 
 SoftwareSerial ppplink(RX, TX);
 HardwareSerial& logger = Serial;
 PPPServer ppp(&ppplink);
 
 void PPPConnectedCallback(netif* nif) {
-  logger.printf("ppp: ip=%s/mask=%s/gw=%s\n",
-                IPAddress(&nif->ip_addr).toString().c_str(),
-                IPAddress(&nif->netmask).toString().c_str(),
-                IPAddress(&nif->gw).toString().c_str());
+  logger.printf("ppp: ip=%s/mask=%s/gw=%s\n", IPAddress(&nif->ip_addr).toString().c_str(), IPAddress(&nif->netmask).toString().c_str(), IPAddress(&nif->gw).toString().c_str());
 
   logger.printf("Heap before: %d\n", ESP.getFreeHeap());
   err_t ret = ip_napt_init(NAPT, NAPT_PORT);
@@ -53,9 +50,7 @@ void PPPConnectedCallback(netif* nif) {
   if (ret == ERR_OK) {
     ret = ip_napt_enable_no(nif->num, 1);
     logger.printf("ip_napt_enable(nif): ret=%d (OK=%d)\n", (int)ret, (int)ERR_OK);
-    if (ret == ERR_OK) {
-      logger.printf("PPP client is NATed\n");
-    }
+    if (ret == ERR_OK) { logger.printf("PPP client is NATed\n"); }
 
     // could not make this work yet,
     // but packets are arriving on ppp client (= linux host)
@@ -64,9 +59,7 @@ void PPPConnectedCallback(netif* nif) {
     logger.printf("redirect443=%d\n", ip_portmap_add(IP_PROTO_TCP, ip_2_ip4(&nif->ip_addr)->addr, 443, ip_2_ip4(&nif->gw)->addr, 443));
   }
   logger.printf("Heap after napt init: %d\n", ESP.getFreeHeap());
-  if (ret != ERR_OK) {
-    logger.printf("NAPT initialization failed\n");
-  }
+  if (ret != ERR_OK) { logger.printf("NAPT initialization failed\n"); }
 }
 
 void setup() {
@@ -79,10 +72,7 @@ void setup() {
     logger.print('.');
     delay(500);
   }
-  logger.printf("\nSTA: %s (dns: %s / %s)\n",
-                WiFi.localIP().toString().c_str(),
-                WiFi.dnsIP(0).toString().c_str(),
-                WiFi.dnsIP(1).toString().c_str());
+  logger.printf("\nSTA: %s (dns: %s / %s)\n", WiFi.localIP().toString().c_str(), WiFi.dnsIP(0).toString().c_str(), WiFi.dnsIP(1).toString().c_str());
 
   ppplink.begin(PPPLINKBAUD);
   ppplink.enableIntTx(true);
@@ -107,5 +97,4 @@ void setup() {
 
 #endif
 
-void loop() {
-}
+void loop() {}

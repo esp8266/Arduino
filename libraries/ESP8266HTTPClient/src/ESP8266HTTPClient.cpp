@@ -102,9 +102,16 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
  */
 bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, const String& uri, bool https)
 {
+    // Disconnect when reusing HTTPClient to talk to a different host
+    if (!_host.isEmpty() && _host != host) {
+        _canReuse = false;
+        disconnect(true);
+    }
+    
     _client = client.clone();
 
-     clear();
+    clear();
+
     _host = host;
     _port = port;
     _uri = uri;
@@ -155,6 +162,8 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
         _base64Authorization = base64::encode(auth, false /* doNewLines */);
     }
 
+    const String oldHost = _host;
+
     // get port
     index = host.indexOf(':');
     if(index >= 0) {
@@ -164,6 +173,13 @@ bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol
     } else {
         _host = host;
     }
+
+    // Disconnect when reusing HTTPClient to talk to a different host
+    if (!oldHost.isEmpty() && _host != oldHost) {
+        _canReuse = false;
+        disconnect(true);
+    }
+
     _uri = url;
 
     if ( expectedProtocol != nullptr && _protocol != expectedProtocol) {

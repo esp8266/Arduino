@@ -12,30 +12,23 @@ RANLIB ?= ranlib
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
-CXX =  $(shell for i in g++-10  g++-9  g++-8  g++;  do which $$i > /dev/null && { echo $$i; break; } done)
-CC  =  $(shell for i in gcc-10  gcc-9  gcc-8  gcc;  do which $$i > /dev/null && { echo $$i; break; } done)
-GCOV = $(shell for i in gcov-10 gcov-9 gcov-8 gcov; do which $$i > /dev/null && { echo $$i; break; } done)
-$(warning using $(CXX))
-ifeq ($(CXX),g++)
-CXXFLAGS += -std=gnu++11
-else
-CXXFLAGS += -std=gnu++17
-endif
-ifeq ($(CC),gcc)
-CFLAGS += -std=gnu11
-else
-CFLAGS += -std=gnu17
-endif
+# Prefer named GCC (and, specifically, GCC10), same as platform.txt / platformio_build.py
+find_tool = $(shell for name in $(1) $(2); do which $$name && break; done 2>/dev/null)
+CXX  = $(call find_tool,g++-10,g++)
+CC   = $(call find_tool,gcc-10,gcc)
+GCOV = $(call find_tool,gcov-10,gcov)
 
-# I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
-ifeq ($(shell uname -s),Darwin)
-CC  ?= gcc
-CXX ?= g++
-endif
-GCOV ?= gcov
+$(warning using $(CXX) and $(CC))
+
+GCOV     ?= gcov
 VALGRIND ?= valgrind
-LCOV ?= lcov --gcov-tool $(GCOV)
-GENHTML ?= genhtml
+LCOV     ?= lcov --gcov-tool $(GCOV)
+GENHTML  ?= genhtml
+
+# Board fild will be built with GCC10, but we have some limited ability to build with older versions
+# *Always* push the standard used in the platform.txt
+CXXFLAGS += -std=gnu++17
+CFLAGS += -std=gnu17
 
 ifeq ($(FORCE32),1)
 SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
@@ -136,7 +129,7 @@ MOCK_CPP_FILES_COMMON := \
 		MockUART.cpp \
 		MockTools.cpp \
 		MocklwIP.cpp \
-		MockDigital.cpp \
+		HostWiring.cpp \
 	)
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) \
@@ -173,6 +166,8 @@ INC_PATHS += \
 		../../tools/sdk/include \
 		../../tools/sdk/lwip2/include \
 	)
+
+TEST_ARGS ?=
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
@@ -236,7 +231,7 @@ CI:					# run CI
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)			# run host test for CI
-	$(OUTPUT_BINARY)
+	$(OUTPUT_BINARY) $(TEST_ARGS)
 
 .PHONY: clean
 clean: clean-lcov clean-objects
@@ -356,7 +351,6 @@ MOCK_ARDUINO_LIBS := \
 		MockWiFiServerSocket.cpp \
 		MockWiFiServer.cpp \
 		UdpContextSocket.cpp \
-		HostWiring.cpp \
 		MockEsp.cpp \
 		MockEEPROM.cpp \
 		MockSPI.cpp \

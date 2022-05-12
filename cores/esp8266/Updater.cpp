@@ -24,8 +24,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-extern "C" uint32_t _FS_start;
-extern "C" uint32_t _FS_end;
+#include <flash_hal.h> // not "flash_hal.h": can use hijacked MOCK version
 
 UpdaterClass::UpdaterClass()
 {
@@ -118,7 +117,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   if (command == U_FLASH) {
     //address of the end of the space available for sketch and update
-    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+    uintptr_t updateEndAddress = FS_start - 0x40200000;
 
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
@@ -135,14 +134,14 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_FS) {
-    if((uintptr_t)&_FS_start + roundedSize > (uintptr_t)&_FS_end) {
+    if(FS_start + roundedSize > FS_end) {
       _setError(UPDATE_ERROR_SPACE);
       return false;
     }
 
 #ifdef ATOMIC_FS_UPDATE
     //address of the end of the space available for update
-    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+    uintptr_t updateEndAddress = FS_start - 0x40200000;
 
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
@@ -151,7 +150,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
 #else
-    updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
+    updateStartAddress = FS_start - 0x40200000;
 #endif
   }
   else {
@@ -224,19 +223,29 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-  uint32_t sigLen = 0;
   if (_verify) {
-    ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    const uint32_t expectedSigLen = _verify->length();
+      // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
+      // contain a matching length field, preceded by the bytes of the signature itself.
+      // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    uint32_t sigLen = 0;
+
+    if (expectedSigLen > 0) {
+      ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    }
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
 #endif
-    if (sigLen != _verify->length()) {
+    if (sigLen != expectedSigLen) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
 
-    int binSize = _size - sigLen - sizeof(uint32_t) /* The siglen word */;
+    int binSize = _size;
+    if (expectedSigLen > 0) {
+      _size -= (sigLen + sizeof(uint32_t) /* The siglen word */);
+    }
     _hash->begin();
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
@@ -255,20 +264,24 @@ bool UpdaterClass::end(bool evenIfRemaining){
     for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
     DEBUG_UPDATER.printf("\n");
 #endif
-    uint8_t *sig = (uint8_t*)malloc(sigLen);
-    if (!sig) {
-      _setError(UPDATE_ERROR_SIGN);
-      _reset();
-      return false;
-    }
-    ESP.flashRead(_startAddress + binSize, sig, sigLen);
+
+    uint8_t *sig = nullptr; // Safe to free if we don't actually malloc
+    if (expectedSigLen > 0) {
+      sig = (uint8_t*)malloc(sigLen);
+      if (!sig) {
+        _setError(UPDATE_ERROR_SIGN);
+        _reset();
+        return false;
+      }
+      ESP.flashRead(_startAddress + binSize, sig, sigLen);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
-    for (size_t i=0; i<sigLen; i++) {
-      DEBUG_UPDATER.printf(" %02x", sig[i]);
-    }
-    DEBUG_UPDATER.printf("\n");
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
+      for (size_t i=0; i<sigLen; i++) {
+        DEBUG_UPDATER.printf(" %02x", sig[i]);
+      }
+      DEBUG_UPDATER.printf("\n");
 #endif
+    }
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       free(sig);
       _setError(UPDATE_ERROR_SIGN);
@@ -314,7 +327,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
     ebcmd.args[0] = _startAddress;
-    ebcmd.args[1] = (uintptr_t)&_FS_start - 0x40200000;
+    ebcmd.args[1] = FS_start - 0x40200000;
     ebcmd.args[2] = _size;
     eboot_command_write(&ebcmd);
 #endif
@@ -460,6 +473,9 @@ bool UpdaterClass::_verifyEnd() {
             return false;
         }
 
+// it makes no sense to check flash size in auto flash mode
+// (sketch size would have to be set in bin header, instead of flash size)
+#if !FLASH_MAP_SUPPORT
         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
         // check if new bin fits to SPI flash
@@ -468,6 +484,7 @@ bool UpdaterClass::_verifyEnd() {
             _setError(UPDATE_ERROR_NEW_FLASH_CONFIG);            
             return false;
         }
+#endif
 
         return true;
     } else if(_command == U_FS) {
