@@ -17,6 +17,7 @@ runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.sizes={runtime.platform.path}/tools/sizes.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
+runtime.tools.mkbuildoptglobals={runtime.platform.path}/tools/mkbuildoptglobals.py
 runtime.tools.mkdir={runtime.platform.path}/tools/mkdir.py
 runtime.tools.cp={runtime.platform.path}/tools/cp.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
@@ -58,11 +59,18 @@ build.spiffs_start=
 build.spiffs_end=
 build.spiffs_blocksize=
 
+# Fully qualified file names for processing sketch global options
+globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
+commonhfile.fqfn={build.core.path}/CommonHFile.h
+build.opt.fqfn={build.path}/core/build.opt
+build.opt.flags="@{build.opt.fqfn}"
+mkbuildoptglobals.extra_flags=
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 {build.opt.flags} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 # support precompiled libraries in IDE v1.8.6+
 compiler.libraries.ldflags=
@@ -107,7 +115,11 @@ compiler.elf2hex.extra_flags=
 ## needs git
 recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
-recipe.hooks.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
+recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
+
+# Handle processing sketch global options
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
+
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkdir}" -p "{build.path}/ld_h/"
