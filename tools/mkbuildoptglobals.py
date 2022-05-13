@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # This script manages the use of a file with a unique name, like
 # `Sketch.ino.globals.h`, in the Sketch source directory to provide compiler
