@@ -70,7 +70,9 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         _server->send_P(200, PSTR("text/html"), successResponse);
         delay(100);
         _server->client().stop();
-        ESP.restart();
+        if (_rebootOnUpdate) {
+          ESP.restart();
+        }
       }
     },[&](){
       // handler for the file upload, gets the sketch bytes, and writes

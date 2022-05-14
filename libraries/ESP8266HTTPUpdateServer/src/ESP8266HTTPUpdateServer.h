@@ -35,6 +35,11 @@ class ESP8266HTTPUpdateServerTemplate
       _password = password;
     }
 
+    void rebootOnUpdate(bool reboot)
+    {
+      _rebootOnUpdate = reboot;
+    }
+
   protected:
     void _setUpdaterError();
 
@@ -45,6 +50,7 @@ class ESP8266HTTPUpdateServerTemplate
     String _password;
     bool _authenticated;
     String _updaterError;
+    bool _rebootOnUpdate = true;
 };
 
 };
