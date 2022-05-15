@@ -13,6 +13,15 @@ if ! which xtensa-lx106-elf-ar | grep "tools/xtensa-lx106-elf/bin" >>/dev/null; 
   add_path_ifexist "../../../xtensa-lx106-elf/bin" || add_path_ifexist "../../xtensa-lx106-elf/bin"
 fi
 
+help_msg() {
+  cat <<EOF
+Try:
+  eval_fix_sdks.sh --analyze
+or
+  eval_fix_sdks.sh --patch
+
+EOF
+}
 
 list_sdks() {
   cat <<EOF
@@ -98,6 +107,11 @@ patch_all() {
   done
 }
 
-# analyze
-patch_all
+if [[ "${1}" == "--analyze" ]]; then
+  analyze
+elif [[ "${1}" == "--patch" ]]; then
+  patch_all
+else
+  help_msg
+fi
 exit 0
