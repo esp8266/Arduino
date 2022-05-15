@@ -85,15 +85,20 @@ typedef uint32_t sys_prot_t;
 ///////////////////////////////
 //// MISSING 
 
-// transparent wrapper for millis()'s return value type from ulong to u32
+// Arduino Core exposes time func with a generic type
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-extern unsigned long millis(void); // arduino definition
-inline __attribute__((always_inline)) u32_t sys_now (void) { return (u32_t)millis(); }
+unsigned long millis(void);
 #ifdef __cplusplus
 }
 #endif
+
+// b/c we have conflicting typedefs of u32_t and ulong and can't substitute funcs,
+// forcibly cast the `millis()` result to lwip's version of u32_t
+// (previous version was `#define sys_now millis`)
+#define sys_now() ((u32_t)millis())
 
 #define LWIP_RAND r_rand	// old lwip uses this useful undocumented function
 #define IPSTR "%d.%d.%d.%d"
