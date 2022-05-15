@@ -170,6 +170,7 @@ void   mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize);
 
 class UdpContext;
 void register_udp(int sock, UdpContext* udp = nullptr);
+void mock_stop_udp();
 
 //
 
