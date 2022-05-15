@@ -104,7 +104,7 @@ public:
   using ClientType = WiFiClient;
 
 protected:
-  long _accept(tcp_pcb* newpcb, long err);
+  err_t  _accept(tcp_pcb* newpcb, err_t err);
   void   _discard(ClientContext* client);
 
   static err_t _s_accept(void *arg, tcp_pcb* newpcb, err_t err);

@@ -186,7 +186,7 @@ T* slist_append_tail(T* head, T* item) {
     return head;
 }
 
-long WiFiServer::_accept(tcp_pcb* apcb, long err) {
+err_t WiFiServer::_accept(tcp_pcb* apcb, err_t err) {
     (void) err;
     DEBUGV("WS:ac\r\n");
 
