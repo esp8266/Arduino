@@ -10,7 +10,8 @@
 #include <ets_sys.h>
 #include <pgmspace.h>
 #include "coredecls.h"
-#if 0
+
+#ifdef  DEBUG_WPA2_EAP_PATCH
 #include "esp8266_undocumented.h"
 #define DEBUG_PRINTF ets_uart_printf
 #else
@@ -67,16 +68,28 @@ asm(
  * While some insight can be gained from the ESP32 repo for this structure.
  * It does not match exactly. This alternate structure focuses on correct offset
  * rather than trying to exactly reconstruct the original labels.
+ * These offset were found in libwpa2.a:eap.o .text.eap_peer_config_init
  */
 struct StateMachine { // size 200 bytes
     void* beforeConfig[16];
     void* config[26];
-    // 0  - mov a2, a12, 64  // username / Identity
-    // 1  - mov a2, a12, 68
-    // 2  - mov a2, a12, 72  // anonymous Identity
-    // 3  - mov a2, a12, 76
-    // 4  - mov a2, a12, 80  // password
-    // 21 - mov a2, a12, 148 // ??
+    // 0  - s32i a2, a12, 64  // username / Identity
+    // 1  - s32i a2, a12, 68  //   length
+    // 2  - s32i a2, a12, 72  // anonymous Identity
+    // 3  - s32i a2, a12, 76
+    // 4  - s32i a2, a12, 80  // password
+    // 5  - s32i a2, a12, 84
+    //
+    // "new password" - From wifi_station_set_enterprise_new_password(), we see
+    // global saved value .bss+32 and .bss+36 which are later used to populate
+    // ".config" in eap_peer_config_init(). I do not have an environment to
+    // exercise this parameter. In my tests, the "new password" element in the
+    // ".config" is never initialized. At the moment, I don't see any code that
+    // would free the allocation.
+    // allocated via pvPortZalloc from line 0x30f, 783
+    // 21 - s32i a2, a12, 148 // new password
+    // 22 - s32i a2, a12, 152
+
     void* afterConfig[8];
 };
 
@@ -88,6 +101,7 @@ struct StateMachine { // size 200 bytes
  */
 void patch_wpa2_eap_vPortFree_a12(void *ptr, const char* file, int line, void* a12) {
     if (799 == line) {
+        // This caller is eap_peer_config_deinit()
         struct StateMachine* sm = (struct StateMachine*)a12;
         if (ptr == sm->config[0]) {
             // Fix leaky frunction - eap.o only frees one out of 4 config items
@@ -97,8 +111,31 @@ void patch_wpa2_eap_vPortFree_a12(void *ptr, const char* file, int line, void* a
             vPortFree(sm->config[21], file, line);
             // ptr is sm->config[0], let fall through handle it
         }
-        DEBUG_PRINTF("\nz2EapFree/vPortFree patch working\n");
+#ifdef  DEBUG_WPA2_EAP_PATCH
+        DEBUG_PRINTF("\nz2EapFree/vPortFree patch struct StateMachine * = %8p\n", a12);
+        DEBUG_PRINTF("  config[0]   vPortFree(%8p, file, line);\n", ptr);
+        DEBUG_PRINTF("  config[2]   vPortFree(%8p, file, line);\n", sm->config[2]);
+        DEBUG_PRINTF("  config[4]   vPortFree(%8p, file, line);\n", sm->config[4]);
+        DEBUG_PRINTF("  config[21]  vPortFree(%8p, file, line);\n", sm->config[21]);
+        if (a12) {
+            void** pw = (void**)a12;
+            DEBUG_PRINTF("\nhexdump struct StateMachine:\n");
+            for (size_t i=0; i<200/4; i+=4) {
+                DEBUG_PRINTF("%03u: %8p %8p %8p %8p\n", i*4, pw[i], pw[i+1], pw[i+2], pw[i+3]);
+            }
+        }
+#endif
     }
+#if 0
+    // This is not needed because the call was NO-OPed in the library. This code
+    // snippit is just to show how a future memory free issue might be resolved.
+    else if (672 == line) {
+        // This caller is wpa2_sm_rx_eapol()
+        // 1st of a double free
+        // let the 2nd free handle it.
+        return;
+    }
+#endif
     vPortFree(ptr, file, line);
 }
 
