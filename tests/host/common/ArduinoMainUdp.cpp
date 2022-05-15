@@ -33,7 +33,7 @@
 #include <poll.h>
 #include <map>
 
-std::map<int, UdpContext*> udps;
+static std::map<int, UdpContext*> udps;
 
 void register_udp(int sock, UdpContext* udp)
 {
@@ -57,4 +57,9 @@ void check_incoming_udp()
             udp.second->mock_cb();
         }
     }
+}
+
+void mock_stop_udp()
+{
+    udps.clear();
 }
