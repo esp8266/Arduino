@@ -233,30 +233,6 @@ class String {
         bool operator ==(std::nullptr_t) const {
             return length() == 0;
         }
-        bool operator ==(int num) const {
-            return equals(String(num));
-        }
-        bool operator ==(unsigned int num) const {
-            return equals(String(num));
-        }
-        bool operator ==(long num) const {
-            return equals(String(num));
-        }
-        bool operator ==(unsigned long num) const {
-            return equals(String(num));
-        }
-        bool operator ==(long long num) const {
-            return equals(String(num));
-        }
-        bool operator ==(unsigned long long num) const {
-            return equals(String(num));
-        }
-        bool operator ==(float num) const {
-            return equals(String(num));
-        }
-        bool operator ==(double num) const {
-            return equals(String(num));
-        }
         bool operator !=(const String &rhs) const {
             return !equals(rhs);
         }
@@ -268,30 +244,6 @@ class String {
         }
         bool operator !=(std::nullptr_t) const {
             return length() != 0;
-        }
-        bool operator !=(int num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(unsigned int num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(long num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(unsigned long num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(long long num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(unsigned long long num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(float num) const {
-            return !equals(String(num));
-        }
-        bool operator !=(double num) const {
-            return !equals(String(num));
         }
         bool operator <(const String &rhs) const;
         bool operator >(const String &rhs) const;
