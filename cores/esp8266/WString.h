@@ -227,9 +227,6 @@ class String {
         bool operator ==(const char *cstr) const {
             return equals(cstr);
         }
-        bool operator ==(const __FlashStringHelper *rhs) const {
-            return equals(rhs);
-        }
         bool operator ==(std::nullptr_t) const {
             return length() == 0;
         }
@@ -238,9 +235,6 @@ class String {
         }
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
-        }
-        bool operator !=(const __FlashStringHelper *rhs) const {
-            return !equals(rhs);
         }
         bool operator !=(std::nullptr_t) const {
             return length() != 0;
