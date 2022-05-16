@@ -211,10 +211,9 @@ class String {
             return *this;
         }
 
-        // checks whether the internal buffer pointer is set.
-        // (should not be the case for us, since we always reset the pointer to the SSO buffer instead of setting it to nullptr)
+        // checks whether the String is empty
         explicit operator bool() const {
-            return buffer() != nullptr;
+            return length() != 0;
         }
 
         int compareTo(const String &s) const;
@@ -227,7 +226,13 @@ class String {
         bool operator ==(const char *cstr) const {
             return equals(cstr);
         }
+        bool operator ==(const __FlashStringHelper *rhs) const {
+            return equals(rhs);
+        }
         bool operator ==(std::nullptr_t) const {
+            return length() == 0;
+        }
+        bool operator ==(decltype(NULL)) const {
             return length() == 0;
         }
         bool operator !=(const String &rhs) const {
@@ -236,7 +241,13 @@ class String {
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
         }
+        bool operator !=(const __FlashStringHelper *rhs) const {
+            return !equals(rhs);
+        }
         bool operator !=(std::nullptr_t) const {
+            return length() != 0;
+        }
+        bool operator !=(decltype(NULL)) const {
             return length() != 0;
         }
         bool operator <(const String &rhs) const;
