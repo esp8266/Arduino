@@ -232,6 +232,7 @@ class String {
         bool operator ==(std::nullptr_t) const {
             return length() == 0;
         }
+        [[deprecated("use nullptr instead of NULL")]]
         bool operator ==(decltype(NULL)) const {
             return length() == 0;
         }
@@ -247,6 +248,7 @@ class String {
         bool operator !=(std::nullptr_t) const {
             return length() != 0;
         }
+        [[deprecated("use nullptr instead of NULL")]]
         bool operator !=(decltype(NULL)) const {
             return length() != 0;
         }
