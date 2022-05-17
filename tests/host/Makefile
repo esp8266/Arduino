@@ -371,7 +371,7 @@ else
 LIBSSL = $(LIBSSLFILE)
 endif
 ssl:							# download source and build BearSSL
-	cd ../../tools/sdk/ssl && make native$(N32)
+	cd ../../tools/sdk/ssl && $(MAKE) native$(N32)
 
 ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
 USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src $$d/src/libmad; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
@@ -391,7 +391,7 @@ $(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
 ifeq ($(INO),)
 
 %:
-	make INO=$@.ino $(BINDIR)/$(abspath $@)
+	$(MAKE) INO=$@.ino $(BINDIR)/$(abspath $@)
 
 else
 
