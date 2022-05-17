@@ -20,7 +20,9 @@
 import argparse
 import os
 import subprocess
+import sys
 
+sys.stdout = sys.stderr
 
 def get_segment_sizes(elf, path, mmu):
     iram_size = 0
