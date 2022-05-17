@@ -211,9 +211,10 @@ class String {
             return *this;
         }
 
-        // checks whether the String is empty
+        // checks whether the internal buffer pointer is set.
+        // (should not be the case for us, since we always reset the pointer to the SSO buffer instead of setting it to nullptr)
         explicit operator bool() const {
-            return length() != 0;
+            return buffer() != nullptr;
         }
 
         int compareTo(const String &s) const;
