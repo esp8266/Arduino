@@ -226,31 +226,11 @@ class String {
         bool operator ==(const char *cstr) const {
             return equals(cstr);
         }
-        bool operator ==(const __FlashStringHelper *rhs) const {
-            return equals(rhs);
-        }
-        bool operator ==(std::nullptr_t) const {
-            return length() == 0;
-        }
-        [[deprecated("use nullptr instead of NULL")]]
-        bool operator ==(decltype(NULL)) const {
-            return length() == 0;
-        }
         bool operator !=(const String &rhs) const {
             return !equals(rhs);
         }
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
-        }
-        bool operator !=(const __FlashStringHelper *rhs) const {
-            return !equals(rhs);
-        }
-        bool operator !=(std::nullptr_t) const {
-            return length() != 0;
-        }
-        [[deprecated("use nullptr instead of NULL")]]
-        bool operator !=(decltype(NULL)) const {
-            return length() != 0;
         }
         bool operator <(const String &rhs) const;
         bool operator >(const String &rhs) const;
