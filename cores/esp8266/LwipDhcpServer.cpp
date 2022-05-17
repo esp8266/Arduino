@@ -51,6 +51,7 @@
 
 #include "user_interface.h"
 #include "mem.h"
+#include "Arduino.h"
 
 typedef struct dhcps_state
 {
@@ -536,6 +537,7 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
 
     end = add_msg_type(&m->options[4], DHCPOFFER);
     end = add_offer_options(end);
+    end = insert_custom_offer_options(end, &m->options[0]);
     end = add_end(end);
 
     p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
@@ -658,6 +660,7 @@ void DhcpServer::send_ack(struct dhcps_msg* m)
 
     end = add_msg_type(&m->options[4], DHCPACK);
     end = add_offer_options(end);
+    end = insert_custom_offer_options(end, &m->options[0]);
     end = add_end(end);
 
     p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
@@ -1590,4 +1593,52 @@ uint32 DhcpServer::dhcps_client_update(u8* bssid, struct ipv4_addr* ip)
     }
 
     return pdhcps_pool->ip.addr;
+}
+
+uint16 DhcpServer::add_dhcps_custom_options(uint8 offerCode, char *offerContent)
+{
+    Serial.print("OfferCode: ");
+    Serial.println(String(offerCode)+offerContent);
+    int sizeOfCustomOptions = strlen(dhcpCustomOffers);
+    if (sizeOfCustomOptions + strlen(offerContent) + 1 < 100){
+        dhcpCustomOffers[sizeOfCustomOptions] = offerCode;
+        dhcpCustomOffers[sizeOfCustomOptions +1] = strlen(offerContent);
+        for(int i = 0; i<(strlen(offerContent)); i++){
+            dhcpCustomOffers[sizeOfCustomOptions + 2 + i] = offerContent[i];
+        }
+    } else{
+        return 0;
+    }
+    return strlen(dhcpCustomOffers);
+}
+
+void DhcpServer::remove_dhcps_custom_options()
+{
+    for(uint16 i = 0; i < 100; i++){
+        dhcpCustomOffers[i] = '\0';
+    }
+}
+
+uint8_t* DhcpServer::insert_custom_offer_options(uint8_t* optptr, uint8_t* optionsStart)
+{
+    Serial.println("Adding Options");
+    Serial.println(dhcpCustomOffers);
+    int sizeOfCustomOptions = strlen(dhcpCustomOffers);
+    Serial.println(sizeOfCustomOptions);
+    uint16 i = 0;
+    while (i < sizeOfCustomOptions){
+        if((uint16(dhcpCustomOffers[i+1]) +1) < (uint16(312) - uint16(optptr - optionsStart))){
+            Serial.println("DHCP: Made it into IF:");
+            Serial.println((uint16(312) - uint16(optptr - optionsStart)));
+            for(int y = 0; y < uint16(dhcpCustomOffers[i+1]) + 2; y++){
+                *optptr++ = dhcpCustomOffers[i+y];
+                Serial.println(dhcpCustomOffers[i+y]);
+            }
+        }
+        else{
+            return optptr;
+        }
+        i += uint16(dhcpCustomOffers[i+1]) +2;
+    }
+    return optptr;
 }

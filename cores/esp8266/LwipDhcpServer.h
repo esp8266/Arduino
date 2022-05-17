@@ -60,6 +60,10 @@ public:
     bool   reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
     bool   add_dhcps_lease(uint8* macaddr);
+    uint16 add_dhcps_custom_options(uint8 offerCode, char *offerContent);
+    void   remove_dhcps_custom_options(void);
+    char   dhcpCustomOffers[312];
+
 
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
 
@@ -76,6 +80,7 @@ protected:
     void        node_remove_from_list(list_node** phead, list_node* pdelete);
     uint8_t*    add_msg_type(uint8_t* optptr, uint8_t type);
     uint8_t*    add_offer_options(uint8_t* optptr);
+    uint8_t*    insert_custom_offer_options(uint8_t* optptr, uint8_t* optionsStart);
     uint8_t*    add_end(uint8_t* optptr);
     void        create_msg(struct dhcps_msg* m);
     void        send_offer(struct dhcps_msg* m);
