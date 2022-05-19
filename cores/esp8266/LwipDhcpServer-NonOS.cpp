@@ -16,8 +16,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "ESP8266WiFi.h"
-#include "ESP8266WiFiAP.h"
+#include "LwipDhcpServer-NonOS.h"
 
 #include <lwip/init.h>
 #include <lwip/netif.h>
@@ -26,16 +25,11 @@
 // (since the netif object never goes away, even when AP is disabled)
 // Initial version fully emulates nonos-sdk api in DhcpServer class,
 // before trying to further change it and possibly break legacy behaviour
-static DhcpServer& getNonOSDhcpServer()
+DhcpServer& getNonOSDhcpServer()
 {
     extern netif      netif_git[2];
     static DhcpServer server(&netif_git[SOFTAP_IF]);
     return server;
-}
-
-DhcpServer& ESP8266WiFiAPClass::softAPDhcpServer()
-{
-    return getNonOSDhcpServer();
 }
 
 extern "C"
@@ -98,5 +92,3 @@ extern "C"
     }
 
 }  // extern "C"
-
-

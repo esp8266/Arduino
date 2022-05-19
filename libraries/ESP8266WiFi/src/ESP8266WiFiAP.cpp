@@ -391,3 +391,11 @@ String ESP8266WiFiAPClass::softAPPSK() const {
 
     return psk;
 }
+
+/**
+ * Get the static DHCP server instance attached to the softAP interface
+ * @return DhcpServer instance.
+ */
+DhcpServer& ESP8266WiFiAPClass::softAPDhcpServer() {
+    return getNonOSDhcpServer();
+}
