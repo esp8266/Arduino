@@ -252,13 +252,6 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         ret = false;
     }
 
-    // set lease time to 720min --> 12h
-    if(!server.set_dhcps_lease_time(720))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
-        ret = false;
-    }
-
     uint8 mode = info.gw.addr ? 1 : 0;
     if(!server.set_dhcps_offer_option(OFFER_ROUTER, &mode))
     {

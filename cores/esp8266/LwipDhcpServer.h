@@ -35,7 +35,7 @@
 class DhcpServer
 {
 public:
-    static constexpr int    DefaultLeaseTime = 120;         // seconds
+    static constexpr int    DefaultLeaseTime = 720;         // minutes
     static constexpr uint32 MagicCookie      = 0x63538263;  // https://tools.ietf.org/html/rfc1497
 
     DhcpServer(netif*);
