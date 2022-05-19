@@ -176,7 +176,7 @@ extern "C"
             {
                 auto test_ipv4
                     = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
-                mockverbose(" IPV4 (0x%08lx)", test_ipv4);
+                mockverbose(" IPV4 (0x%08x)", test_ipv4);
                 if ((test_ipv4 & 0xff000000) == 0x7f000000)
                     // 127./8
                     mockverbose(" (local, ignored)");
