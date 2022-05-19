@@ -163,6 +163,7 @@ static struct option options[] = {
 
 void cleanup()
 {
+    mock_stop_udp();
     mock_stop_spiffs();
     mock_stop_littlefs();
     mock_stop_uart();
