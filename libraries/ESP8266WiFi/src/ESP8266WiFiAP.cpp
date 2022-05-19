@@ -26,6 +26,8 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiAP.h"
 
+#include <LwipDhcpServer-NonOS.h>
+
 extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
