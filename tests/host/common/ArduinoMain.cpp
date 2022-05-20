@@ -113,7 +113,7 @@ static int mock_stop_uart(void)
     return (0);
 }
 
-uint8_t mock_read_uart(void)
+static uint8_t mock_read_uart(void)
 {
     uint8_t ch = 0;
     int ret = read(STDIN, &ch, 1);
