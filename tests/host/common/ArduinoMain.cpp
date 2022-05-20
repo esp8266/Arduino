@@ -113,10 +113,13 @@ static int mock_stop_uart(void)
     return (0);
 }
 
-static uint8_t mock_read_uart(void)
+uint8_t mock_read_uart(void)
 {
     uint8_t ch = 0;
-    return (read(STDIN, &ch, 1) == 1) ? ch : 0;
+    int ret = read(STDIN, &ch, 1);
+    if (ret == -1)
+        perror("read(STDIN,1)");
+    return (ret == 1) ? ch : 0;
 }
 
 void help(const char* argv0, int exitcode)

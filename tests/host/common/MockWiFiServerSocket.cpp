@@ -129,7 +129,7 @@ bool WiFiServer::hasClient()
 
 void WiFiServer::close()
 {
-    if (pcb2int(_listen_pcb) >= 0)
+    if (pcb2int(_listen_pcb) >= 3) // 0=stdin 1=stdout 2=stderr
         ::close(pcb2int(_listen_pcb));
     _listen_pcb = int2pcb(-1);
 }
