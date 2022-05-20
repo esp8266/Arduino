@@ -374,9 +374,10 @@ ssl:							# download source and build BearSSL
 	cd ../../tools/sdk/ssl && $(MAKE) native$(N32)
 
 ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
-USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src $$d/src/libmad; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
-USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp $$d/src/libmad/*.c; do test -r $$ss && echo $$ss; done; done)
-INC_PATHS += $(USERLIBDIRS)
+USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/utility $$d/src $$d/src/utility; do test -d $$dd && echo $$dd; done; done)
+USERLIBSRCS := $(shell test -z "$(USERLIBDIRS)" || for d in $(USERLIBDIRS); do for ss in $$d/*.c $$d/*.cpp; do test -r $$ss && echo $$ss; done; done)
+USERLIBINCS = $(shell for d in $(USERLIBDIRS); do echo -I$$d; done)
+INC_PATHS += $(USERLIBINCS)
 INC_PATHS += -I$(INODIR)/..
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o) $(USERCXXSOURCES:.cpp=.cpp.o)
 C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c.o)
