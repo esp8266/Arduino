@@ -51,7 +51,6 @@
 
 #include "user_interface.h"
 #include "mem.h"
-#include "Arduino.h"
 
 typedef struct dhcps_state
 {
@@ -1595,50 +1594,24 @@ uint32 DhcpServer::dhcps_client_update(u8* bssid, struct ipv4_addr* ip)
     return pdhcps_pool->ip.addr;
 }
 
-uint16 DhcpServer::add_dhcps_custom_options(uint8 offerCode, char *offerContent)
+void DhcpServer::add_dhcps_custom_options(char *offerContent)
 {
-    Serial.print("OfferCode: ");
-    Serial.println(String(offerCode)+offerContent);
-    int sizeOfCustomOptions = strlen(dhcpCustomOffers);
-    if (sizeOfCustomOptions + strlen(offerContent) + 1 < 100){
-        dhcpCustomOffers[sizeOfCustomOptions] = offerCode;
-        dhcpCustomOffers[sizeOfCustomOptions +1] = strlen(offerContent);
-        for(int i = 0; i<(strlen(offerContent)); i++){
-            dhcpCustomOffers[sizeOfCustomOptions + 2 + i] = offerContent[i];
-        }
-    } else{
-        return 0;
-    }
-    return strlen(dhcpCustomOffers);
+    isSetCustomOptions = true;
+    customOptionsContent = offerContent;
 }
 
 void DhcpServer::remove_dhcps_custom_options()
 {
-    for(uint16 i = 0; i < 100; i++){
-        dhcpCustomOffers[i] = '\0';
-    }
+    isSetCustomOptions = false;
 }
 
 uint8_t* DhcpServer::insert_custom_offer_options(uint8_t* optptr, uint8_t* optionsStart)
 {
-    Serial.println("Adding Options");
-    Serial.println(dhcpCustomOffers);
-    int sizeOfCustomOptions = strlen(dhcpCustomOffers);
-    Serial.println(sizeOfCustomOptions);
-    uint16 i = 0;
-    while (i < sizeOfCustomOptions){
-        if((uint16(dhcpCustomOffers[i+1]) +1) < (uint16(312) - uint16(optptr - optionsStart))){
-            Serial.println("DHCP: Made it into IF:");
-            Serial.println((uint16(312) - uint16(optptr - optionsStart)));
-            for(int y = 0; y < uint16(dhcpCustomOffers[i+1]) + 2; y++){
-                *optptr++ = dhcpCustomOffers[i+y];
-                Serial.println(dhcpCustomOffers[i+y]);
-            }
-        }
-        else{
-            return optptr;
-        }
-        i += uint16(dhcpCustomOffers[i+1]) +2;
+    if(isSetCustomOptions){
+        uint16 customOptionsSize = strlen(customOptionsContent);
+        if((optptr + customOptionsSize - optionsStart) >= 311) return optptr;
+        memcpy(optptr, customOptionsContent, strlen(customOptionsContent));
+        optptr += customOptionsSize;
     }
     return optptr;
 }

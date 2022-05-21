@@ -60,9 +60,10 @@ public:
     bool   reset_dhcps_lease_time(void);
     uint32 get_dhcps_lease_time(void);
     bool   add_dhcps_lease(uint8* macaddr);
-    uint16 add_dhcps_custom_options(uint8 offerCode, char *offerContent);
+    void add_dhcps_custom_options(char *offerContent);
     void   remove_dhcps_custom_options(void);
-    char   dhcpCustomOffers[100];
+    bool   isSetCustomOptions;
+    char   *customOptionsContent;
 
 
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
