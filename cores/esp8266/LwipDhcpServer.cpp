@@ -1609,7 +1609,12 @@ uint8_t* DhcpServer::insert_custom_offer_options(uint8_t* optptr, uint8_t* optio
 {
     if(isSetCustomOptions){
         uint16 customOptionsSize = strlen(customOptionsContent);
-        if((optptr + customOptionsSize - optionsStart) >= 311) return optptr;
+        if((optptr + customOptionsSize - optionsStart) >= 311){
+            #if DHCPS_DEBUG
+            os_printf("ERROR: DHCP Custom Options Too Large. Ignoring Custom Options");
+            #endif
+            return optptr;
+        }
         memcpy(optptr, customOptionsContent, strlen(customOptionsContent));
         optptr += customOptionsSize;
     }
