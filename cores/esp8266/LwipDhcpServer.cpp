@@ -1596,7 +1596,7 @@ uint32 DhcpServer::dhcps_client_update(u8* bssid, struct ipv4_addr* ip)
 
 uint8_t* DhcpServer::add_custom_offer_options(uint8_t* optptr, uint8_t* end) {
     for (const auto& option : custom_options) {
-        if (option.data.size() > UINT8_MAX) {
+        if (option.data.size() > (UINT8_MAX - 1)) {
             break;
         }
 
