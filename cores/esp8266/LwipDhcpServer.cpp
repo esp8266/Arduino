@@ -534,8 +534,9 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
     u16_t        i;
     create_msg(m);
 
-    end = add_msg_type(&m->options[4], DHCPOFFER);
+    end = add_msg_type(&m->options[4], DHCPOFFER); // 3
     end = add_offer_options(end);
+    end = add_custom_offer_options(end, std::end(m->options) - 1);
     end = add_end(end);
 
     p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
@@ -658,6 +659,7 @@ void DhcpServer::send_ack(struct dhcps_msg* m)
 
     end = add_msg_type(&m->options[4], DHCPACK);
     end = add_offer_options(end);
+    end = add_custom_offer_options(end, std::end(m->options) - 1);
     end = add_end(end);
 
     p = pbuf_alloc(PBUF_TRANSPORT, sizeof(struct dhcps_msg), PBUF_RAM);
@@ -1590,4 +1592,24 @@ uint32 DhcpServer::dhcps_client_update(u8* bssid, struct ipv4_addr* ip)
     }
 
     return pdhcps_pool->ip.addr;
+}
+
+uint8_t* DhcpServer::add_custom_offer_options(uint8_t* optptr, uint8_t* end) {
+    for (const auto& option : custom_options) {
+        if (option.data.size() > UINT8_MAX) {
+            break;
+        }
+
+        if ((end - optptr) < (2 + (option.data.end() - option.data.begin()))) {
+            break;
+        }
+
+        *optptr++ = option.code;
+        *optptr++ = option.data.size();
+        for (auto it = option.data.begin(); it != option.data.end(); ++it) {
+            *optptr++ = *it;
+        }
+    }
+
+    return optptr;
 }

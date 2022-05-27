@@ -33,9 +33,17 @@
 
 #include <lwip/init.h>  // LWIP_VERSION
 
+#include <cstdint>
+#include <vector>
+
 class DhcpServer
 {
 public:
+    struct Option {
+        uint8_t code;
+        std::vector<uint8_t> data;
+    };
+
     DhcpServer(netif* netif);
     ~DhcpServer();
 
@@ -63,6 +71,12 @@ public:
 
     void dhcps_set_dns(int num, const ipv4_addr_t* dns);
 
+    template <typename T>
+    void add_custom_offer_option(T&& option) {
+        custom_options.push_back(std::forward<T>(option));
+    }
+
+    void offers();
 protected:
     // legacy C structure and API to eventually turn into C++
 
@@ -76,6 +90,7 @@ protected:
     void        node_remove_from_list(list_node** phead, list_node* pdelete);
     uint8_t*    add_msg_type(uint8_t* optptr, uint8_t type);
     uint8_t*    add_offer_options(uint8_t* optptr);
+    uint8_t*    add_custom_offer_options(uint8_t* optptr, uint8_t* end);
     uint8_t*    add_end(uint8_t* optptr);
     void        create_msg(struct dhcps_msg* m);
     void        send_offer(struct dhcps_msg* m);
@@ -105,6 +120,7 @@ protected:
     uint8              offer;
     bool               renew;
 
+    std::vector<Option> custom_options;
     static const uint32 magic_cookie;
 };
 
