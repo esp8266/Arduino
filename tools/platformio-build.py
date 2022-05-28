@@ -78,7 +78,6 @@ env.Append(
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
-        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
@@ -122,7 +121,8 @@ env.Append(
         ("ARDUINO", 10805),
         ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
         "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
-        "LWIP_OPEN_SRC"
+        "LWIP_OPEN_SRC",
+        "_GNU_SOURCE",        
     ],
 
     # The list of directories that the C preprocessor will search for include directories
