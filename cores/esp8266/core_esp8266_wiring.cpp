@@ -160,16 +160,16 @@ unsigned long IRAM_ATTR millis()
   // (a) Init. low-acc with high-word of 1st product. The right-shift
   //     falls on a byte boundary, hence is relatively quick.
   
-  acc.q  = ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
+  acc.q  = ( __builtin_umulsidi3( m, MAGIC_1E3_wLO ) >> 32 );
 
   // (b) Offset sum, low-acc
-  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );
+  acc.q += ( __builtin_umulsidi3( m, MAGIC_1E3_wHI ) );
 
   // (c) Offset sum, low-acc
-  acc.q += ( c * (uint64_t)MAGIC_1E3_wLO );
+  acc.q += ( __builtin_umulsidi3( c, MAGIC_1E3_wLO ) );
 
   // (d) Truncated sum, high-acc
-  acc.a[1] += (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+  acc.a[1] += (uint32_t)( __builtin_umulsidi3( c, MAGIC_1E3_wHI ) );
 
   return ( acc.a[1] );  // Extract result, high-acc
 
