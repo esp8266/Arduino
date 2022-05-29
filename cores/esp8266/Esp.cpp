@@ -881,13 +881,39 @@ bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
                     }
                 }
             } else {
-                // Pointer is properly aligned and write does not cross page boundary,
-                // so use aligned write
-                if (!flashWrite(address, (uint32_t *)data, sizeLeft)) {
-                    return false;
+                // If the flash address is not aligned, write a partial 4-bytes block and than re-check
+                // the alignment of data address of remaining data. This may lead to a reallocation and
+                // a significant stack usage.
+                if(address % 4){
+                    size_t byteCount = 4 - (address % 4);
+
+                    if (!flashReplaceBlock(address, data, byteCount)) {
+                        return false;
+                    }
+                    // We will now have aligned address, so we can cross page boundaries
+                    currentOffset += byteCount;
+                    // Realign size to 4
+                    sizeLeft = (size - byteCount) & ~3;
+
+                    // Memory is unaligned, so we need to copy it to an aligned buffer
+                    uint32_t alignedData[FLASH_PAGE_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
+                    memcpy(alignedData, data + currentOffset, sizeLeft);
+
+                    // Pointer is properly aligned and write does not cross page boundary,
+                    // so use aligned write
+                    if (!flashWrite(address + currentOffset, alignedData, sizeLeft)) {
+                        return false;
+                    }
+                    currentOffset += sizeLeft;
+                } else {
+                    // Pointer is properly aligned and write does not cross page boundary,
+                    // so use aligned write
+                    if (!flashWrite(address, (uint32_t *)data, sizeLeft)) {
+                        return false;
+                    }
+                    currentOffset = sizeLeft;
+                    sizeLeft = 0;
                 }
-                currentOffset = sizeLeft;
-                sizeLeft = 0;
             }
         }
     }
