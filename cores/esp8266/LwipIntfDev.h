@@ -68,7 +68,7 @@ public:
     //    the first one is picked.  On esp8266/Arduno: WiFi interfaces are
     //    checked first.
     // 3. Or, use `::setDefault()` to force routing through this interface.
-    void setDefault(bool deflt = true);
+    void setDefault(bool default = true);
 
     // true if interface has a valid IPv4 address
     bool connected()
@@ -401,10 +401,10 @@ err_t LwipIntfDev<RawDev>::handlePackets()
 }
 
 template<class RawDev>
-void LwipIntfDev<RawDev>::setDefault(bool deflt)
+void LwipIntfDev<RawDev>::setDefault(bool default)
 {
-    _default = deflt;
-    if (connected())
+    _default = default;
+    if (default && connected())
     {
         netif_set_default(&_netif);
     }
