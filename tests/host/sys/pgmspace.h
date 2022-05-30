@@ -75,10 +75,12 @@ inline int vsnprintf_P(char* str, size_t size, const char* format, va_list ap)
 #define memmove_P memmove
 #define strncpy_P strncpy
 #define strcmp_P strcmp
+#define strcasecmp_P strcasecmp
 #define memccpy_P memccpy
 #define snprintf_P snprintf
 #define sprintf_P sprintf
 #define strncmp_P strncmp
+#define strncasecmp_P strncasecmp
 #define strcat_P strcat
 
 #endif
