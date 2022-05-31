@@ -68,12 +68,17 @@ public:
     //    the first one is picked.  On esp8266/Arduno: WiFi interfaces are
     //    checked first.
     // 3. Or, use `::setDefault()` to force routing through this interface.
-    void setDefault(bool default = true);
+    void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
     bool connected()
     {
         return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
+    }
+
+    bool routable()
+    {
+        return !ip_addr_isany(&_netif.gw);
     }
 
     // ESP8266WiFi API compatibility
@@ -82,6 +87,7 @@ public:
 
 protected:
     err_t netif_init();
+    void  check_route();
     void  netif_status_callback();
 
     static err_t netif_init_s(netif* netif);
@@ -316,16 +322,25 @@ err_t LwipIntfDev<RawDev>::netif_init()
 template<class RawDev>
 void LwipIntfDev<RawDev>::netif_status_callback()
 {
+    check_route();
     if (connected())
     {
-        if (_default || (netif_default == nullptr && !ip_addr_isany(&_netif.gw)))
-        {
-            // on user request,
-            // or if there is no current default interface, but a gateway is valid
-            netif_set_default(&_netif);
-        }
         sntp_stop();
         sntp_init();
+    }
+}
+
+template<class RawDev>
+void LwipIntfDev<RawDev>::check_route()
+{
+    if (connected())
+    {
+        if (_default || (netif_default == nullptr && routable()))
+        {
+            // on user request,
+            // or if there is no current default interface, but our gateway is valid
+            netif_set_default(&_netif);
+        }
     }
     else if (netif_default == &_netif)
     {
@@ -401,13 +416,10 @@ err_t LwipIntfDev<RawDev>::handlePackets()
 }
 
 template<class RawDev>
-void LwipIntfDev<RawDev>::setDefault(bool default)
+void LwipIntfDev<RawDev>::setDefault(bool deflt)
 {
-    _default = default;
-    if (default && connected())
-    {
-        netif_set_default(&_netif);
-    }
+    _default = deflt;
+    check_route();
 }
 
 #endif  // _LWIPINTFDEV_H
