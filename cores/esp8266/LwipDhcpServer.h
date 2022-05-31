@@ -79,24 +79,21 @@ public:
 
         OptionsBuffer& add(uint8_t code, uint8_t value)
         {
-            uint8_t buffer[] { value };
-            return add(code, buffer, sizeof(buffer));
+            return add(code, { value });
         }
 
         OptionsBuffer& add(uint8_t code, uint16_t value)
         {
-            uint8_t buffer[2] { static_cast<uint8_t>((value >> 8) & 0xff),
-                                static_cast<uint8_t>(value & 0xff) };
-            return add(code, buffer, sizeof(buffer));
+            return add(code, { static_cast<uint8_t>((value >> 8) & 0xff),
+                               static_cast<uint8_t>(value & 0xff) });
         }
 
         OptionsBuffer& add(uint8_t code, uint32_t value)
         {
-            uint8_t buffer[4] { static_cast<uint8_t>((value >> 24) & 0xff),
-                                static_cast<uint8_t>((value >> 16) & 0xff),
-                                static_cast<uint8_t>((value >> 8) & 0xff),
-                                static_cast<uint8_t>((value & 0xff)) };
-            return add(code, buffer, sizeof(buffer));
+            return add(code, { static_cast<uint8_t>((value >> 24) & 0xff),
+                               static_cast<uint8_t>((value >> 16) & 0xff),
+                               static_cast<uint8_t>((value >> 8) & 0xff),
+                               static_cast<uint8_t>((value & 0xff)) });
         }
 
         OptionsBuffer& add(uint8_t code)
