@@ -342,8 +342,11 @@ bool DhcpServer::add_dhcps_lease(uint8* macaddr)
 void DhcpServer::add_offer_options(OptionsBuffer& options)
 {
     options.add(DHCP_OPTION_SUBNET_MASK, ip_2_ip4(&_netif->netmask))
-        .add(DHCP_OPTION_LEASE_TIME, lease_time)
         .add(DHCP_OPTION_SERVER_ID, ip_2_ip4(&_netif->ip_addr));
+
+    // option units are seconds, while server opt is minutes
+    const uint32_t lease_time_seconds = lease_time * 60;
+    options.add(DHCP_OPTION_LEASE_TIME, lease_time_seconds);
 
     if (offer_router && !ip4_addr_isany_val(*ip_2_ip4(&_netif->gw)))
     {
