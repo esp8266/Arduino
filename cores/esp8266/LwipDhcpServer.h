@@ -37,8 +37,6 @@
 #include <cstddef>
 #include <cstring>
 
-#include <sys/pgmspace.h>
-
 #include <array>
 #include <initializer_list>
 
@@ -49,26 +47,7 @@ public:
     {
         OptionsBuffer(uint8_t* begin, uint8_t* end) : _it(begin), _begin(begin), _end(end) { }
 
-        OptionsBuffer& add(uint8_t code, const uint8_t* data, size_t size)
-        {
-            if (size >= UINT8_MAX)
-            {
-                return *this;
-            }
-
-            if ((size_t)(_end - _it) < (size + 2))
-            {
-                return *this;
-            }
-
-            *_it++ = code;
-            *_it++ = size;
-
-            memcpy_P(_it, data, size);
-            _it += size;
-
-            return *this;
-        }
+        OptionsBuffer& add(uint8_t code, const uint8_t* data, size_t size);
 
         OptionsBuffer& add(uint8_t code, const char* data, size_t size)
         {

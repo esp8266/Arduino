@@ -51,6 +51,7 @@
 #include "mem.h"
 
 #include <cstring>
+#include <sys/pgmspace.h>
 
 typedef struct dhcps_state
 {
@@ -169,6 +170,30 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 const uint32 DhcpServer::magic_cookie = 0x63538263;  // https://tools.ietf.org/html/rfc1497
 
 int fw_has_started_softap_dhcps = 0;
+
+////////////////////////////////////////////////////////////////////////////////////
+
+DhcpServer::OptionsBuffer& DhcpServer::OptionsBuffer::add(uint8_t code, const uint8_t* data,
+                                                          size_t size)
+{
+    if (size >= UINT8_MAX)
+    {
+        return *this;
+    }
+
+    if ((size_t)(_end - _it) < (size + 2))
+    {
+        return *this;
+    }
+
+    *_it++ = code;
+    *_it++ = size;
+
+    memcpy_P(_it, data, size);
+    _it += size;
+
+    return *this;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 
