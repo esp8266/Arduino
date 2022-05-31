@@ -250,19 +250,8 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         ret = false;
     }
 
-    // set lease time to 720min --> 12h
-    if(!dhcpSoftAP.set_dhcps_lease_time(720))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
-        ret = false;
-    }
-
-    uint8 mode = info.gw.addr ? 1 : 0;
-    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
-        ret = false;
-    }
+    dhcpSoftAP.setLeaseTime(720); // 720 minutes == 12 h
+    dhcpSoftAP.setRouter(true); // send ROUTER option with netif's gateway IP
 
     if(!wifi_softap_dhcps_start()) {
         DEBUG_WIFI("[APConfig] wifi_softap_dhcps_start failed!\n");

@@ -3,14 +3,13 @@
 #include <LwipDhcpServer.h>
 
 void setup() {
-    dhcpSoftAP.add_custom_offer_option(
-        DhcpServer::Option{
-            .code = 43,
-            .data = {0xca,0xfe,0xfe,0xfe,0xfe}
-        });
-    WiFi.softAP("TEST", "testtesttest");
+  dhcpSoftAP.custom_offer_options = [](const DhcpServer&, auto& options) {
+    options.add(43, { 0xca, 0xfe, 0xca, 0xfe, 0xfe });  // VENDOR is... vendor specific
+    options.add(114, "https://192.168.4.1");            // Captive portal
+  };
+  WiFi.softAP("TEST", "testtesttest");
 }
 
 void loop() {
-    delay(100);
+  delay(100);
 }

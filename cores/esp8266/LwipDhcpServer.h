@@ -31,27 +31,160 @@
 #ifndef __DHCPS_H__
 #define __DHCPS_H__
 
-#include <lwip/init.h>  // LWIP_VERSION
+#include <lwip/init.h>
 
 #include <cstdint>
-#include <vector>
+#include <cstddef>
+#include <cstring>
+
+#include <sys/pgmspace.h>
+
+#include <array>
+#include <initializer_list>
 
 class DhcpServer
 {
 public:
-    struct Option {
-        uint8_t code;
-        std::vector<uint8_t> data;
+    struct OptionsBuffer
+    {
+        OptionsBuffer(uint8_t* begin, uint8_t* end) : _it(begin), _begin(begin), _end(end) { }
+
+        OptionsBuffer& add(uint8_t code, const uint8_t* data, size_t size)
+        {
+            if (size >= UINT8_MAX)
+            {
+                return *this;
+            }
+
+            if ((size_t)(_end - _it) < (size + 2))
+            {
+                return *this;
+            }
+
+            *_it++ = code;
+            *_it++ = size;
+
+            memcpy_P(_it, data, size);
+            _it += size;
+
+            return *this;
+        }
+
+        OptionsBuffer& add(uint8_t code, const char* data, size_t size)
+        {
+            return add(code, reinterpret_cast<const uint8_t*>(data), size);
+        }
+
+        template<size_t Size>
+        OptionsBuffer& add(uint8_t code, const char (&data)[Size])
+        {
+            return add(code, &data[0], Size - 1);
+        }
+
+        template<size_t Size>
+        OptionsBuffer& add(uint8_t code, const uint8_t (&data)[Size])
+        {
+            return add(code, &data[0], Size);
+        }
+
+        OptionsBuffer& add(uint8_t code, std::initializer_list<uint8_t> data)
+        {
+            return add(code, data.begin(), data.size());
+        }
+
+        OptionsBuffer& add(uint8_t code, const ip4_addr_t* addr)
+        {
+            return add(code,
+                       { ip4_addr1(addr), ip4_addr2(addr), ip4_addr3(addr), ip4_addr4(addr) });
+        }
+
+        OptionsBuffer& add(uint8_t code, uint8_t value)
+        {
+            uint8_t buffer[] { value };
+            return add(code, buffer, sizeof(buffer));
+        }
+
+        OptionsBuffer& add(uint8_t code, uint16_t value)
+        {
+            uint8_t buffer[2] { static_cast<uint8_t>((value >> 8) & 0xff),
+                                static_cast<uint8_t>(value & 0xff) };
+            return add(code, buffer, sizeof(buffer));
+        }
+
+        OptionsBuffer& add(uint8_t code, uint32_t value)
+        {
+            uint8_t buffer[4] { static_cast<uint8_t>((value >> 24) & 0xff),
+                                static_cast<uint8_t>((value >> 16) & 0xff),
+                                static_cast<uint8_t>((value >> 8) & 0xff),
+                                static_cast<uint8_t>((value & 0xff)) };
+            return add(code, buffer, sizeof(buffer));
+        }
+
+        OptionsBuffer& add(uint8_t code)
+        {
+            if (_it != _end)
+            {
+                *_it++ = code;
+            }
+            return *this;
+        }
+
+    private:
+        uint8_t* _it;
+        uint8_t* _begin;
+        uint8_t* _end;
     };
+
+    using OfferOptionsCallback = void (*)(const DhcpServer&, OptionsBuffer&);
 
     DhcpServer(netif* netif);
     ~DhcpServer();
 
-    void setDns(int num, const ipv4_addr_t* dns);
+    netif* getNetif() const
+    {
+        return _netif;
+    }
+
+    void setRouter(bool value)
+    {
+        offer_router = value;
+    }
+
+    bool getRouter() const
+    {
+        return offer_router;
+    }
+
+    void setDns(ip_addr_t addr)
+    {
+        dns_address = addr;
+    }
+
+    ip_addr_t getDns() const
+    {
+        return dns_address;
+    }
+
+    void resetLeaseTime();
+
+    void setLeaseTime(uint32_t minutes)
+    {
+        lease_time = minutes;
+    }
+
+    uint32_t getLeaseTime() const
+    {
+        return lease_time;
+    }
 
     bool begin(ip_info* info);
     void end();
     bool isRunning();
+
+    // Will call this on ACK and OFFER replies
+    // `options.add(...)` to append to the options list
+    // (does not check for duplicates!)
+    OfferOptionsCallback custom_offer_options = nullptr;
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -60,24 +193,16 @@ public:
 
     // legacy public C structure and API to eventually turn into C++
 
-    void   init_dhcps_lease(uint32 ip);
-    bool   set_dhcps_lease(struct dhcps_lease* please);
-    bool   get_dhcps_lease(struct dhcps_lease* please);
-    bool   set_dhcps_offer_option(uint8 level, void* optarg);
-    bool   set_dhcps_lease_time(uint32 minute);
-    bool   reset_dhcps_lease_time(void);
-    uint32 get_dhcps_lease_time(void);
-    bool   add_dhcps_lease(uint8* macaddr);
-
-    void dhcps_set_dns(int num, const ipv4_addr_t* dns);
-
-    template <typename T>
-    void add_custom_offer_option(T&& option) {
-        custom_options.push_back(std::forward<T>(option));
-    }
+    void init_dhcps_lease(uint32 ip);
+    bool set_dhcps_lease(struct dhcps_lease* please);
+    bool get_dhcps_lease(struct dhcps_lease* please);
+    bool add_dhcps_lease(uint8* macaddr);
 
     void offers();
+
 protected:
+    void add_offer_options(OptionsBuffer&);
+
     // legacy C structure and API to eventually turn into C++
 
     typedef struct _list_node
@@ -86,13 +211,11 @@ protected:
         struct _list_node* pnext;
     } list_node;
 
-    void        node_insert_to_list(list_node** phead, list_node* pinsert);
-    void        node_remove_from_list(list_node** phead, list_node* pdelete);
-    uint8_t*    add_msg_type(uint8_t* optptr, uint8_t type);
-    uint8_t*    add_offer_options(uint8_t* optptr);
-    uint8_t*    add_custom_offer_options(uint8_t* optptr, uint8_t* end);
-    uint8_t*    add_end(uint8_t* optptr);
-    void        create_msg(struct dhcps_msg* m);
+    void node_insert_to_list(list_node** phead, list_node* pinsert);
+    void node_remove_from_list(list_node** phead, list_node* pdelete);
+
+    OptionsBuffer create_msg(struct dhcps_msg* m);
+
     void        send_offer(struct dhcps_msg* m);
     void        send_nak(struct dhcps_msg* m);
     void        send_ack(struct dhcps_msg* m);
@@ -108,19 +231,22 @@ protected:
 
     netif* _netif;
 
-    struct udp_pcb*  pcb_dhcps;
-    ip_addr_t        broadcast_dhcps;
-    struct ipv4_addr server_address;
-    struct ipv4_addr client_address;
-    struct ipv4_addr dns_address;
-    uint32           dhcps_lease_time;
+    struct udp_pcb* pcb_dhcps = nullptr;
+    ip_addr_t       broadcast_dhcps {};
+    ip4_addr_t      server_address {};
+    ip4_addr_t      client_address {};
 
-    struct dhcps_lease dhcps_lease;
-    list_node*         plist;
-    uint8              offer;
-    bool               renew;
+    static constexpr uint32_t DefaultLeaseTime { 720 };
+    uint32_t                  lease_time = DefaultLeaseTime;
 
-    std::vector<Option> custom_options;
+    bool      offer_router = true;
+    ip_addr_t dns_address {};
+
+    dhcps_lease lease {};
+
+    list_node* plist = nullptr;
+    bool       renew = false;
+
     static const uint32 magic_cookie;
 };
 
