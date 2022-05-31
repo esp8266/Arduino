@@ -341,9 +341,9 @@ bool DhcpServer::add_dhcps_lease(uint8* macaddr)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::add_offer_options(OptionsBuffer& options)
 {
-    options.add(DHCP_OPTION_SUBNET_MASK, ip_2_ip4(&_netif->netmask));
-    options.add(DHCP_OPTION_LEASE_TIME, lease_time);
-    options.add(DHCP_OPTION_SERVER_ID, ip_2_ip4(&_netif->ip_addr));
+    options.add(DHCP_OPTION_SUBNET_MASK, ip_2_ip4(&_netif->netmask))
+        .add(DHCP_OPTION_LEASE_TIME, lease_time)
+        .add(DHCP_OPTION_SERVER_ID, ip_2_ip4(&_netif->ip_addr));
 
     if (offer_router && !ip4_addr_isany_val(*ip_2_ip4(&_netif->gw)))
     {
@@ -352,8 +352,8 @@ void DhcpServer::add_offer_options(OptionsBuffer& options)
 
 #ifdef USE_DNS
     options.add(DHCP_OPTION_DNS_SERVER, !ip4_addr_isany_val(*ip_2_ip4(&dns_address))
-                                           ? ip_2_ip4(&dns_address)
-                                           : ip_2_ip4(&_netif->ip_addr));
+                                            ? ip_2_ip4(&dns_address)
+                                            : ip_2_ip4(&_netif->ip_addr));
 #endif
 
     {
