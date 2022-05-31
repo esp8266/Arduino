@@ -339,19 +339,19 @@ bool DhcpServer::add_dhcps_lease(uint8* macaddr)
     @param server -- DHCP server instance
 */
 ///////////////////////////////////////////////////////////////////////////////////
-void DhcpServer::add_offer_options(OptionsBuffer& buffer)
+void DhcpServer::add_offer_options(OptionsBuffer& options)
 {
-    buffer.add(DHCP_OPTION_SUBNET_MASK, ip_2_ip4(&_netif->netmask));
-    buffer.add(DHCP_OPTION_LEASE_TIME, lease_time);
-    buffer.add(DHCP_OPTION_SERVER_ID, ip_2_ip4(&_netif->ip_addr));
+    options.add(DHCP_OPTION_SUBNET_MASK, ip_2_ip4(&_netif->netmask));
+    options.add(DHCP_OPTION_LEASE_TIME, lease_time);
+    options.add(DHCP_OPTION_SERVER_ID, ip_2_ip4(&_netif->ip_addr));
 
     if (offer_router && !ip4_addr_isany_val(*ip_2_ip4(&_netif->gw)))
     {
-        buffer.add(DHCP_OPTION_ROUTER, ip_2_ip4(&_netif->gw));
+        options.add(DHCP_OPTION_ROUTER, ip_2_ip4(&_netif->gw));
     }
 
 #ifdef USE_DNS
-    buffer.add(DHCP_OPTION_DNS_SERVER, !ip4_addr_isany_val(*ip_2_ip4(&dns_address))
+    options.add(DHCP_OPTION_DNS_SERVER, !ip4_addr_isany_val(*ip_2_ip4(&dns_address))
                                            ? ip_2_ip4(&dns_address)
                                            : ip_2_ip4(&_netif->ip_addr));
 #endif
@@ -361,15 +361,15 @@ void DhcpServer::add_offer_options(OptionsBuffer& buffer)
         const auto  broadcast
             = ip4_addr_t { .addr = (addr->addr & ip_2_ip4(&_netif->netmask)->addr) | ~addr->addr };
 
-        buffer.add(DHCP_OPTION_BROADCAST_ADDRESS, &broadcast);
+        options.add(DHCP_OPTION_BROADCAST_ADDRESS, &broadcast);
     }
 
     // TODO: _netif->mtu ?
     static constexpr uint16_t Mtu { 1500 };
-    buffer.add(DHCP_OPTION_INTERFACE_MTU, Mtu);
+    options.add(DHCP_OPTION_INTERFACE_MTU, Mtu);
 
     static constexpr uint8_t RouterDiscovery { 0 };
-    buffer.add(DHCP_OPTION_PERFORM_ROUTER_DISCOVERY, RouterDiscovery);
+    options.add(DHCP_OPTION_PERFORM_ROUTER_DISCOVERY, RouterDiscovery);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
