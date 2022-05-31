@@ -59,7 +59,13 @@ if gzip_fw:
     gzip_switch = ["--gzip", "PIO"]
 
 env.Append(
-    ASFLAGS=["-x", "assembler-with-cpp"],
+    ASFLAGS=[
+        "-mlongcalls",
+        "-mtext-section-literals",
+    ],
+    ASPPFLAGS=[
+        "-x", "assembler-with-cpp",
+    ],
 
     # General options that are passed to the C compiler (C only; not C++)
     CFLAGS=[
@@ -78,7 +84,6 @@ env.Append(
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
-        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
@@ -119,6 +124,7 @@ env.Append(
         ("F_CPU", "$BOARD_F_CPU"),
         "__ets__",
         "ICACHE_FLASH",
+        "_GNU_SOURCE",
         ("ARDUINO", 10805),
         ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
         "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
@@ -165,9 +171,6 @@ env.Append(
         )
     )
 )
-
-# copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
-env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 
