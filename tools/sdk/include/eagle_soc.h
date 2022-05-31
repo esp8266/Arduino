@@ -74,8 +74,8 @@
 //}}
 
 //Periheral Clock {{
-#define  CPU_CLK_FREQ                       80*1000000       //unit: Hz
-#define  APB_CLK_FREQ                       CPU_CLK_FREQ
+#define  CPU_CLK_FREQ                       
+#define  APB_CLK_FREQ                       80*1000000       //unit: Hz
 #define  UART_CLK_FREQ                      APB_CLK_FREQ
 #define  TIMER_CLK_FREQ                     (APB_CLK_FREQ>>8) //divided by 256
 //}}
