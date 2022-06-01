@@ -230,16 +230,16 @@ bool UpdaterClass::end(bool evenIfRemaining){
     // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
     // contain a matching length field, preceded by the bytes of the signature itself.
     // But if expectedSigLen is zero, we expect neither a signature nor a length field;
-    static constexpr uint32_t sigSize = 4;
+    static constexpr uint32_t SigSize = sizeof(uint32_t);
     const uint32_t expectedSigLen = _verify->length();
-    const uint32_t sigLenAddr = _startAddress + _size - sigSize;
+    const uint32_t sigLenAddr = _startAddress + _size - SigSize;
     uint32_t sigLen = 0;
 
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] expected sigLen: %lu\n"), expectedSigLen);
 #endif
     if (expectedSigLen > 0) {
-      ESP.flashRead(sigLenAddr, &sigLen, sigSize);
+      ESP.flashRead(sigLenAddr, &sigLen, SigSize);
 #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen from flash: %lu\n"), sigLen);
 #endif
@@ -253,12 +253,12 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
     auto binSize = _size;
     if (expectedSigLen > 0) {
-      if (binSize < (sigLen + sigSize)) {
+      if (binSize < (sigLen + SigSize)) {
         _setError(UPDATE_ERROR_SIGN);
         _reset();
         return false;
       }
-      binSize -= (sigLen + sigSize);
+      binSize -= (sigLen + SigSize);
 #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted size (without the signature and sigLen): %lu\n"), binSize);
 #endif
