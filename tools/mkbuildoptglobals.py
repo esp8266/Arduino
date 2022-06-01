@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # This script manages the use of a file with a unique name, like
 # `Sketch.ino.globals.h`, in the Sketch source directory to provide compiler
@@ -290,7 +291,7 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
         else:
             # Place holder - Must have an empty file to satisfy parameter list
             # specifications in platform.txt.
-            with open(build_target_fqfn, 'w'):
+            with open(build_target_fqfn, 'w', encoding="utf-8"):
                 pass
     return True     # file changed
 
@@ -298,10 +299,10 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
 def add_include_line(build_opt_fqfn, include_fqfn):
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
-        with open(include_fqfn, 'w'):
+        with open(include_fqfn, 'w', encoding="utf-8"):
             pass
         print("add_include_line: Created " + include_fqfn)
-    with open(build_opt_fqfn, 'a') as build_opt:
+    with open(build_opt_fqfn, 'a', encoding="utf-8") as build_opt:
         build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
 
 
@@ -313,7 +314,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     """
     global build_opt_signature
 
-    build_opt = open(build_opt_fqfn, 'w')
+    build_opt = open(build_opt_fqfn, 'w', encoding="utf-8")
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
         return False
@@ -324,7 +325,7 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     # If the source sketch did not have the file Sketch.ino.globals.h, an empty
     # file was created in the ./core/ folder.
     # By using the copy, open will always succeed.
-    with open(globals_h_fqfn, 'r') as src:
+    with open(globals_h_fqfn, 'r', encoding="utf-8") as src:
         for line in src:
             line = line.strip()
             line_no += 1
@@ -389,7 +390,7 @@ def enable_override(enable, commonhfile_fqfn):
                 return
         elif not enable:
             return
-    with open(commonhfile_fqfn, 'w') as file:
+    with open(commonhfile_fqfn, 'w', encoding="utf-8") as file:
         if enable:
             file.write("//Override aggressive caching\n")
     # enable workaround when getsize(commonhfile_fqfn) is non-zero, disabled when zero
@@ -481,7 +482,7 @@ def get_preferences_txt(file_fqfn, key):
     # Get Key Value, key is allowed to be missing.
     # We assume file file_fqfn exists
     basename = os.path.basename(file_fqfn)
-    with open(file_fqfn) as file:
+    with open(file_fqfn, encoding="utf-8") as file:
         for line in file:
             name, value = line.partition("=")[::2]
             if name.strip().lower() == key:
@@ -527,16 +528,16 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
 
 
 def touch(fname, times=None):
-    with open(fname, "a") as file:
+    with open(fname, "ab") as file:
         os.utime(file.fileno(), times)
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
     global debug_enabled
     # touch both files with the same timestamp
     touch(globals_h_fqfn)
-    with open(globals_h_fqfn, 'r') as file:
+    with open(globals_h_fqfn, "rb") as file:
         ts = os.stat(file.fileno())
-        with open(commonhfile_fqfn, 'a') as file2:
+        with open(commonhfile_fqfn, "ab") as file2:
             os.utime(file2.fileno(), ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
     if debug_enabled:
