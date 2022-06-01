@@ -53,9 +53,9 @@ void setup() {
   }
   Serial.printf("\nSTA: %s (dns: %s / %s)\n", WiFi.localIP().toString().c_str(), WiFi.dnsIP(0).toString().c_str(), WiFi.dnsIP(1).toString().c_str());
 
-  // by default, DNS option will point to the interface IP
-  // instead, point it to the real DNS server
-  // (notice that only a single IP is supported)
+  // By default, DNS option will point to the interface IP
+  // Instead, point it to the real DNS server.
+  // Notice that only a single IP is supported by the DhcpServer class.
   dhcpSoftAP.setDns(WiFi.dnsIP(0));
 
   WiFi.softAPConfig(  // enable AP, with android-compatible google domain
