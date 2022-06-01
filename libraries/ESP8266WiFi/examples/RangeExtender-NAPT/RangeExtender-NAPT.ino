@@ -55,7 +55,9 @@ void setup() {
 
   // By default, DNS option will point to the interface IP
   // Instead, point it to the real DNS server.
-  // Notice that only a single IP is supported by the DhcpServer class.
+  // Notice that:
+  // - DhcpServer class only supports IPv4
+  // - Only a single IP can be set
   dhcpSoftAP.setDns(WiFi.dnsIP(0));
 
   WiFi.softAPConfig(  // enable AP, with android-compatible google domain

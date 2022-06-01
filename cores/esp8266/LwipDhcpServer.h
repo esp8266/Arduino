@@ -131,12 +131,12 @@ public:
         return offer_router;
     }
 
-    void setDns(ip_addr_t addr)
+    void setDns(ip4_addr_t addr)
     {
         dns_address = addr;
     }
 
-    ip_addr_t getDns() const
+    ip4_addr_t getDns() const
     {
         return dns_address;
     }
@@ -159,7 +159,8 @@ public:
     // Will use provided callback for ACK and OFFER replies
     // `options.add(...)` to append to the options list
     // (does not check for duplicates!)
-    void onSendOptions(OptionsBufferHandler handler) {
+    void onSendOptions(OptionsBufferHandler handler)
+    {
         custom_offer_options = handler;
     }
 
@@ -217,11 +218,11 @@ protected:
     ip4_addr_t      server_address {};
     ip4_addr_t      client_address {};
 
-    static constexpr uint32_t DefaultLeaseTime { 720 };
+    static constexpr uint32_t DefaultLeaseTime { 720 };  // minutes
     uint32_t                  lease_time = DefaultLeaseTime;
 
-    bool      offer_router = true;
-    ip_addr_t dns_address {};
+    bool       offer_router = true;
+    ip4_addr_t dns_address {};
 
     dhcps_lease lease {};
 

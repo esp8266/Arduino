@@ -379,9 +379,8 @@ void DhcpServer::add_offer_options(OptionsBuffer& options)
     }
 
 #ifdef USE_DNS
-    options.add(DHCP_OPTION_DNS_SERVER, !ip4_addr_isany_val(*ip_2_ip4(&dns_address))
-                                            ? ip_2_ip4(&dns_address)
-                                            : ip_2_ip4(&_netif->ip_addr));
+    options.add(DHCP_OPTION_DNS_SERVER,
+                !ip4_addr_isany_val(dns_address) ? &dns_address : ip_2_ip4(&_netif->ip_addr));
 #endif
 
     {
