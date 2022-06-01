@@ -45,7 +45,8 @@ extern "C"
         }
     }
 
-    void dhcps_stop() {
+    void dhcps_stop()
+    {
         auto& server = getNonOSDhcpServer();
         if (server.isRunning())
         {
