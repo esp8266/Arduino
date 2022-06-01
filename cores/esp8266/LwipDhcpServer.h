@@ -111,7 +111,7 @@ public:
         uint8_t* _end;
     };
 
-    using OfferOptionsCallback = void (*)(const DhcpServer&, OptionsBuffer&);
+    using OptionsBufferHandler = void (*)(const DhcpServer&, OptionsBuffer&);
 
     DhcpServer(netif* netif);
     ~DhcpServer();
@@ -153,14 +153,16 @@ public:
         return lease_time;
     }
 
+    // Will use provided callback for ACK and OFFER replies
+    // `options.add(...)` to append to the options list
+    // (does not check for duplicates!)
+    void onSendOptions(OptionsBufferHandler handler) {
+        custom_offer_options = handler;
+    }
+
     bool begin(ip_info* info);
     void end();
     bool isRunning();
-
-    // Will call this on ACK and OFFER replies
-    // `options.add(...)` to append to the options list
-    // (does not check for duplicates!)
-    OfferOptionsCallback custom_offer_options = nullptr;
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -222,6 +224,8 @@ protected:
 
     list_node* plist = nullptr;
     bool       renew = false;
+
+    OptionsBufferHandler custom_offer_options = nullptr;
 
     static const uint32 magic_cookie;
 };
