@@ -1169,11 +1169,6 @@ void DhcpServer::dhcps_coarse_tmr(void)
     }
 }
 
-void DhcpServer::resetLeaseTime()
-{
-    lease_time = DefaultLeaseTime;
-}
-
 void DhcpServer::dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force)
 {
     struct dhcps_pool* pdhcps_pool = nullptr;

@@ -141,7 +141,10 @@ public:
         return dns_address;
     }
 
-    void resetLeaseTime();
+    void resetLeaseTime()
+    {
+        lease_time = DefaultLeaseTime;
+    }
 
     void setLeaseTime(uint32_t minutes)
     {
