@@ -20,7 +20,9 @@
 import argparse
 import os
 import subprocess
+import sys
 
+sys.stdout = sys.stderr
 
 def get_segment_sizes(elf, path, mmu):
     iram_size = 0
@@ -110,9 +112,9 @@ def safe_prefix(n, length):
 
 def prefix(n, length):
     if n == length:
-        return "└──"
+        return "╚══"
 
-    return "├──"
+    return "╠══"
 
 
 def filter_segments(segments):
@@ -159,7 +161,10 @@ def main():
         number, used, segments = filter_segments(segments)
 
         print(f". {group:<8}, used {used} / {total} bytes ({percentage(used, total)})")
-        print("|   SEGMENT  BYTES    DESCRIPTION")
+        try:
+            print("║   SEGMENT  BYTES    DESCRIPTION")
+        except UnicodeEncodeError:
+            print("|   SEGMENT  BYTES    DESCRIPTION")
         for n, segment, size in segments:
             try:
                 print(f"{prefix(n, number)} ", end="")

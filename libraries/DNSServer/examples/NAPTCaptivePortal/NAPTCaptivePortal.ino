@@ -74,7 +74,6 @@
 #include <ESP8266WiFi.h>
 #include <lwip/napt.h>
 #include <lwip/dns.h>
-#include <dhcpserver.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
