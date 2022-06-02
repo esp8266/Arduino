@@ -1,7 +1,19 @@
 #!/bin/bash
 set -e
 
-export PATH=../../../xtensa-lx106-elf/bin:$PATH
+add_path_ifexist() {
+	if [[ -d $1 ]]; then
+		export PATH=$( realpath $1 ):$PATH
+		return 0
+	fi
+	return 1
+}
+
+if ! which xtensa-lx106-elf-ar | grep "tools/xtensa-lx106-elf/bin" >>/dev/null; then
+	add_path_ifexist "../../../xtensa-lx106-elf/bin" || add_path_ifexist "../../xtensa-lx106-elf/bin"
+fi
+WORK_SPACE=${PWD}
+
 VERSION=$(basename ${PWD})
 
 addSymbol_system_func1() {
@@ -18,13 +30,29 @@ patchFile() {
 	EXPECTED=$4
 	REPLACEWITH=$5
 	if [[ "$(dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$EXPECTED" ]]; then
-		echo "Patching $1..."
+		echo "Patching  $VERSION $1 ..."
 		echo $5 | base64 -d | dd of=$FILE bs=1 count=$LENGTH seek=$ADDRESS conv=notrunc
 	elif ! [[ "$(dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0)" = "$REPLACEWITH" ]]; then
 		echo "PATCH FAILED!"
-		exit 0
+		echo "dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0"
+		dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | hexdump -C
+		dd if=$FILE bs=1 count=$LENGTH skip=$ADDRESS status=none | base64 -w0
+		echo ""
+		exit 1
 	fi
 }
+
+# # xtensa-lx106-elf-ar x libwpa2.a eap.o
+if [[ "--shell" == "$1" ]]; then
+	# need to poke around a bit
+	bash --rcfile <(echo ". ~/.bashrc; cd ${WORK_SPACE}")
+	exit 0
+fi
+
+if [[ ! -f libmain.a ]]; then
+	echo -e "\n\n*** Archive libmain.a is missing ***\n\n"
+	exit 1
+fi
 
 # Remove mem_manager.o from libmain.a to use custom heap implementation,
 # and time.o to fix redefinition of time-related functions:
@@ -44,15 +72,19 @@ xtensa-lx106-elf-objcopy --redefine-sym hostname=wifi_station_hostname eagle_lwi
 xtensa-lx106-elf-objcopy --redefine-sym default_hostname=wifi_station_default_hostname user_interface.o
 xtensa-lx106-elf-objcopy --redefine-sym default_hostname=wifi_station_default_hostname eagle_lwip_if.o
 
+
 if [[ ${VERSION} == "NONOSDK221" ]]; then
 	addSymbol_system_func1 "0x60"
 	patchFile "eap.o" "3055" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
+	patchFile "eap.o" "26352" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 elif [[ ${VERSION} == "NONOSDK22x"* ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "3059" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
+	patchFile "eap.o" "26356" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 elif [[ ${VERSION} == "NONOSDK3"* ]]; then
 	addSymbol_system_func1 "0x60"
 	patchFile "eap.o" "3059" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
+	patchFile "eap.o" "26356" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 else
 	echo "WARN: Unknown address for system_func1() called by system_restart_local()"
 fi
@@ -64,4 +96,3 @@ if [[ $(sha256sum user_interface.o | awk '{print $1}') != $uics || $(sha256sum e
 	xtensa-lx106-elf-ar r libmain.a eagle_lwip_if.o user_interface.o
 fi
 rm -f eagle_lwip_if.o user_interface.o eap.o
-
