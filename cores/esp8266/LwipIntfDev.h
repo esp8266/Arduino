@@ -67,7 +67,8 @@ public:
     //    matching the destination address.  If several interfaces match,
     //    the first one is picked.  On esp8266/Arduno: WiFi interfaces are
     //    checked first.
-    // 3. Or, use `::setDefault()` to force routing through this interface.
+    // 3. Or, use `::setDefault(true)` to force using this interface's gateway
+    //    as default router.
     void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
