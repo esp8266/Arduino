@@ -27,3 +27,4 @@ NamespaceIndentation: Inner
 BreakBeforeBraces: Allman
 IndentWidth: 4
 IndentCaseLabels: false
+ReflowComments: false
