@@ -1766,11 +1766,13 @@ namespace MDNSImplementation
         stcMDNS_RRAttributes attributes(DNS_RRTYPE_AAAA,
                                         ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0)
                                          | DNS_RRCLASS_IN));  // Cache flush? & INternet
-        bool    bResult = ((_writeMDNSHostDomain(m_pcHostname, false, p_rSendParameter)) && // esp8266.local
-                       (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&            // TYPE & CLASS
-                       (_write32((p_rSendParameter.m_bUnannounce ? 0 : MDNS_HOST_TTL), p_rSendParameter)) &&    // TTL
-                       (_write16(MDNS_IP6_SIZE, p_rSendParameter)) &&                       // RDLength
-                       (false /*TODO: IP6 version of: _udpAppendBuffer((uint32_t)p_IPAddress, MDNS_IP4_SIZE)*/));   // RData
+        bool                 bResult
+            = ((_writeMDNSHostDomain(m_pcHostname, false, p_rSendParameter)) &&  // esp8266.local
+               (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&         // TYPE & CLASS
+               (_write32((p_rSendParameter.m_bUnannounce ? 0 : MDNS_HOST_TTL), p_rSendParameter))
+               &&                                              // TTL
+               (_write16(MDNS_IP6_SIZE, p_rSendParameter)) &&  // RDLength
+               (false /*TODO: IP6 version of: _udpAppendBuffer((uint32_t)p_IPAddress, MDNS_IP4_SIZE)*/));  // RData
 
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_AAAA: FAILED!\n"));
@@ -1855,7 +1857,7 @@ namespace MDNSImplementation
                                                             p_rSendParameter.m_u16Offset))
                        && (_writeMDNSRRDomain(hostDomain,
                                               p_rSendParameter)))  // Host, eg. esp8266.local
-                    // Cache available for domain
+                                                                   // Cache available for domain
                     : ((MDNS_DOMAIN_COMPRESS_MARK
                         > ((u16CachedDomainOffset >> 8) & ~MDNS_DOMAIN_COMPRESS_MARK))
                        &&                                      // Valid offset

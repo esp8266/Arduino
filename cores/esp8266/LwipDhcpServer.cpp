@@ -158,7 +158,7 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
         int ret = 1, errval = (err);                                                               \
         if (errval != ERR_OK)                                                                      \
         {                                                                                          \
-            os_printf("DHCPS ERROR: %s (lwip:%d)\n", what, errval);                                \
+            os_printf("DHCPS ERROR: %s (lwip:%s(%d))\n", what, lwip_strerr(errval), errval);       \
             ret = 0;                                                                               \
         }                                                                                          \
         ret;                                                                                       \
@@ -166,10 +166,6 @@ const char mem_debug_file[] ICACHE_RODATA_ATTR = __FILE__;
 #else
 #define LWIP_IS_OK(what, err) ((err) == ERR_OK)
 #endif
-
-const uint32 DhcpServer::magic_cookie = 0x63538263;  // https://tools.ietf.org/html/rfc1497
-
-int fw_has_started_softap_dhcps = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -197,23 +193,7 @@ DhcpServer::OptionsBuffer& DhcpServer::OptionsBuffer::add(uint8_t code, const ui
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-DhcpServer::DhcpServer(netif* netif) : _netif(netif)
-{
-    if (netif->num == SOFTAP_IF && fw_has_started_softap_dhcps == 1)
-    {
-        // When nonos-sdk starts DHCPS at boot:
-        // 1. `fw_has_started_softap_dhcps` is already initialized to 1
-        // 2. global ctor DhcpServer's `dhcpSoftAP(&netif_git[SOFTAP_IF])` is called
-        // 3. (that's here) => begin(legacy-values) is called
-        ip_info ip = {
-            { 0x0104a8c0 },  // IP 192.168.4.1
-            { 0x00ffffff },  // netmask 255.255.255.0
-            { 0 }            // gateway 0.0.0.0
-        };
-        begin(&ip);
-        fw_has_started_softap_dhcps = 2;  // not 1, ending initial boot sequence
-    }
-};
+DhcpServer::DhcpServer(netif* netif) : _netif(netif) { }
 
 // wifi_softap_set_station_info is missing in user_interface.h:
 extern "C" void wifi_softap_set_station_info(uint8_t* mac, struct ipv4_addr*);
@@ -421,7 +401,7 @@ DhcpServer::OptionsBuffer DhcpServer::create_msg(struct dhcps_msg* m)
     memset((char*)m->sname, 0, sizeof(m->sname));
     memset((char*)m->file, 0, sizeof(m->file));
     memset((char*)m->options, 0, sizeof(m->options));
-    memcpy((char*)m->options, &magic_cookie, sizeof(magic_cookie));
+    memcpy((char*)m->options, &MagicCookie, sizeof(MagicCookie));
 
     return { &m->options[sizeof(magic_cookie)], std::end(m->options) };
 }
@@ -713,7 +693,7 @@ uint8_t DhcpServer::parse_options(uint8_t* optptr, sint16_t len)
 ///////////////////////////////////////////////////////////////////////////////////
 sint16_t DhcpServer::parse_msg(struct dhcps_msg* m, u16_t len)
 {
-    if (memcmp((char*)m->options, &magic_cookie, sizeof(magic_cookie)) == 0)
+    if (memcmp((char*)m->options, &MagicCookie, sizeof(MagicCookie)) == 0)
     {
         struct ipv4_addr ip;
         memcpy(&ip.addr, m->ciaddr, sizeof(ip.addr));
@@ -900,7 +880,7 @@ void DhcpServer::init_dhcps_lease(uint32 ip)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-bool DhcpServer::begin(struct ip_info* info)
+bool DhcpServer::begin()
 {
     if (pcb_dhcps != nullptr)
     {
@@ -908,9 +888,11 @@ bool DhcpServer::begin(struct ip_info* info)
     }
 
     pcb_dhcps = udp_new();
-    if (pcb_dhcps == nullptr || info == nullptr)
+    if (pcb_dhcps == nullptr)
     {
+#if DHCPS_DEBUG
         os_printf("dhcps_start(): could not obtain pcb\n");
+#endif
         return false;
     }
 
@@ -922,7 +904,7 @@ bool DhcpServer::begin(struct ip_info* info)
     ip_2_ip4(&broadcast_dhcps)->addr |= ~ip_2_ip4(&_netif->netmask)->addr;
     // XXXFIXMEIPV6 broadcast address?
 
-    server_address = info->ip;
+    server_address = *ip_2_ip4(&_netif->ip_addr);
     init_dhcps_lease(server_address.addr);
 
     udp_bind(pcb_dhcps, IP_ADDR_ANY, DHCPS_SERVER_PORT);
@@ -931,12 +913,6 @@ bool DhcpServer::begin(struct ip_info* info)
     os_printf("dhcps:dhcps_start->udp_recv function Set a receive callback handle_dhcp for UDP_PCB "
               "pcb_dhcps\n");
 #endif
-
-    if (_netif->num == SOFTAP_IF)
-    {
-        wifi_set_ip_info(SOFTAP_IF, info);  // added for lwip-git, not sure whether useful
-    }
-    _netif->flags |= NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;  // added for lwip-git
 
     return true;
 }
@@ -983,9 +959,9 @@ void DhcpServer::end()
     }
 }
 
-bool DhcpServer::isRunning()
+bool DhcpServer::isRunning() const
 {
-    return !!_netif->state;
+    return pcb_dhcps != nullptr;
 }
 
 /******************************************************************************

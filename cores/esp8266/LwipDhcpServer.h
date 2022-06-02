@@ -28,8 +28,7 @@
 // nearly as-is. This is an initial version to guaranty legacy behavior
 // with same default values.
 
-#ifndef __DHCPS_H__
-#define __DHCPS_H__
+#pragma once
 
 #include <lwip/init.h>
 
@@ -43,6 +42,9 @@
 class DhcpServer
 {
 public:
+    static constexpr int    DefaultLeaseTime = 720;         // minutes
+    static constexpr uint32 MagicCookie      = 0x63538263;  // https://tools.ietf.org/html/rfc1497
+                                                            //
     struct OptionsBuffer
     {
         OptionsBuffer(uint8_t* begin, uint8_t* end) : _it(begin), _begin(begin), _end(end) { }
@@ -164,9 +166,9 @@ public:
         custom_offer_options = handler;
     }
 
-    bool begin(ip_info* info);
+    bool begin();
     void end();
-    bool isRunning();
+    bool isRunning() const;
 
     // this is the C interface encapsulated in a class
     // (originally dhcpserver.c in lwIP-v1.4 in NonOS-SDK)
@@ -211,15 +213,14 @@ protected:
     void   dhcps_client_leave(u8* bssid, struct ipv4_addr* ip, bool force);
     uint32 dhcps_client_update(u8* bssid, struct ipv4_addr* ip);
 
-    netif* _netif;
+    netif* _netif = nullptr;
 
     struct udp_pcb* pcb_dhcps = nullptr;
     ip_addr_t       broadcast_dhcps {};
     ip4_addr_t      server_address {};
     ip4_addr_t      client_address {};
 
-    static constexpr uint32_t DefaultLeaseTime { 720 };  // minutes
-    uint32_t                  lease_time = DefaultLeaseTime;
+    uint32_t        lease_time = DefaultLeaseTime;
 
     bool       offer_router = true;
     ip4_addr_t dns_address {};
@@ -233,9 +234,3 @@ protected:
 
     static const uint32 magic_cookie;
 };
-
-// SoftAP DHCP server always exists and is started on boot
-extern DhcpServer dhcpSoftAP;
-extern "C" int    fw_has_started_softap_dhcps;
-
-#endif  // __DHCPS_H__

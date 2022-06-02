@@ -41,34 +41,6 @@
 
 #include "MocklwIP.h"
 
-#include <LwipDhcpServer.h>
-
-bool DhcpServer::set_dhcps_lease(struct dhcps_lease* please)
-{
-    (void)please;
-    return false;
-}
-
-void DhcpServer::end() { }
-
-bool DhcpServer::begin(struct ip_info* info)
-{
-    (void)info;
-    return false;
-}
-
-DhcpServer::DhcpServer(netif* netif)
-{
-    (void)netif;
-}
-
-DhcpServer::~DhcpServer()
-{
-    end();
-}
-
-DhcpServer dhcpSoftAP(nullptr);
-
 extern "C"
 {
 #include <user_interface.h>
@@ -387,21 +359,6 @@ extern "C"
         (void)max_tpw;
     }
 
-    bool wifi_softap_dhcps_start(void)
-    {
-        return true;
-    }
-
-    enum dhcp_status wifi_softap_dhcps_status(void)
-    {
-        return DHCP_STARTED;
-    }
-
-    bool wifi_softap_dhcps_stop(void)
-    {
-        return true;
-    }
-
     bool wifi_softap_get_config(struct softap_config* config)
     {
         strcpy((char*)config->ssid, "apssid");
@@ -434,25 +391,6 @@ extern "C"
     bool wifi_softap_set_config_current(struct softap_config* config)
     {
         (void)config;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_lease(struct dhcps_lease* please)
-    {
-        (void)please;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_lease_time(uint32 minute)
-    {
-        (void)minute;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
-    {
-        (void)level;
-        (void)optarg;
         return true;
     }
 

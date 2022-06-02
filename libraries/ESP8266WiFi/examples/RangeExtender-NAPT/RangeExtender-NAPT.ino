@@ -13,7 +13,6 @@
 #include <ESP8266WiFi.h>
 #include <lwip/napt.h>
 #include <lwip/dns.h>
-#include <LwipDhcpServer.h>
 
 #define NAPT 1000
 #define NAPT_PORT 10
@@ -58,7 +57,8 @@ void setup() {
   // Notice that:
   // - DhcpServer class only supports IPv4
   // - Only a single IP can be set
-  dhcpSoftAP.setDns(WiFi.dnsIP(0));
+  auto& server = WiFi.softAPDhcpServer();
+  server.setDns(WiFi.dnsIP(0));
 
   WiFi.softAPConfig(  // enable AP, with android-compatible google domain
     IPAddress(172, 217, 28, 254), IPAddress(172, 217, 28, 254), IPAddress(255, 255, 255, 0));
