@@ -26,6 +26,8 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiAP.h"
 
+#include <LwipDhcpServer-NonOS.h>
+
 extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
@@ -37,7 +39,6 @@ extern "C" {
 }
 
 #include "debug.h"
-#include "LwipDhcpServer.h"
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -166,16 +167,18 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
-    dhcpSoftAP.end();
+    auto& server = softAPDhcpServer();
+    server.end();
 
     // check IP config
     struct ip_info ip;
     if(wifi_get_ip_info(SOFTAP_IF, &ip)) {
         if(ip.ip.addr == 0x00000000) {
-            // Invalid config
             DEBUG_WIFI("[AP] IP config Invalid resetting...\n");
-            //192.168.4.1 , 192.168.4.1 , 255.255.255.0
-            ret = softAPConfig(0x0104A8C0, 0x0104A8C0, 0x00FFFFFF);
+            ret = softAPConfig(
+                0x0104A8C0 /* 192.168.4.1 */,
+                0x0104A8C0 /* 192.168.4.1 */,
+                0x00FFFFFF /* 255.255.255.0 */);
             if(!ret) {
                 DEBUG_WIFI("[AP] softAPConfig failed!\n");
                 ret = false;
@@ -186,7 +189,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         ret = false;
     }
 
-    dhcpSoftAP.begin(&ip);
+    server.begin();
 
     return ret;
 }
@@ -244,21 +247,15 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    if(!dhcpSoftAP.set_dhcps_lease(&dhcp_lease))
+    auto& server = softAPDhcpServer();
+    if(!server.set_dhcps_lease(&dhcp_lease))
     {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
     }
 
-    // set lease time to 720min --> 12h
-    if(!dhcpSoftAP.set_dhcps_lease_time(720))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
-        ret = false;
-    }
-
     uint8 mode = info.gw.addr ? 1 : 0;
-    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode))
+    if(!server.set_dhcps_offer_option(OFFER_ROUTER, &mode))
     {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;
@@ -388,4 +385,12 @@ String ESP8266WiFiAPClass::softAPPSK() const {
     psk.concat(ptr, strnlen(ptr, sizeof(config.password)));
 
     return psk;
+}
+
+/**
+ * Get the static DHCP server instance attached to the softAP interface
+ * @return DhcpServer instance.
+ */
+DhcpServer& ESP8266WiFiAPClass::softAPDhcpServer() {
+    return getNonOSDhcpServer();
 }
