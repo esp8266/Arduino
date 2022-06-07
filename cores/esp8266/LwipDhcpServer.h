@@ -220,7 +220,7 @@ protected:
     ip4_addr_t      server_address {};
     ip4_addr_t      client_address {};
 
-    uint32_t        lease_time = DefaultLeaseTime;
+    uint32_t lease_time = DefaultLeaseTime;
 
     bool       offer_router = true;
     ip4_addr_t dns_address {};

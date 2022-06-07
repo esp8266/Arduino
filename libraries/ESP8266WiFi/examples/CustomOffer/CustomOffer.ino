@@ -1,11 +1,16 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <LwipDhcpServer.h>
 
 void setup() {
-  dhcpSoftAP.onSendOptions([](const DhcpServer&, auto& options) {
-    options.add(43, { 0xca, 0xfe, 0xca, 0xfe, 0xfe })  // VENDOR is... vendor specific
-      .add(114, "https://192.168.4.1");                // Captive portal
+  auto& server = WiFi.softAPDhcpServer();
+  server.onSendOptions([](const DhcpServer& server, auto& options) {
+    // VENDOR is... vendor specific
+    options.add(43, { 0xca, 0xfe, 0xca, 0xfe, 0xfe });
+
+    // Captive Portal URI
+    const IPAddress gateway = netif_ip4_addr(server.getNetif());
+    const String captive = F("http://") + gateway.toString();
+    options.add(114, captive.c_str(), captive.length());
   });
   WiFi.softAP("TEST", "testtesttest");
 }

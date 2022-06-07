@@ -51,5 +51,4 @@ extern "C"
         (void)please;
         return true;
     }
-
 }
