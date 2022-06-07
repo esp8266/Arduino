@@ -1307,7 +1307,7 @@ class OpenWithBackupDir:
             os.rename(self.path, backup_path)
 
         self._stdout = sys.stdout
-        sys.stdout = open(self.path, "w", newline="\n")
+        sys.stdout = open(self.path, "w", encoding="utf-8", newline="\n")
 
         return self
 
@@ -1331,7 +1331,7 @@ class OpenWithBackupFile:
             os.rename(self.path, self.orig)
 
         self._stdout = sys.stdout
-        sys.stdout = open(self.path, "w", newline="\n")
+        sys.stdout = open(self.path, "w", encoding="utf-8", newline="\n")
 
         return self
 
@@ -2298,7 +2298,7 @@ def all_boards_generate (output, boards, macros, extra_header=[], extra_board=[]
 def filtered_boards(boards, path, action=operator.sub):
     filters = set()
 
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         for line in f:
             if line.startswith("#"):
                 continue
@@ -2347,7 +2347,7 @@ def boardnames (boards):
 ################################################################
 
 def package_generate (output, boards):
-    with open(output, "r") as f:
+    with open(output, "r", encoding="utf-8") as f:
         data = json.load(f, object_pairs_hook=collections.OrderedDict)
 
     target = None
