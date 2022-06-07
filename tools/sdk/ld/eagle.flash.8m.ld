@@ -1,9 +1,9 @@
-/* Flash Split for 2MB chips */
+/* Flash Split for 8MB chips */
 /* sketch @0x40201010 (~1019KB) (1044464B) */
-/* empty  @0x40300000 (~1004KB) (1028096B) */
-/* eeprom @0x403FB000 (4096B) */
-/* rfcal  @0x403FC000 (4096B) */
-/* wifi   @0x403FD000 (12288B) */
+/* empty  @0x40300000 (~6MB) (7319552B) */
+/* eeprom @0x409FB000 (4096B) */
+/* rfcal  @0x409FC000 (4096B) */
+/* wifi   @0x409FD000 (12288B) */
 
 MEMORY
 {
@@ -12,14 +12,14 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
-PROVIDE ( _FS_start = 0x403FB000 );
-PROVIDE ( _FS_end = 0x403FB000 );
+PROVIDE ( _FS_start = 0x409FB000 );
+PROVIDE ( _FS_end = 0x409FB000 );
 PROVIDE ( _FS_page = 0x0 );
 PROVIDE ( _FS_block = 0x0 );
-PROVIDE ( _EEPROM_start = 0x403FB000 );
+PROVIDE ( _EEPROM_start = 0x409FB000 );
 /* The following symbols are DEPRECATED and will be REMOVED in a future release */
-PROVIDE ( _SPIFFS_start = 0x403FB000 );
-PROVIDE ( _SPIFFS_end = 0x403FB000 );
+PROVIDE ( _SPIFFS_start = 0x409FB000 );
+PROVIDE ( _SPIFFS_end = 0x409FB000 );
 PROVIDE ( _SPIFFS_page = 0x0 );
 PROVIDE ( _SPIFFS_block = 0x0 );
 

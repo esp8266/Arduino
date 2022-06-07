@@ -1893,8 +1893,8 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
 
     assert(layout.free == 0)
 
+    # used as property value and for .ld output generator
     ld = f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
-    menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
 
     max_upload_size = min(Megabytes(1), flash_size) - reserved
     if empty:
@@ -1911,15 +1911,17 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
         "eeprom": layout["EEPROM"],
         "empty": empty,
         "fs": fs,
+        "expected_fs_size": expected_fs_size,
         "sketch": sketch,
         "max_upload_size": max_upload_size,
         "max_ota_size": max_ota_size,
         "ld": ld,
-        "menu": menu,
     }
 
 
-def menu_generate (*, ld, menu, max_ota_size, max_upload_size, rfcal, flash_size, fs, **kwargs):
+def menu_generate (*, ld, max_ota_size, max_upload_size, rfcal, flash_size, fs, expected_fs_size, **kwargs):
+    menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
+
     out = [
         ( menu, f'{humanize_flash_menu(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
         ( f'{menu}.build.flash_size', humanize_flash(flash_size) ),

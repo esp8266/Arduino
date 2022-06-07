@@ -1,10 +1,10 @@
-/* Flash Split for 4M chips */
-/* sketch @0x40200000 (~1019KB) (1044464B) */
-/* empty  @0x402FEFF0 (~2052KB) (2101264B) */
-/* spiffs @0x40500000 (~1000KB) (1024000B) */
-/* eeprom @0x405FB000 (4KB) */
-/* rfcal  @0x405FC000 (4KB) */
-/* wifi   @0x405FD000 (12KB) */
+/* Flash Split for 4MB chips */
+/* sketch @0x40201010 (~1019KB) (1044464B) */
+/* empty  @0x40300000 (~2MB) (2097152B) */
+/* fs     @0x40500000 (~1000KB) (1024000B) */
+/* eeprom @0x405FB000 (4096B) */
+/* rfcal  @0x405FC000 (4096B) */
+/* wifi   @0x405FD000 (12288B) */
 
 MEMORY
 {
@@ -17,7 +17,7 @@ PROVIDE ( _FS_start = 0x40500000 );
 PROVIDE ( _FS_end = 0x405FA000 );
 PROVIDE ( _FS_page = 0x100 );
 PROVIDE ( _FS_block = 0x2000 );
-PROVIDE ( _EEPROM_start = 0x405fb000 );
+PROVIDE ( _EEPROM_start = 0x405FB000 );
 /* The following symbols are DEPRECATED and will be REMOVED in a future release */
 PROVIDE ( _SPIFFS_start = 0x40500000 );
 PROVIDE ( _SPIFFS_end = 0x405FA000 );
