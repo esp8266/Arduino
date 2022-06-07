@@ -1984,7 +1984,10 @@ def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, e
     if not fs:
         fs = Filesystem(Region("", eeprom.start, eeprom.start), 0, 0)
 
-    with context(os.path.join(output, ld)):
+    if output and not os.path.isdir(output):
+        raise TypeError('.ld output must be a directory')
+
+    with context(os.path.join(output, ld) if output else None):
         print(f'/* Flash Split for {size(layout)} chips */')
         print(f'/* sketch @{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
         if empty:
@@ -2389,21 +2392,14 @@ def boardnames (boards):
 ################################################################
 
 def package_generate (output, boards):
-    with open(output, "r", encoding="utf-8") as f:
-        data = json.load(f, object_pairs_hook=collections.OrderedDict)
+    context = contextlib.nullcontext
+    if output:
+        context = OpenWithBackupFile
 
-    target = None
-    for package in data["packages"]:
-        for platform in package["platforms"]:
-            if platform["name"] == "esp8266":
-                target = platform["boards"]
-
-    if not target:
-        raise ValueError('no "boards" field found for the platform')
-
-    with OpenWithBackupFile(output):
+    with context(output):
         target = [{"name": board["name"]} for board in boards.values()]
         print(json.dumps(data, indent=3, separators=(",", ": ")))
+
 
 ################################################################
 
@@ -2444,11 +2440,11 @@ def parse_cmdline ():
     filters.add_argument("--exclude", nargs="?", help="resulting BOARDSFILE will *not* include boards listed in the EXCLUDE file")
 
     generators = [
-        ["boards", "boardsfile", "boards.txt", "boards.txt"],
-        ["ld", "lddir", "tools/sdk/ld", ".ld scripts"],
-        ["flashmap", "flashmapfile", "cores/esp8266/FlashMap.h", "FlashMap header"],
-        ["package", "packagefile", "package/package_esp8266com_index.template.json", "package template .json"],
-        ["doc", "docfile", "doc/boards.rst", "boards documentation"],
+        ["boards", "boards-file", "boards.txt", "boards.txt"],
+        ["ld", "ld-dir", "tools/sdk/ld", ".ld scripts"],
+        ["flashmap", "flashmap-file", "cores/esp8266/FlashMap.h", "FlashMap header"],
+        ["package", "package-file", "package/package_esp8266com_index.boards.json", "IDE package index boards list (.json)"],
+        ["doc", "doc-file", "doc/boards.rst", "Boards documentation (.rst)"],
     ]
 
     for name, output, default, title in generators:
@@ -2456,11 +2452,12 @@ def parse_cmdline ():
         sub.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
         sub.add_argument(f'--{output}', default=default)
 
-    parser.add_argument("--all", dest="generators", action="store_const", const=[
+    generate_all = parser.add_argument_group("Use all available generators")
+    generate_all.add_argument("--all", dest="generators", action="store_const", const=[
         name for name, _, _, _ in generators
-    ], help="Select all available generators")
+    ])
 
-    parser.add_argument("--generate", action="store_true", help="Generate and write to selected files")
+    parser.add_argument("--output", action="store", choices=("file", "stdout"), default="stdout", help="Generators output to file (or directory) or stdout (default)")
 
     return parser.parse_args()
 
@@ -2482,11 +2479,14 @@ def main ():
         boardnames(boards)
         return
 
+    def maybe_output(file):
+        return file if args.output == "file" else None
+
     generators = set(name for name in args.generators or [])
 
     if "boards" in generators:
         all_boards_generate(
-            args.boardsfile if args.generate else None,
+            maybe_output(args.boards_file),
             boards,
             macros=prepare_macros(MACROS, all_flash_maps(), args.led),
             extra_header=[
@@ -2499,24 +2499,16 @@ def main ():
             ])
 
     if "ld" in generators:
-        all_ldscript_generate(
-            args.lddir if args.generate else None,
-            all_flash_maps())
+        all_ldscript_generate(maybe_output(args.ld_dir), all_flash_maps())
 
     if "flashmap" in generators:
-        flashmap_generate(
-            args.flashmapfile if args.generate else None,
-            all_flash_maps())
+        flashmap_generate(maybe_output(args.flashmap_file), all_flash_maps())
 
     if "package" in generators:
-        package_generate(
-            args.packagefile if args.generate else None,
-            boards)
+        package_generate(maybe_output(args.package_file), boards)
 
     if "doc" in generators:
-        doc_generate(
-            args.docfile if args.generate else None,
-            boards)
+        doc_generate(maybe_output(args.doc_file), boards)
 
 
 if __name__ == "__main__":
