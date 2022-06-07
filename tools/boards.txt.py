@@ -1734,6 +1734,18 @@ class Filesystem:
 
 
 def humanize_fs(size):
+    """Filesystem size in properties and file names.
+
+    Only suffixed when in greater than 1 megabyte.
+    Bytes() mostly stay unused.
+
+    >>> humanize_fs(Bytes(1))
+    '1'
+    >>> humanize_fs(Kilobytes(64))
+    '64'
+    >>> humanize_fs(Megabytes(2))
+    '2M'
+    """
     convert = [
         [Bytes(1), ""],
         [Kilobytes(1), ""],
@@ -1744,10 +1756,38 @@ def humanize_fs(size):
 
 
 def humanize_flash(size):
+    """Flash size in properties and file names.
+
+    >>> humanize_flash(Bytes(64))
+    '64'
+    >>> humanize_flash(Kilobytes(512))
+    '512K'
+    >>> humanize_flash(Megabytes(4))
+    '4M'
+    """
     convert = [
         [Bytes(1), ""],
         [Kilobytes(1), "K"],
         [Megabytes(1), "M"],
+    ]
+
+    return humanize(size, convert=convert)
+
+
+def humanize_flash_menu(size):
+    """Menu entry in the IDE.
+
+    >>> humanize_flash_menu(Bytes(128))
+    '128'
+    >>> humanize_flash_menu(Kilobytes(512))
+    '512KB'
+    >>> humanize_flash_menu(Megabytes(16))
+    '16MB'
+    """
+    convert = [
+        [Bytes(1), ""],
+        [Kilobytes(1), "KB"],
+        [Megabytes(1), "MB"],
     ]
 
     return humanize(size, convert=convert)
@@ -1881,7 +1921,7 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
 
 def menu_generate (*, ld, menu, max_ota_size, max_upload_size, rfcal, flash_size, fs, **kwargs):
     out = [
-        ( menu, f'{humanize_flash(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
+        ( menu, f'{humanize_flash_menu(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
         ( f'{menu}.build.flash_size', humanize_flash(flash_size) ),
         ( f'{menu}.build.flash_ld', ld ),
         ( f'{menu}.build.rfcal_addr', f'0x{rfcal.start:05X}' ),
