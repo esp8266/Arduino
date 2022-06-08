@@ -1291,55 +1291,42 @@ MACROS = {
 # file writer helpers, we need these for *gen functions
 
 
-class OpenWithBackupDir:
+class OpenWrapStdout:
     def __init__(self, path):
         self.path = os.path.normpath(path)
-        self.backup = os.path.join(
-            os.path.dirname(path),
-            "backup")
+        self.backup = None
 
     def __enter__(self):
-        if not os.path.isdir(self.backup):
-            os.mkdir(self.backup)
-
-        backup_path = os.path.join(self.backup, os.path.basename(self.path))
-        if os.path.isfile(self.path) and not os.path.isfile(backup_path):
-            os.rename(self.path, backup_path)
-
         self._stdout = sys.stdout
         sys.stdout = open(self.path, "w", encoding="utf-8", newline="\n")
-
         return self
 
     def __exit__(self, *exc):
         sys.stdout.close()
         sys.stdout = self._stdout
-        if not any(exc):
-            print(f'wrote: {self.path}')
+        if any(exc):
+            if self.backup and os.path.isfile(self.backup):
+                os.rename(self.backup, self.path)
+                print(f'error: {exc}\nrestored {self.path} from {self.backup}')
+            return
+        print(f'wrote: {self.path}')
+        if self.backup:
+            print(f'backup: {self.backup}')
 
 
-class OpenWithBackupFile:
+class OpenWithBackupFile(OpenWrapStdout):
     def __init__(self, path):
-        self.path = os.path.normpath(path)
-        self.orig = f'{self.path}.orig'
+        super().__init__(path)
+        self.backup = f'{self.path}.orig'
 
     def __enter__(self):
-        if os.path.isfile(self.orig):
-            os.remove(self.orig)
+        if os.path.isfile(self.backup):
+            os.remove(self.backup)
 
         if os.path.isfile(self.path):
-            os.rename(self.path, self.orig)
+            os.rename(self.path, self.backup)
 
-        self._stdout = sys.stdout
-        sys.stdout = open(self.path, "w", encoding="utf-8", newline="\n")
-
-        return self
-
-    def __exit__(self, *exc):
-        sys.stdout.close()
-        sys.stdout = self._stdout
-        if not any(exc):
-            print(f'wrote: {self.path}')
+        return super().__enter__()
 
 
 ################################################################
@@ -1793,6 +1780,11 @@ def humanize_flash_menu(size):
     return humanize(size, convert=convert)
 
 
+# used as property value and for .ld output generator
+def ldscript_name(*, flash_size, expected_fs_size, **kwargs):
+    return f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
+
+
 SPI_START = 0x40200000
 SPI_SECTOR = Kilobytes(4)
 
@@ -1821,10 +1813,6 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     >>> x = flash_map(Megabytes(2), Kilobytes(64), 'Test')
     >>> x['flash_map_name']
     'Test'
-    >>> x['ld']
-    'eagle.flash.2m64.ld'
-    >>> x['menu']
-    '.menu.eesz.2M64'
     >>> x['layout']['Filesystem'].size
     45056
     >>> import pprint
@@ -1893,9 +1881,6 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
 
     assert(layout.free == 0)
 
-    # used as property value and for .ld output generator
-    ld = f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
-
     max_upload_size = min(Megabytes(1), flash_size) - reserved
     if empty:
         max_ota_size = empty.size
@@ -1915,17 +1900,16 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
         "sketch": sketch,
         "max_upload_size": max_upload_size,
         "max_ota_size": max_ota_size,
-        "ld": ld,
     }
 
 
-def menu_generate (*, ld, max_ota_size, max_upload_size, rfcal, flash_size, fs, expected_fs_size, **kwargs):
+def menu_generate (*, max_ota_size, max_upload_size, rfcal, flash_size, fs, expected_fs_size, **kwargs):
     menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
 
     out = [
         ( menu, f'{humanize_flash_menu(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
         ( f'{menu}.build.flash_size', humanize_flash(flash_size) ),
-        ( f'{menu}.build.flash_ld', ld ),
+        ( f'{menu}.build.flash_ld', ldscript_name(flash_size=flash_size, expected_fs_size=expected_fs_size) ),
         ( f'{menu}.build.rfcal_addr', f'0x{rfcal.start:05X}' ),
     ]
 
@@ -1967,11 +1951,7 @@ def menu_macros (flash_maps):
     return output
 
 
-def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, eeprom, fs, empty, sketch, **kwargs):
-    context = contextlib.nullcontext
-    if output:
-        context = OpenWithBackupDir
-
+def ldscript_generate (output, *, layout, max_upload_size, sdkwifi, rfcal, eeprom, fs, empty, sketch, **kwargs):
     def address(value):
         return f'0x{SPI_START + value.start:08X}'
 
@@ -1984,10 +1964,7 @@ def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, e
     if not fs:
         fs = Filesystem(Region("", eeprom.start, eeprom.start), 0, 0)
 
-    if output and not os.path.isdir(output):
-        raise TypeError('.ld output must be a directory')
-
-    with context(os.path.join(output, ld) if output else None):
+    with output:
         print(f'/* Flash Split for {size(layout)} chips */')
         print(f'/* sketch @{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
         if empty:
@@ -2020,14 +1997,9 @@ def ldscript_generate (output, *, ld, layout, max_upload_size, sdkwifi, rfcal, e
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
 
-def all_ldscript_generate (output, flash_maps):
-    for flash_map in flash_maps:
-        ldscript_generate(output, **flash_map)
-
-
 def flashmap_generate (output, flash_maps):
     """
-    >>> flashmap_generate(None, (flash_map(Megabytes(1), Kilobytes(512), 'TEST'), ))
+    >>> flashmap_generate(contextlib.nullcontext(), (flash_map(Megabytes(1), Kilobytes(512), 'TEST'), ))
     // - DO NOT EDIT - autogenerated by boards.txt.py
     <BLANKLINE>
     #pragma once
@@ -2105,11 +2077,7 @@ def flashmap_generate (output, flash_maps):
         ["flash_size_kb", as_dec],
     ]
 
-    context = contextlib.nullcontext
-    if output:
-        context = OpenWithBackupFile
-
-    with context(output):
+    with output:
         print("// - DO NOT EDIT - autogenerated by boards.txt.py")
         print()
         print("#pragma once")
@@ -2272,15 +2240,10 @@ def prepare_macros (defaults, flashmap, builtinled):
     return macros
 
 
-def all_boards_generate (output, boards, macros, extra_header=[], extra_board=[]):
-
-    context = contextlib.nullcontext
-    if output:
-        context = OpenWithBackupFile
-
-    with context(output):
+def boards_generate (output, boards, macros, extra_header=[], extra_board=[]):
+    with output:
         print("// - DO NOT EDIT - autogenerated by boards.txt.py")
-        print('# Instead, modify {cmdname} and run `{cmdname} --boards --output-file`'.format(
+        print('# Instead, modify {cmdname} and run `{cmdname} --boards --output-file{{,-with-backup}}`'.format(
             cmdname=os.path.basename(sys.argv[0])))
         print('#')
         for func in extra_header:
@@ -2383,7 +2346,7 @@ def prepare_boards (boards, required_boards):
     return out
 
 
-def boardnames (boards):
+def show_names (boards):
     print('# Available board names. Delete or comment out the boards you do not need:')
     for name, board in boards.items():
         print(f'{name: <20s} # {board["name"]}')
@@ -2392,11 +2355,7 @@ def boardnames (boards):
 ################################################################
 
 def package_generate (output, boards):
-    context = contextlib.nullcontext
-    if output:
-        context = OpenWithBackupFile
-
-    with context(output):
+    with output:
         print(json.dumps(
             [{"name": board["name"]} for board in boards.values()],
             indent=3, separators=(",", ": ")))
@@ -2405,11 +2364,7 @@ def package_generate (output, boards):
 ################################################################
 
 def doc_generate (output, boards):
-    context = contextlib.nullcontext
-    if output:
-        context = OpenWithBackupFile
-
-    with context(output):
+    with output:
         print("Boards")
         print("=" * len("Boards"))
         print()
@@ -2425,75 +2380,70 @@ def doc_generate (output, boards):
 ################################################################
 # entrypoint
 
+GENERATORS = (
+    ("boards", "boards-file", "boards.txt", "boards.txt"),
+    ("ld", "ld-dir", "tools/sdk/ld", ".ld scripts"),
+    ("flashmap", "flashmap-file", "cores/esp8266/FlashMap.h", "FlashMap header"),
+    ("package", "package-file", "package/package_esp8266com_index.boards.json", "IDE package index boards list (.json)"),
+    ("doc", "doc-file", "doc/boards.rst", "Boards documentation (.rst)"),
+)
+
+
 def parse_cmdline ():
     parser = argparse.ArgumentParser(description="File generator for esp8266/Arduino")
 
     generic = parser.add_argument_group(title="Generic options")
-    generic.add_argument("--test", action="store_true", help=argparse.SUPPRESS)
 
     generic.add_argument("--led", type=int, default=2, help="default builtin led specified for generic boards (default %(default)d)")
     generic.add_argument("--no-float", action="store_true", help="disable float support in printf and scanf (enabled by default)")
     generic.add_argument("--custom-speed", action="append", default=[], help="additional serial speed option for all boards. can be specified multiple times.")
 
-    generic.add_argument("--board-names", action="store_true", help="prints a list of board names")
-
     filters = generic.add_mutually_exclusive_group()
     filters.add_argument("--include", nargs="?", help="resulting BOARDS_FILE will include *only* the boards listed in the INCLUDE file")
     filters.add_argument("--exclude", nargs="?", help="resulting BOARDS_FILE will *not* include boards listed in the EXCLUDE file")
 
-    output = parser.add_argument_group(title="Output")
+    output = generic.add_argument_group(title="Output")
     outputs = output.add_mutually_exclusive_group()
     outputs.add_argument("--output-stdout", action="store_true", default=True)
     outputs.add_argument("--output-file", action="store_true")
+    outputs.add_argument("--output-file-with-backup", action="store_true")
 
-    generators = [
-        ["boards", "boards-file", "boards.txt", "boards.txt"],
-        ["ld", "ld-dir", "tools/sdk/ld", ".ld scripts"],
-        ["flashmap", "flashmap-file", "cores/esp8266/FlashMap.h", "FlashMap header"],
-        ["package", "package-file", "package/package_esp8266com_index.boards.json", "IDE package index boards list (.json)"],
-        ["doc", "doc-file", "doc/boards.rst", "Boards documentation (.rst)"],
-    ]
+    subparsers = parser.add_subparsers(dest="command", help="sub-commands")
+    subparsers.required = True
 
-    for name, output, default, title in generators:
-        sub = parser.add_argument_group(title=title)
-        sub.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
-        sub.add_argument(f'--{output}', default=default)
+    names = subparsers.add_parser("names", help="prints a list of all available board names")
+    test = subparsers.add_parser("test", help="run a doctest self-check")
 
-    generate_all = parser.add_argument_group("Use all available generators")
-    generate_all.add_argument("--all", dest="generators", action="store_const", const=[
-        name for name, _, _, _ in generators
+    generate = subparsers.add_parser("generate", help="generate file(s)")
+
+    use_all = generate.add_argument_group(title="Use all available generators")
+    use_all.add_argument("--all", dest="generators", action="store_const", const=[
+        name for name, _, _, _ in GENERATORS
     ])
+
+    for name, output, default, title in GENERATORS:
+        group = generate.add_argument_group(title=title)
+        group.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
+        group.add_argument(f'--{output}', default=default)
 
     return parser.parse_args()
 
 
-def main ():
-    args = parse_cmdline()
-    if args.test:
-        doctest.testmod()
-        return
-
-    boards = prepare_boards(BOARDS, REQUIRED_BOARDS)
-
-    filter_path = args.include or args.exclude
-    if filter_path:
-        action = operator.and_ if args.include else operator.sub
-        boards = filtered_boards(boards, filter_path, action)
-
-    if args.board_names:
-        boardnames(boards)
-        return
-
-    def maybe_output(file):
-        return file if args.output_file else None
-
+def run_generators(args):
     generators = set(name for name in args.generators or [])
-
     if not generators:
         raise ValueError("no generators selected")
 
+    def maybe_output(file):
+        if args.output_file_with_backup:
+            return OpenWithBackupFile(file)
+        if args.output_file:
+            return OpenWrapStdout(file)
+
+        return contextlib.nullcontext()
+
     if "boards" in generators:
-        all_boards_generate(
+        boards_generate(
             maybe_output(args.boards_file),
             boards,
             macros=prepare_macros(MACROS, all_flash_maps(), args.led),
@@ -2507,7 +2457,8 @@ def main ():
             ])
 
     if "ld" in generators:
-        all_ldscript_generate(maybe_output(args.ld_dir), all_flash_maps())
+        for flash_map in all_flash_maps():
+            ldscript_generate(maybe_output(ldscript_name(**flash_map)), **flash_map)
 
     if "flashmap" in generators:
         flashmap_generate(maybe_output(args.flashmap_file), all_flash_maps())
@@ -2517,6 +2468,28 @@ def main ():
 
     if "doc" in generators:
         doc_generate(maybe_output(args.doc_file), boards)
+
+
+def main ():
+    args = parse_cmdline()
+
+    if args.command == "test":
+        doctest.testmod()
+        return
+
+    boards = prepare_boards(BOARDS, REQUIRED_BOARDS)
+
+    filter_path = args.include or args.exclude
+    if filter_path:
+        action = operator.and_ if args.include else operator.sub
+        boards = filtered_boards(boards, filter_path, action)
+
+    if args.command == "names":
+        show_names(boards)
+        return
+
+    if args.command == "generators":
+        run_generators(boards, args)
 
 
 if __name__ == "__main__":
