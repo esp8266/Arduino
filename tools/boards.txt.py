@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -1311,15 +1310,16 @@ class BaseOpenWithBackup:
         if any(exc):
             if self.backup and os.path.isfile(self.backup):
                 os.rename(self.backup, self.path)
-                print(f'error: {exc}\nrestored {self.path} from {self.backup}')
+                print(f"error: {exc}\nrestored {self.path} from {self.backup}")
             return
-        print(f'wrote: {self.path}')
+        print(f"wrote: {self.path}")
         if self.backup:
-            print(f'backup: {self.backup}')
+            print(f"backup: {self.backup}")
 
 
 class Open(BaseOpenWithBackup):
     """Open and replace stdout with the specified path."""
+
     pass
 
 
@@ -1329,7 +1329,7 @@ class OpenWithBackupFile(BaseOpenWithBackup):
 
     def __init__(self, path):
         super().__init__(path)
-        self.backup = f'{self.path}.orig'
+        self.backup = f"{self.path}.orig"
 
     def __enter__(self):
         if os.path.isfile(self.backup):
@@ -1343,6 +1343,7 @@ class OpenWithBackupFile(BaseOpenWithBackup):
 
 ################################################################
 # debug options
+
 
 def subslices(values):
     """Generate a combinations list for each possible length of the provided list.
@@ -1358,54 +1359,66 @@ def subslices(values):
         for combination in itertools.combinations(values, n):
             yield combination
 
-def debug_macros ():
-    debugmenu = collections.OrderedDict([
-            ( '.menu.dbg.Disabled', 'Disabled' ),
-            ( '.menu.dbg.Disabled.build.debug_port', '' ),
-            ( '.menu.dbg.Serial', 'Serial' ),
-            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
-            ( '.menu.dbg.Serial1', 'Serial1' ),
-            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
-            ( '.menu.lvl.None____', 'None' ),
-            ( '.menu.lvl.None____.build.debug_level', '' ),
-        ])
+
+def debug_macros():
+    debugmenu = collections.OrderedDict(
+        [
+            (".menu.dbg.Disabled", "Disabled"),
+            (".menu.dbg.Disabled.build.debug_port", ""),
+            (".menu.dbg.Serial", "Serial"),
+            (".menu.dbg.Serial.build.debug_port", "-DDEBUG_ESP_PORT=Serial"),
+            (".menu.dbg.Serial1", "Serial1"),
+            (".menu.dbg.Serial1.build.debug_port", "-DDEBUG_ESP_PORT=Serial1"),
+            (".menu.lvl.None____", "None"),
+            (".menu.lvl.None____.build.debug_level", ""),
+        ]
+    )
 
     options = []
 
     # since IDE does not allow to flag multiple options, these are split
     # into two sort-of related groups. first ones end up as 'subslice' combinations
-    a = ( 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' )
+    a = ("SSL", "TLS_MEM", "HTTP_CLIENT", "HTTP_SERVER")
 
     options.extend(subslices(a))
 
     # these end up as standalone options and a combined one
-    b = ( 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM', 'MDNS' )
+    b = ("CORE", "WIFI", "HTTP_UPDATE", "UPDATER", "OTA", "OOM", "MDNS")
     for flag in b:
         options.append((flag,))
     options.append(b)
 
     # and these could only happen on their own or with grouped options
-    for flag in ( 'HWDT', 'HWDT_NOEXTRA4K' ):
+    for flag in ("HWDT", "HWDT_NOEXTRA4K"):
         options.append((flag,))
         options.append(b + (flag,))
         options.append(a + b + (flag,))
 
     def add_menu_entry(name, menuname, flags):
-        debugmenu.update(((
-            ( f'.menu.lvl.{name}', menuname ),
-            ( f'.menu.lvl.{name}.build.debug_level', " {}".format(" ".join(flags)) )
-            )))
+        debugmenu.update(
+            (
+                (
+                    (f".menu.lvl.{name}", menuname),
+                    (
+                        f".menu.lvl.{name}.build.debug_level",
+                        " {}".format(" ".join(flags)),
+                    ),
+                )
+            )
+        )
 
-    add_menu_entry('NoAssert-NDEBUG', 'NoAssert-NDEBUG', ['-DNDEBUG'])
+    add_menu_entry("NoAssert-NDEBUG", "NoAssert-NDEBUG", ["-DNDEBUG"])
 
     # TODO make sure to prepend with space
     for optlist in options:
         add_menu_entry(
             "".join(optlist),
             "+".join(optlist),
-            [f'-DDEBUG_ESP_{opt}' for opt in optlist])
+            [f"-DDEBUG_ESP_{opt}" for opt in optlist],
+        )
 
-    return { 'debug_menu': debugmenu }
+    return {"debug_menu": debugmenu}
+
 
 ################################################################
 # flash size
@@ -1468,9 +1481,9 @@ def humanize(size, *, decimal=False, convert=None):
 
     if not convert:
         convert = [
-            [Bytes(1), 'B'],
-            [Kilobytes(1), 'KB'],
-            [Megabytes(1), 'MB'],
+            [Bytes(1), "B"],
+            [Kilobytes(1), "KB"],
+            [Megabytes(1), "MB"],
         ]
 
     for ratio, suffix in reversed(convert):
@@ -1478,13 +1491,13 @@ def humanize(size, *, decimal=False, convert=None):
             if size % ratio > (size / 4):
                 continue
 
-            size = f'{size / ratio:.02f}'
+            size = f"{size / ratio:.02f}"
             if not decimal:
                 size = size[:-3]
 
             size = size.replace(".00", "")
 
-            return f'{size}{suffix}'
+            return f"{size}{suffix}"
 
     return ""
 
@@ -1510,7 +1523,7 @@ class Region:
 
     def __init__(self, name, start, end):
         if start > end:
-            raise ValueError(f'{start=} cannot be larger than {end=}')
+            raise ValueError(f"{start=} cannot be larger than {end=}")
         self.name = name
         self.start = start
         self.end = end
@@ -1525,7 +1538,7 @@ class Region:
         return None
 
     def __repr__(self):
-        return f'<Region {self.name=} {self.size=} at [0x{self.start:08x}:0x{self.end:08x})>'
+        return f"<Region {self.name=} {self.size=} at [0x{self.start:08x}:0x{self.end:08x})>"
 
     def copy(self):
         return Region(self.name, self.start, self.end)
@@ -1580,7 +1593,7 @@ class Layout:
         self.subregions = []
 
     def __repr__(self):
-        return f'<Flash at {self.region} with {len(self.subregions)} subregions>'
+        return f"<Flash at {self.region} with {len(self.subregions)} subregions>"
 
     def __getitem__(self, name):
         for region in self.subregions:
@@ -1615,7 +1628,9 @@ class Layout:
 
     @property
     def edge(self):
-        return self.subregions[-1] if self.subregions else Region("", self.end, self.end)
+        return (
+            self.subregions[-1] if self.subregions else Region("", self.end, self.end)
+        )
 
     def push(self, region):
         """
@@ -1640,11 +1655,11 @@ class Layout:
         ValueError: No space left
         """
         if self.free < region.size:
-            raise ValueError(f'No space left')
+            raise ValueError(f"No space left")
         elif self.start > region.start or self.end < region.end:
-            raise ValueError(f'Out of bounds of {self.region}')
+            raise ValueError(f"Out of bounds of {self.region}")
         elif self.subregions and region.end > self.edge.start:
-            raise ValueError(f'Region is located before {self.edge=}')
+            raise ValueError(f"Region is located before {self.edge=}")
 
         self.free = self.free - region.size
         self.subregions.append(region)
@@ -1721,7 +1736,8 @@ class Filesystem:
         return self.region.end
 
     def __repr__(self):
-        return f'<Filesystem at {self.region} block {self.block_size} page {self.page_size}>'
+        return f"<Filesystem at {self.region} block {self.block_size} page {self.page_size}>"
+
 
 # - menu properties *will* be used in scripts, so these suffixes *must* remain the same
 #   flash size uses short uppercase suffix (without the B)
@@ -1794,7 +1810,7 @@ def humanize_flash_menu(size):
 
 # used as property value and for .ld output generator
 def ldscript_name(*, flash_size, expected_fs_size, **kwargs):
-    return f'eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld'.lower()
+    return f"eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld".lower()
 
 
 SPI_START = 0x40200000
@@ -1818,7 +1834,7 @@ def common_layout(name, flash_size):
     return layout
 
 
-def flash_map (flash_size, fs_size = Bytes(0), name = ''):
+def flash_map(flash_size, fs_size=Bytes(0), name=""):
     """Generate template variables for the specified flash and filesystem sizes.
     Name is optional and is simply passed through.
 
@@ -1863,7 +1879,9 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     if fs_size:
         fs = Filesystem(
             layout.add_aligned("Filesystem", fs_size, fs_block_size),
-            fs_block_size, fs_page_size)
+            fs_block_size,
+            fs_page_size,
+        )
     else:
         fs = None
 
@@ -1891,7 +1909,7 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     layout.add("Bootloader", SPI_SECTOR - Bytes(8))
     layout.add("", Bytes(8))
 
-    assert(layout.free == 0)
+    assert layout.free == 0
 
     max_upload_size = min(Megabytes(1), flash_size) - reserved
     if empty:
@@ -1915,40 +1933,50 @@ def flash_map (flash_size, fs_size = Bytes(0), name = ''):
     }
 
 
-def menu_generate (*, max_ota_size, max_upload_size, rfcal, flash_size, fs, expected_fs_size, **kwargs):
-    menu = f'.menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}'
+def menu_generate(
+    *, max_ota_size, max_upload_size, rfcal, flash_size, fs, expected_fs_size, **kwargs
+):
+    menu = f".menu.eesz.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}"
 
     out = [
-        ( menu, f'{humanize_flash_menu(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})' ),
-        ( f'{menu}.build.flash_size', humanize_flash(flash_size) ),
-        ( f'{menu}.build.flash_ld', ldscript_name(flash_size=flash_size, expected_fs_size=expected_fs_size) ),
-        ( f'{menu}.build.rfcal_addr', f'0x{rfcal.start:05X}' ),
+        (
+            menu,
+            f'{humanize_flash_menu(flash_size)} (FS:{humanize(fs.size) if fs else "none"} OTA:~{humanize(max_ota_size)})',
+        ),
+        (f"{menu}.build.flash_size", humanize_flash(flash_size)),
+        (
+            f"{menu}.build.flash_ld",
+            ldscript_name(flash_size=flash_size, expected_fs_size=expected_fs_size),
+        ),
+        (f"{menu}.build.rfcal_addr", f"0x{rfcal.start:05X}"),
     ]
 
-    out.append(
-        ( f'{menu}.upload.maximum_size', f'{max_upload_size}' )
-    )
+    out.append((f"{menu}.upload.maximum_size", f"{max_upload_size}"))
 
     if fs:
-        out.extend((
-            ( f'{menu}.build.spiffs_start', f'0x{fs.start:05X}' ),
-            ( f'{menu}.build.spiffs_end', f'0x{fs.end:05X}' ),
-            ( f'{menu}.build.spiffs_blocksize', fs.block_size ),
-            ( f'{menu}.build.spiffs_pagesize', fs.page_size ),
-        ))
+        out.extend(
+            (
+                (f"{menu}.build.spiffs_start", f"0x{fs.start:05X}"),
+                (f"{menu}.build.spiffs_end", f"0x{fs.end:05X}"),
+                (f"{menu}.build.spiffs_blocksize", fs.block_size),
+                (f"{menu}.build.spiffs_pagesize", fs.page_size),
+            )
+        )
 
     return collections.OrderedDict(out)
 
 
-def menu_macros (flash_maps):
+def menu_macros(flash_maps):
     output = {
-        'autoflash': collections.OrderedDict([
-            ( '.menu.eesz.autoflash', 'Mapping defined by Hardware and Sketch' ),
-            ( '.menu.eesz.autoflash.build.flash_size', '16M' ),
-            ( '.menu.eesz.autoflash.build.flash_ld', 'eagle.flash.auto.ld' ),
-            ( '.menu.eesz.autoflash.build.extra_flags', '-DFLASH_MAP_SUPPORT=1' ),
-            ( '.menu.eesz.autoflash.upload.maximum_size', '1044464' ),
-        ])
+        "autoflash": collections.OrderedDict(
+            [
+                (".menu.eesz.autoflash", "Mapping defined by Hardware and Sketch"),
+                (".menu.eesz.autoflash.build.flash_size", "16M"),
+                (".menu.eesz.autoflash.build.flash_ld", "eagle.flash.auto.ld"),
+                (".menu.eesz.autoflash.build.extra_flags", "-DFLASH_MAP_SUPPORT=1"),
+                (".menu.eesz.autoflash.upload.maximum_size", "1044464"),
+            ]
+        )
     }
 
     for flash_map in flash_maps:
@@ -1963,53 +1991,69 @@ def menu_macros (flash_maps):
     return output
 
 
-def ldscript_generate (output, *, layout, max_upload_size, sdkwifi, rfcal, eeprom, fs, empty, sketch, **kwargs):
+def ldscript_generate(
+    output,
+    *,
+    layout,
+    max_upload_size,
+    sdkwifi,
+    rfcal,
+    eeprom,
+    fs,
+    empty,
+    sketch,
+    **kwargs,
+):
     def address(value):
-        return f'0x{SPI_START + value.start:08X}'
+        return f"0x{SPI_START + value.start:08X}"
 
     def symbol(value):
-        return f'0x{SPI_START + value:08X}'
+        return f"0x{SPI_START + value:08X}"
 
     def size(value):
-        return f'{humanize(value.size)}'
+        return f"{humanize(value.size)}"
 
     if not fs:
         fs = Filesystem(Region("", eeprom.start, eeprom.start), 0, 0)
 
     with output:
-        print(f'/* Flash Split for {size(layout)} chips */')
-        print(f'/* sketch @{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */')
+        print(f"/* Flash Split for {size(layout)} chips */")
+        print(f"/* sketch @{address(sketch)} (~{size(sketch)}) ({sketch.size}B) */")
         if empty:
-            print(f'/* empty  @{address(empty)} (~{size(empty)}) ({empty.size}B) */')
+            print(f"/* empty  @{address(empty)} (~{size(empty)}) ({empty.size}B) */")
         if fs:
-            print(f'/* fs     @{address(fs)} (~{size(fs)}) ({fs.size}B) */')
-        print(f'/* eeprom @{address(eeprom)} ({eeprom.size}B) */')
-        print(f'/* rfcal  @{address(rfcal)} ({rfcal.size}B) */')
-        print(f'/* wifi   @{address(sdkwifi)} ({sdkwifi.size}B) */')
+            print(f"/* fs     @{address(fs)} (~{size(fs)}) ({fs.size}B) */")
+        print(f"/* eeprom @{address(eeprom)} ({eeprom.size}B) */")
+        print(f"/* rfcal  @{address(rfcal)} ({rfcal.size}B) */")
+        print(f"/* wifi   @{address(sdkwifi)} ({sdkwifi.size}B) */")
         print()
         print("MEMORY")
         print("{")
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
-        print(f'  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}')
+        print(
+            f"  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}"
+        )
         print("}")
         print()
-        print(f'PROVIDE ( _FS_start = {symbol(fs.start)} );')
-        print(f'PROVIDE ( _FS_end = {symbol(fs.end)} );')
-        print(f'PROVIDE ( _FS_page = 0x{fs.page_size:X} );')
-        print(f'PROVIDE ( _FS_block = 0x{fs.block_size:X} );')
-        print(f'PROVIDE ( _EEPROM_start = {symbol(eeprom.start)} );')
+        print(f"PROVIDE ( _FS_start = {symbol(fs.start)} );")
+        print(f"PROVIDE ( _FS_end = {symbol(fs.end)} );")
+        print(f"PROVIDE ( _FS_page = 0x{fs.page_size:X} );")
+        print(f"PROVIDE ( _FS_block = 0x{fs.block_size:X} );")
+        print(f"PROVIDE ( _EEPROM_start = {symbol(eeprom.start)} );")
         # Re-add deprecated symbols pointing to the same address as the new standard ones
-        print("/* The following symbols are DEPRECATED and will be REMOVED in a future release */")
-        print(f'PROVIDE ( _SPIFFS_start = {symbol(fs.start)} );')
-        print(f'PROVIDE ( _SPIFFS_end = {symbol(fs.end)} );')
-        print(f'PROVIDE ( _SPIFFS_page = 0x{fs.page_size:X} );')
-        print(f'PROVIDE ( _SPIFFS_block = 0x{fs.block_size:X} );')
+        print(
+            "/* The following symbols are DEPRECATED and will be REMOVED in a future release */"
+        )
+        print(f"PROVIDE ( _SPIFFS_start = {symbol(fs.start)} );")
+        print(f"PROVIDE ( _SPIFFS_end = {symbol(fs.end)} );")
+        print(f"PROVIDE ( _SPIFFS_page = 0x{fs.page_size:X} );")
+        print(f"PROVIDE ( _SPIFFS_block = 0x{fs.block_size:X} );")
         print()
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
 
-def flashmap_generate (output, flash_maps):
+def flashmap_generate(output, flash_maps):
     """
     >>> flashmap_generate(contextlib.nullcontext(), (flash_map(Megabytes(1), Kilobytes(512), 'TEST'), ))
     // - DO NOT EDIT - autogenerated by boards.txt.py
@@ -2045,13 +2089,13 @@ def flashmap_generate (output, flash_maps):
     """
 
     def as_address(value):
-        return f'0x{SPI_START + value:08x}'
+        return f"0x{SPI_START + value:08x}"
 
     def as_hex(value):
-        return f'0x{value:x}'
+        return f"0x{value:x}"
 
     def as_dec(value):
-        return f'{value:d}'
+        return f"{value:d}"
 
     # note that the current header version *only* has the values
     # previously PROVIDEd by the .ld script
@@ -2064,28 +2108,32 @@ def flashmap_generate (output, flash_maps):
         }
 
         if fs:
-            values.update({
-                "fs_start": fs.start,
-                "fs_end": fs.end,
-                "fs_block_size": fs.block_size,
-                "fs_page_size": fs.page_size,
-            })
+            values.update(
+                {
+                    "fs_start": fs.start,
+                    "fs_end": fs.end,
+                    "fs_block_size": fs.block_size,
+                    "fs_page_size": fs.page_size,
+                }
+            )
         else:
-            values.update({
-                "fs_start": eeprom.start,
-                "fs_end": eeprom.start,
-                "fs_block_size": 0,
-                "fs_page_size": 0,
-            })
+            values.update(
+                {
+                    "fs_start": eeprom.start,
+                    "fs_end": eeprom.start,
+                    "fs_block_size": 0,
+                    "fs_page_size": 0,
+                }
+            )
 
         return values
 
     fields = [
-        ["eeprom_start",  as_address],
-        ["fs_start",      as_address],
-        ["fs_end",        as_address],
+        ["eeprom_start", as_address],
+        ["fs_start", as_address],
+        ["fs_end", as_address],
         ["fs_block_size", as_hex],
-        ["fs_page_size",  as_hex],
+        ["fs_page_size", as_hex],
         ["flash_size_kb", as_dec],
     ]
 
@@ -2100,14 +2148,16 @@ def flashmap_generate (output, flash_maps):
         print("typedef struct")
         print("{")
         for field, _ in fields:
-            print(f'    uint32_t {field};')
+            print(f"    uint32_t {field};")
         print("} flash_map_s;")
         print()
         print("/*")
         print("  Following definitions map the above structure, one per line.")
         print("  FLASH_MAP_* is a user choice in sketch:")
         print("      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`")
-        print("  Configuration is made at boot with detected flash chip size (last argument 512..16384)")
+        print(
+            "  Configuration is made at boot with detected flash chip size (last argument 512..16384)"
+        )
         print("  Other values are defined from `tools/boards.txt.py`.")
         print("*/")
         print()
@@ -2122,163 +2172,182 @@ def flashmap_generate (output, flash_maps):
             if not ordered_maps.get(name):
                 ordered_maps[name] = []
 
-            line = ", ".join(f'.{field} = {mod(values[field])}' if mod
-                             else values[field] for field, mod in fields)
-            ordered_maps[name].append(f'{{ {line} }}, \\')
+            line = ", ".join(
+                f".{field} = {mod(values[field])}" if mod else values[field]
+                for field, mod in fields
+            )
+            ordered_maps[name].append(f"{{ {line} }}, \\")
 
         for name, lines in ordered_maps.items():
-            print(f'#define FLASH_MAP_{name.upper()} \\')
+            print(f"#define FLASH_MAP_{name.upper()} \\")
             print("    { \\")
             for line in lines:
-                print(f'        {line}')
+                print(f"        {line}")
             print("    }")
             print()
 
 
-def all_flash_maps ():
+def all_flash_maps():
     # flash_map(name=...) is optional. when it is set,
     # we will generate a named FlashMap.h entry
     return (
-        flash_map( Megabytes(1), Kilobytes(64), "OTA_FS" ),
-        flash_map( Megabytes(1), Kilobytes(128) ),
-        flash_map( Megabytes(1), Kilobytes(144) ),
-        flash_map( Megabytes(1), Kilobytes(160) ),
-        flash_map( Megabytes(1), Kilobytes(192) ),
-        flash_map( Megabytes(1), Kilobytes(256) ),
-        flash_map( Megabytes(1), Kilobytes(512), "MAX_FS" ),
-        flash_map( Megabytes(1), Kilobytes(0),  "NO_FS" ),
-
-        flash_map( Megabytes(2), Kilobytes(64) ),
-        flash_map( Megabytes(2), Kilobytes(128) ),
-        flash_map( Megabytes(2), Kilobytes(256), "OTA_FS" ),
-        flash_map( Megabytes(2), Kilobytes(512) ),
-        flash_map( Megabytes(2), Megabytes(1), "MAX_FS" ),
-        flash_map( Megabytes(2), Kilobytes(0), "NO_FS" ),
-
-        flash_map( Megabytes(4), Megabytes(2), "OTA_FS" ),
-        flash_map( Megabytes(4), Megabytes(3), "MAX_FS" ),
-        flash_map( Megabytes(4), Megabytes(1) ),
-        flash_map( Megabytes(4), Kilobytes(0), "NO_FS"),
-
-        flash_map( Megabytes(8), Megabytes(6), "OTA_FS" ),
-        flash_map( Megabytes(8), Megabytes(7), "MAX_FS" ),
-        flash_map( Megabytes(8), Kilobytes(0), "NO_FS" ),
-
-        flash_map( Megabytes(16), Megabytes(14), "OTA_FS" ),
-        flash_map( Megabytes(16), Megabytes(15), "MAX_FS" ),
-        flash_map( Megabytes(16), Kilobytes(0), "NO_FS" ),
-
-        flash_map( Kilobytes(512), Kilobytes(32), "OTA_FS" ),
-        flash_map( Kilobytes(512), Kilobytes(64) ),
-        flash_map( Kilobytes(512), Kilobytes(128), "MAX_FS" ),
-        flash_map( Kilobytes(512), Kilobytes(0), "NO_FS" ),
+        flash_map(Megabytes(1), Kilobytes(64), "OTA_FS"),
+        flash_map(Megabytes(1), Kilobytes(128)),
+        flash_map(Megabytes(1), Kilobytes(144)),
+        flash_map(Megabytes(1), Kilobytes(160)),
+        flash_map(Megabytes(1), Kilobytes(192)),
+        flash_map(Megabytes(1), Kilobytes(256)),
+        flash_map(Megabytes(1), Kilobytes(512), "MAX_FS"),
+        flash_map(Megabytes(1), Kilobytes(0), "NO_FS"),
+        flash_map(Megabytes(2), Kilobytes(64)),
+        flash_map(Megabytes(2), Kilobytes(128)),
+        flash_map(Megabytes(2), Kilobytes(256), "OTA_FS"),
+        flash_map(Megabytes(2), Kilobytes(512)),
+        flash_map(Megabytes(2), Megabytes(1), "MAX_FS"),
+        flash_map(Megabytes(2), Kilobytes(0), "NO_FS"),
+        flash_map(Megabytes(4), Megabytes(2), "OTA_FS"),
+        flash_map(Megabytes(4), Megabytes(3), "MAX_FS"),
+        flash_map(Megabytes(4), Megabytes(1)),
+        flash_map(Megabytes(4), Kilobytes(0), "NO_FS"),
+        flash_map(Megabytes(8), Megabytes(6), "OTA_FS"),
+        flash_map(Megabytes(8), Megabytes(7), "MAX_FS"),
+        flash_map(Megabytes(8), Kilobytes(0), "NO_FS"),
+        flash_map(Megabytes(16), Megabytes(14), "OTA_FS"),
+        flash_map(Megabytes(16), Megabytes(15), "MAX_FS"),
+        flash_map(Megabytes(16), Kilobytes(0), "NO_FS"),
+        flash_map(Kilobytes(512), Kilobytes(32), "OTA_FS"),
+        flash_map(Kilobytes(512), Kilobytes(64)),
+        flash_map(Kilobytes(512), Kilobytes(128), "MAX_FS"),
+        flash_map(Kilobytes(512), Kilobytes(0), "NO_FS"),
     )
+
 
 ################################################################
 # builtin led
 
-def led (name, default, ledList):
-    menu = collections.OrderedDict((
-        (f'.menu.led.{default}', str(default)),
-        (f'.menu.led.{default}.build.led', f'-DLED_BUILTIN={default}'),
-        ))
-    for led in ledList: # Make range incluside of max (16), since there are really 16 GPIOS not 15
+
+def led(name, default, ledList):
+    menu = collections.OrderedDict(
+        (
+            (f".menu.led.{default}", str(default)),
+            (f".menu.led.{default}.build.led", f"-DLED_BUILTIN={default}"),
+        )
+    )
+    for (
+        led
+    ) in (
+        ledList
+    ):  # Make range incluside of max (16), since there are really 16 GPIOS not 15
         if not led == default:
-            menu.update((
-                (f'.menu.led.{led}', str(led)),
-                (f'.menu.led.{led}.build.led', f'-DLED_BUILTIN={led}'),
-                ))
-    return { name: menu }
+            menu.update(
+                (
+                    (f".menu.led.{led}", str(led)),
+                    (f".menu.led.{led}.build.led", f"-DLED_BUILTIN={led}"),
+                )
+            )
+    return {name: menu}
+
 
 ################################################################
 # sdk selection
 
-def sdk_macros ():
-    return { 'sdk': collections.OrderedDict([
-                        ('.menu.sdk.nonosdk_190703', 'nonos-sdk 2.2.1+100 (190703)'),
-                        ('.menu.sdk.nonosdk_190703.build.sdk', 'NONOSDK22x_190703'),
-                        ('.menu.sdk.nonosdk_191122', 'nonos-sdk 2.2.1+119 (191122)'),
-                        ('.menu.sdk.nonosdk_191122.build.sdk', 'NONOSDK22x_191122'),
-                        ('.menu.sdk.nonosdk_191105', 'nonos-sdk 2.2.1+113 (191105)'),
-                        ('.menu.sdk.nonosdk_191105.build.sdk', 'NONOSDK22x_191105'),
-                        ('.menu.sdk.nonosdk_191024', 'nonos-sdk 2.2.1+111 (191024)'),
-                        ('.menu.sdk.nonosdk_191024.build.sdk', 'NONOSDK22x_191024'),
-                        ('.menu.sdk.nonosdk_190313', 'nonos-sdk 2.2.1+61 (190313)'),
-                        ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
-                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
-                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
-                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
-                    ])
-           }
+
+def sdk_macros():
+    return {
+        "sdk": collections.OrderedDict(
+            [
+                (".menu.sdk.nonosdk_190703", "nonos-sdk 2.2.1+100 (190703)"),
+                (".menu.sdk.nonosdk_190703.build.sdk", "NONOSDK22x_190703"),
+                (".menu.sdk.nonosdk_191122", "nonos-sdk 2.2.1+119 (191122)"),
+                (".menu.sdk.nonosdk_191122.build.sdk", "NONOSDK22x_191122"),
+                (".menu.sdk.nonosdk_191105", "nonos-sdk 2.2.1+113 (191105)"),
+                (".menu.sdk.nonosdk_191105.build.sdk", "NONOSDK22x_191105"),
+                (".menu.sdk.nonosdk_191024", "nonos-sdk 2.2.1+111 (191024)"),
+                (".menu.sdk.nonosdk_191024.build.sdk", "NONOSDK22x_191024"),
+                (".menu.sdk.nonosdk_190313", "nonos-sdk 2.2.1+61 (190313)"),
+                (".menu.sdk.nonosdk_190313.build.sdk", "NONOSDK22x_190313"),
+                (".menu.sdk.nonosdk221", "nonos-sdk 2.2.1 (legacy)"),
+                (".menu.sdk.nonosdk221.build.sdk", "NONOSDK221"),
+                (".menu.sdk.nonosdk3v0", "nonos-sdk pre-3 (180626 known issues)"),
+                (".menu.sdk.nonosdk3v0.build.sdk", "NONOSDK3V0"),
+            ]
+        )
+    }
+
 
 ################################################################
 
-def abridged_boards_txt (filtered, boards):
+
+def abridged_boards_txt(filtered, boards):
     def handler():
         if filtered:
-            print('# The following boards were included: {}'.format(" ".join(boards.keys())))
+            print(
+                "# The following boards were included: {}".format(
+                    " ".join(boards.keys())
+                )
+            )
 
     return handler
 
-def custom_speeds_boards_txt (speeds):
+
+def custom_speeds_boards_txt(speeds):
     def handler(name):
         for speed in speeds:
-            print(f'{name}.menu.baud.{speed}={speed}')
-            print(f'{name}.menu.baud.{speed}.upload.speed={speed}')
+            print(f"{name}.menu.baud.{speed}={speed}")
+            print(f"{name}.menu.baud.{speed}.upload.speed={speed}")
 
     return handler
 
 
-def no_float_boards_txt (disabled):
+def no_float_boards_txt(disabled):
     def handler(name):
         if disabled:
-            print(f'{name}.build.float=')
+            print(f"{name}.build.float=")
 
     return handler
 
 
-def prepare_macros (defaults, flashmap, builtinled):
+def prepare_macros(defaults, flashmap, builtinled):
     macros = defaults
     macros.update(menu_macros(flashmap))
     macros.update(debug_macros())
-    macros.update(led('led', builtinled, range(0, 17)))
-    macros.update(led('led216', 2, (16, )))
+    macros.update(led("led", builtinled, range(0, 17)))
+    macros.update(led("led216", 2, (16,)))
     macros.update(sdk_macros())
 
     return macros
 
 
-def boards_generate (output, boards, macros, extra_header=[], extra_board=[]):
+def boards_generate(output, boards, macros, extra_header=[], extra_board=[]):
     with output:
-        print('# DO NOT EDIT - autogenerated by boards.txt.py')
+        print("# DO NOT EDIT - autogenerated by boards.txt.py")
         print(f'# Command line `{" ".join(sys.argv)}`')
         for func in extra_header:
             func()
         print()
         # With Arduino IDE 1.8.7 the order of the menu items will be honored from the tools pull down list.
-        print('menu.BoardModel=Model')
-        print('menu.ESPModule=Module')
-        print('menu.UploadTool=Upload Tool')
-        print('menu.led=Builtin Led')
-        print('menu.baud=Upload Speed')
-        print('menu.xtal=CPU Frequency')
-        print('menu.CrystalFreq=Crystal Frequency')
-        print('menu.eesz=Flash Size')
-        print('menu.FlashMode=Flash Mode')
-        print('menu.FlashFreq=Flash Frequency')
-        print('menu.ResetMethod=Reset Method')
-        print('menu.dbg=Debug port')
-        print('menu.lvl=Debug Level')
-        print('menu.ip=lwIP Variant')
-        print('menu.vt=VTables')
-        print('menu.exception=C++ Exceptions')
-        print('menu.stacksmash=Stack Protection')
-        print('menu.wipe=Erase Flash')
-        print('menu.sdk=Espressif FW')
-        print('menu.ssl=SSL Support')
-        print('menu.mmu=MMU')
-        print('menu.non32xfer=Non-32-Bit Access')
+        print("menu.BoardModel=Model")
+        print("menu.ESPModule=Module")
+        print("menu.UploadTool=Upload Tool")
+        print("menu.led=Builtin Led")
+        print("menu.baud=Upload Speed")
+        print("menu.xtal=CPU Frequency")
+        print("menu.CrystalFreq=Crystal Frequency")
+        print("menu.eesz=Flash Size")
+        print("menu.FlashMode=Flash Mode")
+        print("menu.FlashFreq=Flash Frequency")
+        print("menu.ResetMethod=Reset Method")
+        print("menu.dbg=Debug port")
+        print("menu.lvl=Debug Level")
+        print("menu.ip=lwIP Variant")
+        print("menu.vt=VTables")
+        print("menu.exception=C++ Exceptions")
+        print("menu.stacksmash=Stack Protection")
+        print("menu.wipe=Erase Flash")
+        print("menu.sdk=Espressif FW")
+        print("menu.ssl=SSL Support")
+        print("menu.mmu=MMU")
+        print("menu.non32xfer=Non-32-Bit Access")
         print()
 
         for name, board in boards.items():
@@ -2286,26 +2355,35 @@ def boards_generate (output, boards, macros, extra_header=[], extra_board=[]):
             print(f'{name}.name={board["name"]}')
 
             # standalone options
-            if 'opts' in board:
-                for optname in sorted(board['opts']):
+            if "opts" in board:
+                for optname in sorted(board["opts"]):
                     print(f'{name}{optname}={board["opts"][optname]}')
 
             # macros
-            macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'stacksmash_menu', 'ssl_cipher_menu', 'mmu_menu', 'non32xfer_menu' ]
-            if 'macro' in board:
-                macrolist += board['macro']
-            macrolist += [ 'lwip', 'debug_menu', 'flash_erase_menu' ]
+            macrolist = [
+                "defaults",
+                "cpufreq_menu",
+                "vtable_menu",
+                "exception_menu",
+                "stacksmash_menu",
+                "ssl_cipher_menu",
+                "mmu_menu",
+                "non32xfer_menu",
+            ]
+            if "macro" in board:
+                macrolist += board["macro"]
+            macrolist += ["lwip", "debug_menu", "flash_erase_menu"]
 
             macrolist += SERIAL_SPEEDS[board.get("serial", DEFAULT_SERIAL_SPEED)]
-            macrolist += [ 'autoflash' ]
+            macrolist += ["autoflash"]
 
             for func in extra_board:
                 func(name)
 
             for block in macrolist:
                 for optname in macros[block]:
-                    if not ('opts' in board) or not (optname in board['opts']):
-                        print(f'{name}{optname}={macros[block][optname]}')
+                    if not ("opts" in board) or not (optname in board["opts"]):
+                        print(f"{name}{optname}={macros[block][optname]}")
 
             print()
 
@@ -2323,7 +2401,7 @@ def filtered_boards(boards, path, action=operator.sub):
 
     filtered = action(set(boards.keys()), filters)
 
-    print('Filtered boards list:')
+    print("Filtered boards list:")
     print(" ".join(filtered))
     print()
 
@@ -2341,10 +2419,12 @@ def filtered_boards(boards, path, action=operator.sub):
     return result
 
 
-def prepare_boards (boards, required_boards):
+def prepare_boards(boards, required_boards):
     boardslist = set(required_boards) | set(boards.keys())
     boardslist = boardslist - set(required_boards)
-    boardslist = required_boards + tuple(sorted(boardslist, key=lambda x: boards[x]["name"]))
+    boardslist = required_boards + tuple(
+        sorted(boardslist, key=lambda x: boards[x]["name"])
+    )
 
     out = collections.OrderedDict()
     for name in boardslist:
@@ -2353,24 +2433,30 @@ def prepare_boards (boards, required_boards):
     return out
 
 
-def show_names (boards):
-    print('# Available board names. Delete or comment out the boards you do not need:')
+def show_names(boards):
+    print("# Available board names. Delete or comment out the boards you do not need:")
     for name, board in boards.items():
         print(f'{name: <20s} # {board["name"]}')
 
 
 ################################################################
 
-def package_generate (output, boards):
+
+def package_generate(output, boards):
     with output:
-        print(json.dumps(
-            [{"name": board["name"]} for board in boards.values()],
-            indent=3, separators=(",", ": ")))
+        print(
+            json.dumps(
+                [{"name": board["name"]} for board in boards.values()],
+                indent=3,
+                separators=(",", ": "),
+            )
+        )
 
 
 ################################################################
 
-def doc_generate (output, boards):
+
+def doc_generate(output, boards):
     with output:
         print("Boards")
         print("=" * len("Boards"))
@@ -2384,6 +2470,7 @@ def doc_generate (output, boards):
                 print(line)
             print()
 
+
 ################################################################
 # entrypoint
 
@@ -2391,46 +2478,86 @@ GENERATORS = (
     ("boards", "boards-file", "boards.txt", "boards.txt"),
     ("ld", "ld-dir", "tools/sdk/ld", ".ld scripts"),
     ("flashmap", "flashmap-file", "cores/esp8266/FlashMap.h", "FlashMap header"),
-    ("package", "package-file", "package/package_esp8266com_index.boards.json", "IDE package index boards list (.json)"),
+    (
+        "package",
+        "package-file",
+        "package/package_esp8266com_index.boards.json",
+        "IDE package index boards list (.json)",
+    ),
     ("doc", "doc-file", "doc/boards.rst", "Boards documentation (.rst)"),
 )
 
 
-def parse_cmdline ():
+def parse_cmdline():
     parser = argparse.ArgumentParser(description="File generator for esp8266/Arduino")
 
     generic = parser.add_argument_group(title="Generic options")
 
-    generic.add_argument("--led", type=int, default=2, help="default PIN for builtin LED, specified for generic boards (default %(default)d)")
-    generic.add_argument("--no-float", action="store_true", help="disable float support in printf and scanf (enabled by default)")
-    generic.add_argument("--custom-speed", action="append", default=[], help="additional serial speed option for all boards. can be specified multiple times.")
+    generic.add_argument(
+        "--led",
+        type=int,
+        default=2,
+        help="default PIN for builtin LED, specified for generic boards (default %(default)d)",
+    )
+    generic.add_argument(
+        "--no-float",
+        action="store_true",
+        help="disable float support in printf and scanf (enabled by default)",
+    )
+    generic.add_argument(
+        "--custom-speed",
+        action="append",
+        default=[],
+        help="additional serial speed option for all boards. can be specified multiple times.",
+    )
 
-    filters = parser.add_argument_group("Filtering", "either INCLUDE or EXCLUDE boards based on the filter file").add_mutually_exclusive_group()
+    filters = parser.add_argument_group(
+        "Filtering", "either INCLUDE or EXCLUDE boards based on the filter file"
+    ).add_mutually_exclusive_group()
     filters.add_argument("--include", nargs="?")
     filters.add_argument("--exclude", nargs="?")
 
     subparsers = parser.add_subparsers(dest="command", help="sub-commands")
     subparsers.required = True
 
-    names = subparsers.add_parser("names", help="prints a list of all available board names")
+    names = subparsers.add_parser(
+        "names", help="prints a list of all available board names"
+    )
     test = subparsers.add_parser("test", help="run a doctest self-check")
 
-    generate = subparsers.add_parser("generate", help="generate file(s). pass --all to enable all or --<name> to enable specific generator.")
+    generate = subparsers.add_parser(
+        "generate",
+        help="generate file(s). pass --all to enable all or --<name> to enable specific generator.",
+    )
 
-    outputs = generate.add_argument_group("Output destination",
+    outputs = generate.add_argument_group(
+        "Output destination",
         "Either use STDOUT or write to the output file(s). "
-        "Optionally, when output file(s) already exist, preserve the original with .orig extension.")
-    outputs.add_argument("--output", choices=["stdout", "file", "file-with-backup"], default="file", help='(default "%(default)s")')
+        "Optionally, when output file(s) already exist, preserve the original with .orig extension.",
+    )
+    outputs.add_argument(
+        "--output",
+        choices=["stdout", "file", "file-with-backup"],
+        default="file",
+        help='(default "%(default)s")',
+    )
 
     use_all = generate.add_argument_group(title="Use all available generators")
-    use_all.add_argument("--all", dest="generators", action="store_const", const=[
-        name for name, _, _, _ in GENERATORS
-    ])
+    use_all.add_argument(
+        "--all",
+        dest="generators",
+        action="store_const",
+        const=[name for name, _, _, _ in GENERATORS],
+    )
 
     for name, output, default, title in GENERATORS:
         group = generate.add_argument_group(title=title)
-        group.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
-        group.add_argument(f'--{output}', default=default, help='(default "%(default)s")')
+        group.add_argument(
+            f"--{name}", dest="generators", action="append_const", const=name
+        )
+        group.add_argument(
+            f"--{output}", default=default, help='(default "%(default)s")'
+        )
 
     return parser.parse_args()
 
@@ -2459,7 +2586,8 @@ def run_generators(boards, filter_path, args):
             extra_board=[
                 no_float_boards_txt(args.no_float),
                 custom_speeds_boards_txt(args.custom_speed),
-            ])
+            ],
+        )
 
     if "ld" in generators:
         for flash_map in all_flash_maps():
@@ -2476,7 +2604,7 @@ def run_generators(boards, filter_path, args):
         doc_generate(maybe_output(args.doc_file), boards)
 
 
-def main ():
+def main():
     args = parse_cmdline()
 
     if args.command == "test":
