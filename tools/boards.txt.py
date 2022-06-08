@@ -1888,6 +1888,10 @@ def humanize(size, *, decimal=False, convert=None):
     '1MB'
     >>> humanize(Megabytes(1) + Kilobytes(512))
     '1536KB'
+    >>> humanize(Bytes(7315456))
+    '7144KB'
+    >>> humanize(Bytes(6266880))
+    '6120KB'
 
     """
 
@@ -1900,7 +1904,7 @@ def humanize(size, *, decimal=False, convert=None):
 
     for ratio, suffix in reversed(convert):
         if size >= ratio:
-            if size % ratio > (size / 4):
+            if size % ratio > (size / 8):
                 continue
 
             size = f"{size / ratio:.02f}"
