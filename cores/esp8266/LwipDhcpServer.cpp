@@ -364,9 +364,9 @@ void DhcpServer::add_offer_options(OptionsBuffer& options)
 #endif
 
     {
-        const auto* addr = ip_2_ip4(&_netif->ip_addr);
-        const auto  broadcast
-            = ip4_addr_t { .addr = (addr->addr & ip_2_ip4(&_netif->netmask)->addr) | ~addr->addr };
+        const auto* addr      = ip_2_ip4(&_netif->ip_addr);
+        const auto* mask      = ip_2_ip4(&_netif->netmask);
+        const auto  broadcast = ip4_addr_t { .addr = (addr->addr & mask->addr) | ~mask->addr };
 
         options.add(DHCP_OPTION_BROADCAST_ADDRESS, &broadcast);
     }
