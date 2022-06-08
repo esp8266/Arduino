@@ -46,7 +46,7 @@ How can I get some extra KBs in flash ?
 * Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
   be saved by using the option ``--nofloat`` with the boards generator:
 
-  ``./tools/boards.txt.py --nofloat --boardsgen``
+  ``./tools/boards.txt.py --no-float generate --boards``
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
@@ -55,21 +55,7 @@ How can I get some extra KBs in flash ?
 About WPS
 ~~~~~~~~~
 
-From release 2.4.2 and ahead, not using WPS will give an extra ~4.5KB in
-heap.
-
-In release 2.4.2 only, WPS is disabled by default and the board generator is
-required to enable it:
-
-``./tools/boards.txt.py --allowWPS --boardsgen``
-
-`Read more <a05-board-generator.rst>`__.
-
-For platformIO (and maybe other build environments), you will also need to add the build flag: -D NO_EXTRA_4K_HEAP
-
-This manual selection is not needed starting from 2.5.0 (and in git
-version).  WPS is always available, and not using it will give an extra
-~4.5KB compared to releases until 2.4.1 included.
+Starting from release 2.5.0, WPS support is enabled automatically.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

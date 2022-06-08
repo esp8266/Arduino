@@ -106,7 +106,7 @@ to generate a new abridged boards.txt run:
 
 ::
 
-   ./tools/boards.txt.py --include favorites.txt --output-file generate --boards
+   ./tools/boards.txt.py --include favorites.txt generate --boards
 
 
 The commands below will generate a boards.txt file that omits the boards named
@@ -115,8 +115,8 @@ named in favorites.txt.
 
 ::
 
-    ./tools/boards.txt.py --output-file --exclude favorites.txt generate --boards
-    ./tools/boards.txt.py --output-file --include favorites.txt generate --boards --boards-file boards.local.txt
+    ./tools/boards.txt.py --exclude favorites.txt generate --boards
+    ./tools/boards.txt.py --include favorites.txt generate --boards --boards-file boards.local.txt
 
 Additional Notes:
 
@@ -124,8 +124,10 @@ Additional Notes:
 
 2. Using filter exclude you could omit ``generic`` and ``esp8285`` boards.
 
-3. Default ``--output-file`` behaviour is to simply over-write the target file. Use ``--output-file-with-backup`` to preserve it as ``<filename>.orig``.
+3. Use ``--output-stdout`` to see resulting file(s) in the console.
 
-4. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--include <file>``. By default, boards are sorted alphabetically.
+4. Default ``--output-file`` behaviour is to simply over-write the target file. Use ``--output-file-with-backup`` to preserve it as ``<filename>.orig``.
+
+5. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--include <file>``. By default, boards are sorted alphabetically.
 
 `FAQ list :back: <readme.rst>`__
