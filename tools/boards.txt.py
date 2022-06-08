@@ -2469,7 +2469,8 @@ def run_generators(boards, filter_path, args):
 
     if "ld" in generators:
         for flash_map in all_flash_maps():
-            ldscript_generate(maybe_output(ldscript_name(**flash_map)), **flash_map)
+            file = os.path.join(args.ld_dir, ldscript_name(**flash_map))
+            ldscript_generate(maybe_output(file), **flash_map)
 
     if "flashmap" in generators:
         flashmap_generate(maybe_output(args.flashmap_file), all_flash_maps())
