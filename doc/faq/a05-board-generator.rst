@@ -79,7 +79,7 @@ files and include them in the pull-request.
 
 ::
 
-    ./tools/boards.txt.py --output-file generate --all
+    ./tools/boards.txt.py generate --all
     git add -u
     git commit
 
@@ -124,9 +124,9 @@ Additional Notes:
 
 2. Using filter exclude you could omit ``generic`` and ``esp8285`` boards.
 
-3. Use ``--output-stdout`` to see resulting file(s) in the console.
+3. To avoid modifying any files, use ``--output=stdout`` and see the result in console output.
 
-4. Default ``--output-file`` behaviour is to simply over-write the target file. Use ``--output-file-with-backup`` to preserve it as ``<filename>.orig``.
+4. Default ``--output=file`` behaviour is to simply over-write the target file(s). Use ``--output=file-with-orig`` to preserve them as ``<filename>.orig``.
 
 5. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--include <file>``. By default, boards are sorted alphabetically.
 

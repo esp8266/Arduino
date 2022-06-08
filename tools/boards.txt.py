@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
 
 # boards.txt python builder for esp8266/Arduino
 # Copyright (C) 2017 community
@@ -2400,19 +2401,13 @@ def parse_cmdline ():
 
     generic = parser.add_argument_group(title="Generic options")
 
-    generic.add_argument("--led", type=int, default=2, help="default builtin led specified for generic boards (default %(default)d)")
+    generic.add_argument("--led", type=int, default=2, help="default PIN for builtin LED, specified for generic boards (default %(default)d)")
     generic.add_argument("--no-float", action="store_true", help="disable float support in printf and scanf (enabled by default)")
     generic.add_argument("--custom-speed", action="append", default=[], help="additional serial speed option for all boards. can be specified multiple times.")
 
-    filters = generic.add_mutually_exclusive_group()
-    filters.add_argument("--include", nargs="?", help="resulting BOARDS_FILE will include *only* the boards listed in the INCLUDE file")
-    filters.add_argument("--exclude", nargs="?", help="resulting BOARDS_FILE will *not* include boards listed in the EXCLUDE file")
-
-    output = generic.add_argument_group(title="Output")
-    outputs = output.add_mutually_exclusive_group()
-    outputs.add_argument("--output-stdout", action="store_true")
-    outputs.add_argument("--output-file", action="store_true", default=True)
-    outputs.add_argument("--output-file-with-backup", action="store_true")
+    filters = parser.add_argument_group("Filtering", "either INCLUDE or EXCLUDE boards based on the filter file").add_mutually_exclusive_group()
+    filters.add_argument("--include", nargs="?")
+    filters.add_argument("--exclude", nargs="?")
 
     subparsers = parser.add_subparsers(dest="command", help="sub-commands")
     subparsers.required = True
@@ -2420,7 +2415,12 @@ def parse_cmdline ():
     names = subparsers.add_parser("names", help="prints a list of all available board names")
     test = subparsers.add_parser("test", help="run a doctest self-check")
 
-    generate = subparsers.add_parser("generate", help="generate file(s)")
+    generate = subparsers.add_parser("generate", help="generate file(s). pass --all to enable all or --<name> to enable specific generator.")
+
+    outputs = generate.add_argument_group("Output destination",
+        "Either use STDOUT or write to the output file(s). "
+        "Optionally, when output file(s) already exist, preserve the original with .orig extension.")
+    outputs.add_argument("--output", choices=["stdout", "file", "file-with-backup"], default="file", help='(default "%(default)s")')
 
     use_all = generate.add_argument_group(title="Use all available generators")
     use_all.add_argument("--all", dest="generators", action="store_const", const=[
@@ -2430,7 +2430,7 @@ def parse_cmdline ():
     for name, output, default, title in GENERATORS:
         group = generate.add_argument_group(title=title)
         group.add_argument(f'--{name}', dest="generators", action="append_const", const=name)
-        group.add_argument(f'--{output}', default=default)
+        group.add_argument(f'--{output}', default=default, help='(default "%(default)s")')
 
     return parser.parse_args()
 
@@ -2441,9 +2441,9 @@ def run_generators(boards, filter_path, args):
         raise ValueError("no generators selected")
 
     def maybe_output(file):
-        if args.output_file_with_backup:
+        if args.output == "file-with-backup":
             return OpenWithBackupFile(file)
-        if args.output_file:
+        if args.output == "file":
             return Open(file)
 
         return contextlib.nullcontext()
