@@ -90,22 +90,42 @@ BOARDS = collections.OrderedDict(
                     "sdk",
                 ],
                 "desc": [
-                    "These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.",
+                    "These modules come in different form factors and pinouts. "
+                    "See the page at ESP8266 community wiki for more info: "
+                    "`ESP8266 Module Family"
+                    " <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.",
                     "",
-                    "Usually these modules have no bootstrapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.",
+                    "Usually these modules have no bootstrapping resistors on board,"
+                    " insufficient decoupling capacitors, no voltage regulator, no"
+                    " reset circuit, and no USB-serial adapter. This makes using them"
+                    " somewhat tricky, compared to development boards which add these"
+                    " features.",
                     "",
-                    "In order to use these modules, make sure to observe the following:",
+                    "In order to use these modules, make sure to observe the"
+                    " following:",
                     "",
-                    "-  **Provide sufficient power to the module.** For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required. Using the power available from USB to Serial adapter is not recommended, these adapters typically do not supply enough current to run ESP8266 reliably in every situation. An external supply or regulator alongwith filtering capacitors is preferred.",
+                    "-  **Provide sufficient power to the module.** For stable use of"
+                    " the ESP8266 a power supply with 3.3V and >= 250mA is required."
+                    " Using the power available from USB to Serial adapter is not"
+                    " recommended, these adapters typically do not supply enough"
+                    " current to run ESP8266 reliably in every situation. An external"
+                    " supply or regulator alongwith filtering capacitors is preferred.",
                     "",
-                    "-  **Connect bootstrapping resistors** to GPIO0, GPIO2, GPIO15 according to the schematics below.",
+                    "-  **Connect bootstrapping resistors** to GPIO0, GPIO2, GPIO15"
+                    " according to the schematics below.",
                     "",
                     "-  **Put ESP8266 into bootloader mode** before uploading code.",
                     "",
                     "Serial Adapter",
                     "--------------",
                     "",
-                    "There are many different USB to Serial adapters / boards. To be able to put ESP8266 into bootloader mode using serial handshaking lines, you need the adapter which breaks out RTS and DTR outputs. CTS and DSR are not useful for upload (they are inputs). Make sure the adapter can work with 3.3V IO voltage: it should have a jumper or a switch to select between 5V and 3.3V, or be marked as 3.3V only.",
+                    "There are many different USB to Serial adapters / boards. To be"
+                    " able to put ESP8266 into bootloader mode using serial handshaking"
+                    " lines, you need the adapter which breaks out RTS and DTR outputs."
+                    " CTS and DSR are not useful for upload (they are inputs). Make"
+                    " sure the adapter can work with 3.3V IO voltage: it should have a"
+                    " jumper or a switch to select between 5V and 3.3V, or be marked as"
+                    " 3.3V only.",
                     "",
                     "Adapters based around the following ICs should work:",
                     "",
@@ -113,7 +133,8 @@ BOARDS = collections.OrderedDict(
                     "-  CP2102",
                     "-  CH340G",
                     "",
-                    "PL2303-based adapters are known not to work on Mac OS X. See https://github.com/igrr/esptool-ck/issues/9 for more info.",
+                    "PL2303-based adapters are known not to work on Mac OS X. See"
+                    " https://github.com/igrr/esptool-ck/issues/9 for more info.",
                     "",
                     "Minimal Hardware Setup for Bootloading and Usage",
                     "------------------------------------------------",
@@ -143,9 +164,12 @@ BOARDS = collections.OrderedDict(
                     "-  Reset is also named RSBT or REST (adding PullUp improves the",
                     "   stability of the module)",
                     "-  GPIO2 is alternative TX for the boot loader mode",
-                    "-  **Directly connecting a pin to VCC or GND is not a substitute for a",
-                    "   PullUp or PullDown resistor, doing this can break upload management",
-                    "   and the serial console, instability has also been noted in some",
+                    "-  **Directly connecting a pin to VCC or GND is not a substitute"
+                    " for a",
+                    "   PullUp or PullDown resistor, doing this can break upload"
+                    " management",
+                    "   and the serial console, instability has also been noted in"
+                    " some",
                     "   cases.**",
                     "",
                     "ESP to Serial",
@@ -222,7 +246,8 @@ BOARDS = collections.OrderedDict(
                     "Boot Messages and Modes",
                     "-----------------------",
                     "",
-                    "The ESP module checks at every boot the Pins 0, 2 and 15. based on them its boots in different modes:",
+                    "The ESP module checks at every boot the Pins 0, 2 and 15. based on"
+                    " them its boots in different modes:",
                     "",
                     "+----------+---------+---------+------------------------------------+",
                     "| GPIO15   | GPIO0   | GPIO2   | Mode                               |",
@@ -240,7 +265,8 @@ BOARDS = collections.OrderedDict(
                     "",
                     "    rst cause:2, boot mode:(3,6)",
                     "",
-                    "note: - GPIO2 is used as TX output and the internal Pullup is enabled on boot.",
+                    "note: - GPIO2 is used as TX output and the internal Pullup is"
+                    " enabled on boot.",
                     "",
                     "rst cause",
                     "~~~~~~~~~",
@@ -305,9 +331,15 @@ BOARDS = collections.OrderedDict(
                     "sdk",
                 ],
                 "desc": [
-                    "ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.",
+                    "ESP8285 (`datasheet"
+                    " <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__)"
+                    " is a multi-chip package which contains ESP8266 and 1MB flash. All"
+                    " points related to bootstrapping resistors and recommended"
+                    " circuits listed above apply to ESP8285 as well.",
                     "",
-                    "Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.",
+                    "Note that since ESP8285 has SPI flash memory internally connected"
+                    " in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM"
+                    " pins.",
                 ],
             },
         ),
@@ -330,12 +362,16 @@ BOARDS = collections.OrderedDict(
                 "desc": [
                     "Procuct page https://www.lifely.cc",
                     "",
-                    'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.',
+                    'This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core'
+                    " with WiFi 2,4Ghz and 2MB of Flash.",
                     "Power",
-                    "Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin",
+                    "Micro usb power cable, Lir2450 rechargeable battery (or not"
+                    " rechargeable)or with JST connector in the back board Max 6 Vin",
                     "Libraries and examples",
-                    "Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/",
-                    "Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource",
+                    "Download libraries from: Official Arduino Ide, our website"
+                    " https://www.lifely.cc or https://github.com/lifely-cc/",
+                    "Full pinout and PDF for setup here https://www.lifely.cc our"
+                    " libraries is OpenSource",
                 ],
             },
         ),
@@ -387,7 +423,16 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Adafruit Feather HUZZAH ESP8266 will automatically recharge a connected battery when USB power is available.",
+                    "The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi"
+                    " development board powered by Ai-Thinker's ESP-12S, clocked at 80"
+                    " MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip"
+                    " is included so that you can upload code at a blistering 921600"
+                    " baud for fast development time. It also has auto-reset so no"
+                    " noodling with pins and reset button pressings. A 3.7V Lithium"
+                    " polymer battery connector is included, making it ideal for"
+                    " portable projects. The Adafruit Feather HUZZAH ESP8266 will"
+                    " automatically recharge a connected battery when USB power is"
+                    " available.",
                     "",
                     "Product page: https://www.adafruit.com/product/2821",
                 ],
@@ -408,7 +453,15 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Heltec WiFi Kit 8 will automatically recharge a connected battery when USB power is available.",
+                    "The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development"
+                    " board powered by Ai-Thinker's ESP-12S, clocked at 80 MHz at 3.3V"
+                    " logic. A high-quality SiLabs CP2104 USB-Serial chip is included"
+                    " so that you can upload code at a blistering 921600 baud for fast"
+                    " development time. It also has auto-reset so no noodling with pins"
+                    " and reset button pressings. A 3.7V Lithium polymer battery"
+                    " connector is included, making it ideal for portable projects. The"
+                    " Heltec WiFi Kit 8 will automatically recharge a connected battery"
+                    " when USB power is available.",
                     "",
                     "Product page: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series",
                 ],
@@ -429,7 +482,11 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng",
+                    "The Invent One is an Arduino-compatible Wi-Fi development board"
+                    " powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic."
+                    " It has an onboard ADC (PCF8591) so that you can have multiple"
+                    " analog inputs to work with. More information can be found here:"
+                    " https://blog.inventone.ng",
                     "",
                     "Product page: https://inventone.ng",
                 ],
@@ -451,7 +508,10 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.",
+                    "The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi"
+                    " development board powered by an ESP-12F, clocked at 80 MHz at"
+                    " 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection"
+                    " ports.",
                     "",
                     "Product page: https://xinabox.cc/products/CW01",
                 ],
@@ -472,7 +532,14 @@ BOARDS = collections.OrderedDict(
                     "resetmethod_menu",
                 ],
                 "desc": [
-                    "ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi development board powered by Espressif System's own ESP8266 WROOM-02 module. It has breadboard-friendly breakout pins with in-built LED, two reset/flash buttons and a user programmable button . The operating voltage is 3.3VDC, regulated with 800mA maximum current. Special distinctive features include on-board I2C pads that allow direct connection to OLED LCD and sensor boards.",
+                    "ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi"
+                    " development board powered by Espressif System's own ESP8266"
+                    " WROOM-02 module. It has breadboard-friendly breakout pins with"
+                    " in-built LED, two reset/flash buttons and a user programmable"
+                    " button . The operating voltage is 3.3VDC, regulated with 800mA"
+                    " maximum current. Special distinctive features include on-board"
+                    " I2C pads that allow direct connection to OLED LCD and sensor"
+                    " boards.",
                 ],
             },
         ),
@@ -491,7 +558,14 @@ BOARDS = collections.OrderedDict(
                     "resetmethod_menu",
                 ],
                 "desc": [
-                    "ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.",
+                    "ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board"
+                    " based on an earlier V1 (beta version). Re-designed together with"
+                    " Cytron Technologies, the newly-revised ESPresso Lite V2.0"
+                    " features the auto-load/auto-program function, eliminating the"
+                    " previous need to reset the board manually before flashing a new"
+                    " program. It also feature two user programmable side buttons and a"
+                    " reset button. The special distinctive features of on-board pads"
+                    " for I2C sensor and actuator is retained.",
                 ],
             },
         ),
@@ -551,7 +625,9 @@ BOARDS = collections.OrderedDict(
                     "Pin mapping",
                     "~~~~~~~~~~~",
                     "",
-                    "Pin numbers written on the board itself do not correspond to ESP8266 GPIO pin numbers. Constants are defined to make using this board easier:",
+                    "Pin numbers written on the board itself do not correspond to"
+                    " ESP8266 GPIO pin numbers. Constants are defined to make using"
+                    " this board easier:",
                     "",
                     ".. code:: c++",
                     "",
@@ -567,7 +643,8 @@ BOARDS = collections.OrderedDict(
                     "    static const uint8_t D9   = 3;",
                     "    static const uint8_t D10  = 1;",
                     "",
-                    "If you want to use NodeMCU pin 5, use D5 for pin number, and it will be translated to 'real' GPIO pin 14.",
+                    "If you want to use NodeMCU pin 5, use D5 for pin number, and it"
+                    " will be translated to 'real' GPIO pin 14.",
                 ],
             },
         ),
@@ -587,17 +664,28 @@ BOARDS = collections.OrderedDict(
                     "led216",
                 ],
                 "desc": [
-                    "This module is sold under many names for around $6.50 on AliExpress and it's one of the cheapest, fully integrated ESP8266 solutions.",
+                    "This module is sold under many names for around $6.50 on"
+                    " AliExpress and it's one of the cheapest, fully integrated ESP8266"
+                    " solutions.",
                     "",
-                    "It's an open hardware design with an ESP-12E core and 4 MB of SPI flash.",
+                    "It's an open hardware design with an ESP-12E core and 4 MB of SPI"
+                    " flash.",
                     "",
-                    'According to the manufacturer, "with a micro USB cable, you can connect NodeMCU devkit to your laptop and flash it without any trouble". This is more or less true: the board comes with a CP2102 onboard USB to serial adapter which just works, well, the majority of the time. Sometimes flashing fails and you have to reset the board by holding down FLASH +',
-                    "RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.",
+                    'According to the manufacturer, "with a micro USB cable, you can'
+                    " connect NodeMCU devkit to your laptop and flash it without any"
+                    ' trouble". This is more or less true: the board comes with a'
+                    " CP2102 onboard USB to serial adapter which just works, well, the"
+                    " majority of the time. Sometimes flashing fails and you have to"
+                    " reset the board by holding down FLASH +",
+                    "RST, then releasing FLASH, then releasing RST. This forces the"
+                    " CP2102 device to power cycle and to be re-numbered by Linux.",
                     "",
-                    "The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.",
+                    "The board also features a NCP1117 voltage regulator, a blue LED on"
+                    " GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.",
                     "The ESP-12E usually has a led connected on GPIO2.",
                     "",
-                    "Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__",
+                    "Full pinout and PDF schematics can be found `here"
+                    " <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__",
                 ],
             },
         ),
@@ -617,17 +705,24 @@ BOARDS = collections.OrderedDict(
                     "2M",
                 ],
                 "desc": [
-                    "This board comes with 2 MB of SPI flash and optional accessories (e.g. evaluation board ESP8266-EVB or BAT-BOX for batteries).",
+                    "This board comes with 2 MB of SPI flash and optional accessories"
+                    " (e.g. evaluation board ESP8266-EVB or BAT-BOX for batteries).",
                     "",
-                    "The basic module has three solder jumpers that allow you to switch the operating mode between SDIO, UART and FLASH.",
+                    "The basic module has three solder jumpers that allow you to switch"
+                    " the operating mode between SDIO, UART and FLASH.",
                     "",
-                    "The board is shipped for FLASH operation mode, with jumpers TD0JP=0, IO0JP=1, IO2JP=1.",
+                    "The board is shipped for FLASH operation mode, with jumpers"
+                    " TD0JP=0, IO0JP=1, IO2JP=1.",
                     "",
-                    "Since jumper IO0JP is tied to GPIO0, which is PIN 21, you'll have to ground it before programming with a USB to serial adapter and reset the board by power cycling it.",
+                    "Since jumper IO0JP is tied to GPIO0, which is PIN 21, you'll have"
+                    " to ground it before programming with a USB to serial adapter and"
+                    " reset the board by power cycling it.",
                     "",
-                    "UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, pin 4).",
+                    "UART pins for programming and serial I/O are GPIO1 (TXD, pin 3)"
+                    " and GPIO3 (RXD, pin 4).",
                     "",
-                    "You can find the board schematics `here <https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf>`__",
+                    "You can find the board schematics `here"
+                    " <https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf>`__",
                 ],
             },
         ),
@@ -736,7 +831,8 @@ BOARDS = collections.OrderedDict(
                     "Clone variant of the LOLIN(WEMOS) D1 mini board,",
                     "with enabled flash-mode menu, DOUT selected by default.",
                     "",
-                    "Product page of the preferred official board: https://www.wemos.cc/",
+                    "Product page of the preferred official board:"
+                    " https://www.wemos.cc/",
                 ],
             },
         ),
@@ -785,7 +881,8 @@ BOARDS = collections.OrderedDict(
                     "Power:",
                     "~~~~~~",
                     "",
-                    "- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input",
+                    "- 5V pin : 4.7V 500mA output when the board is powered by USB ;"
+                    " 3.5V-6V input",
                     "- 3V3 pin : 3.3V 500mA regulated output",
                     "- Digital pins : 3.3V 30mA.",
                     "",
@@ -793,9 +890,12 @@ BOARDS = collections.OrderedDict(
                     "~~~~~~",
                     "",
                     "- Product page: https://www.wemos.cc/",
-                    "- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf",
-                    "- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf",
-                    "- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf",
+                    "- Board schematic:"
+                    " https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf",
+                    "- ESP8285 datasheet:"
+                    " https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf",
+                    "- Voltage regulator datasheet:"
+                    " http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf",
                 ],
             },
         ),
@@ -832,9 +932,14 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104 USB-Serial bridge and a micro USB connector for easy programming. It is designed for fitting in a breadboard and has an RGB Led and two buttons for easy prototyping.",
+                    "ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104"
+                    " USB-Serial bridge and a micro USB connector for easy programming."
+                    " It is designed for fitting in a breadboard and has an RGB Led and"
+                    " two buttons for easy prototyping.",
                     "",
-                    "For more information about the hardware, pinout diagram and programming procedures, please see the `datasheet <https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf>`__.",
+                    "For more information about the hardware, pinout diagram and"
+                    " programming procedures, please see the `datasheet"
+                    " <https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf>`__.",
                     "",
                     "Product page: http://www.espino.io/en",
                 ],
@@ -855,16 +960,18 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "ESPino by ThaiEasyElec using WROOM-02 module from Espressif Systems with 4 MB Flash.",
+                    "ESPino by ThaiEasyElec using WROOM-02 module from Espressif"
+                    " Systems with 4 MB Flash.",
                     "",
                     "We will update an English description soon. - Product page:",
                     "http://thaieasyelec.com/products/wireless-modules/wifi-modules/espino-wifi-development-board-detail.html",
                     "- Schematics:",
-                    "www.thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_Schematic.pdf -",
+                    "www.thaieasyelec.com/downloads/ETEE052/ETEE052\\_ESPino\\_Schematic.pdf -",
                     "Dimensions:",
-                    "http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_Dimension.pdf",
+                    "http://thaieasyelec.com/downloads/ETEE052/ETEE052\\_ESPino\\_Dimension.pdf",
                     "- Pinouts:",
-                    "http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_User\_Manual\_TH\_v1\_0\_20160204.pdf (Please see pg. 8)",
+                    "http://thaieasyelec.com/downloads/ETEE052/ETEE052\\_ESPino\\_User\\_Manual\\_TH\\_v1\\_0\\_20160204.pdf"
+                    " (Please see pg. 8)",
                 ],
             },
         ),
@@ -905,9 +1012,17 @@ BOARDS = collections.OrderedDict(
                     "1M",
                 ],
                 "desc": [
-                    "WifInfo integrates the ESP-12 or ESP-07+Ext antenna module with a 3.3v regulator and the hardware to be able to measure French telemetry issue from ERDF powering meter serial output. It has a USB connector for powering, an RGB WS2812 Led, 4 pins I2C connector to fit OLED or sensor, and two buttons + FTDI connector and auto reset feature.",
+                    "WifInfo integrates the ESP-12 or ESP-07+Ext antenna module with a"
+                    " 3.3v regulator and the hardware to be able to measure French"
+                    " telemetry issue from ERDF powering meter serial output. It has a"
+                    " USB connector for powering, an RGB WS2812 Led, 4 pins I2C"
+                    " connector to fit OLED or sensor, and two buttons + FTDI connector"
+                    " and auto reset feature.",
                     "",
-                    "For more information, please see WifInfo related `blog <http://hallard.me/category/wifinfo/>`__ entries, `github <https://github.com/hallard/WifInfo>`__ and `community <https://community.hallard.me/category/16/wifinfo>`__ forum.",
+                    "For more information, please see WifInfo related `blog"
+                    " <http://hallard.me/category/wifinfo/>`__ entries, `github"
+                    " <https://github.com/hallard/WifInfo>`__ and `community"
+                    " <https://community.hallard.me/category/16/wifinfo>`__ forum.",
                 ],
             },
         ),
@@ -978,13 +1093,19 @@ BOARDS = collections.OrderedDict(
                 "desc": [
                     "gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.",
                     "",
-                    '2.4", 2.8" and 3.2" TFT LCD with uSD card socket and Resistive Touch. Chip Antenna + uFL Connector.',
+                    '2.4", 2.8" and 3.2" TFT LCD with uSD card socket and Resistive'
+                    " Touch. Chip Antenna + uFL Connector.",
                     "",
-                    "Datasheet and associated downloads can be found on the 4D Systems product page.",
+                    "Datasheet and associated downloads can be found on the 4D Systems"
+                    " product page.",
                     "",
-                    "The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.",
+                    "The gen4-IoD range can be programmed using the Arduino IDE and"
+                    " also the 4D Systems Workshop4 IDE, which incorporates many"
+                    " additional graphics benefits. GFX4d library is available, along"
+                    " with a number of demo applications.",
                     "",
-                    "- Product page: https://4dsystems.com.au/products/iot-display-modules",
+                    "- Product page:"
+                    " https://4dsystems.com.au/products/iot-display-modules",
                 ],
             },
         ),
@@ -1004,11 +1125,17 @@ BOARDS = collections.OrderedDict(
                 ],
                 "serial": "921",
                 "desc": [
-                    "The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.",
+                    "The Oak requires an `Serial Adapter`_ for a serial connection or"
+                    " flashing; its micro USB port is only for power.",
                     "",
-                    "To make a serial connection, wire the adapter's **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.",
+                    "To make a serial connection, wire the adapter's **TX to P3**, **RX"
+                    " to P4**, and **GND** to **GND**.  Supply 3.3v from the serial"
+                    " adapter if not already powered via USB.",
                     "",
-                    "To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.",
+                    "To put the board into bootloader mode, configure a serial"
+                    " connection as above, connect **P2 to GND**, then re-apply power. "
+                    " Once flashing is complete, remove the connection from P2 to GND,"
+                    " then re-apply power to boot into normal mode.",
                 ],
             },
         ),
@@ -1063,9 +1190,15 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.",
+                    "Wio Link is designed to simplify your IoT development. It is an"
+                    " ESP8266 based open-source Wi-Fi development board to create IoT"
+                    " applications by virtualizing plug-n-play modules to RESTful APIs"
+                    " with mobile APPs. Wio Link is also compatible with the Arduino"
+                    " IDE.",
                     "",
-                    "Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.",
+                    "Please DO NOTICE that you MUST pull up pin 15 to enable the power"
+                    " for Grove ports, the board is designed like this for the purpose"
+                    " of peripherals power management.",
                     "",
                     "Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html",
                 ],
@@ -1086,9 +1219,13 @@ BOARDS = collections.OrderedDict(
                     "4M",
                 ],
                 "desc": [
-                    "ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.",
+                    "ESPectro Core is ESP8266 development board as the culmination of"
+                    " our 3+ year experience in exploring and developing products with"
+                    " ESP8266 MCU.",
                     "",
-                    "Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.",
+                    "Initially designed for kids in mind, everybody should be able to"
+                    " use it. Yet it's still hacker-friendly as we break out all"
+                    " ESP8266 ESP-12F pins.",
                     "",
                     "More details at https://shop.makestro.com/product/espectrocore/",
                 ],
@@ -1110,7 +1247,8 @@ BOARDS = collections.OrderedDict(
                 ],
                 "serial": "512",
                 "desc": [
-                    "Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module",
+                    "Eduino WiFi is an Arduino-compatible DIY WiFi development board"
+                    " using an ESP-12 module",
                     "",
                     "Product page: https://schirmilabs.de/?page_id=165",
                 ],
@@ -1140,26 +1278,33 @@ BOARDS = collections.OrderedDict(
                     "1M",
                 ],
                 "desc": [
-                    "ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, "
+                    "ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff"
+                    " Basic, "
                     + "and Sonoff S20",
                     "",
                     "These are not development boards. The development process is "
-                    + "inconvenient with these devices. When flashing firmware you will "
+                    + "inconvenient with these devices. When flashing firmware you"
+                    " will "
                     + "need a Serial Adapter to connect it to your computer.",
                     "",
-                    " | Most of these devices, during normal operation, are connected to "
-                    + "*wall power (AKA Mains Electricity)*. **NEVER** try to flash these "
+                    " | Most of these devices, during normal operation, are"
+                    " connected to "
+                    + "*wall power (AKA Mains Electricity)*. **NEVER** try to flash"
+                    " these "
                     + "devices when connected to *wall power*. **ALWAYS** have them "
                     + "disconnected from *wall power* when connecting them to your "
                     + "computer. Your life may depend on it!",
                     "",
-                    "When flashing you will need to hold down the push button connected "
-                    + "to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB "
+                    "When flashing you will need to hold down the push button"
+                    " connected "
+                    + "to the GPIO0 pin, while powering up with a safe 3.3 Volt source."
+                    " Some USB "
                     + "Serial Adapters may supply enough power to handle flashing; "
                     + "however, it many may not supply enough power to handle the "
                     + "activities when the device reboots.",
                     "",
-                    "More product details at the bottom of https://www.itead.cc/wiki/Product/",
+                    "More product details at the bottom of"
+                    " https://www.itead.cc/wiki/Product/",
                 ],
             },
         ),
@@ -1179,13 +1324,19 @@ BOARDS = collections.OrderedDict(
                     "1M",
                 ],
                 "desc": [
-                    "DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module "
-                    + "(`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) "
-                    + "using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. "
-                    + "The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 "
-                    + "and is active low to turn on. It uses a CH340C, USB to Serial converter chip. ",
+                    "DOIT ESP-Mx DevKit - This is a development board by DOIT, with a"
+                    " DOIT ESP-Mx module "
+                    + "(`datasheet"
+                    " <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) "
+                    + "using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9"
+                    " and 10 are not available. "
+                    + "The DOIT ESP-Mx DevKit board has a red power LED and a blue LED"
+                    " connected to GPIO16 "
+                    + "and is active low to turn on. It uses a CH340C, USB to Serial"
+                    " converter chip. ",
                     "",
-                    "ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) "
+                    "ESP8285 (`datasheet"
+                    " <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) "
                     + "is a multi-chip package which contains ESP8266 and 1MB flash. ",
                 ],
             },
@@ -1280,7 +1431,7 @@ MACROS = {
             (".build.flash_freq", "80"),
         ]
     ),
-    ####################### menu.resetmethod
+    # menu.resetmethod
     "resetmethod_menu": collections.OrderedDict(
         [
             (".menu.ResetMethod.nodemcu", "dtr (aka nodemcu)"),
@@ -1304,7 +1455,7 @@ MACROS = {
             ),
         ]
     ),
-    ####################### upload.resetmethod (new esptool.py options)
+    # upload.resetmethod (new esptool.py options)
     "resetmethod_ck": collections.OrderedDict(
         [
             (".upload.resetmethod", "--before no_reset --after soft_reset"),
@@ -1330,7 +1481,7 @@ MACROS = {
             (".upload.resetmethod", "--before no_reset_no_sync --after soft_reset"),
         ]
     ),
-    ####################### menu.FlashMode
+    # menu.FlashMode
     "flashmode_menu": collections.OrderedDict(
         [
             (".menu.FlashMode.dout", "DOUT (compatible)"),
@@ -1347,7 +1498,7 @@ MACROS = {
             (".menu.FlashMode.qio.build.flash_flags", "-DFLASHMODE_QIO"),
         ]
     ),
-    ####################### default flash_mode
+    # default flash_mode
     "flashmode_dio": collections.OrderedDict(
         [
             (".build.flash_mode", "dio"),
@@ -1372,7 +1523,7 @@ MACROS = {
             (".build.flash_flags", "-DFLASHMODE_QOUT"),
         ]
     ),
-    ####################### lwip
+    # lwip variant
     "lwip": collections.OrderedDict(
         [
             (".menu.ip.lm2f", "v2 Lower Memory"),
@@ -1419,7 +1570,7 @@ MACROS = {
             ),
         ]
     ),
-    ####################### serial
+    # serial baud rate
     "s9": collections.OrderedDict(
         [
             (".menu.baud.9600", "9600"),
@@ -1476,7 +1627,7 @@ MACROS = {
             (".menu.baud.3000000.upload.speed", "3000000"),
         ]
     ),
-    ####################### flash erase
+    # partial or full flash erase
     "flash_erase_menu": collections.OrderedDict(
         [
             (".menu.wipe.none", "Only Sketch"),
@@ -1490,7 +1641,7 @@ MACROS = {
             (".menu.wipe.all.upload.erase_cmd", "erase_flash"),
         ]
     ),
-    ######################## SSL supported protocols
+    # optional 'basic' cipher list
     "ssl_cipher_menu": collections.OrderedDict(
         [
             (".menu.ssl.all", "All SSL ciphers (most compatible)"),
@@ -1499,7 +1650,7 @@ MACROS = {
             (".menu.ssl.basic.build.sslflags", "-DBEARSSL_SSL_BASIC"),
         ]
     ),
-    ####################### mmu
+    # configure icache split, mmu
     "mmu_menu": collections.OrderedDict(
         [
             (".menu.mmu.3232", "32KB cache + 32KB IRAM (balanced)"),
@@ -1520,21 +1671,24 @@ MACROS = {
             (".menu.mmu.3216", "16KB cache + 32KB IRAM + 16KB 2nd Heap (not shared)"),
             (
                 ".menu.mmu.3216.build.mmuflags",
-                "-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000 -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000",
+                "-DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x4000"
+                " -DMMU_SEC_HEAP=0x40108000 -DMMU_SEC_HEAP_SIZE=0x4000",
             ),
             (".menu.mmu.ext128k", "128K Heap External 23LC1024"),
             (
                 ".menu.mmu.ext128k.build.mmuflags",
-                "-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000",
+                "-DMMU_EXTERNAL_HEAP=128 -DMMU_IRAM_SIZE=0x8000"
+                " -DMMU_ICACHE_SIZE=0x8000",
             ),
             (".menu.mmu.ext8192k", "8M w/256K Heap External 64 MBit PSRAM"),
             (
                 ".menu.mmu.ext8192k.build.mmuflags",
-                "-DMMU_EXTERNAL_HEAP=256 -DMMU_IRAM_SIZE=0x8000 -DMMU_ICACHE_SIZE=0x8000",
+                "-DMMU_EXTERNAL_HEAP=256 -DMMU_IRAM_SIZE=0x8000"
+                " -DMMU_ICACHE_SIZE=0x8000",
             ),
         ]
     ),
-    ######################## Non 32-bit load/store exception handler
+    # install our exception handler for non-aligned memory access
     "non32xfer_menu": collections.OrderedDict(
         [
             (".menu.non32xfer.fast", "Use pgm_read macros for IRAM/PROGMEM"),
@@ -1796,7 +1950,10 @@ class Region:
         return None
 
     def __repr__(self):
-        return f"<Region {self.name=} {self.size=} at [0x{self.start:08x}:0x{self.end:08x})>"
+        return (
+            f"<Region {self.name=} {self.size=} at"
+            f" [0x{self.start:08x}:0x{self.end:08x})>"
+        )
 
     def copy(self):
         return Region(self.name, self.start, self.end)
@@ -1913,7 +2070,7 @@ class Layout:
         ValueError: No space left
         """
         if self.free < region.size:
-            raise ValueError(f"No space left")
+            raise ValueError("No space left")
         elif self.start > region.start or self.end < region.end:
             raise ValueError(f"Out of bounds of {self.region}")
         elif self.subregions and region.end > self.edge.start:
@@ -1960,8 +2117,6 @@ class Layout:
         >>> x.add_aligned("", Kilobytes(20), Kilobytes(8))
         <Region self.name='' self.size=16384 at [0x00075c00:0x00079c00)>
         """
-        end = self.edge.copy()
-
         remainder = size % alignment
         if remainder:
             self.add("", remainder)
@@ -1994,7 +2149,10 @@ class Filesystem:
         return self.region.end
 
     def __repr__(self):
-        return f"<Filesystem at {self.region} block {self.block_size} page {self.page_size}>"
+        return (
+            f"<Filesystem at {self.region} block {self.block_size} page"
+            f" {self.page_size}>"
+        )
 
 
 # - menu properties *will* be used in scripts, so these suffixes *must* remain the same
@@ -2068,7 +2226,10 @@ def humanize_flash_menu(size):
 
 # used as property value and for .ld output generator
 def ldscript_name(*, flash_size, expected_fs_size, **kwargs):
-    return f"eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld".lower()
+    return (
+        f"eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld"
+        .lower()
+    )
 
 
 SPI_START = 0x40200000
@@ -2083,11 +2244,11 @@ def common_layout(name, flash_size):
     layout = Layout(Region(name, 0, flash_size))
 
     # these are *always* at the end of the flash, so layout is populated backwards
-    sdkwifi = layout.add("SDK + WiFi", (SPI_SECTOR * 3))
-    rfcal = layout.add("RFCAL", SPI_SECTOR)
+    layout.add("SDK + WiFi", (SPI_SECTOR * 3))
+    layout.add("RFCAL", SPI_SECTOR)
 
     # eeprom sector is always there, since we don't know whether it is used or not
-    eeprom = layout.add("EEPROM", SPI_SECTOR)
+    layout.add("EEPROM", SPI_SECTOR)
 
     return layout
 
@@ -2290,7 +2451,7 @@ def ldscript_generate(
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
         print(
-            f"  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}"
+             f"  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}"
         )
         print("}")
         print()
@@ -2301,7 +2462,8 @@ def ldscript_generate(
         print(f"PROVIDE ( _EEPROM_start = {symbol(eeprom.start)} );")
         # Re-add deprecated symbols pointing to the same address as the new standard ones
         print(
-            "/* The following symbols are DEPRECATED and will be REMOVED in a future release */"
+            "/* The following symbols are DEPRECATED and will be REMOVED in a future"
+            " release */"
         )
         print(f"PROVIDE ( _SPIFFS_start = {symbol(fs.start)} );")
         print(f"PROVIDE ( _SPIFFS_end = {symbol(fs.end)} );")
@@ -2414,7 +2576,8 @@ def flashmap_generate(output, flash_maps):
         print("  FLASH_MAP_* is a user choice in sketch:")
         print("      `FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)`")
         print(
-            "  Configuration is made at boot with detected flash chip size (last argument 512..16384)"
+            "  Configuration is made at boot with detected flash chip size (last"
+            " argument 512..16384)"
         )
         print("  Other values are defined from `tools/boards.txt.py`.")
         print("*/")
@@ -2484,23 +2647,20 @@ def all_flash_maps():
 # builtin led
 
 
-def led(name, default, ledList):
+def menu_led(name, pins, default):
     menu = collections.OrderedDict(
         (
             (f".menu.led.{default}", str(default)),
             (f".menu.led.{default}.build.led", f"-DLED_BUILTIN={default}"),
         )
     )
-    for (
-        led
-    ) in (
-        ledList
-    ):  # Make range incluside of max (16), since there are really 16 GPIOS not 15
-        if not led == default:
+
+    for pin in pins:
+        if not pin == default:
             menu.update(
                 (
-                    (f".menu.led.{led}", str(led)),
-                    (f".menu.led.{led}.build.led", f"-DLED_BUILTIN={led}"),
+                    (f".menu.led.{pin}", str(pin)),
+                    (f".menu.led.{pin}.build.led", f"-DLED_BUILTIN={pin}"),
                 )
             )
     return {name: menu}
@@ -2569,8 +2729,8 @@ def prepare_macros(defaults, flashmap, builtinled):
     macros = defaults
     macros.update(menu_macros(flashmap))
     macros.update(debug_macros())
-    macros.update(led("led", builtinled, range(0, 17)))
-    macros.update(led("led216", 2, (16,)))
+    macros.update(menu_led("led", range(0, 17), builtinled))
+    macros.update(menu_led("led216", (16,), 2))
     macros.update(sdk_macros())
 
     return macros
@@ -2698,7 +2858,7 @@ def show_names(boards):
 
 
 ################################################################
-
+# boards .json
 
 def package_generate(output, boards):
     with output:
@@ -2712,7 +2872,7 @@ def package_generate(output, boards):
 
 
 ################################################################
-
+# boards .rst, here's the only place to use "desc" field
 
 def doc_generate(output, boards):
     with output:
@@ -2730,7 +2890,7 @@ def doc_generate(output, boards):
 
 
 ################################################################
-# entrypoint
+# command line parsing
 
 GENERATORS = (
     ("boards", "boards-file", "boards.txt", "boards.txt"),
@@ -2770,7 +2930,8 @@ def parse_cmdline():
     )
 
     filters = parser.add_argument_group(
-        "Filtering", "either INCLUDE or EXCLUDE boards based on the filter file"
+        title="Filtering",
+        description="either INCLUDE or EXCLUDE boards based on the filter file",
     ).add_mutually_exclusive_group()
     filters.add_argument("--include", nargs="?")
     filters.add_argument("--exclude", nargs="?")
@@ -2778,10 +2939,8 @@ def parse_cmdline():
     subparsers = parser.add_subparsers(dest="command", help="sub-commands")
     subparsers.required = True
 
-    names = subparsers.add_parser(
-        "names", help="prints a list of all available board names"
-    )
-    test = subparsers.add_parser("test", help="run a doctest self-check")
+    subparsers.add_parser("names", help="prints a list of all available board names")
+    subparsers.add_parser("test", help="run a doctest self-check")
 
     generate = subparsers.add_parser(
         "generate",
@@ -2789,9 +2948,11 @@ def parse_cmdline():
     )
 
     outputs = generate.add_argument_group(
-        "Output destination",
-        "Either use STDOUT or write to the output file(s). "
-        "Optionally, when output file(s) already exist, preserve the original with .orig extension.",
+        title="Output destination",
+        description=(
+            "Either use STDOUT or write to the output file(s). Optionally, when output"
+            " file(s) already exist, preserve the original with .orig extension."
+        ),
     )
     outputs.add_argument(
         "--output",
@@ -2861,6 +3022,9 @@ def run_generators(boards, filter_path, args):
     if "doc" in generators:
         doc_generate(maybe_output(args.doc_file), boards)
 
+
+################################################################
+# entrypoint
 
 def main():
     args = parse_cmdline()
