@@ -44,31 +44,31 @@ Make your own risk analysis and, depending on the application, decide what libra
 Advanced Security - Signed Updates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee that only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
+While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level public-key encryption to guarantee that only the holder of a cryptographic private key can produce signed updates accepted by the OTA update mechanisms.
 
-Signed updates are updates whose compiled binaries are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone except the holder of the developer's private key, the hash will not match and the ESP8266 will reject the upload.
+Signed updates are updates whose compiled binaries are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash (also called a signature) to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone except the holder of the developer's private key, the signature will not match and the ESP8266 will reject the upload.
 
 Cryptographic signing only protects against tampering with binaries delivered via OTA.  If someone has physical access, they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not protect code inside the device: if a user has physical access they can read out your program.
 
-**Securing your private key is paramount.  The same private/public keypair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
+**Securing your private key is paramount.  The same private/public key pair that was used with the original upload must also be used to sign later binaries.  Loss of the private key associated with a binary means that you will not be able to OTA-update any of your devices in the field.  Alternatively, if someone else copies the private key, then they will be able to use it to sign binaries which will be accepted by the ESP.**
 
 Signed Binary Format
 ^^^^^^^^^^^^^^^^^^^^
 
 The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
 
-As shown below, the signed hash is appended to the unsigned binary, followed by the total length of the signed hash (i.e., if the signed hash was 64 bytes, then this uint32 data segment will contain 64).  This format allows for extensibility (such as adding a CA-based validation scheme allowing multiple signing keys all based on a trust anchor). Pull requests are always welcome.
+As shown below, the signed hash is appended to the unsigned binary, followed by the total length of the signed hash (i.e., if the signed hash was 64 bytes, then this uint32 data segment will contain 64).  This format allows for extensibility (such as adding a CA-based validation scheme allowing multiple signing keys all based on a trust anchor). Pull requests are always welcome. (currently it uses SHA256 with RSASSA-PKCS1-V1_5-SIGN signature scheme from RSA PKCS #1 v1.5)
 
 .. code:: bash
 
-    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS>
+    NORMAL-BINARY <SIGNATURE> <uint32 LENGTH-OF-SIGNATURE>
 
 Signed Binary Prerequisites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 OpenSSL is required to run the standard signing steps, and should be available on any UNIX-like or Windows system.  As usual, the latest stable version of OpenSSL is recommended.
 
-Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following shell commands will generate a new public/private keypair.  Run them in the sketch directory:
+Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following shell commands will generate a new public/private key pair.  Run them in the sketch directory:
 
 .. code:: bash
 
@@ -161,7 +161,7 @@ If signing is desired, sign the gzip compressed file *after* compression.
 Updating apps in the field to support compression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you have applications deployed in the field and wish to update them to support compressed OTA uploads, you will need to first recompile the application, then _upload the uncompressed `.bin` file once_.  Attempting to upload a `gzip` compressed binary to a legacy app will result in the Updater rejecting the upload as it does not understand the `gzip` format.  After this initial upload, which will include the new bootloader and `Updater` class with compression support, compressed updates can then be used.
+If you have applications deployed in the field and wish to update them to support compressed OTA uploads, you will need to first recompile the application, then _upload the uncompressed `.bin` file once.  Attempting to upload a `gzip` compressed binary to a legacy app will result in the Updater rejecting the upload as it does not understand the `gzip` format.  After this initial upload, which will include the new bootloader and `Updater` class with compression support, compressed updates can then be used.
 
 
 Safety
@@ -226,13 +226,6 @@ Instructions below show configuration of OTA on a NodeMCU 1.0 (ESP-12E Module) b
    -  esp8266/Arduino platform package 2.0.0 or newer - for instructions
       follow
       https://github.com/esp8266/Arduino#installing-with-boards-manager
-   -  Python 3.x - https://www.python.org/
-
-      **Note:** Windows users should select “Add python.exe to Path”
-      (see below – this option is not selected by default).
-
-      .. figure:: a-ota-python-configuration.png
-         :alt: Python installation set up
 
 2. Now prepare the sketch and configuration for upload via a serial port.
 
@@ -530,7 +523,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
-    ESPhttpUpdate.update("192.168.0.2", 80, "/arduino.bin");
+    WiFiClient client;
+    ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
 Advanced updater
 ^^^^^^^^^^^^^^^^
@@ -541,7 +535,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update("192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
+    WiFiClient client;
+    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
         case HTTP_UPDATE_FAILED:
             Serial.println("[update] Update failed.");
@@ -553,6 +548,11 @@ The server-side script can respond as follows: - response code 200, and send the
             Serial.println("[update] Update ok."); // may not be called since we reboot the ESP
             break;
     }
+
+TLS updater
+^^^^^^^^^^^
+
+Please read and try the examples provided with the library.
 
 Server request handling
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -571,15 +571,16 @@ Example header data:
 
 ::
 
-        [HTTP_USER_AGENT] => ESP8266-http-Update
-        [HTTP_X_ESP8266_STA_MAC] => 18:FE:AA:AA:AA:AA
-        [HTTP_X_ESP8266_AP_MAC] => 1A:FE:AA:AA:AA:AA
-        [HTTP_X_ESP8266_FREE_SPACE] => 671744
-        [HTTP_X_ESP8266_SKETCH_SIZE] => 373940
-        [HTTP_X_ESP8266_SKETCH_MD5] => a56f8ef78a0bebd812f62067daf1408a
-        [HTTP_X_ESP8266_CHIP_SIZE] => 4194304
-        [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
-        [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
+        [User-Agent] => ESP8266-http-Update
+        [x-ESP8266-STA-MAC] => 18:FE:AA:AA:AA:AA
+        [x-ESP8266-AP-MAC] => 1A:FE:AA:AA:AA:AA
+        [x-ESP8266-free-space] => 671744
+        [x-ESP8266-sketch-size] => 373940
+        [x-ESP8266-sketch-md5] => a56f8ef78a0bebd812f62067daf1408a
+        [x-ESP8266-chip-size] => 4194304
+        [x-ESP8266-sdk-version] => 1.3.0
+        [x-ESP8266-version] => DOOR-7-g14f53a19
+        [x-ESP8266-mode] => sketch
 
 With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address, as in the following example:
 
@@ -608,20 +609,20 @@ With this information the script now can check if an update is needed. It is als
         readfile($path);
     }
 
-    if(!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
+    if(!check_header('User-Agent', 'ESP8266-http-Update')) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
         echo "only for ESP8266 updater!\n";
         exit();
     }
 
     if(
-        !check_header('HTTP_X_ESP8266_STA_MAC') ||
-        !check_header('HTTP_X_ESP8266_AP_MAC') ||
-        !check_header('HTTP_X_ESP8266_FREE_SPACE') ||
-        !check_header('HTTP_X_ESP8266_SKETCH_SIZE') ||
-        !check_header('HTTP_X_ESP8266_SKETCH_MD5') ||
-        !check_header('HTTP_X_ESP8266_CHIP_SIZE') ||
-        !check_header('HTTP_X_ESP8266_SDK_VERSION')
+        !check_header('x-ESP8266-STA-MAC') ||
+        !check_header('x-ESP8266-AP-MAC') ||
+        !check_header('x-ESP8266-free-space') ||
+        !check_header('x-ESP8266-sketch-size') ||
+        !check_header('x-ESP8266-sketch-md5') ||
+        !check_header('x-ESP8266-chip-size') ||
+        !check_header('x-ESP8266-sdk-version')
     ) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
         echo "only for ESP8266 updater! (header)\n";
@@ -633,17 +634,17 @@ With this information the script now can check if an update is needed. It is als
         "18:FE:AA:AA:AA:BB" => "TEMP-1.0.0"
     );
 
-    if(!isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {
+    if(!isset($db[$_SERVER['x-ESP8266-STA-MAC']])) {
         header($_SERVER["SERVER_PROTOCOL"].' 500 ESP MAC not configured for updates', true, 500);
     }
 
-    $localBinary = "./bin/".$db[$_SERVER['HTTP_X_ESP8266_STA_MAC']].".bin";
+    $localBinary = "./bin/".$db[$_SERVER['x-ESP8266-STA-MAC']].".bin";
 
     // Check if version has been set and does not match, if not, check if
     // MD5 hash between local binary and ESP8266 binary do not match if not.
     // then no update has been found.
-    if((!check_header('HTTP_X_ESP8266_SDK_VERSION') && $db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION'])
-        || $_SERVER["HTTP_X_ESP8266_SKETCH_MD5"] != md5_file($localBinary)) {
+    if((!check_header('x-ESP8266-sdk-version') && $db[$_SERVER['x-ESP8266-STA-MAC']] != $_SERVER['x-ESP8266-version'])
+        || $_SERVER["x-ESP8266-sketch-md5"] != md5_file($localBinary)) {
         sendFile($localBinary);
     } else {
         header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);

@@ -220,6 +220,12 @@ void __wrap_system_restart_local() {
 
     cut_here();
 
+    if (s_unhandled_exception && umm_last_fail_alloc_addr) {
+        // now outside from the "cut-here" zone, print correctly the `new` caller address,
+        // idf-monitor.py will be able to decode this one and show exact location in sources
+        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
+    }
+
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
     ets_delay_us(10000);
@@ -239,12 +245,12 @@ static void print_stack(uint32_t start, uint32_t end) {
     }
 }
 
-static void uart_write_char_d(char c) {
+static void IRAM_ATTR uart_write_char_d(char c) {
     uart0_write_char_d(c);
     uart1_write_char_d(c);
 }
 
-static void uart0_write_char_d(char c) {
+static void IRAM_ATTR uart0_write_char_d(char c) {
     while (((USS(0) >> USTXC) & 0xff)) { }
 
     if (c == '\n') {
@@ -253,7 +259,7 @@ static void uart0_write_char_d(char c) {
     USF(0) = c;
 }
 
-static void uart1_write_char_d(char c) {
+static void IRAM_ATTR uart1_write_char_d(char c) {
     while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
 
     if (c == '\n') {

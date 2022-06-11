@@ -62,6 +62,8 @@ class ArduinoOTAClass
     //Starts the ArduinoOTA service
     void begin(bool useMDNS = true);
 
+    //Ends the ArduinoOTA service
+    void end();
     //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.
     void handle();
 
@@ -69,31 +71,31 @@ class ArduinoOTAClass
     int getCommand();
 
   private:
-    int _port;
-    String _password;
-    String _hostname;
-    String _nonce;
-    UdpContext *_udp_ota;
-    bool _initialized;
-    bool _rebootOnSuccess;
-    bool _useMDNS;
-    ota_state_t _state;
-    int _size;
-    int _cmd;
-    uint16_t _ota_port;
-    uint16_t _ota_udp_port;
-    IPAddress _ota_ip;
-    String _md5;
-
-    THandlerFunction _start_callback;
-    THandlerFunction _end_callback;
-    THandlerFunction_Error _error_callback;
-    THandlerFunction_Progress _progress_callback;
-
     void _runUpdate(void);
     void _onRx(void);
     int parseInt(void);
     String readStringUntil(char end);
+
+    int _port = 0;
+    String _password;
+    String _hostname;
+    String _nonce;
+    UdpContext *_udp_ota = nullptr;
+    bool _initialized = false;
+    bool _rebootOnSuccess = true;
+    bool _useMDNS = true;
+    ota_state_t _state = OTA_IDLE;
+    int _size = 0;
+    int _cmd = 0;
+    uint16_t _ota_port = 0;
+    uint16_t _ota_udp_port = 0;
+    IPAddress _ota_ip;
+    String _md5;
+
+    THandlerFunction _start_callback = nullptr;
+    THandlerFunction _end_callback = nullptr;
+    THandlerFunction_Error _error_callback = nullptr;
+    THandlerFunction_Progress _progress_callback = nullptr;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)

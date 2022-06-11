@@ -23,18 +23,19 @@
 #define wifiserver_h
 
 extern "C" {
-  #include "include/wl_definitions.h"
+  #include <wl_definitions.h>
 
   struct tcp_pcb;
 }
 
-#include "Server.h"
-#include "IPAddress.h"
+#include <Server.h>
+#include <IPAddress.h>
+#include <lwip/err.h>
 
 // lwIP-v2 backlog facility allows to keep memory safe by limiting the
 // maximum number of incoming *pending clients*.  Default number of possibly
 // simultaneously pending clients is defined in WiFiServer.cpp
-// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can overide it at runtime from
+// (MAX_PENDING_CLIENTS_PER_PORT=5).  User can override it at runtime from
 // sketch:
 //      WiFiServer::begin(port, max-simultaneous-pending-clients);
 //
@@ -65,43 +66,48 @@ extern "C" {
 class ClientContext;
 class WiFiClient;
 
-class WiFiServer : public Server {
+class WiFiServer {
   // Secure server needs access to all the private entries here
 protected:
   uint16_t _port;
   IPAddress _addr;
-  tcp_pcb* _listen_pcb;
+  tcp_pcb* _listen_pcb = nullptr;
 
-  ClientContext* _unclaimed;
-  ClientContext* _discarded;
+  ClientContext* _unclaimed = nullptr;
+  ClientContext* _discarded = nullptr;
   enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
   WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
-  WiFiClient available(uint8_t* status = NULL);
+  WiFiClient accept(); // https://www.arduino.cc/en/Reference/EthernetServerAccept
+  WiFiClient available(uint8_t* status = NULL) __attribute__((deprecated("Renamed to accept().")));
   bool hasClient();
+  // hasClientData():
+  // returns the amount of data available from the first client
+  // or 0 if there is none
+  size_t hasClientData();
+  // hasMaxPendingClients():
+  // returns true if the queue of pending clients is full
+  bool hasMaxPendingClients();
   void begin();
   void begin(uint16_t port);
   void begin(uint16_t port, uint8_t backlog);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
   uint8_t status();
   uint16_t port() const;
   void close();
   void stop();
 
-  using Print::write;
   using ClientType = WiFiClient;
 
 protected:
-  long _accept(tcp_pcb* newpcb, long err);
+  err_t  _accept(tcp_pcb* newpcb, err_t err);
   void   _discard(ClientContext* client);
 
-  static long _s_accept(void *arg, tcp_pcb* newpcb, long err);
+  static err_t _s_accept(void *arg, tcp_pcb* newpcb, err_t err);
   static void _s_discard(void* server, ClientContext* ctx);
 };
 

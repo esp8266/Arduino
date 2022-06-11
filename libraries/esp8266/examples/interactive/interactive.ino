@@ -12,11 +12,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char * SSID = STASSID;
-const char * PSK = STAPSK;
+const char* SSID = STASSID;
+const char* PSK = STAPSK;
 
 IPAddress staticip(192, 168, 1, 123);
 IPAddress gateway(192, 168, 1, 254);
@@ -35,15 +35,14 @@ void setup() {
   }
   Serial.println();
   Serial.println(WiFi.localIP());
-  Serial.print(
-    "WL_IDLE_STATUS      = 0\n"
-    "WL_NO_SSID_AVAIL    = 1\n"
-    "WL_SCAN_COMPLETED   = 2\n"
-    "WL_CONNECTED        = 3\n"
-    "WL_CONNECT_FAILED   = 4\n"
-    "WL_CONNECTION_LOST  = 5\n"
-    "WL_DISCONNECTED     = 6\n"
-  );
+  Serial.print("WL_IDLE_STATUS      = 0\n"
+               "WL_NO_SSID_AVAIL    = 1\n"
+               "WL_SCAN_COMPLETED   = 2\n"
+               "WL_CONNECTED        = 3\n"
+               "WL_CONNECT_FAILED   = 4\n"
+               "WL_CONNECTION_LOST  = 5\n"
+               "WL_WRONG_PASSWORD   = 6\n"
+               "WL_DISCONNECTED     = 7\n");
 }
 
 void WiFiOn() {
@@ -64,9 +63,16 @@ void WiFiOff() {
 void loop() {
 #define TEST(name, var, varinit, func) \
   static decltype(func) var = (varinit); \
-  if ((var) != (func)) { var = (func); Serial.printf("**** %s: ", name); Serial.println(var); }
+  if ((var) != (func)) { \
+    var = (func); \
+    Serial.printf("**** %s: ", name); \
+    Serial.println(var); \
+  }
 
-#define DO(x...) Serial.println(F( #x )); x; break
+#define DO(x...) \
+  Serial.println(F(#x)); \
+  x; \
+  break
 
   TEST("Free Heap", freeHeap, 0, ESP.getFreeHeap());
   TEST("WiFiStatus", status, WL_IDLE_STATUS, WiFi.status());
@@ -90,7 +96,7 @@ void loop() {
     case 'n': DO(WiFi.setSleepMode(WIFI_NONE_SLEEP));
     case 'l': DO(WiFi.setSleepMode(WIFI_LIGHT_SLEEP));
     case 'm': DO(WiFi.setSleepMode(WIFI_MODEM_SLEEP));
-    case 'S': DO(WiFi.config(staticip, gateway, subnet)); // use static address
-    case 's': DO(WiFi.config(0u, 0u, 0u));                // back to dhcp client
+    case 'S': DO(WiFi.config(staticip, gateway, subnet));  // use static address
+    case 's': DO(WiFi.config(0u, 0u, 0u));                 // back to dhcp client
   }
 }

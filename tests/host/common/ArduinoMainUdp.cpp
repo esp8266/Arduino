@@ -29,37 +29,37 @@
  DEALINGS WITH THE SOFTWARE.
 */
 
-#include "lwip/opt.h"
-#include "lwip/udp.h"
-#include "lwip/inet.h"
-#include "lwip/igmp.h"
-#include "lwip/mem.h"
 #include <include/UdpContext.h>
 #include <poll.h>
 #include <map>
 
-std::map<int,UdpContext*> udps;
+static std::map<int, UdpContext*> udps;
 
-void register_udp (int sock, UdpContext* udp)
+void register_udp(int sock, UdpContext* udp)
 {
-	if (udp)
-		udps[sock] = udp;
-	else
-		udps.erase(sock);
+    if (udp)
+        udps[sock] = udp;
+    else
+        udps.erase(sock);
 }
 
-void check_incoming_udp ()
+void check_incoming_udp()
 {
-	// check incoming udp
-	for (auto& udp: udps)
-	{
-		pollfd p;
-		p.fd = udp.first;
-		p.events = POLLIN;
-		if (poll(&p, 1, 0) && p.revents == POLLIN)
-		{
-			mockverbose("UDP poll(%d) -> cb\r", p.fd);
-			udp.second->mock_cb();
-		}
-	}
+    // check incoming udp
+    for (auto& udp : udps)
+    {
+        pollfd p;
+        p.fd     = udp.first;
+        p.events = POLLIN;
+        if (poll(&p, 1, 0) && p.revents == POLLIN)
+        {
+            mockverbose("UDP poll(%d) -> cb\r", p.fd);
+            udp.second->mock_cb();
+        }
+    }
+}
+
+void mock_stop_udp()
+{
+    udps.clear();
 }

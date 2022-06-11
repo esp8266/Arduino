@@ -16,7 +16,6 @@
  all copies or substantial portions of the Software.
 */
 
-
 #include "littlefs_mock.h"
 #include "spiffs_mock.h"
 #include "spiffs/spiffs.h"
@@ -31,7 +30,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "flash_hal_mock.h"
+#include <cerrno>
 
 #define LITTLEFS_FILE_NAME "littlefs.bin"
 
@@ -56,7 +55,8 @@ LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, con
 
 void LittleFSMock::reset()
 {
-    LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
+    LittleFS = FS(
+        FSImplPtr(new littlefs_impl::LittleFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
     load();
 }
 
@@ -72,47 +72,52 @@ LittleFSMock::~LittleFSMock()
     LittleFS = FS(FSImplPtr(nullptr));
 }
 
-void LittleFSMock::load ()
+void LittleFSMock::load()
 {
     if (!m_fs.size() || !m_storage.length())
         return;
-    
+
     int fs = ::open(m_storage.c_str(), O_RDONLY);
     if (fs == -1)
     {
         fprintf(stderr, "LittleFS: loading '%s': %s\n", m_storage.c_str(), strerror(errno));
         return;
     }
-    
+
     off_t flen = lseek(fs, 0, SEEK_END);
     if (flen == (off_t)-1)
     {
-        fprintf(stderr, "LittleFS: checking size of '%s': %s\n", m_storage.c_str(), strerror(errno));
+        fprintf(stderr, "LittleFS: checking size of '%s': %s\n", m_storage.c_str(),
+                strerror(errno));
         return;
     }
     lseek(fs, 0, SEEK_SET);
-    
+
     if (flen != (off_t)m_fs.size())
     {
-        fprintf(stderr, "LittleFS: size of '%s': %d does not match requested size %zd\n", m_storage.c_str(), (int)flen, m_fs.size());
+        fprintf(stderr, "LittleFS: size of '%s': %d does not match requested size %zd\n",
+                m_storage.c_str(), (int)flen, m_fs.size());
         if (!m_overwrite && flen > 0)
         {
             fprintf(stderr, "LittleFS: aborting at user request\n");
             exit(1);
         }
-        fprintf(stderr, "LittleFS: continuing without loading at user request, '%s' will be overwritten\n", m_storage.c_str());
+        fprintf(stderr,
+                "LittleFS: continuing without loading at user request, '%s' will be overwritten\n",
+                m_storage.c_str());
     }
     else
     {
         fprintf(stderr, "LittleFS: loading %zi bytes from '%s'\n", m_fs.size(), m_storage.c_str());
         ssize_t r = ::read(fs, m_fs.data(), m_fs.size());
         if (r != (ssize_t)m_fs.size())
-            fprintf(stderr, "LittleFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r, strerror(errno));
+            fprintf(stderr, "LittleFS: reading %zi bytes: returned %zd: %s\n", m_fs.size(), r,
+                    strerror(errno));
     }
     ::close(fs);
 }
 
-void LittleFSMock::save ()
+void LittleFSMock::save()
 {
     if (!m_fs.size() || !m_storage.length())
         return;

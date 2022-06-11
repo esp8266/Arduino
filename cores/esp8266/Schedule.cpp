@@ -1,3 +1,20 @@
+/*
+ Schedule.cpp - Scheduled functions.
+ Copyright (c) 2020 esp8266/Arduino
+ 
+ This file is part of the esp8266 core for Arduino environment.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include <assert.h>
 
@@ -85,6 +102,7 @@ bool schedule_function(const std::function<void(void)>& fn)
     return true;
 }
 
+IRAM_ATTR // (not only) called from ISR
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     uint32_t repeat_us, const std::function<bool(void)>& alarm)
 {
@@ -117,8 +135,6 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 void run_scheduled_functions()
 {
-    esp8266::polledTimeout::periodicFastMs yieldNow(100); // yield every 100ms
-
     // prevent scheduling of new functions during this run
     auto stop = sLast;
     bool done = false;
@@ -143,13 +159,10 @@ void run_scheduled_functions()
             recycle_fn_unsafe(to_recycle);
         }
 
-        if (yieldNow)
-        {
-            // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
-            esp_schedule();
-            cont_yield(g_pcont);
-        }
+        // scheduled functions might last too long for watchdog etc.
+        // yield() is allowed in scheduled functions, therefore
+        // recursion into run_scheduled_recurrent_functions() is permitted
+        optimistic_yield(100000);
     }
 }
 
@@ -223,9 +236,10 @@ void run_scheduled_recurrent_functions()
         if (yieldNow)
         {
             // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack:
+            // this is yield() in cont stack, but need to call cont_suspend directly
+            // to prevent recursion into run_scheduled_recurrent_functions()
             esp_schedule();
-            cont_yield(g_pcont);
+            cont_suspend(g_pcont);
         }
     } while (current && !done);
 

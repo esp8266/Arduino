@@ -23,34 +23,40 @@
 #include "coredecls.h"
 #include "Esp.h"
 
-void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
+void EspClass::getHeapStats(uint32_t* hfree, uint32_t* hmax, uint8_t* hfrag)
 {
-    // L2 / Euclidian norm of free block sizes.
+    // L2 / Euclidean norm of free block sizes.
     // Having getFreeHeap()=sum(hole-size), fragmentation is given by
     // 100 * (1 - sqrt(sum(hole-size²)) / sum(hole-size))
-
     umm_info(NULL, false);
-    uint8_t block_size = umm_block_size();
+
+    uint32_t free_size = umm_free_heap_size_core(umm_get_current_heap());
     if (hfree)
-        *hfree = ummHeapInfo.freeBlocks * block_size;
+        *hfree = free_size;
     if (hmax)
-        *hmax = (uint16_t)ummHeapInfo.maxFreeContiguousBlocks * block_size;
+        *hmax = umm_max_block_size_core(umm_get_current_heap());
     if (hfrag) {
-      if (ummHeapInfo.freeBlocks) {
-        *hfrag = 100 - (sqrt32(ummHeapInfo.freeBlocksSquared) * 100) / ummHeapInfo.freeBlocks;
+      if (free_size) {
+        *hfrag = umm_fragmentation_metric_core(umm_get_current_heap());
       } else {
         *hfrag = 0;
       }
     }
 }
 
+void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
+{
+    uint32_t hmax32;
+    getHeapStats(hfree, &hmax32, hfrag);
+    if (hmax) {
+      // With the MMU_EXTERNAL_HEAP option, hmax could overflow for heaps larger
+      // then 64KB. return UINT16_MAX (saturation) for those cases.
+      // Added deprecated attribute and message.
+      *hmax = (hmax32 > UINT16_MAX) ? UINT16_MAX : hmax32;
+    }
+}
+
 uint8_t EspClass::getHeapFragmentation()
 {
-#ifdef UMM_INLINE_METRICS
-    return (uint8_t)umm_fragmentation_metric();
-#else
-    uint8_t hfrag;
-    getHeapStats(nullptr, nullptr, &hfrag);
-    return hfrag;
-#endif
+  return (uint8_t)umm_fragmentation_metric();
 }

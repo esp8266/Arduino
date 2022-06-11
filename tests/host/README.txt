@@ -11,7 +11,7 @@ Sketch emulation on host
 
 This environment let compile esp8266/Arduino sketches into native
 environment.  Network (tcp, udp, including ssl and multicast) is linked to
-local host interfaces.  WiFi is trivialy emulated and reported as "just"
+local host interfaces.  WiFi is trivially emulated and reported as "just"
 already connected and usable.
 
 Currently network emulation is a complete rewrite of
@@ -19,12 +19,12 @@ WiFiClient+WiFiServer/ClientContext and WifiUdp/UdpContext using socket
 posix API.  Further work will optionally propose native lwIP library
 instead.
 
-Serial UART0 and UART1 are emulated via stdin/stdout/stderr.  Therefor
+Serial UART0 and UART1 are emulated via stdin/stdout/stderr.  Therefore
 stdin is connected to UART0(RX) and stdout is connected to UART0(TX).
 UART1(TX) writes to stderr.  Reading from stdin happens in non-blocking
 raw mode, that means each character is directly injected into the UART
 FIFO without any buffering in the console.  The command line switch -c
-can be used to stop the emulation from intersepting CTRL-C (SIGINT).
+can be used to stop the emulation from intercepting CTRL-C (SIGINT).
 
 How to compile and run a sketch
 -------------------------------
@@ -42,10 +42,10 @@ run it:
 
 
 Optional 'V=1' enables makefile verbosity
-Optional 'D=1' enables core debug (same as IDE's tools menu)
-Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, D=1 implies -O0)
+Optional 'D=1' enables core debug messages (same as Arduino IDE's tools/debug menu)
+Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, -D=1 implies -O0)
 Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gcc-multilib is not detected)
-
+Optional 'R="<options>"' (ex: R="-b -v") runs the executable with given options after build
 
 Non exhaustive list of working examples:
 	make D=1 ../../libraries/ESP8266WiFi/examples/udp/udp
@@ -64,7 +64,7 @@ Compile other sketches:
   or:
 	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
 
-  or (preferred):
+  or:
 	export ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2
 	export D=1
 	export OPTZ=-O2
@@ -72,6 +72,12 @@ Compile other sketches:
 	make /path/to/your/sketchdir/sketch/sketch
 	./bin/sketch/sketch
 
+Additional flags:
+    make USERCFLAGS="-I some/where -I some/where/else" \
+         USERCSOURCES="some/where/file1.c some/where/file2.c ..." \
+         USERCXXSOURCES="some/where/file3.cpp some/where/file4.cpp ..." \
+         USERLDFLAGS="-L some/where/around" \
+         ...
 
 Executable location is always in bin/. Once a sketch is compiled, just run it:
 	bin/sketch/sketch
@@ -96,7 +102,7 @@ Make fun, propose PRs.
 - SDCARD on Host filesystem ? or in an image ?
 - nice curses interface to display/change gpios ?
 - display device emulation (like ssd1306)
-- optionaly use arduino-builder ?
+- optionally use arduino-builder ?
 - store sketch objects and binaries outside from the source directories (done for sketches)
 - compile and use lwIP on host
 - easily debug HTTP classes

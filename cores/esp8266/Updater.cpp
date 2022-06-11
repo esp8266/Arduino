@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
+#include <PolledTimeout.h>
 #include "StackThunk.h"
 
 //#define DEBUG_UPDATER Serial
@@ -23,22 +24,9 @@ extern "C" {
     #include "user_interface.h"
 }
 
-extern "C" uint32_t _FS_start;
-extern "C" uint32_t _FS_end;
+#include <flash_hal.h> // not "flash_hal.h": can use hijacked MOCK version
 
 UpdaterClass::UpdaterClass()
-: _async(false)
-, _error(0)
-, _buffer(0)
-, _bufferLen(0)
-, _size(0)
-, _startAddress(0)
-, _currentAddress(0)
-, _command(U_FLASH)
-, _ledPin(-1)
-, _hash(nullptr)
-, _verify(nullptr)
-, _progress_callback(nullptr)
 {
 #if ARDUINO_SIGNING
   installSignature(&esp8266::updaterSigningHash, &esp8266::updaterSigningVerifier);
@@ -129,7 +117,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   if (command == U_FLASH) {
     //address of the end of the space available for sketch and update
-    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+    uintptr_t updateEndAddress = FS_start - 0x40200000;
 
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
@@ -146,14 +134,14 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_FS) {
-    if((uintptr_t)&_FS_start + roundedSize > (uintptr_t)&_FS_end) {
+    if(FS_start + roundedSize > FS_end) {
       _setError(UPDATE_ERROR_SPACE);
       return false;
     }
 
 #ifdef ATOMIC_FS_UPDATE
     //address of the end of the space available for update
-    uintptr_t updateEndAddress = (uintptr_t)&_FS_start - 0x40200000;
+    uintptr_t updateEndAddress = FS_start - 0x40200000;
 
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
@@ -162,7 +150,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
       return false;
     }
 #else
-    updateStartAddress = (uintptr_t)&_FS_start - 0x40200000;
+    updateStartAddress = FS_start - 0x40200000;
 #endif
   }
   else {
@@ -215,6 +203,11 @@ bool UpdaterClass::end(bool evenIfRemaining){
     return false;
   }
 
+  // Updating w/o any data is an error we detect here
+  if (!progress()) {
+    _setError(UPDATE_ERROR_NO_DATA);
+  }
+
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
@@ -230,25 +223,35 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-  uint32_t sigLen = 0;
   if (_verify) {
-    ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    const uint32_t expectedSigLen = _verify->length();
+      // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
+      // contain a matching length field, preceded by the bytes of the signature itself.
+      // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    uint32_t sigLen = 0;
+
+    if (expectedSigLen > 0) {
+      ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+    }
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
 #endif
-    if (sigLen != _verify->length()) {
+    if (sigLen != expectedSigLen) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
 
-    int binSize = _size - sigLen - sizeof(uint32_t) /* The siglen word */;
+    int binSize = _size;
+    if (expectedSigLen > 0) {
+      _size -= (sigLen + sizeof(uint32_t) /* The siglen word */);
+    }
     _hash->begin();
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
 #endif
       // Calculate the MD5 and hash using proper size
-    uint8_t buff[128];
+    uint8_t buff[128] __attribute__((aligned(4)));
     for(int i = 0; i < binSize; i += sizeof(buff)) {
       ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
       size_t read = std::min((int)sizeof(buff), binSize - i);
@@ -261,20 +264,24 @@ bool UpdaterClass::end(bool evenIfRemaining){
     for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
     DEBUG_UPDATER.printf("\n");
 #endif
-    uint8_t *sig = (uint8_t*)malloc(sigLen);
-    if (!sig) {
-      _setError(UPDATE_ERROR_SIGN);
-      _reset();
-      return false;
-    }
-    ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
+
+    uint8_t *sig = nullptr; // Safe to free if we don't actually malloc
+    if (expectedSigLen > 0) {
+      sig = (uint8_t*)malloc(sigLen);
+      if (!sig) {
+        _setError(UPDATE_ERROR_SIGN);
+        _reset();
+        return false;
+      }
+      ESP.flashRead(_startAddress + binSize, sig, sigLen);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
-    for (size_t i=0; i<sigLen; i++) {
-      DEBUG_UPDATER.printf(" %02x", sig[i]);
-    }
-    DEBUG_UPDATER.printf("\n");
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
+      for (size_t i=0; i<sigLen; i++) {
+        DEBUG_UPDATER.printf(" %02x", sig[i]);
+      }
+      DEBUG_UPDATER.printf("\n");
 #endif
+    }
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       free(sig);
       _setError(UPDATE_ERROR_SIGN);
@@ -282,6 +289,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
     free(sig);
+    _size = binSize; // Adjust size to remove signature, not part of bin payload
+
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
@@ -318,7 +327,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
     ebcmd.args[0] = _startAddress;
-    ebcmd.args[1] = (uintptr_t)&_FS_start - 0x40200000;
+    ebcmd.args[1] = FS_start - 0x40200000;
     ebcmd.args[2] = _size;
     eboot_command_write(&ebcmd);
 #endif
@@ -367,7 +376,7 @@ bool UpdaterClass::_writeBuffer(){
   
   if (eraseResult) {
     if(!_async) yield();
-    writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+    writeResult = ESP.flashWrite(_currentAddress, _buffer, _bufferLen);
   } else { // if erase was unsuccessful
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_ERASE);
@@ -414,7 +423,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
     left -= toBuff;
     if(!_async) yield();
   }
-  //lets see whats left
+  //lets see what's left
   memcpy(_buffer + _bufferLen, data + (len - left), left);
   _bufferLen += left;
   if(_bufferLen == remaining()){
@@ -445,7 +454,7 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
 bool UpdaterClass::_verifyEnd() {
     if(_command == U_FLASH) {
 
-        uint8_t buf[4];
+        uint8_t buf[4] __attribute__((aligned(4)));
         if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
             _currentAddress = (_startAddress);
             _setError(UPDATE_ERROR_READ);            
@@ -464,6 +473,9 @@ bool UpdaterClass::_verifyEnd() {
             return false;
         }
 
+// it makes no sense to check flash size in auto flash mode
+// (sketch size would have to be set in bin header, instead of flash size)
+#if !FLASH_MAP_SUPPORT
         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
         // check if new bin fits to SPI flash
@@ -472,6 +484,7 @@ bool UpdaterClass::_verifyEnd() {
             _setError(UPDATE_ERROR_NEW_FLASH_CONFIG);            
             return false;
         }
+#endif
 
         return true;
     } else if(_command == U_FS) {
@@ -481,7 +494,7 @@ bool UpdaterClass::_verifyEnd() {
     return false;
 }
 
-size_t UpdaterClass::writeStream(Stream &data) {
+size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
     size_t written = 0;
     size_t toRead = 0;
     if(hasError() || !isRunning())
@@ -494,6 +507,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
         _reset();
         return 0;
     }
+    esp8266::polledTimeout::oneShotMs timeOut(streamTimeout);
     if (_progress_callback) {
         _progress_callback(0, _size);
     }
@@ -511,13 +525,15 @@ size_t UpdaterClass::writeStream(Stream &data) {
         }
         toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
-            delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
-            if(toRead == 0) { //Timeout
-                _currentAddress = (_startAddress + _size);
-                _setError(UPDATE_ERROR_STREAM);
-                return written;
-            }
+          if (timeOut) {
+            _currentAddress = (_startAddress + _size);
+            _setError(UPDATE_ERROR_STREAM);
+            _reset();
+            return written;
+          }
+          delay(100);
+        } else {
+          timeOut.reset();
         }
         if(_ledPin != -1) {
             digitalWrite(_ledPin, !_ledOn); // Switch LED off
@@ -561,6 +577,8 @@ void UpdaterClass::printError(Print &out){
     out.println(F("Bad Size Given"));
   } else if(_error == UPDATE_ERROR_STREAM){
     out.println(F("Stream Read Timeout"));
+  } else if(_error == UPDATE_ERROR_NO_DATA){
+    out.println(F("No data supplied"));
   } else if(_error == UPDATE_ERROR_MD5){
     out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
   } else if(_error == UPDATE_ERROR_SIGN){

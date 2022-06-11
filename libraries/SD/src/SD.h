@@ -25,15 +25,15 @@
 #include <SDFS.h>
 
 #undef FILE_READ
-#define FILE_READ sdfat::O_READ
+#define FILE_READ ((uint8_t)O_READ)
 #undef FILE_WRITE
-#define FILE_WRITE (sdfat::O_READ | sdfat::O_WRITE | sdfat::O_CREAT | sdfat::O_APPEND)
+#define FILE_WRITE ((uint8_t)(O_READ | O_WRITE | O_CREAT | O_APPEND))
 
 
 class SDClass {
 public:
-    boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
-	SDFS.setConfig(SDFSConfig(csPin, cfg));
+    bool begin(uint8_t csPin, uint32_t cfg = SPI_HALF_SPEED) {
+        SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
 
@@ -44,19 +44,19 @@ public:
         }
     }
 
-    File open(const char *filename, uint8_t mode = FILE_READ) {
+    fs::File open(const char *filename, uint8_t mode = FILE_READ) {
         return SDFS.open(filename, getMode(mode));
     }
 
-    File open(const char *filename, const char *mode) {
+    fs::File open(const char *filename, const char *mode) {
         return SDFS.open(filename, mode);
     }
 
-    File open(const String &filename, uint8_t mode = FILE_READ) {
+    fs::File open(const String &filename, uint8_t mode = FILE_READ) {
         return open(filename.c_str(), mode);
     }
 
-    File open(const String &filename, const char *mode) {
+    fs::File open(const String &filename, const char *mode) {
         return open(filename.c_str(), mode);
     }
 
@@ -66,6 +66,14 @@ public:
 
     boolean exists(const String &filepath) {
         return (boolean)SDFS.exists(filepath.c_str());
+    }
+
+    boolean rename(const char* filepathfrom, const char* filepathto) {
+        return (boolean)SDFS.rename(filepathfrom, filepathto);
+    }
+
+    boolean rename(const String &filepathfrom, const String &filepathto) {
+        return (boolean)rename(filepathfrom.c_str(), filepathto.c_str());
     }
 
     boolean mkdir(const char *filepath) {
@@ -127,8 +135,8 @@ public:
     size_t size() {
         uint64_t sz = size64();
 #ifdef DEBUG_ESP_PORT
-	if (sz > (uint64_t)SIZE_MAX) {
-            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld>= 4GB).  Please update source to use size64().\n"), sz);
+	if (sz > std::numeric_limits<uint32_t>::max()) {
+            DEBUG_ESP_PORT.printf_P(PSTR("WARNING: SD card size overflow (%lld >= 4GB).  Please update source to use size64().\n"), (long long)sz);
         }
 #endif
         return (size_t)sz;
@@ -151,9 +159,9 @@ public:
 
 private:
     const char *getMode(uint8_t mode) {
-        bool read = (mode & sdfat::O_READ) ? true : false;
-        bool write = (mode & sdfat::O_WRITE) ? true : false;
-        bool append = (mode & sdfat::O_APPEND) ? true : false;
+        bool read = (mode & O_READ) ? true : false;
+        bool write = (mode & O_WRITE) ? true : false;
+        bool append = (mode & O_APPEND) ? true : false;
         if      (  read & !write )           { return "r";  }
         else if ( !read &  write & !append ) { return "w+"; }
         else if ( !read &  write &  append ) { return "a";  }
@@ -175,10 +183,6 @@ private:
 };
 
 
-// Expose FatStructs.h helpers for MSDOS date/time for use with dateTimeCallback
-static inline uint16_t FAT_DATE(uint16_t year, uint8_t month, uint8_t day) {
-  return (year - 1980) << 9 | month << 5 | day;
-}
 static inline uint16_t FAT_YEAR(uint16_t fatDate) {
   return 1980 + (fatDate >> 9);
 }
@@ -187,9 +191,6 @@ static inline uint8_t FAT_MONTH(uint16_t fatDate) {
 }
 static inline uint8_t FAT_DAY(uint16_t fatDate) {
   return fatDate & 0X1F;
-}
-static inline uint16_t FAT_TIME(uint8_t hour, uint8_t minute, uint8_t second) {
-  return hour << 11 | minute << 5 | second >> 1;
 }
 static inline uint8_t FAT_HOUR(uint16_t fatTime) {
   return fatTime >> 11;

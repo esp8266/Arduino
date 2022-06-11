@@ -25,17 +25,15 @@
 
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
-
-extern "C" uint32_t _FS_start;
-extern "C" uint32_t _FS_end;
+#include <flash_hal.h>
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000), _followRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS), _ledPin(-1)
+        : _httpClientTimeout(8000)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout), _followRedirects(HTTPC_DISABLE_FOLLOW_REDIRECTS), _ledPin(-1)
+        : _httpClientTimeout(httpClientTimeout)
 {
 }
 
@@ -63,50 +61,6 @@ void ESP8266HTTPUpdate::setAuthorization(const String &auth)
     _auth = auth;
 }
 
-#if HTTPUPDATE_1_2_COMPATIBLE
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
-        const String& httpsFingerprint, bool reboot)
-{
-    rebootOnUpdate(reboot);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    return update(url, currentVersion, httpsFingerprint);
-#pragma GCC diagnostic pop
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
-        const String& httpsFingerprint)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
-        const uint8_t httpsFingerprint[20])
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-#endif
-
 HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url, const String& currentVersion)
 {
     HTTPClient http;
@@ -114,94 +68,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url
     return handleUpdate(http, currentVersion, false);
 }
 
-#if HTTPUPDATE_1_2_COMPATIBLE
-HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, true);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20])
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, true);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(url);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, true);
-}
-#endif
-
 HTTPUpdateResult ESP8266HTTPUpdate::updateFS(WiFiClient& client, const String& url, const String& currentVersion)
 {
     HTTPClient http;
     http.begin(client, url);
     return handleUpdate(http, currentVersion, true);
 }
-
-#if HTTPUPDATE_1_2_COMPATIBLE
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
-        bool https, const String& httpsFingerprint, bool reboot)
-{
-    (void)https;
-    rebootOnUpdate(reboot);
-    if (httpsFingerprint.length() == 0) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-        return update(host, port, uri, currentVersion);
-    } else {
-        return update(host, port, uri, currentVersion, httpsFingerprint);
-#pragma GCC diagnostic pop
-    }
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri,
-        const String& currentVersion)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(host, port, uri);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
-        const String& currentVersion, const String& httpsFingerprint)
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(host, port, url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-
-HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
-        const String& currentVersion, const uint8_t httpsFingerprint[20])
-{
-    HTTPClient http;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
-    http.begin(host, port, url, httpsFingerprint);
-#pragma GCC diagnostic pop
-    return handleUpdate(http, currentVersion, false);
-}
-#endif
 
 HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& host, uint16_t port, const String& uri,
         const String& currentVersion)
@@ -337,8 +209,14 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate]  - code: %d\n", code);
     DEBUG_HTTP_UPDATE("[httpUpdate]  - len: %d\n", len);
 
-    if(http.hasHeader("x-MD5")) {
-        DEBUG_HTTP_UPDATE("[httpUpdate]  - MD5: %s\n", http.header("x-MD5").c_str());
+    String md5;
+    if (_md5Sum.length()) {
+        md5 = _md5Sum; 
+    } else if(http.hasHeader("x-MD5")) {
+        md5 = http.header("x-MD5");
+    }
+    if(md5.length()) {
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - MD5: %s\n", md5.c_str());
     }
 
     DEBUG_HTTP_UPDATE("[httpUpdate] ESP8266 info:\n");
@@ -354,7 +232,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         if(len > 0) {
             bool startUpdate = true;
             if(spiffs) {
-                size_t spiffsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+                size_t spiffsSize = ((size_t)FS_end - (size_t)FS_start);
                 if(len > (int) spiffsSize) {
                     DEBUG_HTTP_UPDATE("[httpUpdate] spiffsSize to low (%d) needed: %d\n", spiffsSize, len);
                     startUpdate = false;
@@ -376,6 +254,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                 }
 
                 WiFiClient * tcp = http.getStreamPtr();
+                if (!tcp) {
+                    DEBUG_HTTP_UPDATE("[httpUpdate] WiFiClient connection unexpectedly absent\n");
+                    _setLastError(HTTPC_ERROR_CONNECTION_LOST);
+                    http.end();
+                    return HTTP_UPDATE_FAILED;
+                }
 
                 if (_closeConnectionsOnUpdate) {
                     WiFiUDP::stopAll();
@@ -412,6 +296,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     }
 
+// it makes no sense to check flash size in auto flash mode
+// (sketch size would have to be set in bin header, instead of flash size)
+#if !FLASH_MAP_SUPPORT
                     if (buf[0] == 0xe9) {
                         uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
@@ -423,8 +310,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                             return HTTP_UPDATE_FAILED;
                         }
                     }
+#endif
                 }
-                if(runUpdate(*tcp, len, http.header("x-MD5"), command)) {
+                if(runUpdate(*tcp, len, md5, command)) {
                     ret = HTTP_UPDATE_OK;
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
                     http.end();

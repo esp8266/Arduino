@@ -48,9 +48,17 @@ author: d. gauchard
 extern "C"
 {
 #endif
+
+#ifdef LWIP14GLUE
+#define __IPV4_ADDR_H__     // prevents inclusion of ipv4_addr.h meant for lwip2
+#define ipv4_addr ip_addr   // structures are identical, ipv4_addr is unknown with lwIP-1.4
+#include <lwip/ip_addr.h>   // formerly official struct ip_info, disappeared in lwIP-v2
+#endif
+
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
+
 #ifdef __cplusplus
 }
 #endif
@@ -109,5 +117,21 @@ err_glue_t	glue2esp_linkoutput		(int netif_idx, void* ref2save, void* data, size
 #endif
 #define lwip_xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define lwip_xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
+
+// quickfix: workaround for definition of __PRI32(x) in inttypes.h
+// it has changed with recent version of xtensa-gcc
+// __INT32 is missing
+// gcc-4.x:    __PRI32(x) is __STRINGIFY(l##x)
+// gcc-10.2.0: __PRI32(x) is __INT32 __STRINGIFY(x)
+#include <inttypes.h>
+#if !defined(__INT8)
+#define __INT8
+#endif
+#if !defined(__INT16)
+#define __INT16
+#endif
+#if !defined(__INT32)
+#define __INT32 "l"
+#endif
 
 #endif // GLUE_H

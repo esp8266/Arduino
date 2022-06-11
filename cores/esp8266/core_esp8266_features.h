@@ -31,39 +31,11 @@
 #define CORE_HAS_UMM
 
 #define WIFI_HAS_EVENT_CALLBACK
+#define WIFI_IS_OFF_AT_BOOT
 
 #include <stdlib.h> // malloc()
 #include <stddef.h> // size_t
 #include <stdint.h>
-
-#ifdef __cplusplus
-
-namespace arduino
-{
-    extern "C++"
-    template <typename T, typename ...TConstructorArgs>
-    T* new0 (size_t n, TConstructorArgs... TconstructorArgs)
-    {
-        // n==0: single allocation, otherwise it is an array
-        size_t offset = n? sizeof(size_t): 0;
-        size_t arraysize = n? n: 1;
-        T* ptr = (T*)malloc(offset + (arraysize * sizeof(T)));
-        if (ptr)
-        {
-            if (n)
-                *(size_t*)(ptr) = n;
-            for (size_t i = 0; i < arraysize; i++)
-                new (ptr + offset + i * sizeof(T)) T(TconstructorArgs...);
-            return ptr + offset;
-        }
-        return nullptr;
-    }
-}
-
-#define arduino_new(Type, ...) arduino::new0<Type>(0, ##__VA_ARGS__)
-#define arduino_newarray(Type, n, ...) arduino::new0<Type>(n, ##__VA_ARGS__)
-
-#endif // __cplusplus
 
 #ifndef __STRINGIFY
 #define __STRINGIFY(a) #a
@@ -83,6 +55,7 @@ namespace arduino
 // level 0 will enable ALL interrupts,
 //
 #ifndef CORE_MOCK
+
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
@@ -101,6 +74,9 @@ inline uint32_t esp_get_program_counter() {
 }
 
 #else // CORE_MOCK
+
+#define xt_rsil(level) (level)
+#define xt_wsr_ps(state) do { (void)(state); } while (0)
 
 inline uint32_t esp_get_program_counter() { return 0; }
 
@@ -146,6 +122,9 @@ inline int esp_get_cpu_freq_mhz()
 }
 #endif
 
+// Call this function in your setup() to cause the phase locked version of the generator to
+// be linked in automatically.  Otherwise, the default PWM locked version will be used.
+void enablePhaseLockedWaveform(void);
 
 #ifdef __cplusplus
 }

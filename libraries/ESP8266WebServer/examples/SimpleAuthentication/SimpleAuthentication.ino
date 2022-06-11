@@ -4,7 +4,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -12,7 +12,7 @@ const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
-//Check if header is present and correct
+// Check if header is present and correct
 bool is_authenticated() {
   Serial.println("Enter is_authenticated");
   if (server.hasHeader("Cookie")) {
@@ -28,7 +28,7 @@ bool is_authenticated() {
   return false;
 }
 
-//login page, also called for disconnect
+// login page, also called for disconnect
 void handleLogin() {
   String msg;
   if (server.hasHeader("Cookie")) {
@@ -45,7 +45,7 @@ void handleLogin() {
     return;
   }
   if (server.hasArg("USERNAME") && server.hasArg("PASSWORD")) {
-    if (server.arg("USERNAME") == "admin" &&  server.arg("PASSWORD") == "admin") {
+    if (server.arg("USERNAME") == "admin" && server.arg("PASSWORD") == "admin") {
       server.sendHeader("Location", "/");
       server.sendHeader("Cache-Control", "no-cache");
       server.sendHeader("Set-Cookie", "ESPSESSIONID=1");
@@ -64,7 +64,7 @@ void handleLogin() {
   server.send(200, "text/html", content);
 }
 
-//root page can be accessed only if authentication is ok
+// root page can be accessed only if authentication is ok
 void handleRoot() {
   Serial.println("Enter handleRoot");
   String header;
@@ -75,14 +75,12 @@ void handleRoot() {
     return;
   }
   String content = "<html><body><H2>hello, you successfully connected to esp8266!</H2><br>";
-  if (server.hasHeader("User-Agent")) {
-    content += "the user agent used is : " + server.header("User-Agent") + "<br><br>";
-  }
+  if (server.hasHeader("User-Agent")) { content += "the user agent used is : " + server.header("User-Agent") + "<br><br>"; }
   content += "You can access this page until you <a href=\"/login?DISCONNECT=YES\">disconnect</a></body></html>";
   server.send(200, "text/html", content);
 }
 
-//no need authentication
+// no need authentication
 void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -92,9 +90,7 @@ void handleNotFound() {
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
+  for (uint8_t i = 0; i < server.args(); i++) { message += " " + server.argName(i) + ": " + server.arg(i) + "\n"; }
   server.send(404, "text/plain", message);
 }
 
@@ -123,11 +119,8 @@ void setup(void) {
   });
 
   server.onNotFound(handleNotFound);
-  //here the list of headers to be recorded
-  const char * headerkeys[] = {"User-Agent", "Cookie"} ;
-  size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
-  //ask server to track these headers
-  server.collectHeaders(headerkeys, headerkeyssize);
+  // ask server to track these headers
+  server.collectHeaders("User-Agent", "Cookie");
   server.begin();
   Serial.println("HTTP server started");
 }

@@ -382,12 +382,16 @@ void wifi_softap_free_station_info(void);
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
 
+// esp8266/Arduino notice:
+// these dhcp functions are no longer provided by the lwip lib
+// only way to include them is to build our NonOS LwipDhcpServer helpers
+// (ref. libraries/ESP8266WiFi/src/ESP8266WiFiAP-DhcpServer.cpp)
+
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
 bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 uint32 wifi_softap_get_dhcps_lease_time(void);
 bool wifi_softap_set_dhcps_lease_time(uint32 minute);
 bool wifi_softap_reset_dhcps_lease_time(void);
-
 bool wifi_softap_add_dhcps_lease(uint8 *macaddr);	// add static lease on the list, this will be the next available @
 
 enum dhcp_status wifi_softap_dhcps_status(void);

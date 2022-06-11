@@ -5,6 +5,18 @@
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
+extern "C" size_t umm_umul_sat(const size_t a, const size_t b);
+
+// z2EapFree: See wpa2_eap_patch.cpp for details
+extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((weak, alias("vPortFree"), nothrow));
+// I don't understand all the compiler noise around this alias.
+// Adding "__attribute__ ((nothrow))" seems to resolve the issue.
+// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824 
+
+// Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
+#define FORCE_ALWAYS_INLINE_HEAP_SELECT
+#include "umm_malloc/umm_heap_select.h"
+
 #include <c_types.h>
 #include <sys/reent.h>
 #include <user_interface.h>
@@ -16,6 +28,7 @@ extern "C" {
 #define UMM_CALLOC(n,s)         umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) umm_poison_realloc_fl(p,s,f,l)
 #define UMM_FREE_FL(p,f,l)      umm_poison_free_fl(p,f,l)
+#define STATIC_ALWAYS_INLINE
 
 #undef realloc
 #undef free
@@ -25,6 +38,7 @@ extern "C" {
 #define UMM_CALLOC(n,s)         umm_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) umm_realloc(p,s)
 #define UMM_FREE_FL(p,f,l)      umm_free(p)
+#define STATIC_ALWAYS_INLINE
 
 #undef realloc
 #undef free
@@ -34,6 +48,10 @@ extern "C" {
 #define UMM_CALLOC(n,s)         calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l) realloc(p,s)
 #define UMM_FREE_FL(p,f,l)      free(p)
+
+// STATIC_ALWAYS_INLINE only applies to the non-debug build path,
+// it must not be enabled on the debug build path.
+#define STATIC_ALWAYS_INLINE static ALWAYS_INLINE
 #endif
 
 
@@ -142,7 +160,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
+    PTR_CHECK__LOG_LAST_FAIL(ret, umm_umul_sat(count, size));
     return ret;
 }
 
@@ -153,7 +171,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 
 #define DEBUG_HEAP_PRINTF ets_uart_printf
 
-void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
+void IRAM_ATTR print_loc(size_t size, const char* file, int line)
 {
     (void)size;
     (void)line;
@@ -161,11 +179,11 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
         DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
 
         bool inISR = ETS_INTR_WITHINISR();
-        if (inISR && (uint32_t)file >= 0x40200000) {
+        if (NULL == file || (inISR && (uint32_t)file >= 0x40200000)) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
-            char buf[ets_strlen(file) + 1] __attribute__((aligned(4)));
-            ets_strcpy(buf, file);
+            char buf[strlen_P(file) + 1];
+            strcpy_P(buf, file);
             DEBUG_HEAP_PRINTF(buf);
         } else {
             DEBUG_HEAP_PRINTF(file);
@@ -175,7 +193,7 @@ void ICACHE_RAM_ATTR print_loc(size_t size, const char* file, int line)
     }
 }
 
-void ICACHE_RAM_ATTR print_oom_size(size_t size)
+void IRAM_ATTR print_oom_size(size_t size)
 {
     (void)size;
     if (system_get_os_print()) {
@@ -183,8 +201,8 @@ void ICACHE_RAM_ATTR print_oom_size(size_t size)
     }
 }
 
-#define OOM_CHECK__PRINT_OOM(p, s) if (!p) print_oom_size(s)
-#define OOM_CHECK__PRINT_LOC(p, s, f, l) if (!p) print_loc(s, f, l)
+#define OOM_CHECK__PRINT_OOM(p, s) if ((s) && !(p)) print_oom_size(s)
+#define OOM_CHECK__PRINT_LOC(p, s, f, l) if ((s) && !(p)) print_loc(s, f, l)
 
 #else  // ! DEBUG_ESP_OOM
 
@@ -215,13 +233,13 @@ void ICACHE_RAM_ATTR print_oom_size(size_t size)
      b. Before, when the *alloc function creates a new, not modified, allocation.
 
      In a free() or realloc() call, the focus is on their allocation. It is
-     checked 1st and reported on 1ST if an error exists. Full Posion Check is
+     checked 1st and reported on 1ST if an error exists. Full Poison Check is
      done after.
 
-     For malloc(), calloc(), and zalloc() Full Posion Check is done 1st since
+     For malloc(), calloc(), and zalloc() Full Poison Check is done 1st since
      these functions do not modify an existing allocation.
 */
-void* ICACHE_RAM_ATTR malloc(size_t size)
+void* IRAM_ATTR malloc(size_t size)
 {
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
@@ -231,17 +249,20 @@ void* ICACHE_RAM_ATTR malloc(size_t size)
     return ret;
 }
 
-void* ICACHE_RAM_ATTR calloc(size_t count, size_t size)
+void* IRAM_ATTR calloc(size_t count, size_t size)
 {
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
-    OOM_CHECK__PRINT_OOM(ret, size);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);// For logging purposes
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL(ret, total_size);
+    OOM_CHECK__PRINT_OOM(ret, total_size);
     return ret;
 }
 
-void* ICACHE_RAM_ATTR realloc(void* ptr, size_t size)
+void* IRAM_ATTR realloc(void* ptr, size_t size)
 {
     INTEGRITY_CHECK__ABORT();
     void* ret = UMM_REALLOC_FL(ptr, size, NULL, 0);
@@ -251,7 +272,7 @@ void* ICACHE_RAM_ATTR realloc(void* ptr, size_t size)
     return ret;
 }
 
-void ICACHE_RAM_ATTR free(void* p)
+void IRAM_ATTR free(void* p)
 {
     INTEGRITY_CHECK__ABORT();
     UMM_FREE_FL(p, NULL, 0);
@@ -259,8 +280,8 @@ void ICACHE_RAM_ATTR free(void* p)
 }
 #endif
 
-
-void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* IRAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
@@ -270,17 +291,22 @@ void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL_FL(ret, count * size, file, line);
-    OOM_CHECK__PRINT_LOC(ret, size, file, line);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line);
+    OOM_CHECK__PRINT_LOC(ret, total_size, file, line);
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line);
@@ -290,7 +316,8 @@ void* ICACHE_RAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, in
     return ret;
 }
 
-void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void* IRAM_ATTR heap_pvPortZalloc(size_t size, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
@@ -300,21 +327,62 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
     return ret;
 }
 
-void ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line)
+STATIC_ALWAYS_INLINE
+void IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line);
     UMM_FREE_FL(ptr, file, line);
     POISON_CHECK__PANIC_FL(file, line);
 }
 
-size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
+size_t IRAM_ATTR xPortWantedSizeAlign(size_t size)
 {
     return (size + 3) & ~((size_t) 3);
 }
 
 void system_show_malloc(void)
 {
+    HeapSelectDram ephemeral;
     umm_info(NULL, true);
+}
+
+/*
+  NONOS SDK and lwIP do not handle IRAM heap well. Since they also use portable
+  malloc calls pvPortMalloc, ... we can leverage that for this solution.
+  Force pvPortMalloc, ... APIs to serve DRAM only.
+*/
+void* IRAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortMalloc(size,  file, line);;
+}
+
+void* IRAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortCalloc(count, size,  file, line);
+}
+
+void* IRAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortRealloc(ptr, size,  file, line);
+}
+
+void* IRAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
+{
+    HeapSelectDram ephemeral;
+    return heap_pvPortZalloc(size,  file, line);
+}
+
+void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
+{
+#if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+    // This is only needed for debug checks to ensure they are performed in
+    // correct context. umm_malloc free internally determines the correct heap.
+    HeapSelectDram ephemeral;
+#endif
+    return heap_vPortFree(ptr,  file, line);
 }
 
 };

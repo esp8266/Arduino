@@ -26,10 +26,11 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#include <memory>
 #include <Arduino.h>
-
+#include <StreamString.h>
 #include <WiFiClient.h>
+
+#include <memory>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
@@ -153,24 +154,21 @@ class StreamString;
 class HTTPClient : public Stream
 {
 public:
-    HTTPClient();
-    ~HTTPClient();
+    HTTPClient() = default;
+    ~HTTPClient() = default;
+    HTTPClient(HTTPClient&&) = default;
+    HTTPClient& operator=(HTTPClient&&) = default;
 
-/*
- * Since both begin() functions take a reference to client as a parameter, you need to 
- * ensure the client object lives the entire time of the HTTPClient
- */
+    // Note that WiFiClient's underlying connection *will* be captured
     bool begin(WiFiClient &client, const String& url);
     bool begin(WiFiClient &client, const String& host, uint16_t port, const String& uri = "/", bool https = false);
 
-    // Plain HTTP connection, unencrypted
-    bool begin(String url)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
-    // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    // deprecated, use the overload above instead
-    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+    // old API is now explicitly forbidden
+    bool begin(String url)  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, url)")));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((error("obsolete API, use ::begin(WiFiClient, host, port, uri)")));
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((error("obsolete API, use ::begin(WiFiClientSecure, ...)")));
 
     void end(void);
 
@@ -180,10 +178,10 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setAuthorization(String auth);
     void setTimeout(uint16_t timeout);
 
     // Redirections
-    void setFollowRedirects(bool follow) __attribute__ ((deprecated));
     void setFollowRedirects(followRedirects_t follow);
     void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
 
@@ -192,6 +190,7 @@ public:
 
     /// request handling
     int GET();
+    int DELETE();
     int POST(const uint8_t* payload, size_t size);
     int POST(const String& payload);
     int PUT(const uint8_t* payload, size_t size);
@@ -218,6 +217,7 @@ public:
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
+	int writeToPrint(Print* print);
     int writeToStream(Stream* stream);
     const String& getString(void);
     static String errorToString(int error);
@@ -244,12 +244,15 @@ protected:
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
 
-    bool readChunkHeader(bool blocking = true);
-    bool readChunkTrailer(bool blocking = true);
+    // The common pattern to use the class is to
+    // {
+    //     WiFiClient socket;
+    //     HTTPClient http;
+    //     http.begin(socket, "http://blahblah");
+    // }
+    // Make sure it's not possible to break things in an opposite direction
 
-    TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcpDeprecated;
-    WiFiClient* _client;
+    std::unique_ptr<WiFiClient> _client;
 
     /// request handling
     String _host;
@@ -261,12 +264,14 @@ protected:
     String _uri;
     String _protocol;
     String _headers;
-    String _userAgent;
     String _base64Authorization;
 
+    static const String defaultUserAgent;
+    String _userAgent = defaultUserAgent;
+
     /// Response handling
-    RequestArgument* _currentHeaders = nullptr;
-    size_t           _headerKeysCount = 0;
+    std::unique_ptr<RequestArgument[]> _currentHeaders;
+    size_t _headerKeysCount = 0;
 
     int _returnCode = 0;
     int _size = -1;
@@ -280,7 +285,5 @@ protected:
     uint32_t _chunkOffset = 0;
     std::unique_ptr<StreamString> _payload;
 };
-
-
 
 #endif /* ESP8266HTTPClient_H_ */

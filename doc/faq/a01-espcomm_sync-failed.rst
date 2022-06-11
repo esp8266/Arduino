@@ -41,9 +41,8 @@ following three things right: 1. Module is provided with enough power,
 2. GPIO0, GPIO15 and CH\_PD are connected using pull up / pull down
 resistors, 3. Module is put into boot loader mode.
 
-For specific details please refer to section on `Generic ESP8266
-modules <../boards.rst#generic-esp8266-modules>`__. Example modules
-without USB to serial converter on board are shown below.
+For specific details please refer to section on `Generic ESP8266 module <../boards.rst#generic-esp8266-module>`__.
+Example modules without USB to serial converter on board are shown below.
 
 .. figure:: pictures/a01-example-boards-without-usb.png
    :alt: Example ESP8266 modules without USB to serial converter
@@ -313,14 +312,14 @@ example at 921600 baud, but with two reset retries.
 
    Reset Method: nodemcu, reset retries
 
-If you are interested how noodemcu reset method is implemented, then
+If you are interested how nodemcu reset method is implemented, then
 check circuit below. As indicated it does not pull to ground RTS and DTR
 lines once you open Serial Monitor in Arduino IDE.
 
 .. figure:: pictures/a01-nodemcu-reset-implementation.png
-   :alt: Implementation of noodemcu reset
+   :alt: Implementation of nodemcu reset
 
-   Implementation of noodemcu reset
+   Implementation of nodemcu reset
 
 It consists of two transistors and resistors that you can locate on
 NodeMCU board on right. On left you can see complete circuit and the

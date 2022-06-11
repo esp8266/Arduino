@@ -31,19 +31,6 @@ extern "C" {
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
-: _port(0)
-, _udp_ota(0)
-, _initialized(false)
-, _rebootOnSuccess(true)
-, _useMDNS(true)
-, _state(OTA_IDLE)
-, _size(0)
-, _cmd(0)
-, _ota_port(0)
-, _start_callback(NULL)
-, _end_callback(NULL)
-, _error_callback(NULL)
-, _progress_callback(NULL)
 {
 }
 
@@ -362,6 +349,20 @@ void ArduinoOTAClass::_runUpdate() {
   }
 }
 
+void ArduinoOTAClass::end() {
+    _initialized = false;
+    _udp_ota->unref();
+    _udp_ota = 0;
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+    if(_useMDNS){
+        MDNS.end();
+    }
+#endif
+    _state = OTA_IDLE;
+    #ifdef OTA_DEBUG
+    OTA_DEBUG.printf("OTA server stopped.\n");
+    #endif    
+}
 //this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {

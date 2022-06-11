@@ -8,15 +8,16 @@ function skip_ino()
     # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
     read -d '' skiplist << EOL || true
 /#attic/
-/AnalogBinLogger/
-/LowLatencyLogger/
-/LowLatencyLoggerADXL345/
-/LowLatencyLoggerMPU6050/
-/PrintBenchmark/
-/TeensySdioDemo/
+/AvrAdcLogger/
+/examplesV1/
+/RtcTimestampTest/
 /SoftwareSpi/
-/STM32Test/
-/extras/
+/TeensyDmaAdcLogger/
+/TeensyRtcTimestamp/
+/TeensySdioDemo/
+/TeensySdioLogger/
+/UserChipSelectFunction/
+/UserSPIDriver/
 EOL
     echo $ino | grep -q -F "$skiplist"
     echo $(( 1 - $? ))
@@ -66,6 +67,8 @@ function build_sketches()
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
+    local k_partial_core_cleanup=("build.opt" "*.ino.globals.h")
+    local mk_clean_core=1
     local testcnt=0
     for sketch in $sketches; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -73,13 +76,45 @@ function build_sketches()
             continue  # Not ours to do
         fi
 
+        # mkbuildoptglobals.py is optimized around the Arduino IDE 1.x
+        # behaviour. One way the CI differs from the Arduino IDE is in the
+        # handling of core and caching core. With the Arduino IDE, each sketch
+        # has a private copy of core and contributes to a core cache. With the
+        # CI, there is one shared copy of core for all sketches. When global
+        # options are used, the shared copy of core and cache are removed before
+        # and after the build.
+        #
+        # Do we need a clean core build? $build_dir/core/* cannot be shared
+        # between sketches when global options are present.
+        if [ -s ${sketch}.globals.h ]; then
+            mk_clean_core=1
+        fi
+        if [ $mk_clean_core -ne 0 ]; then
+            rm -rf rm $build_dir/core/*
+        else
+            # Remove sketch specific files from ./core/ between builds.
+            rm -rf $build_dir/core/build.opt $build_dir/core/*.ino.globals.h
+        fi
+
         if [ -e $cache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
             # with this sketch's ino file, or builder will throw everything away.
-	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json > $build_dir/build.options.json.tmp
+            mv $build_dir/build.options.json.tmp $build_dir/build.options.json
             # Set the time of the cached core.a file to the future so the GIT header
             # we regen won't cause the builder to throw it out and rebuild from scratch.
             touch -d 'now + 1 day' $cache_dir/core/*.a
+            if [ $mk_clean_core -ne 0 ]; then
+                # Hack workaround for CI not handling core rebuild for global options
+                rm $cache_dir/core/*.a
+            fi
+        fi
+
+        if [ -s ${sketch}.globals.h ]; then
+            # Set to cleanup core at the start of the next build.
+            mk_clean_core=1
+        else
+            mk_clean_core=0
         fi
 
         # Clear out the last built sketch, map, elf, bin files, but leave the compiled
@@ -104,7 +139,7 @@ function build_sketches()
         fi
         echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
-	if [ "$WINDOWS" == "1" ]; then
+        if [ "$WINDOWS" == "1" ]; then
             sketch=$(echo $sketch | sed 's/^\/c//')
             # MINGW will try to be helpful and silently convert args that look like paths to point to a spot inside the MinGW dir.  This breaks everything.
             # http://www.mingw.org/wiki/Posix_path_conversion
@@ -147,10 +182,10 @@ function install_libraries()
 
 function install_ide()
 {
-    #local idever='nightly'
-    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
+    local idever='nightly'
+    #local idever='1.8.10'
 
-    local idever='1.8.10'
+    #local ideurl='https://www.arduino.cc/download.php?f=/arduino-nightly'
     local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "using Arduino IDE distribution ${idever}"
@@ -158,9 +193,10 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    mkdir -p ${core_path}/tools/dist
     if [ "$WINDOWS" = "1" ]; then
-        test -r arduino-windows.zip || curl --output arduino-windows.zip -L "${ideurl}-windows.zip"
-        unzip -q arduino-windows.zip
+        test -r ${core_path}/tools/dist/arduino-windows.zip || curl --output ${core_path}/tools/dist/arduino-windows.zip -L "${ideurl}-windows.zip"
+        unzip -q ${core_path}/tools/dist/arduino-windows.zip
         mv arduino-${idever} arduino-distrib
     elif [ "$MACOSX" = "1" ]; then
         # MACOS only has next-to-obsolete Python2 installed.  Install Python 3 from python.org
@@ -169,13 +205,13 @@ function install_ide()
         # Install the Python3 certificates, because SSL connections fail w/o them and of course they aren't installed by default.
         ( cd "/Applications/Python 3.7/" && sudo "./Install Certificates.command" )
         # Hack to place arduino-builder in the same spot as sane OSes
-        test -r arduino-macos.zip || wget -q -O arduino-macos.zip "${ideurl}-macosx.zip"
-        unzip -q arduino-macos.zip
+        test -r ${core_path}/tools/dist/arduino-macos.zip || wget -q -O ${core_path}/tools/dist/arduino-macos.zip "${ideurl}-macosx.zip"
+        unzip -q ${core_path}/tools/dist/arduino-macos.zip
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        test -r arduino-linux.tar.xz || wget -q -O arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
-        tar xf arduino-linux.tar.xz
+        test -r ${core_path}/tools/dist/arduino-linux.tar.xz || wget -q -O ${core_path}/tools/dist/arduino-linux.tar.xz "${ideurl}-linux64.tar.xz"
+        tar xf ${core_path}/tools/dist/arduino-linux.tar.xz
         mv arduino-${idever} arduino-distrib
     fi
     mv arduino-distrib $ide_path
@@ -194,6 +230,7 @@ function install_ide()
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
     echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
     echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
+    echo "mkbuildoptglobals.extra_flags=--ci --cache_core" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
@@ -247,4 +284,3 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
     popd > /dev/null
     echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
 fi
-

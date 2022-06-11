@@ -59,24 +59,26 @@ public:
           _mounted(false) {
         memset(&_lfs, 0, sizeof(_lfs));
         memset(&_lfs_cfg, 0, sizeof(_lfs_cfg));
-        _lfs_cfg.context = (void*) this;
-        _lfs_cfg.read = lfs_flash_read;
-        _lfs_cfg.prog = lfs_flash_prog;
-        _lfs_cfg.erase = lfs_flash_erase;
-        _lfs_cfg.sync = lfs_flash_sync;
-        _lfs_cfg.read_size = 64;
-        _lfs_cfg.prog_size = 64;
-        _lfs_cfg.block_size =  _blockSize;
-        _lfs_cfg.block_count =_blockSize? _size / _blockSize: 0;
-        _lfs_cfg.block_cycles = 16; // TODO - need better explanation
-        _lfs_cfg.cache_size = 64;
-        _lfs_cfg.lookahead_size = 64;
-        _lfs_cfg.read_buffer = nullptr;
-        _lfs_cfg.prog_buffer = nullptr;
-        _lfs_cfg.lookahead_buffer = nullptr;
-        _lfs_cfg.name_max = 0;
-        _lfs_cfg.file_max = 0;
-        _lfs_cfg.attr_max = 0;
+        if (_size && _blockSize) {
+            _lfs_cfg.context = (void*) this;
+            _lfs_cfg.read = lfs_flash_read;
+            _lfs_cfg.prog = lfs_flash_prog;
+            _lfs_cfg.erase = lfs_flash_erase;
+            _lfs_cfg.sync = lfs_flash_sync;
+            _lfs_cfg.read_size = 64;
+            _lfs_cfg.prog_size = 64;
+            _lfs_cfg.block_size =  _blockSize;
+            _lfs_cfg.block_count = _size / _blockSize;
+            _lfs_cfg.block_cycles = 16; // TODO - need better explanation
+            _lfs_cfg.cache_size = 64;
+            _lfs_cfg.lookahead_size = 64;
+            _lfs_cfg.read_buffer = nullptr;
+            _lfs_cfg.prog_buffer = nullptr;
+            _lfs_cfg.lookahead_buffer = nullptr;
+            _lfs_cfg.name_max = 0;
+            _lfs_cfg.file_max = 0;
+            _lfs_cfg.attr_max = 0;
+        }
     }
 
     ~LittleFSImpl() {
@@ -181,7 +183,10 @@ public:
     }
 
     bool begin() override {
-        if (_size <= 0) {
+        if (_mounted) {
+            return true;
+        }
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("LittleFS size is <= zero");
             return false;
         }
@@ -203,7 +208,7 @@ public:
     }
 
     bool format() override {
-        if (_size == 0) {
+        if ((_blockSize <= 0) || (_size <= 0)) {
             DEBUGV("lfs size is zero\n");
             return false;
         }
@@ -221,11 +226,44 @@ public:
             return false;
         }
 
+        if(_timeCallback && _tryMount()) {
+            // Mounting is required to set attributes
+
+            time_t t = _timeCallback();
+            rc = lfs_setattr(&_lfs, "/", 'c', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 'c': rc=%d\n", rc);
+                return false;
+            }
+
+            rc = lfs_setattr(&_lfs, "/", 't', &t, 8);
+            if (rc != 0) {
+                DEBUGV("lfs_format, lfs_setattr 't': rc=%d\n", rc);
+                return false;
+            }
+
+            lfs_unmount(&_lfs);
+            _mounted = false;
+        }
+
         if (wasMounted) {
             return _tryMount();
         }
 
         return true;
+    }
+
+    time_t getCreationTime() override {
+        time_t t;
+        uint32_t t32b;
+
+        if (lfs_getattr(&_lfs, "/", 'c', &t, 8) == 8) {
+            return t;
+        } else if (lfs_getattr(&_lfs, "/", 'c', &t32b, 4) == 4) {
+            return (time_t)t32b;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -334,6 +372,30 @@ public:
         }
     }
 
+    int availableForWrite () override {
+        if (!_opened || !_fd) {
+            return 0;
+        }
+
+        const auto f = _getFD();
+        const auto fs = _fs->getFS();
+
+        // check for remaining size in current block
+        // ignore inline feature (per code in lfs_file_rawwrite())
+        auto afw = fs->cfg->block_size - f->off;
+
+        if (afw == 0) {
+            // current block is full
+            // check for filesystem full (per code in lfs_alloc())
+            if (!(fs->free.i == fs->free.size && fs->free.ack == 0)) {
+                // fs is not full, return a full sector as free space
+                afw = fs->cfg->block_size;
+            }
+        }
+
+        return afw;
+    }
+
     size_t write(const uint8_t *buf, size_t size) override {
         if (!_opened || !_fd || !buf) {
             return 0;
@@ -346,7 +408,7 @@ public:
         return result;
     }
 
-    size_t read(uint8_t* buf, size_t size) override {
+    int read(uint8_t* buf, size_t size) override {
         if (!_opened || !_fd | !buf) {
             return 0;
         }
@@ -424,19 +486,19 @@ public:
             lfs_file_close(_fs->getFS(), _getFD());
             _opened = false;
             DEBUGV("lfs_file_close: fd=%p\n", _getFD());
-            if (timeCallback && (_flags & LFS_O_WRONLY)) {
+            if (_timeCallback && (_flags & LFS_O_WRONLY)) {
                 // If the file opened with O_CREAT, write the creation time attribute
                 if (_creation) {
                     int rc = lfs_setattr(_fs->getFS(), _name.get(), 'c', (const void *)&_creation, sizeof(_creation));
                     if (rc < 0) {
-                        DEBUGV("Unable to set creation time on '%s' to %d\n", _name.get(), _creation);
+                        DEBUGV("Unable to set creation time on '%s' to %ld\n", _name.get(), (long)_creation);
                     }
                 }
                 // Add metadata with last write time
-                time_t now = timeCallback();
+                time_t now = _timeCallback();
                 int rc = lfs_setattr(_fs->getFS(), _name.get(), 't', (const void *)&now, sizeof(now));
                 if (rc < 0) {
-                    DEBUGV("Unable to set last write time on '%s' to %d\n", _name.get(), now);
+                    DEBUGV("Unable to set last write time on '%s' to %ld\n", _name.get(), (long)now);
                 }
             }
         }
@@ -556,11 +618,35 @@ public:
     }
 
     time_t fileTime() override {
-        return (time_t)_getAttr4('t');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('t', 8, &t)) {
+            return t;
+        } else if (_getAttr('t', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
     time_t fileCreationTime() override {
-        return (time_t)_getAttr4('c');
+        time_t t;
+        int32_t t32b;
+
+        // If the attribute is 8-bytes, we're all set
+        if (_getAttr('c', 8, &t)) {
+            return t;
+        } else if (_getAttr('c', 4, &t32b)) {
+            // If it's 4 bytes silently promote to 64b
+            return (time_t)t32b;
+        } else {
+            // OTW, none present
+            return 0;
+        }
     }
 
 
@@ -599,20 +685,17 @@ protected:
         return _dir.get();
     }
 
-    uint32_t _getAttr4(char attr) {
-        if (!_valid) {
-            return 0;
+    bool _getAttr(char attr, int len, void *dest) {
+        if (!_valid || !len || !dest) {
+            return false;
         }
         int nameLen = 3; // Slashes, terminator
         nameLen += _dirPath.get() ? strlen(_dirPath.get()) : 0;
         nameLen += strlen(_dirent.name);
         char tmpName[nameLen];
         snprintf(tmpName, nameLen, "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _dirent.name);
-        time_t ftime = 0;
-        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, (void *)&ftime, sizeof(ftime));
-        if (rc != sizeof(ftime))
-            ftime = 0; // Error, so clear read value
-        return ftime;
+        int rc = lfs_getattr(_fs->getFS(), tmpName, attr, dest, len);
+        return (rc == len);
     }
 
     String                      _pattern;

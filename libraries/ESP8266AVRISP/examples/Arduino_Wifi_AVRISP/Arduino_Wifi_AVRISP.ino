@@ -5,7 +5,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* host = "esp8266-avrisp";
@@ -20,7 +20,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("");
   Serial.println("Arduino AVR-ISP over TCP");
-  avrprog.setReset(false); // let the AVR run
+  avrprog.setReset(false);  // let the AVR run
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -51,17 +51,20 @@ void loop() {
   AVRISPState_t new_state = avrprog.update();
   if (last_state != new_state) {
     switch (new_state) {
-      case AVRISP_STATE_IDLE: {
+      case AVRISP_STATE_IDLE:
+        {
           Serial.printf("[AVRISP] now idle\r\n");
           // Use the SPI bus for other purposes
           break;
         }
-      case AVRISP_STATE_PENDING: {
+      case AVRISP_STATE_PENDING:
+        {
           Serial.printf("[AVRISP] connection pending\r\n");
           // Clean up your other purposes and prepare for programming mode
           break;
         }
-      case AVRISP_STATE_ACTIVE: {
+      case AVRISP_STATE_ACTIVE:
+        {
           Serial.printf("[AVRISP] programming mode\r\n");
           // Stand by for completion
           break;
@@ -70,11 +73,7 @@ void loop() {
     last_state = new_state;
   }
   // Serve the client
-  if (last_state != AVRISP_STATE_IDLE) {
-    avrprog.serve();
-  }
+  if (last_state != AVRISP_STATE_IDLE) { avrprog.serve(); }
 
-  if (WiFi.status() == WL_CONNECTED) {
-    MDNS.update();
-  }
+  if (WiFi.status() == WL_CONNECTED) { MDNS.update(); }
 }

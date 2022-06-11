@@ -13,41 +13,36 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
 const char* ssidPassword = STAPSK;
 
-const char *username = "admin";
-const char *password = "admin";
+const char* username = "admin";
+const char* password = "admin";
 
-const char *server = "http://httpbin.org";
-const char *uri = "/digest-auth/auth/admin/admin/MD5";
+const char* server = "http://httpbin.org";
+const char* uri = "/digest-auth/auth/admin/admin/MD5";
 
 String exractParam(String& authReq, const String& param, const char delimit) {
   int _begin = authReq.indexOf(param);
-  if (_begin == -1) {
-    return "";
-  }
+  if (_begin == -1) { return ""; }
   return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
 
 String getCNonce(const int len) {
-  static const char alphanum[] =
-    "0123456789"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz";
+  static const char alphanum[] = "0123456789"
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                 "abcdefghijklmnopqrstuvwxyz";
   String s = "";
 
-  for (int i = 0; i < len; ++i) {
-    s += alphanum[rand() % (sizeof(alphanum) - 1)];
-  }
+  for (int i = 0; i < len; ++i) { s += alphanum[rand() % (sizeof(alphanum) - 1)]; }
 
   return s;
 }
 
-String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, unsigned int counter) {
+String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
   // extracting required parameters for RFC 2069 simpler Digest
   String realm = exractParam(authReq, "realm=\"", '"');
   String nonce = exractParam(authReq, "nonce=\"", '"');
@@ -64,7 +59,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   String h1 = md5.toString();
 
   md5.begin();
-  md5.add(String("GET:") + uri);
+  md5.add(method + ":" + uri);
   md5.calculate();
   String h2 = md5.toString();
 
@@ -73,14 +68,14 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   md5.calculate();
   String response = md5.toString();
 
-  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce +
-                         "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
+  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
   Serial.println(authorization);
 
   return authorization;
 }
 
 void setup() {
+  randomSeed(RANDOM_REG32);
   Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
@@ -99,7 +94,7 @@ void setup() {
 
 void loop() {
   WiFiClient client;
-  HTTPClient http; //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
+  HTTPClient http;  // must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
 
   Serial.print("[HTTP] begin...\n");
 
@@ -107,7 +102,7 @@ void loop() {
   http.begin(client, String(server) + String(uri));
 
 
-  const char *keys[] = {"WWW-Authenticate"};
+  const char* keys[] = { "WWW-Authenticate" };
   http.collectHeaders(keys, 1);
 
   Serial.print("[HTTP] GET...\n");
@@ -118,7 +113,7 @@ void loop() {
     String authReq = http.header("WWW-Authenticate");
     Serial.println(authReq);
 
-    String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
+    String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
 
     http.end();
     http.begin(client, String(server) + String(uri));

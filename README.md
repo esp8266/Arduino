@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.7.2/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/3.0.2/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -28,22 +28,22 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install the current upstream Arduino IDE at the 1.8.9 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8.9 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/software).
 - Start Arduino and open the Preferences window.
-- Enter ```https://arduino.esp8266.com/stable/package_esp8266com_index.json``` into the *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
+- Enter ```https://arduino.esp8266.com/stable/package_esp8266com_index.json``` into the *File>Preferences>Additional Boards Manager URLs* field of the Arduino IDE. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.7.2/](https://arduino-esp8266.readthedocs.io/en/2.7.2/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/3.0.2/](https://arduino-esp8266.readthedocs.io/en/3.0.2/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
 Also known as latest git or master branch.
 
-- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/software).
 - Follow the [instructions in the documentation](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
 
 ### Using PlatformIO
@@ -108,7 +108,7 @@ ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
 Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
-Espressif SDK included in this build is under Espressif MIT License.
+[Espressif's NONOS SDK](https://github.com/espressif/ESP8266_NONOS_SDK) included in this build is under Espressif MIT License.
 
 ESP8266 core files are licensed under LGPL.
 
@@ -117,8 +117,6 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under the MIT license.
 
 [SoftwareSerial](https://github.com/plerup/espsoftwareserial) library and examples written by Peter Lerup. Distributed under LGPL 2.1.
-
-[axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
 
 [BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
 

@@ -13,16 +13,19 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
+#include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure server(443);
+BearSSL::ServerSessions serverCache(5);
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -47,7 +50,7 @@ JfUvYadSYxh3nblvA4OL+iEZiW8NE3hbW6WPXxvS7Euge0uWMPc4uEcnsE0ZVG3m
 -----END CERTIFICATE-----
 )EOF";
 
-static const char serverKey[] PROGMEM =  R"EOF(
+static const char serverKey[] PROGMEM = R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEA9UoHBtn4oNKXjRgIOQ/rLxK/iI0a8Q5mDxhfuwa9//FkftSI
 IFY8UhGk2YNJpnfKOyYWqbqwuJhIZJ2sEIWp2301OnavuGBrpKOgBJJljgH2l/4Z
@@ -86,24 +89,22 @@ void handleRoot() {
   digitalWrite(led, 0);
 }
 
-void handleNotFound(){
+void handleNotFound() {
   digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i=0; i<server.args(); i++){
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
+  for (uint8_t i = 0; i < server.args(); i++) { message += " " + server.argName(i) + ": " + server.arg(i) + "\n"; }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
 
-void setup(void){
+void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
@@ -124,15 +125,16 @@ void setup(void){
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+  if (MDNS.begin("esp8266")) { Serial.println("MDNS responder started"); }
 
   server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
 
+  // Cache SSL sessions to accelerate the TLS handshake.
+  server.getServer().setCache(&serverCache);
+
   server.on("/", handleRoot);
 
-  server.on("/inline", [](){
+  server.on("/inline", []() {
     server.send(200, "text/plain", "this works as well");
   });
 
@@ -142,7 +144,75 @@ void setup(void){
   Serial.println("HTTPS server started");
 }
 
-void loop(void){
+extern "C" void stack_thunk_dump_stack();
+
+void processKey(Print& out, int hotKey) {
+  switch (hotKey) {
+    case 'd':
+      {
+        HeapSelectDram ephemeral;
+        umm_info(NULL, true);
+        break;
+      }
+    case 'i':
+      {
+        HeapSelectIram ephemeral;
+        umm_info(NULL, true);
+        break;
+      }
+    case 'h':
+      {
+        {
+          HeapSelectIram ephemeral;
+          Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+        }
+        {
+          HeapSelectDram ephemeral;
+          Serial.printf(PSTR("DRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
+        }
+        break;
+      }
+#ifdef DEBUG_ESP_PORT
+    // From this context stack_thunk_dump_stack() will only work when Serial
+    // debug is enabled.
+    case 'p':
+      out.println(F("Calling stack_thunk_dump_stack();"));
+      stack_thunk_dump_stack();
+      break;
+#endif
+    case 'R':
+      out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
+      ESP.restart();
+      break;
+    case '\r': out.println();
+    case '\n': break;
+    case '?':
+      out.println();
+      out.println(F("Press a key + <enter>"));
+      out.println(F("  h    - Free Heap Report;"));
+      out.println(F("  i    - iRAM umm_info(null, true);"));
+      out.println(F("  d    - dRAM umm_info(null, true);"));
+#ifdef DEBUG_ESP_PORT
+      out.println(F("  p    - call stack_thunk_dump_stack();"));
+#endif
+      out.println(F("  R    - Restart, ESP.restart();"));
+      out.println(F("  ?    - Print Help"));
+      out.println();
+      break;
+    default:
+      out.printf_P(PSTR("\"%c\" - Not an option?  / ? - help"), hotKey);
+      out.println();
+      processKey(out, '?');
+      break;
+  }
+}
+
+
+void loop(void) {
   server.handleClient();
   MDNS.update();
+  if (Serial.available() > 0) {
+    int hotKey = Serial.read();
+    processKey(Serial, hotKey);
+  }
 }

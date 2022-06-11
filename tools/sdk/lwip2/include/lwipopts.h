@@ -1557,7 +1557,7 @@
  * TCP_MSS, IP header, and link header.
  */
 #if !defined PBUF_POOL_BUFSIZE || defined __DOXYGEN__
-#define PBUF_POOL_BUFSIZE               LWIP_MEM_ALIGN_SIZE(TCP_MSS+40+PBUF_LINK_ENCAPSULATION_HLEN+PBUF_LINK_HLEN)
+#define PBUF_POOL_BUFSIZE               LWIP_MEM_ALIGN_SIZE(TCP_MSS+PBUF_IP_HLEN+PBUF_TRANSPORT_HLEN+PBUF_LINK_ENCAPSULATION_HLEN+PBUF_LINK_HLEN)
 #endif
 
 /**
@@ -1566,6 +1566,14 @@
  */
 #ifndef LWIP_PBUF_REF_T
 #define LWIP_PBUF_REF_T                 u8_t
+#endif
+
+/**
+ * LWIP_PBUF_CUSTOM_DATA: Store private data on pbufs (e.g. timestamps)
+ * This extends struct pbuf so user can store custom data on every pbuf.
+ */
+#if !defined LWIP_PBUF_CUSTOM_DATA || defined __DOXYGEN__
+#define LWIP_PBUF_CUSTOM_DATA
 #endif
 /**
  * @}
@@ -1924,11 +1932,8 @@
 
 /** LWIP_NETCONN_FULLDUPLEX==1: Enable code that allows reading from one thread,
  * writing from a 2nd thread and closing from a 3rd thread at the same time.
- * ATTENTION: This is currently really alpha! Some requirements:
- * - LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from
- *   multiple threads at once
- * - sys_mbox_free() has to unblock receive tasks waiting on recvmbox/acceptmbox
- *   and prevent a task pending on this during/after deletion
+ * LWIP_NETCONN_SEM_PER_THREAD==1 is required to use one socket/netconn from
+ * multiple threads at once!
  */
 #if !defined LWIP_NETCONN_FULLDUPLEX || defined __DOXYGEN__
 #define LWIP_NETCONN_FULLDUPLEX         0
@@ -2464,7 +2469,7 @@
  * network startup.
  */
 #if !defined LWIP_IPV6_SEND_ROUTER_SOLICIT || defined __DOXYGEN__
-#define LWIP_IPV6_SEND_ROUTER_SOLICIT   1
+#define LWIP_IPV6_SEND_ROUTER_SOLICIT   LWIP_IPV6
 #endif
 
 /**
@@ -2509,10 +2514,12 @@
 
 /**
  * LWIP_ICMP6_DATASIZE: bytes from original packet to send back in
- * ICMPv6 error messages.
+ * ICMPv6 error messages (0 = default of IP6_MIN_MTU_LENGTH)
+ * ATTENTION: RFC4443 section 2.4 says IP6_MIN_MTU_LENGTH is a MUST,
+ * so override this only if you absolutely have to!
  */
 #if !defined LWIP_ICMP6_DATASIZE || defined __DOXYGEN__
-#define LWIP_ICMP6_DATASIZE             8
+#define LWIP_ICMP6_DATASIZE             0
 #endif
 
 /**
@@ -3139,7 +3146,7 @@
  *  u8_t *ptr = (u8_t*)pbuf_get_contiguous(p, buf, sizeof(buf), LWIP_MIN(option_len, sizeof(buf)), offset);
  */
 #ifdef __DOXYGEN__
-#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, offset)
+//#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, offset)
 #endif
 
 /**
@@ -3547,9 +3554,20 @@
    --------------------------------------------------
 */
 
+#include "lwip/debug.h"
+#include "arch/cc.h"
+#include "lwip-git-hash.h"
+#include <sys/time.h> // settimeofday() + struct timeval
+
 #ifndef LWIP_FEATURES
 #error LWIP_FEATURES must be defined
 #endif
+
+#define PPPOS_SUPPORT       IP_NAPT         // because we don't have proxyarp yet
+#define PPP_SUPPORT         PPPOS_SUPPORT
+#define PPP_SERVER          1
+#define PPP_DEBUG           ULWIPDEBUG
+#define PRINTPKT_SUPPORT    ULWIPDEBUG
 
 #ifdef __cplusplus
 extern "C" {
@@ -3559,6 +3577,37 @@ extern "C" {
  * TCP_RANDOM_PORT: randomize port instead of simply increasing
  */
 #define TCP_RANDOM_PORT 1
+
+/*
+   --------------------------------------------------
+   ------------------ DHCP options ------------------
+   --------------------------------------------------
+*/
+
+#define LWIP_HOOK_DHCP_PARSE_OPTION(netif, dhcp, state, msg, msg_type, option, len, pbuf, option_value_offset) \
+    lwip_hook_dhcp_parse_option(netif, dhcp, state, msg, msg_type, option, len, pbuf, option_value_offset)
+
+// search for LWIP_HOOK_DHCP_PARSE_OPTION above for an arguments explanation
+struct netif;
+struct dhcp;
+struct dhcp_msg;
+struct pbuf;
+extern void lwip_hook_dhcp_parse_option(struct netif *netif, struct dhcp *dhcp, int state, struct dhcp_msg *msg,
+                                        int msg_type, int option, int option_len, struct pbuf *pbuf,
+                                        int option_value_offset);
+
+#if LWIP_FEATURES
+#define LWIP_HOOK_DHCP_APPEND_OPTIONS(netif, dhcp, state, msg, msg_type, option_len_ptr) { \
+   /* https://github.com/esp8266/Arduino/issues/8223 */ \
+   lwip_hook_dhcp_amend_options(netif, dhcp, state, msg, msg_type, option_len_ptr); \
+   /* https://github.com/esp8266/Arduino/issues/8247 */ \
+   if ((msg_type) == DHCP_DISCOVER) \
+      *(option_len_ptr) = dhcp_option_hostname(*(option_len_ptr), (msg)->options, netif); \
+}
+
+extern void lwip_hook_dhcp_amend_options(struct netif *netif, struct dhcp *dhcp, int state, struct dhcp_msg *msg,
+                                         int msg_type, u16 *option_len_ptr);
+#endif
 
 /*
    --------------------------------------------------
@@ -3574,7 +3623,7 @@ extern "C" {
 
 #define SNTP_SERVER_DNS 1                   // enable SNTP support DNS names through sntp_setservername / sntp_getservername
 
-#define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
+#define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, (struct timezone*)0xFeedC0de); } while (0)
 
 #define SNTP_SUPPRESS_DELAY_CHECK 1
 #define SNTP_UPDATE_DELAY_DEFAULT 3600000   // update delay defined by a default weak function
@@ -3605,11 +3654,6 @@ uint32_t SNTP_STARTUP_DELAY_FUNC;
    --------------------------------------------------
 */
 
-#include "lwip/debug.h"
-#include "arch/cc.h"
-#include "lwip-git-hash.h"
-#include <sys/time.h> // settimeofday() + struct timeval
-
 // allow to handle special packets (user redefinable)
 struct pbuf;
 struct netif;
@@ -3618,6 +3662,9 @@ struct netif;
 #endif
 //#define LWIP_ERR_T s8
 LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif);
+
+// called when STA OR AP is set up or down
+void netif_status_changed (struct netif*);
 
 /*
    --------------------------------------------------
@@ -3648,6 +3695,16 @@ void tcp_kill_timewait (void);
 #ifndef MEMP_NUM_TCP_PCB_TIME_WAIT
 #define MEMP_NUM_TCP_PCB_TIME_WAIT       5
 #endif
+
+/*
+   --------------------------------------------------
+   ----------------- Alloc functions ----------------
+   --------------------------------------------------
+*/
+
+#define mem_clib_free(p)      vPortFree(p, NULL, -1)
+#define mem_clib_malloc(s)   pvPortMalloc(s, NULL, -1)
+#define mem_clib_calloc(n,s) pvPortZalloc(n*s, NULL, -1)
 
 #ifdef __cplusplus
 } // extern "C"

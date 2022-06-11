@@ -7,7 +7,7 @@ ESP8266 is all about Wi-Fi. If you are eager to connect your new ESP8266 module 
 Introduction
 ------------
 
-The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP8266 SDK to `esp8266 /
+The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed based on `ESP8266 SDK <https://github.com/espressif/ESP8266_NONOS_SDK>`__, using the naming conventions and overall functionality philosophy of the `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time, the wealth of Wi-Fi features ported from ESP8266 SDK to `esp8266 /
 Arduino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we would need to provide separate documentation on what is new and extra.
 
 This documentation will walk you through several classes, methods and properties of the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
@@ -156,6 +156,40 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 
 Check out the separate section with `list of functions <client-class.rst>`__
 
+WiFi Multi
+~~~~~~~~~~
+
+`ESP8266WiFiMulti.h` can be used to connect to a WiFi network with strongest WiFi signal (RSSI). This requires registering one or more access points with SSID and password. It automatically switches to another WiFi network when the WiFi connection is lost.
+
+Example:
+
+.. code:: cpp
+
+    #include <ESP8266WiFiMulti.h>
+
+    ESP8266WiFiMulti wifiMulti;
+
+    // WiFi connect timeout per AP. Increase when connecting takes longer.
+    const uint32_t connectTimeoutMs = 5000;
+
+    void setup()
+    {
+      // Set in station mode
+      WiFi.mode(WIFI_STA);
+
+      // Register multi WiFi networks
+      wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+      wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+      wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+    }
+
+    void loop()
+    {
+      // Maintain WiFi connection
+      if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+          ...
+      }
+    }
 
 BearSSL Client Secure and Server Secure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -227,8 +261,9 @@ This function returns following codes to describe what is going on with Wi-Fi co
 * 0 : ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
 * 1 : ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached 
 * 3 : ``WL_CONNECTED`` after successful connection is established 
-* 4 : ``WL_CONNECT_FAILED`` if password is incorrect 
-* 6 : ``WL_DISCONNECTED`` if module is not configured in station mode
+* 4 : ``WL_CONNECT_FAILED`` if connection failed 
+* 6 : ``WL_CONNECT_WRONG_PASSWORD`` if password is incorrect 
+* 7 : ``WL_DISCONNECTED`` if module is not configured in station mode
 
 It is a good practice to display and check information returned by functions. Application development and troubleshooting will be easier with that.
 

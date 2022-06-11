@@ -24,12 +24,13 @@
 class UdpContext;
 
 extern "C" {
-void esp_yield();
+void esp_suspend();
 void esp_schedule();
 #include <assert.h>
 }
 
 #include <AddrList.h>
+#include <PolledTimeout.h>
 
 #define PBUF_ALIGNER_ADJUST 4
 #define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
@@ -176,7 +177,7 @@ public:
     }
 
     // warning: handler is called from tcp stack context
-    // esp_yield and non-reentrant functions which depend on it will fail
+    // esp_suspend and non-reentrant functions which depend on it will fail
     void onRx(rxhandler_t handler) {
         _on_rx = handler;
     }
@@ -185,7 +186,7 @@ public:
     // this helper is ready to be used when debugging UDP
     void printChain (const pbuf* pb, const char* msg, size_t n) const
     {
-        // printf the pb pbuf chain, bufferred and all at once
+        // printf the pb pbuf chain, buffered and all at once
         char buf[128];
         int l = snprintf(buf, sizeof(buf), "UDP: %s %u: ", msg, n);
         while (pb)
@@ -265,7 +266,7 @@ public:
             return true;
         }
 
-        // We have interleaved informations on addresses within received pbuf chain:
+        // We have interleaved information on addresses within received pbuf chain:
         // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
         // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
         //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
@@ -390,14 +391,39 @@ public:
         return size;
     }
 
+    void cancelBuffer ()
+    {
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
+        _tx_buf_head = 0;
+        _tx_buf_cur = 0;
+        _tx_buf_offset = 0;
+    }
+
     bool send(const ip_addr_t* addr = 0, uint16_t port = 0)
+    {
+        return trySend(addr, port, /* don't keep buffer */false) == ERR_OK;
+    }
+
+    bool sendTimeout(const ip_addr_t* addr, uint16_t port,
+                     esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
+    {
+        err_t err;
+        esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
+        while (((err = trySend(addr, port, /* keep buffer on error */true)) != ERR_OK) && !timeout)
+            esp_yield();
+        if (err != ERR_OK)
+            cancelBuffer(); // get rid of buffer kept on error after timeout
+        return err == ERR_OK;
+    }
+
+private:
+
+    err_t trySend(const ip_addr_t* addr, uint16_t port, bool keepBufferOnError)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        if(!tx_copy){
-            DEBUGV("failed pbuf_alloc");
-        }
-        else{
+        if (tx_copy) {
             uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
             for (pbuf* p = _tx_buf_head; p; p = p->next) {
                 size_t will_copy = (data_size < p->len) ? data_size : p->len;
@@ -406,38 +432,32 @@ public:
                 data_size -= will_copy;
             }
         }
-        if (_tx_buf_head)
-            pbuf_free(_tx_buf_head);
-        _tx_buf_head = 0;
-        _tx_buf_cur = 0;
-        _tx_buf_offset = 0;
-        if(!tx_copy){
-            return false;
-        }
 
+        if (!keepBufferOnError)
+            cancelBuffer();
+
+        if (!tx_copy){
+            DEBUGV("failed pbuf_alloc");
+            return ERR_MEM;
+        }
 
         if (!addr) {
             addr = &_pcb->remote_ip;
             port = _pcb->remote_port;
         }
-#ifdef LWIP_MAYBE_XCC
-        uint16_t old_ttl = _pcb->ttl;
-        if (ip_addr_ismulticast(addr)) {
-            _pcb->ttl = _mcast_ttl;
-        }
-#endif
+
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", (int) err);
         }
-#ifdef LWIP_MAYBE_XCC
-        _pcb->ttl = old_ttl;
-#endif
-        pbuf_free(tx_copy);
-        return err == ERR_OK;
-    }
 
-private:
+        pbuf_free(tx_copy);
+
+        if (err == ERR_OK)
+            cancelBuffer(); // no error: get rid of buffer
+
+        return err;
+    }
 
     size_t _processSize (const pbuf* pb)
     {

@@ -21,6 +21,9 @@
 #ifndef ESP8266_PERI_H_INCLUDED
 #define ESP8266_PERI_H_INCLUDED
 
+// we expect mocking framework to provide these
+#ifndef CORE_MOCK
+
 #include "c_types.h"
 #include "esp8266_undocumented.h"
 
@@ -160,7 +163,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 #define TCIS  8 //Interrupt Status
 #define TCTE  7 //Timer Enable
 #define TCAR  6 //AutoReload (restart timer when condition is reached)
-#define TCPD  2 //Prescale Devider (2bit) 0:1(12.5ns/tick), 1:16(0.2us/tick), 2/3:256(3.2us/tick)
+#define TCPD  2 //Prescale Divider (2bit) 0:1(12.5ns/tick), 1:16(0.2us/tick), 2/3:256(3.2us/tick)
 #define TCIT  0 //Interrupt Type 0:edge, 1:level
 
 //RTC Registers
@@ -252,7 +255,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 //UART STATUS Registers Bits
 #define USTX    31 //TX PIN Level (Doesn't seem to work, always reads as 0 for both uarts. HW bug? Possible workaround: Enable loopback UxC0 |= 1<<UCLBE and read USRXD, see https://github.com/esp8266/Arduino/issues/7256 for discussion.)
 #define USRTS   30 //RTS PIN Level
-#define USDTR   39 //DTR PIN Level
+#define USDTR   29 //DTR PIN Level
 #define USTXC   16 //TX FIFO COUNT (8bit)
 #define USRXD   15 //RX PIN Level
 #define USCTS   14 //CTS PIN Level
@@ -268,7 +271,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 #define UCRXI   19 //Invert RX
 #define UCTXRST 18 //Reset TX FIFO
 #define UCRXRST 17 //Reset RX FIFO
-#define UCTXHFE 15 //TX Harware Flow Enable
+#define UCTXHFE 15 //TX Hardware Flow Enable
 #define UCLBE   14 //LoopBack Enable
 #define UCBRK   8  //Send Break on the TX line
 #define UCSWDTR 7  //Set this bit to assert DTR
@@ -280,11 +283,11 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 
 //UART CONF1 Registers Bits
 #define UCTOE   31 //RX TimeOut Enable
-#define UCTOT   24 //RX TimeOut Treshold (7bit)
-#define UCRXHFE 23 //RX Harware Flow Enable
-#define UCRXHFT 16 //RX Harware Flow Treshold (7bit)
-#define UCFET   8  //TX FIFO Empty Treshold (7bit)
-#define UCFFT   0  //RX FIFO Full Treshold (7bit)
+#define UCTOT   24 //RX TimeOut Threshold (7bit)
+#define UCRXHFE 23 //RX Hardware Flow Enable
+#define UCRXHFT 16 //RX Hardware Flow Threshold (7bit)
+#define UCFET   8  //TX FIFO Empty Threshold (7bit)
+#define UCFFT   0  //RX FIFO Full Threshold (7bit)
 
 //WDT Feed (the dog) Register
 #define WDTFEED    ESP8266_REG(0x914)
@@ -369,7 +372,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
 #define SPI1E3 		ESP8266_REG(0x1FC)
 #define SPI1W(p)  ESP8266_REG(0x140 + ((p & 0xF) * 4))
 
-//SPI0, SPI1 & I2S Interupt Register
+//SPI0, SPI1 & I2S Interrupt Register
 #define SPIIR     ESP8266_DREG(0x20)
 #define SPII0     4 //SPI0 Interrupt
 #define SPII1     7 //SPI1 Interrupt
@@ -846,5 +849,7 @@ extern volatile uint32_t* const esp8266_gpioToFn[16];
  http://esp8266-re.foogod.com/wiki/Random_Number_Generator
 **/
 #define RANDOM_REG32  ESP8266_DREG(0x20E44)
+
+#endif // ifndef CORE_MOCK
 
 #endif

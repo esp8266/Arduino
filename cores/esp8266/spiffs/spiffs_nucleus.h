@@ -353,7 +353,7 @@ extern "C" {
     if ((ph).span_ix != (spix)) return SPIFFS_ERR_DATA_SPAN_MISMATCH;
 
 
-// check id, only visit matching objec ids
+// check id, only visit matching object ids
 #define SPIFFS_VIS_CHECK_ID     (1<<0)
 // report argument object id to visitor - else object lookup id is reported
 #define SPIFFS_VIS_CHECK_PH     (1<<1)

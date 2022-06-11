@@ -6,6 +6,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Introduction <#introduction>`__
 -  `What ESP has to Say <#what-esp-has-to-say>`__
 -  `Get Your H/W Right <#get-your-hw-right>`__
+-  `Enable compilation warnings <#enable-compilation-warnings>`__
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
@@ -65,13 +66,50 @@ If you are using generic ESP modules, please follow
 `recommendations <Generic%20ESP8266%20modules>`__ on power supply and
 boot strapping resistors.
 
-For boards with integrated USB to serial converter and power supply,
+For boards with integrated USB-to-serial converter and power supply,
 usually it is enough to connect it to an USB hub that provides standard
 0.5A and is not shared with other USB devices.
 
-In any case make sure that your module is able to stable run standard
-example sketches that establish Wi-Fi connection like e.g.
+In any case, make sure that your module is able to stably run standard
+example sketches that establish Wi-Fi connection like, e.g.,
 `HelloServer.ino <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer/examples/HelloServer>`__.
+
+Enable compilation warnings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most common issues may be resolved by enabling compilation warnings and fixing them.
+
+For Arduino IDE, select ``File -> Preferences``:
+
+- Make sure ``Show verbose output during: compilation`` is enabled
+- Set ``Compiler warnings`` to ``More`` or ``All``
+
+For PlatformIO, all warnings should already be enabled by default.
+
+Notice that the default configuration of Arduino IDE inhibits **all** compilation warnings.
+For the ESP8266 platform, some warnings should be treated as errors, otherwise it may cause unexpected issues at runtime:
+
+.. code:: cpp
+
+    int func() {
+    }
+
+    int other() {
+      return func();
+    }
+
+Should fail to build with the following message:
+
+.. code:: console
+
+    return-value.cpp: In function ‘int func()’:
+    return-value.cpp:2:1: error: no return statement in function returning non-void [-Werror=return-type]
+        2 | }
+          | ^
+    compilation terminated due to -Wfatal-errors.
+    cc1plus: some warnings being treated as errors
+
+Notice that ``-Werror=return-type`` is the default starting with Core 3.0.2 w/ GCC 10.3
 
 What is the Cause of Restart?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,13 +120,13 @@ is wrong, it restarts itself to tell you about it.
 
 There are two typical scenarios that trigger ESP restarts:
 
--  **Exception** - when code is performing `illegal
+-  **Exception** - when the code attempts an `illegal
    operation <../exception_causes.rst>`__,
    like trying to write to non-existent memory location.
--  **Watchdog** - if code is `locked
-   up <https://en.wikipedia.org/wiki/Watchdog_timer>`__ staying too long
-   in a loop or processing some task, so vital processes like Wi-Fi
-   communication are not able to run.
+-  **Watchdog** - if the code `locks
+   up <https://en.wikipedia.org/wiki/Watchdog_timer>`__, staying too long
+   in a loop or processing any other task without any pauses, which would
+   prevent vital processes like Wi-Fi communication from running.
 
 Please check below how to recognize `exception <#exception>`__ and
 `watchdog <#watchdog>`__ scenarios and what to do about it.
@@ -127,7 +165,7 @@ up.
    `SDK <https://bbs.espressif.com/viewforum.php?f=46>`__, that is part
    of `esp8266 / arduino <https://github.com/esp8266/Arduino>`__ core
    loaded to module together with your application.
--  **Hardware Watchdog** - build in ESP8266 hardware and acting if
+-  **Hardware Watchdog** - built-in ESP8266 hardware, acting if the
    software watchdog is disabled for too long, in case it fails, or if
    it is not provided at all.
 
@@ -187,7 +225,7 @@ If you don't have any code for troubleshooting, use the example below:
       Serial.println();
       Serial.println("Let's provoke the s/w wdt firing...");
       //
-      // provoke an OOM, will be recorded as the last occured one
+      // provoke an OOM, will be recorded as the last occurred one
       char* out_of_memory_failure = (char*)malloc(1000000);
       //
       // wait for s/w wdt in infinite loop below
@@ -247,8 +285,8 @@ Interrupt Service Routines
    cache may kick in for that code. However, the cache currently can't be used 
    during hardware interrupts. That means that, if you use a hardware ISR, such as 
    attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the 
-   ICACHE_RAM_ATTR attribute declared. Not only that, but the entire function tree 
-   called from the ISR must also have the ICACHE_RAM_ATTR declared.
+   IRAM_ATTR attribute declared. Not only that, but the entire function tree 
+   called from the ISR must also have the IRAM_ATTR declared.
    Be aware that every function that has this attribute reduces available memory.
 
    In addition, it is not possible to execute delay() or yield() from an ISR, 
@@ -310,11 +348,12 @@ Memory, memory, memory
    * If you use std libs like std::vector, make sure to call its ::reserve() method before filling it. This allows allocating only once, which reduces mem fragmentation, and makes sure that there are no empty unused slots left over in the container at the end.
 
 Stack
-   The amount of stack in the ESP is tiny at only 4KB. For normal developement in large systems, it 
+   The amount of stack in the ESP is tiny at only 4KB. For normal development in large systems, it 
    is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
+   
    * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
-   * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
-   * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
+   * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and should be dynamically allocated instead (consider smart pointers).
+   * Objects that have large data members, such as large arrays, should also be avoided on the stack, and should be dynamically allocated (consider smart pointers).
 
 
 If at the Wall, Enter an Issue Report
@@ -330,37 +369,38 @@ author of code in his / her repository.
 
 If there are no guidelines, include in your report the following:
 
--  [ ] Exact steps by step instructions to reproduce the issue
+-  [ ] Exact step-by-step instructions to reproduce the issue
 -  [ ] Your exact hardware configuration including the schematic
--  [ ] If the issue concerns standard, commercially available ESP board
+-  [ ] If the issue concerns a standard, commercially available ESP board
    with power supply and USB interface, without extra h/w attached, then
-   provide just the board type or link to description
+   provide just the board type or a link to its description
 -  [ ] Configuration settings in Arduino IDE used to upload the
    application
 -  [ ] Error log & messages produced by the application (enable
    debugging for more details)
 -  [ ] Decoded stack trace
 -  [ ] Copy of your sketch
--  [ ] Copy of all the libraries used by the sketch
--  [ ] If you are using standard libraries available in Library Manager,
-   then provide just version numbers
+-  [ ] Copy of all the libraries used by the sketch (if you are using
+   standard libraries available in the Arduino Library Manager,
+   then provide just version numbers)
 -  [ ] Version of `esp8266 /
    Arduino <https://github.com/esp8266/Arduino>`__ core
 -  [ ] Name and version of your programming IDE and O/S
 
 With plenty of ESP module types available, several versions of libraries
 or `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core,
-types and versions of O/S, you need to provide exact information what
-your application is about. Only then people willing to look into your
-issue may be able to refer it to configuration they have. If you are
-lucky, they may even attempt to reproduce your issue on their equipment.
-This will be far more difficult if you are providing only vague details,
+types and versions of O/S, you need to provide exact information on what
+your application is about. Only then, people willing to look into your
+issue may be able to compare it to a configuration they are familiar with.
+If you are lucky, they may even attempt to reproduce your issue on their 
+own equipment!
+This will be far more difficult if you provide only vague details,
 so somebody would need to ask you to find out what is really happening.
 
-On the other hand if you flood your issue report with hundreds lines of
-code, you may also have difficulty to find somebody willing to analyze
-it. Therefore reduce your code to the bare minimum that is still causing
-the issue. It will help you as well to isolate the issue and pin done
+On the other hand, if you flood your issue report with hundreds lines of
+code, you may also have difficulty finding somebody willing to analyze
+it. Therefore, reduce your code to the bare minimum that is still causing
+the issue. This will also help to isolate the issue and pin down
 the root cause.
 
 Conclusion
@@ -371,8 +411,8 @@ Do not be afraid to troubleshoot ESP exception and watchdog restarts.
 detailed diagnostics that will help you pin down the issue. Before
 checking the s/w, get your h/w right. Use `ESP Exception
 Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ to find
-out where the code fails. If you do you homework and still unable to
-identify the root cause, enter the issue report. Provide enough details.
+out where the code fails. If you do you homework and are still unable to
+identify the root cause, submit an issue report. Provide enough details.
 Be specific and isolate the issue. Then ask community for support. There
 are plenty of people that like to work with ESP and willing to help with
 your problem.

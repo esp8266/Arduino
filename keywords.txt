@@ -13,9 +13,9 @@ analogWriteFreq	KEYWORD2
 analogWriteRange	KEYWORD2
 baudrate	KEYWORD2
 swap	KEYWORD2
+enablePhaseLockedWaveform	KEYWORD2
 
 ######################################
 # Constants (LITERAL1)
 #######################################
 INPUT_PULLDOWN_16	LITERAL1
-PWMRANGE	LITERAL1

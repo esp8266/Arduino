@@ -6,6 +6,7 @@ Welcome to ESP8266 Arduino Core's documentation!
    :caption: Contents:
 
    Installing <installing>
+   Arduino IDE options <ideoptions>
    Reference <reference>
    Libraries <libraries>
    File system <filesystem>
@@ -13,10 +14,11 @@ Welcome to ESP8266 Arduino Core's documentation!
    OTA Updates <ota_updates/readme>
    PROGMEM <PROGMEM>
    Using GDB to debug <gdb>
+   MMU <mmu>
 
    Boards <boards>
    FAQ <faq/readme>
-   
+
    Exception causes <exception_causes>
    Debugging <Troubleshooting/debugging>
    Stack Dump <Troubleshooting/stack_dump>

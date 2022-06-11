@@ -59,6 +59,7 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #endif
 
 #define HTTP_MAX_DATA_WAIT 5000 //ms to wait for the client to send the request
+#define HTTP_MAX_DATA_AVAILABLE_WAIT 30 //ms to wait for the client to send the request when there is another client with data available
 #define HTTP_MAX_POST_WAIT 5000 //ms to wait for POST data to arrive
 #define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
@@ -82,7 +83,11 @@ namespace esp8266webserver {
 template<typename ServerType>
 class ESP8266WebServerTemplate;
 
+}
+
 #include "detail/RequestHandler.h"
+
+namespace esp8266webserver {
 
 template<typename ServerType>
 class ESP8266WebServerTemplate
@@ -110,6 +115,8 @@ public:
   void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
+  typedef std::function<String(FS &fs, const String &fName)> ETagFunction;
+
   void on(const Uri &uri, THandlerFunction handler);
   void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
   void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
@@ -118,6 +125,7 @@ public:
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
   void enableCORS(bool enable);
+  void enableETag(bool enable, ETagFunction fn = nullptr);
 
   const String& uri() const { return _currentUri; }
   HTTPMethod method() const { return _currentMethod; }
@@ -134,6 +142,8 @@ public:
   int args() const;                        // get arguments count
   bool hasArg(const String& name) const;   // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
+  template<typename... Args>
+  void collectHeaders(const Args&... args); // set the request headers to collect (variadic template version)
   const String& header(const String& name) const; // get request header value by name
   const String& header(int i) const;       // get request header value by number
   const String& headerName(int i) const;   // get request header name by number
@@ -145,7 +155,7 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
-  void send(int code, const char* content_type = NULL, const String& content = String(""));
+  void send(int code, const char* content_type = NULL, const String& content = emptyString);
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send(int code, const char *content_type, const char *content) {
@@ -160,13 +170,24 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
+  void send(int code, const char* content_type, Stream* stream, size_t content_length = 0);
+  void send(int code, const char* content_type, Stream& stream, size_t content_length = 0) {
+    send(code, content_type, &stream, content_length);
+  }
+
   void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
+  void sendContent(String& content) {
+    sendContent((const String&)content);
+  }
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
   void sendContent(const char *content) { sendContent_P(content); }
   void sendContent(const char *content, size_t size) { sendContent_P(content, size); }
+
+  void sendContent(Stream* content, ssize_t content_length = 0);
+  void sendContent(Stream& content, ssize_t content_length = 0) { sendContent(&content, content_length); }
 
   bool chunkedResponseModeStart_P (int code, PGM_P content_type) {
     if (_currentVersion == 0)
@@ -211,9 +232,33 @@ public:
     size_t contentLength = 0;
     _streamFileCore(file.size(), file.name(), contentType);
     if (requestMethod == HTTP_GET) {
-      contentLength = _currentClient.write(file);
+      contentLength = file.sendAll(_currentClient);
     }
     return contentLength;
+  }
+
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T &aStream, const String& contentType, HTTPMethod requestMethod, ssize_t size) {
+    setContentLength(size);
+    send(200, contentType, emptyString);
+    if (requestMethod == HTTP_GET)
+        size = aStream.sendSize(_currentClient, size);
+    return size;
+  }
+
+  // Implement GET and HEAD requests for stream
+  // Stream body on HTTP_GET but not on HTTP_HEAD requests.
+  template<typename T>
+  size_t stream(T& aStream, const String& contentType, HTTPMethod requestMethod = HTTP_GET) {
+    ssize_t size = aStream.size();
+    if (size < 0)
+    {
+        send(500, F("text/html"), F("input stream: undetermined size"));
+        return 0;
+    }
+    return stream(aStream, contentType, requestMethod, size);
   }
 
   static String responseCodeToString(const int code);
@@ -232,6 +277,9 @@ public:
     }
   }
 
+  bool             _eTagEnabled = false;
+  ETagFunction     _eTagFunction = nullptr;
+
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
@@ -242,7 +290,7 @@ protected:
   bool _parseForm(ClientType& client, const String& boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
-  uint8_t _uploadReadByte(ClientType& client);
+  int _uploadReadByte(ClientType& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
 
@@ -259,35 +307,35 @@ protected:
 
   ServerType  _server;
   ClientType  _currentClient;
-  HTTPMethod  _currentMethod;
+  HTTPMethod  _currentMethod = HTTP_ANY;
   String      _currentUri;
-  uint8_t     _currentVersion;
-  HTTPClientStatus _currentStatus;
-  unsigned long _statusChange;
-  bool _keepAlive;
+  uint8_t     _currentVersion = 0;
+  HTTPClientStatus _currentStatus = HC_NONE;
+  unsigned long _statusChange = 0;
 
-  RequestHandlerType*  _currentHandler;
-  RequestHandlerType*  _firstHandler;
-  RequestHandlerType*  _lastHandler;
+  RequestHandlerType*  _currentHandler = nullptr;
+  RequestHandlerType*  _firstHandler = nullptr;
+  RequestHandlerType*  _lastHandler = nullptr;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
-  int              _currentArgCount;
-  RequestArgument* _currentArgs;
-  int              _currentArgsHavePlain;
+  int              _currentArgCount = 0;
+  RequestArgument* _currentArgs = nullptr;
+  int              _currentArgsHavePlain = 0;
   std::unique_ptr<HTTPUpload> _currentUpload;
-  int              _postArgsLen;
-  RequestArgument* _postArgs;
+  int              _postArgsLen = 0;
+  RequestArgument* _postArgs = nullptr;
 
-  int              _headerKeysCount;
-  RequestArgument* _currentHeaders;
+  int              _headerKeysCount = 0;
+  RequestArgument* _currentHeaders = nullptr;
 
-  size_t           _contentLength;
+  size_t           _contentLength = 0;
   String           _responseHeaders;
 
   String           _hostHeader;
-  bool             _chunked;
-  bool             _corsEnabled;
+  bool             _chunked = false;
+  bool             _corsEnabled = false;
+  bool             _keepAlive = false;
 
   String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
@@ -296,15 +344,12 @@ protected:
   HookFunction     _hook;
 };
 
+} // namespace
 
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
 
-};
-
-
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
-
 
 #endif //ESP8266WEBSERVER_H

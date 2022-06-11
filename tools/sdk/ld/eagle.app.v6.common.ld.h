@@ -1,6 +1,15 @@
 /* This linker script generated from xt-genldscripts.tpp for LSP . */
 /* Linker Script for ld -N */
 
+/* The restriction to one MEMORY command, appears to be a restriction in
+   past versions. https://stackoverflow.com/a/55673816
+   This 2nd MEMORY command appears to work fine.
+*/
+MEMORY
+{
+  iram1_0_seg :                         org = 0x40100000, len = MMU_IRAM_SIZE
+}
+
 PHDRS
 {
   dport0_0_phdr PT_LOAD;
@@ -88,7 +97,7 @@ SECTIONS
   {
     *(.noinit)
   } >dram0_0_seg :dram0_0_phdr
-  
+
 #ifdef VTABLES_IN_DRAM
 #include "eagle.app.v6.common.ld.vtables.h"
 #endif
@@ -138,6 +147,13 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
+
+    /* Stuff the CRC in well known symbols at a well known location */
+    __crc_len = ABSOLUTE(.);
+    LONG(0x00000000);
+    __crc_val = ABSOLUTE(.);
+    LONG(0x00000000);
+
     *(.ver_number)
     *.c.o(.literal*, .text*)
     *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
