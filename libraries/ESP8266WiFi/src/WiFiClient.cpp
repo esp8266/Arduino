@@ -77,14 +77,14 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0)
+: _client(0), _owned(0)
 {
     _timeout = 5000;
     WiFiClient::_add(this);
 }
 
 WiFiClient::WiFiClient(ClientContext* client)
-: _client(client)
+: _client(client), _owned(0)
 {
     _timeout = 5000;
     _client->ref();
@@ -101,11 +101,16 @@ WiFiClient::~WiFiClient()
         _client->unref();
 }
 
+std::unique_ptr<WiFiClient> WiFiClient::clone() const {
+    return std::make_unique<WiFiClient>(*this);
+}
+
 WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -118,6 +123,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
+    _owned = other._owned;
     if (_client)
         _client->ref();
     return *this;
@@ -382,9 +388,18 @@ void WiFiClient::stopAll()
 
 void WiFiClient::stopAllExcept(WiFiClient* except)
 {
+    // Stop all will look at the lowest-level wrapper connections only
+    while (except->_owned) {
+         except = except->_owned;
+    }
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        if (it != except) {
-            it->stop();
+        WiFiClient* conn = it;
+        // Find the lowest-level owner of the current list entry
+        while (conn->_owned) {
+            conn = conn->_owned;
+        }
+        if (conn != except) {
+            conn->stop();
         }
     }
 }

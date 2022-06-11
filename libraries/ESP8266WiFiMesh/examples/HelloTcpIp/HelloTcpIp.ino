@@ -1,4 +1,4 @@
-#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
+#define ESP8266WIFIMESH_DISABLE_COMPATIBILITY  // Excludes redundant compatibility code. TODO: Should be used for new code until the compatibility code is removed with release 3.0.0 of the Arduino core.
 
 #include <ESP8266WiFi.h>
 #include <TcpIpMeshBackend.h>
@@ -20,7 +20,7 @@ namespace TypeCast = MeshTypeConversionFunctions;
    https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
 */
 constexpr char exampleMeshName[] PROGMEM = "MeshNode_";
-constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO"; // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
+constexpr char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";  // Note: " is an illegal character. The password has to be min 8 and max 64 characters long, otherwise an AP which uses it will not be found during scans.
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
@@ -37,7 +37,7 @@ TcpIpMeshBackend tcpIpNode = TcpIpMeshBackend(manageRequest, manageResponse, net
 
    @param request The request string received from another node in the mesh
    @param meshInstance The MeshBackendBase instance that called the function.
-   @return The string to send back to the other node. For ESP-NOW, return an empy string ("") if no response should be sent.
+   @return The string to send back to the other node. For ESP-NOW, return an empty string ("") if no response should be sent.
 */
 String manageRequest(const String &request, MeshBackendBase &meshInstance) {
   // To get the actual class of the polymorphic meshInstance, do as follows (meshBackendCast replaces dynamic_cast since RTTI is disabled)
@@ -45,7 +45,7 @@ String manageRequest(const String &request, MeshBackendBase &meshInstance) {
     String transmissionEncrypted = espnowInstance->receivedEncryptedTransmission() ? F(", Encrypted transmission") : F(", Unencrypted transmission");
     Serial.print(String(F("ESP-NOW (")) + espnowInstance->getSenderMac() + transmissionEncrypted + F("): "));
   } else if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
-    (void)tcpIpInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
+    (void)tcpIpInstance;  // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
     Serial.print(F("TCP/IP: "));
   } else {
     Serial.print(F("UNKNOWN!: "));
@@ -145,8 +145,7 @@ bool exampleTransmissionOutcomesUpdateHook(MeshBackendBase &meshInstance) {
   if (TcpIpMeshBackend *tcpIpInstance = TypeCast::meshBackendCast<TcpIpMeshBackend *>(&meshInstance)) {
     if (tcpIpInstance->latestTransmissionOutcomes().back().transmissionStatus() == TransmissionStatusType::TRANSMISSION_COMPLETE) {
       // Our last request got a response, so time to create a new request.
-      meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ")
-                              + meshInstance.getMeshName() + meshInstance.getNodeID() + String('.'));
+      meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + F(" from ") + meshInstance.getMeshName() + meshInstance.getNodeID() + String('.'));
     }
   } else {
     Serial.println(F("Invalid mesh backend!"));
@@ -174,8 +173,8 @@ void setup() {
 
   /* Initialise the mesh node */
   tcpIpNode.begin();
-  tcpIpNode.activateAP(); // Each AP requires a separate server port.
-  tcpIpNode.setStaticIP(IPAddress(192, 168, 4, 22)); // Activate static IP mode to speed up connection times.
+  tcpIpNode.activateAP();                             // Each AP requires a separate server port.
+  tcpIpNode.setStaticIP(IPAddress(192, 168, 4, 22));  // Activate static IP mode to speed up connection times.
 
   // Storing our message in the TcpIpMeshBackend instance is not required, but can be useful for organizing code, especially when using many TcpIpMeshBackend instances.
   // Note that calling the multi-recipient tcpIpNode.attemptTransmission will replace the stored message with whatever message is transmitted.
@@ -186,17 +185,15 @@ void setup() {
 
 int32_t timeOfLastScan = -10000;
 void loop() {
-  if (millis() - timeOfLastScan > 3000 // Give other nodes some time to connect between data transfers.
-      || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) { // Scan for networks with two second intervals when not already connected.
+  if (millis() - timeOfLastScan > 3000                                           // Give other nodes some time to connect between data transfers.
+      || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) {  // Scan for networks with two second intervals when not already connected.
 
     // attemptTransmission(message, scan, scanAllWiFiChannels, concludingDisconnect, initialDisconnect = false)
     tcpIpNode.attemptTransmission(tcpIpNode.getMessage(), true, false, false);
     timeOfLastScan = millis();
 
     // One way to check how attemptTransmission worked out
-    if (tcpIpNode.latestTransmissionSuccessful()) {
-      Serial.println(F("Transmission successful."));
-    }
+    if (tcpIpNode.latestTransmissionSuccessful()) { Serial.println(F("Transmission successful.")); }
 
     // Another way to check how attemptTransmission worked out
     if (tcpIpNode.latestTransmissionOutcomes().empty()) {

@@ -34,10 +34,17 @@ namespace BearSSL {
 class WiFiClientSecureCtx : public WiFiClient {
   public:
     WiFiClientSecureCtx();
-    WiFiClientSecureCtx(const WiFiClientSecure &rhs) = delete;
+    WiFiClientSecureCtx(const WiFiClientSecureCtx &rhs) = delete;
     ~WiFiClientSecureCtx() override;
 
     WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
+
+    // TODO: usage is invalid b/c of deleted copy, but this will only trigger an error when it is actually used by something
+    // TODO: don't remove just yet to avoid including the WiFiClient default implementation and unintentionally causing
+    //       a 'slice' that this method tries to avoid in the first place
+    std::unique_ptr<WiFiClient> clone() const override {
+        return nullptr;
+    }
 
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String& host, uint16_t port) override;
@@ -189,6 +196,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     size_t _recvapp_len;
 
     bool _clientConnected(); // Is the underlying socket alive?
+    std::shared_ptr<unsigned char> _alloc_iobuf(size_t sz);
     void _freeSSL();
     int _run_until(unsigned target, bool blocking = true);
     size_t _write(const uint8_t *buf, size_t size, bool pmem);
@@ -230,13 +238,23 @@ class WiFiClientSecure : public WiFiClient {
   // Instead, all virtual functions call their counterpart in "WiFiClientecureCtx* _ctx"
   //          which also derives from WiFiClient (this parent is the one which is eventually used)
 
+  // TODO: notice that this complicates the implementation by having two distinct ways the client connection is managed, consider:
+  // - implementing the secure connection details in the ClientContext
+  //   (i.e. delegate the write & read functions there)
+  // - simplify the inheritance chain by implementing base wificlient class and inherit the original wificlient and wificlientsecure from it
+  // - abstract internals so it's possible to seamlessly =default copy and move with the instance *without* resorting to manual copy and initialization of each member
+
+  // TODO: prefer implementing virtual overrides in the .cpp (or, at least one of them)
+
   public:
 
-    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { }
-    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { }
+    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { _owned = _ctx.get(); }
+    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { if (_ctx) _owned = _ctx.get(); }
     ~WiFiClientSecure() override { _ctx = nullptr; }
 
-    WiFiClientSecure& operator=(const WiFiClientSecure&) = default; // The shared-ptrs handle themselves automatically
+    WiFiClientSecure& operator=(const WiFiClientSecure&) = default;
+
+    std::unique_ptr<WiFiClient> clone() const override { return std::unique_ptr<WiFiClient>(new WiFiClientSecure(*this)); }
 
     uint8_t status() override { return _ctx->status(); }
     int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
@@ -309,8 +327,8 @@ class WiFiClientSecure : public WiFiClient {
 
     // Limit the TLS versions BearSSL will connect with.  Default is
     // BR_TLS10...BR_TLS12. Allowed values are: BR_TLS10, BR_TLS11, BR_TLS12
-    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12) { return _ctx->setSSLVersion(min, max); };    
-    
+    bool setSSLVersion(uint32_t min = BR_TLS10, uint32_t max = BR_TLS12) { return _ctx->setSSLVersion(min, max); };
+
     // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);

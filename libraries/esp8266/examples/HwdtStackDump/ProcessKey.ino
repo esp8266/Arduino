@@ -1,5 +1,5 @@
 #include <esp8266_undocumented.h>
-void crashMeIfYouCan(void)__attribute__((weak));
+void crashMeIfYouCan(void) __attribute__((weak));
 int divideA_B(int a, int b);
 
 int* nullPointer = NULL;
@@ -14,7 +14,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
       break;
-    case 's': {
+    case 's':
+      {
         uint32_t startTime = millis();
         out.printf_P(PSTR("Now crashing with Software WDT. This will take about 3 seconds.\r\n"));
         ets_install_putc1(ets_putc);
@@ -32,7 +33,9 @@ void processKey(Print& out, int hotKey) {
                    "mov.n a4, %2\n\t"
                    "mov.n a5, %3\n\t"
                    "mov.n a6, %4\n\t"
-                   : : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa) : "memory");
+                   :
+                   : "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa), "r"(0xaaaaaaaa)
+                   : "memory");
       // Could not find these in the stack dump, unless interrupts were enabled.
       {
         uint32_t startTime = millis();
@@ -70,14 +73,12 @@ void processKey(Print& out, int hotKey) {
       out.println(F("This line will not be printable w/o running GDB"));
       break;
     case '0':
-      out.println(F("Crashing at an embeded 'break 1, 15' instruction that was generated"));
+      out.println(F("Crashing at an embedded 'break 1, 15' instruction that was generated"));
       out.println(F("by the compiler after detecting a divide by zero."));
       out.printf_P(PSTR("This should not print %d\n"), divideA_B_bp(1, 0));
       break;
-    case '\r':
-      out.println();
-    case '\n':
-      break;
+    case '\r': out.println();
+    case '\n': break;
     case '?':
       out.println();
       out.println(F("Press a key + <enter>"));

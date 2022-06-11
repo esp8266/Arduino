@@ -28,6 +28,8 @@
 #include "PolledTimeout.h"
 #include "LwipIntf.h"
 
+#include <coredecls.h>
+
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -43,9 +45,6 @@ extern "C" {
 }
 
 #include "debug.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -136,7 +135,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     int passphraseLen = passphrase == nullptr ? 0 : strlen(passphrase);
     if(passphraseLen > 64) {
         // fail passphrase too long!
-        return WL_CONNECT_FAILED;
+        return WL_WRONG_PASSWORD;
     }
 
     struct station_config conf;
@@ -431,10 +430,10 @@ int8_t ESP8266WiFiSTAClass::waitForConnectResult(unsigned long timeoutLength) {
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    using esp8266::polledTimeout::oneShot;
-    oneShot timeout(timeoutLength); // number of milliseconds to wait before returning timeout error
+    // if probing doesn't trip, this yields
+    using oneShotYieldMs = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
+    oneShotYieldMs timeout(timeoutLength); // number of milliseconds to wait before returning timeout error
     while(!timeout) {
-        yield();
         if(status() != WL_DISCONNECTED) {
             return status();
         }
@@ -506,7 +505,7 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
 
 /**
  * Get the broadcast ip address.
- * @return IPAddress Bradcast IP
+ * @return IPAddress Broadcast IP
  */
 IPAddress ESP8266WiFiSTAClass::broadcastIP()
 {

@@ -14,12 +14,188 @@
 #define ETS_PRINTF ets_uart_printf
 #endif
 
+/*
+  Verify mmu_get_uint16()'s compliance with strict-aliasing rules under
+  different optimizations.
+*/
+
+#pragma GCC push_options
+// reference
+#pragma GCC optimize("O0")  // We expect -O0 to generate the correct results
+__attribute__((noinline)) void aliasTestReference(uint16_t *x) {
+  // Without adhearance to strict-aliasing, this sequence of code would fail
+  // when optimized by GCC Version 10.3
+  size_t len = 3;
+  for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+    for (size_t v = 0; v < len; v++) { x[v] = mmu_get_uint16(&x[v]) + x1; }
+  }
+}
+// Tests
+#pragma GCC optimize("Os")
+__attribute__((noinline)) void aliasTestOs(uint16_t *x) {
+  size_t len = 3;
+  for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+    for (size_t v = 0; v < len; v++) { x[v] = mmu_get_uint16(&x[v]) + x1; }
+  }
+}
+#pragma GCC optimize("O2")
+__attribute__((noinline)) void aliasTestO2(uint16_t *x) {
+  size_t len = 3;
+  for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+    for (size_t v = 0; v < len; v++) { x[v] = mmu_get_uint16(&x[v]) + x1; }
+  }
+}
+#pragma GCC optimize("O3")
+__attribute__((noinline)) void aliasTestO3(uint16_t *x) {
+  size_t len = 3;
+  for (size_t u = 0; u < len; u++) {
+    uint16_t x1 = mmu_get_uint16(&x[0]);
+    for (size_t v = 0; v < len; v++) { x[v] = mmu_get_uint16(&x[v]) + x1; }
+  }
+}
+
+// Evaluate if optomizer may have changed 32-bit access to 8-bit.
+// 8-bit access will take longer as it will be processed thought
+// the exception handler. For this case the -O0 version will appear faster.
+#pragma GCC optimize("O0")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_Reference(uint8_t *res) {
+  // This test case was verified with GCC 10.3
+  // There is a code case that can result in 32-bit wide IRAM load from memory
+  // being optimized down to an 8-bit memory access. In this test case we need
+  // to supply a constant IRAM address that is not 0 when anded with 3u.
+  // This section verifies that the workaround implimented by the inline
+  // function mmu_get_uint8() is preventing this. See comments for function
+  // mmu_get_uint8(() in mmu_iram.h for more details.
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("Os")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_Os(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("O2")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_O2(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC optimize("O3")
+__attribute__((noinline)) IRAM_ATTR uint32_t timedRead_O3(uint8_t *res) {
+  const uint8_t *x = (const uint8_t *)0x40100003ul;
+  uint32_t b = ESP.getCycleCount();
+  *res = mmu_get_uint8(x);
+  return ESP.getCycleCount() - b;
+}
+#pragma GCC pop_options
+
+bool test4_32bit_loads() {
+  bool result = true;
+  uint8_t res;
+  uint32_t cycle_count_ref, cycle_count;
+  Serial.printf("\r\nFor mmu_get_uint8, verify that 32-bit wide IRAM access is preserved across different optimizations:\r\n");
+  cycle_count_ref = timedRead_Reference(&res);
+  /*
+    If the optimizer (for options -Os, -O2, and -O3) replaces the 32-bit wide
+    IRAM access with an 8-bit, the exception handler will get invoked on memory
+    reads. The total execution time will show a significant increase when
+    compared to the reference (option -O0).
+  */
+  Serial.printf("  Option -O0, cycle count %5u - reference\r\n", cycle_count_ref);
+  cycle_count = timedRead_Os(&res);
+  Serial.printf("  Option -Os, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  cycle_count = timedRead_O2(&res);
+  Serial.printf("  Option -O2, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  cycle_count = timedRead_O3(&res);
+  Serial.printf("  Option -O3, cycle count %5u ", cycle_count);
+  if (cycle_count_ref > cycle_count) {
+    Serial.printf("- passed\r\n");
+  } else {
+    result = false;
+    Serial.printf("- failed\r\n");
+  }
+  return result;
+}
+
+void printPunFail(uint16_t *ref, uint16_t *x, size_t sz) {
+  Serial.printf("    Expected:");
+  for (size_t i = 0; i < sz; i++) { Serial.printf(" %3u", ref[i]); }
+  Serial.printf("\r\n    Got:     ");
+  for (size_t i = 0; i < sz; i++) { Serial.printf(" %3u", x[i]); }
+  Serial.printf("\r\n");
+}
+
+bool testPunning() {
+  bool result = true;
+  // Get reference result for verifing test
+  alignas(uint32_t) uint16_t x_ref[] = { 1, 2, 3, 0 };
+  aliasTestReference(x_ref);  // -O0
+  Serial.printf("mmu_get_uint16() strict-aliasing tests with different optimizations:\r\n");
+
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
+    aliasTestOs(x);
+    Serial.printf("  Option -Os ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
+    }
+  }
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
+    aliasTestO2(x);
+    Serial.printf("  Option -O2 ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
+    }
+  }
+  {
+    alignas(alignof(uint32_t)) uint16_t x[] = { 1, 2, 3, 0 };
+    aliasTestO3(x);
+    Serial.printf("  Option -O3 ");
+    if (0 == memcmp(x_ref, x, sizeof(x_ref))) {
+      Serial.printf("- passed\r\n");
+    } else {
+      result = false;
+      Serial.printf("- failed\r\n");
+      printPunFail(x_ref, x, sizeof(x_ref) / sizeof(uint16_t));
+    }
+  }
+  return result;
+}
+
+
 uint32_t cyclesToRead_nKx32(int n, unsigned int *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n * 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < n * 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
@@ -37,9 +213,7 @@ uint32_t cyclesToWrite_nKx32(int n, unsigned int *x) {
 uint32_t cyclesToRead_nKx16(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n * 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < n * 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
@@ -57,9 +231,7 @@ uint32_t cyclesToWrite_nKx16(int n, unsigned short *x) {
 uint32_t cyclesToRead_nKxs16(int n, short *x, int32_t *res) {
   uint32_t b = ESP.getCycleCount();
   int32_t sum = 0;
-  for (int i = 0; i < n * 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < n * 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
@@ -74,17 +246,15 @@ uint32_t cyclesToWrite_nKxs16(int n, short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKx8(int n, unsigned char*x, uint32_t *res) {
+uint32_t cyclesToRead_nKx8(int n, unsigned char *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
-  for (int i = 0; i < n * 1024; i++) {
-    sum += *(x++);
-  }
+  for (int i = 0; i < n * 1024; i++) { sum += *(x++); }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
+uint32_t cyclesToWrite_nKx8(int n, unsigned char *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
@@ -95,12 +265,11 @@ uint32_t cyclesToWrite_nKx8(int n, unsigned char*x) {
 }
 
 // Compare with Inline
-
 uint32_t cyclesToRead_nKx16_viaInline(int n, unsigned short *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_uint16(x++); //*(x++);
+    sum += mmu_get_uint16(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
@@ -121,7 +290,7 @@ uint32_t cyclesToRead_nKxs16_viaInline(int n, short *x, int32_t *res) {
   uint32_t b = ESP.getCycleCount();
   int32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_int16(x++); //*(x++);
+    sum += mmu_get_int16(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
@@ -138,17 +307,17 @@ uint32_t cyclesToWrite_nKxs16_viaInline(int n, short *x) {
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char*x, uint32_t *res) {
+uint32_t cyclesToRead_nKx8_viaInline(int n, unsigned char *x, uint32_t *res) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
-    sum += mmu_get_uint8(x++); //*(x++);
+    sum += mmu_get_uint8(x++);  //*(x++);
   }
   *res = sum;
   return ESP.getCycleCount() - b;
 }
 
-uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
+uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char *x) {
   uint32_t b = ESP.getCycleCount();
   uint32_t sum = 0;
   for (int i = 0; i < n * 1024; i++) {
@@ -159,25 +328,27 @@ uint32_t cyclesToWrite_nKx8_viaInline(int n, unsigned char*x) {
   return ESP.getCycleCount() - b;
 }
 
+
 bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
   uint32_t res, verify_res;
   uint32_t t;
   bool success = true;
   int sres, verify_sres;
 
-  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception handling for IRAM.\r\n");;
-  t = cyclesToWrite_nKx16(nK, (uint16_t*)mem);
+  Serial.printf("\r\nPerformance numbers for 16 bit access - using inline macros or exception handling for IRAM.\r\n");
+  ;
+  t = cyclesToWrite_nKx16(nK, (uint16_t *)mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx16(nK, (uint16_t*)mem, &verify_res);
+  t = cyclesToRead_nKx16(nK, (uint16_t *)mem, &verify_res);
   Serial.printf("DRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_res);
-  t = cyclesToWrite_nKxs16(nK, (int16_t*)mem);
+  t = cyclesToWrite_nKxs16(nK, (int16_t *)mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKxs16(nK, (int16_t*)mem, &verify_sres);
+  t = cyclesToRead_nKxs16(nK, (int16_t *)mem, &verify_sres);
   Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_sres);
 
-  t = cyclesToWrite_nKx16_viaInline(nK, (uint16_t*)imem);
+  t = cyclesToWrite_nKx16_viaInline(nK, (uint16_t *)imem);
   Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx16_viaInline(nK, (uint16_t*)imem, &res);
+  t = cyclesToRead_nKx16_viaInline(nK, (uint16_t *)imem, &res);
   Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
@@ -186,9 +357,9 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     success = false;
   }
 
-  t = cyclesToWrite_nKxs16_viaInline(nK, (int16_t*)imem);
+  t = cyclesToWrite_nKxs16_viaInline(nK, (int16_t *)imem);
   Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKxs16_viaInline(nK, (int16_t*)imem, &sres);
+  t = cyclesToRead_nKxs16_viaInline(nK, (int16_t *)imem, &sres);
   Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), sres);
   if (sres == verify_sres) {
     Serial.printf("- passed\r\n");
@@ -197,9 +368,9 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     success = false;
   }
 
-  t = cyclesToWrite_nKx16(nK, (uint16_t*)imem);
+  t = cyclesToWrite_nKx16(nK, (uint16_t *)imem);
   Serial.printf("IRAM Memory Write:         %7d cycles for %dK by uint16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx16(nK, (uint16_t*)imem, &res);
+  t = cyclesToRead_nKx16(nK, (uint16_t *)imem, &res);
   Serial.printf("IRAM Memory Read:          %7d cycles for %dK by uint16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
@@ -207,9 +378,9 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     Serial.printf("!= (sum %08x ) - failed\r\n", verify_res);
     success = false;
   }
-  t = cyclesToWrite_nKxs16(nK, (int16_t*)imem);
+  t = cyclesToWrite_nKxs16(nK, (int16_t *)imem);
   Serial.printf("IRAM Memory Write:         %7d cycles for %dK by  int16, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKxs16(nK, (int16_t*)imem, &sres);
+  t = cyclesToRead_nKxs16(nK, (int16_t *)imem, &sres);
   Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  int16, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), sres);
   if (sres == verify_sres) {
     Serial.printf("- passed\r\n");
@@ -218,15 +389,16 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     success = false;
   }
 
-  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception handling for IRAM access.\r\n");;
-  t = cyclesToWrite_nKx8(nK, (uint8_t*)mem);
+  Serial.printf("\r\nPerformance numbers for 8 bit access - using inline macros or exception handling for IRAM access.\r\n");
+  ;
+  t = cyclesToWrite_nKx8(nK, (uint8_t *)mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx8(nK, (uint8_t*)mem, &verify_res);
+  t = cyclesToRead_nKx8(nK, (uint8_t *)mem, &verify_res);
   Serial.printf("DRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x)\r\n", t, nK, t / (nK * 1024), verify_res);
 
-  t = cyclesToWrite_nKx8_viaInline(nK, (uint8_t*)imem);
+  t = cyclesToWrite_nKx8_viaInline(nK, (uint8_t *)imem);
   Serial.printf("IRAM Memory Write Inline:  %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx8_viaInline(nK, (uint8_t*)imem, &res);
+  t = cyclesToRead_nKx8_viaInline(nK, (uint8_t *)imem, &res);
   Serial.printf("IRAM Memory Read Inline:   %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
@@ -235,9 +407,9 @@ bool perfTest_nK(int nK, uint32_t *mem, uint32_t *imem) {
     success = false;
   }
 
-  t = cyclesToWrite_nKx8(nK, (uint8_t*)imem);
+  t = cyclesToWrite_nKx8(nK, (uint8_t *)imem);
   Serial.printf("IRAM Memory Write:         %7d cycles for %dK by  uint8, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
-  t = cyclesToRead_nKx8(nK, (uint8_t*)imem, &res);
+  t = cyclesToRead_nKx8(nK, (uint8_t *)imem, &res);
   Serial.printf("IRAM Memory Read:          %7d cycles for %dK by  uint8, %3d AVG cycles/transfer (sum %08x) ", t, nK, t / (nK * 1024), res);
   if (res == verify_res) {
     Serial.printf("- passed\r\n");
@@ -271,9 +443,7 @@ void setup() {
   Serial.printf("DRAM free: %6d\r\n", ESP.getFreeHeap());
   uint32_t *mem = (uint32_t *)malloc(2 * 1024 * sizeof(uint32_t));
   Serial.printf("DRAM buffer: Address %p, free %d\r\n", mem, ESP.getFreeHeap());
-  if (!mem) {
-    return;
-  }
+  if (!mem) { return; }
 
   // Now request from the IRAM heap
 #ifdef USE_SET_IRAM_HEAP
@@ -297,14 +467,13 @@ void setup() {
     Serial.printf("IRAM buffer: Address %p, free %d\r\n", imem, ESP.getFreeHeap());
   }
 #endif
-  if (!imem) {
-    return;
-  }
+  if (!imem) { return; }
 
   uint32_t res;
   uint32_t t;
   int nK = 1;
-  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros needed.\r\n");;
+  Serial.printf("\r\nPerformance numbers for 32 bit access - no exception handler or inline macros needed.\r\n");
+  ;
   t = cyclesToWrite_nKx32(nK, mem);
   Serial.printf("DRAM Memory Write:         %7d cycles for %dK by uint32, %3d AVG cycles/transfer\r\n", t, nK, t / (nK * 1024));
   t = cyclesToRead_nKx32(nK, mem, &res);
@@ -317,7 +486,7 @@ void setup() {
   Serial.println();
 
 
-  if (perfTest_nK(1, mem, imem)) {
+  if (perfTest_nK(1, mem, imem) && testPunning() && test4_32bit_loads()) {
     Serial.println();
   } else {
     Serial.println("\r\n*******************************");
@@ -394,11 +563,10 @@ void setup() {
     size_t free_iram = ESP.getFreeHeap();
     ETS_PRINTF("IRAM free: %6d\n", free_iram);
     uint32_t hfree;
-    uint16_t hmax;
+    uint32_t hmax;
     uint8_t hfrag;
     ESP.getHeapStats(&hfree, &hmax, &hfrag);
-    ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n",
-               hfree, hmax, hfrag);
+    ETS_PRINTF("ESP.getHeapStats(free: %u, max: %u, frag: %u)\n", hfree, hmax, hfrag);
     if (free_iram > UMM_OVERHEAD_ADJUST) {
       void *all = malloc(free_iram - UMM_OVERHEAD_ADJUST);
       ETS_PRINTF("%p = malloc(%u)\n", all, free_iram);
@@ -413,19 +581,22 @@ void setup() {
   }
 }
 
-void processKey(Print& out, int hotKey) {
+void processKey(Print &out, int hotKey) {
   switch (hotKey) {
-    case 'd': {
+    case 'd':
+      {
         HeapSelectDram ephemeral;
         umm_info(NULL, true);
         break;
       }
-    case 'i': {
+    case 'i':
+      {
         HeapSelectIram ephemeral;
         umm_info(NULL, true);
         break;
       }
-    case 'h': {
+    case 'h':
+      {
         {
           HeapSelectIram ephemeral;
           Serial.printf(PSTR("IRAM ESP.getFreeHeap:  %u\n"), ESP.getFreeHeap());
@@ -440,10 +611,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Restart, ESP.restart(); ...\r\n"));
       ESP.restart();
       break;
-    case '\r':
-      out.println();
-    case '\n':
-      break;
+    case '\r': out.println();
+    case '\n': break;
     case '?':
       out.println();
       out.println(F("Press a key + <enter>"));

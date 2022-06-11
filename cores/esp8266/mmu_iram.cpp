@@ -19,13 +19,16 @@
 #include "mmu_iram.h"
 #include <user_interface.h>
 
+#define ICACHE_SIZE_32 1
+#define ICACHE_SIZE_16 0
+
 extern "C" {
 
 #if (MMU_ICACHE_SIZE == 0x4000)
-#define SOC_CACHE_SIZE 0 // 16KB
+#define SOC_CACHE_SIZE ICACHE_SIZE_16
 #pragma message("ICACHE size 16K")
 #else
-#define SOC_CACHE_SIZE 1 // 32KB
+#define SOC_CACHE_SIZE ICACHE_SIZE_32
 #endif
 
 #if (MMU_ICACHE_SIZE == 0x4000)
@@ -80,7 +83,7 @@ extern "C" {
  *
  * "Cache_Read_Enable" is underdocumented. Main sources of information were from
  * rboot, zboot, https://richard.burtons.org/2015/06/12/esp8266-cache_read_enable/,
- * and other places. And some additional expermentation.
+ * and other places. And some additional experimentation.
  *
  * Searching through the NONOS SDK shows nothing on this API; however, some
  * clues on what the NONOS SDK might be doing with ICACHE related calls can be
@@ -185,8 +188,21 @@ extern "C" void pinMode( uint8_t pin, uint8_t mode ) {
 
     __pinMode( pin, mode );
 }
+#else   // #ifdef DEV_DEBUG_PRINT
+extern void Cache_Read_Disable(void);
 #endif  // #ifdef DEV_DEBUG_PRINT
 
+#else   // #if (MMU_ICACHE_SIZE == 0x4000)
+extern void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 #endif  // #if (MMU_ICACHE_SIZE == 0x4000)
+
+/*
+ * This wrapper is for running code from IROM (flash) before the SDK starts.
+ */
+void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
+  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
+  fn();
+  Cache_Read_Disable();
+}
 
 };

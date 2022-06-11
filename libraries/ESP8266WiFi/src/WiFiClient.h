@@ -52,6 +52,18 @@ public:
   WiFiClient(const WiFiClient&);
   WiFiClient& operator=(const WiFiClient&);
 
+  // b/c this is both a real class and a virtual parent of the secure client, make sure
+  // there's a safe way to copy from the pointer without 'slicing' it; i.e. only the base
+  // portion of a derived object will be copied, and the polymorphic behavior will be corrupted. 
+  //
+  // this class still implements the copy and assignment though, so this is not yet enforced
+  // (but, *should* be inside the Core itself, see httpclient & server)
+  //
+  // ref.
+  // - https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rc-copy-virtual
+  // - https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rh-copy
+  virtual std::unique_ptr<WiFiClient> clone() const;
+
   virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;
@@ -59,7 +71,8 @@ public:
   virtual size_t write(uint8_t) override;
   virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
-  size_t write(Stream& stream) [[ deprecated("use stream.sendHow(client...)") ]];
+  [[ deprecated("use stream.sendHow(client...)") ]]
+  size_t write(Stream& stream);
 
   virtual int available() override;
   virtual int read() override;
@@ -71,7 +84,7 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  virtual void flush() override { (void)flush(0); }
+  virtual void flush() override { (void)flush(0); } // wait for all outgoing characters to be sent, output buffer should be empty after this call
   virtual void stop() override { (void)stop(0); }
   bool flush(unsigned int maxWaitMs);
   bool stop(unsigned int maxWaitMs);
@@ -144,6 +157,7 @@ protected:
   void _err(int8_t err);
 
   ClientContext* _client;
+  WiFiClient* _owned;
   static uint16_t _localPort;
 };
 

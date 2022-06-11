@@ -3,15 +3,21 @@
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>
 
-uint32_t timed_byte_read(char *pc, uint32_t * o);
-uint32_t timed_byte_read2(char *pc, uint32_t * o);
+#if defined(CORE_MOCK)
+#define XCHAL_INSTRAM1_VADDR 0x40100000
+#else
+#include <sys/config.h>  // For config/core-isa.h
+#endif
+
+uint32_t timed_byte_read(char *pc, uint32_t *o);
+uint32_t timed_byte_read2(char *pc, uint32_t *o);
 int divideA_B(int a, int b);
 
-int* nullPointer = NULL;
+int *nullPointer = NULL;
 
-char *probe_b  = NULL;
+char *probe_b = NULL;
 short *probe_s = NULL;
-char *probe_c  = (char *)0x40110000;
+char *probe_c = (char *)0x40110000;
 short *unaligned_probe_s = NULL;
 
 uint32_t read_var = 0x11223344;
@@ -27,7 +33,7 @@ uint32_t read_var = 0x11223344;
 uint32_t *gobble;
 size_t gobble_sz;
 
-#elif (MMU_IRAM_SIZE > 32*1024)
+#elif (MMU_IRAM_SIZE > 32 * 1024)
 uint32_t gobble[4 * 1024] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
 
@@ -36,7 +42,7 @@ uint32_t gobble[256] IRAM_ATTR;
 constexpr size_t gobble_sz = sizeof(gobble);
 #endif
 
-bool  isValid(uint32_t *probe) {
+bool isValid(uint32_t *probe) {
   bool rc = true;
   if (NULL == probe) {
     ets_uart_printf("\nNULL memory pointer %p ...\n", probe);
@@ -48,7 +54,8 @@ bool  isValid(uint32_t *probe) {
   uint32_t saveData = *probe;
   for (size_t i = 0; i < 32; i++) {
     *probe = BIT(i);
-    asm volatile("" ::: "memory");
+    asm volatile("" ::
+                   : "memory");
     uint32_t val = *probe;
     if (val != BIT(i)) {
       ets_uart_printf("  Read 0x%08X != Wrote 0x%08X\n", val, (uint32_t)BIT(i));
@@ -62,7 +69,7 @@ bool  isValid(uint32_t *probe) {
 }
 
 
-void dump_mem32(const void * addr, const size_t len) {
+void dump_mem32(const void *addr, const size_t len) {
   uint32_t *addr32 = (uint32_t *)addr;
   ets_uart_printf("\n");
   if ((uintptr_t)addr32 & 3) {
@@ -71,9 +78,7 @@ void dump_mem32(const void * addr, const size_t len) {
   }
   for (size_t i = 0; i < len;) {
     ets_uart_printf("%p: ", &addr32[i]);
-    do {
-      ets_uart_printf(" 0x%08x", addr32[i]);
-    } while (i++, (i & 3) && (i < len));
+    do { ets_uart_printf(" 0x%08x", addr32[i]); } while (i++, (i & 3) && (i < len));
     ets_uart_printf("\n");
   }
   ets_uart_printf("\n");
@@ -81,7 +86,7 @@ void dump_mem32(const void * addr, const size_t len) {
 
 extern "C" void _text_end(void);
 // extern void *_text_end;
-void print_mmu_status(Print& oStream) {
+void print_mmu_status(Print &oStream) {
   oStream.println();
   oStream.printf_P(PSTR("MMU Configuration"));
   oStream.println();
@@ -102,7 +107,7 @@ void print_mmu_status(Print& oStream) {
 #ifdef MMU_IRAM_SIZE
   oStream.printf_P(PSTR("  IRAM Size:               %u"), MMU_IRAM_SIZE);
   oStream.println();
-  const uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - 0x40100000UL);
+  const uint32_t iram_free = MMU_IRAM_SIZE - (uint32_t)((uintptr_t)_text_end - (uintptr_t)XCHAL_INSTRAM1_VADDR);
   oStream.printf_P(PSTR("  IRAM free:               %u"), iram_free);
   oStream.println();
 #endif
@@ -131,7 +136,7 @@ void setup() {
   {
     HeapSelectIram ephemeral;
     // Serial.printf_P(PSTR("ESP.getFreeHeap(): %u\n"), ESP.getFreeHeap());
-    gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST; // - 4096;
+    gobble_sz = ESP.getFreeHeap() - UMM_OVERHEAD_ADJUST;  // - 4096;
     gobble = (uint32_t *)malloc(gobble_sz);
   }
   Serial.printf_P(PSTR("\r\nmalloc() from IRAM Heap:\r\n"));
@@ -146,9 +151,7 @@ void setup() {
 #if (MMU_IRAM_SIZE > 0x8000) || defined(MMU_IRAM_HEAP) || defined(MMU_SEC_HEAP)
   if (isValid(gobble)) {
     // Put something in our new memory
-    for (size_t i = 0; i < (gobble_sz / 4); i++) {
-      gobble[i] = (uint32_t)&gobble[i];
-    }
+    for (size_t i = 0; i < (gobble_sz / 4); i++) { gobble[i] = (uint32_t)&gobble[i]; }
 
     // Now is it there?
     dump_mem32(gobble, 32);
@@ -164,12 +167,12 @@ void setup() {
   probe_b = (char *)gobble;
   probe_s = (short *)((uintptr_t)gobble);
   unaligned_probe_s = (short *)((uintptr_t)gobble + 1);
-
 }
 
-void processKey(Print& out, int hotKey) {
+void processKey(Print &out, int hotKey) {
   switch (hotKey) {
-    case 't': {
+    case 't':
+      {
         uint32_t tmp;
         out.printf_P(PSTR("Test how much time is added by exception handling"));
         out.println();
@@ -221,7 +224,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read Byte from iRAM, 0x%02X at %p"), probe_b[0], probe_b);
       out.println();
       break;
-    case 'B': {
+    case 'B':
+      {
         out.printf_P(PSTR("Load/Store exception by writing byte to iRAM"));
         out.println();
         char val = 0x55;
@@ -240,7 +244,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("Read short from iRAM, 0x%04X at %p"), probe_s[0], probe_s);
       out.println();
       break;
-    case 'S': {
+    case 'S':
+      {
         out.printf_P(PSTR("Load/Store exception by writing short to iRAM"));
         out.println();
         short int val = 0x0AA0;
@@ -266,10 +271,8 @@ void processKey(Print& out, int hotKey) {
       out.printf_P(PSTR("This should not print %d"), divideA_B(1, 0));
       out.println();
       break;
-    case '\r':
-      out.println();
-    case '\n':
-      break;
+    case '\r': out.println();
+    case '\n': break;
     case '?':
       out.println();
       out.println(F("Press a key + <enter>"));

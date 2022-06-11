@@ -458,7 +458,7 @@ static inline int gdbHandleCommand() {
 		return ST_CONT;
 	} else if (cmd[0] == 's') {	//single-step instruction
 		//Single-stepping can go wrong if an interrupt is pending, especially when it is e.g. a task switch:
-		//the ICOUNT register will overflow in the task switch code. That is why we disable interupts when
+		//the ICOUNT register will overflow in the task switch code. That is why we disable interrupts when
 		//doing single-instruction stepping.
 		singleStepPs=gdbstub_savedRegs.ps;
 		gdbstub_savedRegs.ps=(gdbstub_savedRegs.ps & ~0xf) | (XCHAL_DEBUGLEVEL - 1);

@@ -26,7 +26,7 @@
 #include "spi_vendors.h"
 
 /**
- * AVR macros for WDT managment
+ * AVR macros for WDT management
  */
 typedef enum {
     WDTO_0MS    = 0,   //!< WDTO_0MS
@@ -114,9 +114,10 @@ class EspClass {
         static uint32_t getChipId();
 
         static uint32_t getFreeHeap();
-        static uint16_t getMaxFreeBlockSize();
+        static uint32_t getMaxFreeBlockSize();
         static uint8_t getHeapFragmentation(); // in %
-        static void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
+        static void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr) __attribute__((deprecated("Use 'uint32_t*' on max, 2nd argument")));
+        static void getHeapStats(uint32_t* free = nullptr, uint32_t* max = nullptr, uint8_t* frag = nullptr);
 
         static uint32_t getFreeContStack();
         static void resetFreeContStack();
@@ -264,7 +265,7 @@ class EspClass {
         static bool flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount);
         /**
          * @brief Write up to @a size bytes from @a data to flash at @a address
-         * This function takes case of unaligned memory acces by copying @a data to a temporary buffer,
+         * This function takes case of unaligned memory access by copying @a data to a temporary buffer,
          * it also takes care of page boundary crossing see @a flashWritePageBreak as to why it's done.
          * Less than @a size bytes may be written, due to 4 byte alignment requirement of spi_flash_write
          * @param address address on flash where write should start

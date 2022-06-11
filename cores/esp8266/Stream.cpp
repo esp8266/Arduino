@@ -148,7 +148,7 @@ long Stream::parseInt(char skipChar) {
 
     do {
         if(c == skipChar)
-            ; // ignore this charactor
+            ; // ignore this character
         else if(c == '-')
             isNegative = true;
         else if(c >= '0' && c <= '9')        // is c a digit?
@@ -274,7 +274,7 @@ int Stream::read (uint8_t* buffer, size_t maxLen)
         int c = read();
         if (c == -1)
             break;
-        buffer[nbread++] = read();
+        buffer[nbread++] = c;
     }
     return nbread;
 }

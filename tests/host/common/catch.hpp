@@ -4225,7 +4225,7 @@ namespace Catch {
             ss << seed;
             ss >> config.rngSeed;
             if( ss.fail() )
-                throw std::runtime_error( "Argment to --rng-seed should be the word 'time' or a number" );
+                throw std::runtime_error( "Argument to --rng-seed should be the word 'time' or a number" );
         }
     }
     inline void setVerbosity( ConfigData& config, int level ) {
@@ -6649,7 +6649,7 @@ namespace Catch {
                 Colour colourGuard( Colour::Red );
                 Catch::cerr()
                     << "Tag name [" << tag << "] not allowed.\n"
-                    << "Tag names starting with non alpha-numeric characters are reserved\n";
+                    << "Tag names starting with non alphanumeric characters are reserved\n";
             }
             {
                 Colour colourGuard( Colour::FileName );
