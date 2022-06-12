@@ -137,6 +137,10 @@
 #include "bearssl_x509.h"
 #include "bearssl_pem.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \brief Type for a configuration option.
  *
  * A "configuration option" is a value that is selected when the BearSSL
@@ -166,5 +170,14 @@ typedef struct {
  * \return  the configuration report.
  */
 const br_config_option *br_get_config(void);
+
+/* ======================================================================= */
+
+/** \brief Version feature: support for time callback. */
+#define BR_FEATURE_X509_TIME_CALLBACK   1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
