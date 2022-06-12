@@ -242,7 +242,8 @@ protected:
     bool sendHeader(const char * type);
     bool endRequest(void);
     int handleHeaderResponse();
-    int writeToStreamDataBlock(Stream * stream, int len);
+    bool readChunkHeader(bool blocking = true);
+    bool readChunkTrailer(bool blocking = true);
 
     // The common pattern to use the class is to
     // {
