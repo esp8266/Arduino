@@ -20,7 +20,12 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <eagle_soc.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* precache()
  *  pre-loads flash data into the flash cache
@@ -28,10 +33,6 @@
  *  otherwise preloads flash at the given address.
  *  All preloads are word aligned.
  */
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void precache(void *f, uint32_t bytes) {
   // Size of a cache page in bytes. We only need to read one word per
   // page (ie 1 word in 8) for this to work.
@@ -44,6 +45,24 @@ void precache(void *f, uint32_t bytes) {
   uint32_t x;
   for (uint32_t i=0; i<lines; i++, p+=CACHE_PAGE_SIZE/sizeof(uint32_t)) x=*p;
   (void)x;
+}
+
+/** based on efuse data, we could determine what type of chip this is
+ * - https://github.com/espressif/esptool/blob/f04d34bcab29ace798d2d3800ba87020cccbbfdd/esptool.py#L1060-L1070
+ * - https://github.com/espressif/ESP8266_RTOS_SDK/blob/3c055779e9793e5f082afff63a011d6615e73639/components/esp8266/include/esp8266/efuse_register.h#L20-L21
+ */
+bool __attribute__((const)) esp_is_8285() {
+    static const bool result = ([]() {
+        const uint32_t data[] {
+            READ_PERI_REG(0x3ff00050), // aka MAC0
+            READ_PERI_REG(0x3ff00058), // aka CHIPID
+        };
+
+        return ((data[0] & (1 << 4)) > 0)
+            || ((data[1] & (1 << 16)) > 0);
+    })();
+
+    return result;
 }
 
 #ifdef __cplusplus
