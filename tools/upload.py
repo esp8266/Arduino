@@ -26,7 +26,7 @@ write_addr = '0x0'
 erase_addr = ''
 erase_len = ''
 
-while len(sys.argv):
+while sys.argv:
     thisarg = sys.argv.pop(0)
 
     # We silently replace the 921kbaud setting with 460k to enable backward
@@ -68,7 +68,7 @@ try:
 except esptool.FatalError as e:
     sys.stderr.write('\nA fatal esptool.py error occurred: %s' % e)
 finally:
-    if len(erase_file):
+    if erase_file:
         os.remove(erase_file)
     if sys.exc_info:
         sys.exit(2)
