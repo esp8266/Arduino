@@ -260,7 +260,8 @@ String &String::copy(const char *cstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    memmove_P(wbuffer(), cstr, length + 1);
+    memmove_P(wbuffer(), cstr, length);
+    wbuffer()[length] = 0;
     return *this;
 }
 
@@ -270,7 +271,8 @@ String &String::copy(const __FlashStringHelper *pstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    memcpy_P(wbuffer(), (PGM_P)pstr, length + 1); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
+    memcpy_P(wbuffer(), (PGM_P)pstr, length); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
+    wbuffer()[length] = 0;
     return *this;
 }
 
@@ -411,8 +413,9 @@ bool String::concat(const __FlashStringHelper *str) {
     unsigned int newlen = len() + length;
     if (!reserve(newlen))
         return false;
-    memcpy_P(wbuffer() + len(), (PGM_P)str, length + 1);
+    memcpy_P(wbuffer() + len(), (PGM_P)str, length);
     setLen(newlen);
+    wbuffer()[newlen] = 0;
     return true;
 }
 
