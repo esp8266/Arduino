@@ -414,7 +414,7 @@ DhcpServer::OptionsBuffer DhcpServer::create_msg(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_offer(struct dhcps_msg* m)
 {
-    struct pbuf *p, *q;
+    struct pbuf *p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPOFFER);
@@ -438,12 +438,7 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
         os_printf("dhcps: send_offer>>p->tot_len = %d\n", p->tot_len);
         os_printf("dhcps: send_offer>>p->len = %d\n", p->len);
 #endif
-        q = p;
-        while (q != nullptr)
-        {
-            std::memcpy((u8_t*)q->payload, reinterpret_cast<u8_t*>(&m), q->len);
-            q = q->next;
-        }
+        pbuf_take(p, m, sizeof(struct dhcps_msg));
     }
     else
     {
@@ -475,7 +470,7 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_nak(struct dhcps_msg* m)
 {
-    struct pbuf *p, *q;
+    struct pbuf *p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPNAK);
@@ -492,12 +487,7 @@ void DhcpServer::send_nak(struct dhcps_msg* m)
         os_printf("dhcps: send_nak>>p->tot_len = %d\n", p->tot_len);
         os_printf("dhcps: send_nak>>p->len = %d\n", p->len);
 #endif
-        q = p;
-        while (q != nullptr)
-        {
-            std::memcpy((u8_t*)q->payload, (u8_t*)m, q->len);
-            q = q->next;
-        }
+        pbuf_take(p, m, sizeof(struct dhcps_msg));
     }
     else
     {
@@ -524,7 +514,7 @@ void DhcpServer::send_nak(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_ack(struct dhcps_msg* m)
 {
-    struct pbuf *p, *q;
+    struct pbuf *p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPACK);
@@ -548,12 +538,7 @@ void DhcpServer::send_ack(struct dhcps_msg* m)
         os_printf("dhcps: send_ack>>p->tot_len = %d\n", p->tot_len);
         os_printf("dhcps: send_ack>>p->len = %d\n", p->len);
 #endif
-        q = p;
-        while (q != nullptr)
-        {
-            std::memcpy((u8_t*)q->payload, (u8_t*)m, q->len);
-            q = q->next;
-        }
+        pbuf_take(p, m, sizeof(struct dhcps_msg));
     }
     else
     {
