@@ -414,7 +414,7 @@ DhcpServer::OptionsBuffer DhcpServer::create_msg(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_offer(struct dhcps_msg* m)
 {
-    struct pbuf *p;
+    struct pbuf* p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPOFFER);
@@ -470,7 +470,7 @@ void DhcpServer::send_offer(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_nak(struct dhcps_msg* m)
 {
-    struct pbuf *p;
+    struct pbuf* p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPNAK);
@@ -514,7 +514,7 @@ void DhcpServer::send_nak(struct dhcps_msg* m)
 ///////////////////////////////////////////////////////////////////////////////////
 void DhcpServer::send_ack(struct dhcps_msg* m)
 {
-    struct pbuf *p;
+    struct pbuf* p;
 
     auto options = create_msg(m);
     options.add(DHCP_OPTION_MSG_TYPE, DHCPACK);
