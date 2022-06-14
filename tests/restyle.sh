@@ -54,11 +54,13 @@ done
 # TODO should not be matched, these are formatted externally
 # exclude=$(git submodule --quiet foreach git rev-parse --show-toplevel | grep libraries)
 
-style=$(makeClangFormatStyle ${root}/tests/clang-format-arduino.yaml)
-find libraries \
-    -path libraries/ESP8266SdFat -prune -o \
-    -path libraries/Ethernet -prune -o \
-    -path libraries/SoftwareSerial -prune -o \
-    -name '*.ino' -exec $CLANG_FORMAT --verbose --style="$style" -i {} \;
+if [ -z $1 ] ; then
+    style=$(makeClangFormatStyle ${root}/tests/clang-format-arduino.yaml)
+    find libraries \
+        -path libraries/ESP8266SdFat -prune -o \
+        -path libraries/Ethernet -prune -o \
+        -path libraries/SoftwareSerial -prune -o \
+        -name '*.ino' -exec $CLANG_FORMAT --verbose --style="$style" -i {} \;
+fi
 
 #########################################

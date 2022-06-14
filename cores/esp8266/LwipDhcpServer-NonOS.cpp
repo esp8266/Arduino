@@ -71,19 +71,21 @@ extern "C"
     uint32 wifi_softap_get_dhcps_lease_time()
     {
         auto& server = getNonOSDhcpServer();
-        return server.get_dhcps_lease_time();
+        return server.getLeaseTime();
     }
 
     bool wifi_softap_set_dhcps_lease_time(uint32 minutes)
     {
         auto& server = getNonOSDhcpServer();
-        return server.set_dhcps_lease_time(minutes);
+        server.setLeaseTime(minutes);
+        return true;
     }
 
     bool wifi_softap_reset_dhcps_lease_time()
     {
         auto& server = getNonOSDhcpServer();
-        return server.reset_dhcps_lease_time();
+        server.resetLeaseTime();
+        return true;
     }
 
     bool wifi_softap_add_dhcps_lease(uint8* macaddr)

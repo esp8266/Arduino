@@ -176,9 +176,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         if(ip.ip.addr == 0x00000000) {
             DEBUG_WIFI("[AP] IP config Invalid resetting...\n");
             ret = softAPConfig(
-                0x0104A8C0 /* 192.168.4.1 */,
-                0x0104A8C0 /* 192.168.4.1 */,
-                0x00FFFFFF /* 255.255.255.0 */);
+                IPAddress(192, 168, 4, 1),
+                IPAddress(192, 168, 4, 1),
+                IPAddress(255, 255, 255, 0));
             if(!ret) {
                 DEBUG_WIFI("[AP] softAPConfig failed!\n");
                 ret = false;
@@ -227,9 +227,8 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     info.gw.addr = gateway.v4();
     info.netmask.addr = subnet.v4();
 
-    if(!wifi_softap_dhcps_stop()) {
-        DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
-    }
+    auto& server = softAPDhcpServer();
+    server.end();
 
     if(!wifi_set_ip_info(SOFTAP_IF, &info)) {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
@@ -247,24 +246,14 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    auto& server = softAPDhcpServer();
     if(!server.set_dhcps_lease(&dhcp_lease))
     {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
     }
 
-    uint8 mode = info.gw.addr ? 1 : 0;
-    if(!server.set_dhcps_offer_option(OFFER_ROUTER, &mode))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
-        ret = false;
-    }
-
-    if(!wifi_softap_dhcps_start()) {
-        DEBUG_WIFI("[APConfig] wifi_softap_dhcps_start failed!\n");
-        ret = false;
-    }
+    server.setRouter(true); // send ROUTER option with netif's gateway IP
+    server.begin();
 
     // check config
     if(wifi_get_ip_info(SOFTAP_IF, &info)) {
