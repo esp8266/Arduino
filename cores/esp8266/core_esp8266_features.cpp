@@ -51,18 +51,14 @@ void precache(void *f, uint32_t bytes) {
  * - https://github.com/espressif/esptool/blob/f04d34bcab29ace798d2d3800ba87020cccbbfdd/esptool.py#L1060-L1070
  * - https://github.com/espressif/ESP8266_RTOS_SDK/blob/3c055779e9793e5f082afff63a011d6615e73639/components/esp8266/include/esp8266/efuse_register.h#L20-L21
  */
-bool __attribute__((const)) esp_is_8285() {
-    static const bool result = ([]() {
-        const uint32_t data[] {
-            READ_PERI_REG(0x3ff00050), // aka MAC0
-            READ_PERI_REG(0x3ff00058), // aka CHIPID
-        };
+bool esp_is_8285() {
+    const uint32_t data[] {
+        READ_PERI_REG(0x3ff00050), // aka MAC0
+        READ_PERI_REG(0x3ff00058), // aka CHIPID
+    };
 
-        return ((data[0] & (1 << 4)) > 0)
-            || ((data[1] & (1 << 16)) > 0);
-    })();
-
-    return result;
+    return ((data[0] & (1 << 4)) > 0)
+        || ((data[1] & (1 << 16)) > 0);
 }
 
 #ifdef __cplusplus
