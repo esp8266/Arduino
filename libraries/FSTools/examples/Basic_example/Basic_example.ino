@@ -32,7 +32,7 @@ FSTools fstools;
 
 #ifndef STASSID
 #define STASSID "xxxx"
-#define STAPSK  "xxxx"
+#define STAPSK "xxxx"
 #endif
 
 const char* ssid = STASSID;
@@ -40,13 +40,13 @@ const char* password = STAPSK;
 
 
 bool migrateFS() {
-  if (!fstools.attemptToMountFS(LittleFS)) { //  Attempts to mount LittleFS without autoformat...
+  if (!fstools.attemptToMountFS(LittleFS)) {  //  Attempts to mount LittleFS without autoformat...
     Serial.println(F("Default FS not found"));
-    if (fstools.mountAlternativeFS(FST::SPIFFS  /* FST::LITTLEFS */, TARGET_FS_LAYOUT, true)) {
+    if (fstools.mountAlternativeFS(FST::SPIFFS /* FST::LITTLEFS */, TARGET_FS_LAYOUT, true)) {
       Serial.println(F("Alternative found"));
       if (fstools.moveFS(LittleFS)) {
         Serial.println(F("FileSystem Moved New FS contents:"));
-        fstools.fileListIterator(LittleFS, "/", [](File & f) {
+        fstools.fileListIterator(LittleFS, "/", [](File& f) {
           Serial.printf_P(PSTR(" File: %-30s [%8uB]\n"), f.fullName(), f.size());
         });
         return true;
@@ -70,7 +70,7 @@ void initWiFiOTA() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
-    } else { // U_FS
+    } else {  // U_FS
       type = "filesystem";
     }
 
@@ -116,7 +116,7 @@ void setup() {
 
   Serial.println("Booting");
 
-  migrateFS(); // MUST call this before calling your own begin();
+  migrateFS();  // MUST call this before calling your own begin();
 
   initWiFiOTA();
 
