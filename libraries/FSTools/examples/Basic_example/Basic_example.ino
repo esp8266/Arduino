@@ -32,7 +32,7 @@ FSTools fstools;
 
 #ifndef STASSID
 #define STASSID "xxxx"
-#define STAPSK  "xxxx"
+#define STAPSK "xxxx"
 #endif
 
 const char* ssid = STASSID;
