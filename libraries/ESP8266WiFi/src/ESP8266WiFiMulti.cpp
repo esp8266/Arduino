@@ -25,6 +25,7 @@
 
 #include "PolledTimeout.h"
 #include "ESP8266WiFiMulti.h"
+#include <coredecls.h>
 #include <limits.h>
 #include <string.h>
 
@@ -82,37 +83,29 @@ static void printWiFiStatus(wl_status_t status)
  */
 static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
 {
-    wl_status_t status;
+    wl_status_t status = WL_CONNECT_FAILED;
+    // The final argument, intvl_ms, to esp_delay influences how frequently
+    // the scheduled recurrent functions (Schedule.h) are probed.
+    esp_delay(connectTimeoutMs,
+        [&status]() {
+            status = WiFi.status();
+            return status != WL_CONNECTED && status != WL_CONNECT_FAILED;
+        }, 0);
 
-    // Set WiFi connect timeout
-    using esp8266::polledTimeout::oneShotMs;
-    oneShotMs connectTimeout(connectTimeoutMs);
+    // Check status
+    if (status == WL_CONNECTED) {
+        // Connected, print WiFi status
+        printWiFiStatus(status);
 
-    // Wait for WiFi status change or timeout
-    do {
-        // Refresh watchdog
-        delay(0);
+        // Return WiFi status
+        return status;
+    } else if (status == WL_CONNECT_FAILED) {
+        DEBUG_WIFI_MULTI("[WIFIM] Connect failed\n");
+    } else {
+        DEBUG_WIFI_MULTI("[WIFIM] Connect timeout\n");
+    }
 
-        // Get WiFi status
-        status = WiFi.status();
-
-        // Check status
-        if (status == WL_CONNECTED) {
-            // Connected, print WiFi status
-            printWiFiStatus(status);
-
-            // Return WiFi status
-            return status;
-        } else if (status == WL_CONNECT_FAILED) {
-            DEBUG_WIFI_MULTI("[WIFIM] Connect failed\n");
-
-            // Return WiFi connect failed
-            return WL_CONNECT_FAILED;
-        }
-    } while (!connectTimeout);
-
-    DEBUG_WIFI_MULTI("[WIFIM] Connect timeout\n");
-
+    // Return WiFi connect failed
     return WL_CONNECT_FAILED;
 }
 
@@ -242,24 +235,19 @@ int8_t ESP8266WiFiMulti::startScan()
     // Start wifi scan in async mode
     WiFi.scanNetworks(true);
 
-    // Set WiFi scan timeout
-    using esp8266::polledTimeout::oneShotMs;
-    oneShotMs scanTimeout(WIFI_SCAN_TIMEOUT_MS);
-
     // Wait for WiFi scan change or timeout
-    do {
-        // Refresh watchdog
-        delay(0);
-
-        // Check scan timeout which may occur when scan does not report completion
-        if (scanTimeout) {
-            DEBUG_WIFI_MULTI("[WIFIM] Scan timeout\n");
-            return WIFI_SCAN_FAILED;
-        }
-
-        // Get scan result
-        scanResult = WiFi.scanComplete();
-    } while (scanResult < 0);
+    // The final argument, intvl_ms, to esp_delay influences how frequently
+    // the scheduled recurrent functions (Schedule.h) are probed.
+    esp_delay(WIFI_SCAN_TIMEOUT_MS,
+        [&scanResult]() {
+            scanResult = WiFi.scanComplete();
+            return scanResult < 0;
+        }, 0);
+    // Check for scan timeout which may occur when scan does not report completion
+    if (scanResult < 0) {
+        DEBUG_WIFI_MULTI("[WIFIM] Scan timeout\n");
+        return WIFI_SCAN_FAILED;
+    }
 
     // Print WiFi scan result
     printWiFiScan();
@@ -273,7 +261,7 @@ int8_t ESP8266WiFiMulti::startScan()
  * @param connectTimeoutMs
  *      WiFi connect timeout in ms
  * @return
- *      WiFi conneciton status
+ *      WiFi connection status
  */
 wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
 {
@@ -326,15 +314,21 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
     }
     DEBUG_WIFI_MULTI("\n");
 
+    // Create indices for AP connection failures
+    uint8_t connectSkipIndex[_APlist.size()];
+    memset(connectSkipIndex, 0, sizeof(connectSkipIndex));
+
     // Connect to known WiFi AP's sorted by RSSI
     for (int8_t i = 0; i < numNetworks; i++) {
         // Get network information
         WiFi.getNetworkInfo(known[i], ssid, encType, rssi, bssid, channel, hidden);
 
-        for (auto entry : _APlist) {
+        for (uint8_t j = 0; j < _APlist.size(); j++) {
+            auto &entry = _APlist[j];
+
             // Check SSID
             if (ssid == entry.ssid) {
-                DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid);
+                DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid.c_str());
 
                 // Connect to WiFi
                 WiFi.begin(ssid, entry.passphrase, channel, bssid);
@@ -343,13 +337,33 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
                 if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
                     return WL_CONNECTED;
                 }
+
+                // Failed to connect, skip for hidden SSID connects
+                connectSkipIndex[j] = true;
             }
         }
     }
 
-    DEBUG_WIFI_MULTI("[WIFIM] Could not connect\n", ssid);
+    // Try to connect to hidden AP's which are not reported by WiFi scan
+    for (uint8_t i = 0; i < _APlist.size(); i++) {
+        auto &entry = _APlist[i];
 
-    // Coult not connect to any WiFi network
+        if (!connectSkipIndex[i]) {
+            DEBUG_WIFI_MULTI("[WIFIM] Try hidden connect %s\n", entry.ssid);
+
+            // Connect to WiFi
+            WiFi.begin(entry.ssid, entry.passphrase);
+
+            // Wait for status change
+            if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
+                return WL_CONNECTED;
+            }
+        }
+    }
+
+    DEBUG_WIFI_MULTI("[WIFIM] Could not connect\n");
+
+    // Could not connect to any WiFi network
     return WL_CONNECT_FAILED;
 }
 
@@ -509,7 +523,7 @@ void ESP8266WiFiMulti::printWiFiScan()
                          rssi,
                          (encryptionType == ENC_TYPE_NONE) ? ' ' : '*',
                          ssid.c_str());
-        delay(0);
+        esp_yield();
     }
 #endif
 }

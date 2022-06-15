@@ -37,22 +37,8 @@ namespace esp8266webserver {
 template <typename ServerType>
 static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
-  if (!data.reserve(maxLength + 1))
-    return false;
-  data[0] = 0;  // data.clear()??
-  while (data.length() < maxLength) {
-    int tries = timeout_ms;
-    size_t avail;
-    while (!(avail = client.available()) && tries--)
-      delay(1);
-    if (!avail)
-      break;
-    if (data.length() + avail > maxLength)
-      avail = maxLength - data.length();
-    while (avail--)
-      data += (char)client.read();
-  }
-  return data.length() == maxLength;
+  S2Stream dataStream(data);
+  return client.sendSize(dataStream, maxLength, timeout_ms) == maxLength;
 }
 
 template <typename ServerType>
@@ -196,7 +182,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
     if (!isForm) {
       if (contentLength) {
         // add key=value: plain={body} (post json or other data)
-        RequestArgument& arg = _currentArgs[_currentArgCount++];
+        RequestArgument& arg = _currentArgs[_currentArgCount];
         arg.key = F("plain");
         arg.value = plainBuf;
         _currentArgsHavePlain = 1;

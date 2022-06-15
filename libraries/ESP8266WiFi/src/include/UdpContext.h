@@ -24,7 +24,7 @@
 class UdpContext;
 
 extern "C" {
-void esp_yield();
+void esp_suspend();
 void esp_schedule();
 #include <assert.h>
 }
@@ -177,7 +177,7 @@ public:
     }
 
     // warning: handler is called from tcp stack context
-    // esp_yield and non-reentrant functions which depend on it will fail
+    // esp_suspend and non-reentrant functions which depend on it will fail
     void onRx(rxhandler_t handler) {
         _on_rx = handler;
     }
@@ -186,7 +186,7 @@ public:
     // this helper is ready to be used when debugging UDP
     void printChain (const pbuf* pb, const char* msg, size_t n) const
     {
-        // printf the pb pbuf chain, bufferred and all at once
+        // printf the pb pbuf chain, buffered and all at once
         char buf[128];
         int l = snprintf(buf, sizeof(buf), "UDP: %s %u: ", msg, n);
         while (pb)
@@ -266,7 +266,7 @@ public:
             return true;
         }
 
-        // We have interleaved informations on addresses within received pbuf chain:
+        // We have interleaved information on addresses within received pbuf chain:
         // (before ipv6 code we had: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order)
         // Now:         (address-info-pbuf -> chained-data-pbuf [-> chained-data-pbuf...]) ->
         //      (chained-address-info-pbuf -> chained-data-pbuf [-> chained...]) -> ...
@@ -411,7 +411,7 @@ public:
         err_t err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port, /* keep buffer on error */true)) != ERR_OK) && !timeout)
-            delay(0);
+            esp_yield();
         if (err != ERR_OK)
             cancelBuffer(); // get rid of buffer kept on error after timeout
         return err == ERR_OK;

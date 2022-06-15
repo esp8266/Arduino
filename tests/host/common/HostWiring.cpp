@@ -37,49 +37,87 @@
 #define VERBOSE(x...) mockverbose(x)
 #endif
 
-void pinMode (uint8_t pin, uint8_t mode)
+#define GPIONUM 17
+
+static uint8_t _mode[GPIONUM];
+static uint8_t _gpio[GPIONUM];
+
+void pinMode(uint8_t pin, uint8_t mode)
 {
-	#define xxx(mode) case mode: m=STRHELPER(mode); break
-	const char* m;
-	switch (mode)
-	{
-	case INPUT: m="INPUT"; break;
-	case OUTPUT: m="OUTPUT"; break;
-	case INPUT_PULLUP: m="INPUT_PULLUP"; break;
-	case OUTPUT_OPEN_DRAIN: m="OUTPUT_OPEN_DRAIN"; break;
-	case INPUT_PULLDOWN_16: m="INPUT_PULLDOWN_16"; break;
-	case WAKEUP_PULLUP: m="WAKEUP_PULLUP"; break;
-	case WAKEUP_PULLDOWN: m="WAKEUP_PULLDOWN"; break;
-	default: m="(special)";
-	}
-	VERBOSE("gpio%d: mode='%s'\n", pin, m);
+#define xxx(mode)                                                                                  \
+    case mode:                                                                                     \
+        m = STRHELPER(mode);                                                                       \
+        break
+    const char* m;
+    switch (mode)
+    {
+    case INPUT:
+        m = "INPUT";
+        break;
+    case OUTPUT:
+        m = "OUTPUT";
+        break;
+    case INPUT_PULLUP:
+        m = "INPUT_PULLUP";
+        break;
+    case OUTPUT_OPEN_DRAIN:
+        m = "OUTPUT_OPEN_DRAIN";
+        break;
+    case INPUT_PULLDOWN_16:
+        m = "INPUT_PULLDOWN_16";
+        break;
+    case WAKEUP_PULLUP:
+        m = "WAKEUP_PULLUP";
+        break;
+    case WAKEUP_PULLDOWN:
+        m = "WAKEUP_PULLDOWN";
+        break;
+    default:
+        m = "(special)";
+    }
+    VERBOSE("gpio%d: mode='%s'\n", pin, m);
+
+    if (pin < GPIONUM)
+    {
+        _mode[pin] = mode;
+    }
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
-	VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val);
+    VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val);
+    if (pin < GPIONUM)
+    {
+        _gpio[pin] = val;
+    }
 }
 
 void analogWrite(uint8_t pin, int val)
 {
-	VERBOSE("analogWrite(pin=%d, val=%d\n", pin, val);
+    VERBOSE("analogWrite(pin=%d, val=%d\n", pin, val);
 }
 
 int analogRead(uint8_t pin)
 {
-	(void)pin;
-	return 512;
+    (void)pin;
+    return 512;
 }
 
 void analogWriteRange(uint32_t range)
 {
-	VERBOSE("analogWriteRange(range=%d)\n", range);
+    VERBOSE("analogWriteRange(range=%d)\n", range);
 }
 
 int digitalRead(uint8_t pin)
 {
-	VERBOSE("digitalRead(%d)\n", pin);
+    VERBOSE("digitalRead(%d)\n", pin);
 
-	// pin 0 is most likely a low active input
-	return pin ? 0 : 1;
+    if (pin < GPIONUM)
+    {
+        return _gpio[pin] != 0;
+    }
+    else
+    {
+        return 0;
+    }
 }

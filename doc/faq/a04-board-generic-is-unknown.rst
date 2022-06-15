@@ -48,7 +48,7 @@ follows:
     Error compiling for board Generic ESP8266 Module.
 
 Below is an example messages for
-`WeMos <../boards.rst#wemos-d1-r2-mini>`__:
+`WeMos <../boards.rst#lolin-wemos-d1-r2-mini>`__:
 
 ::
 

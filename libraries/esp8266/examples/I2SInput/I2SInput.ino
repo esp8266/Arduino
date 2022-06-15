@@ -28,14 +28,14 @@
 */
 
 #include <ESP8266WiFi.h>
-#include <i2s.h>
+#include <I2S.h>
 
 void setup() {
   Serial.begin(115200);
   WiFi.forceSleepBegin();
   delay(500);
 
-  i2s_rxtx_begin(true, false); // Enable I2S RX
+  i2s_rxtx_begin(true, false);  // Enable I2S RX
   i2s_set_rate(11025);
 
   delay(1000);

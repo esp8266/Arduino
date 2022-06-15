@@ -13,7 +13,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -45,7 +45,7 @@ void setup() {
 
 
   http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
-  //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
+  // http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
 }
 
 int pass = 0;
@@ -60,15 +60,13 @@ void loop() {
       Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
       // file found at server
-      if (httpCode == HTTP_CODE_OK) {
-        http.writeToStream(&Serial);
-      }
+      if (httpCode == HTTP_CODE_OK) { http.writeToStream(&Serial); }
     } else {
       Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
       // Something went wrong with the connection, try to reconnect
       http.end();
       http.begin(client, "http://jigsaw.w3.org/HTTP/connection.html");
-      //http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
+      // http.begin(client, "jigsaw.w3.org", 80, "/HTTP/connection.html");
     }
 
     if (pass == 10) {

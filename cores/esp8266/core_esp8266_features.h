@@ -31,6 +31,7 @@
 #define CORE_HAS_UMM
 
 #define WIFI_HAS_EVENT_CALLBACK
+#define WIFI_IS_OFF_AT_BOOT
 
 #include <stdlib.h> // malloc()
 #include <stddef.h> // size_t
@@ -121,6 +122,9 @@ inline int esp_get_cpu_freq_mhz()
 }
 #endif
 
+// Call this function in your setup() to cause the phase locked version of the generator to
+// be linked in automatically.  Otherwise, the default PWM locked version will be used.
+void enablePhaseLockedWaveform(void);
 
 #ifdef __cplusplus
 }

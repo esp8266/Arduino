@@ -15,7 +15,6 @@ namespace NetCapture
 class PacketType
 {
 public:
-
     enum PType : int
     {
         ARP,

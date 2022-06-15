@@ -171,6 +171,7 @@ int digitalRead(uint8_t pin);
 int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t pin, int val);
+void analogWriteMode(uint8_t pin, int val, bool openDrain);
 void analogWriteFreq(uint32_t freq);
 void analogWriteResolution(int res);
 void analogWriteRange(uint32_t range);
@@ -185,6 +186,9 @@ void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 void attachInterruptArg(uint8_t pin, void (*)(void*), void* arg, int mode);
 
+#if FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+#endif
 void preinit(void);
 void setup(void);
 void loop(void);
@@ -277,6 +281,8 @@ inline void configTzTime(const char* tz, const char* server1,
 {
     configTime(tz, server1, server2, server3);
 }
+
+bool getLocalTime(struct tm * info, uint32_t ms = 5000);
 
 // Everything we expect to be implicitly loaded for the sketch
 #include <pgmspace.h>

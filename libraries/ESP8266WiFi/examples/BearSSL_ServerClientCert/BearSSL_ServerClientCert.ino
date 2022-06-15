@@ -67,7 +67,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -160,8 +160,7 @@ seoK24dHmt6tWmn/sbxX7Aa6TL/4mVlFoOgcaTJyVaY/BrY=
 // head of the app.
 
 // Set time via NTP, as required for x.509 validation
-void setClock()
-{
+void setClock() {
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   Serial.print("Waiting for NTP time sync: ");
@@ -199,7 +198,7 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  setClock(); // Required for X.509 validation
+  setClock();  // Required for X.509 validation
 
   // Attach the server private cert/key combo
   BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
@@ -214,30 +213,27 @@ void setup() {
   server.begin();
 }
 
-static const char *HTTP_RES =
-        "HTTP/1.0 200 OK\r\n"
-        "Connection: close\r\n"
-        "Content-Length: 59\r\n"
-        "Content-Type: text/html; charset=iso-8859-1\r\n"
-        "\r\n"
-        "<html>\r\n"
-        "<body>\r\n"
-        "<p>Hello my friend!</p>\r\n"
-        "</body>\r\n"
-        "</html>\r\n";
+static const char *HTTP_RES = "HTTP/1.0 200 OK\r\n"
+                              "Connection: close\r\n"
+                              "Content-Length: 59\r\n"
+                              "Content-Type: text/html; charset=iso-8859-1\r\n"
+                              "\r\n"
+                              "<html>\r\n"
+                              "<body>\r\n"
+                              "<p>Hello my friend!</p>\r\n"
+                              "</body>\r\n"
+                              "</html>\r\n";
 
 void loop() {
-  BearSSL::WiFiClientSecure incoming = server.available();
-  if (!incoming) {
-    return;
-  }
+  BearSSL::WiFiClientSecure incoming = server.accept();
+  if (!incoming) { return; }
   Serial.println("Incoming connection...\n");
-  
+
   // Ugly way to wait for \r\n (i.e. end of HTTP request which we don't actually parse here)
-  uint32_t timeout=millis() + 1000;
+  uint32_t timeout = millis() + 1000;
   int lcwn = 0;
   for (;;) {
-    unsigned char x=0;
+    unsigned char x = 0;
     if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
       incoming.stop();
       Serial.printf("Connection error, closed\n");
@@ -248,14 +244,12 @@ void loop() {
     } else if (x == 0x0D) {
       continue;
     } else if (x == 0x0A) {
-      if (lcwn) {
-        break;
-      }
+      if (lcwn) { break; }
       lcwn = 1;
     } else
       lcwn = 0;
   }
-  incoming.write((uint8_t*)HTTP_RES, strlen(HTTP_RES));
+  incoming.write((uint8_t *)HTTP_RES, strlen(HTTP_RES));
   incoming.flush();
   incoming.stop();
   Serial.printf("Connection closed.\n");

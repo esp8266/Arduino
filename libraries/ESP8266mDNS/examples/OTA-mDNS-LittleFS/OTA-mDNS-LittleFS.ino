@@ -14,12 +14,12 @@
 
 #ifndef APSSID
 #define APSSID "your-apssid"
-#define APPSK  "your-password"
+#define APPSK "your-password"
 #endif
 
 #ifndef STASSID
 #define STASSID "your-sta"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 // includes
@@ -35,15 +35,15 @@
    @brief mDNS and OTA Constants
    @{
 */
-#define HOSTNAME "ESP8266-OTA-" ///< Hostname. The setup function adds the Chip ID at the end.
+#define HOSTNAME "ESP8266-OTA-"  ///< Hostname. The setup function adds the Chip ID at the end.
 /// @}
 
 /**
    @brief Default WiFi connection information.
    @{
 */
-const char* ap_default_ssid = APSSID; ///< Default SSID.
-const char* ap_default_psk = APPSK; ///< Default PSK.
+const char *ap_default_ssid = APSSID;  ///< Default SSID.
+const char *ap_default_psk = APPSK;    ///< Default PSK.
 /// @}
 
 /// Uncomment the next line for verbose output over UART.
@@ -55,9 +55,9 @@ const char* ap_default_psk = APPSK; ///< Default PSK.
    @param pass String pointer for storing PSK.
    @return True or False.
 
-   The config file have to containt the WiFi SSID in the first line
+   The config file has to contain the WiFi SSID in the first line
    and the WiFi PSK in the second line.
-   Line seperator can be \r\n (CR LF) \r or \n.
+   Line separator can be \r\n (CR LF) \r or \n.
 */
 bool loadConfig(String *ssid, String *pass) {
   // open file for reading.
@@ -74,16 +74,14 @@ bool loadConfig(String *ssid, String *pass) {
 
   content.trim();
 
-  // Check if ther is a second line available.
+  // Check if there is a second line available.
   int8_t pos = content.indexOf("\r\n");
   uint8_t le = 2;
   // check for linux and mac line ending.
   if (pos == -1) {
     le = 1;
     pos = content.indexOf("\n");
-    if (pos == -1) {
-      pos = content.indexOf("\r");
-    }
+    if (pos == -1) { pos = content.indexOf("\r"); }
   }
 
   // If there is no second line: Some information is missing.
@@ -110,7 +108,7 @@ bool loadConfig(String *ssid, String *pass) {
 #endif
 
   return true;
-} // loadConfig
+}  // loadConfig
 
 
 /**
@@ -135,7 +133,7 @@ bool saveConfig(String *ssid, String *pass) {
   configFile.close();
 
   return true;
-} // saveConfig
+}  // saveConfig
 
 
 /**
@@ -160,7 +158,7 @@ void setup() {
 
   // Print hostname.
   Serial.println("Hostname: " + hostname);
-  //Serial.println(WiFi.hostname());
+  // Serial.println(WiFi.hostname());
 
 
   // Initialize file system.
@@ -170,7 +168,7 @@ void setup() {
   }
 
   // Load wifi connection information.
-  if (! loadConfig(&station_ssid, &station_psk)) {
+  if (!loadConfig(&station_ssid, &station_psk)) {
     station_ssid = STASSID;
     station_psk = STAPSK;
 
@@ -196,7 +194,7 @@ void setup() {
     Serial.println(WiFi.SSID());
 
     // ... Uncomment this for debugging output.
-    //WiFi.printDiag(Serial);
+    // WiFi.printDiag(Serial);
   } else {
     // ... Begin with sdk config.
     WiFi.begin();
@@ -208,7 +206,7 @@ void setup() {
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
     Serial.write('.');
-    //Serial.print(WiFi.status());
+    // Serial.print(WiFi.status());
     delay(500);
   }
   Serial.println();
@@ -245,4 +243,3 @@ void loop() {
   // Handle OTA server.
   ArduinoOTA.handle();
 }
-

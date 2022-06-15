@@ -67,13 +67,14 @@ public:
     size_t readBytes(char *buffer, size_t length) override {
         return read((uint8_t*)buffer, length);
     }
-    size_t read(uint8_t* buf, size_t size);
+    int read(uint8_t* buf, size_t size) override;
     bool seek(uint32_t pos, SeekMode mode);
     bool seek(uint32_t pos) {
         return seek(pos, SeekSet);
     }
     size_t position() const;
     size_t size() const;
+    virtual ssize_t streamRemaining() override { return (ssize_t)size() - (ssize_t)position(); }
     void close();
     operator bool() const;
     const char* name() const;
@@ -84,6 +85,7 @@ public:
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
+    //TODO use stream::send / check read(buf,size) result
     template<typename T> size_t write(T &src){
       uint8_t obuf[256];
       size_t doneLen = 0;
@@ -115,6 +117,18 @@ public:
     time_t getLastWrite();
     time_t getCreationTime();
     void setTimeCallback(time_t (*cb)(void));
+
+    // Stream::send configuration
+
+    bool inputCanTimeout () override {
+        // unavailable data can't become later available
+        return false;
+    }
+
+    bool outputCanTimeout () override {
+        // free space for write can't increase later
+        return false;
+    }
 
 protected:
     FileImplPtr _p;
@@ -234,6 +248,8 @@ public:
     // Low-level FS routines, not needed by most applications
     bool gc();
     bool check();
+
+    time_t getCreationTime();
 
     void setTimeCallback(time_t (*cb)(void));
 

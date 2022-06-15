@@ -66,7 +66,7 @@ int File::read() {
     return result;
 }
 
-size_t File::read(uint8_t* buf, size_t size) {
+int File::read(uint8_t* buf, size_t size) {
     if (!_p)
         return 0;
 
@@ -439,6 +439,13 @@ bool FS::rename(const char* pathFrom, const char* pathTo) {
 
 bool FS::rename(const String& pathFrom, const String& pathTo) {
     return rename(pathFrom.c_str(), pathTo.c_str());
+}
+
+time_t FS::getCreationTime() {
+    if (!_impl) {
+        return 0;
+    }
+    return _impl->getCreationTime();
 }
 
 void FS::setTimeCallback(time_t (*cb)(void)) {

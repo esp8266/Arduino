@@ -20,41 +20,43 @@ environment:
     Sketch    OTA update   File system   EEPROM  WiFi config (SDK)
 
 File system size depends on the flash chip size. Depending on the board
-which is selected in IDE, you have the following options for flash size:
+which is selected in IDE, the following table shows options for flash size.
 
-+---------------------------------+--------------------------+---------------------------+
-| Board                           | Flash chip size, bytes   | File system size, bytes   |
-+=================================+==========================+===========================+
-| Generic module                  | 512k                     | 64k, 128k                 |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 1M                       | 64k, 128k, 256k, 512k     |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 2M                       | 1M                        |
-+---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| Adafruit HUZZAH                 | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 1.0               | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 2.0               | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| NodeMCU 0.9                     | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| NodeMCU 1.0                     | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| Olimex MOD-WIFI-ESP8266(-DEV)   | 2M                       | 1M                        |
-+---------------------------------+--------------------------+---------------------------+
-| SparkFun Thing                  | 512k                     | 64k                       |
-+---------------------------------+--------------------------+---------------------------+
-| SweetPea ESP-210                | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| WeMos D1 R1, R2 & mini          | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| ESPDuino                        | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
-| WiFiduino                       | 4M                       | 1M, 2M, 3M                |
-+---------------------------------+--------------------------+---------------------------+
+Another option called ``Mapping defined by Hardware and Sketch`` is available.
+It allows a sketch, not the user, to select FS configuration at boot
+according to flash chip size.
+
+This option is also enabled with this compilation define: ``-DFLASH_MAP_SUPPORT=1``.
+
+There are three possible configurations:
+
+-  ``FLASH_MAP_OTA_FS``: largest available space for onboard FS, allowing OTA (noted 'OTA' in the table)
+-  ``FLASH_MAP_MAX_FS``: largest available space for onboard FS (noted 'MAX' in the table)
+-  ``FLASH_MAP_NO_FS``: no onboard FS
+
+Sketch can invoke a particular configuration by adding this line:
+
+.. code:: cpp
+
+    FLASH_MAP_SETUP_CONFIG(FLASH_MAP_OTA_FS)
+    void setup () { ... }
+    void loop () { ... }
+
++-------+--------------------------+----------------------------------------------------------+
+| Board | Flash chip size (bytes)  | File system size (bytes)                                 |
++=======+==========================+==========================================================+
+| Any   | 512KBytes                | 32KB(OTA), 64KB, 128KB(MAX)                              |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 1MBytes                  | 64KB(OTA), 128KB, 144KB, 160KB, 192KB, 256KB, 512KB(MAX) |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 2MBytes                  | 64KB, 128KB, 256KB(OTA), 512KB, 1MB(MAX)                 |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 4MBytes                  | 1MB, 2MB(OTA), 3MB(MAX)                                  |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 8MBytes                  | 6MB(OTA), 7MB(MAX)                                       |
++-------+--------------------------+----------------------------------------------------------+
+| Any   | 16MBytes                 | 14MB(OTA), 15MB(MAX)                                     |
++-------+--------------------------+----------------------------------------------------------+
 
 **Note:** to use any of file system functions in the sketch, add the
 following include to the sketch:
@@ -63,6 +65,7 @@ following include to the sketch:
 
     //#include "FS.h" // SPIFFS is declared
     #include "LittleFS.h" // LittleFS is declared
+    //#include "SDFS.h" // SDFS is declared
 
 SPIFFS Deprecation Warning
 --------------------------
@@ -127,7 +130,7 @@ when updgrading core versions.
 SPIFFS file system limitations
 ------------------------------
 
-The SPIFFS implementation for ESP8266 had to accomodate the
+The SPIFFS implementation for ESP8266 had to accommodate the
 constraints of the chip, among which its limited RAM.
 `SPIFFS <https://github.com/pellepl/spiffs>`__ was selected because it
 is designed for small systems, but that comes at the cost of some
@@ -474,8 +477,8 @@ Performs the same operation as ``info`` but allows for reporting greater than
 4GB for filesystem size/used/etc.  Should be used with the SD and SDFS
 filesystems since most SD cards today are greater than 4GB in size.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -574,8 +577,8 @@ rewind
 
 Resets the internal pointer to the start of the directory.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sets the time callback for any files accessed from this Dir object via openNextFile.
 Note that the SD and SDFS filesystems only support a filesystem-wide callback and
@@ -693,7 +696,7 @@ Close the file. No other operations should be performed on *File* object
 after ``close`` function was called.
 
 openNextFile  (compatibiity method, not recommended for new code)
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -705,7 +708,7 @@ Opens the next file in the directory pointed to by the File.  Only valid
 when ``File.isDirectory() == true``.
 
 rewindDirectory  (compatibiity method, not recommended for new code)
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
@@ -718,8 +721,8 @@ rewindDirectory  (compatibiity method, not recommended for new code)
 Resets the ``openNextFile`` pointer to the top of the directory.  Only
 valid when ``File.isDirectory() == true``.
 
-setTimeCallback(time_t (*cb)(void))
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setTimeCallback(time_t (\*cb)(void))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sets the time callback for this specific file.  Note that the SD and
 SDFS filesystems only support a filesystem-wide callback and calls to

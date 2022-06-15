@@ -58,6 +58,7 @@ class PublicKey {
 
     // Disable the copy constructor, we're pointer based
     PublicKey(const PublicKey& that) = delete;
+    PublicKey& operator=(const PublicKey& that) = delete;
 
   private:
     brssl::public_key *_key;
@@ -86,6 +87,7 @@ class PrivateKey {
 
     // Disable the copy constructor, we're pointer based
     PrivateKey(const PrivateKey& that) = delete;
+    PrivateKey& operator=(const PrivateKey& that) = delete;
 
   private:
     brssl::private_key *_key;
@@ -122,6 +124,7 @@ class X509List {
 
     // Disable the copy constructor, we're pointer based
     X509List(const X509List& that) = delete;
+    X509List& operator=(const X509List& that) = delete;
 
   private:
     size_t _count;
@@ -161,7 +164,7 @@ class ServerSessions {
     ServerSessions(ServerSession *sessions, uint32_t size) : ServerSessions(sessions, size, false) {}
 
     // Dynamically allocates a cache for the given number of sessions and initializes it.
-    // If the allocation of the buffer wasn't successfull, the value
+    // If the allocation of the buffer wasn't successful, the value
     // returned by size() will be 0.
     ServerSessions(uint32_t size) : ServerSessions(size > 0 ? new ServerSession[size] : nullptr, size, true) {}
 
@@ -178,7 +181,7 @@ class ServerSessions {
 
     // Size of the store in sessions.
     uint32_t _size;
-    // Store where the informations for the sessions are stored.
+    // Store where the information for the sessions are stored.
     ServerSession *_store;
     // Whether the store is dynamically allocated.
     // If this is true, the store needs to be freed in the destructor.

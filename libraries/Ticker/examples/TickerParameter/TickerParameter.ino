@@ -1,5 +1,5 @@
 /*
-  Passing paramters to Ticker callbacks
+  Passing parameters to Ticker callbacks
 
   Apart from void(void) functions, the Ticker library supports
   functions taking one argument. This argument's size has to be less or
@@ -46,5 +46,4 @@ void setup() {
   tickerSetChar.attach_ms(26, setPinChar, (char)1);
 }
 
-void loop() {
-}
+void loop() {}

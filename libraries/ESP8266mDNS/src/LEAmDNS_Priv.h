@@ -37,7 +37,7 @@ namespace MDNSImplementation
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
-//#define DEBUG_ESP_MDNS_RESPONDER
+    //#define DEBUG_ESP_MDNS_RESPONDER
 
 #if !defined(DEBUG_ESP_MDNS_RESPONDER) && defined(DEBUG_ESP_MDNS)
 #define DEBUG_ESP_MDNS_RESPONDER
@@ -48,8 +48,9 @@ namespace MDNSImplementation
 #endif
 
 //
-// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful probing
-// This allows to drive the responder in a environment, where 'update()' isn't called in the loop
+// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful
+// probing This allows to drive the responder in a environment, where 'update()' isn't called in the
+// loop
 //#define ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
 
 // Enable/disable debug trace macros
@@ -62,7 +63,7 @@ namespace MDNSImplementation
 
 #ifdef DEBUG_ESP_MDNS_RESPONDER
 #ifdef DEBUG_ESP_MDNS_INFO
-#define DEBUG_EX_INFO(A)    A
+#define DEBUG_EX_INFO(A) A
 #else
 #define DEBUG_EX_INFO(A)
 #endif
@@ -72,12 +73,12 @@ namespace MDNSImplementation
 #define DEBUG_EX_ERR(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_TX
-#define DEBUG_EX_TX(A)  A
+#define DEBUG_EX_TX(A) A
 #else
 #define DEBUG_EX_TX(A)
 #endif
 #ifdef DEBUG_ESP_MDNS_RX
-#define DEBUG_EX_RX(A)  A
+#define DEBUG_EX_RX(A) A
 #else
 #define DEBUG_EX_RX(A)
 #endif
@@ -88,19 +89,34 @@ namespace MDNSImplementation
 #define DEBUG_OUTPUT Serial
 #endif
 #else
-#define DEBUG_EX_INFO(A)    do { (void)0; } while (0)
-#define DEBUG_EX_ERR(A)     do { (void)0; } while (0)
-#define DEBUG_EX_TX(A)      do { (void)0; } while (0)
-#define DEBUG_EX_RX(A)      do { (void)0; } while (0)
+#define DEBUG_EX_INFO(A)                                                                           \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
+    } while (0)
+#define DEBUG_EX_ERR(A)                                                                            \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
+    } while (0)
+#define DEBUG_EX_TX(A)                                                                             \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
+    } while (0)
+#define DEBUG_EX_RX(A)                                                                             \
+    do                                                                                             \
+    {                                                                                              \
+        (void)0;                                                                                   \
+    } while (0)
 #endif
 
 /*  already defined in lwIP ('lwip/prot/dns.h')
     #ifdef MDNS_IP4_SUPPORT
-    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t v4group = DNS_MQUERY_IPV4_GROUP_INIT
-    #endif
-    #ifdef MDNS_IP6_SUPPORT
-    #define DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group = DNS_MQUERY_IPV6_GROUP_INIT
-    #endif*/
+    #define DNS_MQUERY_IPV4_GROUP_INIT     (IPAddress(224, 0, 0, 251))              // ip_addr_t
+   v4group = DNS_MQUERY_IPV4_GROUP_INIT #endif #ifdef MDNS_IP6_SUPPORT #define
+   DNS_MQUERY_IPV6_GROUP_INIT     IPADDR6_INIT_HOST(0xFF020000,0,0,0xFB)   // ip_addr_t v6group =
+   DNS_MQUERY_IPV6_GROUP_INIT #endif*/
 //#define MDNS_MULTICAST_PORT               5353
 
 /*
@@ -111,43 +127,43 @@ namespace MDNSImplementation
 
     However, RFC 3171 seems to force 255 instead
 */
-#define MDNS_MULTICAST_TTL              255/*1*/
+#define MDNS_MULTICAST_TTL 255 /*1*/
 
 /*
     This is the MDNS record TTL
     Host level records are set to 2min (120s)
     service level records are set to 75min (4500s)
 */
-#define MDNS_HOST_TTL                   120
-#define MDNS_SERVICE_TTL                4500
+#define MDNS_HOST_TTL 120
+#define MDNS_SERVICE_TTL 4500
 
 /*
-    Compressed labels are flaged by the two topmost bits of the length byte being set
+    Compressed labels are flagged by the two topmost bits of the length byte being set
 */
-#define MDNS_DOMAIN_COMPRESS_MARK       0xC0
+#define MDNS_DOMAIN_COMPRESS_MARK 0xC0
 /*
     Avoid endless recursion because of malformed compressed labels
 */
-#define MDNS_DOMAIN_MAX_REDIRCTION      6
+#define MDNS_DOMAIN_MAX_REDIRCTION 6
 
 /*
     Default service priority and weight in SRV answers
 */
-#define MDNS_SRV_PRIORITY               0
-#define MDNS_SRV_WEIGHT                 0
+#define MDNS_SRV_PRIORITY 0
+#define MDNS_SRV_WEIGHT 0
 
 /*
     Delay between and number of probes for host and service domains
     Delay between and number of announces for host and service domains
-    Delay between and number of service queries; the delay is multiplied by the resent number in '_checkServiceQueryCache'
+    Delay between and number of service queries; the delay is multiplied by the resent number in
+   '_checkServiceQueryCache'
 */
-#define MDNS_PROBE_DELAY                250
-#define MDNS_PROBE_COUNT                3
-#define MDNS_ANNOUNCE_DELAY             1000
-#define MDNS_ANNOUNCE_COUNT             8
+#define MDNS_PROBE_DELAY 250
+#define MDNS_PROBE_COUNT 3
+#define MDNS_ANNOUNCE_DELAY 1000
+#define MDNS_ANNOUNCE_COUNT 8
 #define MDNS_DYNAMIC_QUERY_RESEND_COUNT 5
 #define MDNS_DYNAMIC_QUERY_RESEND_DELAY 5000
-
 
 /*
     Force host domain to use only lowercase letters
@@ -156,7 +172,7 @@ namespace MDNSImplementation
 
 /*
     Enable/disable the usage of the F() macro in debug trace printf calls.
-    There needs to be an PGM comptible printf function to use this.
+    There needs to be an PGM compatible printf function to use this.
 
     USE_PGM_PRINTF and F
 */
@@ -167,15 +183,14 @@ namespace MDNSImplementation
 #ifdef F
 #undef F
 #endif
-#define F(A)    A
+#define F(A) A
 #endif
 
-}   // namespace MDNSImplementation
+}  // namespace MDNSImplementation
 
-} // namespace esp8266
+}  // namespace esp8266
 
 // Include the main header, so the submodlues only need to include this header
 #include "LEAmDNS.h"
-
 
 #endif  // MDNS_PRIV_H

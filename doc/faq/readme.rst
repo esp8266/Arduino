@@ -177,3 +177,26 @@ will need to implement an additional (short) deep sleep using
 ``WAKE_RF_DEFAULT``.
 
 Ref.  `#3072 <https://github.com/esp8266/Arduino/issues/3072>`__
+
+My WiFi was previously automatically connected right after booting, but isn't anymore
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This was WiFi persistence.  Starting from version 3 of this core, WiFi is
+indeed off at boot and is powered on only when starting to be used with the
+regular API.
+
+Read more at `former WiFi persistent mode <../esp8266wifi/generic-class.rst#persistent>`__.
+
+How to resolve "undefined reference to ``flashinit`'" error ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please read `flash layout <../filesystem.rst>`__ documentation entry.
+
+How to specify global build defines and options?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By using a uniquely named `.h` file, macro definitions can be created and
+globally used. Additionally, compiler command-line options can be embedded in
+this file as a unique block comment.
+
+`Read more <a06-global-build-options.rst>`__.

@@ -11,6 +11,9 @@
 #include "FS.h"
 #include <LittleFS.h>
 
+// more and possibly updated information can be found at:
+// https://arduinojson.org/v6/example/config/
+
 bool loadConfig() {
   File configFile = LittleFS.open("/config.json", "r");
   if (!configFile) {
@@ -18,22 +21,8 @@ bool loadConfig() {
     return false;
   }
 
-  size_t size = configFile.size();
-  if (size > 1024) {
-    Serial.println("Config file size is too large");
-    return false;
-  }
-
-  // Allocate a buffer to store contents of the file.
-  std::unique_ptr<char[]> buf(new char[size]);
-
-  // We don't use String here because ArduinoJson library requires the input
-  // buffer to be mutable. If you don't use ArduinoJson, you may as well
-  // use configFile.readString instead.
-  configFile.readBytes(buf.get(), size);
-
   StaticJsonDocument<200> doc;
-  auto error = deserializeJson(doc, buf.get());
+  auto error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println("Failed to parse config file");
     return false;
@@ -92,5 +81,4 @@ void setup() {
   }
 }
 
-void loop() {
-}
+void loop() {}

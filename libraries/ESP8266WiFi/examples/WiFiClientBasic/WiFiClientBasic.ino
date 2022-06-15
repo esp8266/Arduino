@@ -9,10 +9,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
 const char* host = "192.168.1.1";
@@ -64,7 +64,7 @@ void loop() {
   // This will send the request to the server
   client.println("hello from ESP8266");
 
-  //read back one line from server
+  // read back one line from server
   Serial.println("receiving from remote server");
   String line = client.readStringUntil('\r');
   Serial.println(line);
@@ -75,4 +75,3 @@ void loop() {
   Serial.println("wait 5 sec...");
   delay(5000);
 }
-

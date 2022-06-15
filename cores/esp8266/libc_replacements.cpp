@@ -47,27 +47,27 @@
 
 extern "C" {
 
-int ICACHE_RAM_ATTR _open_r (struct _reent* unused, const char *ptr, int mode) {
+int IRAM_ATTR _open_r (struct _reent* unused, const char *ptr, int mode) {
     (void)unused;
     (void)ptr;
     (void)mode;
     return 0;
 }
 
-int ICACHE_RAM_ATTR _close_r(struct _reent* unused, int file) {
+int IRAM_ATTR _close_r(struct _reent* unused, int file) {
     (void)unused;
     (void)file;
     return 0;
 }
 
-int ICACHE_RAM_ATTR _fstat_r(struct _reent* unused, int file, struct stat *st) {
+int IRAM_ATTR _fstat_r(struct _reent* unused, int file, struct stat *st) {
     (void)unused;
     (void)file;
     st->st_mode = S_IFCHR;
     return 0;
 }
 
-int ICACHE_RAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
+int IRAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
     (void)unused;
     (void)file;
     (void)ptr;
@@ -75,7 +75,7 @@ int ICACHE_RAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) 
     return 0;
 }
 
-int ICACHE_RAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len) {
+int IRAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len) {
     (void)unused;
     (void)file;
     (void)ptr;
@@ -83,7 +83,7 @@ int ICACHE_RAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len)
     return 0;
 }
 
-int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
+int IRAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     (void) r;
     int pos = len;
     if (file == STDOUT_FILENO) {
@@ -95,9 +95,9 @@ int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     return len;
 }
 
-int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
+int IRAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
 
-int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
+int IRAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
     (void) r;
     if (file->_file == STDOUT_FILENO) {
       ets_putc(c);
@@ -106,7 +106,7 @@ int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
     return EOF;
 }
 
-int ICACHE_RAM_ATTR puts(const char * str) {
+int IRAM_ATTR puts(const char * str) {
     char c;
     while((c = *str) != 0) {
         ets_putc(c);
@@ -117,7 +117,7 @@ int ICACHE_RAM_ATTR puts(const char * str) {
 }
 
 #undef putchar
-int ICACHE_RAM_ATTR putchar(int c) {
+int IRAM_ATTR putchar(int c) {
     ets_putc(c);
     return c;
 }

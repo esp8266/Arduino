@@ -26,11 +26,11 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
-
+#include "flash_hal.h"
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
-// #include "core_esp8266_vm.h"
 #include <pgmspace.h>
+#include "reboot_uart_dwnld.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -115,20 +115,18 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-extern "C" void esp_yield();
-
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep_instant(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
@@ -200,7 +198,16 @@ void EspClass::reset(void)
 void EspClass::restart(void)
 {
     system_restart();
-    esp_yield();
+    esp_suspend();
+}
+
+[[noreturn]] void EspClass::rebootIntoUartDownloadMode()
+{
+	wdtDisable();
+	/* disable hardware watchdog */
+	CLEAR_PERI_REG_MASK(PERIPHS_HW_WDT, 0x1);
+
+	esp8266RebootIntoUartDownloadMode();
 }
 
 uint16_t EspClass::getVcc(void)
@@ -215,7 +222,7 @@ uint32_t EspClass::getFreeHeap(void)
     return system_get_free_heap_size();
 }
 
-uint16_t EspClass::getMaxFreeBlockSize(void)
+uint32_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
 }
@@ -284,6 +291,9 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
+#if FLASH_MAP_SUPPORT
+    return getFlashChipRealSize();
+#else
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
@@ -291,6 +301,7 @@ uint32_t EspClass::getFlashChipSize(void)
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
+#endif
 }
 
 uint32_t EspClass::getFlashChipSpeed(void)
@@ -316,6 +327,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
+#if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
@@ -336,6 +348,7 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return 0;
     }
 }
+#endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
     switch(byte & 0x0F) {
@@ -444,22 +457,24 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
     return false;
 }
 
+// These are defined in the linker script, and filled in by the elf2bin.py util
+extern "C" uint32_t __crc_len;
+extern "C" uint32_t __crc_val;
+
 bool EspClass::checkFlashCRC() {
-    // The CRC and total length are placed in extra space at the end of the 4K chunk
-    // of flash occupied by the bootloader.  If the bootloader grows to >4K-8 bytes,
-    // we'll need to adjust this.
-    uint32_t flashsize = *((uint32_t*)(0x40200000 + 4088)); // Start of PROGMEM plus 4K-8
-    uint32_t flashcrc = *((uint32_t*)(0x40200000 + 4092)); // Start of PROGMEM plus 4K-4
+    // Dummy CRC fill
     uint32_t z[2];
     z[0] = z[1] = 0;
 
+    uint32_t firstPart = (uintptr_t)&__crc_len - 0x40200000; // How many bytes to check before the 1st CRC val
+
     // Start the checksum
-    uint32_t crc = crc32((const void*)0x40200000, 4096-8, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, firstPart, 0xffffffff);
     // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
-    crc = crc32((const void*)0x40201000, flashsize-4096, crc);
-    return crc == flashcrc;
+    crc = crc32((const void*)(0x40200000 + firstPart + 8), __crc_len - (firstPart + 8), crc);
+    return crc == __crc_val;
 }
 
 
@@ -514,7 +529,7 @@ bool EspClass::eraseConfig(void) {
     return true;
 }
 
-uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) const
+uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes)
 {
   /**
    * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
@@ -564,7 +579,7 @@ uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes) co
   return resultArray;
 }
 
-uint32_t EspClass::random() const
+uint32_t EspClass::random()
 {
   union { uint32_t b32; uint8_t b8[4]; } result;
   random(result.b8, 4);
@@ -603,14 +618,12 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _FS_start;
-
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
@@ -972,22 +985,11 @@ String EspClass::getSketchMD5()
     return result;
 }
 
-void EspClass::enableVM()
-{
-#ifdef UMM_HEAP_EXTERNAL
-    if (!vmEnabled)
-        install_vm_exception_handler();
-    vmEnabled = true;
-#endif
-}
-
 void EspClass::setExternalHeap()
 {
 #ifdef UMM_HEAP_EXTERNAL
-    if (vmEnabled) {
-        if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
-            panic();
-        }
+    if (!umm_push_heap(UMM_HEAP_EXTERNAL)) {
+        panic();
     }
 #endif
 }
@@ -1004,10 +1006,8 @@ void EspClass::setIramHeap()
 void EspClass::setDramHeap()
 {
 #if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
-    if (vmEnabled) {
-        if (!umm_push_heap(UMM_HEAP_DRAM)) {
-            panic();
-        }
+    if (!umm_push_heap(UMM_HEAP_DRAM)) {
+        panic();
     }
 #elif defined(UMM_HEAP_IRAM)
     if (!umm_push_heap(UMM_HEAP_DRAM)) {
@@ -1019,10 +1019,8 @@ void EspClass::setDramHeap()
 void EspClass::resetHeap()
 {
 #if defined(UMM_HEAP_EXTERNAL) && !defined(UMM_HEAP_IRAM)
-    if (vmEnabled) {
-        if (!umm_pop_heap()) {
-            panic();
-        }
+    if (!umm_pop_heap()) {
+        panic();
     }
 #elif defined(UMM_HEAP_IRAM)
     if (!umm_pop_heap()) {

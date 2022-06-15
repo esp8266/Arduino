@@ -47,7 +47,7 @@
 // The following values are in us (microseconds).
 // Since the defaults can be overwritten in the new attach() member function,
 // they were modified from the Arduino AVR defaults to be in the safe range
-// of publically available specifications. While this implies that many 180°
+// of publicly available specifications. While this implies that many 180°
 // servos do not operate the full 0° to 180° sweep using these, it also prevents
 // unsuspecting damage. For Arduino AVR, the same change is being discussed.
 #define DEFAULT_MIN_PULSE_WIDTH      1000 // uncalibrated default, the shortest duty cycle sent to a servo

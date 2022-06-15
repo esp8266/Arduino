@@ -27,9 +27,9 @@
 /********************************************************************************************
 * NOTE!
 *
-* All method signatures in this file are deprecated and will be removed in core version 2.5.0.
+* All method signatures in this file are deprecated and will be removed in core version 3.0.0.
 * If you are still using these methods, please consider migrating to the new API shown in 
-* the ESP8266WiFiMesh.h source file.
+* the EspnowMeshBackend.h or TcpIpMeshBackend.h source files.
 *
 * TODO: delete this file.
 ********************************************************************************************/
@@ -84,7 +84,7 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient &currClient, int maxWait)
  * and pass that to the user-supplied handler.
  *
  * @message The string to send to the node.
- * @returns: True if the exchange was a succes, false otherwise.
+ * @returns: True if the exchange was a success, false otherwise.
  * 
  */
 // DEPRECATED!

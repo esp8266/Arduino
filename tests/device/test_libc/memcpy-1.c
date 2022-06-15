@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-
 #define memcmp memcmp_P
 #define memcpy memcpy_P
 #define memmem memmem_P
@@ -69,106 +68,105 @@
 #define TOO_MANY_ERRORS 11
 static int errors = 0;
 
-static void
-print_error (char const* msg, ...)
-{   
-  errors++;
-  if (errors == TOO_MANY_ERRORS)
+static void print_error(char const* msg, ...)
+{
+    errors++;
+    if (errors == TOO_MANY_ERRORS)
     {
-      fprintf (stderr, "Too many errors.\n");
+        fprintf(stderr, "Too many errors.\n");
     }
-  else if (errors < TOO_MANY_ERRORS)
+    else if (errors < TOO_MANY_ERRORS)
     {
-      va_list ap;
-      va_start (ap, msg);
-      vfprintf (stderr, msg, ap);
-      va_end (ap);
+        va_list ap;
+        va_start(ap, msg);
+        vfprintf(stderr, msg, ap);
+        va_end(ap);
     }
-  else
+    else
     {
-      /* Further errors omitted.  */
+        /* Further errors omitted.  */
     }
 }
 
 extern int rand_seed;
-void memcpy_main(void)
+void       memcpy_main(void)
 {
-  /* Allocate buffers to read and write from.  */
-  char src[BUFF_SIZE], dest[BUFF_SIZE], backup_src[BUFF_SIZE];
+    /* Allocate buffers to read and write from.  */
+    char src[BUFF_SIZE], dest[BUFF_SIZE], backup_src[BUFF_SIZE];
 
-  /* Fill the source buffer with non-null values, reproducable random data.  */
-  srand (rand_seed);
-  int i, j;
-  unsigned sa;
-  unsigned da;
-  unsigned n;
-  for (i = 0; i < BUFF_SIZE; i++)
+    /* Fill the source buffer with non-null values, reproducible random data. */
+    srand(rand_seed);
+    int      i, j;
+    unsigned sa;
+    unsigned da;
+    unsigned n;
+    for (i = 0; i < BUFF_SIZE; i++)
     {
-      src[i] = (char)rand () | 1;
-      backup_src[i] = src[i];
+        src[i]        = (char)rand() | 1;
+        backup_src[i] = src[i];
     }
 
-  /* Make calls to memcpy with block sizes ranging between 1 and
-     MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
-  for (sa = 0; sa <= MAX_OFFSET; sa++)
-    for (da = 0; da <= MAX_OFFSET; da++)
-      for (n = 1; n <= MAX_BLOCK_SIZE; n++)
-        {
-          //printf (".");
-          /* Zero dest so we can check it properly after the copying.  */
-          for (j = 0; j < BUFF_SIZE; j++)
-            dest[j] = 0;
-          
-          void *ret = memcpy (dest + START_COPY + da, src + sa, n);
-          
-          /* Check return value.  */
-          if (ret != (dest + START_COPY + da))
-            print_error ("\nFailed: wrong return value in memcpy of %u bytes "
-                         "with src_align %u and dst_align %u. "
-                         "Return value and dest should be the same"
-                         "(ret is %p, dest is %p)\n",
-                         n, sa, da, ret, dest + START_COPY + da);
-          
-          /* Check that content of the destination buffer
-             is the same as the source buffer, and
-             memory outside destination buffer is not modified.  */
-          for (j = 0; j < BUFF_SIZE; j++)
-            if ((unsigned)j < START_COPY + da)
-              {
-                if (dest[j] != 0)
-                  print_error ("\nFailed: after memcpy of %u bytes "
-                               "with src_align %u and dst_align %u, "
-                               "byte %u before the start of dest is not 0.\n",
-                               n, sa, da, START_COPY - j);
-              }
-            else if ((unsigned)j < START_COPY + da + n)
-              {
-                i = j - START_COPY - da;
-                if (dest[j] != (src + sa)[i])
-                  print_error ("\nFailed: after memcpy of %u bytes "
-                               "with src_align %u and dst_align %u, "
-                               "byte %u in dest and src are not the same.\n",
-                               n, sa, da, i);
-              }
-            else if (dest[j] != 0)
-              {
-                print_error ("\nFailed: after memcpy of %u bytes "
-                             "with src_align %u and dst_align %u, "
-                             "byte %u after the end of dest is not 0.\n",
-                             n, sa, da, j - START_COPY - da - n);
-              }
+    /* Make calls to memcpy with block sizes ranging between 1 and
+       MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
+    for (sa = 0; sa <= MAX_OFFSET; sa++)
+        for (da = 0; da <= MAX_OFFSET; da++)
+            for (n = 1; n <= MAX_BLOCK_SIZE; n++)
+            {
+                // printf (".");
+                /* Zero dest so we can check it properly after the copying.  */
+                for (j = 0; j < BUFF_SIZE; j++)
+                    dest[j] = 0;
 
-          /* Check src is not modified.  */
-          for (j = 0; j < BUFF_SIZE; j++)
-            if (src[i] != backup_src[i])
-              print_error ("\nFailed: after memcpy of %u bytes "
-                           "with src_align %u and dst_align %u, "
-                           "byte %u of src is modified.\n",
-                           n, sa, da, j);
-        }
+                void* ret = memcpy(dest + START_COPY + da, src + sa, n);
 
-  if (errors != 0)
-    abort ();
+                /* Check return value.  */
+                if (ret != (dest + START_COPY + da))
+                    print_error("\nFailed: wrong return value in memcpy of %u bytes "
+                                "with src_align %u and dst_align %u. "
+                                "Return value and dest should be the same"
+                                "(ret is %p, dest is %p)\n",
+                                n, sa, da, ret, dest + START_COPY + da);
 
-  printf("ok\n");
+                /* Check that content of the destination buffer
+                   is the same as the source buffer, and
+                   memory outside destination buffer is not modified.  */
+                for (j = 0; j < BUFF_SIZE; j++)
+                    if ((unsigned)j < START_COPY + da)
+                    {
+                        if (dest[j] != 0)
+                            print_error("\nFailed: after memcpy of %u bytes "
+                                        "with src_align %u and dst_align %u, "
+                                        "byte %u before the start of dest is not 0.\n",
+                                        n, sa, da, START_COPY - j);
+                    }
+                    else if ((unsigned)j < START_COPY + da + n)
+                    {
+                        i = j - START_COPY - da;
+                        if (dest[j] != (src + sa)[i])
+                            print_error("\nFailed: after memcpy of %u bytes "
+                                        "with src_align %u and dst_align %u, "
+                                        "byte %u in dest and src are not the same.\n",
+                                        n, sa, da, i);
+                    }
+                    else if (dest[j] != 0)
+                    {
+                        print_error("\nFailed: after memcpy of %u bytes "
+                                    "with src_align %u and dst_align %u, "
+                                    "byte %u after the end of dest is not 0.\n",
+                                    n, sa, da, j - START_COPY - da - n);
+                    }
+
+                /* Check src is not modified.  */
+                for (j = 0; j < BUFF_SIZE; j++)
+                    if (src[i] != backup_src[i])
+                        print_error("\nFailed: after memcpy of %u bytes "
+                                    "with src_align %u and dst_align %u, "
+                                    "byte %u of src is modified.\n",
+                                    n, sa, da, j);
+            }
+
+    if (errors != 0)
+        abort();
+
+    printf("ok\n");
 }

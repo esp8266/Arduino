@@ -16,13 +16,21 @@
 
 
 /*
+ * Saturated unsigned add and unsigned multiply
+ */
+size_t umm_umul_sat(const size_t a, const size_t b);  // share with heap.cpp
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+static size_t umm_uadd_sat(const size_t a, const size_t b);
+#endif
+
+/*
  * This redefines DBGLOG_FORCE defined in dbglog/dbglog.h
  * Just for printing from umm_info() which is assumed to always be called from
  * non-ISR. Thus SPI bus is available to handle cache-miss and reading a flash
  * string while INTLEVEL is non-zero.
  */
 #undef DBGLOG_FORCE
-#define DBGLOG_FORCE(force, format, ...) {if(force) {UMM_INFO_PRINTF(format, ## __VA_ARGS__);}}
+#define DBGLOG_FORCE(force, format, ...) {if (force) {UMM_INFO_PRINTF(format,##__VA_ARGS__);}}
 // #define DBGLOG_FORCE(force, format, ...) {if(force) {::printf(PSTR(format), ## __VA_ARGS__);}}
 
 
@@ -37,7 +45,7 @@
 
 
 #if defined(UMM_POISON_CHECK_LITE)
-static bool check_poison_neighbors( umm_heap_context_t *_context, uint16_t cur );
+static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur);
 #endif
 
 
@@ -48,23 +56,22 @@ void ICACHE_FLASH_ATTR umm_print_stats(int force);
 
 
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-#define UMM_INFO_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR4(fmt), ##__VA_ARGS__)
-// use PSTR4() instead of PSTR() to ensure 4-bytes alignment in Flash, whatever the default alignment of PSTR_ALIGN
+#define UMM_INFO_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt),##__VA_ARGS__)
 
 
 typedef struct umm_block_t umm_block;
 
 struct UMM_HEAP_CONTEXT {
-  umm_block *heap;
-  void *heap_end;
-#if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
-  UMM_STATISTICS stats;
-#endif
-#ifdef UMM_INFO
-  UMM_HEAP_INFO info;
-#endif
-  unsigned short int numblocks;
-  unsigned char id;
+    umm_block *heap;
+    void *heap_end;
+    #if (!defined(UMM_INLINE_METRICS) && defined(UMM_STATS)) || defined(UMM_STATS_FULL)
+    UMM_STATISTICS stats;
+    #endif
+    #ifdef UMM_INFO
+    UMM_HEAP_INFO info;
+    #endif
+    unsigned short int numblocks;
+    unsigned char id;
 };
 
 

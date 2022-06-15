@@ -73,7 +73,7 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
         fqbn += ',waveform=phase'
     cmd += [fqbn]
     cmd += ['-built-in-libraries', ide_path + '/libraries']
-    cmd += ['-ide-version=10607']
+    cmd += ['-ide-version=10802']
     cmd += ['-warnings={warnings}'.format(**vars(args))]
     if args.verbose:
         cmd += ['-verbose']
