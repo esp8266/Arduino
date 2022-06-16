@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <coredecls.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
@@ -92,7 +93,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "filesystem") {
-          size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+          size_t fsSize = ((size_t)FS_end - (size_t)FS_start);
           close_all_fs();
           if (!Update.begin(fsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
@@ -110,7 +111,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         }
       } else if(_authenticated && upload.status == UPLOAD_FILE_END && !_updaterError.length()){
         if(Update.end(true)){ //true to set the size to the current progress
-          if (_serial_output) Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+          if (_serial_output) Serial.printf("Update Success: %zu\nRebooting...\n", upload.totalSize);
         } else {
           _setUpdaterError();
         }
@@ -119,7 +120,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         Update.end();
         if (_serial_output) Serial.println("Update was aborted");
       }
-      delay(0);
+      esp_yield();
     });
 }
 

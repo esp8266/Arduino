@@ -4,12 +4,11 @@
 
 extern "C"
 {
-
 #include <user_interface.h>
 #include <lwip/netif.h>
 
-extern netif netif0;
+    extern netif netif0;
 
-} // extern "C"
+}  // extern "C"
 
-#endif // __MOCKLWIP_H
+#endif  // __MOCKLWIP_H

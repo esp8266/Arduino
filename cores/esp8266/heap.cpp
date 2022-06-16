@@ -5,6 +5,13 @@
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
+extern "C" size_t umm_umul_sat(const size_t a, const size_t b);
+
+// z2EapFree: See wpa2_eap_patch.cpp for details
+extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((weak, alias("vPortFree"), nothrow));
+// I don't understand all the compiler noise around this alias.
+// Adding "__attribute__ ((nothrow))" seems to resolve the issue.
+// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824 
 
 // Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
 #define FORCE_ALWAYS_INLINE_HEAP_SELECT
@@ -153,7 +160,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
+    PTR_CHECK__LOG_LAST_FAIL(ret, umm_umul_sat(count, size));
     return ret;
 }
 
@@ -172,7 +179,7 @@ void IRAM_ATTR print_loc(size_t size, const char* file, int line)
         DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
 
         bool inISR = ETS_INTR_WITHINISR();
-        if (inISR && (uint32_t)file >= 0x40200000) {
+        if (NULL == file || (inISR && (uint32_t)file >= 0x40200000)) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
             char buf[strlen_P(file) + 1];
@@ -247,8 +254,11 @@ void* IRAM_ATTR calloc(size_t count, size_t size)
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
-    OOM_CHECK__PRINT_OOM(ret, size);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);// For logging purposes
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL(ret, total_size);
+    OOM_CHECK__PRINT_OOM(ret, total_size);
     return ret;
 }
 
@@ -287,8 +297,11 @@ void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, i
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL_FL(ret, count * size, file, line);
-    OOM_CHECK__PRINT_LOC(ret, size, file, line);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line);
+    OOM_CHECK__PRINT_LOC(ret, total_size, file, line);
     return ret;
 }
 

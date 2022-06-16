@@ -28,6 +28,8 @@
 #include "PolledTimeout.h"
 #include "LwipIntf.h"
 
+#include <coredecls.h>
+
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -43,9 +45,6 @@ extern "C" {
 }
 
 #include "debug.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -136,7 +135,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     int passphraseLen = passphrase == nullptr ? 0 : strlen(passphrase);
     if(passphraseLen > 64) {
         // fail passphrase too long!
-        return WL_CONNECT_FAILED;
+        return WL_WRONG_PASSWORD;
     }
 
     struct station_config conf;

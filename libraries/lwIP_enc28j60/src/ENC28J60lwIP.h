@@ -7,4 +7,4 @@
 
 using ENC28J60lwIP = LwipIntfDev<ENC28J60>;
 
-#endif // _ENC28J60LWIP_H
+#endif  // _ENC28J60LWIP_H

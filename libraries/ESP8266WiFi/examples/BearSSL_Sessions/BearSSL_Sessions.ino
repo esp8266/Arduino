@@ -1,22 +1,28 @@
 // Example of using SSL sessions to speed up SSL connection initiation
 //
+// Note that sessions are a function of individual HTTPS servers, so if you
+// are connecting to a service through a load abalncer (i.e. Azure, AWS, GitHub)
+// two connections to the same IP address will generally connect to two
+// different web servers, meaning that sessions won't work.  If you are
+// connecting to a single server not behind a load balancer/etc., however,
+// there should be a significant speedup.
+//
 // September 2018 by Earle F. Philhower, III
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
 #include <time.h>
+#include "certs.h"
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
 const char *pass = STAPSK;
 
-const char *   host = "api.github.com";
-const uint16_t port = 443;
-const char *   path = "/";
+const char *path = "/";
 
 void setup() {
   Serial.begin(115200);
@@ -54,9 +60,7 @@ void setup() {
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
 void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
-  if (!path) {
-    path = "/";
-  }
+  if (!path) { path = "/"; }
 
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
@@ -76,11 +80,9 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     do {
       char tmp[32];
       memset(tmp, 0, 32);
-      int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
+      int rlen = client->read((uint8_t *)tmp, sizeof(tmp) - 1);
       yield();
-      if (rlen < 0) {
-        break;
-      }
+      if (rlen < 0) { break; }
       // Only print out first line up to \r, then abort connection
       char *nl = strchr(tmp, '\r');
       if (nl) {
@@ -97,34 +99,11 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
 
 
 void loop() {
-  static const char digicert[] PROGMEM = R"EOF(
------BEGIN CERTIFICATE-----
-MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs
-MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3
-d3cuZGlnaWNlcnQuY29tMSswKQYDVQQDEyJEaWdpQ2VydCBIaWdoIEFzc3VyYW5j
-ZSBFViBSb290IENBMB4XDTA2MTExMDAwMDAwMFoXDTMxMTExMDAwMDAwMFowbDEL
-MAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3
-LmRpZ2ljZXJ0LmNvbTErMCkGA1UEAxMiRGlnaUNlcnQgSGlnaCBBc3N1cmFuY2Ug
-RVYgUm9vdCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMbM5XPm
-+9S75S0tMqbf5YE/yc0lSbZxKsPVlDRnogocsF9ppkCxxLeyj9CYpKlBWTrT3JTW
-PNt0OKRKzE0lgvdKpVMSOO7zSW1xkX5jtqumX8OkhPhPYlG++MXs2ziS4wblCJEM
-xChBVfvLWokVfnHoNb9Ncgk9vjo4UFt3MRuNs8ckRZqnrG0AFFoEt7oT61EKmEFB
-Ik5lYYeBQVCmeVyJ3hlKV9Uu5l0cUyx+mM0aBhakaHPQNAQTXKFx01p8VdteZOE3
-hzBWBOURtCmAEvF5OYiiAhF8J2a3iLd48soKqDirCmTCv2ZdlYTBoSUeh10aUAsg
-EsxBu24LUTi4S8sCAwEAAaNjMGEwDgYDVR0PAQH/BAQDAgGGMA8GA1UdEwEB/wQF
-MAMBAf8wHQYDVR0OBBYEFLE+w2kD+L9HAdSYJhoIAu9jZCvDMB8GA1UdIwQYMBaA
-FLE+w2kD+L9HAdSYJhoIAu9jZCvDMA0GCSqGSIb3DQEBBQUAA4IBAQAcGgaX3Nec
-nzyIZgYIVyHbIUf4KmeqvxgydkAQV8GK83rZEWWONfqe/EW1ntlMMUu4kehDLI6z
-eM7b41N5cdblIZQB2lWHmiRk9opmzN6cN82oNLFpmyPInngiK3BD41VHMWEZ71jF
-hS9OMPagMRYjyOfiZRYzy78aG6A9+MpeizGLYAiJLQwGXFK3xPkKmNEVX58Svnw2
-Yzi9RKR/5CYrCsSXaQ3pjOLAEFe4yHYSkVXySGnYvCoCWw9E1CAx2/S6cCZdkGCe
-vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
-+OkuE6N36B9K
------END CERTIFICATE-----
-)EOF";
   uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(digicert);
+  BearSSL::X509List cert(certForum);
+  const char *host = "esp8266.com";
+  const int port = 443;
 
   Serial.printf("Connecting without sessions...");
   start = millis();
@@ -156,6 +135,5 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
-  delay(10000); // Avoid DDOSing github
+  delay(10000);  // Avoid DDOSing github
 }
-

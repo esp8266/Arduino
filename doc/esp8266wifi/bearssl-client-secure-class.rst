@@ -48,7 +48,7 @@ As a rule, either keep your objects global, use `new` to create them, or ensure 
 TLS and HTTPS Basics
 ~~~~~~~~~~~~~~~~~~~~
 
-The following discussion is only intended to give a rough idea of TLS/HTTPS(which is just HTTP over a TLS connection) and the components an application needs to manage to make a TLS connection.  For more detailed information, please check the relevant `RFC 5246 <https://www.ietf.org/rfc/rfc5246>`__ and others.
+The following discussion is only intended to give a rough idea of TLS/HTTPS(which is just HTTP over a TLS connection) and the components an application needs to manage to make a TLS connection.  For more detailed information, please check the relevant `RFC 5246 <https://tools.ietf.org/search/rfc5246>`__ and others.
 
 TLS can be broken into two stages: verifying the identities of server (and potentially client), and then encrypting blocks of data bidirectionally.  Verifying the identity of the other partner is handled via keys encoded in X509 certificates, optionally signed by a series of other entities.
 

@@ -12,30 +12,23 @@ RANLIB ?= ranlib
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
-CXX =  $(shell for i in g++-10  g++-9  g++-8  g++;  do which $$i > /dev/null && { echo $$i; break; } done)
-CC  =  $(shell for i in gcc-10  gcc-9  gcc-8  gcc;  do which $$i > /dev/null && { echo $$i; break; } done)
-GCOV = $(shell for i in gcov-10 gcov-9 gcov-8 gcov; do which $$i > /dev/null && { echo $$i; break; } done)
-$(warning using $(CXX))
-ifeq ($(CXX),g++)
-CXXFLAGS += -std=gnu++11
-else
-CXXFLAGS += -std=gnu++17
-endif
-ifeq ($(CC),gcc)
-CFLAGS += -std=gnu11
-else
-CFLAGS += -std=gnu17
-endif
+# Prefer named GCC (and, specifically, GCC10), same as platform.txt / platformio_build.py
+find_tool = $(shell for name in $(1) $(2); do which $$name && break; done 2>/dev/null)
+CXX  = $(call find_tool,g++-10,g++)
+CC   = $(call find_tool,gcc-10,gcc)
+GCOV = $(call find_tool,gcov-10,gcov)
 
-# I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
-ifeq ($(shell uname -s),Darwin)
-CC  ?= gcc
-CXX ?= g++
-endif
-GCOV ?= gcov
+$(warning using $(CXX) and $(CC))
+
+GCOV     ?= gcov
 VALGRIND ?= valgrind
-LCOV ?= lcov --gcov-tool $(GCOV)
-GENHTML ?= genhtml
+LCOV     ?= lcov --gcov-tool $(GCOV)
+GENHTML  ?= genhtml
+
+# Board fild will be built with GCC10, but we have some limited ability to build with older versions
+# *Always* push the standard used in the platform.txt
+CXXFLAGS += -std=gnu++17
+CFLAGS += -std=gnu17
 
 ifeq ($(FORCE32),1)
 SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
@@ -97,6 +90,7 @@ CORE_CPP_FILES := \
 		HardwareSerial.cpp \
 		crc32.cpp \
 		Updater.cpp \
+		time.cpp \
 	) \
 	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
@@ -104,12 +98,16 @@ CORE_CPP_FILES := \
 		FatLib/FatFilePrint.cpp \
 		FatLib/FatFileSFN.cpp \
 		FatLib/FatFormatter.cpp \
+		FatLib/FatName.cpp \
 		FatLib/FatVolume.cpp \
 		FatLib/FatPartition.cpp \
 		common/FmtNumber.cpp \
+		common/FsCache.cpp \
 		common/FsStructs.cpp \
 		common/FsDateTime.cpp \
-		common/PrintBasic.cpp \
+		common/FsUtf.cpp \
+		common/FsName.cpp \
+		common/upcase.cpp \
 	) \
 	$(abspath $(LIBRARIES_PATH)/SDFS/src/SDFS.cpp) \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
@@ -131,7 +129,7 @@ MOCK_CPP_FILES_COMMON := \
 		MockUART.cpp \
 		MockTools.cpp \
 		MocklwIP.cpp \
-		MockDigital.cpp \
+		HostWiring.cpp \
 	)
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) \
@@ -145,6 +143,7 @@ MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) \
 		ArduinoMainUdp.cpp \
 		ArduinoMainSpiffs.cpp \
 		ArduinoMainLittlefs.cpp \
+		DhcpServer.cpp \
 		user_interface.cpp \
 	)
 
@@ -168,6 +167,8 @@ INC_PATHS += \
 		../../tools/sdk/include \
 		../../tools/sdk/lwip2/include \
 	)
+
+TEST_ARGS ?=
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
@@ -231,7 +232,7 @@ CI:					# run CI
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)			# run host test for CI
-	$(OUTPUT_BINARY)
+	$(OUTPUT_BINARY) $(TEST_ARGS)
 
 .PHONY: clean
 clean: clean-lcov clean-objects
@@ -341,6 +342,7 @@ OPT_ARDUINO_LIBS ?= \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+		Hash/src/Hash.cpp \
 	)
 
 MOCK_ARDUINO_LIBS := \
@@ -350,7 +352,6 @@ MOCK_ARDUINO_LIBS := \
 		MockWiFiServerSocket.cpp \
 		MockWiFiServer.cpp \
 		UdpContextSocket.cpp \
-		HostWiring.cpp \
 		MockEsp.cpp \
 		MockEEPROM.cpp \
 		MockSPI.cpp \
@@ -371,12 +372,13 @@ else
 LIBSSL = $(LIBSSLFILE)
 endif
 ssl:							# download source and build BearSSL
-	cd ../../tools/sdk/ssl && make native$(N32)
+	cd ../../tools/sdk/ssl && $(MAKE) native$(N32)
 
 ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
-USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src $$d/src/libmad; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
-USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp $$d/src/libmad/*.c; do test -r $$ss && echo $$ss; done; done)
-INC_PATHS += $(USERLIBDIRS)
+USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/utility $$d/src $$d/src/utility; do test -d $$dd && echo $$dd; done; done)
+USERLIBSRCS := $(shell test -z "$(USERLIBDIRS)" || for d in $(USERLIBDIRS); do for ss in $$d/*.c $$d/*.cpp; do test -r $$ss && echo $$ss; done; done)
+USERLIBINCS = $(shell for d in $(USERLIBDIRS); do echo -I$$d; done)
+INC_PATHS += $(USERLIBINCS)
 INC_PATHS += -I$(INODIR)/..
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o) $(USERCXXSOURCES:.cpp=.cpp.o)
 C_OBJECTS_CORE_EMU = $(USERCSOURCES:.c=.c.o)
@@ -391,7 +393,7 @@ $(BINDIR)/fullcore.a: $(FULLCORE_OBJECTS_ISOLATED)
 ifeq ($(INO),)
 
 %:
-	make INO=$@.ino $(BINDIR)/$(abspath $@)
+	$(MAKE) INO=$@.ino $(BINDIR)/$(abspath $@)
 
 else
 

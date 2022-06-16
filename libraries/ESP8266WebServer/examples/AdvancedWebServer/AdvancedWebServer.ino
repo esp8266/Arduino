@@ -35,7 +35,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -69,8 +69,7 @@ void handleRoot() {
   </body>\
 </html>",
 
-           hr, min % 60, sec % 60
-          );
+           hr, min % 60, sec % 60);
   server.send(200, "text/html", temp);
   digitalWrite(led, 0);
 }
@@ -86,9 +85,7 @@ void handleNotFound() {
   message += server.args();
   message += "\n";
 
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
+  for (uint8_t i = 0; i < server.args(); i++) { message += " " + server.argName(i) + ": " + server.arg(i) + "\n"; }
 
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
@@ -133,9 +130,7 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+  if (MDNS.begin("esp8266")) { Serial.println("MDNS responder started"); }
 
   server.on("/", handleRoot);
   server.on("/test.svg", drawGraph);
@@ -151,4 +146,3 @@ void loop(void) {
   server.handleClient();
   MDNS.update();
 }
-
