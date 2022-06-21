@@ -57,7 +57,7 @@ DHCP stress.
 
 Known side-effects:
 
--  ``WiFi.mode()`` must be called before changing mac addresses with `wifi_set_macaddr({SOFTAP,STATION}_IF, ...)``.
+-  ``WiFi.mode()`` must be called before changing mac addresses with ``wifi_set_macaddr({SOFTAP,STATION}_IF, ...)``.
 
 Legacy behavior can be restored by calling ``enableWiFiAtBootTime()`` from
 anywhere in the code (it is a weak void function intended to play with the
