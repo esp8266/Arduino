@@ -190,7 +190,7 @@ typedef uintptr_t mem_ptr_t;
  * sys/types or unistd.h are available).
  * Being like that, we define it to 'int' if SSIZE_MAX is not defined.
  */
-#if !defined(SSIZE_MAX) || !defined(_SSIZE_T_DECLARED)
+#ifdef SSIZE_MAX
 /* If SSIZE_MAX is defined, unistd.h should provide the type as well */
 #ifndef LWIP_NO_UNISTD_H
 #define LWIP_NO_UNISTD_H 0
