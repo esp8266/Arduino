@@ -55,6 +55,10 @@ This change is harmless with standard sketches: Calls to ``WiFi.mode()`` do
 enable radio as usual.  It also smooths current spikes at boot and decreases
 DHCP stress.
 
+Known side-effects:
+
+-  ``WiFi.mode()`` must be called before changing mac addresses with ``wifi_set_macaddr({SOFTAP,STATION}_IF, ...)``.
+
 Legacy behavior can be restored by calling ``enableWiFiAtBootTime()`` from
 anywhere in the code (it is a weak void function intended to play with the
 linker).
