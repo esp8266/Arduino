@@ -122,9 +122,20 @@ inline int esp_get_cpu_freq_mhz()
 }
 #endif
 
+
 // Call this function in your setup() to cause the phase locked version of the generator to
 // be linked in automatically.  Otherwise, the default PWM locked version will be used.
 void enablePhaseLockedWaveform(void);
+
+// Determine when the sketch runs on ESP8285
+#if !defined(CORE_MOCK)
+bool __attribute__((const, nothrow)) esp_is_8285();
+#else
+inline bool esp_is_8285()
+{
+    return false;
+}
+#endif
 
 #ifdef __cplusplus
 }
