@@ -878,7 +878,7 @@ bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
             return flashWriteUnalignedMemory(address, data, size) == size;
         }
 
-        return flashWrite(address, reinterpret_cast<const uint32_t *>(data), size) == size;
+        return flashWrite(address, reinterpret_cast<const uint32_t *>(data), size);
     }
 
     return false;
