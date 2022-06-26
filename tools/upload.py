@@ -70,5 +70,5 @@ except esptool.FatalError as e:
 finally:
     if erase_file:
         os.remove(erase_file)
-    if sys.exc_info:
+    if any(sys.exc_info()):
         sys.exit(2)
