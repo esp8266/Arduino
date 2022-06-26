@@ -69,20 +69,8 @@ enum wl_enc_type {  /* Values map to 802.11 encryption suites... */
         ENC_TYPE_AUTO = 8
 };
 
-#if !defined(LWIP_INTERNAL) && !defined(__LWIP_TCP_H__) && !defined(LWIP_HDR_TCPBASE_H)
-enum wl_tcp_state {
-  CLOSED      = 0,
-  LISTEN      = 1,
-  SYN_SENT    = 2,
-  SYN_RCVD    = 3,
-  ESTABLISHED = 4,
-  FIN_WAIT_1  = 5,
-  FIN_WAIT_2  = 6,
-  CLOSE_WAIT  = 7,
-  CLOSING     = 8,
-  LAST_ACK    = 9,
-  TIME_WAIT   = 10
-};
-#endif
+#include <lwip/init.h>
+#include <lwip/tcpbase.h>
+using wl_tcp_state = tcp_state;
 
 #endif /* WL_DEFINITIONS_H_ */

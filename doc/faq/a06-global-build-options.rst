@@ -18,13 +18,16 @@ signature line must be alone on a single line. The block comment ending
 compiler command-line options just as you would have for the GCC @file
 command option.
 
-Actions taken in processing comment block to create ``build.opt`` \* for
-each line, white space is trimmed \* blank lines are skipped \* lines
-starting with ``*``, ``//``, or ``#`` are skipped \* the remaining
-results are written to build tree\ ``/core/build.opt`` \* multiple
-``/*@create-file:build.opt@`` ``*/`` comment blocks are not allowed \*
-``build.opt`` is finished with a ``-include ...`` command, which
-references the global .h its contents were extracted from.
+Actions taken in processing comment block to create ``build.opt``
+
+-  for each line, white space is trimmed
+-  blank lines are skipped
+-  lines starting with ``*``, ``//``, or ``#`` are skipped
+-  the remaining results are written to build tree\ ``/core/build.opt``
+-  multiple ``/*@create-file:build.opt@`` ``*/`` comment blocks are not
+   allowed
+-  ``build.opt`` is finished with a ``-include ...`` command, which
+   references the global .h its contents were extracted from.
 
 Example Sketch: ``LowWatermark.ino``
 
@@ -108,10 +111,12 @@ multiple Sketches are open, they can no longer reliably share one cached
 of ``core.a`` cached. Other sketches will use this cached version for
 their builds.
 
-There are two solutions to this issue: 1. Turn off the “Aggressively
-Cache Compiled core” feature, by setting ``compiler.cache_core=false``.
+There are two solutions to this issue:
+
+1. Turn off the “Aggressively Cache Compiled core” feature, by setting
+   ``compiler.cache_core=false``.
 2. Rely on the not ideal fail-safe, aggressive cache workaround built
-into the script.
+   into the script.
 
 Using “compiler.cache_core=false”
 ---------------------------------
@@ -145,11 +150,16 @@ When you switch between Sketch windows, core will be recompiled and the
 cache updated. The workaround logic is reset when Arduino IDE is
 completely shutdown and restarted.
 
-The workaround is not perfect. These issues may be of concern: 1. Dirty
-temp space. Arduino build cache files left over from a previous run or
-boot. 2. Arduino command-line options: \* override default
-preferences.txt file. \* override a preference, specifically
-``compiler.cache_core``. 3. Multiple versions of the Arduino IDE running
+The workaround is not perfect. These issues may be of concern:
+
+1. Dirty temp space. Arduino build cache files left over from a previous
+   run or boot.
+2. Arduino command-line options:
+
+   -  override default preferences.txt file.
+   -  override a preference, specifically ``compiler.cache_core``.
+
+3. Multiple versions of the Arduino IDE running
 
 **Dirty temp space**
 

@@ -265,8 +265,6 @@ void ArduinoOTAClass::_runUpdate() {
   delay(100);
 
   Update.setMD5(_md5.c_str());
-  WiFiUDP::stopAll();
-  WiFiClient::stopAll();
 
   if (_start_callback) {
     _start_callback();
