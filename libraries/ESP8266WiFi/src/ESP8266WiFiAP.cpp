@@ -276,7 +276,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 /**
  * Disconnect from the network (close AP)
  * @param wifioff disable mode?
- * @return one value of wl_status_t enum
+ * @return operation success
  */
 bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     bool ret;

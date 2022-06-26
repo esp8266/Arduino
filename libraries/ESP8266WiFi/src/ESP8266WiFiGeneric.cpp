@@ -222,8 +222,14 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
     DEBUG_WIFI("wifi evt: %d\n", event->event);
 
-    if(event->event == EVENT_STAMODE_DISCONNECTED) {
+    if (event->event == EVENT_STAMODE_DISCONNECTED) {
         DEBUG_WIFI("STA disconnect: %d\n", event->event_info.disconnected.reason);
+        // workaround for https://github.com/esp8266/Arduino/issues/7432
+        // still delivers the event, just handle this specific case
+        if ((wifi_station_get_connect_status() == STATION_GOT_IP) && !wifi_station_get_reconnect_policy()) {
+            DEBUG_WIFI("forcibly stopping the station connection manager\n");
+            wifi_station_disconnect();
+        }
     }
 
     if (event->event == EVENT_STAMODE_AUTHMODE_CHANGE) {
