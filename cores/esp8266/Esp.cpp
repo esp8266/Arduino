@@ -697,7 +697,8 @@ static SpiFlashOpResult spi_flash_write_page_break(uint32_t offset, uint32_t *da
         return result;
     }
 
-    for (uint32_t page = 0; page < (size - size_page_aligned) / PageSize; ++page) {
+    const auto last_page = (size - size_page_aligned) / PageSize;
+    for (uint32_t page = 0; page < last_page; ++page) {
         if ((result = spi_flash_write(offset + size_page_aligned, data + (size_page_aligned >> 2), PageSize)) != SPI_FLASH_RESULT_OK) {
             return result;
         }
