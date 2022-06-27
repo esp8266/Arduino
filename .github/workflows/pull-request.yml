@@ -22,15 +22,15 @@ jobs:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.2
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -57,15 +57,15 @@ jobs:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.2
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -85,15 +85,15 @@ jobs:
     name: Windows
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Cache Windows toolchain
       id: cache-windows
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -120,15 +120,15 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Cache Mac toolchain
       id: cache-mac
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -152,10 +152,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Build subset on Platform.IO
@@ -179,10 +179,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Run host tests
@@ -203,10 +203,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Build documentation
@@ -230,10 +230,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Style check
@@ -264,10 +264,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Mock build
@@ -286,15 +286,15 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3.0.4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -316,7 +316,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.0.2
       with:
         submodules: true
     - name: Run codespell
