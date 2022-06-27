@@ -21,8 +21,6 @@
 */
 
 
-#define LWIP_INTERNAL
-
 extern "C" {
     #include "osapi.h"
     #include "ets_sys.h"
