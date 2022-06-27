@@ -758,7 +758,7 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
 }
 #endif
 
-static constexpr uint32_t Alignment { 4 };
+static constexpr size_t Alignment { 4 };
 
 template <typename T>
 static T aligned(T value) {
@@ -799,34 +799,34 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
     size_t written = 0;
 
     if (!isAlignedAddress(address)) {
-        auto r_addr = alignBefore(address);
-        auto c_off = address - r_addr;
-        auto wbytes = std::min(Alignment - c_off, size);
+        auto before_address = alignBefore(address);
+        auto offset = address - before_address;
+        auto wlen = std::min(Alignment - offset, size);
 
-        if (!flash_read(r_addr, &buf[0], Alignment)) {
+        if (!flash_read(before_address, &buf[0], Alignment)) {
             return 0;
         }
 
 #if PUYA_SUPPORT
         if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-            for (size_t i = 0; i < wbytes ; ++i) {
-                buf[c_off + i] &= data[i];
+            for (size_t i = 0; i < wlen ; ++i) {
+                buf[offset + i] &= data[i];
             }
         } else {
 #endif
-            memcpy(&buf[c_off], data, wbytes);
+            memcpy(&buf[offset], data, wlen);
 #if PUYA_SUPPORT
         }
 #endif
 
-        if (!flash_write(r_addr, &buf[0], Alignment)) {
-            return wbytes;
+        if (!flash_write(before_address, &buf[0], Alignment)) {
+            return 0;
         }
 
-        address += wbytes;
-        data += wbytes;
-        written += wbytes;
-        size -= wbytes;
+        address += wlen;
+        data += wlen;
+        written += wlen;
+        size -= wlen;
     }
 
     while (size > 0) {
