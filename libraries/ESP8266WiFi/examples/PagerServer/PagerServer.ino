@@ -2,7 +2,7 @@
   Pager Server
 
   The ESP8266WiFi library's WiFiServer and WiFiServerSecure
-  work differently then WiFiServer and EthernetSever
+  work differently than WiFiServer and EthernetSever
   in Arduino networking libraries.
   This example demonstrates the ArduinoWiFiServer,
   which enhances the WiFiServer.
@@ -25,10 +25,10 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char* ssid     = STASSID;
+const char* ssid = STASSID;
 const char* password = STAPSK;
 
 ArduinoWiFiServer server(2323);
@@ -60,13 +60,13 @@ void setup() {
 
 void loop() {
 
-  WiFiClient client = server.available(); // returns first client which has data to read or a 'false' client
-  if (client) { // client is true only if it is connected and has data to read
-    String s = client.readStringUntil('\n'); // read the message incoming from one of the clients
-    s.trim(); // trim eventual \r
-    Serial.println(s); // print the message to Serial Monitor
-    client.print("echo: "); // this is only for the sending client
-    server.println(s); // send the message to all connected clients
-    server.flush(); // flush the buffers
+  WiFiClient client = server.available();     // returns first client which has data to read or a 'false' client
+  if (client) {                               // client is true only if it is connected and has data to read
+    String s = client.readStringUntil('\n');  // read the message incoming from one of the clients
+    s.trim();                                 // trim eventual \r
+    Serial.println(s);                        // print the message to Serial Monitor
+    client.print("echo: ");                   // this is only for the sending client
+    server.println(s);                        // send the message to all connected clients
+    server.flush();                           // flush the buffers
   }
 }

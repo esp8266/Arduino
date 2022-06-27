@@ -457,6 +457,7 @@ namespace brssl {
         }
         memcpy(pk->key.ec.q, ek->q, ek->qlen);
         pk->key.ec.qlen = ek->qlen;
+        pk->key.ec.curve = ek->curve;
         return pk;
 
       default:

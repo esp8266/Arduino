@@ -17,6 +17,12 @@
 #include <umm_malloc/umm_malloc.h>
 #if defined(UMM_HEAP_IRAM)
 
+#if defined(CORE_MOCK)
+#define XCHAL_INSTRAM1_VADDR 0x40100000
+#else
+#include <sys/config.h>  // For config/core-isa.h
+#endif
+
 // durable - as in long life, persisting across reboots.
 struct durable {
   uint32_t bootCounter;
@@ -30,7 +36,7 @@ struct durable {
 #define IRAM_RESERVE_SZ ((sizeof(struct durable) + 7UL) & ~7UL)
 
 // Position its address just above the reduced 2nd Heap.
-#define IRAM_RESERVE (0x40100000UL + 0xC000UL - IRAM_RESERVE_SZ)
+#define IRAM_RESERVE ((uintptr_t)XCHAL_INSTRAM1_VADDR + 0xC000UL - IRAM_RESERVE_SZ)
 
 // Define a reference with the right properties to make access easier.
 #define DURABLE ((struct durable *)IRAM_RESERVE)
@@ -52,8 +58,7 @@ extern struct rst_info resetInfo;
   XOR sum on the IRAM data (or just a section of the IRAM data).
 */
 inline bool is_iram_valid(void) {
-  return (REASON_WDT_RST      <= resetInfo.reason &&
-          REASON_SOFT_RESTART >= resetInfo.reason);
+  return (REASON_WDT_RST <= resetInfo.reason && REASON_SOFT_RESTART >= resetInfo.reason);
 }
 
 
@@ -64,16 +69,13 @@ void setup() {
   delay(10);
   Serial.printf_P(PSTR("\r\nSetup ...\r\n"));
 
-  if (!is_iram_valid()) {
-    DURABLE->bootCounter = 0;
-  }
+  if (!is_iram_valid()) { DURABLE->bootCounter = 0; }
 
   DURABLE->bootCounter++;
 
   Serial.printf("Number of reboots at %u\r\n", DURABLE->bootCounter);
   Serial.printf("\r\nSome less than direct, ways to restart:\r\n");
   processKey(Serial, '?');
-
 }
 
 void loop(void) {
@@ -100,14 +102,11 @@ extern "C" void umm_init_iram(void) {
     adjustments and checksums. These can affect the persistence of data across
     reboots.
   */
-  uint32_t sec_heap = (uint32_t)_text_end + 32;
+  uintptr_t sec_heap = (uintptr_t)_text_end + 32;
   sec_heap &= ~7;
-  size_t sec_heap_sz = 0xC000UL - (sec_heap - 0x40100000UL);
-  sec_heap_sz -= IRAM_RESERVE_SZ; // Shrink IRAM heap
-  if (0xC000UL > sec_heap_sz) {
-
-    umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true);
-  }
+  size_t sec_heap_sz = 0xC000UL - (sec_heap - (uintptr_t)XCHAL_INSTRAM1_VADDR);
+  sec_heap_sz -= IRAM_RESERVE_SZ;  // Shrink IRAM heap
+  if (0xC000UL > sec_heap_sz) { umm_init_iram_ex((void *)sec_heap, sec_heap_sz, true); }
 }
 
 #else
@@ -119,6 +118,5 @@ void setup() {
   Serial.println("\r\n\r\nThis sketch requires Tools Option: 'MMU: 16KB cache + 48KB IRAM and 2nd Heap (shared)'");
 }
 
-void loop(void) {
-}
+void loop(void) {}
 #endif

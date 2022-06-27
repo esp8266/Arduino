@@ -18,7 +18,7 @@ const int16_t I2C_MASTER = 0x42;
 const int16_t I2C_SLAVE = 0x08;
 
 void setup() {
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER); // join i2c bus (address optional for master)
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER);  // join i2c bus (address optional for master)
 }
 
 byte x = 0;
@@ -28,10 +28,10 @@ void loop() {
   static periodic nextPing(1000);
 
   if (nextPing) {
-    Wire.beginTransmission(I2C_SLAVE); // transmit to device #8
-    Wire.write("x is ");        // sends five bytes
-    Wire.write(x);              // sends one byte
-    Wire.endTransmission();    // stop transmitting
+    Wire.beginTransmission(I2C_SLAVE);  // transmit to device #8
+    Wire.write("x is ");                // sends five bytes
+    Wire.write(x);                      // sends one byte
+    Wire.endTransmission();             // stop transmitting
 
     x++;
   }

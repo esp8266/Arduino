@@ -20,8 +20,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#define LWIP_INTERNAL
-
 extern "C"
 {
     #include "wl_definitions.h"
@@ -99,6 +97,10 @@ WiFiClient::~WiFiClient()
     WiFiClient::_remove(this);
     if (_client)
         _client->unref();
+}
+
+std::unique_ptr<WiFiClient> WiFiClient::clone() const {
+    return std::make_unique<WiFiClient>(*this);
 }
 
 WiFiClient::WiFiClient(const WiFiClient& other)

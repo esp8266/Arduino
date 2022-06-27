@@ -248,4 +248,32 @@ Enhancement ideas:
   save on the execution time spent with interrupts disabled.
 
 */
+
+/*
+  Dec 29, 2021
+  Upstream umm_malloc at git hash id 4dac43c3be7a7470dd669323021ba238081da18e
+  processed all project files with the style program uncrustify.
+
+  This PR updates our ported version of umm_malloc processed with "uncrustify".
+  This should make subsequent merges of upstream into this port easier.
+
+  This also makes the style more consistant through umm_malloc.
+
+  Some edits to source files was needed to get uncrustify to work.
+  1) macros with "if"s need to be of the form "if ( blah ) { } " curley braces
+     are needed for it to parse correctly
+  2) These "#ifdef __cplusplus" also had to be commented out while running to
+     avoid parser confusion.
+  ```
+  #ifdef __cplusplus
+  extern "C" {
+  #endif
+  ```
+  and
+  ```
+  #ifdef __cplusplus
+  }
+  #endif
+  ```
+*/
 #endif

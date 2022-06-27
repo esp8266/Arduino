@@ -20,6 +20,28 @@
  * synchronisation of the two through timeshift64
  */
 
+#include <Arduino.h>
+
+// https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-time.c
+
+bool getLocalTime(struct tm * info, uint32_t ms)
+{
+    uint32_t start = millis();
+    time_t now;
+    while((millis()-start) <= ms) {
+        time(&now);
+        localtime_r(&now, info);
+        if(info->tm_year > (2016 - 1900)){
+            return true;
+        }
+        delay(10);
+    }
+    return false;
+}
+
+
+#if !defined(CORE_MOCK)
+
 #include <stdlib.h>
 #include <../include/time.h> // See issue #6714
 #include <sys/time.h>
@@ -33,7 +55,6 @@ extern "C" {
 #include <coredecls.h>
 #include <Schedule.h>
 
-#include <Arduino.h> // configTime()
 
 extern "C" {
 
@@ -187,6 +208,19 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     sntp_init();
 }
 
+void configTime(int timezone_sec, int daylightOffset_sec, String server1, String server2, String server3)
+{
+    static String servers[3];
+    servers[0] = std::move(server1);
+    servers[1] = std::move(server2);
+    servers[2] = std::move(server3);
+
+    configTime(timezone_sec, daylightOffset_sec,
+        servers[0].length() ? servers[0].c_str() : nullptr,
+        servers[1].length() ? servers[1].c_str() : nullptr,
+        servers[2].length() ? servers[2].c_str() : nullptr);
+}
+
 void setTZ(const char* tz){
 	
     char tzram[strlen_P(tz) + 1];
@@ -207,11 +241,29 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
     sntp_init();
 }
 
+void configTime(const char* tz, String server1, String server2, String server3)
+{
+    static String servers[3];
+    servers[0] = std::move(server1);
+    servers[1] = std::move(server2);
+    servers[2] = std::move(server3);
+
+    configTime(tz,
+        servers[0].length() ? servers[0].c_str() : nullptr,
+        servers[1].length() ? servers[1].c_str() : nullptr,
+        servers[2].length() ? servers[2].c_str() : nullptr);
+}
+
 static BoolCB _settimeofday_cb;
 
 void settimeofday_cb (const TrivialCB& cb)
 {
     _settimeofday_cb = [cb](bool sntp) { (void)sntp; cb(); };
+}
+
+void settimeofday_cb (BoolCB&& cb)
+{
+    _settimeofday_cb = std::move(cb);
 }
 
 void settimeofday_cb (const BoolCB& cb)
@@ -252,4 +304,6 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
     return 0;
 }
 
-};
+}; // extern "C"
+
+#endif // !defined(CORE_MOCK)

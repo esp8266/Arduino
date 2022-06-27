@@ -26,7 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
-
+#include "flash_hal.h"
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
 #include <pgmspace.h>
@@ -115,20 +115,18 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-extern "C" void esp_yield();
-
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep_instant(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
@@ -200,7 +198,7 @@ void EspClass::reset(void)
 void EspClass::restart(void)
 {
     system_restart();
-    esp_yield();
+    esp_suspend();
 }
 
 [[noreturn]] void EspClass::rebootIntoUartDownloadMode()
@@ -224,7 +222,7 @@ uint32_t EspClass::getFreeHeap(void)
     return system_get_free_heap_size();
 }
 
-uint16_t EspClass::getMaxFreeBlockSize(void)
+uint32_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
 }
@@ -293,6 +291,9 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
+#if FLASH_MAP_SUPPORT
+    return getFlashChipRealSize();
+#else
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
@@ -300,6 +301,7 @@ uint32_t EspClass::getFlashChipSize(void)
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
+#endif
 }
 
 uint32_t EspClass::getFlashChipSpeed(void)
@@ -325,6 +327,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
+#if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
@@ -345,6 +348,7 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return 0;
     }
 }
+#endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
     switch(byte & 0x0F) {
@@ -614,14 +618,12 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _FS_start;
-
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);

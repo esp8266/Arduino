@@ -265,8 +265,6 @@ void ArduinoOTAClass::_runUpdate() {
   delay(100);
 
   Update.setMD5(_md5.c_str());
-  WiFiUDP::stopAll();
-  WiFiClient::stopAll();
 
   if (_start_callback) {
     _start_callback();
@@ -349,6 +347,20 @@ void ArduinoOTAClass::_runUpdate() {
   }
 }
 
+void ArduinoOTAClass::end() {
+    _initialized = false;
+    _udp_ota->unref();
+    _udp_ota = 0;
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+    if(_useMDNS){
+        MDNS.end();
+    }
+#endif
+    _state = OTA_IDLE;
+    #ifdef OTA_DEBUG
+    OTA_DEBUG.printf("OTA server stopped.\n");
+    #endif    
+}
 //this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {

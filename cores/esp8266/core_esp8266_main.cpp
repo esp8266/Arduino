@@ -62,14 +62,14 @@ cont_t* g_pcont __attribute__((section(".noinit")));
 static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
 
 /* Used to implement optimistic_yield */
-static uint32_t s_cycles_at_yield_start;
+static uint32_t s_cycles_at_resume;
 
 /* For ets_intr_lock_nest / ets_intr_unlock_nest
  * Max nesting seen by SDK so far is 2.
  */
 #define ETS_INTR_LOCK_NEST_MAX 7
 static uint16_t ets_intr_lock_stack[ETS_INTR_LOCK_NEST_MAX];
-static byte     ets_intr_lock_stack_ptr=0;
+static uint8_t  ets_intr_lock_stack_ptr=0;
 
 
 extern "C" {
@@ -80,6 +80,10 @@ const char* core_release =
 #else
     NULL;
 #endif
+
+static os_timer_t delay_timer;
+#define ONCE 0
+#define REPEAT 1
 } // extern "C"
 
 void initVariant() __attribute__((weak));
@@ -106,32 +110,71 @@ extern "C" void __preloop_update_frequency() {
 extern "C" void preloop_update_frequency() __attribute__((weak, alias("__preloop_update_frequency")));
 
 extern "C" bool can_yield() {
-  return cont_can_yield(g_pcont);
+  return cont_can_suspend(g_pcont);
 }
 
-static inline void esp_yield_within_cont() __attribute__((always_inline));
-static void esp_yield_within_cont() {
-        cont_yield(g_pcont);
-        s_cycles_at_yield_start = ESP.getCycleCount();
+static inline void esp_suspend_within_cont() __attribute__((always_inline));
+static void esp_suspend_within_cont() {
+        cont_suspend(g_pcont);
+        s_cycles_at_resume = ESP.getCycleCount();
         run_scheduled_recurrent_functions();
 }
 
-extern "C" void __esp_yield() {
-    if (can_yield()) {
-        esp_yield_within_cont();
+extern "C" void __esp_suspend() {
+    if (cont_can_suspend(g_pcont)) {
+        esp_suspend_within_cont();
     }
 }
 
-extern "C" void esp_yield() __attribute__ ((weak, alias("__esp_yield")));
+extern "C" void esp_suspend() __attribute__ ((weak, alias("__esp_suspend")));
 
 extern "C" IRAM_ATTR void esp_schedule() {
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
-extern "C" void __yield() {
-    if (can_yield()) {
+// Replacement for delay(0). In CONT, same as yield(). Whereas yield() panics
+// in SYS, esp_yield() is safe to call and only schedules CONT. Use yield()
+// whereever only called from CONT, use esp_yield() if code is called from SYS
+// or both CONT and SYS.
+extern "C" void esp_yield() {
+    esp_schedule();
+    esp_suspend();
+}
+
+void delay_end(void* arg) {
+    (void)arg;
+    esp_schedule();
+}
+
+extern "C" void __esp_delay(unsigned long ms) {
+    if (ms) {
+        os_timer_setfn(&delay_timer, (os_timer_func_t*)&delay_end, 0);
+        os_timer_arm(&delay_timer, ms, ONCE);
+    }
+    else {
         esp_schedule();
-        esp_yield_within_cont();
+    }
+    esp_suspend();
+    if (ms) {
+        os_timer_disarm(&delay_timer);
+    }
+}
+
+extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
+
+bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms) {
+    uint32_t expired = millis() - start_ms;
+    if (expired >= timeout_ms) {
+        return true;
+    }
+    esp_delay(std::min((timeout_ms - expired), intvl_ms));
+    return false;
+}
+
+extern "C" void __yield() {
+    if (cont_can_suspend(g_pcont)) {
+        esp_schedule();
+        esp_suspend_within_cont();
     }
     else {
         panic();
@@ -140,6 +183,9 @@ extern "C" void __yield() {
 
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
+// In CONT, actually performs yield() only once the given time interval
+// has elapsed since the last time yield() occured. Whereas yield() panics
+// in SYS, optimistic_yield() additionally is safe to call and does nothing.
 extern "C" void optimistic_yield(uint32_t interval_us) {
     const uint32_t intvl_cycles = interval_us *
 #if defined(F_CPU)
@@ -147,7 +193,7 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 #else
         ESP.getCpuFreqMHz();
 #endif
-    if ((ESP.getCycleCount() - s_cycles_at_yield_start) > intvl_cycles &&
+    if ((ESP.getCycleCount() - s_cycles_at_resume) > intvl_cycles &&
         can_yield())
     {
         yield();
@@ -207,7 +253,7 @@ static void loop_wrapper() {
 
 static void loop_task(os_event_t *events) {
     (void) events;
-    s_cycles_at_yield_start = ESP.getCycleCount();
+    s_cycles_at_resume = ESP.getCycleCount();
     ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
     ESP.setDramHeap();
@@ -215,8 +261,8 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
-extern "C" {
 
+extern "C" {
 struct object { long placeholder[ 10 ]; };
 void __register_frame_info (const void *begin, struct object *ob);
 extern char __eh_frame[];
@@ -253,7 +299,6 @@ static void  __unhandled_exception_cpp()
     }
 #endif
 }
-
 }
 
 void init_done() {
@@ -318,6 +363,14 @@ extern "C" void app_entry_redefinable(void)
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
+    /* Doing umm_init just once before starting the SDK, allowed us to remove
+       test and init calls at each malloc API entry point, saving IRAM. */
+#ifdef UMM_INIT_USE_IRAM
+    umm_init();
+#else
+    // umm_init() is in IROM
+    mmu_wrap_irom_fn(umm_init);
+#endif
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
@@ -325,7 +378,6 @@ static void app_entry_custom (void) __attribute__((weakref("app_entry_redefinabl
 
 extern "C" void app_entry (void)
 {
-    umm_init();
     return app_entry_custom();
 }
 
@@ -345,6 +397,12 @@ extern "C" void __disableWiFiAtBootTime (void)
     wifi_fpm_open();
     wifi_fpm_do_sleep(0xFFFFFFF);
 }
+
+#if FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+extern "C" void flashinit (void);
+uint32_t __flashindex;
+#endif
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -367,13 +425,16 @@ extern "C" void user_init(void) {
 #if defined(UMM_HEAP_EXTERNAL)
     install_vm_exception_handler();
 #endif
-  
+
 #if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
     install_non32xfer_exception_handler();
 #endif
 
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
+#endif
+#if FLASH_MAP_SUPPORT
+    flashinit();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi

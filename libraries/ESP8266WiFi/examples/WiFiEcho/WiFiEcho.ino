@@ -7,11 +7,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <PolledTimeout.h>
-#include <algorithm> // std::min
+#include <algorithm>  // std::min
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 constexpr int port = 23;
@@ -19,12 +19,12 @@ constexpr int port = 23;
 WiFiServer server(port);
 WiFiClient client;
 
-constexpr size_t sizes [] = { 0, 512, 384, 256, 128, 64, 16, 8, 4 };
+constexpr size_t sizes[] = { 0, 512, 384, 256, 128, 64, 16, 8, 4 };
 constexpr uint32_t breathMs = 200;
 esp8266::polledTimeout::oneShotFastMs enoughMs(breathMs);
 esp8266::polledTimeout::periodicFastMs test(2000);
-int t = 1; // test (1, 2 or 3, see below)
-int s = 0; // sizes[] index
+int t = 1;  // test (1, 2 or 3, see below)
+int s = 0;  // sizes[] index
 
 void setup() {
 
@@ -63,31 +63,40 @@ void loop() {
   static uint32_t cnt = 0;
   if (test && cnt) {
     Serial.printf("measured-block-size=%u min-free-stack=%u", tot / cnt, ESP.getFreeContStack());
-    if (t == 2 && sizes[s]) {
-      Serial.printf(" (blocks: at most %d bytes)", sizes[s]);
-    }
-    if (t == 3 && sizes[s]) {
-      Serial.printf(" (blocks: exactly %d bytes)", sizes[s]);
-    }
-    if (t == 3 && !sizes[s]) {
-      Serial.printf(" (blocks: any size)");
-    }
+    if (t == 2 && sizes[s]) { Serial.printf(" (blocks: at most %d bytes)", sizes[s]); }
+    if (t == 3 && sizes[s]) { Serial.printf(" (blocks: exactly %d bytes)", sizes[s]); }
+    if (t == 3 && !sizes[s]) { Serial.printf(" (blocks: any size)"); }
     Serial.printf("\n");
   }
 
-  //check if there are any new clients
+  // check if there are any new clients
   if (server.hasClient()) {
-    client = server.available();
+    client = server.accept();
     Serial.println("New client");
   }
 
   if (Serial.available()) {
     s = (s + 1) % (sizeof(sizes) / sizeof(sizes[0]));
     switch (Serial.read()) {
-      case '1': if (t != 1) s = 0; t = 1; Serial.println("byte-by-byte (watch then press 2, 3 or 4)"); break;
-      case '2': if (t != 2) s = 1; t = 2; Serial.printf("through buffer (watch then press 2 again, or 1, 3 or 4)\n"); break;
-      case '3': if (t != 3) s = 0; t = 3; Serial.printf("direct access (sendAvailable - watch then press 3 again, or 1, 2 or 4)\n"); break;
-      case '4':                    t = 4; Serial.printf("direct access (sendAll - close peer to stop, then press 1, 2 or 3 before restarting peer)\n"); break;
+      case '1':
+        if (t != 1) s = 0;
+        t = 1;
+        Serial.println("byte-by-byte (watch then press 2, 3 or 4)");
+        break;
+      case '2':
+        if (t != 2) s = 1;
+        t = 2;
+        Serial.printf("through buffer (watch then press 2 again, or 1, 3 or 4)\n");
+        break;
+      case '3':
+        if (t != 3) s = 0;
+        t = 3;
+        Serial.printf("direct access (sendAvailable - watch then press 3 again, or 1, 2 or 4)\n");
+        break;
+      case '4':
+        t = 4;
+        Serial.printf("direct access (sendAll - close peer to stop, then press 1, 2 or 3 before restarting peer)\n");
+        break;
     }
     tot = cnt = 0;
     ESP.resetFreeContStack();
@@ -113,9 +122,7 @@ void loop() {
       uint8_t buf[maxTo];
       size_t tcp_got = client.read(buf, maxTo);
       size_t tcp_sent = client.write(buf, tcp_got);
-      if (tcp_sent != maxTo) {
-        Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got, tcp_sent);
-      }
+      if (tcp_sent != maxTo) { Serial.printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxTo, tcp_got, tcp_sent); }
       tot += tcp_sent;
       cnt++;
     }
@@ -141,7 +148,7 @@ void loop() {
 
   else if (t == 4) {
     // stream to print, possibly with only one copy
-    tot += client.sendAll(&client); // this one might not exit until peer close
+    tot += client.sendAll(&client);  // this one might not exit until peer close
     cnt++;
 
     switch (client.getLastSendReport()) {
@@ -152,5 +159,4 @@ void loop() {
       case Stream::Report::ShortOperation: Serial.println("Stream::send: short transfer"); break;
     }
   }
-
 }

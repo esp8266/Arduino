@@ -20,14 +20,14 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-unsigned int localPort = 8888;      // local port to listen on
+unsigned int localPort = 8888;  // local port to listen on
 
 // buffers for receiving and sending data
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1]; //buffer to hold incoming packet,
-char  ReplyBuffer[] = "acknowledged\r\n";       // a string to send back
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1];  // buffer to hold incoming packet,
+char ReplyBuffer[] = "acknowledged\r\n";        // a string to send back
 
 WiFiUDP Udp;
 
@@ -49,11 +49,7 @@ void loop() {
   // if there's data available, read a packet
   int packetSize = Udp.parsePacket();
   if (packetSize) {
-    Serial.printf("Received packet of size %d from %s:%d\n    (to %s:%d, free heap = %d B)\n",
-                  packetSize,
-                  Udp.remoteIP().toString().c_str(), Udp.remotePort(),
-                  Udp.destinationIP().toString().c_str(), Udp.localPort(),
-                  ESP.getFreeHeap());
+    Serial.printf("Received packet of size %d from %s:%d\n    (to %s:%d, free heap = %d B)\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort(), Udp.destinationIP().toString().c_str(), Udp.localPort(), ESP.getFreeHeap());
 
     // read the packet into packetBufffer
     int n = Udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
@@ -66,11 +62,10 @@ void loop() {
     Udp.write(ReplyBuffer);
     Udp.endPacket();
   }
-
 }
 
 /*
   test (shell/netcat):
   --------------------
-	  nc -u 192.168.esp.address 8888
+    nc -u 192.168.esp.address 8888
 */

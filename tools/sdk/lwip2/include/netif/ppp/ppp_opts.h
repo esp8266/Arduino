@@ -45,6 +45,13 @@
 #endif
 
 /**
+ * PPPOE_SCNAME_SUPPORT==1: Enable PPP Over Ethernet Service Name and Concentrator Name support
+ */
+#ifndef PPPOE_SCNAME_SUPPORT
+#define PPPOE_SCNAME_SUPPORT            0
+#endif
+
+/**
  * PPPOL2TP_SUPPORT==1: Enable PPP Over L2TP
  */
 #ifndef PPPOL2TP_SUPPORT

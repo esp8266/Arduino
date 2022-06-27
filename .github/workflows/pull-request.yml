@@ -15,6 +15,9 @@ jobs:
   build-linux:
     name: Build ${{ matrix.chunk }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -47,6 +50,9 @@ jobs:
   build-debug-ipv6:
     name: Debug IPv6 ${{ matrix.chunk }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -110,6 +116,9 @@ jobs:
   build-mac:
     name: Mac
     runs-on: macOS-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -139,6 +148,9 @@ jobs:
   build-pio:
     name: Build Platform.IO
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -163,6 +175,9 @@ jobs:
   host-tests:
     name: Host tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -184,6 +199,9 @@ jobs:
   documentation:
     name: Documentation
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -208,6 +226,9 @@ jobs:
   style-check:
     name: Style and formatting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -217,11 +238,21 @@ jobs:
         python-version: '3.x'
     - name: Style check
       env:
+        LLVM_SNAPSHOT_KEY: "6084F3CF814B57C1CF12EFD515CF4D18AF4F7421"
         TRAVIS_BUILD_DIR: ${{ github.workspace }}
         TRAVIS_TAG: ${{ github.ref }}
       run: |
+          export GNUPGHOME=$(mktemp -d)
+          gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$LLVM_SNAPSHOT_KEY"
+          gpg --batch --armor --export "$LLVM_SNAPSHOT_KEY" | \
+            sudo tee /etc/apt/trusted.gpg.d/llvm-snapshot.gpg.asc
+          gpgconf --kill all
+          rm -r $GNUPGHOME
+          echo "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-13   main" | \
+            sudo tee /etc/apt/sources.list.d/llvm.list
           sudo apt update
-          sudo apt install astyle
+          sudo apt install clang-format-13
+          pip3 install pyyaml
           bash ./tests/ci/style_check.sh
 
 
@@ -229,6 +260,9 @@ jobs:
   mock-check:
     name: Mock trivial test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -248,6 +282,9 @@ jobs:
   boards-check:
     name: Boards.txt check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
@@ -275,6 +312,9 @@ jobs:
   code-spell:
     name: Check spelling
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
