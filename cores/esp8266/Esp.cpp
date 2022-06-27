@@ -779,17 +779,17 @@ static bool isAlignedSize(size_t size) {
     return (size & (Alignment - 1)) == 0;
 }
 
-static bool isAlignedPointer(const uint8_t* ptr) {
+static bool isAlignedPointer(const uint8_t *ptr) {
     return isAlignedAddress(reinterpret_cast<uint32_t>(ptr));
 }
 
 
 size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size) {
-    auto flash_write = [](uint32_t address, uint8_t* data, size_t size) {
+    auto flash_write = [](uint32_t address, uint8_t *data, size_t size) {
         return spi_flash_write(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
     };
 
-    auto flash_read = [](uint32_t address, uint8_t* data, size_t size) {
+    auto flash_read = [](uint32_t address, uint8_t *data, size_t size) {
         return spi_flash_read(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
     };
 
@@ -841,7 +841,7 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
         }
 
         memcpy(&buf[0], data, len);
-        if (!flashWrite(address, reinterpret_cast<const uint32_t*>(&buf[0]), wlen)) {
+        if (!flashWrite(address, reinterpret_cast<const uint32_t *>(&buf[0]), wlen)) {
             return written;
         }
 
@@ -946,7 +946,7 @@ String EspClass::getSketchMD5()
     md5.begin();
     while( lengthLeft > 0) {
         size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
-        if (!flashRead(offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)) {
+        if (!flashRead(offset, reinterpret_cast<uint32_t *>(buf.get()), (readBytes + 3) & ~3)) {
             return emptyString;
         }
         md5.add(buf.get(), readBytes);
