@@ -793,7 +793,8 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
         return spi_flash_read(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
     };
 
-    alignas(alignof(uint32_t)) uint8_t buf[FLASH_PAGE_SIZE];
+    constexpr size_t BufferSize { FLASH_PAGE_SIZE };
+    alignas(alignof(uint32_t)) uint8_t buf[BufferSize];
 
     size_t written = 0;
 
@@ -829,7 +830,7 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
     }
 
     while (size > 0) {
-        auto len = std::min(size, sizeof(buf));
+        auto len = std::min(size, BufferSize);
         auto wlen = aligned(len);
 
         if (wlen != len) {
