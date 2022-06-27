@@ -175,7 +175,7 @@ TEST_CASE("Unaligned page cross only", "[spi_flash]")
     CHECK(testFlash(0xa0000 + 255, 1, 2));
 }
 
-TEST_CASE("Unaligned page cross with unaligned size (#8588)", "[spi_flash]")
+TEST_CASE("Unaligned page cross with unaligned size (#8372, #8588, #8605)", "[spi_flash]")
 {
     CHECK(testFlash(0xa00b, 0, 202));
 }
