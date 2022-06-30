@@ -110,10 +110,27 @@ static void cut_here() {
     ets_putc('\n');
 }
 
-void __wrap_system_restart_local() {
-    register uint32_t sp asm("a1");
-    uint32_t sp_dump = sp;
+static void postmortem_report(uint32_t sp_dump) __attribute__((used));
+/*
+  Add some assembly to grab the stack pointer and pass it as an argument before
+  it grows for the target function. Should stabilize the stack offsets, used to
+  find the relevant stack content for dumping.
+*/
+extern "C" void __wrap_system_restart_local(void);
+asm(
+    ".section     .text.__wrap_system_restart_local,\"ax\",@progbits\n\t"
+    ".literal_position\n\t"
+    ".align       4\n\t"
+    ".global      __wrap_system_restart_local\n\t"
+    ".type        __wrap_system_restart_local, @function\n\t"
+    "\n"
+"__wrap_system_restart_local:\n\t"
+    "mov          a2,     a1\n\t"
+    "j            postmortem_report\n\t"
+    ".size __wrap_system_restart_local, .-__wrap_system_restart_local\n\t"
+);
 
+void postmortem_report(uint32_t sp_dump) {
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
     if (s_user_reset_reason == REASON_DEFAULT_RST)
@@ -152,9 +169,17 @@ void __wrap_system_restart_local() {
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
         // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
         // In that case, print the exception as (6) which is IntegerDivZero
-        bool div_zero = (rst_info.exccause == 0) && (rst_info.epc1 == 0x4000dce5);
+        uint32_t epc1 = rst_info.epc1;
+        uint32_t exccause = rst_info.exccause;
+        bool div_zero = (exccause == 0) && (epc1 == 0x4000dce5u);
+        if (div_zero) {
+            exccause = 6;
+            // In place of the detached 'ILL' instruction., redirect attention
+            // back to the code that called the ROM divide function.
+            __asm__ __volatile__("rsr.excsave1 %0\n\t" : "=r"(epc1) :: "memory");
+        }
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            div_zero ? 6 : rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
+            exccause, epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
@@ -174,16 +199,31 @@ void __wrap_system_restart_local() {
 
     // amount of stack taken by interrupt or exception handler
     // and everything up to __wrap_system_restart_local
-    // (determined empirically, might break)
+    // ~(determined empirically, might break)~
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        offset = 0x1a0;
+        // Stack Tally
+        // 256 User Exception vector handler reserves stack space
+        //     directed to _xtos_l1int_handler function in Boot ROM
+        //  48 wDev_ProcessFiq - its address appears in a vector table at 0x3FFFC27C
+        //  16 ?unnamed? - index into a table, pull out pointer, and call if non-zero
+        //     appears near near wDev_ProcessFiq
+        //  32 pp_soft_wdt_feed_local - gather the specifics and call __wrap_system_restart_local
+        offset =  32 + 16 + 48 + 256;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        offset = 0x190;
+        // Stack Tally
+        // 256 Exception vector reserves stack space
+        //     filled in by "C" wrapper handler
+        //  16 Handler level 1 - enable icache
+        //  64 Handler level 2 - exception report
+        offset = 64 + 16 + 256;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;
+    }
+    else if (rst_info.reason == REASON_USER_SWEXCEPTION_RST) {
+        offset = 16;
     }
 
     ets_printf_P(PSTR("\n>>>stack>>>\n"));
@@ -280,8 +320,9 @@ static void raise_exception() {
 
     s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
-    __wrap_system_restart_local();
-
+    uint32_t sp;
+    __asm__ __volatile__ ("mov %0, a1\n\t" : "=r"(sp) :: "memory");
+    postmortem_report(sp);
     while (1); // never reached, needed to satisfy "noreturn" attribute
 }
 
@@ -321,7 +362,9 @@ void __stack_chk_fail(void) {
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
-    __wrap_system_restart_local();
+    uint32_t sp;
+    __asm__ __volatile__ ("mov %0, a1\n\t" : "=r"(sp) :: "memory");
+    postmortem_report(sp);
 
     __builtin_unreachable(); // never reached, needed to satisfy "noreturn" attribute
 }
