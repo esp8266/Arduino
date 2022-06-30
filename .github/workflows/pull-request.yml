@@ -9,6 +9,10 @@ on:
   pull_request:
 
 
+permissions:
+  contents: read
+
+
 jobs:
 
 # Run 8 parallel jobs for the default build of all examples.
