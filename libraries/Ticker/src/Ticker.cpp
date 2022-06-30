@@ -23,49 +23,84 @@
 #include "eagle_soc.h"
 #include "osapi.h"
 
+#include <Arduino.h>
 #include "Ticker.h"
 
-Ticker::Ticker()
-    : _timer(nullptr) {}
-
-Ticker::~Ticker()
+void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
 {
-    detach();
-}
-
-void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
-{
-    if (_timer)
-    {
+    if (_timer) {
         os_timer_disarm(_timer);
-    }
-    else
-    {
-        _timer = &_etsTimer;
+    } else {
+        _timer = &_timer_internal;
     }
 
-    os_timer_setfn(_timer, callback, arg);
-    os_timer_arm(_timer, milliseconds, repeat);
+    os_timer_setfn(_timer,
+        [](void* ptr) {
+            auto* ticker = reinterpret_cast<Ticker*>(ptr);
+            ticker->_static_callback();
+        }, this);
+
+    // whenever duration excedes this limit, make timer repeatable N times
+    // in case it is really repeatable, it will reset itself and continue as usual
+    _tick = callback_tick_t{};
+
+    if (milliseconds > DurationMax) {
+        _tick.repeat = repeat;
+        _tick.total += 1;
+        while (milliseconds > DurationMax) {
+            _tick.total *= 2;
+            milliseconds /= 2;
+        }
+        repeat = true;
+    }
+
+    os_timer_arm(_timer, milliseconds.count(), repeat);
 }
 
 void Ticker::detach()
 {
-    if (!_timer)
-        return;
+    if (_timer) {
+        os_timer_disarm(_timer);
+        _timer = nullptr;
 
-    os_timer_disarm(_timer);
-    _timer = nullptr;
-    _callback_function = nullptr;
+        _tick = callback_tick_t{
+            .total = 0,
+            .count = 0,
+            .repeat = false,
+        };
+
+        _callback = std::monostate{};
+    }
 }
 
 bool Ticker::active() const
 {
-    return _timer;
+    return _timer != nullptr;
 }
 
-void Ticker::_static_callback(void* arg)
+void Ticker::_static_callback()
 {
-    Ticker* _this = reinterpret_cast<Ticker*>(arg);
-    if (_this && _this->_callback_function)
-        _this->_callback_function();
+    if (_tick.total) {
+        ++_tick.count;
+        if (_tick.count < _tick.total) {
+            return;
+        }
+
+        if (_tick.repeat) {
+            _tick.count = 0;
+        }
+    }
+
+    std::visit([](auto&& callback) {
+        using T = std::decay_t<decltype(callback)>;
+        if constexpr (std::is_same_v<T, callback_ptr_t>) {
+            callback.func(callback.arg);
+        } else if constexpr (std::is_same_v<T, callback_function_t>) {
+            callback();
+        }
+    }, _callback);
+
+    if (_tick.total && _tick.repeat) {
+        _tick.count = 0;
+    }
 }

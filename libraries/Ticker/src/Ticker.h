@@ -19,140 +19,213 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef TICKER_H
-#define TICKER_H
+#pragma once
 
+#include <chrono>
 #include <functional>
+#include <variant>
+
+#include <Arduino.h>
 #include <Schedule.h>
 #include <ets_sys.h>
 
 class Ticker
 {
 public:
-    Ticker();
-    ~Ticker();
+    Ticker() = default;
 
-    typedef void (*callback_with_arg_t)(void*);
-    typedef std::function<void(void)> callback_function_t;
+    ~Ticker()
+    {
+        detach();
+    }
+
+    // TODO: should re-arm with the new _timer pointer
+
+    Ticker(const Ticker&) = delete;
+    Ticker(Ticker&&) = delete;
+
+    Ticker& operator=(const Ticker&) = delete;
+    Ticker& operator=(Ticker&&) = delete;
+
+    // native SDK type, simple function with void* argument
+    using callback_with_arg_t = void(*)(void*);
+
+    // our helper type to support any callable object
+    using callback_function_t = std::function<void()>;
 
     // callback will be called at following loop() after ticker fires
     void attach_scheduled(float seconds, callback_function_t callback)
     {
-        _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(1000UL * seconds, true);
+        _callback = [callback]() {
+            schedule_function(callback);
+        };
+        _attach(Seconds(seconds), true);
     }
 
     // callback will be called in SYS ctx when ticker fires
     void attach(float seconds, callback_function_t callback)
     {
-        _callback_function = std::move(callback);
-        _attach_ms(1000UL * seconds, true);
+        _callback = std::move(callback);
+        _attach(Seconds(seconds), true);
     }
 
     // callback will be called at following loop() after ticker fires
     void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
-        _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(milliseconds, true);
+        _callback = [callback]() {
+            schedule_function(callback);
+        };
+        _attach(Milliseconds(milliseconds), true);
     }
 
     // callback will be called at following yield() after ticker fires
     void attach_ms_scheduled_accurate(uint32_t milliseconds, callback_function_t callback)
     {
-        _callback_function = [callback]() { schedule_recurrent_function_us([callback]() { callback(); return false; }, 0); };
-        _attach_ms(milliseconds, true);
+        _callback = [callback]() {
+            schedule_recurrent_function_us([callback]() {
+                callback();
+                return false;
+            }, 0);
+        };
+        _attach(Milliseconds(milliseconds), true);
     }
 
     // callback will be called in SYS ctx when ticker fires
     void attach_ms(uint32_t milliseconds, callback_function_t callback)
     {
-        _callback_function = std::move(callback);
-        _attach_ms(milliseconds, true);
+        _callback = std::move(callback);
+        _attach(Milliseconds(milliseconds), true);
     }
 
-    // callback will be called in SYS ctx when ticker fires
-    template<typename TArg>
-    void attach(float seconds, void (*callback)(TArg), TArg arg)
+    // instead of copying the callback function, store function pointer and it's argument
+    // callback will still be called in SYS ctx when ticker fires in N seconds
+    template <typename TArg, typename Callback = void(*)(TArg)>
+    void attach(float seconds, Callback callback, TArg arg)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-function-type"
-        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(1000UL * seconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
-#pragma GCC diagnostic pop
+        _callback = callback_data_t {
+            .arg = reinterpret_cast<void*>(arg),
+            .func = callback,
+        };
+        _attach(Seconds(seconds), true);
     }
 
-    // callback will be called in SYS ctx when ticker fires
-    template<typename TArg>
-    void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
+    // instead of copying the callback function, store function pointer and it's argument
+    // (that may not be larger than the size of the pointer aka 4bytes)
+    // callback will still be called in SYS ctx when ticker fires in N milliseconds
+    template <typename TArg, typename Callback = void(*)(TArg)>
+    void attach_ms(uint32_t milliseconds, Callback callback, TArg arg)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-function-type"
-        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
-#pragma GCC diagnostic pop
+        _callback = callback_data_t {
+            .arg = reinterpret_cast<void*>(arg),
+            .func = callback,
+        };
+        _attach(Milliseconds(milliseconds), true);
     }
 
     // callback will be called at following loop() after ticker fires
     void once_scheduled(float seconds, callback_function_t callback)
     {
-        _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(1000UL * seconds, false);
+        _callback = [callback]() { schedule_function(callback); };
+        _attach(Seconds(seconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
     void once(float seconds, callback_function_t callback)
     {
-        _callback_function = std::move(callback);
-        _attach_ms(1000UL * seconds, false);
+        _callback = std::move(callback);
+        _attach(Seconds(seconds), false);
     }
 
     // callback will be called at following loop() after ticker fires
     void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
     {
-        _callback_function = [callback]() { schedule_function(callback); };
-        _attach_ms(milliseconds, false);
+        _callback = [callback]() { schedule_function(callback); };
+        _attach(Milliseconds(milliseconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
     void once_ms(uint32_t milliseconds, callback_function_t callback)
     {
-        _callback_function = std::move(callback);
-        _attach_ms(milliseconds, false);
+        _callback = std::move(callback);
+        _attach(Milliseconds(milliseconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template<typename TArg>
-    void once(float seconds, void (*callback)(TArg), TArg arg)
+    template <typename TArg, typename Callback = void(*)(TArg)>
+    void once(float seconds, Callback callback, TArg arg)
     {
-        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(1000UL * seconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+        _callback = callback_data_t {
+            .arg = reinterpret_cast<void*>(arg),
+            .func = callback,
+        };
+        _attach(Seconds(seconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template<typename TArg>
-    void once_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
+    template <typename TArg, typename Callback = void(*)(TArg)>
+    void once_ms(uint32_t milliseconds, Callback callback, TArg arg)
     {
-        static_assert(sizeof(TArg) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        _attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), reinterpret_cast<void*>(arg));
+        _callback = callback_data_t {
+            .arg = reinterpret_cast<void*>(arg),
+            .func = callback,
+        };
+        _attach(Milliseconds(milliseconds), false);
     }
 
     void detach();
+
     bool active() const;
 
-protected:
-    static void _static_callback(void* arg);
-    void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg);
-    void _attach_ms(uint32_t milliseconds, bool repeat)
-    {
-        _attach_ms(milliseconds, repeat, _static_callback, this);
+    explicit operator bool() const {
+        return active();
     }
 
-    ETSTimer* _timer;
-    callback_function_t _callback_function = nullptr;
+protected:
+    // internals use this as duration
+    using Milliseconds = std::chrono::duration<uint32_t, std::ratio<1, 1000>>;
+
+    // however, we allow a floating point as input as well
+    using Seconds = std::chrono::duration<float, std::ratio<1>>;
+
+    // NONOS SDK timer object duration value range is 5...6870947 (0x68D7A3)
+    // when that's the case, we split execution into multiple 'ticks'
+    static constexpr auto DurationMin = Milliseconds(5);
+    static constexpr auto DurationMax = Milliseconds(6870947);
+
+    struct callback_tick_t
+    {
+        uint32_t total = 0;
+        uint32_t count = 0;
+        bool repeat = false;
+    };
+
+    void _static_callback();
+
+    void _attach(Milliseconds milliseconds, bool repeat);
+    void _attach(Seconds seconds, bool repeat)
+    {
+        _attach(std::chrono::duration_cast<Milliseconds>(seconds), repeat);
+    }
+
+    ETSTimer* _timer = nullptr;
 
 private:
-    ETSTimer _etsTimer;
+    struct callback_ptr_t
+    {
+        void* arg = nullptr;
+        callback_with_arg_t func = nullptr;
+    };
+
+    using callback_data_t = std::variant<
+        std::monostate,
+        callback_ptr_t,
+        callback_function_t>;
+
+    callback_data_t _callback = callback_ptr_t{
+        .arg = nullptr,
+        .func = nullptr,
+    };
+    callback_tick_t _tick;
+
+    ETSTimer _timer_internal;
 };
-
-
-#endif //TICKER_H
