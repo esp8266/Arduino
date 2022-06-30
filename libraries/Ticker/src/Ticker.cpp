@@ -43,9 +43,9 @@ void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
     // whenever duration excedes this limit, make timer repeatable N times
     // in case it is really repeatable, it will reset itself and continue as usual
     _tick = callback_tick_t{};
+    _tick.repeat = repeat;
 
     if (milliseconds > DurationMax) {
-        _tick.repeat = repeat;
         _tick.total += 1;
         while (milliseconds > DurationMax) {
             _tick.total *= 2;
@@ -85,10 +85,6 @@ void Ticker::_static_callback()
         if (_tick.count < _tick.total) {
             return;
         }
-
-        if (_tick.repeat) {
-            _tick.count = 0;
-        }
     }
 
     std::visit([](auto&& callback) {
@@ -100,7 +96,11 @@ void Ticker::_static_callback()
         }
     }, _callback);
 
-    if (_tick.total && _tick.repeat) {
+    if (_tick.total) {
         _tick.count = 0;
+    }
+
+    if (!_tick.repeat) {
+        detach();
     }
 }
