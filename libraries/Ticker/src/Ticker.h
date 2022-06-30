@@ -102,9 +102,9 @@ public:
     template <typename TArg, typename Callback = void(*)(TArg)>
     void attach(float seconds, Callback callback, TArg arg)
     {
-        _callback = callback_data_t {
+        _callback = callback_ptr_t{
+            .func = reinterpret_cast<callback_with_arg_t>(callback),
             .arg = reinterpret_cast<void*>(arg),
-            .func = callback,
         };
         _attach(Seconds(seconds), true);
     }
@@ -115,9 +115,9 @@ public:
     template <typename TArg, typename Callback = void(*)(TArg)>
     void attach_ms(uint32_t milliseconds, Callback callback, TArg arg)
     {
-        _callback = callback_data_t {
+        _callback = callback_ptr_t{
+            .func = reinterpret_cast<callback_with_arg_t>(callback),
             .arg = reinterpret_cast<void*>(arg),
-            .func = callback,
         };
         _attach(Milliseconds(milliseconds), true);
     }
@@ -154,9 +154,9 @@ public:
     template <typename TArg, typename Callback = void(*)(TArg)>
     void once(float seconds, Callback callback, TArg arg)
     {
-        _callback = callback_data_t {
+        _callback = callback_ptr_t{
+            .func = reinterpret_cast<callback_with_arg_t>(callback),
             .arg = reinterpret_cast<void*>(arg),
-            .func = callback,
         };
         _attach(Seconds(seconds), false);
     }
@@ -165,9 +165,9 @@ public:
     template <typename TArg, typename Callback = void(*)(TArg)>
     void once_ms(uint32_t milliseconds, Callback callback, TArg arg)
     {
-        _callback = callback_data_t {
+        _callback = callback_ptr_t{
+            .func = reinterpret_cast<callback_with_arg_t>(callback),
             .arg = reinterpret_cast<void*>(arg),
-            .func = callback,
         };
         _attach(Milliseconds(milliseconds), false);
     }
@@ -212,8 +212,8 @@ protected:
 private:
     struct callback_ptr_t
     {
-        void* arg = nullptr;
         callback_with_arg_t func = nullptr;
+        void* arg = nullptr;
     };
 
     using callback_data_t = std::variant<
@@ -221,10 +221,7 @@ private:
         callback_ptr_t,
         callback_function_t>;
 
-    callback_data_t _callback = callback_ptr_t{
-        .arg = nullptr,
-        .func = nullptr,
-    };
+    callback_data_t _callback;
     callback_tick_t _tick;
 
     ETSTimer _timer_internal;
