@@ -97,28 +97,26 @@ public:
         _attach(Milliseconds(milliseconds), true);
     }
 
+    // use function pointer directly. SDK used for argument storage, so we don't support anything larger than 4 bytes
+    template <typename T>
+    using callback_with_typed_arg_t = void(*)(T);
+
     // instead of copying the callback function, store function pointer and it's argument
     // callback will still be called in SYS ctx when ticker fires in N seconds
-    template <typename TArg, typename Callback = void(*)(TArg)>
-    void attach(float seconds, Callback callback, TArg arg)
+    template <typename T>
+    void attach(float seconds, callback_with_typed_arg_t<T> callback, T arg)
     {
-        _callback = callback_ptr_t{
-            .func = reinterpret_cast<callback_with_arg_t>(callback),
-            .arg = reinterpret_cast<void*>(arg),
-        };
+        _callback = callback_ptr_t(callback, arg);
         _attach(Seconds(seconds), true);
     }
 
     // instead of copying the callback function, store function pointer and it's argument
-    // (that may not be larger than the size of the pointer aka 4bytes)
+    // (that **cannot** be larger than the size of the pointer - 4 bytes)
     // callback will still be called in SYS ctx when ticker fires in N milliseconds
-    template <typename TArg, typename Callback = void(*)(TArg)>
-    void attach_ms(uint32_t milliseconds, Callback callback, TArg arg)
+    template <typename T>
+    void attach_ms(uint32_t milliseconds, callback_with_typed_arg_t<T> callback, T arg)
     {
-        _callback = callback_ptr_t{
-            .func = reinterpret_cast<callback_with_arg_t>(callback),
-            .arg = reinterpret_cast<void*>(arg),
-        };
+        _callback = callback_ptr_t(callback, arg);
         _attach(Milliseconds(milliseconds), true);
     }
 
@@ -151,24 +149,18 @@ public:
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template <typename TArg, typename Callback = void(*)(TArg)>
-    void once(float seconds, Callback callback, TArg arg)
+    template <typename T>
+    void once(float seconds, callback_with_typed_arg_t<T> callback, T arg)
     {
-        _callback = callback_ptr_t{
-            .func = reinterpret_cast<callback_with_arg_t>(callback),
-            .arg = reinterpret_cast<void*>(arg),
-        };
+        _callback = callback_ptr_t(callback, arg);
         _attach(Seconds(seconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template <typename TArg, typename Callback = void(*)(TArg)>
-    void once_ms(uint32_t milliseconds, Callback callback, TArg arg)
+    template <typename T>
+    void once_ms(uint32_t milliseconds, callback_with_typed_arg_t<T> callback, T arg)
     {
-        _callback = callback_ptr_t{
-            .func = reinterpret_cast<callback_with_arg_t>(callback),
-            .arg = reinterpret_cast<void*>(arg),
-        };
+        _callback = callback_ptr_t(callback, arg);
         _attach(Milliseconds(milliseconds), false);
     }
 
@@ -212,6 +204,14 @@ protected:
 private:
     struct callback_ptr_t
     {
+        template <typename T>
+        callback_ptr_t(callback_with_typed_arg_t<T> func, T arg) :
+            func(reinterpret_cast<callback_with_arg_t>(func)),
+            arg(reinterpret_cast<void*>(arg))
+        {
+            static_assert(sizeof(T) <= sizeof(void*), "");
+        }
+
         callback_with_arg_t func = nullptr;
         void* arg = nullptr;
     };
