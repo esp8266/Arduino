@@ -30,7 +30,7 @@ jobs:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -65,7 +65,7 @@ jobs:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -93,7 +93,7 @@ jobs:
         python-version: '3.x'
     - name: Cache Windows toolchain
       id: cache-windows
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -128,7 +128,7 @@ jobs:
         python-version: '3.x'
     - name: Cache Mac toolchain
       id: cache-mac
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
@@ -294,7 +294,7 @@ jobs:
         python-version: '3.x'
     - name: Cache Linux toolchain
       id: cache-linux
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
