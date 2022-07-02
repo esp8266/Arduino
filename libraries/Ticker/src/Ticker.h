@@ -180,9 +180,8 @@ protected:
     // float -> u32 has some precision issues, though
     using Seconds = std::chrono::duration<float, std::ratio<1>>;
 
-    // NONOS SDK timer object duration value range is 5...6870947 (0x68D7A3)
+    // NONOS SDK timer object duration cannot be longer than 6870947 (0x68D7A3)
     // when that's the case, we split execution into multiple 'ticks'
-    static constexpr auto DurationMin = Milliseconds(5);
     static constexpr auto DurationMax = Milliseconds(6870947);
 
     struct callback_tick_t
