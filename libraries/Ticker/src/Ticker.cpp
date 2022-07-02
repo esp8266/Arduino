@@ -46,7 +46,7 @@ void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
     _tick.repeat = repeat;
 
     if (milliseconds > DurationMax) {
-        _tick.total += 1;
+        _tick.total = 1;
         while (milliseconds > DurationMax) {
             _tick.total *= 2;
             milliseconds /= 2;
@@ -62,13 +62,7 @@ void Ticker::detach()
     if (_timer) {
         os_timer_disarm(_timer);
         _timer = nullptr;
-
-        _tick = callback_tick_t{
-            .total = 0,
-            .count = 0,
-            .repeat = false,
-        };
-
+        _tick = callback_tick_t{};
         _callback = std::monostate{};
     }
 }

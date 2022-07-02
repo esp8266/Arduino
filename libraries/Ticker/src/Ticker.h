@@ -39,18 +39,20 @@ public:
         detach();
     }
 
-    // TODO: should re-arm with the new _timer pointer
+    // TODO disable existing timr? =default to retain backwards compatibility
+    Ticker(const Ticker&) = default;
+    Ticker& operator=(const Ticker&) = default;
 
-    Ticker(const Ticker&) = delete;
-    Ticker(Ticker&&) = delete;
+    // TODO re-arm or disable the timer? =default to retain backwards compatibility
+    Ticker(Ticker&&) = default;
+    Ticker& operator=(Ticker&&) = default;
 
-    Ticker& operator=(const Ticker&) = delete;
-    Ticker& operator=(Ticker&&) = delete;
-
-    // native SDK type, simple function with void* argument
+    // Native SDK type, simple function with void* argument
     using callback_with_arg_t = void(*)(void*);
 
-    // our helper type to support any callable object
+    // Our helper type to support any callable object
+    // In case of a lambda with bound variable(s), it will be destroyed
+    // either when the timer expires or detach() is called
     using callback_function_t = std::function<void()>;
 
     // callback will be called at following loop() after ticker fires
@@ -97,12 +99,11 @@ public:
         _attach(Milliseconds(milliseconds), true);
     }
 
-    // use function pointer directly. SDK used for argument storage, so we don't support anything larger than 4 bytes
+    // only works with a function pointer. argument *may not* be larger than the size of the `void*`
     template <typename T>
     using callback_with_typed_arg_t = void(*)(T);
 
-    // instead of copying the callback function, store function pointer and it's argument
-    // callback will still be called in SYS ctx when ticker fires in N seconds
+    // callback will still be called in SYS ctx when ticker fires
     template <typename T>
     void attach(float seconds, callback_with_typed_arg_t<T> callback, T arg)
     {
@@ -110,9 +111,7 @@ public:
         _attach(Seconds(seconds), true);
     }
 
-    // instead of copying the callback function, store function pointer and it's argument
-    // (that **cannot** be larger than the size of the pointer - 4 bytes)
-    // callback will still be called in SYS ctx when ticker fires in N milliseconds
+    // callback will still be called in SYS ctx when ticker fires
     template <typename T>
     void attach_ms(uint32_t milliseconds, callback_with_typed_arg_t<T> callback, T arg)
     {
@@ -164,6 +163,7 @@ public:
         _attach(Milliseconds(milliseconds), false);
     }
 
+    // if active(), disables currently running timer
     void detach();
 
     bool active() const;
@@ -176,7 +176,8 @@ protected:
     // internals use this as duration
     using Milliseconds = std::chrono::duration<uint32_t, std::ratio<1, 1000>>;
 
-    // however, we allow a floating point as input as well
+    // we allow a floating point as input as well
+    // float -> u32 has some precision issues, though
     using Seconds = std::chrono::duration<float, std::ratio<1>>;
 
     // NONOS SDK timer object duration value range is 5...6870947 (0x68D7A3)
