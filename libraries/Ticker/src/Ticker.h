@@ -202,16 +202,15 @@ protected:
     ETSTimer* _timer = nullptr;
 
 private:
-    struct callback_ptr_t
-    {
         // XXX undefined behaviour? fix next pr
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+    struct callback_ptr_t
+    {
         template <typename T>
         callback_ptr_t(callback_with_typed_arg_t<T> func, T arg) :
             func(reinterpret_cast<callback_with_arg_t>(func)),
             arg(reinterpret_cast<void*>(arg))
-#pragma GCC diagnostic pop
         {
             static_assert(sizeof(T) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         }
@@ -219,6 +218,7 @@ private:
         callback_with_arg_t func = nullptr;
         void* arg = nullptr;
     };
+#pragma GCC diagnostic pop
 
     using callback_data_t = std::variant<
         std::monostate,
