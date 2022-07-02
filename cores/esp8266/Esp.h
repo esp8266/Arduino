@@ -254,9 +254,10 @@ class EspClass {
     private:
         /**
          * @brief Write up to @a size bytes from @a data to flash at @a address
-         * This function takes case of unaligned memory access by copying @a data to a temporary buffer,
-         * it also takes care of page boundary crossing see @a flashWritePageBreak as to why it's done.
-         * Less than @a size bytes may be written, due to 4 byte alignment requirement of spi_flash_write
+         * This function handles all cases of unaligned memory acccess; when either
+         * address is not aligned, data pointer is not aligned or size is not a multiple of 4.
+         * User of this function should note that @a data will be copied into a buffer allocated on stack.
+         *
          * @param address address on flash where write should start
          * @param data input buffer
          * @param size amount of data
