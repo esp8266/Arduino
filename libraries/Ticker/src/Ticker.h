@@ -204,12 +204,16 @@ protected:
 private:
     struct callback_ptr_t
     {
+        // XXX undefined behaviour? fix next pr
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
         template <typename T>
         callback_ptr_t(callback_with_typed_arg_t<T> func, T arg) :
             func(reinterpret_cast<callback_with_arg_t>(func)),
             arg(reinterpret_cast<void*>(arg))
+#pragma GCC diagnostic pop
         {
-            static_assert(sizeof(T) <= sizeof(void*), "");
+            static_assert(sizeof(T) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
         }
 
         callback_with_arg_t func = nullptr;
