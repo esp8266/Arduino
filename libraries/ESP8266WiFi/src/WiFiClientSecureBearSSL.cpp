@@ -250,7 +250,11 @@ void WiFiClientSecureCtx::_freeSSL() {
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
-  return _client && (_client->state() == ESTABLISHED);
+  if (!_client || (_client->state() == CLOSED)) {
+    return false;
+  }
+
+  return _client->state() == ESTABLISHED;
 }
 
 bool WiFiClientSecureCtx::_engineConnected() {
@@ -264,7 +268,7 @@ uint8_t WiFiClientSecureCtx::connected() {
 
   _pollRecvBuffer();
 
-  return _engineConnected();
+  return _engineConnected() || (available() > 0);
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
