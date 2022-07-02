@@ -17,7 +17,7 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -74,10 +74,7 @@ void setup() {
   Serial.print("Requesting URL: ");
   Serial.println(url);
 
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + github_host + "\r\n" +
-               "User-Agent: BuildFailureDetectorESP8266\r\n" +
-               "Connection: close\r\n\r\n");
+  client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + github_host + "\r\n" + "User-Agent: BuildFailureDetectorESP8266\r\n" + "Connection: close\r\n\r\n");
 
   Serial.println("Request sent");
   while (client.available()) {
@@ -100,5 +97,4 @@ void setup() {
   Serial.println("Closing connection");
 }
 
-void loop() {
-}
+void loop() {}

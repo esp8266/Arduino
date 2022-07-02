@@ -41,52 +41,8 @@
 
 #include "MocklwIP.h"
 
-#include <LwipDhcpServer.h>
-
-bool DhcpServer::set_dhcps_lease(struct dhcps_lease *please)
-{
-    (void)please;
-    return false;
-}
-
-bool DhcpServer::set_dhcps_lease_time(uint32 minute)
-{
-    (void)minute;
-    return false;
-}
-
-bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
-{
-    (void)level;
-    (void)optarg;
-    return false;
-}
-
-void DhcpServer::end ()
-{
-}
-
-bool DhcpServer::begin (struct ip_info *info)
-{
-    (void)info;
-    return false;
-}
-
-DhcpServer::DhcpServer (netif* netif)
-{
-    (void)netif;
-}
-
-DhcpServer::~DhcpServer ()
-{
-    end();
-}
-
-DhcpServer dhcpSoftAP(nullptr);
-
 extern "C"
 {
-
 #include <user_interface.h>
 #include <lwip/netif.h>
 
@@ -120,14 +76,14 @@ extern "C"
         return 1;
     }
 
-    bool wifi_station_get_config(struct station_config *config)
+    bool wifi_station_get_config(struct station_config* config)
     {
         strcpy((char*)config->ssid, "emulated-ssid");
         strcpy((char*)config->password, "emulated-ssid-password");
         config->bssid_set = 0;
         for (int i = 0; i < 6; i++)
             config->bssid[i] = i;
-        config->threshold.rssi = 1;
+        config->threshold.rssi     = 1;
         config->threshold.authmode = AUTH_WPA_PSK;
 #ifdef NONOSDK3V0
         config->open_and_wep_mode_disable = true;
@@ -135,9 +91,7 @@ extern "C"
         return true;
     }
 
-    void wifi_fpm_close(void)
-    {
-    }
+    void wifi_fpm_close(void) { }
 
     sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us)
     {
@@ -145,34 +99,30 @@ extern "C"
         return 1;
     }
 
-    void wifi_fpm_do_wakeup(void)
-    {
-    }
+    void wifi_fpm_do_wakeup(void) { }
 
-    void wifi_fpm_open(void)
-    {
-    }
+    void wifi_fpm_open(void) { }
 
     void wifi_fpm_set_sleep_type(sleep_type_t type)
     {
         (void)type;
     }
 
-    uint32_t global_ipv4_netfmt = 0; // global binding
+    uint32_t global_ipv4_netfmt = 0;  // global binding
 
-    netif netif0;
+    netif    netif0;
     uint32_t global_source_address = INADDR_ANY;
 
-    bool wifi_get_ip_info(uint8 if_index, struct ip_info *info)
+    bool wifi_get_ip_info(uint8 if_index, struct ip_info* info)
     {
         // emulate wifi_get_ip_info()
         // ignore if_index
         // use global option -i (host_interface) to select bound interface/address
 
-        struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
-        uint32_t ipv4 = lwip_htonl(0x7f000001);
-        uint32_t mask = lwip_htonl(0xff000000);
-        global_source_address = INADDR_ANY; // =0
+        struct ifaddrs *ifAddrStruct = NULL, *ifa = NULL;
+        uint32_t        ipv4  = lwip_htonl(0x7f000001);
+        uint32_t        mask  = lwip_htonl(0xff000000);
+        global_source_address = INADDR_ANY;  // =0
 
         if (getifaddrs(&ifAddrStruct) != 0)
         {
@@ -186,22 +136,24 @@ extern "C"
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
-            if (ifa->ifa_addr
-                    && ifa->ifa_addr->sa_family == AF_INET // ip_info is IPv4 only
-               )
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
+            )
             {
-                auto test_ipv4 = lwip_ntohl(*(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
-                mockverbose(" IPV4 (0x%08lx)", test_ipv4);
+                auto test_ipv4
+                    = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
+                mockverbose(" IPV4 (0x%08x)", test_ipv4);
                 if ((test_ipv4 & 0xff000000) == 0x7f000000)
                     // 127./8
                     mockverbose(" (local, ignored)");
                 else
                 {
-                    if (!host_interface || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
+                    if (!host_interface
+                        || (host_interface && strcmp(ifa->ifa_name, host_interface) == 0))
                     {
-                        // use the first non-local interface, or, if specified, the one selected by user on cmdline
-                        ipv4 = *(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
-                        mask = *(uint32_t*) & ((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
+                        // use the first non-local interface, or, if specified, the one selected by
+                        // user on cmdline
+                        ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+                        mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
                         mockverbose(" (selected)\n");
                         if (host_interface)
                             global_source_address = ntohl(ipv4);
@@ -216,7 +168,7 @@ extern "C"
             freeifaddrs(ifAddrStruct);
 
         (void)if_index;
-        //if (if_index != STATION_IF)
+        // if (if_index != STATION_IF)
         //	fprintf(stderr, "we are not AP");
 
         if (global_ipv4_netfmt == NO_GLOBAL_BINDING)
@@ -224,15 +176,15 @@ extern "C"
 
         if (info)
         {
-            info->ip.addr = ipv4;
+            info->ip.addr      = ipv4;
             info->netmask.addr = mask;
-            info->gw.addr = ipv4;
+            info->gw.addr      = ipv4;
 
             netif0.ip_addr.addr = ipv4;
             netif0.netmask.addr = mask;
-            netif0.gw.addr = ipv4;
-            netif0.flags = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
-            netif0.next = nullptr;
+            netif0.gw.addr      = ipv4;
+            netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
+            netif0.next         = nullptr;
         }
 
         return true;
@@ -243,7 +195,7 @@ extern "C"
         return 1;
     }
 
-    bool wifi_get_macaddr(uint8 if_index, uint8 *macaddr)
+    bool wifi_get_macaddr(uint8 if_index, uint8* macaddr)
     {
         (void)if_index;
         macaddr[0] = 0xde;
@@ -267,7 +219,7 @@ extern "C"
         return MIN_SLEEP_T;
     }
 
-#endif // nonos-sdk-pre-3
+#endif  // nonos-sdk-pre-3
 
     sleep_type_t wifi_get_sleep_type(void)
     {
@@ -281,13 +233,13 @@ extern "C"
     }
 
     wifi_event_handler_cb_t wifi_event_handler_cb_emu = nullptr;
-    void wifi_set_event_handler_cb(wifi_event_handler_cb_t cb)
+    void                    wifi_set_event_handler_cb(wifi_event_handler_cb_t cb)
     {
         wifi_event_handler_cb_emu = cb;
         mockverbose("TODO: wifi_set_event_handler_cb set\n");
     }
 
-    bool wifi_set_ip_info(uint8 if_index, struct ip_info *info)
+    bool wifi_set_ip_info(uint8 if_index, struct ip_info* info)
     {
         (void)if_index;
         (void)info;
@@ -352,12 +304,12 @@ extern "C"
         return true;
     }
 
-    bool wifi_station_get_config_default(struct station_config *config)
+    bool wifi_station_get_config_default(struct station_config* config)
     {
         return wifi_station_get_config(config);
     }
 
-    char wifi_station_get_hostname_str [128];
+    char        wifi_station_get_hostname_str[128];
     const char* wifi_station_get_hostname(void)
     {
         return strcpy(wifi_station_get_hostname_str, "esposix");
@@ -378,19 +330,19 @@ extern "C"
         return set != 0;
     }
 
-    bool wifi_station_set_config(struct station_config *config)
+    bool wifi_station_set_config(struct station_config* config)
     {
         (void)config;
         return true;
     }
 
-    bool wifi_station_set_config_current(struct station_config *config)
+    bool wifi_station_set_config_current(struct station_config* config)
     {
         (void)config;
         return true;
     }
 
-    bool wifi_station_set_hostname(const char *name)
+    bool wifi_station_set_hostname(const char* name)
     {
         (void)name;
         return true;
@@ -407,35 +359,20 @@ extern "C"
         (void)max_tpw;
     }
 
-    bool wifi_softap_dhcps_start(void)
-    {
-        return true;
-    }
-
-    enum dhcp_status wifi_softap_dhcps_status(void)
-    {
-        return DHCP_STARTED;
-    }
-
-    bool wifi_softap_dhcps_stop(void)
-    {
-        return true;
-    }
-
-    bool wifi_softap_get_config(struct softap_config *config)
+    bool wifi_softap_get_config(struct softap_config* config)
     {
         strcpy((char*)config->ssid, "apssid");
         strcpy((char*)config->password, "appasswd");
-        config->ssid_len = strlen("appasswd");
-        config->channel = 1;
-        config->authmode = AUTH_WPA2_PSK;
-        config->ssid_hidden = 0;
-        config->max_connection = 4;
+        config->ssid_len        = strlen("appasswd");
+        config->channel         = 1;
+        config->authmode        = AUTH_WPA2_PSK;
+        config->ssid_hidden     = 0;
+        config->max_connection  = 4;
         config->beacon_interval = 100;
         return true;
     }
 
-    bool wifi_softap_get_config_default(struct softap_config *config)
+    bool wifi_softap_get_config_default(struct softap_config* config)
     {
         return wifi_softap_get_config(config);
     }
@@ -445,38 +382,19 @@ extern "C"
         return 2;
     }
 
-    bool wifi_softap_set_config(struct softap_config *config)
+    bool wifi_softap_set_config(struct softap_config* config)
     {
         (void)config;
         return true;
     }
 
-    bool wifi_softap_set_config_current(struct softap_config *config)
+    bool wifi_softap_set_config_current(struct softap_config* config)
     {
         (void)config;
         return true;
     }
 
-    bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please)
-    {
-        (void)please;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_lease_time(uint32 minute)
-    {
-        (void)minute;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
-    {
-        (void)level;
-        (void)optarg;
-        return true;
-    }
-
-    bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb)
+    bool wifi_station_scan(struct scan_config* config, scan_done_cb_t cb)
     {
         (void)config;
         cb(nullptr, FAIL);
@@ -498,7 +416,7 @@ extern "C"
         (void)intr;
     }
 
-    void dns_setserver(u8_t numdns, ip_addr_t *dnsserver)
+    void dns_setserver(u8_t numdns, ip_addr_t* dnsserver)
     {
         (void)numdns;
         (void)dnsserver;
@@ -511,11 +429,10 @@ extern "C"
         return addr;
     }
 
-
 #include <smartconfig.h>
     bool smartconfig_start(sc_callback_t cb, ...)
     {
-        //XXXFIXME ... -> ptr
+        // XXXFIXME ... -> ptr
         cb(SC_STATUS_LINK, NULL);
         return true;
     }
@@ -530,4 +447,4 @@ extern "C"
         return NONE_SLEEP_T;
     }
 
-} // extern "C"
+}  // extern "C"

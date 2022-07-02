@@ -254,6 +254,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                 }
 
                 WiFiClient * tcp = http.getStreamPtr();
+                if (!tcp) {
+                    DEBUG_HTTP_UPDATE("[httpUpdate] WiFiClient connection unexpectedly absent\n");
+                    _setLastError(HTTPC_ERROR_CONNECTION_LOST);
+                    http.end();
+                    return HTTP_UPDATE_FAILED;
+                }
 
                 if (_closeConnectionsOnUpdate) {
                     WiFiUDP::stopAll();

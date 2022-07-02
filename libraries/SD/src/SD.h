@@ -32,8 +32,8 @@
 
 class SDClass {
 public:
-    boolean begin(uint8_t csPin, uint32_t cfg = SPI_HALF_SPEED) {
-	SDFS.setConfig(SDFSConfig(csPin, cfg));
+    bool begin(uint8_t csPin, uint32_t cfg = SPI_HALF_SPEED) {
+        SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
 
@@ -44,19 +44,19 @@ public:
         }
     }
 
-    File open(const char *filename, uint8_t mode = FILE_READ) {
+    fs::File open(const char *filename, uint8_t mode = FILE_READ) {
         return SDFS.open(filename, getMode(mode));
     }
 
-    File open(const char *filename, const char *mode) {
+    fs::File open(const char *filename, const char *mode) {
         return SDFS.open(filename, mode);
     }
 
-    File open(const String &filename, uint8_t mode = FILE_READ) {
+    fs::File open(const String &filename, uint8_t mode = FILE_READ) {
         return open(filename.c_str(), mode);
     }
 
-    File open(const String &filename, const char *mode) {
+    fs::File open(const String &filename, const char *mode) {
         return open(filename.c_str(), mode);
     }
 

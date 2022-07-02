@@ -34,7 +34,7 @@ namespace BearSSL {
 class WiFiClientSecureCtx : public WiFiClient {
   public:
     WiFiClientSecureCtx();
-    WiFiClientSecureCtx(const WiFiClientSecure &rhs) = delete;
+    WiFiClientSecureCtx(const WiFiClientSecureCtx &rhs) = delete;
     ~WiFiClientSecureCtx() override;
 
     WiFiClientSecureCtx& operator=(const WiFiClientSecureCtx&) = delete;
@@ -43,7 +43,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     // TODO: don't remove just yet to avoid including the WiFiClient default implementation and unintentionally causing
     //       a 'slice' that this method tries to avoid in the first place
     std::unique_ptr<WiFiClient> clone() const override {
-        return std::unique_ptr<WiFiClient>(new WiFiClientSecureCtx(*this));
+        return nullptr;
     }
 
     int connect(IPAddress ip, uint16_t port) override;
