@@ -266,9 +266,11 @@ uint8_t WiFiClientSecureCtx::connected() {
     return false;
   }
 
-  _pollRecvBuffer();
+  if (_pollRecvBuffer() > 0) {
+    return true;
+  }
 
-  return _engineConnected() || (available() > 0);
+  return _engineConnected();
 }
 
 int WiFiClientSecureCtx::availableForWrite () {
