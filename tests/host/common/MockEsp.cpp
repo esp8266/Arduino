@@ -39,6 +39,8 @@
 #include <user_interface.h>
 struct rst_info resetInfo;
 
+char wifi_station_hostname [33]; // exists in nonosdk
+
 unsigned long long operator"" _kHz(unsigned long long x)
 {
     return x * 1000;
