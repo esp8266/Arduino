@@ -3,6 +3,9 @@
 
 #include "MocklwIP.h"
 
+#include <lwip/dns.h>
+#include <arpa/inet.h>
+
 esp8266::AddressListImplementation::AddressList addrList;
 
 extern "C"
@@ -55,6 +58,20 @@ extern "C"
     {
         (void)idx;
         return &netif0;
+    }
+
+    void dns_setserver(u8_t numdns, const ip_addr_t* dnsserver)
+    {
+        (void)numdns;
+        (void)dnsserver;
+    }
+
+    const ip_addr_t* dns_getserver(u8_t numdns)
+    {
+        (void)numdns;
+        static ip_addr_t addr;
+        addr.addr = htonl(0x7f000001);  // 127.0.0.1
+        return &addr;
     }
 
 }  // extern "C"
