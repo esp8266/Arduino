@@ -310,11 +310,11 @@ extern "C"
     }
 
     extern "C" char* wifi_station_hostname;  // exists in nonosdk
-    char             wifi_station_hostname_str[33];
+    char             wifi_station_hostname_str[33] { "esposix" };
     char*            wifi_station_hostname = wifi_station_hostname_str;
     const char*      wifi_station_get_hostname(void)
     {
-        return strcpy(wifi_station_hostname, "esposix");
+        return wifi_station_hostname;
     }
 
     bool wifi_station_get_reconnect_policy()
