@@ -309,8 +309,8 @@ extern "C"
         return wifi_station_get_config(config);
     }
 
-    extern "C" char wifi_station_hostname [33]; // exists in nonosdk
-    const char* wifi_station_get_hostname(void)
+    extern "C" char wifi_station_hostname[33];  // exists in nonosdk
+    const char*     wifi_station_get_hostname(void)
     {
         return strcpy(wifi_station_hostname, "esposix");
     }
