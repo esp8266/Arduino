@@ -309,10 +309,12 @@ extern "C"
         return wifi_station_get_config(config);
     }
 
-    char        wifi_station_get_hostname_str[128];
-    const char* wifi_station_get_hostname(void)
+    extern "C" char* wifi_station_hostname;  // exists in nonosdk
+    char             wifi_station_hostname_str[33] { "esposix" };
+    char*            wifi_station_hostname = wifi_station_hostname_str;
+    const char*      wifi_station_get_hostname(void)
     {
-        return strcpy(wifi_station_get_hostname_str, "esposix");
+        return wifi_station_hostname;
     }
 
     bool wifi_station_get_reconnect_policy()
