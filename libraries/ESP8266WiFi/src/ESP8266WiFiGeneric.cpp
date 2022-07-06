@@ -49,6 +49,9 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
+// see comments on wifi_station_hostname in LwipIntf.cpp
+extern "C" char* wifi_station_hostname; // sdk's hostname location
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -419,7 +422,10 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
         return true;
     }
 
+    char backup_hostname [33] { 0 }; // hostname is 32 chars long (RFC)
+
     if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        memcpy(backup_hostname, wifi_station_hostname, sizeof(backup_hostname));
         // wifi starts asleep by default
         wifi_fpm_do_wakeup();
         wifi_fpm_close();
@@ -451,6 +457,9 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
             return false; //timeout
         }
     }
+
+    if (backup_hostname[0])
+        memcpy(wifi_station_hostname, backup_hostname, sizeof(backup_hostname));
 
     return ret;
 }
