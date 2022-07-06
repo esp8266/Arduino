@@ -4,7 +4,6 @@
 #include "MocklwIP.h"
 
 #include <lwip/dns.h>
-#include <arpa/inet.h>
 
 esp8266::AddressListImplementation::AddressList addrList;
 
@@ -70,7 +69,7 @@ extern "C"
     {
         (void)numdns;
         static ip_addr_t addr;
-        addr.addr = htonl(0x7f000001);  // 127.0.0.1
+        IP4_ADDR(&addr, 127, 0, 0, 1);
         return &addr;
     }
 
