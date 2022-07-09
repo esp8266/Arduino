@@ -51,7 +51,7 @@ public:
 
     String hostname();
 
-    bool   hostname(const String& aHostname)
+    bool hostname(const String& aHostname)
     {
         return hostname(aHostname.c_str());
     }
