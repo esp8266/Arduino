@@ -136,8 +136,7 @@ extern "C"
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
-            )
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)  // ip_info is IPv4 only
             {
                 auto test_ipv4
                     = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
@@ -179,13 +178,13 @@ extern "C"
             info->ip.addr      = ipv4;
             info->netmask.addr = mask;
             info->gw.addr      = ipv4;
-
-            netif0.ip_addr.addr = ipv4;
-            netif0.netmask.addr = mask;
-            netif0.gw.addr      = ipv4;
-            netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
-            netif0.next         = nullptr;
         }
+
+        netif0.ip_addr.addr = ipv4;
+        netif0.netmask.addr = mask;
+        netif0.gw.addr      = ipv4;
+        netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
+        netif0.next         = nullptr;
 
         return true;
     }
@@ -416,19 +415,6 @@ extern "C"
     void ets_isr_unmask(int intr)
     {
         (void)intr;
-    }
-
-    void dns_setserver(u8_t numdns, ip_addr_t* dnsserver)
-    {
-        (void)numdns;
-        (void)dnsserver;
-    }
-
-    ip_addr_t dns_getserver(u8_t numdns)
-    {
-        (void)numdns;
-        ip_addr_t addr = { 0x7f000001 };
-        return addr;
     }
 
 #include <smartconfig.h>
