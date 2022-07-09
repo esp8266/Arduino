@@ -25,11 +25,95 @@
 #include "WString.h"
 #include "stdlib_noniso.h"
 
+#include <limits>
+
 #define OOM_STRING_BORDER_DISPLAY           10
 #define OOM_STRING_THRESHOLD_REALLOC_WARN  128
 
 #define __STRHELPER(x) #x
 #define STR(x) __STRHELPER(x) // stringifier
+
+/*********************************************/
+/*  Conversion helpers                       */
+/*********************************************/
+
+static String toString(unsigned char value, unsigned char base) {
+    String out;
+
+    char buf[1 + std::numeric_limits<unsigned char>::digits];
+    out = utoa(value, buf, base);
+
+    return out;
+}
+
+static String toString(int value, unsigned char base) {
+    String out;
+
+    char buf[2 + std::numeric_limits<int>::digits];
+    out = itoa(value, buf, base);
+
+    return out;
+}
+
+static String toString(unsigned int value, unsigned char base) {
+    String out;
+
+    char buf[1 + std::numeric_limits<unsigned int>::digits];
+    out = utoa(value, buf, base);
+
+    return out;
+}
+
+static String toString(long value, unsigned char base) {
+    String out;
+
+    char buf[2 + std::numeric_limits<long>::digits];
+    out = ltoa(value, buf, base);
+
+    return out;
+}
+
+static String toString(unsigned long value, unsigned char base) {
+    String out;
+
+    char buf[1 + std::numeric_limits<unsigned long>::digits];
+    out = ultoa(value, buf, base);
+
+    return out;
+}
+
+// TODO: {u,}lltoa don't guarantee that the buffer is usable directly, one should always use the returned pointer
+
+static String toString(long long value, unsigned char base) {
+    String out;
+
+    char buf[2 + std::numeric_limits<long long>::digits];
+    out = lltoa(value, buf, sizeof(buf), base);
+
+    return out;
+}
+
+static String toString(unsigned long long value, unsigned char base) {
+    String out;
+
+    char buf[1 + std::numeric_limits<unsigned long long>::digits];
+    out = ulltoa(value, buf, sizeof(buf), base);
+
+    return out;
+}
+
+static String toString(double value, unsigned char decimalPlaces) {
+    String out;
+
+    char buf[33];
+    out = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+
+    return out;
+}
+
+static String toString(float value, unsigned char decimalPlaces) {
+    return toString(static_cast<double>(value), decimalPlaces);
+}
 
 /*********************************************/
 /*  Constructors                             */
@@ -56,86 +140,41 @@ String::String(String &&rval) noexcept {
     move(rval);
 }
 
-String::String(unsigned char value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned char)];
-    utoa(value, buf, base);
-    *this = buf;
-}
+String::String(unsigned char value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(int value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(int)];
-    if (base == 10) {
-        sprintf(buf, "%d", value);
-    } else {
-        itoa(value, buf, base);
-    }
-    *this = buf;
-}
+String::String(int value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned int value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned int)];
-    utoa(value, buf, base);
-    *this = buf;
-}
+String::String(unsigned int value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(long value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(long)];
-    if (base == 10) {
-        sprintf(buf, "%ld", value);
-    } else {
-        ltoa(value, buf, base);
-    }
-    *this = buf;
-}
+String::String(long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned long value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long)];
-    ultoa(value, buf, base);
-    *this = buf;
-}
+String::String(unsigned long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(long long value) {
-    init();
-    char buf[2 + 8 * sizeof(long long)];
-    sprintf(buf, "%lld", value);
-    *this = buf;
-}
+String::String(long long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(unsigned long long value) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    sprintf(buf, "%llu", value);
-    *this = buf;
-}
+String::String(unsigned long long value, unsigned char base) :
+    String(toString(value, base))
+{}
 
-String::String(long long value, unsigned char base) {
-    init();
-    char buf[2 + 8 * sizeof(long long)];
-    *this = lltoa(value, buf, sizeof(buf), base);
-}
+String::String(float value, unsigned char decimalPlaces) :
+    String(toString(value, decimalPlaces))
+{}
 
-String::String(unsigned long long value, unsigned char base) {
-    init();
-    char buf[1 + 8 * sizeof(unsigned long long)];
-    *this = ulltoa(value, buf, sizeof(buf), base);
-}
-
-String::String(float value, unsigned char decimalPlaces) {
-    init();
-    char buf[33];
-    *this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
-}
-
-String::String(double value, unsigned char decimalPlaces) {
-    init();
-    char buf[33];
-    *this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
-}
+String::String(double value, unsigned char decimalPlaces) :
+    String(toString(value, decimalPlaces))
+{}
 
 /*********************************************/
 /*  Memory Management                        */
@@ -221,7 +260,8 @@ String &String::copy(const char *cstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    memmove_P(wbuffer(), cstr, length + 1);
+    memmove_P(wbuffer(), cstr, length);
+    wbuffer()[length] = 0;
     return *this;
 }
 
@@ -231,7 +271,8 @@ String &String::copy(const __FlashStringHelper *pstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    memcpy_P(wbuffer(), (PGM_P)pstr, length + 1); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
+    memcpy_P(wbuffer(), (PGM_P)pstr, length); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
+    wbuffer()[length] = 0;
     return *this;
 }
 
@@ -278,7 +319,6 @@ String &String::operator =(char c) {
     *this = buffer;
     return *this;
 }
-
 
 /*********************************************/
 /*  concat                                   */
@@ -329,52 +369,39 @@ bool String::concat(char c) {
 }
 
 bool String::concat(unsigned char num) {
-    char buf[1 + 3 * sizeof(unsigned char)];
-    return concat(buf, sprintf(buf, "%d", num));
+    return concat(String(num));
 }
 
 bool String::concat(int num) {
-    char buf[2 + 3 * sizeof(int)];
-    return concat(buf, sprintf(buf, "%d", num));
+    return concat(String(num));
 }
 
 bool String::concat(unsigned int num) {
-    char buf[1 + 3 * sizeof(unsigned int)];
-    utoa(num, buf, 10);
-    return concat(buf, strlen(buf));
+    return concat(String(num));
 }
 
 bool String::concat(long num) {
-    char buf[2 + 3 * sizeof(long)];
-    return concat(buf, sprintf(buf, "%ld", num));
+    return concat(String(num));
 }
 
 bool String::concat(unsigned long num) {
-    char buf[1 + 3 * sizeof(unsigned long)];
-    ultoa(num, buf, 10);
-    return concat(buf, strlen(buf));
+    return concat(String(num));
 }
 
 bool String::concat(long long num) {
-    char buf[2 + 3 * sizeof(long long)];
-    return concat(buf, sprintf(buf, "%lld", num));
+    return concat(String(num));
 }
 
 bool String::concat(unsigned long long num) {
-    char buf[1 + 3 * sizeof(unsigned long long)];
-    return concat(buf, sprintf(buf, "%llu", num));
+    return concat(String(num));
 }
 
 bool String::concat(float num) {
-    char buf[20];
-    char *string = dtostrf(num, 4, 2, buf);
-    return concat(string, strlen(string));
+    return concat(String(num));
 }
 
 bool String::concat(double num) {
-    char buf[20];
-    char *string = dtostrf(num, 4, 2, buf);
-    return concat(string, strlen(string));
+    return concat(String(num));
 }
 
 bool String::concat(const __FlashStringHelper *str) {
@@ -386,8 +413,9 @@ bool String::concat(const __FlashStringHelper *str) {
     unsigned int newlen = len() + length;
     if (!reserve(newlen))
         return false;
-    memcpy_P(wbuffer() + len(), (PGM_P)str, length + 1);
+    memcpy_P(wbuffer() + len(), (PGM_P)str, length);
     setLen(newlen);
+    wbuffer()[newlen] = 0;
     return true;
 }
 

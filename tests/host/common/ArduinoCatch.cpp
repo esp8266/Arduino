@@ -14,6 +14,25 @@
 */
 
 #define CATCH_CONFIG_MAIN
-#include <catch.hpp>
-#include <sys/time.h>
-#include "Arduino.h"
+#include "ArduinoCatch.hpp"
+
+std::ostream& operator<<(std::ostream& out, const String& str)
+{
+    out.write(str.c_str(), str.length());
+    return out;
+}
+
+namespace Catch
+{
+
+std::string toString(const String& str)
+{
+    return std::string(str.begin(), str.length());
+}
+
+std::string StringMaker<String>::convert(String const& str)
+{
+    return toString(str);
+}
+
+}  // namespace Catch

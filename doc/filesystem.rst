@@ -93,7 +93,7 @@ directory support, but has higher filesystem and per-file overhead
 (4K minimum vs. SPIFFS' 256 byte minimum file allocation unit).
 
 They share a compatible API but have incompatible on-flash
-implementations, so it is important to choose one or the per project
+implementations, so it is important to choose one or the other per project
 as attempting to mount a SPIFFS volume under LittleFS may result
 in a format operation and definitely will not preserve any files,
 and vice-versa.

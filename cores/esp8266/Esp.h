@@ -103,11 +103,11 @@ class EspClass {
 
         static void reset();
         static void restart();
-	/**
-	 * @brief When calling this method the ESP8266 reboots into the UART download mode without
-	 * the need of any external wiring. This is the same mode which can also be entered by
-	 * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
-	 */
+        /**
+         * @brief When calling this method the ESP8266 reboots into the UART download mode without
+         * the need of any external wiring. This is the same mode which can also be entered by
+         * pulling GPIO0=low, GPIO2=high, GPIO15=low and resetting the ESP8266.
+         */
         [[noreturn]] static void rebootIntoUartDownloadMode();
 
         static uint16_t getVcc();
@@ -253,38 +253,17 @@ class EspClass {
         static void resetHeap();
     private:
         /**
-         * @brief Replaces @a byteCount bytes of a 4 byte block on flash
-         *
-         * @param address flash address
-         * @param value buffer with data
-         * @param byteCount number of bytes to replace
-         * @return bool result of operation
-         * @retval true success
-         * @retval false failed to read/write or invalid args
-         */
-        static bool flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount);
-        /**
          * @brief Write up to @a size bytes from @a data to flash at @a address
-         * This function takes case of unaligned memory access by copying @a data to a temporary buffer,
-         * it also takes care of page boundary crossing see @a flashWritePageBreak as to why it's done.
-         * Less than @a size bytes may be written, due to 4 byte alignment requirement of spi_flash_write
+         * This function handles all cases of unaligned memory acccess; when either
+         * address is not aligned, data pointer is not aligned or size is not a multiple of 4.
+         * User of this function should note that @a data will be copied into a buffer allocated on stack.
+         *
          * @param address address on flash where write should start
          * @param data input buffer
          * @param size amount of data
          * @return size_t amount of data written, 0 on failure
          */
         static size_t flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size);
-        /**
-         * @brief Splits up to 4 bytes into 4 byte blocks and writes them to flash
-         * We need this since spi_flash_write cannot handle writing over a page boundary with unaligned offset
-         * i.e. spi_flash_write(254, data, 4) will fail, also we cannot write less bytes as in
-         * spi_flash_write(254, data, 2) since it will be extended internally to 4 bytes and fail
-         * @param address start of write
-         * @param data data to be written
-         * @param size amount of data, must be < 4
-         * @return bool result of operation
-         */
-        static bool flashWritePageBreak(uint32_t address, const uint8_t *data, size_t size);
 };
 
 extern EspClass ESP;

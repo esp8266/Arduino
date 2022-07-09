@@ -115,8 +115,14 @@ static int mock_stop_uart(void)
 
 static uint8_t mock_read_uart(void)
 {
-    uint8_t ch = 0;
-    return (read(STDIN, &ch, 1) == 1) ? ch : 0;
+    uint8_t ch  = 0;
+    int     ret = read(STDIN, &ch, 1);
+    if (ret == -1)
+    {
+        perror("read(STDIN,1)");
+        return 0;
+    }
+    return (ret == 1) ? ch : 0;
 }
 
 void help(const char* argv0, int exitcode)
@@ -163,6 +169,7 @@ static struct option options[] = {
 
 void cleanup()
 {
+    mock_stop_udp();
     mock_stop_spiffs();
     mock_stop_littlefs();
     mock_stop_uart();
