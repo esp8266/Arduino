@@ -31,11 +31,7 @@
 #include <lwip/igmp.h>
 #include <lwip/prot/dns.h>
 
-// these should be defined at build time
-#ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "ESP8266_GENERIC"
-#endif
-
+// should be defined at build time
 #ifndef ARDUINO_BOARD_ID
 #define ARDUINO_BOARD_ID "generic"
 #endif
