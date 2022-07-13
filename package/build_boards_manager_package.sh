@@ -146,11 +146,7 @@ if [ ! -z "${DOC_URL}" ]; then
         .packages[0].platforms[0].help.online = \"${DOC_URL}\""
 fi
 
-jq_arg="${jq_arg} |\
-    .packages[0].platforms[0].boards = "'$'"boards"
-
-jq --slurpfile boards ${srcdir}/package/package_esp8266com_index.boards.json \
-    "${jq_arg}" ${srcdir}/package/package_esp8266com_index.template.json \
+jq "${jq_arg}" ${srcdir}/package/package_esp8266com_index.template.json \
     > package_esp8266com_index.json
 
 # Use Github API token, if available

@@ -16,7 +16,119 @@
                "version": "",
                "architecture": "esp8266",
                "archiveFileName": "",
-               "boards": [],
+               "boards": [
+                  {
+                     "name": "Generic ESP8266 Module"
+                  },
+                  {
+                     "name": "Generic ESP8285 Module"
+                  },
+                  {
+                     "name": "4D Systems gen4 IoD Range"
+                  },
+                  {
+                     "name": "Adafruit Feather HUZZAH ESP8266"
+                  },
+                  {
+                     "name": "Amperka WiFi Slot"
+                  },
+                  {
+                     "name": "Arduino"
+                  },
+                  {
+                     "name": "DOIT ESP-Mx DevKit (ESP8285)"
+                  },
+                  {
+                     "name": "Digistump Oak"
+                  },
+                  {
+                     "name": "ESPDuino (ESP-13 Module)"
+                  },
+                  {
+                     "name": "ESPectro Core"
+                  },
+                  {
+                     "name": "ESPino (ESP-12 Module)"
+                  },
+                  {
+                     "name": "ESPresso Lite 1.0"
+                  },
+                  {
+                     "name": "ESPresso Lite 2.0"
+                  },
+                  {
+                     "name": "ITEAD Sonoff"
+                  },
+                  {
+                     "name": "Invent One"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 R2 & mini"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 mini (clone)"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 mini Lite"
+                  },
+                  {
+                     "name": "LOLIN(WEMOS) D1 mini Pro"
+                  },
+                  {
+                     "name": "LOLIN(WeMos) D1 R1"
+                  },
+                  {
+                     "name": "Lifely Agrumino Lemon v4"
+                  },
+                  {
+                     "name": "NodeMCU 0.9 (ESP-12 Module)"
+                  },
+                  {
+                     "name": "NodeMCU 1.0 (ESP-12E Module)"
+                  },
+                  {
+                     "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+                  },
+                  {
+                     "name": "Phoenix 1.0"
+                  },
+                  {
+                     "name": "Phoenix 2.0"
+                  },
+                  {
+                     "name": "Schirmilabs Eduino WiFi"
+                  },
+                  {
+                     "name": "Seeed Wio Link"
+                  },
+                  {
+                     "name": "SparkFun Blynk Board"
+                  },
+                  {
+                     "name": "SparkFun ESP8266 Thing"
+                  },
+                  {
+                     "name": "SparkFun ESP8266 Thing Dev"
+                  },
+                  {
+                     "name": "SweetPea ESP-210"
+                  },
+                  {
+                     "name": "ThaiEasyElec's ESPino"
+                  },
+                  {
+                     "name": "WiFi Kit 8"
+                  },
+                  {
+                     "name": "WiFiduino"
+                  },
+                  {
+                     "name": "WifInfo"
+                  },
+                  {
+                     "name": "XinaBox CW01"
+                  }
+               ],
                "toolsDependencies": [
                   {
                      "packager": "esp8266",

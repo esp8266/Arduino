@@ -1279,13 +1279,11 @@ BOARDS = collections.OrderedDict(
                 ],
                 "desc": [
                     "ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff"
-                    " Basic, "
-                    + "and Sonoff S20",
+                    " Basic, and Sonoff S20",
                     "",
                     "These are not development boards. The development process is "
-                    + "inconvenient with these devices. When flashing firmware you"
-                    " will "
-                    + "need a Serial Adapter to connect it to your computer.",
+                    "inconvenient with these devices. When flashing firmware you"
+                    " will need a Serial Adapter to connect it to your computer.",
                     "",
                     " | Most of these devices, during normal operation, are"
                     " connected to "
@@ -2241,10 +2239,7 @@ def ldscript_name(*, flash_size, expected_fs_size, **kwargs):
     >>> ldscript_name(flash_size=Kilobytes(512), expected_fs_size=Bytes(0))
     'eagle.flash.512k.ld'
     """
-    return (
-        f"eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld"
-        .lower()
-    )
+    return f"eagle.flash.{humanize_flash(flash_size)}{humanize_fs(expected_fs_size)}.ld".lower()
 
 
 SPI_START = 0x40200000
@@ -2466,7 +2461,7 @@ def ldscript_generate(
         print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
         print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
         print(
-             f"  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}"
+            f"  irom0_0_seg :                         org = {address(sketch)}, len = 0x{sketch.size:x}"
         )
         print("}")
         print()
@@ -2877,19 +2872,22 @@ def show_names(boards):
 ################################################################
 # boards .json
 
-def package_generate(output, boards):
+
+def package_generate(output, package_file, boards):
+    with open(package_file, "r", encoding="utf-8") as f:
+        contents = json.load(f)
+
+    contents["packages"][0]["platforms"][0]["boards"] = [
+        {"name": board["name"]} for board in boards.values()
+    ]
+
     with output:
-        print(
-            json.dumps(
-                [{"name": board["name"]} for board in boards.values()],
-                indent=3,
-                separators=(",", ": "),
-            )
-        )
+        json.dump(contents, sys.stdout, indent=3, separators=(",", ": "))
 
 
 ################################################################
 # boards .rst, here's the only place to use "desc" field
+
 
 def doc_generate(output, boards):
     with output:
@@ -2916,8 +2914,8 @@ GENERATORS = (
     (
         "package",
         "package-file",
-        "package/package_esp8266com_index.boards.json",
-        "IDE package index boards list (.json)",
+        "package/package_esp8266com_index.template.json",
+        "IDE package index template (.json)",
     ),
     ("doc", "doc-file", "doc/boards.rst", "Boards documentation (.rst)"),
 )
@@ -3034,7 +3032,7 @@ def run_generators(boards, filter_path, args):
         flashmap_generate(maybe_output(args.flashmap_file), all_flash_maps())
 
     if "package" in generators:
-        package_generate(maybe_output(args.package_file), boards)
+        package_generate(maybe_output(args.package_file), args.package_file, boards)
 
     if "doc" in generators:
         doc_generate(maybe_output(args.doc_file), boards)
@@ -3042,6 +3040,7 @@ def run_generators(boards, filter_path, args):
 
 ################################################################
 # entrypoint
+
 
 def main():
     args = parse_cmdline()
