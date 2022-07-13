@@ -31,6 +31,15 @@
 #include <lwip/igmp.h>
 #include <lwip/prot/dns.h>
 
+// these should be defined at build time
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "ESP8266_GENERIC"
+#endif
+
+#ifndef ARDUINO_BOARD_ID
+#define ARDUINO_BOARD_ID "generic"
+#endif
+
 namespace esp8266
 {
 
@@ -39,16 +48,6 @@ namespace esp8266
 */
 namespace MDNSImplementation
 {
-
-/**
-    STRINGIZE
-*/
-#ifndef STRINGIZE
-#define STRINGIZE(x) #x
-#endif
-#ifndef STRINGIZE_VALUE_OF
-#define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
-#endif
 
     /**
         INTERFACE
@@ -1258,7 +1257,8 @@ namespace MDNSImplementation
         {
             if ((!addServiceTxt(hService, "tcp_check", "no"))
                 || (!addServiceTxt(hService, "ssh_upload", "no"))
-                || (!addServiceTxt(hService, "board", STRINGIZE_VALUE_OF(ARDUINO_BOARD)))
+                || (!addServiceTxt(hService, "board", ARDUINO_BOARD_ID))
+                || (!addServiceTxt(hService, "description", ARDUINO_BOARD))
                 || (!addServiceTxt(hService, "auth_upload", (p_bAuthUpload) ? "yes" : "no")))
             {
                 removeService(hService);
