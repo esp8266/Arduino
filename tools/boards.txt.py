@@ -1323,8 +1323,7 @@ BOARDS = collections.OrderedDict(
                 ],
                 "desc": [
                     "DOIT ESP-Mx DevKit - This is a development board by DOIT, with a"
-                    " DOIT ESP-Mx module "
-                    + "(`datasheet"
+                    " DOIT ESP-Mx module " + "(`datasheet"
                     " <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) "
                     + "using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9"
                     " and 10 are not available. "
