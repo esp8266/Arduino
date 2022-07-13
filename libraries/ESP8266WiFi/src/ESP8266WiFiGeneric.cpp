@@ -49,6 +49,9 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
+// see comments on wifi_station_hostname in LwipIntf.cpp
+extern "C" char* wifi_station_hostname; // sdk's hostname location
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -222,9 +225,14 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
     DEBUG_WIFI("wifi evt: %d\n", event->event);
 
-    if(event->event == EVENT_STAMODE_DISCONNECTED) {
+    if (event->event == EVENT_STAMODE_DISCONNECTED) {
         DEBUG_WIFI("STA disconnect: %d\n", event->event_info.disconnected.reason);
-        WiFiClient::stopAll();
+        // workaround for https://github.com/esp8266/Arduino/issues/7432
+        // still delivers the event, just handle this specific case
+        if ((wifi_station_get_connect_status() == STATION_GOT_IP) && !wifi_station_get_reconnect_policy()) {
+            DEBUG_WIFI("forcibly stopping the station connection manager\n");
+            wifi_station_disconnect();
+        }
     }
 
     if (event->event == EVENT_STAMODE_AUTHMODE_CHANGE) {
@@ -414,7 +422,10 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
         return true;
     }
 
+    char backup_hostname [33] { 0 }; // hostname is 32 chars long (RFC)
+
     if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        memcpy(backup_hostname, wifi_station_hostname, sizeof(backup_hostname));
         // wifi starts asleep by default
         wifi_fpm_do_wakeup();
         wifi_fpm_close();
@@ -446,6 +457,9 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
             return false; //timeout
         }
     }
+
+    if (backup_hostname[0])
+        memcpy(wifi_station_hostname, backup_hostname, sizeof(backup_hostname));
 
     return ret;
 }
