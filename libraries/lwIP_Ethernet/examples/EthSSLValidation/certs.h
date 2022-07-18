@@ -9,14 +9,15 @@
 ////////////////////////////////////////////////////////////
 // certificate chain for www.gitlab.com:443
 
-const char* gitlab_host = "www.gitlab.com";
+const char*    gitlab_host = "www.gitlab.com";
 const uint16_t gitlab_port = 443;
 
 // CN: sni.cloudflaressl.com => name: sni_cloudflaressl_com
 // not valid before: 2021-09-11 00:00:00
 // not valid after:  2022-09-10 23:59:59
-const char fingerprint_sni_cloudflaressl_com [] PROGMEM = "04:86:fa:e7:69:4e:7b:75:f4:fd:88:41:6e:42:7a:f1:b0:de:66:3c";
-const char pubkey_sni_cloudflaressl_com [] PROGMEM = R"PUBKEY(
+const char fingerprint_sni_cloudflaressl_com[] PROGMEM
+    = "04:86:fa:e7:69:4e:7b:75:f4:fd:88:41:6e:42:7a:f1:b0:de:66:3c";
+const char pubkey_sni_cloudflaressl_com[] PROGMEM = R"PUBKEY(
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELIhZBDGe53N84LRh6Ng9qPCZ4VQ6
 2yUXTqkR7C+0e3sd+8GGLp67mLuFOvtjcrv+tP5o8zCz+UpDHmj7n1n17A==
@@ -27,7 +28,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAELIhZBDGe53N84LRh6Ng9qPCZ4VQ6
 // CN: Cloudflare Inc ECC CA-3 => name: Cloudflare_Inc_ECC_CA_3
 // not valid before: 2020-01-27 12:48:08
 // not valid after:  2024-12-31 23:59:59
-const char cert_Cloudflare_Inc_ECC_CA_3 [] PROGMEM = R"CERT(
+const char cert_Cloudflare_Inc_ECC_CA_3[] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIQCjeHZF5ftIwiTv0b7RQMPDANBgkqhkiG9w0BAQsFADBa
 MQswCQYDVQQGEwJJRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJl
@@ -55,4 +56,3 @@ CZMRJCQUzym+5iPDuI9yP+kHyCREU3qzuWFloUwOxkgAyXVjBYdwRVKD05WdRerw
 
 // end of certificate chain for www.gitlab.com:443
 ////////////////////////////////////////////////////////////
-
