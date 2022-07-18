@@ -111,7 +111,7 @@ fingerprints will change if anything changes in the certificate chain
 the root authorities, etc.).
 )EOF");
   BearSSL::WiFiClientSecure client;
-  client.setFingerprint(fingerprint_gitlab_com);
+  client.setFingerprint(fingerprint_sni_cloudflaressl_com);
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
 
@@ -137,7 +137,7 @@ private and not shared.  A MITM without the private key would not be
 able to establish communications.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  BearSSL::PublicKey key(pubkey_gitlab_com);
+  BearSSL::PublicKey key(pubkey_sni_cloudflaressl_com);
   client.setKnownKey(&key);
   fetchURL(&client, gitlab_host, gitlab_port, path);
 }
@@ -153,7 +153,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSL::X509List cert(cert_USERTrust_RSA_Certification_Authority);
+  BearSSL::X509List cert(cert_Cloudflare_Inc_ECC_CA_3);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, gitlab_host, gitlab_port, path);
