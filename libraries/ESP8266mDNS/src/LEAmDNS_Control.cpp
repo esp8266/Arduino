@@ -1395,18 +1395,18 @@ namespace MDNSImplementation
             {
                 if ((bResult = _sendHostProbe()))
                 {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                        PSTR("[MDNSResponder] _updateProbeStatus: Did sent host probe to all links \n\n")););
+                    DEBUG_EX_INFO(
+                        DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Did sent "
+                                                   "host probe to all links \n\n")););
                 }
                 else
                 {
-                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                        PSTR("[MDNSResponder] _updateProbeStatus: Did not sent host probe to all links\n\n")););
-
+                    DEBUG_EX_INFO(
+                        DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Did not "
+                                                   "sent host probe to all links\n\n")););
                 }
                 m_HostProbeInformation.m_Timeout.reset(MDNS_PROBE_DELAY);
                 ++m_HostProbeInformation.m_u8SentCount;
-
             }
             else  // Probing finished
             {
@@ -1430,7 +1430,7 @@ namespace MDNSImplementation
                  && (m_HostProbeInformation.m_Timeout.expired()))
         {
             _announce(true, false);  // Don't announce services here
-            
+
             ++m_HostProbeInformation.m_u8SentCount;
 
             if (MDNS_ANNOUNCE_COUNT > m_HostProbeInformation.m_u8SentCount)
@@ -1446,7 +1446,6 @@ namespace MDNSImplementation
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
                     PSTR("[MDNSResponder] _updateProbeStatus: Done host announcing.\n\n")););
             }
-            
         }
 
         //
@@ -1471,16 +1470,17 @@ namespace MDNSImplementation
                     if ((bResult = _sendServiceProbe(*pService)))
                     {
                         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                            PSTR("[MDNSResponder] _updateProbeStatus: Did sent service probe to all links "
+                            PSTR("[MDNSResponder] _updateProbeStatus: Did sent service probe to "
+                                 "all links "
                                  "(%u)\n\n"),
                             (pService->m_ProbeInformation.m_u8SentCount + 1)););
-
                     }
                     else
                     {
                         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                            PSTR("[MDNSResponder] _updateProbeStatus: Did not sent service probe to all links"
-                                "(%u)\n\n"),
+                            PSTR("[MDNSResponder] _updateProbeStatus: Did not sent service probe "
+                                 "to all links"
+                                 "(%u)\n\n"),
                             (pService->m_ProbeInformation.m_u8SentCount + 1)););
                     }
                     pService->m_ProbeInformation.m_Timeout.reset(MDNS_PROBE_DELAY);
@@ -1511,7 +1511,7 @@ namespace MDNSImplementation
                      && (pService->m_ProbeInformation.m_Timeout.expired()))
             {
                 _announceService(*pService);  // Announce service
-                
+
                 ++pService->m_ProbeInformation.m_u8SentCount;
 
                 if (MDNS_ANNOUNCE_COUNT > pService->m_ProbeInformation.m_u8SentCount)
@@ -1519,7 +1519,7 @@ namespace MDNSImplementation
                     pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
                         PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s "
-                                "(%d)\n\n"),
+                             "(%d)\n\n"),
                         (pService->m_pcName ?: m_pcHostname), pService->m_pcService,
                         pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
                 }
@@ -1528,11 +1528,10 @@ namespace MDNSImplementation
                     pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                     DEBUG_EX_INFO(
                         DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done "
-                                                    "service announcing for %s.%s.%s\n\n"),
-                                                (pService->m_pcName ?: m_pcHostname),
-                                                pService->m_pcService, pService->m_pcProtocol););
+                                                   "service announcing for %s.%s.%s\n\n"),
+                                              (pService->m_pcName ?: m_pcHostname),
+                                              pService->m_pcService, pService->m_pcProtocol););
                 }
-                
             }
         }
         DEBUG_EX_ERR(if (!bResult) {
