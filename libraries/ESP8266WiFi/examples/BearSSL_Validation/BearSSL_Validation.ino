@@ -10,8 +10,8 @@
 #include <time.h>
 #include "certs.h"
 
-#define FINGERPRINT fingerprint_ssllabs_com
-#define PUBKEY pubkey_ssllabs_com
+#define FINGERPRINT fingerprint_www_example_org
+#define PUBKEY pubkey_www_example_org
 #define CERT cert_DigiCert_TLS_RSA_SHA256_2020_CA1
 
 #ifndef STASSID
