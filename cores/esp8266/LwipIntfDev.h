@@ -46,6 +46,28 @@
 #define DEFAULT_MTU 1500
 #endif
 
+enum HardwareStatus
+{
+    EthernetNoHardware,
+    EthernetHardwareFound,
+};
+
+enum EthernetLinkStatus
+{
+    Unknown,
+    LinkON,
+    LinkOFF
+};
+
+enum
+{
+    DHCP_CHECK_NONE        = 0,
+    DHCP_CHECK_RENEW_FAIL  = 1,
+    DHCP_CHECK_RENEW_OK    = 2,
+    DHCP_CHECK_REBIND_FAIL = 3,
+    DHCP_CHECK_REBIND_OK   = 4,
+};
+
 template<class RawDev>
 class LwipIntfDev: public LwipIntf, public RawDev
 {
@@ -54,6 +76,8 @@ public:
         RawDev(cs, spi, intr), _mtu(DEFAULT_MTU), _intrPin(intr), _started(false), _default(false)
     {
         memset(&_netif, 0, sizeof(_netif));
+        _hardwareStatus = EthernetNoHardware;
+        _linkStatus     = Unknown;
     }
 
     boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2,
@@ -104,8 +128,21 @@ public:
     }
 
     // ESP8266WiFi API compatibility
-
     wl_status_t status();
+
+    // Arduino Ethernet API compatibility
+    HardwareStatus hardwareStatus() const
+    {
+        return _hardwareStatus;
+    }
+    EthernetLinkStatus linkStatus() const
+    {
+        return _linkStatus;
+    }
+    int maintain() const
+    {
+        return DHCP_CHECK_NONE;
+    }
 
 protected:
     err_t netif_init();
@@ -123,11 +160,13 @@ protected:
 
     netif _netif;
 
-    uint16_t _mtu;
-    int8_t   _intrPin;
-    uint8_t  _macAddress[6];
-    bool     _started;
-    bool     _default;
+    uint16_t           _mtu;
+    int8_t             _intrPin;
+    uint8_t            _macAddress[6];
+    bool               _started;
+    bool               _default;
+    HardwareStatus     _hardwareStatus;
+    EthernetLinkStatus _linkStatus;
 };
 
 template<class RawDev>
@@ -203,6 +242,8 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     {
         return false;
     }
+    _hardwareStatus = EthernetHardwareFound;
+    _linkStatus     = LinkON;
 
     // setup lwIP netif
 
