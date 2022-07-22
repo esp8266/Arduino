@@ -77,7 +77,7 @@ In our example the content type is ``text/html``, the connection will be closed 
     Analog input:  [Value]
     </html>
 
-The content contains two basic `HTML <https://www.w3schools.com/html/>`__ tags, one to denote HTML document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
+The content contains two basic `HTML <https://www.w3schools.com/html/>`__ tags, one to denote `HTML <https://www.scaler.com/topics/html/>`__ document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
 
 .. code:: cpp
 
