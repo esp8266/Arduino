@@ -6,7 +6,7 @@
   using an Arduino Wiznet Ethernet shield.
 
   Circuit:
-   Ethernet shield attached to pins 10, 11, 12, 13
+  * Ethernet Wiznet5500/Wiznet5100/ENC28J60 on esp8266
 
   created 12 April 2011
   modified 9 Apr 2012

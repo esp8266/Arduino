@@ -6,6 +6,9 @@
  A Processing sketch is included at the end of file that can be used to send
  and received messages for testing with a computer.
 
+ Circuit:
+ * Ethernet Wiznet5500/Wiznet5100/ENC28J60 on esp8266
+
  created 21 Aug 2010
  by Michael Margolis
 
