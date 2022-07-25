@@ -96,22 +96,22 @@ Separate production and debug build options
 ===========================================
 
 If your production and debug build option requirements are different,
-you can specify ``mkbuildoptglobals.extra_flags={build.debug_port}`` in
-``platform.local.txt``. With this addition, you have two “C” comment
-blocks that can hold build options. One for debug options and one for
-production options. For debug build options, use a “C” block comment
-starting with ``/*@create-file:build.opt:debug@``. Make your selection
-by selecting or disabling the Arduino->Tools->Debug port.
+adding ``mkbuildoptglobals.extra_flags={build.debug_port}`` to
+``platform.local.txt`` will create separate build option groups for
+debugging and production. For the production build option group, the “C”
+block comment starts with ``/*@create-file:build.opt@``, as previously
+defined. For the debugging group, the new “C” block comment starts with
+``/*@create-file:build.opt:debug@``. You make your group selection
+through “Arduino->Tools->Debug port” by selecting or disabling the
+“Debug port.”
 
 Options common to both debug and production builds must be included in
-both block comments. It is possible to have a sketch that only uses the
-debug build options, and the platform defaults for production and visa
-versa.
+both groups. Neither of the groups is required. You may also omit either
+or both.
 
-Note, adding this change to ``platform.local.txt`` will apply to all old
-sketches. An old “sketch” with only the “C” block comment starting with
-``/*@create-file:build.opt@`` would not use a ``build.opt`` file for the
-debug case. Update old sketches as needed.
+Reminder with this change, any old “sketch” with only a “C” block
+comment starting with ``/*@create-file:build.opt@`` would not use a
+``build.opt`` file for the debug case. Update old sketches as needed.
 
 Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
@@ -124,9 +124,9 @@ Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
    //-fanalyzer
 
-   // Removing the optimization for "sibling and tail recursive calls"  will clear
-   // up some gaps in the stack decoder report. Preserves stack frames created at
-   // each level as you call down to the next.
+   // Removing the optimization for "sibling and tail recursive calls" may fill
+   // in some gaps in the stack decoder report. Preserves the stack frames
+   // created at each level as you call down to the next.
    -fno-optimize-sibling-calls
    */
 
