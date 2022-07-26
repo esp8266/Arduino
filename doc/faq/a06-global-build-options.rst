@@ -148,7 +148,7 @@ Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
    #define MYTITLE2 "Full"
    #endif
 
-   #ifdef ESP_DEBUG_PORT
+   #ifdef DEBUG_ESP_PORT
    // Global Debug defines
    // ...
    #else
