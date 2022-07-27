@@ -515,9 +515,11 @@ void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat)
         }
     }
     //End orig
-    setDataBits(repeatRem * 8);
-    SPI1CMD |= SPIBUSY;
-    while(SPI1CMD & SPIBUSY) {}
+    if (repeatRem) {
+        setDataBits(repeatRem * 8);
+        SPI1CMD |= SPIBUSY;
+        while(SPI1CMD & SPIBUSY) {}
+    }
 
     SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
 }

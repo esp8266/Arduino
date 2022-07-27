@@ -132,11 +132,6 @@ namespace esp8266
 namespace MDNSImplementation
 {
 
-// this should be defined at build time
-#ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
-#endif
-
 #define MDNS_IP4_SUPPORT
 #if LWIP_IPV6
 //#define MDNS_IP6_SUPPORT
