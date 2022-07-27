@@ -104,7 +104,6 @@ public:
     }
 
     // ESP8266WiFi API compatibility
-
     wl_status_t status();
 
 protected:
