@@ -4,6 +4,10 @@
 
 set -ev
 
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
+    export TRAVIS_BUILD_DIR=$(cd ${PWD%/*}/..; pwd)
+fi
+
 cd $TRAVIS_BUILD_DIR/tests/host
 
 
