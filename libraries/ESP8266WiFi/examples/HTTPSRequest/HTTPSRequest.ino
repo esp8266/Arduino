@@ -23,7 +23,7 @@
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-X509List cert(cert_DigiCert_High_Assurance_EV_Root_CA);
+X509List cert(cert_DigiCert_Global_Root_CA);
 
 void setup() {
   Serial.begin(115200);
@@ -62,7 +62,7 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.println(github_host);
 
-  Serial.printf("Using certificate: %s\n", cert_DigiCert_High_Assurance_EV_Root_CA);
+  Serial.printf("Using certificate: %s\n", cert_DigiCert_Global_Root_CA);
   client.setTrustAnchors(&cert);
 
   if (!client.connect(github_host, github_port)) {
