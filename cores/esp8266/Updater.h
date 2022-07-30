@@ -51,7 +51,9 @@ class UpdaterVerifyClass {
 
 class UpdaterClass {
   public:
-    typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
+    using THandlerFunction_Progress = std::function<void(size_t, size_t)>;
+    using THandlerFunction_Error = std::function<void(uint8_t)>;
+    using THandlerFunction = std::function<void()>;
   
     UpdaterClass();
     ~UpdaterClass();
@@ -120,7 +122,33 @@ class UpdaterClass {
     /*
       This callback will be called when Updater is receiving data
     */
-    UpdaterClass& onProgress(THandlerFunction_Progress fn);
+    UpdaterClass& onProgress(THandlerFunction_Progress fn) {
+      _progress_callback = std::move(fn);
+      return *this;
+    }
+
+    /*
+      This callback will be called when Updater ends
+    */
+    UpdaterClass& onError(THandlerFunction_Error fn) {
+      _error_callback = std::move(fn);
+      return *this;
+
+    /*
+      This callback will be called when Updater begins
+    */
+    UpdaterClass& onStart(THandlerFunction fn) {
+      _start_callback = std::move(fn);
+      return *this;
+    }
+
+    /*
+      This callback will be called when Updater ends
+    */
+    UpdaterClass& onEnd(THandlerFunction fn) {
+      _end_callback = std::move(fn);
+      return *this;
+    }
 
     //Helpers
     uint8_t getError(){ return _error; }
@@ -175,7 +203,7 @@ class UpdaterClass {
     }
 
   private:
-    void _reset();
+    void _reset(bool callback = true);
     bool _writeBuffer();
 
     bool _verifyHeader(uint8_t data);
@@ -202,8 +230,12 @@ class UpdaterClass {
     // Optional signed binary verification
     UpdaterHashClass *_hash = nullptr;
     UpdaterVerifyClass *_verify = nullptr;
-    // Optional progress callback function
+
+    // Optional lifetime callback functions
     THandlerFunction_Progress _progress_callback = nullptr;
+    THandlerFunction_Error _error_callback = nullptr;
+    THandlerFunction _start_callback = nullptr;
+    THandlerFunction _end_callback = nullptr;
 };
 
 extern UpdaterClass Update;

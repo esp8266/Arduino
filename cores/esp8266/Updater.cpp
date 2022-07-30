@@ -41,20 +41,21 @@ UpdaterClass::~UpdaterClass()
 #endif
 }
 
-UpdaterClass& UpdaterClass::onProgress(THandlerFunction_Progress fn) {
-    _progress_callback = fn;
-    return *this;
-}
-
-void UpdaterClass::_reset() {
-  if (_buffer)
+void UpdaterClass::_reset(bool callback) {
+  if (_buffer) {
     delete[] _buffer;
-  _buffer = 0;
+  }
+
+  _buffer = nullptr;
   _bufferLen = 0;
   _startAddress = 0;
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+
+  if (callback && _end_callback) {
+    _end_callback();
+  }
 
   if(_ledPin != -1) {
     digitalWrite(_ledPin, !_ledOn); // off
@@ -170,7 +171,15 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   } else {
     _bufferSize = 256;
   }
-  _buffer = new uint8_t[_bufferSize];
+  _buffer = new (std::nothrow) uint8_t[_bufferSize];
+  if (!_buffer) {
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.println(F("[begin] Unable to allocate a temporary buffer."));
+#endif
+    _reset(false);
+    return false;
+  }
+
   _command = command;
 
 #ifdef DEBUG_UPDATER
@@ -182,6 +191,11 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   if (!_verify) {
     _md5.begin();
   }
+
+  if (_start_callback) {
+    _start_callback();
+  }
+
   return true;
 }
 
@@ -555,6 +569,9 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
 
 void UpdaterClass::_setError(int error){
   _error = error;
+  if (_error_callback) {
+    _error_callback(error);
+  }
 #ifdef DEBUG_UPDATER
   printError(DEBUG_UPDATER);
 #endif
