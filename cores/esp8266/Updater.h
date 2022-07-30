@@ -100,6 +100,11 @@ class UpdaterClass {
     bool end(bool evenIfRemaining = false);
 
     /*
+      Gets the last error description as string
+    */
+    String getErrorString() const;
+
+    /*
       Prints the last error to an output stream
     */
     void printError(Print &out);
@@ -133,6 +138,7 @@ class UpdaterClass {
     UpdaterClass& onError(THandlerFunction_Error fn) {
       _error_callback = std::move(fn);
       return *this;
+    }
 
     /*
       This callback will be called when Updater begins

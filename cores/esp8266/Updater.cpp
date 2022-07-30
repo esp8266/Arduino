@@ -578,39 +578,50 @@ void UpdaterClass::_setError(int error){
   _reset(); // Any error condition invalidates the entire update, so clear partial status
 }
 
-void UpdaterClass::printError(Print &out){
-  out.printf_P(PSTR("ERROR[%u]: "), _error);
+String UpdaterClass::getErrorString() const {
+  String out;
+
   if(_error == UPDATE_ERROR_OK){
-    out.println(F("No Error"));
+    out = F("No Error");
   } else if(_error == UPDATE_ERROR_WRITE){
-    out.println(F("Flash Write Failed"));
+    out = F("Flash Write Failed");
   } else if(_error == UPDATE_ERROR_ERASE){
-    out.println(F("Flash Erase Failed"));
+    out = F("Flash Erase Failed");
   } else if(_error == UPDATE_ERROR_READ){
-    out.println(F("Flash Read Failed"));
+    out = F("Flash Read Failed");
   } else if(_error == UPDATE_ERROR_SPACE){
-    out.println(F("Not Enough Space"));
+    out = F("Not Enough Space");
   } else if(_error == UPDATE_ERROR_SIZE){
-    out.println(F("Bad Size Given"));
+    out = F("Bad Size Given");
   } else if(_error == UPDATE_ERROR_STREAM){
-    out.println(F("Stream Read Timeout"));
+    out = F("Stream Read Timeout");
   } else if(_error == UPDATE_ERROR_NO_DATA){
-    out.println(F("No data supplied"));
+    out = F("No data supplied");
   } else if(_error == UPDATE_ERROR_MD5){
-    out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
+    out += F("MD5 verification failed: ");
+    out += F("expected: ") + _target_md5;
+    out += F(", calculated: ") + _md5.toString();
   } else if(_error == UPDATE_ERROR_SIGN){
-    out.println(F("Signature verification failed"));
+    out = F("Signature verification failed");
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
-    out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+    out += F("Flash config wrong: ");
+    out += F("real: ") + String(ESP.getFlashChipRealSize(), 10);
+    out += F(", SDK: ") + String(ESP.getFlashChipSize(), 10);
   } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
-    out.printf_P(PSTR("new Flash config wrong real: %d\n"), ESP.getFlashChipRealSize());
+    out += F("new Flash config wrong, real size: ") + String(ESP.getFlashChipRealSize(), 10);
   } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
-    out.println(F("Magic byte is wrong, not 0xE9"));
+    out = F("Magic byte is not 0xE9");
   } else if (_error == UPDATE_ERROR_BOOTSTRAP){
-    out.println(F("Invalid bootstrapping state, reset ESP8266 before updating"));
+    out = F("Invalid bootstrapping state, reset ESP8266 before updating");
   } else {
-    out.println(F("UNKNOWN"));
+    out = F("UNKNOWN");
   }
+
+  return out;
+}
+
+void UpdaterClass::printError(Print &out){
+  out.printf_P(PSTR("ERROR[%u]: %s\n"), _error, getErrorString().c_str());
 }
 
 UpdaterClass Update;
