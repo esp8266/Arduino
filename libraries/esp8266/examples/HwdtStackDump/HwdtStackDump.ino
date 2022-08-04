@@ -47,8 +47,6 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////
 
 void setup(void) {
-  WiFi.persistent(false);  // w/o this a flash write occurs at every boot
-  WiFi.mode(WIFI_OFF);
   Serial.begin(115200);
   delay(20);  // This delay helps when using the 'Modified Serial monitor' otherwise it is not needed.
   Serial.println();
@@ -56,16 +54,20 @@ void setup(void) {
   Serial.println(F("The Hardware Watchdog Timer Demo is starting ..."));
   Serial.println();
 
+#ifdef DEMO_THUNK
   // This allows us to test dumping a BearSSL stack after HWDT.
   stack_thunk_add_ref();
   thunk_ets_uart_printf("Using Thunk Stack to print this line.\n\n");
+#endif
 
+#ifdef DEMO_WIFI
   // We don't need this for this example; however, starting WiFi uses a little
   // more of the SYS stack.
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println(F("A WiFi connection attempt has been started."));
   Serial.println();
+#endif
 
   // #define DEMO_NOEXTRA4K
 #ifdef DEMO_NOEXTRA4K

@@ -180,7 +180,9 @@
  * tool performing hardware reset and exiting, then the serial monitor
  * re-engaging. This is not an issue that needs to be addressed here.
  */
- #define DEBUG_ESP_HWDT_PRINT_GREETING
+ #ifndef DEBUG_ESP_HWDT_PRINT_GREETING
+ #define DEBUG_ESP_HWDT_PRINT_GREETING (1)
+ #endif
 
 
 /*
@@ -995,7 +997,7 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
     }
 #endif
 
-#if defined(DEBUG_ESP_HWDT_PRINT_GREETING)
+#if DEBUG_ESP_HWDT_PRINT_GREETING
     ETS_PRINTF("\n\nHardware WDT Stack Dump - enabled\n\n");
 #else
     ETS_PRINTF("\n\n");
