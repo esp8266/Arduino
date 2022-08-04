@@ -127,6 +127,7 @@ env.Append(
         "_GNU_SOURCE",
         ("ARDUINO", 10805),
         ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
+        ("ARDUINO_BOARD_ID", '\\"%s\\"' % env.BoardConfig().id),
         "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
         "LWIP_OPEN_SRC"
     ],

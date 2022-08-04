@@ -41,7 +41,7 @@ public:
     // ----     + ---------  -------------
     // local_ip | local_ip   local_ip
     // arg1     | gateway    dns1
-    // arg2     | netmask    [Agateway
+    // arg2     | netmask    gateway
     // arg3     | dns1       netmask
     //
     // result stored into gateway/netmask/dns1
