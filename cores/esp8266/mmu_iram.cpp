@@ -197,9 +197,31 @@ extern void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 #endif  // #if (MMU_ICACHE_SIZE == 0x4000)
 
 /*
- * This wrapper is for running code from IROM (flash) before the SDK starts.
+ * This wrapper is for running code early from IROM (flash) before the SDK starts.
+ * Since the NONOS SDK will do a full/proper init for handling the flash device,
+ * we only do a minimum to make ICACHE functional, keeping IRAM use to a minimum.
  */
 void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
+  // The SPI_CS_SETUP parameter has been observed set by RTOS SDK and NONOS SDK
+  // as part of flash init/configuration. It may be necessary for some flash
+  // chips to perform correctly with ICACHE hardware access. Turning on and
+  // leaving it on should be okay.
+  //
+  // Upon reflection, most ESP8266 boards have a series resistor to the Flash
+  // CLK pin. While reducing ringing, it causes a slight delay of the CLK signal
+  // due to the effective RC circuit formed with the chip's input capacitance.
+  // This narrows the gap between #CS active and the rising CLK edge as seen by
+  // the chip. SPI_CS_SETUP can restore the safety margin for the #CS to CLK.
+  //
+  // One SPI bus clock cycle time is inserted between #CS active and 1st SPI bus
+  // clock cycle. The number of clock cycles is in SPI_CNTRL2 SPI_SETUP_TIME,
+  // defaults to 1.
+  SPI0U |= SPIUCSSETUP; // SPI_CS_SETUP or BIT5
+
+  // For early Cache_Read_Enable only do ICACHE_SIZE_16. The affected registers
+  // are fully restored when Cache_Read_Disable is called. With ICACHE_SIZE_32
+  // one bit is missed at disable. Leave the full commitment to ICACHE_SIZE_32
+  // for the NONOS SDK.
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   fn();
   Cache_Read_Disable();
