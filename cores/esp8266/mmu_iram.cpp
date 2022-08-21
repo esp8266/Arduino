@@ -207,12 +207,6 @@ void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
   // chips to perform correctly with ICACHE hardware access. Turning on and
   // leaving it on should be okay.
   //
-  // Upon reflection, most ESP8266 boards have a series resistor to the Flash
-  // CLK pin. While reducing ringing, it causes a slight delay of the CLK signal
-  // due to the effective RC circuit formed with the chip's input capacitance.
-  // This narrows the gap between #CS active and the rising CLK edge as seen by
-  // the chip. SPI_CS_SETUP can restore the safety margin for the #CS to CLK.
-  //
   // One SPI bus clock cycle time is inserted between #CS active and 1st SPI bus
   // clock cycle. The number of clock cycles is in SPI_CNTRL2 SPI_SETUP_TIME,
   // defaults to 1.
