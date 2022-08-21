@@ -41,47 +41,6 @@
 
 #include "MocklwIP.h"
 
-#include <LwipDhcpServer.h>
-
-bool DhcpServer::set_dhcps_lease(struct dhcps_lease* please)
-{
-    (void)please;
-    return false;
-}
-
-bool DhcpServer::set_dhcps_lease_time(uint32 minute)
-{
-    (void)minute;
-    return false;
-}
-
-bool DhcpServer::set_dhcps_offer_option(uint8 level, void* optarg)
-{
-    (void)level;
-    (void)optarg;
-    return false;
-}
-
-void DhcpServer::end() { }
-
-bool DhcpServer::begin(struct ip_info* info)
-{
-    (void)info;
-    return false;
-}
-
-DhcpServer::DhcpServer(netif* netif)
-{
-    (void)netif;
-}
-
-DhcpServer::~DhcpServer()
-{
-    end();
-}
-
-DhcpServer dhcpSoftAP(nullptr);
-
 extern "C"
 {
 #include <user_interface.h>
@@ -177,8 +136,7 @@ extern "C"
         for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
         {
             mockverbose("host: interface: %s", ifa->ifa_name);
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET  // ip_info is IPv4 only
-            )
+            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)  // ip_info is IPv4 only
             {
                 auto test_ipv4
                     = lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
@@ -220,13 +178,13 @@ extern "C"
             info->ip.addr      = ipv4;
             info->netmask.addr = mask;
             info->gw.addr      = ipv4;
-
-            netif0.ip_addr.addr = ipv4;
-            netif0.netmask.addr = mask;
-            netif0.gw.addr      = ipv4;
-            netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
-            netif0.next         = nullptr;
         }
+
+        netif0.ip_addr.addr = ipv4;
+        netif0.netmask.addr = mask;
+        netif0.gw.addr      = ipv4;
+        netif0.flags        = NETIF_FLAG_IGMP | NETIF_FLAG_UP | NETIF_FLAG_LINK_UP;
+        netif0.next         = nullptr;
 
         return true;
     }
@@ -350,10 +308,12 @@ extern "C"
         return wifi_station_get_config(config);
     }
 
-    char        wifi_station_get_hostname_str[128];
-    const char* wifi_station_get_hostname(void)
+    extern "C" char* wifi_station_hostname;  // exists in nonosdk
+    char             wifi_station_hostname_str[33] { "esposix" };
+    char*            wifi_station_hostname = wifi_station_hostname_str;
+    const char*      wifi_station_get_hostname(void)
     {
-        return strcpy(wifi_station_get_hostname_str, "esposix");
+        return wifi_station_hostname;
     }
 
     bool wifi_station_get_reconnect_policy()
@@ -400,21 +360,6 @@ extern "C"
         (void)max_tpw;
     }
 
-    bool wifi_softap_dhcps_start(void)
-    {
-        return true;
-    }
-
-    enum dhcp_status wifi_softap_dhcps_status(void)
-    {
-        return DHCP_STARTED;
-    }
-
-    bool wifi_softap_dhcps_stop(void)
-    {
-        return true;
-    }
-
     bool wifi_softap_get_config(struct softap_config* config)
     {
         strcpy((char*)config->ssid, "apssid");
@@ -450,25 +395,6 @@ extern "C"
         return true;
     }
 
-    bool wifi_softap_set_dhcps_lease(struct dhcps_lease* please)
-    {
-        (void)please;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_lease_time(uint32 minute)
-    {
-        (void)minute;
-        return true;
-    }
-
-    bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
-    {
-        (void)level;
-        (void)optarg;
-        return true;
-    }
-
     bool wifi_station_scan(struct scan_config* config, scan_done_cb_t cb)
     {
         (void)config;
@@ -489,19 +415,6 @@ extern "C"
     void ets_isr_unmask(int intr)
     {
         (void)intr;
-    }
-
-    void dns_setserver(u8_t numdns, ip_addr_t* dnsserver)
-    {
-        (void)numdns;
-        (void)dnsserver;
-    }
-
-    ip_addr_t dns_getserver(u8_t numdns)
-    {
-        (void)numdns;
-        ip_addr_t addr = { 0x7f000001 };
-        return addr;
     }
 
 #include <smartconfig.h>

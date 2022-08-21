@@ -19,7 +19,6 @@
 #include <lwip/napt.h>
 #include <lwip/dns.h>
 #include <PPPServer.h>
-#include <dhcpserver.h>
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
 

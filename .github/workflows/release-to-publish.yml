@@ -28,6 +28,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   package:
     name: Update master JSON file
@@ -36,7 +39,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: false
         fetch-depth: 0

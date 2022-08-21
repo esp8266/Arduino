@@ -208,6 +208,19 @@ void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, c
     sntp_init();
 }
 
+void configTime(int timezone_sec, int daylightOffset_sec, String server1, String server2, String server3)
+{
+    static String servers[3];
+    servers[0] = std::move(server1);
+    servers[1] = std::move(server2);
+    servers[2] = std::move(server3);
+
+    configTime(timezone_sec, daylightOffset_sec,
+        servers[0].length() ? servers[0].c_str() : nullptr,
+        servers[1].length() ? servers[1].c_str() : nullptr,
+        servers[2].length() ? servers[2].c_str() : nullptr);
+}
+
 void setTZ(const char* tz){
 	
     char tzram[strlen_P(tz) + 1];
@@ -226,6 +239,19 @@ void configTime(const char* tz, const char* server1, const char* server2, const 
 	setTZ(tz);
 	
     sntp_init();
+}
+
+void configTime(const char* tz, String server1, String server2, String server3)
+{
+    static String servers[3];
+    servers[0] = std::move(server1);
+    servers[1] = std::move(server2);
+    servers[2] = std::move(server3);
+
+    configTime(tz,
+        servers[0].length() ? servers[0].c_str() : nullptr,
+        servers[1].length() ? servers[1].c_str() : nullptr,
+        servers[2].length() ? servers[2].c_str() : nullptr);
 }
 
 static BoolCB _settimeofday_cb;

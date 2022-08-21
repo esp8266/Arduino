@@ -5,7 +5,13 @@
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
-extern "C" size_t umm_umul_sat(const size_t a, const size_t b);;
+extern "C" size_t umm_umul_sat(const size_t a, const size_t b);
+
+// z2EapFree: See wpa2_eap_patch.cpp for details
+extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((weak, alias("vPortFree"), nothrow));
+// I don't understand all the compiler noise around this alias.
+// Adding "__attribute__ ((nothrow))" seems to resolve the issue.
+// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824 
 
 // Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
 #define FORCE_ALWAYS_INLINE_HEAP_SELECT

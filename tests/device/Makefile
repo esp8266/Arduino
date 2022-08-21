@@ -65,8 +65,8 @@ $(TEST_LIST):
 ifeq ("$(MOCK)", "1")
 	@echo Compiling $(notdir $@)
 	(cd ../host; make D=$(V) ULIBDIRS=../device/libraries/BSTest ../device/$(@:%.ino=%))
-	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
-		$(PYTHON) $(BS_DIR)/runner.py \
+	$(SILENT)$(BS_DIR)/virtualenv/bin/python \
+		$(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \
 			-e "$(ESP8266_CORE_PATH)/tests/host/bin/$(@:%.ino=%)" \
 			-n $(basename $(notdir $@)) \
@@ -120,8 +120,8 @@ ifneq ("$(NO_RUN)","1")
 		--port $(UPLOAD_PORT) \
 		--baud $(UPLOAD_BAUD) \
 		read_flash_status $(REDIR) # reset
-	$(SILENT)source $(BS_DIR)/virtualenv/bin/activate && \
-		$(PYTHON) $(BS_DIR)/runner.py \
+	$(SILENT)$(BS_DIR)/virtualenv/bin/python \
+		$(BS_DIR)/runner.py \
 			$(RUNNER_DEBUG_FLAG) \
 			-p $(UPLOAD_PORT) \
 			-n $(basename $(notdir $@)) \

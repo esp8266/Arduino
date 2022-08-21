@@ -27,6 +27,7 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 
+#include <LwipDhcpServer.h>
 
 class ESP8266WiFiAPClass {
 
@@ -48,8 +49,10 @@ class ESP8266WiFiAPClass {
         uint8_t* softAPmacAddress(uint8_t* mac);
         String softAPmacAddress(void);
 
-	String softAPSSID() const;
-	String softAPPSK() const;
+        String softAPSSID() const;
+        String softAPPSK() const;
+
+        static DhcpServer& softAPDhcpServer();
 
     protected:
 
