@@ -106,14 +106,18 @@ def decode_lines(format_addresses, elf, lines):
     EPC_STRING = "epc1="
 
     # either print everything as-is, or cache current string and dump after stack contents end
-    stack_addresses = []
+    last_stack = None
+    stack_addresses = {}
+
     in_stack = False
 
     def print_all_addresses(addresses):
-        if addresses:
-            for formatted in format_addresses(elf, addresses):
+        for ctx, addrs in addresses.items():
+            print()
+            print(ctx)
+            for formatted in format_addresses(elf, addrs):
                 print(formatted)
-        return list()
+        return dict()
 
     def format_address(address):
         return "\n".join(format_addresses(elf, [address]))
@@ -123,6 +127,7 @@ def decode_lines(format_addresses, elf, lines):
         # ctx: bearssl *or* ctx: cont *or* ctx: sys *or* ctx: whatever
         if in_stack and "ctx:" in line:
             stack_addresses = print_all_addresses(stack_addresses)
+            last_stack = line.strip()
         # sp: 3ffffdf0 end: 3fffffc0 offset: 0000
         elif in_stack and "sp:" in line:
             continue
@@ -131,8 +136,9 @@ def decode_lines(format_addresses, elf, lines):
             stack, addrs = line.split(":")
             addrs = addrs.strip()
             addrs = addrs.split(" ")
+            stack_addresses.setdefault(last_stack, [])
             for addr in addrs:
-                stack_addresses.append(addr)
+                stack_addresses[last_stack].append(addr)
         # epc1=0xfffefefe epc2=0xfefefefe epc3=0xefefefef excvaddr=0xfefefefe depc=0xfefefefe
         elif EPC_STRING in line:
             pairs = line.split()
@@ -167,7 +173,6 @@ def decode_lines(format_addresses, elf, lines):
             if line:
                 print(line)
 
-    print()
     print_all_addresses(stack_addresses)
 
 
