@@ -98,6 +98,7 @@ def addresses_addr2line(addr2line, elf, addresses):
 def decode_lines(format_addresses, elf, lines):
     STACK_RE = re.compile(r"^[0-9a-f]{8}:\s+([0-9a-f]{8} ?)+ *$")
 
+    CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
     EXCEPTION_STRING = "Exception ("
     EPC_STRING = "epc1="
 
@@ -145,6 +146,9 @@ def decode_lines(format_addresses, elf, lines):
             in_stack = True
         elif "<<<stack<<<" in line:
             break
+        # ignore
+        elif CUT_HERE_STRING in line:
+            continue
         else:
             print(line.strip())
 
