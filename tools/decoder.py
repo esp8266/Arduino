@@ -98,6 +98,9 @@ def addresses_addr2line(addr2line, elf, addresses):
 def decode_lines(format_addresses, elf, lines):
     STACK_RE = re.compile(r"^[0-9a-f]{8}:\s+([0-9a-f]{8} ?)+ *$")
 
+    LAST_ALLOC_RE = re.compile(r"last failed alloc call: ([0-9a-fA-F]{8})\(([0-9]+)\).*")
+    LAST_ALLOC = "last failed alloc"
+
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
     EXCEPTION_STRING = "Exception ("
     EPC_STRING = "epc1="
@@ -141,17 +144,28 @@ def decode_lines(format_addresses, elf, lines):
         elif EXCEPTION_STRING in line:
             number = line.strip()[len(EXCEPTION_STRING) : -2]
             print(f"Exception ({number}) - {EXCEPTION_CODES[int(number)]}")
+        # last failed alloc call: <ADDR>(<NUMBER>)[@<maybe file loc>]
+        elif LAST_ALLOC in line:
+            values = LAST_ALLOC_RE.match(line)
+            if values:
+                addr, size = values.groups()
+                output = "\n".join(format_addresses(elf, [addr]))
+                print()
+                print(f"Allocation of {size} bytes failed: {output}")
         # postmortem guards our actual stack dump values with these
         elif ">>>stack>>>" in line:
             in_stack = True
-        elif "<<<stack<<<" in line:
-            break
         # ignore
+        elif "<<<stack<<<" in line:
+            continue
         elif CUT_HERE_STRING in line:
             continue
         else:
-            print(line.strip())
+            line = line.strip()
+            if line:
+                print(line)
 
+    print()
     print_all_addresses(stack_addresses)
 
 
