@@ -98,7 +98,9 @@ def addresses_addr2line(addr2line, elf, addresses):
 def decode_lines(format_addresses, elf, lines):
     STACK_RE = re.compile(r"^[0-9a-f]{8}:\s+([0-9a-f]{8} ?)+ *$")
 
-    LAST_ALLOC_RE = re.compile(r"last failed alloc call: ([0-9a-fA-F]{8})\(([0-9]+)\).*")
+    LAST_ALLOC_RE = re.compile(
+        r"last failed alloc call: ([0-9a-fA-F]{8})\(([0-9]+)\).*"
+    )
     LAST_ALLOC = "last failed alloc"
 
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
@@ -176,8 +178,10 @@ def decode_lines(format_addresses, elf, lines):
 TOOLS = {"gdb": addresses_gdb, "addr2line": addresses_addr2line}
 
 
-def select_tool(toolchain_path, tool):
-    path = os.path.join(toolchain_path, "bin", f"xtensa-lx106-elf-{tool}")
+def select_tool(toolchain_path, tool, func):
+    path = f"xtensa-lx106-elf-{tool}"
+    if toolchain_path:
+        path = os.path.join(toolchain_path, path)
 
     def formatter(func, path):
         def wrapper(elf, addresses):
@@ -185,19 +189,24 @@ def select_tool(toolchain_path, tool):
 
         return wrapper
 
-    return formatter(TOOLS[tool], path)
+    return formatter(func, path)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--elf-path", required=True)
-    parser.add_argument("--toolchain-path", required=True)
     parser.add_argument("--tool", choices=TOOLS, default="addr2line")
+    parser.add_argument(
+        "--toolchain-path", help="Sets path to Xtensa tools, when they are not in PATH"
+    )
+
+    parser.add_argument("firmware_elf")
     parser.add_argument(
         "postmortem", nargs="?", type=argparse.FileType("r"), default=sys.stdin
     )
 
     args = parser.parse_args()
     decode_lines(
-        select_tool(args.toolchain_path, args.tool), args.elf_path, args.postmortem
+        select_tool(args.toolchain_path, args.tool, TOOLS[args.tool]),
+        args.firmware_elf,
+        args.postmortem,
     )
