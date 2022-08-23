@@ -115,6 +115,9 @@ def decode_lines(format_addresses, elf, lines):
                 print(formatted)
         return list()
 
+    def format_address(address):
+        return "\n".join(format_addresses(elf, [address]))
+
     for line in lines:
         # ctx could happen multiple times. for the 2nd one, reset list
         # ctx: bearssl *or* ctx: cont *or* ctx: sys *or* ctx: whatever
@@ -136,7 +139,7 @@ def decode_lines(format_addresses, elf, lines):
             for pair in pairs:
                 name, addr = pair.split("=")
                 if name in ["epc1", "excvaddr"]:
-                    output = "\n".join(format_addresses(elf, [addr]))
+                    output = format_address(addr)
                     if output:
                         print(f"{name}={output}")
         # Exception (123):
@@ -149,9 +152,8 @@ def decode_lines(format_addresses, elf, lines):
             values = LAST_ALLOC_RE.match(line)
             if values:
                 addr, size = values.groups()
-                output = "\n".join(format_addresses(elf, [addr]))
                 print()
-                print(f"Allocation of {size} bytes failed: {output}")
+                print(f"Allocation of {size} bytes failed: {format_address(addr)}")
         # postmortem guards our actual stack dump values with these
         elif ">>>stack>>>" in line:
             in_stack = True
