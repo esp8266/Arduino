@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Baseline code from https://github.com/me-no-dev/EspExceptionDecoder by Hristo Gochkov (@me-no-dev)
 # - https://github.com/me-no-dev/EspExceptionDecoder/blob/master/src/EspExceptionDecoder.java
 # Stack line detection from https://github.com/platformio/platform-espressif8266/ monitor exception filter by Vojtěch Boček (@Tasssadar)
