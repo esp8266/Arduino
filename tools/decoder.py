@@ -128,9 +128,6 @@ def decode_lines(format_addresses, elf, lines):
         if in_stack and "ctx:" in line:
             stack_addresses = print_all_addresses(stack_addresses)
             last_stack = line.strip()
-        # sp: 3ffffdf0 end: 3fffffc0 offset: 0000
-        elif in_stack and "sp:" in line:
-            continue
         # 3fffffb0:  feefeffe feefeffe 3ffe85d8 401004ed
         elif in_stack and STACK_RE.match(line):
             stack, addrs = line.split(":")
