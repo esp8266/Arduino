@@ -37,7 +37,7 @@
 /*  Conversion helpers                       */
 /*********************************************/
 
-static String toString(unsigned char value, unsigned char base) {
+static String toString(const unsigned char& value, unsigned char base) {
     String out;
 
     char buf[1 + std::numeric_limits<unsigned char>::digits];
@@ -46,7 +46,7 @@ static String toString(unsigned char value, unsigned char base) {
     return out;
 }
 
-static String toString(int value, unsigned char base) {
+static String toString(const int& value, unsigned char base) {
     String out;
 
     char buf[2 + std::numeric_limits<int>::digits];
@@ -55,7 +55,7 @@ static String toString(int value, unsigned char base) {
     return out;
 }
 
-static String toString(unsigned int value, unsigned char base) {
+static String toString(const unsigned int& value, unsigned char base) {
     String out;
 
     char buf[1 + std::numeric_limits<unsigned int>::digits];
@@ -64,7 +64,7 @@ static String toString(unsigned int value, unsigned char base) {
     return out;
 }
 
-static String toString(long value, unsigned char base) {
+static String toString(const long& value, unsigned char base) {
     String out;
 
     char buf[2 + std::numeric_limits<long>::digits];
@@ -73,7 +73,7 @@ static String toString(long value, unsigned char base) {
     return out;
 }
 
-static String toString(unsigned long value, unsigned char base) {
+static String toString(const unsigned long& value, unsigned char base) {
     String out;
 
     char buf[1 + std::numeric_limits<unsigned long>::digits];
@@ -84,7 +84,7 @@ static String toString(unsigned long value, unsigned char base) {
 
 // TODO: {u,}lltoa don't guarantee that the buffer is usable directly, one should always use the returned pointer
 
-static String toString(long long value, unsigned char base) {
+static String toString(const long long& value, unsigned char base) {
     String out;
 
     char buf[2 + std::numeric_limits<long long>::digits];
@@ -93,7 +93,7 @@ static String toString(long long value, unsigned char base) {
     return out;
 }
 
-static String toString(unsigned long long value, unsigned char base) {
+static String toString(const unsigned long long& value, unsigned char base) {
     String out;
 
     char buf[1 + std::numeric_limits<unsigned long long>::digits];
@@ -102,7 +102,7 @@ static String toString(unsigned long long value, unsigned char base) {
     return out;
 }
 
-static String toString(double value, unsigned char decimalPlaces) {
+static String toString(const double& value, unsigned char decimalPlaces) {
     String out;
 
     char buf[33];
@@ -111,7 +111,7 @@ static String toString(double value, unsigned char decimalPlaces) {
     return out;
 }
 
-static String toString(float value, unsigned char decimalPlaces) {
+static String toString(const float& value, unsigned char decimalPlaces) {
     return toString(static_cast<double>(value), decimalPlaces);
 }
 
@@ -140,41 +140,78 @@ String::String(String &&rval) noexcept {
     move(rval);
 }
 
-String::String(unsigned char value, unsigned char base) :
+String::String(const unsigned char& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(int value, unsigned char base) :
+String::String(unsigned char value) :
+    String(value, 10)
+{}
+
+String::String(const int& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(unsigned int value, unsigned char base) :
+String::String(int value) :
+    String(value, 10)
+{}
+
+String::String(const unsigned int& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(long value, unsigned char base) :
+String::String(unsigned int value) :
+    String(value, 10)
+{}
+
+String::String(const long& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(unsigned long value, unsigned char base) :
+String::String(long value) :
+    String(value, 10)
+{}
+
+String::String(const unsigned long& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(long long value, unsigned char base) :
+String::String(unsigned long value) :
+    String(value, 10)
+{}
+
+String::String(const long long& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(unsigned long long value, unsigned char base) :
+String::String(long long value) :
+    String(value, 10)
+{}
+
+String::String(const unsigned long long& value, unsigned char base) :
     String(toString(value, base))
 {}
 
-String::String(float value, unsigned char decimalPlaces) :
+String::String(unsigned long long value) :
+    String(value, 10)
+{}
+
+String::String(const float& value, unsigned char decimalPlaces) :
     String(toString(value, decimalPlaces))
 {}
 
-String::String(double value, unsigned char decimalPlaces) :
+String::String(float value) :
+    String(value, 2)
+{}
+
+String::String(const double& value, unsigned char decimalPlaces) :
     String(toString(value, decimalPlaces))
 {}
+
+String::String(double value) :
+    String(value, 2)
+{}
+
 
 /*********************************************/
 /*  Memory Management                        */
@@ -314,9 +351,54 @@ String &String::operator =(const __FlashStringHelper *pstr) {
     return *this;
 }
 
-String &String::operator =(char c) {
+String &String::operator =(const char& c) {
     char buffer[2] { c, '\0' };
     *this = buffer;
+    return *this;
+}
+
+String &String::operator =(const unsigned char& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const int& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const unsigned int& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const long& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const unsigned long& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const long long& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const unsigned long long& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const float& value) {
+    *this = String(value);
+    return *this;
+}
+
+String &String::operator =(const double& value) {
+    *this = String(value);
     return *this;
 }
 

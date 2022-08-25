@@ -66,50 +66,32 @@ class String {
             sso.isHeap  = 0;
         }
 
-        String(unsigned char, unsigned char base);
-        explicit String(unsigned char value) :
-            String(value, 10)
-        {}
+        String(const unsigned char&, unsigned char base);
+        explicit String(unsigned char value);
 
-        String(int, unsigned char base);
-        explicit String(int value) :
-            String(value, 10)
-        {}
+        String(const int&, unsigned char base);
+        explicit String(int value);
 
-        String(unsigned int, unsigned char base);
-        explicit String(unsigned int value) :
-            String(value, 10)
-        {}
+        String(const unsigned int&, unsigned char base);
+        explicit String(unsigned int value);
 
-        String(long, unsigned char base);
-        explicit String(long value) :
-            String(value, 10)
-        {}
+        String(const long&, unsigned char base);
+        explicit String(long value);
 
-        String(unsigned long, unsigned char base);
-        explicit String(unsigned long value) :
-            String(value, 10)
-        {}
+        String(const unsigned long&, unsigned char base);
+        explicit String(unsigned long value);
 
-        String(long long, unsigned char base);
-        explicit String(long long value) :
-            String(value, 10)
-        {}
+        String(const long long&, unsigned char base);
+        explicit String(long long value);
 
-        String(unsigned long long, unsigned char base);
-        explicit String(unsigned long long value) :
-            String(value, 10)
-        {}
+        String(const unsigned long long&, unsigned char base);
+        explicit String(unsigned long long value);
 
-        String(float, unsigned char decimalPlaces);
-        explicit String(float value) :
-            String(value, 2)
-        {}
+        String(const float&, unsigned char decimalPlaces);
+        explicit String(float value);
 
-        String(double, unsigned char decimalPlaces);
-        explicit String(double value) :
-            String(value, 2)
-        {}
+        String(const double&, unsigned char decimalPlaces);
+        explicit String(double value);
 
         ~String() {
             invalidate();
@@ -135,52 +117,17 @@ class String {
         String &operator =(String &&rval) noexcept;
         String &operator =(const char *cstr);
         String &operator =(const __FlashStringHelper *str);
-        String &operator =(char c);
+        String &operator =(const char& c);
 
-        String &operator =(unsigned char value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(int value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(unsigned int value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(long value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(unsigned long value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(long long value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(unsigned long long value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(float value) {
-            *this = String(value);
-            return *this;
-        }
-
-        String &operator =(double value) {
-            *this = String(value);
-            return *this;
-        }
+        String &operator =(const unsigned char& value);
+        String &operator =(const int& value);
+        String &operator =(const unsigned int& value);
+        String &operator =(const long& value);
+        String &operator =(const unsigned long& value);
+        String &operator =(const long long& value);
+        String &operator =(const unsigned long long& value);
+        String &operator =(const float& value);
+        String &operator =(const double& value);
 
         // concatenate (works w/ built-in types, same as assignment)
 
@@ -227,11 +174,17 @@ class String {
         bool operator ==(const char *cstr) const {
             return equals(cstr);
         }
+        bool operator ==(const __FlashStringHelper *s) const {
+            return equals(s);
+        }
         bool operator !=(const String &rhs) const {
             return !equals(rhs);
         }
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
+        }
+        bool operator !=(const __FlashStringHelper *s) const {
+            return !equals(s);
         }
         bool operator <(const String &rhs) const;
         bool operator >(const String &rhs) const;
