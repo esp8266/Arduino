@@ -196,12 +196,18 @@ extern void Cache_Read_Disable(void);
 extern void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 #endif  // #if (MMU_ICACHE_SIZE == 0x4000)
 
+#if 1 // New experimental code
 /*
- * This wrapper is for running code early from IROM (flash) before the SDK starts.
- * Since the NONOS SDK will do a full/proper init for handling the flash device,
- * we only do a minimum to make ICACHE functional, keeping IRAM use to a minimum.
+ * This wrapper is for running code early from IROM (flash) before the SDK
+ * starts. Since the NONOS SDK will do a full and proper flash device init for
+ * speed and mode, we only do a minimum to make ICACHE functional, keeping IRAM
+ * use to a minimum. After the SDK has started, this function is not needed and
+ * should not be called.
  */
 void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
+  //?? If the problem is not resolved add this line back.
+  //?? Cache_Read_Disable();
+
   // The SPI_CS_SETUP parameter has been observed set by RTOS SDK and NONOS SDK
   // as part of flash init/configuration. It may be necessary for some flash
   // chips to perform correctly with ICACHE hardware access. Turning on and
@@ -212,13 +218,28 @@ void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
   // defaults to 1.
   SPI0U |= SPIUCSSETUP; // SPI_CS_SETUP or BIT5
 
+  // I am not sure what this is does. It appears to be the key function called
+  // from `fix_cache_bug` in the NONOS SDK - Will this help PUYA Flash work?
+  // It appears to do some, lowlevel undocumented register maniplation and
+  // device specific init based on OTP CHIPID model bits.
+  extern uint32_t phy_get_bb_evm(void); // undocumented
+  phy_get_bb_evm();
+
   // For early Cache_Read_Enable only do ICACHE_SIZE_16. The affected registers
   // are fully restored when Cache_Read_Disable is called. With ICACHE_SIZE_32
   // one bit is missed at disable. Leave the full commitment to ICACHE_SIZE_32
   // for the NONOS SDK.
+  // This only works with image slice 0, which is all we do presently.
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   fn();
   Cache_Read_Disable();
 }
+#else
+void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
+  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
+  fn();
+  Cache_Read_Disable();
+}
+#endif
 
 };

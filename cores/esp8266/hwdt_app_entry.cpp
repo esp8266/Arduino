@@ -277,6 +277,7 @@
 #include <esp8266_peri.h>
 #include <uart.h>
 #include <pgmspace.h>
+#include "<umm_malloc/umm_malloc.h"
 #include "mmu_iram.h"
 
 extern "C" {
