@@ -523,6 +523,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
@@ -535,6 +537,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
