@@ -92,6 +92,72 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
    #endif
 
+Separate production and debug build options
+===========================================
+
+If your production and debug build option requirements are different,
+adding ``mkbuildoptglobals.extra_flags={build.debug_port}`` to
+``platform.local.txt`` will create separate build option groups for
+debugging and production. For the production build option group, the “C”
+block comment starts with ``/*@create-file:build.opt@``, as previously
+defined. For the debugging group, the new “C” block comment starts with
+``/*@create-file:build.opt:debug@``. You make your group selection
+through “Arduino->Tools->Debug port” by selecting or disabling the
+“Debug port.”
+
+Options common to both debug and production builds must be included in
+both groups. Neither of the groups is required. You may also omit either
+or both.
+
+Reminder with this change, any old “sketch” with only a “C” block
+comment starting with ``/*@create-file:build.opt@`` would not use a
+``build.opt`` file for the debug case. Update old sketches as needed.
+
+Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
+
+.. code:: cpp
+
+   /*@create-file:build.opt:debug@
+   // Debug build options
+   -DMYTITLE1="\"Running on \""
+   -DUMM_STATS_FULL=1
+
+   //-fanalyzer
+
+   // Removing the optimization for "sibling and tail recursive calls" may fill
+   // in some gaps in the stack decoder report. Preserves the stack frames
+   // created at each level as you call down to the next.
+   -fno-optimize-sibling-calls
+   */
+
+   /*@create-file:build.opt@
+   // Production build options
+   -DMYTITLE1="\"Running on \""
+   -DUMM_STATS_FULL=1
+   -O3
+   */
+
+   #ifndef LOWWATERMARK_INO_GLOBALS_H
+   #define LOWWATERMARK_INO_GLOBALS_H
+
+   #if defined(__cplusplus)
+   #define MYTITLE2 "Empty"
+   #endif
+
+   #if !defined(__cplusplus) && !defined(__ASSEMBLER__)
+   #define MYTITLE2 "Full"
+   #endif
+
+   #ifdef DEBUG_ESP_PORT
+   // Global Debug defines
+   // ...
+   #else
+   // Global Production defines
+   // ...
+   #endif
+
+   #endif
+
 Aggressively cache compiled core
 ================================
 
