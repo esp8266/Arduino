@@ -95,8 +95,8 @@ namespace MDNSImplementation
                 if (IPAddress(intf->ip_addr).isSet())
                 {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                        PSTR("[MDNSResponder] new Interface '%c%c' is UP! restarting\n"), intf->name[0],
-                        intf->name[1]));
+                        PSTR("[MDNSResponder] new Interface '%c%c' is UP! restarting\n"),
+                        intf->name[0], intf->name[1]));
                     _restart();
                 }
             });
