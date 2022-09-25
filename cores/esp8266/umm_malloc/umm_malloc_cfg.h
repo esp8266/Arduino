@@ -213,11 +213,11 @@ struct UMM_HEAP_CONTEXT;
 typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
 
 extern ICACHE_FLASH_ATTR void *umm_info(void *ptr, bool force);
-#ifdef UMM_INLINE_METRICS
-extern size_t umm_free_heap_size(void);
-#else
-extern ICACHE_FLASH_ATTR size_t umm_free_heap_size(void);
+#if (defined(UMM_STATS) || defined(UMM_STATS_FULL)) && defined(UMM_INFO)
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_info(void);
 #endif
+extern size_t umm_free_heap_size(void);
+
 // umm_max_block_size changed to umm_max_free_block_size in upstream.
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size(void);
 extern ICACHE_FLASH_ATTR int umm_usage_metric(void);

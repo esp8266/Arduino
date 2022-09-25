@@ -166,28 +166,61 @@ size_t umm_block_size(void) {
 }
 #endif
 
+
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-// Keep complete call path in IRAM
-size_t umm_free_heap_size_lw(void) {
+// Support a consistant external name across build options. Used by
+// ESP.getFreeHeap(). Keep complete call path in IRAM.
+size_t umm_free_heap_size(void) {
     UMM_CHECK_INITIALIZED();
 
     umm_heap_context_t *_context = umm_get_current_heap();
     return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);
 }
+
+#elif defined(UMM_INLINE_METRICS)
+/*
+  Use `size_t umm_free_heap_size(void)` (in umm_info.c) from upstream
+  umm_malloc. It must have the UMM_INLINE_METRICS Build option enabled to
+  support free heap size reporting without the use of `umm_info()`
+*/
+#else
+// We require a resources to track and report free heap with low overhead.
+// See umm_free_heap_size in umm_info.c for more details
+#error UMM_INLINE_METRICS, UMM_STATS, or UMM_STATS_FULL needs to be defined.
 #endif
 
 /*
-  I assume xPortGetFreeHeapSize needs to be in IRAM. Since
-  system_get_free_heap_size is in IRAM. Which would mean, umm_free_heap_size()
-  in flash, was not a safe alternative for returning the same information.
+  This API is called by `system_get_free_heap_size()` which is in IRAM. Use IRAM
+  to ensure the call chain is in IRAM. Which implies it may be called from an
+  ISR.
+
+  To satisfy this requirement, we need UMM_STATS... or UMM_INLINE_METRICS
+  defined. These support an always available without intense computation
+  free-Heap value.
+
+  Like the other vPort... APIs used by the SDK, this must always report on the
+  DRAM Heap not current Heap.
 */
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")));
-#elif defined(UMM_INFO)
-#ifndef UMM_INLINE_METRICS
-#warning "No ISR safe function available to implement xPortGetFreeHeapSize()"
-#endif
+#if (UMM_NUM_HEAPS == 1)
+// Reduce IRAM usage for the single Heap case
 size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size")));
+
+#else
+size_t xPortGetFreeHeapSize(void) {
+    UMM_CHECK_INITIALIZED();
+    umm_heap_context_t *_context = umm_get_heap_by_id(UMM_HEAP_DRAM);
+
+    #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+    return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);
+    #elif defined(UMM_INLINE_METRICS)
+    return umm_free_heap_size_core(_context);
+    #else
+    // At this time, this build path is not reachable. In case things change,
+    // keep build check.
+    // Not in IRAM umm_info() has to be used to complete this operation.
+    #error "No ISR safe function available to implement xPortGetFreeHeapSize()"
+    #endif
+}
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
