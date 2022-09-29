@@ -319,28 +319,26 @@ Enhancement ideas:
   upstream umm_malloc's `umm_free_heap_size()` and require the build option
   UMM_INLINE_METRICS. Otherwise, fail the build.
 
-  Use function name `umm_free_heap_size()` to support external request for
-  current heap size.
+  Use function name `umm_free_heap_size_lw()` to support external request for
+  current heap size. When build options result in fallback using umm_info.c,
+  ensure UMM_INLINE_METRICS enabled and alias to `umm_free_heap_size()`.
 
-  For the multiple Heap case `xPortGetFreeHeapSize()` becomes a unique function
+  For the multiple Heap case, `xPortGetFreeHeapSize()` becomes a unique function
   and reports only DRAM free heap size. Now `system_get_free_heap_size()` will
   always report DRAM free Heap size. This might be a breaking change.
 
   Specifics:
 
-  * rename `umm_free_heap_size_lw()` to `umm_free_heap_size()` for builds that
-    include option UMM_STATS(default) or UMM_STATS_FULL.
-      * rename upstream umm_malloc's `umm_free_heap_size()` to
-        `umm_free_heap_size_info()`.
+  * Support `umm_free_heap_size_lw()` as an `extern`.
 
   * When the build options UMM_STATS/UMM_STATS_FULL are not used, fallback to
-    the upstream umm_malloc's original `umm_free_heap_size()` function in
-    umm_info.c
+    the upstream umm_malloc's `umm_free_heap_size()` function in umm_info.c
       * require the UMM_INLINE_METRICS build option.
+      * assign `umm_free_heap_size_lw()` as an alias to `umm_free_heap_size()`
 
   * `xPortGetFreeHeapSize()`
-      * For single heap builds, alias to `umm_free_heap_size()`
-      * For multi-heap builds, add a dedicated function that always reports
+      * For single heap builds, alias to `umm_free_heap_size_lw()`
+      * For multiple Heaps builds, add a dedicated function that always reports
         DRAM results.
 
 */

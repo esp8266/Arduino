@@ -106,31 +106,6 @@ extern "C" {
 #include "umm_malloc_cfgport.h"
 #endif
 
-#define UMM_BEST_FIT
-#define UMM_INFO
-// #define UMM_INLINE_METRICS
-#define UMM_STATS
-
-/*
- * To support API call, system_show_malloc(), -DUMM_INFO is required.
- *
- * For the ESP8266 we need an ISR safe function to call for implementing
- * xPortGetFreeHeapSize(). We can get this with one of these options:
- *   1) -DUMM_STATS or -DUMM_STATS_FULL
- *   2) -DUMM_INLINE_METRICS (and implicitly includes -DUMM_INFO)
- *
- * If frequent calls are made to ESP.getHeapFragmentation(),
- * -DUMM_INLINE_METRICS would reduce long periods of interrupts disabled caused
- * by frequent calls to `umm_info()`. Instead, the computations get distributed
- * across each malloc, realloc, and free. This appears to require an additional
- * 116 bytes of IRAM vs using `UMM_STATS` with `UMM_INFO`.
- *
- * When both UMM_STATS and UMM_INLINE_METRICS are defined, macros and structures
- * have been optimized to reduce duplications.
- *
- */
-
-
 /* A couple of macros to make packing structures less compiler dependent */
 
 #define UMM_H_ATTPACKPRE
@@ -177,12 +152,22 @@ extern "C" {
   #define UMM_FRAGMENTATION_METRIC_REMOVE(c)
 #endif // UMM_INLINE_METRICS
 
+struct UMM_HEAP_CONTEXT;
+typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
+
+/*
+  Must always be defined. Core support for getting free Heap size.
+  When possible, access via ESP.getFreeHeap();
+*/
+extern size_t umm_free_heap_size_lw(void);
+extern size_t umm_free_heap_size_core_lw(umm_heap_context_t *_context);
+
 /* -------------------------------------------------------------------------- */
 
 /*
  * -D UMM_INFO :
  *
- * Enables a dup of the heap contents and a function to return the total
+ * Enables a dump of the heap contents and a function to return the total
  * heap size that is unallocated - note this is not the same as the largest
  * unallocated block on the heap!
  */
@@ -209,20 +194,20 @@ typedef struct UMM_HEAP_INFO_t {
 UMM_HEAP_INFO;
 
 // extern UMM_HEAP_INFO ummHeapInfo;
-struct UMM_HEAP_CONTEXT;
-typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
-
 extern ICACHE_FLASH_ATTR void *umm_info(void *ptr, bool force);
-#if (defined(UMM_STATS) || defined(UMM_STATS_FULL)) && defined(UMM_INFO)
-extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_info(void);
-#endif
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size(void);
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core(umm_heap_context_t *_context);
+#else
 extern size_t umm_free_heap_size(void);
+extern size_t umm_free_heap_size_core(umm_heap_context_t *_context);
+#endif
+
 
 // umm_max_block_size changed to umm_max_free_block_size in upstream.
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size(void);
 extern ICACHE_FLASH_ATTR int umm_usage_metric(void);
 extern ICACHE_FLASH_ATTR int umm_fragmentation_metric(void);
-extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_usage_metric_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core(umm_heap_context_t *_context);
@@ -232,9 +217,9 @@ extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core(umm_heap_context_t *_
   #define umm_max_block_size() (0)
   #define umm_fragmentation_metric() (0)
   #define umm_usage_metric() (0)
-  #define umm_free_heap_size_core() (0)
-  #define umm_max_block_size_core() (0)
-  #define umm_fragmentation_metric_core() (0)
+  #define umm_free_heap_size_core(c) (0)
+  #define umm_max_block_size_core(c) (0)
+  #define umm_fragmentation_metric_core(c) (0)
 #endif
 
 /*
@@ -305,7 +290,6 @@ UMM_STATISTICS;
 
 #define STATS__OOM_UPDATE() _context->UMM_OOM_COUNT += 1
 
-extern size_t umm_free_heap_size_lw(void);
 extern size_t umm_get_oom_count(void);
 
 #else  // not UMM_STATS or UMM_STATS_FULL

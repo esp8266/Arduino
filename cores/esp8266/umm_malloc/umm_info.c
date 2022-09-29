@@ -175,37 +175,14 @@ size_t umm_free_heap_size_core(umm_heap_context_t *_context) {
 }
 
 /*
-  Need to expose a function for getting the current free heap size
-  Using umm_free_heap_size for this purpose.
-
-  For an expanded discussion see Notes.h, entry dated "Sep 26, 2022"
+  When used as the fallback option for supporting exported function
+  `umm_free_heap_size_lw()`, the build option UMM_INLINE_METRICS is required.
+  Otherwise, umm_info() would be used to complete the operation, which uses a
+  time-consuming method for getting free Heap and runs with interrupts off,
+  which can negatively impact WiFi operations. Also, it cannot support calls
+  from ISRs, `umm_info()` runs from flash.
 */
-#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-/*
-  For this build option, see umm_free_heap_size in umm_local.c
-*/
-
-/*
-  Make upstream logic available under a new name.
-  May be useful for sanity checks between methods.
-  Only takes .bin space if used.
-*/
-size_t umm_free_heap_size_info(void)
-
-#else
-/*
-  Not our default build path. For this path to function well with WiFi enabled,
-  you must use the build option UMM_INLINE_METRICS. Otherwise, umm_info() is
-  used to complete the operation, which uses a time-consuming method for getting
-  free Heap and runs with interrupts off. Also, it cannot support calls from
-  ISRs, `umm_info()` runs from flash.
-
-  Current build test in umm_local.c fails the build option that uses the
-  umm_info() method.
-*/
-size_t umm_free_heap_size(void)
-#endif
-{
+size_t umm_free_heap_size(void) {
     #ifndef UMM_INLINE_METRICS
     umm_info(NULL, false);
     #endif

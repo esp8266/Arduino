@@ -161,16 +161,29 @@ void umm_poison_free_fl(void *ptr, const char *file, int line) {
 /* ------------------------------------------------------------------------ */
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INFO)
+/*
+  For internal, mainly used by UMM_STATS_FULL; exported so external components
+  can perform Heap related calculations.
+*/
 size_t umm_block_size(void) {
     return sizeof(umm_block);
 }
 #endif
 
+/*
+  Need to expose a function to support getting the current free heap size.
+  Export `size_t umm_free_heap_size_lw(void)` for this purpose.
+  Used by ESP.getFreeHeap().
 
+  For an expanded discussion see Notes.h, entry dated "Sep 26, 2022"
+*/
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-// Support a consistant external name across build options. Used by
-// ESP.getFreeHeap(). Keep complete call path in IRAM.
-size_t umm_free_heap_size(void) {
+/*
+  Default build option to support export.
+
+  Keep complete call path in IRAM.
+*/
+size_t umm_free_heap_size_lw(void) {
     UMM_CHECK_INITIALIZED();
 
     umm_heap_context_t *_context = umm_get_current_heap();
@@ -179,41 +192,57 @@ size_t umm_free_heap_size(void) {
 
 #elif defined(UMM_INLINE_METRICS)
 /*
-  Use `size_t umm_free_heap_size(void)` (in umm_info.c) from upstream
-  umm_malloc. It must have the UMM_INLINE_METRICS Build option enabled to
-  support free heap size reporting without the use of `umm_info()`
+  For the fallback option using `size_t umm_free_heap_size(void)`, we must have
+  the UMM_INLINE_METRICS build option enabled to support free heap size
+  reporting without the use of `umm_info()`.
 */
+size_t umm_free_heap_size_lw(void) __attribute__ ((alias("umm_free_heap_size")));
+
 #else
-// We require a resources to track and report free heap with low overhead.
-// See umm_free_heap_size in umm_info.c for more details
+/*
+  We require a resource to track and report free Heap size with low overhead.
+  For an expanded discussion see Notes.h, entry dated "Sep 26, 2022"
+*/
 #error UMM_INLINE_METRICS, UMM_STATS, or UMM_STATS_FULL needs to be defined.
 #endif
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+size_t umm_free_heap_size_core_lw(umm_heap_context_t *_context) {
+    return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);
+}
+
+#elif defined(UMM_INFO)
+// Backfill support for umm_free_heap_size_core_lw()
+size_t umm_free_heap_size_core_lw(umm_heap_context_t *_context) __attribute__ ((alias("umm_free_heap_size_core")));
+#endif
+
 /*
-  This API is called by `system_get_free_heap_size()` which is in IRAM. Use IRAM
-  to ensure the call chain is in IRAM. Which implies it may be called from an
-  ISR.
+  This API is called by `system_get_free_heap_size()` which is in IRAM. Driving
+  the assumption the callee may be in an ISR or Cache_Read_Disable state. Use
+  IRAM to ensure that the complete call chain is in IRAM.
 
   To satisfy this requirement, we need UMM_STATS... or UMM_INLINE_METRICS
   defined. These support an always available without intense computation
   free-Heap value.
 
   Like the other vPort... APIs used by the SDK, this must always report on the
-  DRAM Heap not current Heap.
+  DRAM Heap not the current Heap.
 */
 #if (UMM_NUM_HEAPS == 1)
 // Reduce IRAM usage for the single Heap case
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size_lw")));
+#else
 size_t xPortGetFreeHeapSize(void) __attribute__ ((alias("umm_free_heap_size")));
+#endif
 
 #else
 size_t xPortGetFreeHeapSize(void) {
+    #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INLINE_METRICS)
     UMM_CHECK_INITIALIZED();
     umm_heap_context_t *_context = umm_get_heap_by_id(UMM_HEAP_DRAM);
 
-    #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-    return (size_t)_context->UMM_FREE_BLOCKS * sizeof(umm_block);
-    #elif defined(UMM_INLINE_METRICS)
-    return umm_free_heap_size_core(_context);
+    return umm_free_heap_size_core_lw(_context);
     #else
     // At this time, this build path is not reachable. In case things change,
     // keep build check.
