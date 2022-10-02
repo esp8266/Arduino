@@ -94,33 +94,36 @@ extern char _heap_start[];
 #endif
 
 /*
- * To support API call, system_show_malloc(), -DUMM_INFO is required.
+ * The NONOS SDK API requires function `umm_info()` for implementing
+ * `system_show_malloc()`. Build option `-DUMM_INFO` enables this support.
  *
- * UMM_INFO is needed to support several EspClass methods and umm_info().
+ * Also, `-DUMM_INFO` is needed to support several EspClass methods.
  * Partial EspClass method list:
- *   uint32_t EspClass::getMaxFreeBlockSize()
- *   void EspClass::getHeapStats(uint32_t* hfree, uint32_t* hmax, uint8_t* hfrag)
- *   uint8_t EspClass::getHeapFragmentation()
+ *   `uint32_t EspClass::getMaxFreeBlockSize()`
+ *   `void EspClass::getHeapStats(uint32_t* hfree, uint32_t* hmax, uint8_t* hfrag)`
+ *   `uint8_t EspClass::getHeapFragmentation()`
  *
- * For the ESP8266 we need an ISR safe function to call for implementing
- * xPortGetFreeHeapSize(). We can get this with one of these options:
- *   1) -DUMM_STATS or -DUMM_STATS_FULL
- *   2) -DUMM_INLINE_METRICS (and implicitly includes -DUMM_INFO)
+ * The NONOS SDK API requires an ISR safe function to call for implementing
+ * `xPortGetFreeHeapSize()`. Use one of these options:
+ *  1) `-DUMM_STATS` or `-DUMM_STATS_FULL`
+ *  2) `-DUMM_INLINE_METRICS` (implicitly includes `-DUMM_INFO`)
  *
- * If frequent calls are made to ESP.getHeapFragmentation(),
- * -DUMM_INLINE_METRICS would reduce long periods of interrupts disabled caused
- * by frequent calls to `umm_info()`. Instead, the computations get distributed
- * across each malloc, realloc, and free. This appears to require an additional
- * 116 bytes of IRAM vs using `UMM_STATS` with `UMM_INFO`.
+ * If frequent calls are made to `ESP.getHeapFragmentation()`, using build
+ * option `-DUMM_INLINE_METRICS` would reduce long periods of interrupts
+ * disabled caused by frequent calls to `umm_info().` Instead, the computations
+ * get distributed across each malloc, realloc, and free. Requires approximately
+ * 116 more bytes of IRAM when compared to the build option `-DUMM_STATS` with
+ * `-DUMM_INFO.`
  *
- * When both UMM_STATS and UMM_INLINE_METRICS are defined, macros and structures
- * have been optimized to reduce duplications.
+ * When both `-DUMM_STATS` and `-DUMM_INLINE_METRICS` are defined, macros and
+ * structures are optimized to reduce duplications.
  *
- * You can use just UMM_INFO and drop UMM_STATS/UMM_STATS_FULL gaining back
- * some IROM at the expense of IRAM.
+ * You can use `-DUMM_INFO` with `-DUMM_INLINE_METRICS` and drop
+ * `-DUMM_STATS(_FULL)` gaining back some IROM at the expense of IRAM.
  *
- * If you don't require the methods in EspClass that are dependent on UMM_INFO,
- * you can use just UMM_STATS and save on IROM and a little IRAM.
+ * If you don't require the methods in EspClass that are dependent on functions
+ * from the `-DUMM_INFO` build option, you can use only `-DUMM_STATS` and save
+ * on IROM and a little IRAM.
  */
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INLINE_METRICS) || defined(UMM_INFO)
 /*

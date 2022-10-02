@@ -246,7 +246,7 @@ size_t xPortGetFreeHeapSize(void) {
     #else
     // At this time, this build path is not reachable. In case things change,
     // keep build check.
-    // Not in IRAM umm_info() has to be used to complete this operation.
+    // Not in IRAM, umm_info() would have been used to complete this operation.
     #error "No ISR safe function available to implement xPortGetFreeHeapSize()"
     #endif
 }
