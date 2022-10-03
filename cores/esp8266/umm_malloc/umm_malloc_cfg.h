@@ -211,8 +211,8 @@ extern ICACHE_FLASH_ATTR int umm_fragmentation_metric(void);
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_usage_metric_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core(umm_heap_context_t *_context);
-#else
-  #define umm_info(p,b)
+#elif defined(UMM_INFO_EMPTY)
+  extern ICACHE_FLASH_ATTR void *umm_info(void *ptr, bool force) __attribute__((deprecated("This method is empty use the build option UMM_INFO to complete.")));
   #define umm_free_heap_size() (0)
   #define umm_max_block_size() (0)
   #define umm_fragmentation_metric() (0)

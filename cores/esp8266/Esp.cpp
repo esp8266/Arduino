@@ -222,10 +222,12 @@ uint32_t EspClass::getFreeHeap(void)
     return umm_free_heap_size_lw();
 }
 
+#if defined(UMM_INFO) || defined(UMM_INFO_EMPTY)
 uint32_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
 }
+#endif
 
 uint32_t EspClass::getFreeContStack()
 {

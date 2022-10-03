@@ -124,6 +124,11 @@ extern char _heap_start[];
  * If you don't require the methods in EspClass that are dependent on functions
  * from the `-DUMM_INFO` build option, you can use only `-DUMM_STATS` and save
  * on IROM and a little IRAM.
+ *
+ * Build option `-DUMM_INFO_EMPTY` ignored when `-DUMM_INFO` enabled.
+ * `-DUMM_INFO_EMPTY` provides empty versions of the functions supplied by
+ * `UMM_INFO` intended for easing build option experimentation. It will report
+ * noisy depreciation messages until you clean up all references.
  */
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INLINE_METRICS) || defined(UMM_INFO)
 /*
@@ -138,7 +143,7 @@ extern char _heap_start[];
 #endif
 
 /*
-  For `-Dname`, gcc assigns a value of 1 and this works find; however,
+  For `-Dname`, gcc assigns a value of 1 and this works fine; however,
   if `-Dname=0` is used, the intended results will not be obtained.
 
   Make value and valueless defines compliant with their usage in umm_malloc:
@@ -146,7 +151,8 @@ extern char _heap_start[];
     `#define name 0` => #undef name
 */
 #if ((1 - UMM_BEST_FIT - 1) == 2)
-// Assume 1 for define w/o value
+// When UMM_BEST_FIT is defined w/o value, the computation becomes
+// (1 - - 1) == 2    =>     (1 + 1) == 2
 #undef UMM_BEST_FIT
 #define UMM_BEST_FIT 1
 #elif ((1 - UMM_BEST_FIT - 1) == 0)

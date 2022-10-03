@@ -269,6 +269,12 @@ static void umm_fragmentation_metric_remove(umm_heap_context_t *_context, uint16
 #endif // UMM_INLINE_METRICS
 
 /* ------------------------------------------------------------------------ */
+#elif defined(UMM_INFO_EMPTY)
+void *umm_info(void *ptr, bool force) {
+    (void)ptr;
+    (void)force;
+    return NULL;
+}
 #endif
 
 #endif  // defined(BUILD_UMM_MALLOC_C)
