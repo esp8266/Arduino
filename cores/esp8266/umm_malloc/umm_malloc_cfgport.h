@@ -125,10 +125,6 @@ extern char _heap_start[];
  * from the `-DUMM_INFO` build option, you can use only `-DUMM_STATS` and save
  * on IROM and a little IRAM.
  *
- * Build option `-DUMM_INFO_EMPTY` ignored when `-DUMM_INFO` enabled.
- * `-DUMM_INFO_EMPTY` provides empty versions of the functions supplied by
- * `UMM_INFO` intended for easing build option experimentation. It will report
- * noisy depreciation messages until you clean up all references.
  */
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL) || defined(UMM_INLINE_METRICS) || defined(UMM_INFO)
 /*

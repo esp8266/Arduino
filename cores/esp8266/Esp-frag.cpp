@@ -23,7 +23,7 @@
 #include "coredecls.h"
 #include "Esp.h"
 
-#if defined(UMM_INFO) || defined(UMM_INFO_EMPTY)
+#if defined(UMM_INFO)
 void EspClass::getHeapStats(uint32_t* hfree, uint32_t* hmax, uint8_t* hfrag)
 {
     // L2 / Euclidean norm of free block sizes.
