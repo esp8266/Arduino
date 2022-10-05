@@ -1,13 +1,9 @@
-#ifndef _UMM_MALLOC_CFGPORT_H
-#define _UMM_MALLOC_CFGPORT_H
-
-#ifndef _UMM_MALLOC_CFG_H
-#error "This include file must be used with umm_malloc_cfg.h"
-#endif
-
 /*
  * Arduino ESP8266 core umm_malloc port config
  */
+
+#ifdef _UMM_MALLOC_CFG_H
+// Additional includes for "umm_malloc_cfg.h" only
 #include <pgmspace.h>
 #include <mmu_iram.h>
 #include "../debug.h"
@@ -18,6 +14,11 @@
 #include <osapi.h>
 
 #include "c_types.h"
+#endif
+
+
+#ifndef _UMM_MALLOC_CFGPORT_H
+#define _UMM_MALLOC_CFGPORT_H
 
 /*
  * Between UMM_BEST_FIT or UMM_FIRST_FIT, UMM_BEST_FIT is the better option for

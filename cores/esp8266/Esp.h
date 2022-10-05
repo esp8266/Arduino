@@ -22,7 +22,6 @@
 #define ESP_H
 
 #include <Arduino.h>
-#include "umm_malloc/umm_malloc_cfg.h"
 #include "core_esp8266_features.h"
 #include "spi_vendors.h"
 

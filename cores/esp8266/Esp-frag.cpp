@@ -19,7 +19,6 @@
  */
 
 #include "umm_malloc/umm_malloc.h"
-#include "umm_malloc/umm_malloc_cfg.h"
 #include "coredecls.h"
 #include "Esp.h"
 
