@@ -40,7 +40,30 @@ void loop() {
     for (int8_t i = 0; i < scanResult; i++) {
       WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
 
-      Serial.printf(PSTR("  %02d: [CH %02d] [%02X:%02X:%02X:%02X:%02X:%02X] %ddBm %c %c %s\n"), i, channel, bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5], rssi, (encryptionType == ENC_TYPE_NONE) ? ' ' : '*', hidden ? 'H' : 'V', ssid.c_str());
+      // get extra info
+      const struct bss_info *bssInfo = WiFi.getNetworkInfo(i);
+      String phyMode;
+      const char *wps = "";
+      if (bssInfo) {
+        phyMode.reserve(12);
+        phyMode = F("802.11");
+        String slash;
+        if (bssInfo->phy_11b) {
+          phyMode += 'b';
+          slash = '/';
+        }
+        if (bssInfo->phy_11g) {
+          phyMode += slash + 'g';
+          slash = '/';
+        }
+        if (bssInfo->phy_11n) {
+          phyMode += slash + 'n';
+        }
+        if (bssInfo->wps) {
+          wps = PSTR("WPS");
+        }
+      }
+      Serial.printf(PSTR("  %02d: [CH %02d] [%02X:%02X:%02X:%02X:%02X:%02X] %ddBm %c %c %-11s %3S %s\n"), i, channel, bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5], rssi, (encryptionType == ENC_TYPE_NONE) ? ' ' : '*', hidden ? 'H' : 'V', phyMode.c_str(), wps, ssid.c_str());
       yield();
     }
   } else {

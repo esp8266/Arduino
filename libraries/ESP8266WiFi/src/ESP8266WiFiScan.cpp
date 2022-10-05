@@ -147,6 +147,14 @@ void ESP8266WiFiScanClass::scanDelete() {
     _scanComplete = false;
 }
 
+/**
+ * returns const pointer to the requested scanned wifi entry for furthor parsing.
+ * @param networkItem uint8_t
+ * @return struct bss_info*, may be NULL
+ */
+const struct bss_info *ESP8266WiFiScanClass::getNetworkInfo(uint8_t i) {
+    return reinterpret_cast<const struct bss_info*>(_getScanInfoByIndex(i));
+}
 
 /**
  * loads all infos from a scanned wifi in to the ptr parameters
