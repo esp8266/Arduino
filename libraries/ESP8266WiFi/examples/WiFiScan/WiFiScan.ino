@@ -41,7 +41,7 @@ void loop() {
       WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel, hidden);
 
       // get extra info
-      const struct bss_info *bssInfo = WiFi.getNetworkInfo(i);
+      const bss_info *bssInfo = WiFi.getScanInfoByIndex(i);
       String phyMode;
       const char *wps = "";
       if (bssInfo) {
