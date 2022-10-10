@@ -1,0 +1,41 @@
+# We do not distribute any environment settings, so just try to build some sketches
+# using the 'master' branch and using the uploaded toolchain version via get.py
+# Also, limit the amount of sketches and simply 
+
+name: Build examples with PlatformIO
+
+on:
+  pull_request:
+    paths-ignore:
+      - "boards.txt"
+      - "package/**"
+      - "tools/boards.txt.py"
+      - 'doc/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build-pio:
+    name: Linux (random sketches)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - uses: actions/cache@v3
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
+    - name: Build
+      env:
+        ESP8266_ARDUINO_BUILDER: "platformio"
+      run: |
+        pip install -U platformio
+        env ESP8266_ARDUINO_SKETCHES="$(find libraries/ -name '*.ino' | shuf -n 10 -)" bash ./tests/build.sh
