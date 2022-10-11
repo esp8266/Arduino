@@ -146,8 +146,8 @@ if [ ! -z "${DOC_URL}" ]; then
         .packages[0].platforms[0].help.online = \"${DOC_URL}\""
 fi
 
-cat ${srcdir}/package/package_esp8266com_index.template.json | \
-    jq "${jq_arg}" > package_esp8266com_index.json
+jq "${jq_arg}" ${srcdir}/package/package_esp8266com_index.template.json \
+    > package_esp8266com_index.json
 
 # Use Github API token, if available
 curl_gh_token_arg=()

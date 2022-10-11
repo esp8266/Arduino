@@ -207,22 +207,18 @@ ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_dat
 
 Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
 
-Lifely Agrumino Lemon v4
-------------------------
+4D Systems gen4 IoD Range
+-------------------------
 
-Procuct page https://www.lifely.cc
+gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.
 
-This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.
-Power
-Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin
-Libraries and examples
-Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/
-Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource
+2.4", 2.8" and 3.2" TFT LCD with uSD card socket and Resistive Touch. Chip Antenna + uFL Connector.
 
-ESPDuino (ESP-13 Module)
-------------------------
+Datasheet and associated downloads can be found on the 4D Systems product page.
 
-*TODO*
+The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
+
+- Product page: https://4dsystems.com.au/products/iot-display-modules
 
 Adafruit Feather HUZZAH ESP8266
 -------------------------------
@@ -231,26 +227,54 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
-WiFi Kit 8
-----------
+Amperka WiFi Slot
+-----------------
 
-The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Heltec WiFi Kit 8 will automatically recharge a connected battery when USB power is available.
+Product page: http://wiki.amperka.ru/wifi-slot
 
-Product page: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series
+Arduino
+-------
 
-Invent One
-----------
+*TODO*
 
-The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng
+DOIT ESP-Mx DevKit (ESP8285)
+----------------------------
 
-Product page: https://inventone.ng
+DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module (`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 and is active low to turn on. It uses a CH340C, USB to Serial converter chip. 
 
-XinaBox CW01
-------------
+ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
 
-The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.
+Digistump Oak
+-------------
 
-Product page: https://xinabox.cc/products/CW01
+The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.
+
+To make a serial connection, wire the adapter's **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.
+
+To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.
+
+ESPDuino (ESP-13 Module)
+------------------------
+
+*TODO*
+
+ESPectro Core
+-------------
+
+ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.
+
+Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.
+
+More details at https://shop.makestro.com/product/espectrocore/
+
+ESPino (ESP-12 Module)
+----------------------
+
+ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104 USB-Serial bridge and a micro USB connector for easy programming. It is designed for fitting in a breadboard and has an RGB Led and two buttons for easy prototyping.
+
+For more information about the hardware, pinout diagram and programming procedures, please see the `datasheet <https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf>`__.
+
+Product page: http://www.espino.io/en
 
 ESPresso Lite 1.0
 -----------------
@@ -262,15 +286,85 @@ ESPresso Lite 2.0
 
 ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
 
-Phoenix 1.0
------------
+ITEAD Sonoff
+------------
 
-Product page: http://www.espert.co
+ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, and Sonoff S20
 
-Phoenix 2.0
------------
+These are not development boards. The development process is inconvenient with these devices. When flashing firmware you will need a Serial Adapter to connect it to your computer.
 
-Product page: http://www.espert.co
+ | Most of these devices, during normal operation, are connected to *wall power (AKA Mains Electricity)*. **NEVER** try to flash these devices when connected to *wall power*. **ALWAYS** have them disconnected from *wall power* when connecting them to your computer. Your life may depend on it!
+
+When flashing you will need to hold down the push button connected to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB Serial Adapters may supply enough power to handle flashing; however, it many may not supply enough power to handle the activities when the device reboots.
+
+More product details at the bottom of https://www.itead.cc/wiki/Product/
+
+Invent One
+----------
+
+The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng
+
+Product page: https://inventone.ng
+
+LOLIN(WEMOS) D1 R2 & mini
+-------------------------
+
+Product page: https://www.wemos.cc/
+
+LOLIN(WEMOS) D1 mini (clone)
+----------------------------
+
+Clone variant of the LOLIN(WEMOS) D1 mini board,
+with enabled flash-mode menu, DOUT selected by default.
+
+Product page of the preferred official board: https://www.wemos.cc/
+
+LOLIN(WEMOS) D1 mini Lite
+-------------------------
+
+Parameters in Arduino IDE:
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Card: "WEMOS D1 Mini Lite"
+- Flash Size: "1M (512K FS)"
+- CPU Frequency: "80 Mhz"
+
+Power:
+~~~~~~
+
+- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
+- 3V3 pin : 3.3V 500mA regulated output
+- Digital pins : 3.3V 30mA.
+
+links:
+~~~~~~
+
+- Product page: https://www.wemos.cc/
+- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf
+- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf
+- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf
+
+LOLIN(WEMOS) D1 mini Pro
+------------------------
+
+Product page: https://www.wemos.cc/
+
+LOLIN(WeMos) D1 R1
+------------------
+
+Product page: https://www.wemos.cc/
+
+Lifely Agrumino Lemon v4
+------------------------
+
+Procuct page https://www.lifely.cc
+
+This Board "Lifely Agrumino Lemon" is based with WT8266-S1 core with WiFi 2,4Ghz and 2MB of Flash.
+Power
+Micro usb power cable, Lir2450 rechargeable battery (or not rechargeable)or with JST connector in the back board Max 6 Vin
+Libraries and examples
+Download libraries from: Official Arduino Ide, our website https://www.lifely.cc or https://github.com/lifely-cc/
+Full pinout and PDF for setup here https://www.lifely.cc our libraries is OpenSource
 
 NodeMCU 0.9 (ESP-12 Module)
 ---------------------------
@@ -326,6 +420,37 @@ UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, 
 
 You can find the board schematics `here <https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf>`__
 
+Phoenix 1.0
+-----------
+
+Product page: http://www.espert.co
+
+Phoenix 2.0
+-----------
+
+Product page: http://www.espert.co
+
+Schirmilabs Eduino WiFi
+-----------------------
+
+Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
+
+Product page: https://schirmilabs.de/?page_id=165
+
+Seeed Wio Link
+--------------
+
+Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.
+
+Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.
+
+Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html
+
+SparkFun Blynk Board
+--------------------
+
+Product page: https://www.sparkfun.com/products/13794
+
 SparkFun ESP8266 Thing
 ----------------------
 
@@ -336,72 +461,10 @@ SparkFun ESP8266 Thing Dev
 
 Product page: https://www.sparkfun.com/products/13711
 
-SparkFun Blynk Board
---------------------
-
-Product page: https://www.sparkfun.com/products/13794
-
 SweetPea ESP-210
 ----------------
 
 *TODO*
-
-LOLIN(WEMOS) D1 R2 & mini
--------------------------
-
-Product page: https://www.wemos.cc/
-
-LOLIN(WEMOS) D1 mini (clone)
-----------------------------
-
-Clone variant of the LOLIN(WEMOS) D1 mini board,
-with enabled flash-mode menu, DOUT selected by default.
-
-Product page of the preferred official board: https://www.wemos.cc/
-
-LOLIN(WEMOS) D1 mini Pro
-------------------------
-
-Product page: https://www.wemos.cc/
-
-LOLIN(WEMOS) D1 mini Lite
--------------------------
-
-Parameters in Arduino IDE:
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- Card: "WEMOS D1 Mini Lite"
-- Flash Size: "1M (512K FS)"
-- CPU Frequency: "80 Mhz"
-
-Power:
-~~~~~~
-
-- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
-- 3V3 pin : 3.3V 500mA regulated output
-- Digital pins : 3.3V 30mA.
-
-links:
-~~~~~~
-
-- Product page: https://www.wemos.cc/
-- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf
-- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf
-- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf
-
-LOLIN(WeMos) D1 R1
-------------------
-
-Product page: https://www.wemos.cc/
-
-ESPino (ESP-12 Module)
-----------------------
-
-ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104 USB-Serial bridge and a micro USB connector for easy programming. It is designed for fitting in a breadboard and has an RGB Led and two buttons for easy prototyping.
-
-For more information about the hardware, pinout diagram and programming procedures, please see the `datasheet <https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf>`__.
-
-Product page: http://www.espino.io/en
 
 ThaiEasyElec's ESPino
 ---------------------
@@ -417,6 +480,18 @@ http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_Dimension.pdf
 - Pinouts:
 http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_User\_Manual\_TH\_v1\_0\_20160204.pdf (Please see pg. 8)
 
+WiFi Kit 8
+----------
+
+The Heltec WiFi Kit 8 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Heltec WiFi Kit 8 will automatically recharge a connected battery when USB power is available.
+
+Product page: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series
+
+WiFiduino
+---------
+
+Product page: https://wifiduino.com/esp8266
+
 WifInfo
 -------
 
@@ -424,85 +499,10 @@ WifInfo integrates the ESP-12 or ESP-07+Ext antenna module with a 3.3v regulator
 
 For more information, please see WifInfo related `blog <http://hallard.me/category/wifinfo/>`__ entries, `github <https://github.com/hallard/WifInfo>`__ and `community <https://community.hallard.me/category/16/wifinfo>`__ forum.
 
-Arduino
--------
-
-*TODO*
-
-4D Systems gen4 IoD Range
--------------------------
-
-gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.
-
-2.4", 2.8" and 3.2" TFT LCD with uSD card socket and Resistive Touch. Chip Antenna + uFL Connector.
-
-Datasheet and associated downloads can be found on the 4D Systems product page.
-
-The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
-
-- Product page: https://4dsystems.com.au/products/iot-display-modules
-
-Digistump Oak
--------------
-
-The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.
-
-To make a serial connection, wire the adapter's **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.
-
-To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.
-
-WiFiduino
----------
-
-Product page: https://wifiduino.com/esp8266
-
-Amperka WiFi Slot
------------------
-
-Product page: http://wiki.amperka.ru/wifi-slot
-
-Seeed Wio Link
---------------
-
-Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.
-
-Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.
-
-Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html
-
-ESPectro Core
--------------
-
-ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.
-
-Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.
-
-More details at https://shop.makestro.com/product/espectrocore/
-
-Schirmilabs Eduino WiFi
------------------------
-
-Eduino WiFi is an Arduino-compatible DIY WiFi development board using an ESP-12 module
-
-Product page: https://schirmilabs.de/?page_id=165
-
-ITEAD Sonoff
+XinaBox CW01
 ------------
 
-ESP8266 based devices from ITEAD: Sonoff SV, Sonoff TH, Sonoff Basic, and Sonoff S20
+The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.
 
-These are not development boards. The development process is inconvenient with these devices. When flashing firmware you will need a Serial Adapter to connect it to your computer.
-
- | Most of these devices, during normal operation, are connected to *wall power (AKA Mains Electricity)*. **NEVER** try to flash these devices when connected to *wall power*. **ALWAYS** have them disconnected from *wall power* when connecting them to your computer. Your life may depend on it!
-
-When flashing you will need to hold down the push button connected to the GPIO0 pin, while powering up with a safe 3.3 Volt source. Some USB Serial Adapters may supply enough power to handle flashing; however, it many may not supply enough power to handle the activities when the device reboots.
-
-More product details at the bottom of https://www.itead.cc/wiki/Product/
-
-DOIT ESP-Mx DevKit (ESP8285)
-----------------------------
-
-DOIT ESP-Mx DevKit - This is a development board by DOIT, with a DOIT ESP-Mx module (`datasheet <https://github.com/SmartArduino/SZDOITWiKi/wiki/ESP8285---ESP-M2>`__) using a ESP8285 Chip. With the DOIT ESP-Mx module, GPIO pins 9 and 10 are not available. The DOIT ESP-Mx DevKit board has a red power LED and a blue LED connected to GPIO16 and is active low to turn on. It uses a CH340C, USB to Serial converter chip. 
-
-ESP8285 (`datasheet <http://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf>`__) is a multi-chip package which contains ESP8266 and 1MB flash. 
+Product page: https://xinabox.cc/products/CW01
 

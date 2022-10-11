@@ -19,24 +19,22 @@ available in the IDE menu.
 How can I run the script ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python needs to be installed on your system.
-
-The script is located in the ``tools`` subdirectory of the core's root installation.
-It needs to be run from the root directory,
+Python needs to be installed on your system.  Either call the script directly, or use specific `python` binary.
+Running without any parameters will show a command line help.
 
 ::
 
-    $ tools/boards.txt.py
+    $ python tools/boards.txt.py
+    $ py -3 tools/boards.txt.py
 
-::
 
-    C:\...> tools\boards.txt.py
-    C:\...> python tools\boards.txt.py
+The Core location depends on your environment.  For example, using Windows:
 
-Running without parameters will show the command line help.  They are
-generally self-explanatory.  Running with the parameters will show no output but will generate a new boards.txt file (and a backup boards.txt.orig).
+* for Arduino IDE git installation, it is %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266\
 
-The core root directory varies depending on your development environment.  In Windows, core root is found under your home directory; for Arduino it is in AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.4.2\ for PlatformIO it is in .platformio\packages\framework-arduinoespressif8266.
+* for Arduino IDE boards manager installation, it is usually %LOCALAPPDATA%\Arduino15\packages\esp8266\hardware\esp8266\VERSION\
+
+* for PlatformIO, it is either %USERPROFILE%\.platformio\packages\framework-arduinoespressif8266 or C:\.platformio
 
 
 What can I do with it ?
@@ -50,9 +48,9 @@ As of today you can:
 
 * increase available flash space by disabling floats in ``*printf`` functions
 
-* change led pin ``LED_BUILTIN`` for the two generic boards
+* change led pin ``LED_BUILTIN`` for the generic boards
 
-* create an abridged boards.txt file
+* re-create boards.txt file with a different set of boards, or create a boards.local.txt
 
 
 When do I need to mess with it ?
@@ -65,7 +63,7 @@ when possible.  It needs to be edited for:
   board (definition, description) can be updated or added to the existing
   list.
 
-* Memory mapping for ldscripts (flash and spiffs size combinations)
+* Memory mapping for ldscripts (flash and filesystem size combinations)
 
 
 Why is my pull-request failing continuous-integration ?
@@ -75,64 +73,58 @@ The generator is able to update a number of files (see list in help), and
 global coherency can be checked by the continuous integration facilities.
 
 After a modification in the generator, it is **mandatory** to regenerate all
-files (option ``--allgen``) and add them in the pull-request.
+files and include them in the pull-request.
+
+::
+
+    ./tools/boards.txt.py generate --all
+    git add -u -p
+    git commit
 
 
 How to create an abridged boards.txt file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The list of boards presented by the IDE has gotten quite long. You can reduce
-the ESP8266 boards shown by the IDE to a favorites list. This can
-be done by generating a new boards.txt file using the ``--filter <file>``
-option.
+the number of ESP8266 boards used in the IDE with a favorites list. This can
+be done by generating a new boards.txt file using the ``--include <file>``
+or ``--exclude <file>`` options.
 
 Start by getting a current list of boards supported by boards.txt.py.
 This command will write a list of supported board names to favorites.txt.
 
 ::
 
-    ./tools/boards.txt.py --boardnames >favorites.txt
+    ./tools/boards.txt.py names > favorites.txt
 
-Edit favorites.txt, keeping the name of the boards you want generated in
-boards.txt.
+Edit favorites.txt, keeping only the names you want to keep.
 
 to generate a new abridged boards.txt run:
 
 ::
 
-   ./tools/boards.txt.py --boardsgen --filter favorites.txt
+   ./tools/boards.txt.py --include favorites.txt generate --boards
 
 
-You can turn the process around by creating a list of boards, you do not want
-to be generated. To do this we use the ``--xfilter <file>`` option.
-
-to generate this abridged boards.txt run:
-
-::
-
-    ./tools/boards.txt.py --boardsgen --xfilter favorites.txt
-
-
-Yet another option, you can split the boards between boards.txt and
-boards.local.txt.
-
-The commands below will generate a boards.txt file that omits the boards named
-in favorites.txt, and generates a boards.local.txt ( via option ``--boardslocalgen`` ) that only contains boards
+The commands below will overwrite the boards.txt file and omit every board named
+in favorites.txt, and the next one will generate a boards.local.txt that only contains boards
 named in favorites.txt.
 
 ::
 
-    ./tools/boards.txt.py --boardsgen --xfilter favorites.txt
-    ./tools/boards.txt.py --boardslocalgen --filter favorites.txt
+    ./tools/boards.txt.py --exclude favorites.txt generate --boards
+    ./tools/boards.txt.py --include favorites.txt generate --boards --boards-file boards.local.txt
 
 Additional Notes:
 
-1. The boards.txt file will always contain the generic and esp8285 boards.
+1. Arduino IDE requires at least one board to be specified in boards.txt.
 
-2. If boards.txt file exist and no backup copy named boards.txt.orig exist, the current boards.txt will be renamed to boards.txt.orig. Otherwise, the existing boards.txt is over-written when you generate a new boards.txt file. Similar behavior for when generating a new boards.local.txt.
+2. Using filtering you could omit our default boards - ``generic`` and ``esp8285``.
 
-3. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--filter <file>``.
+3. By default, generators will overwrite existing files. Use ``--output=stdout`` to redirect output to console.
 
-4. It is outside the scope of this document, but you could manually edit any boards.txt file to have fewer boards. One last observation, the Arduino IDE appears to need at least one board in a board.txt file.
+4. Use ``--output=file-with-orig`` to preserve existing files as ``<filename>.orig``.
+
+5. The boards in the boards.txt file will be in the order they were listed in your favorites file, specified by option ``--include <file>``. By default, boards are sorted alphabetically.
 
 `FAQ list :back: <readme.rst>`__
