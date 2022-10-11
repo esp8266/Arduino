@@ -114,11 +114,12 @@ class EspClass {
         static uint32_t getChipId();
 
         static uint32_t getFreeHeap();
+#if defined(UMM_INFO)
         static uint32_t getMaxFreeBlockSize();
         static uint8_t getHeapFragmentation(); // in %
         static void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr) __attribute__((deprecated("Use 'uint32_t*' on max, 2nd argument")));
         static void getHeapStats(uint32_t* free = nullptr, uint32_t* max = nullptr, uint8_t* frag = nullptr);
-
+#endif
         static uint32_t getFreeContStack();
         static void resetFreeContStack();
 

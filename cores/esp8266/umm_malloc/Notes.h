@@ -276,4 +276,70 @@ Enhancement ideas:
   #endif
   ```
 */
+
+/*
+  Sep 26, 2022
+
+  History/Overview
+
+  ESP.getFreeHeap() needs a function it can call for free Heap size. The legacy
+  method was the SDK function `system_get_free_heap_size()` which is in IRAM.
+
+  `system_get_free_heap_size()` calls `xPortGetFreeHeapSize()` to get free heap
+  size. Our old legacy implementation used umm_info(), employing a
+  time-consuming method for getting free Heap size and runs with interrupts
+  blocked.
+
+  Later we used a distributed method that maintained the free heap size with
+  each malloc API call that changed the Heap. (enabled by build option UMM_STATS
+  or UMM_STATS_FULL) We used an internally function `umm_free_heap_size_lw()` to
+  report free heap size. We satisfied the requirements for
+  `xPortGetFreeHeapSize()` with an alias to `umm_free_heap_size_lw()`
+  in replacement for the legacy umm_info() call wrapper.
+
+  The upstream umm_malloc later implemented a similar method enabled by build
+  option UMM_INLINE_METRICS and introduced the function `umm_free_heap_size()`.
+
+  The NONOS SDK alloc request must use the DRAM Heap. Need to Ensure DRAM Heap
+  results when multiple Heap support is enabled. Since the SDK uses portable
+  malloc calls pvPortMalloc, ... we leveraged that for a solution - force
+  pvPortMalloc, ... APIs to serve DRAM only.
+
+  In an oversight, `xPortGetFreeHeapSize()` was left reporting the results for
+  the current heap selection via `umm_free_heap_size_lw()`. Thus, if an SDK
+  function like os_printf_plus were called when the current heap selection was
+  IRAM, it would get the results for the IRAM Heap. Then would receive DRAM with
+  an alloc request. However, when the free IRAM size is too small, it would
+  skip the Heap alloc request and use stack space.
+
+  Solution
+
+  The resolution is to rely on build UMM_STATS(default) or UMM_STATS_FULL for
+  free heap size information. When not available in the build, fallback to the
+  upstream umm_malloc's `umm_free_heap_size()` and require the build option
+  UMM_INLINE_METRICS. Otherwise, fail the build.
+
+  Use function name `umm_free_heap_size_lw()` to support external request for
+  current heap size. When build options result in fallback using umm_info.c,
+  ensure UMM_INLINE_METRICS enabled and alias to `umm_free_heap_size()`.
+
+  For the multiple Heap case, `xPortGetFreeHeapSize()` becomes a unique function
+  and reports only DRAM free heap size. Now `system_get_free_heap_size()` will
+  always report DRAM free Heap size. This might be a breaking change.
+
+  Specifics:
+
+  * Support `umm_free_heap_size_lw()` as an `extern`.
+
+  * When the build options UMM_STATS/UMM_STATS_FULL are not used, fallback to
+    the upstream umm_malloc's `umm_free_heap_size()` function in umm_info.c
+      * require the UMM_INLINE_METRICS build option.
+      * assign `umm_free_heap_size_lw()` as an alias to `umm_free_heap_size()`
+
+  * `xPortGetFreeHeapSize()`
+      * For single heap builds, alias to `umm_free_heap_size_lw()`
+      * For multiple Heaps builds, add a dedicated function that always reports
+        DRAM results.
+
+*/
 #endif
