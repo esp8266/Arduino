@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e -E -o pipefail
+set -u -e -E -o pipefail
 
 cache_dir=$(mktemp -d)
 trap 'trap_exit' EXIT
