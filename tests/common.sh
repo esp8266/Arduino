@@ -70,9 +70,13 @@ function skip_sketch()
     fi
 }
 
+function print_size_info_header()
+{
+    printf "%-28s %-8s %-8s %-8s %-8s %-10s %-8s %-8s\n" sketch data rodata bss text irom0.text dram flash
+}
+
 function print_size_info()
 {
-    local elf_file=$1
     local awk_script='
 /^\.data/ || /^\.rodata/ || /^\.bss/ || /^\.text/ || /^\.irom0\.text/{
     size[$1] = $2
@@ -88,12 +92,7 @@ END {
             total_ram, total_flash
 }
 '
-
-    if [ -z "$elf_file" ]; then
-        printf "%-28s %-8s %-8s %-8s %-8s %-10s %-8s %-8s\n" sketch data rodata bss text irom0.text dram flash
-        return 0
-    fi
-
+    local elf_file=$1
     local elf_name
     elf_name=$(basename $elf_file)
     xtensa-lx106-elf-size --format=sysv "$elf_file" | \
@@ -124,10 +123,9 @@ function build_sketches()
 " --library_path $library_path"\
 " --lwIP $lwip"\
 " --board_name generic --verbose --warnings all"\
-" --flash_size 4M1M --keep"\
-" $build_arg"
+" --flash_size 4M1M --keep"
 
-    print_size_info >"$cache_dir"/size.log
+    print_size_info_header >"$cache_dir"/size.log
 
     local mk_clean_core=1
     local testcnt=0
@@ -296,8 +294,6 @@ function install_ide()
 
     local ide_path=$1
     local hardware_path=$2
-    local core_path=$3
-    local debug=$4
 
     mkdir -p ${core_path}/tools/dist
     pushd ${core_path}/tools/dist
@@ -323,6 +319,13 @@ function install_ide()
 
     mv arduino-distrib "$ide_path"
     popd
+}
+
+function install_core()
+{
+    local core_path=$1
+    local hardware_path=$2
+    local debug=$3
 
     pushd "${core_path}"
 
@@ -355,25 +358,30 @@ function install_ide()
     popd
     popd
 
-    mkdir -p "$hardware_path"/esp8266com
-    pushd "$hardware_path"/esp8266com
     if [ "${RUNNER_OS-}" = "Windows" ]; then
-        test -d esp8266 && rm -rf esp8266
-        cp -a "$core_path" ./esp8266
+        local hardwaredir
+        hardwaredir=$(dirname "$hardware_path")
+        mkdir -p $(dirname "$hardware_dir")
+        cp -a "$core_path" "${hardwaredir}/esp8266"
     else
-        test -L esp8266 && rm esp8266
-        ln -s "$core_path" ./esp8266
+        ln -s "$core_path" "$hardware_path"
     fi
-    popd
 }
 
 function install_arduino()
 {
-    local debug=$1
     echo ::group::Install arduino
-    test -d "$ESP8266_ARDUINO_IDE" || \
-        install_ide "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_BUILD_DIR" "$debug"
+    local debug=$1
+
+    test -d "$ESP8266_ARDUINO_IDE" \
+        || install_ide "$ESP8266_ARDUINO_IDE"
+
+    local hardware_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
+    test -d "$hardware_path" \
+        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_path" "$debug"
+
     install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
+
     echo ::endgroup::
 }
 
