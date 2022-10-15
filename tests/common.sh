@@ -293,7 +293,6 @@ function install_ide()
     echo "Arduino IDE ${idever}"
 
     local ide_path=$1
-    local hardware_path=$2
 
     mkdir -p ${core_path}/tools/dist
     pushd ${core_path}/tools/dist
@@ -324,7 +323,7 @@ function install_ide()
 function install_core()
 {
     local core_path=$1
-    local hardware_path=$2
+    local hardware_core_path=$2
     local debug=$3
 
     pushd "${core_path}"
@@ -359,12 +358,12 @@ function install_core()
     popd
 
     if [ "${RUNNER_OS-}" = "Windows" ]; then
-        local hardwaredir
-        hardwaredir=$(dirname "$hardware_path")
-        mkdir -p $(dirname "$hardware_dir")
-        cp -a "$core_path" "${hardwaredir}/esp8266"
+        local core_dir
+        core_dir=$(dirname "$hardware_core_path")
+        mkdir -p $(dirname "$core_dir")
+        cp -a "$core_path" "${core_dir}/esp8266"
     else
-        ln -s "$core_path" "$hardware_path"
+        ln -s "$core_path" "$hardware_core_path"
     fi
 }
 
@@ -376,9 +375,9 @@ function install_arduino()
     test -d "$ESP8266_ARDUINO_IDE" \
         || install_ide "$ESP8266_ARDUINO_IDE"
 
-    local hardware_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
-    test -d "$hardware_path" \
-        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_path" "$debug"
+    local hardware_core_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
+    test -d "$hardware_core_path" \
+        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path" "$debug"
 
     install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
 
