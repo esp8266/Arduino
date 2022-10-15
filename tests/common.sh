@@ -7,6 +7,7 @@ trap 'trap_exit' EXIT
 
 function trap_exit()
 {
+    # workaround for macOS shipping with broken bash
     local exit_code=$?
     if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
@@ -368,10 +369,11 @@ function install_core()
     popd
     popd
 
+    local core_dir
+    core_dir=$(dirname "$hardware_core_path")
+    mkdir -p $(dirname "$core_dir")
+
     if [ "${RUNNER_OS-}" = "Windows" ]; then
-        local core_dir
-        core_dir=$(dirname "$hardware_core_path")
-        mkdir -p $(dirname "$core_dir")
         cp -a "$core_path" "${core_dir}/esp8266"
     else
         ln -s "$core_path" "$hardware_core_path"
