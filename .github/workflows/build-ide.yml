@@ -50,7 +50,6 @@ jobs:
   # Just try to build at least one sketch, since we spend so much time with the matrix above
   
   build-windows:
-    if: 0
     name: Windows
     runs-on: windows-latest
     steps:
