@@ -230,7 +230,17 @@ function check_hash()
     local file=$1
     local hash=$2
 
-    echo "$hash  $file" | sha512sum -c -
+    local shasum
+    case ${RUNNER_OS-} in
+    "macOS")
+        shasum="shasum -p -a 512"
+        ;;
+    *)
+        shasum="sha512sum"
+        ;;
+    esac
+
+    echo "$hash  $file" | $shasum -c -
 }
 
 function fetch_and_unpack()
