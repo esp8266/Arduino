@@ -12,13 +12,13 @@ function trap_exit()
     fi
 }
 
-# ref. https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
-function github_step_summary()
+function step_summary()
 {
     local header=$1
     local contents=$2
 
-    if [ -n "${CI-}" ]; then
+    # ref. https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
+    if [ -n "${GITHUB_STEP_SUMMARY-}" ]; then
         { echo "# $header"; echo '```console'; cat "$contents"; echo '```'; } \
             >> $GITHUB_STEP_SUMMARY
     else
@@ -215,7 +215,7 @@ function build_sketches()
             return $result
         else
             grep -s -c warning: "$cache_dir"/build.log \
-                && github_step_summary "$sketch warnings" "$cache_dir/build.log"
+                && step_summary "$sketch warnings" "$cache_dir/build.log"
         fi
 
         print_size_info $build_dir/*.elf >>$cache_dir/size.log
@@ -321,7 +321,6 @@ function install_ide()
         mv arduino-$idever arduino-distrib
     fi
 
-    rm -rf "$ide_path"
     mv arduino-distrib "$ide_path"
     popd
 
@@ -372,7 +371,8 @@ function install_arduino()
 {
     local debug=$1
     echo ::group::Install arduino
-    install_ide "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_BUILD_DIR" "$debug"
+    test -d "$ESP8266_ARDUINO_IDE" || \
+        install_ide "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_BUILD_DIR" "$debug"
     install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
     echo ::endgroup::
 }
@@ -398,7 +398,7 @@ function build_sketches_with_arduino()
     lwip=$(arduino_lwip_menu_option $3)
 
     build_sketches "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_LIBRARIES" "$build_mod" "$build_rem" "$lwip"
-    github_step_summary "Size report" "$cache_dir/size.log"
+    step_summary "Size report" "$cache_dir/size.log"
 }
 
 function install_platformio()
