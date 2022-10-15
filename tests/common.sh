@@ -371,7 +371,7 @@ function install_core()
 
     local core_dir
     core_dir=$(dirname "$hardware_core_path")
-    mkdir -p $(dirname "$core_dir")
+    mkdir -p "$core_dir"
 
     if [ "${RUNNER_OS-}" = "Windows" ]; then
         cp -a "$core_path" "${core_dir}/esp8266"
