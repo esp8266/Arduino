@@ -32,8 +32,9 @@ jobs:
       with:
         path: |
           tools/dist
+          ~/.cache/pip
           ~/.platformio/.cache
-        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
     - name: Build
       env:
         ESP8266_ARDUINO_BUILDER: "platformio"
