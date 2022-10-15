@@ -95,21 +95,24 @@ END {
             total_ram, total_flash
 }
 '
-    local elf_file=$1
+    local size=$1
+    local elf_file=$2
+
     local elf_name
     elf_name=$(basename $elf_file)
-    xtensa-lx106-elf-size --format=sysv "$elf_file" | \
+    $size --format=sysv "$elf_file" | \
         awk -v sketch_name="${elf_name%.*}" "$awk_script" -
 }
 
 function build_sketches()
 {
-    local ide_path=$1
-    local hardware_path=$2
-    local library_path=$3
-    local build_mod=$4
-    local build_rem=$5
-    local lwip=$6
+    local core_path=$1
+    local ide_path=$2
+    local hardware_path=$3
+    local library_path=$4
+    local build_mod=$5
+    local build_rem=$6
+    local lwip=$7
 
     local build_dir="$cache_dir"/build
     mkdir -p "$build_dir"
@@ -219,7 +222,8 @@ function build_sketches()
                 && step_summary "$sketch warnings" "$cache_dir/build.log"
         fi
 
-        print_size_info $build_dir/*.elf >>$cache_dir/size.log
+        print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
+            $build_dir/*.elf >>$cache_dir/size.log
 
         echo ::endgroup::
     done
@@ -360,13 +364,6 @@ function install_core()
 
     pushd tools
     python3 get.py -q
-    if [ "${RUNNER_OS-}" = "Windows" ]; then
-        # Because the symlinks don't work well under Win32, we need to add the path to this copy, not the original...
-        relbin=$(realpath "$PWD"/xtensa-lx106-elf/bin)
-        export PATH="$ide_path:$relbin:$PATH"
-    else
-        export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
-    fi
 
     popd
     popd
@@ -418,7 +415,11 @@ function build_sketches_with_arduino()
     local lwip
     lwip=$(arduino_lwip_menu_option $3)
 
-    build_sketches "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_LIBRARIES" "$build_mod" "$build_rem" "$lwip"
+    build_sketches "$ESP8266_ARDUINO_BUILD_DIR" \
+        "$ESP8266_ARDUINO_IDE" \
+        "$ESP8266_ARDUINO_HARDWARE" \
+        "$ESP8266_ARDUINO_LIBRARIES" \
+        "$build_mod" "$build_rem" "$lwip"
     step_summary "Size report" "$cache_dir/size.log"
 }
 
