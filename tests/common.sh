@@ -292,7 +292,8 @@ function install_ide()
 
     echo "Arduino IDE ${idever}"
 
-    local ide_path=$1
+    local core_path=$1
+    local ide_path=$2
 
     mkdir -p ${core_path}/tools/dist
     pushd ${core_path}/tools/dist
@@ -373,7 +374,7 @@ function install_arduino()
     local debug=$1
 
     test -d "$ESP8266_ARDUINO_IDE" \
-        || install_ide "$ESP8266_ARDUINO_IDE"
+        || install_ide "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_IDE"
 
     local hardware_core_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
     test -d "$hardware_core_path" \

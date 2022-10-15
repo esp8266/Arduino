@@ -18,6 +18,7 @@ jobs:
   # Examples are built in parallel to avoid CI total job time limitation
 
   build-linux:
+    if: 0
     name: Linux - LwIP ${{ matrix.lwip }} (${{ matrix.chunk }})
     runs-on: ubuntu-latest
     defaults:
@@ -49,6 +50,7 @@ jobs:
   # Just try to build at least one sketch, since we spend so much time with the matrix above
   
   build-windows:
+    if: 0
     name: Windows
     runs-on: windows-latest
     steps:
