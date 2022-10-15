@@ -281,6 +281,7 @@ function install_library()
     local url=$5
 
     fetch_and_unpack "$archive" "$hash" "$url"
+    mkdir -p "$lib_path"
     rm -rf "$lib_path/$name"
     mv "$name" "$lib_path/$name"
 }
@@ -290,8 +291,8 @@ function install_libraries()
     local core_path=$1
     local lib_path=$2
 
-    mkdir -p ${core_path}/tools/dist
-    pushd ${core_path}/tools/dist
+    mkdir -p "$core_path"/tools/dist
+    pushd "$core_path"/tools/dist
 
     install_library "$lib_path" \
         "ArduinoJson" \
