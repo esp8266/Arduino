@@ -18,7 +18,6 @@ jobs:
   # Examples are built in parallel to avoid CI total job time limitation
 
   build-linux:
-    if: 0
     name: Linux - LwIP ${{ matrix.lwip }} (${{ matrix.chunk }})
     runs-on: ubuntu-latest
     defaults:

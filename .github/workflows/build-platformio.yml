@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   build-pio:
-    if: 0
     name: Linux (random sketches)
     runs-on: ubuntu-latest
     defaults:
