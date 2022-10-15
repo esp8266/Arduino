@@ -7,9 +7,12 @@ trap 'trap_exit' EXIT
 
 function trap_exit()
 {
+    local exit_code=$?
     if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
     fi
+
+    exit $exit_code
 }
 
 function step_summary()
