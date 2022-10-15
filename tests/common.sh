@@ -233,7 +233,7 @@ function check_hash()
     local shasum
     case ${RUNNER_OS-} in
     "macOS")
-        shasum="shasum -p -a 512"
+        shasum="shasum -a 512"
         ;;
     *)
         shasum="sha512sum"
