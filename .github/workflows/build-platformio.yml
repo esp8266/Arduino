@@ -8,7 +8,6 @@ on:
   pull_request:
     paths-ignore:
       - "boards.txt"
-      - "package/**"
       - "tools/boards.txt.py"
       - 'doc/**'
 
@@ -31,7 +30,9 @@ jobs:
         python-version: '3.x'
     - uses: actions/cache@v3
       with:
-        path: ./tools/dist
+        path: |
+          tools/dist
+          ~/.platformio/.cache
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh') }}
     - name: Build
       env:

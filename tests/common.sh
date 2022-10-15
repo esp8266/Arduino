@@ -7,7 +7,7 @@ trap 'trap_exit' EXIT
 
 function trap_exit()
 {
-    if [ -z "$ESP8266_ARDUINO_PRESERVE_CACHE" ]; then
+    if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
     fi
 }
@@ -18,7 +18,7 @@ function github_step_summary()
     local header=$1
     local contents=$2
 
-    if [ -n "$CI" ]; then
+    if [ -n "${CI-}" ]; then
         { echo "# $header"; echo '```console'; cat "$contents"; echo '```'; } \
             >> $GITHUB_STEP_SUMMARY
     else
@@ -224,11 +224,28 @@ function build_sketches()
     done
 }
 
-function fetch_and_unpack() {
-    local archive=$1
-    local url=$2
+function check_hash()
+{
+    local file=$1
+    local hash=$2
 
-    test -r "$archive" || curl --output "$archive" --location "$url"
+    echo "$hash  $file" | sha512sum -c -
+}
+
+function fetch_and_unpack()
+{
+    local archive=$1
+    local hash=$2
+    local url=$3
+
+    test -r "$archive" \
+        && check_hash "$archive" "$hash" \
+        || { pushd "$cache_dir"
+             curl --output "$archive" --location "$url";
+             check_hash "$archive" "$hash";
+             popd;
+             mv "$cache_dir/$archive" ./"$archive"; }
+
     case $archive in
     *".zip")
         unzip -q "$archive"
@@ -239,21 +256,40 @@ function fetch_and_unpack() {
     esac
 }
 
+function install_library()
+{
+    local lib_path=$1
+    local name=$2
+    local archive=$3
+    local hash=$4
+    local url=$5
+
+    fetch_and_unpack "$archive" "$hash" "$url"
+    rm -rf "$lib_path/$name"
+    mv "$name" "$lib_path/$name"
+}
+
 function install_libraries()
 {
-    mkdir -p "$ESP8266_ARDUINO_LIBRARIES"
-    pushd "$ESP8266_ARDUINO_LIBRARIES"
+    local core_path=$1
+    local lib_path=$2
 
-    fetch_and_unpack "ArduinoJson-v6.11.0.zip" \
-        "https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.0/ArduinoJson-v6.11.0.zip"
+    mkdir -p ${core_path}/tools/dist
+    pushd ${core_path}/tools/dist
+
+    install_library "$lib_path" \
+        "ArduinoJson" \
+        "ArduinoJson-v6.11.5.zip" \
+        "8b836c862e69e60c4357a5ed7cbcf1310a3bb1c6bd284fe028faaa3d9d7eed319d10febc8a6a3e06040d1c73aaba5ca487aeffe87ae9388dc4ae1677a64d602c" \
+        "https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.5/ArduinoJson-v6.11.5.zip"
 
     popd
 }
 
 function install_ide()
 {
-    # notice that this is 1.8.x, not 2.x.x
-    local idever='nightly'
+    # TODO replace ide distribution + arduino-builder with arduino-cli
+    local idever='1.8.19'
     local ideurl="https://downloads.arduino.cc/arduino-$idever"
 
     echo "Arduino IDE ${idever}"
@@ -266,20 +302,27 @@ function install_ide()
     mkdir -p ${core_path}/tools/dist
     pushd ${core_path}/tools/dist
 
-    if [ "$RUNNER_OS" = "Windows" ]; then
-        fetch_and_unpack "arduino-windows.zip" "${ideurl}-windows.zip"
+    if [ "${RUNNER_OS-}" = "Windows" ]; then
+        fetch_and_unpack "arduino-windows.zip" \
+            "c4072d808aea3848bceff5772f9d1e56a0fde02366b5aa523d10975c54eee2ca8def25ee466abbc88995aa323d475065ad8eb30bf35a2aaf07f9473f9168e2da" \
+            "${ideurl}-windows.zip"
         mv arduino-$idever arduino-distrib
-    elif [ "$RUNNER_OS" = "macOS" ]; then
-        fetch_and_unpack "arduino-macos.zip" "${ideurl}-macosx.zip"
+    elif [ "${RUNNER_OS-}" = "macOS" ]; then
+        fetch_and_unpack "arduino-macos.zip" \
+            "053b0c1e70da9176680264e40fcb9502f45ca5a879aeb8b6f71282b38bfdb87c63ebc6b88e35ea70a73720ad439d828cc8cb110e4c6ab07357126a36ee396325" \
+            "${ideurl}-macosx.zip"
         # Hack to place arduino-builder in the same spot as sane OSes
         mv Arduino.app arduino-distrib
         mv arduino-distrib/Contents/Java/* arduino-distrib/.
     else
-        fetch_and_unpack "arduino-linux.tar.xz" "${ideurl}-linux64.tar.xz"
+        fetch_and_unpack "arduino-linux.tar.xz" \
+            "9328abf8778200019ed40d4fc0e6afb03a4cee8baaffbcea7dd3626477e14243f779eaa946c809fb153a542bf2ed60cf11a5f135c91ecccb1243c1387be95328" \
+            "${ideurl}-linux64.tar.xz"
         mv arduino-$idever arduino-distrib
     fi
 
-    mv arduino-distrib $ide_path
+    rm -rf "$ide_path"
+    mv arduino-distrib "$ide_path"
     popd
 
     pushd "${core_path}"
@@ -302,7 +345,7 @@ function install_ide()
 
     pushd tools
     python3 get.py -q
-    if [ "$RUNNER_OS" = "Windows" ]; then
+    if [ "${RUNNER_OS-}" = "Windows" ]; then
         # Because the symlinks don't work well under Win32, we need to add the path to this copy, not the original...
         relbin=$(realpath "$PWD"/xtensa-lx106-elf/bin)
         export PATH="$ide_path:$relbin:$PATH"
@@ -315,10 +358,12 @@ function install_ide()
 
     mkdir -p "$hardware_path"/esp8266com
     pushd "$hardware_path"/esp8266com
-    if [ "$RUNNER_OS" = "Windows" ]; then
-        cp -a "$core_path" esp8266
+    if [ "${RUNNER_OS-}" = "Windows" ]; then
+        test -d esp8266 && rm -rf esp8266
+        cp -a "$core_path" ./esp8266
     else
-        ln -s "$core_path" esp8266
+        test -L esp8266 && rm esp8266
+        ln -s "$core_path" ./esp8266
     fi
     popd
 }
@@ -327,14 +372,13 @@ function install_arduino()
 {
     local debug=$1
     echo ::group::Install arduino
-    pushd $ESP8266_ARDUINO_BUILD_DIR
     install_ide "$ESP8266_ARDUINO_IDE" "$ESP8266_ARDUINO_HARDWARE" "$ESP8266_ARDUINO_BUILD_DIR" "$debug"
-    install_libraries
-    popd
+    install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
     echo ::endgroup::
 }
 
-function arduino_lwip_menu_option() {
+function arduino_lwip_menu_option()
+{
     case $1 in
     "default")
         echo "lm2f"
@@ -441,7 +485,7 @@ function build_sketches_with_platformio()
     done
 }
 
-if [ -z "$ESP8266_ARDUINO_BUILD_DIR" ]; then
+if [ -z "${ESP8266_ARDUINO_BUILD_DIR-}" ]; then
     ESP8266_ARDUINO_BUILD_DIR=$(git rev-parse --show-toplevel)
     echo "Using ESP8266_ARDUINO_BUILD_DIR=$ESP8266_ARDUINO_BUILD_DIR"
 fi
