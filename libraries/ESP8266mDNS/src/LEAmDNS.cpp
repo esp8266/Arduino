@@ -92,7 +92,7 @@ namespace MDNSImplementation
         if (bResult && !m_bLwipCb)
         {
             bool bCallback = LwipIntf::statusChangeCB(
-                [this](netif* pNetIf)
+                [this](netif*)
                 {
                     if (m_bRestarting)
                     {
