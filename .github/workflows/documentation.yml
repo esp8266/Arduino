@@ -4,8 +4,6 @@ name: Documentation
 
 on:
   pull_request:
-    paths:
-      - 'doc/**'
 
 permissions:
   contents: read
