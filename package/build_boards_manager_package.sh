@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 if [ ! -z "${manualversion}" ]; then
 
     # manual-made release based on $manualversion

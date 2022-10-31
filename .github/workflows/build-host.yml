@@ -1,0 +1,45 @@
+# Run host test suite under valgrind for runtime checking of code.
+# Also, a quick test that the mocking builds work at all
+
+name: Build on host OS
+
+on:
+  pull_request:
+    paths-ignore:
+      - "boards.txt"
+      - "package/**"
+      - "tools/boards.txt.py"
+      - 'doc/**'
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - run: |
+        sudo apt update
+        sudo apt install valgrind lcov
+        bash ./tests/ci/host_test.sh
+
+  mock-check:
+    name: Mock
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - run: |
+        cd tests/host
+        make -j ../../libraries/ESP8266WebServer/examples/FSBrowser/FSBrowser

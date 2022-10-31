@@ -11,6 +11,10 @@
 // code there till it is correct then copy/paste back here. Then, you can move
 // comment boarders around until the C code is back in place.
 
+#pragma once
+
+#include <Arduino.h>
+
 #ifdef DEBUG_VIEW
 static const char configHead[] PROGMEM = R"EOF(
 <!--

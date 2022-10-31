@@ -4,12 +4,8 @@
 
 set -ev
 
-if [ -z "$TRAVIS_BUILD_DIR" ]; then
-    export TRAVIS_BUILD_DIR=$(cd ${PWD%/*}/..; pwd)
-fi
-
-cd $TRAVIS_BUILD_DIR/tests/host
-
+root=$(git rev-parse --show-toplevel)
+cd $root/tests/host
 
 make -j2 FORCE32=0 ssl
 for i in ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient \
