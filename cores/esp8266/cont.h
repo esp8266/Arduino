@@ -62,9 +62,8 @@ void cont_run(cont_t*, void (*pfn)(void));
 // execution state (registers and stack)
 void cont_suspend(cont_t*);
 
-// Check guard bytes around the stack. Return 0 in case everything is ok,
-// return 1 if guard bytes were overwritten.
-int cont_check(cont_t* cont);
+// Check guard bytes around the stack. Immediately panics on failure.
+void cont_check(cont_t*);
 
 // Go through stack and check how many bytes are most probably still unchanged
 // and thus weren't used by the user code. i.e. that stack space is free. (high water mark)

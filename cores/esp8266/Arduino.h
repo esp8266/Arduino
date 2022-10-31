@@ -33,6 +33,7 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
+#include "umm_malloc/umm_malloc_cfgport.h"
 #include "stdlib_noniso.h"
 #include "binary.h"
 #include "esp8266_peri.h"
@@ -311,7 +312,8 @@ void configTime(const char* tz, String server1,
 #endif
 
 #ifdef DEBUG_ESP_OOM
-// reinclude *alloc redefinition because of <cstdlib> undefining them
-// this is mandatory for allowing OOM *alloc definitions in .ino files
-#include "umm_malloc/umm_malloc_cfg.h"
+// Position *alloc redefinition at the end of Arduino.h because <cstdlib> would
+// have undefined them. Mandatory for supporting OOM and other debug alloc
+// definitions in .ino files
+#include "heap_api_debug.h"
 #endif

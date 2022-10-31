@@ -11,7 +11,7 @@ extern "C" size_t umm_umul_sat(const size_t a, const size_t b);
 extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((weak, alias("vPortFree"), nothrow));
 // I don't understand all the compiler noise around this alias.
 // Adding "__attribute__ ((nothrow))" seems to resolve the issue.
-// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824 
+// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824
 
 // Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
 #define FORCE_ALWAYS_INLINE_HEAP_SELECT
@@ -342,8 +342,10 @@ size_t IRAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
+#ifdef UMM_INFO
     HeapSelectDram ephemeral;
     umm_info(NULL, true);
+#endif
 }
 
 /*
