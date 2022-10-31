@@ -91,10 +91,10 @@ public:
   virtual uint8_t connected() override;
   virtual operator bool() override;
 
-  IPAddress remoteIP();
-  uint16_t  remotePort();
-  IPAddress localIP();
-  uint16_t  localPort();
+  virtual IPAddress remoteIP();
+  virtual uint16_t  remotePort();
+  virtual IPAddress localIP();
+  virtual uint16_t  localPort();
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
