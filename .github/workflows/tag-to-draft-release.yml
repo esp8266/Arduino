@@ -28,18 +28,24 @@ jobs:
     - name: Set GIT tag name
       run: |
         # Sets an environment variable used in the next steps
-        TRAVIS_TAG="$(git describe --exact-match --tags)"
-        echo "TRAVIS_TAG=${TRAVIS_TAG}" >> $GITHUB_ENV
+        ESP8266_ARDUINO_RELEASE_TAG="$(git describe --exact-match --tags)"
+        echo "ESP8266_ARDUINO_RELEASE_TAG=${ESP8266_ARDUINO_RELEASE_TAG}" >> $GITHUB_ENV
     - name: Build package JSON
       env:
-        TRAVIS_BUILD_DIR: ${{ github.workspace }}
-        BUILD_TYPE: package
         CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
+        BUILD_TYPE: package
       run: |
-           bash ./tests/ci/build_package.sh
-           pip3 install PyGithub
-           # Create a draft release and upload the ZIP and JSON files.
-           # This draft is not visible to normal users and needs to be
-           # updated manually with release notes and published from the
-           # GitHub web interface.
-           python3 ./package/upload_release.py --user "$GITHUB_ACTOR" --repo "$GITHUB_REPOSITORY" --token "$CI_GITHUB_API_KEY" --tag "$TRAVIS_TAG" --name "Release $TRAVIS_TAG" --msg "Update the draft with release notes before publishing." package/versions/*/*.zip package/versions/*/package_esp8266com_index.json
+        bash ./tests/ci/build_package.sh
+        # Create a draft release and upload the ZIP and JSON files.
+        # This draft is not visible to normal users and needs to be
+        # updated manually with release notes and published from the
+        # GitHub web interface.
+        pip3 install PyGithub
+        python3 ./package/upload_release.py \
+          --user "$GITHUB_ACTOR" \
+          --repo "$GITHUB_REPOSITORY" \
+          --token "$CI_GITHUB_API_KEY" \
+          --tag "$ESP8266_ARDUINO_RELEASE_TAG" \
+          --name "Release ${ESP8266_ARDUINO_RELEASE_TAG}" \
+          --msg "Update the draft with release notes before publishing." \
+          package/versions/*/*.zip package/versions/*/package_esp8266com_index.json

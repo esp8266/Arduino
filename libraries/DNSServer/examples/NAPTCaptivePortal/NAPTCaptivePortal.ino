@@ -80,6 +80,8 @@
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
 
+#include "WifiHttp.h"
+
 #define NAPT 1000
 #define NAPT_PORT 10
 

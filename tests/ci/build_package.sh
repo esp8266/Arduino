@@ -4,13 +4,16 @@
 
 set -ev
 
-export PKG_URL=https://github.com/esp8266/Arduino/releases/download/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
-export DOC_URL=https://arduino-esp8266.readthedocs.io/en/$TRAVIS_TAG/
+root=$(git rev-parse --show-toplevel)
+tag=$ESP8266_ARDUINO_RELEASE_TAG
+
+export PKG_URL=https://github.com/esp8266/Arduino/releases/download/$tag/esp8266-$tag.zip
+export DOC_URL=https://arduino-esp8266.readthedocs.io/en/$tag/
 
 if [ -z "$CI_GITHUB_API_KEY" ]; then
     echo "Github API key not set. Skip building the package."
     exit 0
 fi
 
-cd $TRAVIS_BUILD_DIR/package
+cd $root/package
 ./build_boards_manager_package.sh
