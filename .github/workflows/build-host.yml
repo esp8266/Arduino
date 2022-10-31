@@ -5,11 +5,6 @@ name: Build on host OS
 
 on:
   pull_request:
-    paths-ignore:
-      - "boards.txt"
-      - "package/**"
-      - "tools/boards.txt.py"
-      - 'doc/**'
 
 permissions:
   contents: read
