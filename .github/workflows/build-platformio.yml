@@ -6,10 +6,6 @@ name: Build examples with PlatformIO
 
 on:
   pull_request:
-    paths-ignore:
-      - "boards.txt"
-      - "tools/boards.txt.py"
-      - 'doc/**'
 
 permissions:
   contents: read
