@@ -106,31 +106,6 @@ extern "C" {
 #include "umm_malloc_cfgport.h"
 #endif
 
-#define UMM_BEST_FIT
-#define UMM_INFO
-// #define UMM_INLINE_METRICS
-#define UMM_STATS
-
-/*
- * To support API call, system_show_malloc(), -DUMM_INFO is required.
- *
- * For the ESP8266 we need an ISR safe function to call for implementing
- * xPortGetFreeHeapSize(). We can get this with one of these options:
- *   1) -DUMM_STATS or -DUMM_STATS_FULL
- *   2) -DUMM_INLINE_METRICS (and implicitly includes -DUMM_INFO)
- *
- * If frequent calls are made to ESP.getHeapFragmentation(),
- * -DUMM_INLINE_METRICS would reduce long periods of interrupts disabled caused
- * by frequent calls to `umm_info()`. Instead, the computations get distributed
- * across each malloc, realloc, and free. This appears to require an additional
- * 116 bytes of IRAM vs using `UMM_STATS` with `UMM_INFO`.
- *
- * When both UMM_STATS and UMM_INLINE_METRICS are defined, macros and structures
- * have been optimized to reduce duplications.
- *
- */
-
-
 /* A couple of macros to make packing structures less compiler dependent */
 
 #define UMM_H_ATTPACKPRE
@@ -177,12 +152,22 @@ extern "C" {
   #define UMM_FRAGMENTATION_METRIC_REMOVE(c)
 #endif // UMM_INLINE_METRICS
 
+struct UMM_HEAP_CONTEXT;
+typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
+
+/*
+  Must always be defined. Core support for getting free Heap size.
+  When possible, access via ESP.getFreeHeap();
+*/
+extern size_t umm_free_heap_size_lw(void);
+extern size_t umm_free_heap_size_core_lw(umm_heap_context_t *_context);
+
 /* -------------------------------------------------------------------------- */
 
 /*
  * -D UMM_INFO :
  *
- * Enables a dup of the heap contents and a function to return the total
+ * Enables a dump of the heap contents and a function to return the total
  * heap size that is unallocated - note this is not the same as the largest
  * unallocated block on the heap!
  */
@@ -209,32 +194,23 @@ typedef struct UMM_HEAP_INFO_t {
 UMM_HEAP_INFO;
 
 // extern UMM_HEAP_INFO ummHeapInfo;
-struct UMM_HEAP_CONTEXT;
-typedef struct UMM_HEAP_CONTEXT umm_heap_context_t;
-
 extern ICACHE_FLASH_ATTR void *umm_info(void *ptr, bool force);
-#ifdef UMM_INLINE_METRICS
-extern size_t umm_free_heap_size(void);
-#else
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 extern ICACHE_FLASH_ATTR size_t umm_free_heap_size(void);
+extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core(umm_heap_context_t *_context);
+#else
+extern size_t umm_free_heap_size(void);
+extern size_t umm_free_heap_size_core(umm_heap_context_t *_context);
 #endif
+
+
 // umm_max_block_size changed to umm_max_free_block_size in upstream.
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size(void);
 extern ICACHE_FLASH_ATTR int umm_usage_metric(void);
 extern ICACHE_FLASH_ATTR int umm_fragmentation_metric(void);
-extern ICACHE_FLASH_ATTR size_t umm_free_heap_size_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR size_t umm_max_block_size_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_usage_metric_core(umm_heap_context_t *_context);
 extern ICACHE_FLASH_ATTR int umm_fragmentation_metric_core(umm_heap_context_t *_context);
-#else
-  #define umm_info(p,b)
-  #define umm_free_heap_size() (0)
-  #define umm_max_block_size() (0)
-  #define umm_fragmentation_metric() (0)
-  #define umm_usage_metric() (0)
-  #define umm_free_heap_size_core() (0)
-  #define umm_max_block_size_core() (0)
-  #define umm_fragmentation_metric_core() (0)
 #endif
 
 /*
@@ -305,7 +281,6 @@ UMM_STATISTICS;
 
 #define STATS__OOM_UPDATE() _context->UMM_OOM_COUNT += 1
 
-extern size_t umm_free_heap_size_lw(void);
 extern size_t umm_get_oom_count(void);
 
 #else  // not UMM_STATS or UMM_STATS_FULL
@@ -720,91 +695,9 @@ struct UMM_TIME_STATS_t {
     UMM_TIME_STAT id_no_tag;
 };
 #endif
-/////////////////////////////////////////////////
-#ifdef DEBUG_ESP_OOM
-
-#define MEMLEAK_DEBUG
-
-// umm_*alloc are not renamed to *alloc
-// Assumes umm_malloc.h has already been included.
-
-#define umm_zalloc(s) umm_calloc(1,s)
-
-void *malloc_loc(size_t s, const char *file, int line);
-void *calloc_loc(size_t n, size_t s, const char *file, int line);
-void *realloc_loc(void *p, size_t s, const char *file, int line);
-// *alloc are macro calling *alloc_loc calling+checking umm_*alloc()
-// they are defined at the bottom of this file
-
-/////////////////////////////////////////////////
-
-#elif defined(UMM_POISON_CHECK)
-void *realloc_loc(void *p, size_t s, const char *file, int line);
-void  free_loc(void *p, const char *file, int line);
-#else // !defined(ESP_DEBUG_OOM)
-#endif
-
-
-
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _UMM_MALLOC_CFG_H */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef DEBUG_ESP_OOM
-// this must be outside from "#ifndef _UMM_MALLOC_CFG_H"
-// because Arduino.h's <cstdlib> does #undef *alloc
-// Arduino.h recall us to redefine them
-#include <pgmspace.h>
-// Reuse pvPort* calls, since they already support passing location information.
-// Specifically the debug version (heap_...) that does not force DRAM heap.
-void *IRAM_ATTR heap_pvPortMalloc(size_t size, const char *file, int line);
-void *IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char *file, int line);
-void *IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char *file, int line);
-void *IRAM_ATTR heap_pvPortZalloc(size_t size, const char *file, int line);
-void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
-
-#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMalloc(s, mem_debug_file, __LINE__); })
-#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortCalloc(n, s, mem_debug_file, __LINE__); })
-#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_vPortFree(p, mem_debug_file, __LINE__); })
-#else
-#define dbg_heap_free(p) free(p)
-#endif
-
-#elif defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) // #elif for #ifdef DEBUG_ESP_OOM
-#include <pgmspace.h>
-void *IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char *file, int line);
-#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortRealloc(p, s, mem_debug_file, __LINE__); })
-
-void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
-// C - to be discussed
-/*
-  Problem, I would like to report the file and line number with the umm poison
-  event as close as possible to the event. The #define method works for malloc,
-  calloc, and realloc those names are not as generic as free. A #define free
-  captures too much. Classes with methods called free are included :(
-  Inline functions would report the address of the inline function in the .h
-  not where they are called.
-
-  Anybody know a trick to make this work?
-
-  Create dbg_heap_free() as an alternative for free() when you need a little
-  more help in debugging the more challenging problems.
-*/
-#define dbg_heap_free(p) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_vPortFree(p, mem_debug_file, __LINE__); })
-
-#else
-#define dbg_heap_free(p) free(p)
-#endif /* DEBUG_ESP_OOM */
-
-#ifdef __cplusplus
-}
-#endif

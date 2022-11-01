@@ -25,44 +25,54 @@
 #include <Schedule.h>
 #include <debug.h>
 
-#define NETIF_STATUS_CB_SIZE 3
+static constexpr size_t LwipIntfCallbacks = 3;
 
-static int       netifStatusChangeListLength = 0;
-LwipIntf::CBType netifStatusChangeList[NETIF_STATUS_CB_SIZE];
+static LwipIntf::CBType callbacks[LwipIntfCallbacks];
+static size_t           size = 0;
 
+// override empty weak function from glue-lwip
 extern "C" void netif_status_changed(struct netif* netif)
 {
-    // override the default empty weak function
-    for (int i = 0; i < netifStatusChangeListLength; i++)
+    for (size_t index = 0; index < size; ++index)
     {
-        netifStatusChangeList[i](netif);
+        callbacks[index](netif);
     }
 }
 
-bool LwipIntf::stateChangeSysCB(LwipIntf::CBType&& cb)
+bool LwipIntf::statusChangeCB(LwipIntf::CBType cb)
 {
-    if (netifStatusChangeListLength >= NETIF_STATUS_CB_SIZE)
+    if (size < LwipIntfCallbacks)
     {
+        callbacks[size++] = std::move(cb);
+        return true;
+    }
 #if defined(DEBUG_ESP_CORE)
-        DEBUGV("NETIF_STATUS_CB_SIZE is too low\n");
+    DEBUGV("LwipIntf::CB %zu/%zu, cannot add more!\n", size, size);
 #endif
-        return false;
-    }
 
-    netifStatusChangeList[netifStatusChangeListLength++] = cb;
-    return true;
+    return false;
 }
 
-bool LwipIntf::stateUpCB(LwipIntf::CBType&& cb)
+bool LwipIntf::stateUpCB(LwipIntf::CBType cb)
 {
-    return stateChangeSysCB(
-        [cb](netif* nif)
+    return statusChangeCB(
+        [cb](netif* interface)
         {
-            if (netif_is_up(nif))
-                schedule_function(
-                    [cb, nif]()
-                    {
-                        cb(nif);
-                    });
+            if (netif_is_up(interface))
+            {
+                cb(interface);
+            }
+        });
+}
+
+bool LwipIntf::stateDownCB(LwipIntf::CBType cb)
+{
+    return statusChangeCB(
+        [cb](netif* interface)
+        {
+            if (!netif_is_up(interface))
+            {
+                cb(interface);
+            }
         });
 }
