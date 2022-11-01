@@ -657,7 +657,7 @@ String UpdaterClass::getErrorString() const {
 }
 
 void UpdaterClass::printError(Print &out){
-  out.printf_P(PSTR("ERROR[%u]: %s\n"), _error, getErrorString().c_str());
+  out.printf_P(PSTR("ERROR[%hhu]: %s\n"), _error, getErrorString().c_str());
 }
 
 UpdaterClass Update;
