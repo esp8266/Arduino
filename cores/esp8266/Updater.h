@@ -20,6 +20,7 @@
 #define UPDATE_ERROR_BOOTSTRAP          (11)
 #define UPDATE_ERROR_SIGN               (12)
 #define UPDATE_ERROR_NO_DATA            (13)
+#define UPDATE_ERROR_OOM                (14)
 
 #define U_FLASH   0
 #define U_FS      100

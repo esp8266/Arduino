@@ -176,9 +176,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   }
   _buffer = new (std::nothrow) uint8_t[_bufferSize];
   if (!_buffer) {
-#ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println(F("[begin] Unable to allocate a temporary buffer."));
-#endif
+    _setError(UPDATE_ERROR_OOM);
     _reset(false);
     return false;
   }
@@ -307,7 +305,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       const uint32_t sigAddr = _startAddress + binSize;
       sig.reset(new (std::nothrow) uint8_t[sigLen]);
       if (!sig) {
-        _setError(UPDATE_ERROR_SIGN);
+        _setError(UPDATE_ERROR_OOM);
         _reset();
         return false;
       }
@@ -622,16 +620,10 @@ String UpdaterClass::getErrorString() const {
   case UPDATE_ERROR_STREAM:
     out = F("Stream Read Timeout");
     break;
-  case UPDATE_ERROR_NO_DATA:
-    out = F("No data supplied");
-    break;
   case UPDATE_ERROR_MD5:
     out += F("MD5 verification failed: ");
     out += F("expected: ") + _target_md5;
     out += F(", calculated: ") + _md5.toString();
-    break;
-  case UPDATE_ERROR_SIGN:
-    out = F("Signature verification failed");
     break;
   case UPDATE_ERROR_FLASH_CONFIG:
     out += F("Flash config wrong: ");
@@ -647,6 +639,15 @@ String UpdaterClass::getErrorString() const {
     break;
   case UPDATE_ERROR_BOOTSTRAP:
     out = F("Invalid bootstrapping state, reset ESP8266 before updating");
+    break;
+  case UPDATE_ERROR_SIGN:
+    out = F("Signature verification failed");
+    break;
+  case UPDATE_ERROR_NO_DATA:
+    out = F("No data supplied");
+    break;
+  case UPDATE_ERROR_OOM:
+    out = F("Out of memory");
     break;
   default:
     out = F("UNKNOWN");
