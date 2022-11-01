@@ -202,9 +202,11 @@ protected:
     ETSTimer* _timer = nullptr;
 
 private:
-        // XXX undefined behaviour? fix next pr
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+    // original implementation inluded type coersion of integer values that would fit into uintptr_t
+    // to avoid writing these in our every method, use a generic type that automatically converts it
+    // (XXX it is a weird hack, though, consider removing this in the future and prever void* instead)
     struct callback_ptr_t
     {
         template <typename T>
