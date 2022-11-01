@@ -34,8 +34,6 @@ class LwipIntf
 public:
     using CBType = std::function<void(netif*)>;
 
-    static bool stateUpCB(LwipIntf::CBType&& cb);
-
     // reorder WiFi.config() parameters for a esp8266/official Arduino dual-compatibility API
     // args     | esp order  arduino order
     // ----     + ---------  -------------
@@ -67,8 +65,11 @@ public:
     // ESP32 API compatibility
     const char* getHostname();
 
-protected:
-    static bool stateChangeSysCB(LwipIntf::CBType&& cb);
+    // whenever netif status callback is called
+    static bool statusChangeCB(LwipIntf::CBType);
+
+    static bool stateUpCB(LwipIntf::CBType);
+    static bool stateDownCB(LwipIntf::CBType);
 };
 
 #endif  // _LWIPINTF_H

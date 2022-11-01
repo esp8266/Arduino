@@ -2228,7 +2228,7 @@ namespace MDNSImplementation
                 stcMDNS_RRDomain reverseIP4Domain;
                 for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
                 {
-                    if (netif_is_up(pNetIf))
+                    if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
                     {
                         if ((_buildDomainForReverseIP4(pNetIf->ip_addr, reverseIP4Domain))
                             && (p_RRHeader.m_Domain == reverseIP4Domain))
