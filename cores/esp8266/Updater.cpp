@@ -600,40 +600,57 @@ void UpdaterClass::_setError(int error){
 String UpdaterClass::getErrorString() const {
   String out;
 
-  if(_error == UPDATE_ERROR_OK){
+  switch (_error) {
+  case UPDATE_ERROR_OK:
     out = F("No Error");
-  } else if(_error == UPDATE_ERROR_WRITE){
+    break;
+  case UPDATE_ERROR_WRITE:
     out = F("Flash Write Failed");
-  } else if(_error == UPDATE_ERROR_ERASE){
+    break;
+  case UPDATE_ERROR_ERASE:
     out = F("Flash Erase Failed");
-  } else if(_error == UPDATE_ERROR_READ){
+    break;
+  case UPDATE_ERROR_READ:
     out = F("Flash Read Failed");
-  } else if(_error == UPDATE_ERROR_SPACE){
+    break;
+  case UPDATE_ERROR_SPACE:
     out = F("Not Enough Space");
-  } else if(_error == UPDATE_ERROR_SIZE){
+    break;
+  case UPDATE_ERROR_SIZE:
     out = F("Bad Size Given");
-  } else if(_error == UPDATE_ERROR_STREAM){
+    break;
+  case UPDATE_ERROR_STREAM:
     out = F("Stream Read Timeout");
-  } else if(_error == UPDATE_ERROR_NO_DATA){
+    break;
+  case UPDATE_ERROR_NO_DATA:
     out = F("No data supplied");
-  } else if(_error == UPDATE_ERROR_MD5){
+    break;
+  case UPDATE_ERROR_MD5:
     out += F("MD5 verification failed: ");
     out += F("expected: ") + _target_md5;
     out += F(", calculated: ") + _md5.toString();
-  } else if(_error == UPDATE_ERROR_SIGN){
+    break;
+  case UPDATE_ERROR_SIGN:
     out = F("Signature verification failed");
-  } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
+    break;
+  case UPDATE_ERROR_FLASH_CONFIG:
     out += F("Flash config wrong: ");
     out += F("real: ") + String(ESP.getFlashChipRealSize(), 10);
     out += F(", SDK: ") + String(ESP.getFlashChipSize(), 10);
-  } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
-    out += F("new Flash config wrong, real size: ") + String(ESP.getFlashChipRealSize(), 10);
-  } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
+    break;
+  case UPDATE_ERROR_NEW_FLASH_CONFIG:
+    out += F("new Flash config wrong, real size: ");
+    out += String(ESP.getFlashChipRealSize(), 10);
+    break;
+  case UPDATE_ERROR_MAGIC_BYTE:
     out = F("Magic byte is not 0xE9");
-  } else if (_error == UPDATE_ERROR_BOOTSTRAP){
+    break;
+  case UPDATE_ERROR_BOOTSTRAP:
     out = F("Invalid bootstrapping state, reset ESP8266 before updating");
-  } else {
+    break;
+  default:
     out = F("UNKNOWN");
+    break;
   }
 
   return out;
