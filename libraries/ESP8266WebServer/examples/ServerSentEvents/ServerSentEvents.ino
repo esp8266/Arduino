@@ -146,7 +146,9 @@ void updateSensor(sensorType &sensor) {
     SSEBroadcastState(sensor.name, sensor.value, newVal);  // only broadcast if state is different
   }
   sensor.value = newVal;
-  sensor.update.once(rand() % 20 + 10, std::bind(updateSensor, sensor));  // randomly update sensor
+  sensor.update.once(rand() % 20 + 10, [&]() {
+    updateSensor(sensor);
+  });  // randomly update sensor
 }
 
 void handleSubscribe() {
