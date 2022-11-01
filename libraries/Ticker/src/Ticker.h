@@ -33,12 +33,25 @@
 class Ticker
 {
 public:
-    Ticker() = default;
+    // Our helper type to support any callable object
+    // In case of a lambda with bound variable(s), it will be destroyed
+    // either when the timer expires or detach() is called
+    using callback_function_t = std::function<void()>;
 
-    ~Ticker()
-    {
-        detach();
-    }
+    // Native SDK type, simple function with void* argument
+    using callback_with_arg_t = void(*)(void*);
+
+    // Helper type to allow type coercion on function argument
+    // Only works with a function pointer. Argument *must not* be larger than the size of the `void*`
+    template <typename T>
+    using remove_cvref_t = typename std::remove_cv_t<
+            typename std::remove_reference_t<T>>;
+
+    template <typename T, typename Y = remove_cvref_t<T>>
+    using callback_with_typed_arg_t = void(*)(Y);
+
+    Ticker() = default;
+    ~Ticker();
 
     // TODO disable existing timr? =default to retain backwards compatibility
     Ticker(const Ticker&) = default;
@@ -47,14 +60,6 @@ public:
     // TODO re-arm or disable the timer? =default to retain backwards compatibility
     Ticker(Ticker&&) = default;
     Ticker& operator=(Ticker&&) = default;
-
-    // Native SDK type, simple function with void* argument
-    using callback_with_arg_t = void(*)(void*);
-
-    // Our helper type to support any callable object
-    // In case of a lambda with bound variable(s), it will be destroyed
-    // either when the timer expires or detach() is called
-    using callback_function_t = std::function<void()>;
 
     // callback will be called at following loop() after ticker fires
     void attach_scheduled(float seconds, callback_function_t callback)
@@ -100,23 +105,19 @@ public:
         _attach(Milliseconds(milliseconds), true);
     }
 
-    // only works with a function pointer. argument *may not* be larger than the size of the `void*`
-    template <typename T>
-    using callback_with_typed_arg_t = void(*)(T);
-
     // callback will still be called in SYS ctx when ticker fires
-    template <typename T>
-    void attach(float seconds, callback_with_typed_arg_t<T> callback, T arg)
+    template <typename Func, typename Arg>
+    void attach(float seconds, Func func, Arg arg)
     {
-        _callback = callback_ptr_t(callback, arg);
+        _callback = make_callback_ptr(func, arg);
         _attach(Seconds(seconds), true);
     }
 
     // callback will still be called in SYS ctx when ticker fires
-    template <typename T>
-    void attach_ms(uint32_t milliseconds, callback_with_typed_arg_t<T> callback, T arg)
+    template <typename Func, typename Arg>
+    void attach_ms(uint32_t milliseconds, Func func, Arg arg)
     {
-        _callback = callback_ptr_t(callback, arg);
+        _callback = make_callback_ptr(func, arg);
         _attach(Milliseconds(milliseconds), true);
     }
 
@@ -149,18 +150,18 @@ public:
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template <typename T>
-    void once(float seconds, callback_with_typed_arg_t<T> callback, T arg)
+    template <typename Func, typename Arg>
+    void once(float seconds, Func func, Arg arg)
     {
-        _callback = callback_ptr_t(callback, arg);
+        _callback = make_callback_ptr(func, arg);
         _attach(Seconds(seconds), false);
     }
 
     // callback will be called in SYS ctx when ticker fires
-    template <typename T>
-    void once_ms(uint32_t milliseconds, callback_with_typed_arg_t<T> callback, T arg)
+    template <typename Func, typename Arg>
+    void once_ms(uint32_t milliseconds, Func func, Arg arg)
     {
-        _callback = callback_ptr_t(callback, arg);
+        _callback = make_callback_ptr(func, arg);
         _attach(Milliseconds(milliseconds), false);
     }
 
@@ -199,27 +200,31 @@ protected:
         _attach(std::chrono::duration_cast<Milliseconds>(seconds), repeat);
     }
 
+    std::unique_ptr<callback_tick_t> _tick;
+    bool _repeat = false;
+
     ETSTimer* _timer = nullptr;
 
 private:
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-function-type"
+    struct callback_ptr_t
+    {
+        callback_with_arg_t func;
+        void* arg;
+    };
+
     // original implementation inluded type coersion of integer values that would fit into uintptr_t
     // to avoid writing these in our every method, use a generic type that automatically converts it
     // (XXX it is a weird hack, though, consider removing this in the future and prever void* instead)
-    struct callback_ptr_t
-    {
-        template <typename T>
-        callback_ptr_t(callback_with_typed_arg_t<T> func, T arg) :
-            func(reinterpret_cast<callback_with_arg_t>(func)),
-            arg(reinterpret_cast<void*>(arg))
-        {
-            static_assert(sizeof(T) <= sizeof(void*), "attach() callback argument size must be <= sizeof(void*)");
-        }
-
-        callback_with_arg_t func = nullptr;
-        void* arg = nullptr;
-    };
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+    template <typename T, typename Y = remove_cvref_t<T>>
+    static callback_ptr_t make_callback_ptr(callback_with_typed_arg_t<Y> func, T arg) {
+        static_assert(sizeof(Y) <= sizeof(void*), "");
+        return callback_ptr_t{
+            .func = reinterpret_cast<callback_with_arg_t>(func),
+            .arg = reinterpret_cast<void*>(arg),
+        };
+    }
 #pragma GCC diagnostic pop
 
     using callback_data_t = std::variant<
@@ -228,9 +233,6 @@ private:
         callback_function_t>;
 
     callback_data_t _callback;
-
-    std::unique_ptr<callback_tick_t> _tick;
-    bool _repeat = false;
 
     ETSTimer _timer_internal;
 };

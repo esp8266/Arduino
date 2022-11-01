@@ -26,6 +26,11 @@
 #include <Arduino.h>
 #include "Ticker.h"
 
+Ticker::~Ticker()
+{
+    detach();
+}
+
 void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
 {
     if (_timer) {
