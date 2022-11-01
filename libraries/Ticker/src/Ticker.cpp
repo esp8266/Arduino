@@ -36,21 +36,24 @@ void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
 
     os_timer_setfn(_timer,
         [](void* ptr) {
-            auto* ticker = reinterpret_cast<Ticker*>(ptr);
-            ticker->_static_callback();
+            reinterpret_cast<Ticker*>(ptr)->_static_callback();
         }, this);
+
+    _repeat = repeat;
 
     // whenever duration excedes this limit, make timer repeatable N times
     // in case it is really repeatable, it will reset itself and continue as usual
-    _tick = callback_tick_t{};
-    _tick.repeat = repeat;
-
+    size_t total = 0;
     if (milliseconds > DurationMax) {
-        _tick.total = 1;
+        total = 1;
         while (milliseconds > DurationMax) {
-            _tick.total *= 2;
+            total *= 2;
             milliseconds /= 2;
         }
+        _tick.reset(new callback_tick_t{
+            .total = total,
+            .count = 0,
+        });
         repeat = true;
     }
 
@@ -62,7 +65,7 @@ void Ticker::detach()
     if (_timer) {
         os_timer_disarm(_timer);
         _timer = nullptr;
-        _tick = callback_tick_t{};
+        _tick.reset(nullptr);
         _callback = std::monostate{};
     }
 }
@@ -74,9 +77,9 @@ bool Ticker::active() const
 
 void Ticker::_static_callback()
 {
-    if (_tick.total) {
-        ++_tick.count;
-        if (_tick.count < _tick.total) {
+    if (_tick) {
+        ++_tick->count;
+        if (_tick->count < _tick->total) {
             return;
         }
     }
@@ -90,11 +93,12 @@ void Ticker::_static_callback()
         }
     }, _callback);
 
-    if (_tick.total) {
-        _tick.count = 0;
+    if (_repeat) {
+        if (_tick) {
+            _tick->count = 0;
+        }
+        return;
     }
 
-    if (!_tick.repeat) {
-        detach();
-    }
+    detach();
 }

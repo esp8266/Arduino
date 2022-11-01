@@ -23,6 +23,7 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <variant>
 
 #include <Arduino.h>
@@ -188,7 +189,6 @@ protected:
     {
         uint32_t total = 0;
         uint32_t count = 0;
-        bool repeat = false;
     };
 
     void _static_callback();
@@ -226,7 +226,9 @@ private:
         callback_function_t>;
 
     callback_data_t _callback;
-    callback_tick_t _tick;
+
+    std::unique_ptr<callback_tick_t> _tick;
+    bool _repeat = false;
 
     ETSTimer _timer_internal;
 };
