@@ -937,10 +937,14 @@ uint32_t SigningVerifier::length()
 // directly inside the class function for ease of use.
 extern "C" bool SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (_pubKey->isRSA()) {
-    bool ret;
-    unsigned char vrf[hash->len()];
+    // see https://github.com/earlephilhower/bearssl-esp8266/blob/6105635531027f5b298aa656d44be2289b2d434f/inc/bearssl_rsa.h#L257
+    static constexpr int HashLengthMax = 64;
+    unsigned char vrf[HashLengthMax];
+    if (hash->len() > HashLengthMax) {
+      return false;
+    }
     br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
-    ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), sizeof(vrf), _pubKey->getRSA(), vrf);
+    bool ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), hash->len(), _pubKey->getRSA(), vrf);
     if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
       return false;
     } else {

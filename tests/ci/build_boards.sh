@@ -4,11 +4,14 @@
 
 set -ev
 
-cd $TRAVIS_BUILD_DIR
+root=$(git rev-parse --show-toplevel)
 
+cd $root
 tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
 
-git diff --exit-code -- boards.txt \
-                        doc/boards.rst \
-                        tools/sdk/ld/
-git diff --exit-code -w -- package/package_esp8266com_index.template.json
+git diff --exit-code -- \
+    boards.txt \
+    doc/boards.rst \
+    tools/sdk/ld/
+git diff --exit-code --ignore-all-space -- \
+    package/package_esp8266com_index.template.json

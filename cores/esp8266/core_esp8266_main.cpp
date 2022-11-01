@@ -245,11 +245,14 @@ static void loop_wrapper() {
     }
     loop();
     loop_end();
+    cont_check(g_pcont);
     if (serialEventRun) {
         serialEventRun();
     }
     esp_schedule();
 }
+
+extern "C" void __stack_chk_fail(void);
 
 static void loop_task(os_event_t *events) {
     (void) events;
@@ -257,9 +260,6 @@ static void loop_task(os_event_t *events) {
     ESP.resetHeap();
     cont_run(g_pcont, &loop_wrapper);
     ESP.setDramHeap();
-    if (cont_check(g_pcont) != 0) {
-        panic();
-    }
 }
 
 extern "C" {

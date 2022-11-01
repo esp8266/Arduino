@@ -15,7 +15,7 @@
  * If `s` is 0, returns 0.
  * If result overflows/wraps, return saturation value.
  */
-static void add_poison_size(size_t* s) {
+static void add_poison_size(size_t *s) {
     if (*s == 0) {
         return;
     }
