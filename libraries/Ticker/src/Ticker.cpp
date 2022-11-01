@@ -26,9 +26,35 @@
 #include <Arduino.h>
 #include "Ticker.h"
 
+// ETSTimer is part of the instance, and we don't have any state besides
+// the things required for the callback. Allow copies and moves, but
+// disable any member copies and default-init + detach() instead.
+
 Ticker::~Ticker()
 {
     detach();
+}
+
+Ticker::Ticker(const Ticker&)
+{
+}
+
+Ticker& Ticker::operator=(const Ticker&)
+{
+    detach();
+    return *this;
+}
+
+Ticker::Ticker(Ticker&& other) noexcept
+{
+    other.detach();
+}
+
+Ticker& Ticker::operator=(Ticker&& other) noexcept
+{
+    other.detach();
+    detach();
+    return *this;
 }
 
 void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)

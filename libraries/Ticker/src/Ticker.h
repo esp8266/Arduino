@@ -53,13 +53,11 @@ public:
     Ticker() = default;
     ~Ticker();
 
-    // TODO disable existing timr? =default to retain backwards compatibility
-    Ticker(const Ticker&) = default;
-    Ticker& operator=(const Ticker&) = default;
+    Ticker(const Ticker&);
+    Ticker& operator=(const Ticker&);
 
-    // TODO re-arm or disable the timer? =default to retain backwards compatibility
-    Ticker(Ticker&&) = default;
-    Ticker& operator=(Ticker&&) = default;
+    Ticker(Ticker&&) noexcept;
+    Ticker& operator=(Ticker&&) noexcept;
 
     // callback will be called at following loop() after ticker fires
     void attach_scheduled(float seconds, callback_function_t callback)
@@ -233,6 +231,5 @@ private:
         callback_function_t>;
 
     callback_data_t _callback;
-
-    ETSTimer _timer_internal;
+    ETSTimer _timer_internal{};
 };
