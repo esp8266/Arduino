@@ -42,8 +42,8 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/3.0.2/](https://arduin
 
 Also known as latest git or master branch.
 
-- When using [Arduino IDE](https://www.arduino.cc/en/software), follow [our instructions here](https://arduino-esp8266.readthedocs.io/en/master/installing.html#using-git-version).
-- When using [PlatformIO](https://platformio.org/install), follow documentation for the [platformio/espressif8266 platform](https://docs.platformio.org/en/stable/platforms/espressif8266.html#using-arduino-framework-with-staging-version).
+- When using [Arduino IDE](https://www.arduino.cc/en/software), follow [our instructions here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
+- When using [PlatformIO](https://platformio.org/install), refer to [platformio/espressif8266 platform documentation](https://docs.platformio.org/en/stable/platforms/espressif8266.html#using-arduino-framework-with-staging-version).
 
 ### Using PlatformIO
 
