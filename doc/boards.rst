@@ -351,6 +351,11 @@ LOLIN(WEMOS) D1 R2 & mini
 
 Product page: https://www.wemos.cc/
 
+LOLIN(WEMOS) D1 ESP-WROOM-02
+----------------------------
+
+No real product pages. See: https://www.instructables.com/How-to-Use-Wemos-ESP-Wroom-02-D1-Mini-WiFi-Module-/ or https://www.arduino-tech.com/wemos-esp-wroom-02-mainboard-d1-mini-wifi-module-esp826618650-battery/ 
+
 LOLIN(WEMOS) D1 mini (clone)
 ----------------------------
 

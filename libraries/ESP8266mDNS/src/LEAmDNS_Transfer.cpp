@@ -122,7 +122,7 @@ namespace MDNSImplementation
 
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         {
-            if (netif_is_up(pNetIf))
+            if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
             {
                 IPAddress fromIPAddress;
                 // fromIPAddress = _getResponseMulticastInterface();

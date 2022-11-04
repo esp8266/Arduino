@@ -1174,6 +1174,8 @@ namespace MDNSImplementation
         stcMDNSServiceQuery*              m_pServiceQueries;
         MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
         stcProbeInformation               m_HostProbeInformation;
+        bool                              m_bLwipCb;
+        bool                              m_bRestarting;
 
         /** CONTROL **/
         /* MAINTENANCE */

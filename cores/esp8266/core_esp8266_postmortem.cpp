@@ -42,9 +42,12 @@ static int s_panic_line = 0;
 static const char* s_panic_func = 0;
 static const char* s_panic_what = 0;
 
+// Our wiring for abort() and C++ exceptions
 static bool s_abort_called = false;
 static const char* s_unhandled_exception = NULL;
 
+// Common way to notify about where the stack smashing happened
+// (but, **only** if caller uses our handler function)
 static uint32_t s_stacksmash_addr = 0;
 
 void abort() __attribute__((noreturn));
@@ -154,7 +157,7 @@ void __wrap_system_restart_local() {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
-        ets_printf_P(PSTR("\nStack overflow detected.\n"));
+        ets_printf_P(PSTR("\nStack smashing detected.\n"));
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
             5 /* Alloca exception, closest thing to stack fault*/, s_stacksmash_addr, 0, 0, 0, 0);
    }
@@ -310,8 +313,6 @@ void __panic_func(const char* file, int line, const char* func) {
 uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
 void __stack_chk_fail(void) {
     s_user_reset_reason = REASON_USER_STACK_SMASH;
-    ets_printf_P(PSTR("\nPANIC: Stack overrun"));
-
     s_stacksmash_addr = (uint32_t)__builtin_return_address(0);
 
     if (gdb_present())
@@ -319,8 +320,7 @@ void __stack_chk_fail(void) {
 
     __wrap_system_restart_local();
 
-    while (1); // never reached, needed to satisfy "noreturn" attribute
+    __builtin_unreachable(); // never reached, needed to satisfy "noreturn" attribute
 }
 
-
-};
+} // extern "C"

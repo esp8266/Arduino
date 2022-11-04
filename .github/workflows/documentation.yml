@@ -1,0 +1,28 @@
+# Ensure Sphinx can build the documentation properly.
+
+name: Documentation
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  documentation:
+    name: Sphinx build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - name: Build documentation
+      run: |
+        pip install --user -r doc/requirements.txt
+        bash ./tests/ci/build_docs.sh

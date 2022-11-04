@@ -10,8 +10,10 @@
 
 #include <stdint.h>
 
-// C This include is not in upstream
+// C These includes are not in the upstream
 #include "umm_malloc_cfg.h"   /* user-dependent */
+#include <osapi.h>
+#include <heap_api_debug.h>
 
 #ifdef __cplusplus
 extern "C" {
