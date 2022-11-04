@@ -27,7 +27,7 @@
  */
 
 /*
- * -DUMM_INIT_USE_IRAM
+ * -DUMM_INIT_USE_ICACHE
  *
  * Historically, the umm_init() call path has been in IRAM. The umm_init() call
  * path is now in ICACHE (flash). Use the build option UMM_INIT_USE_IRAM to
@@ -37,10 +37,16 @@
  * app_entry_redefinable() in core_esp8266_app_entry_noextra4k.cpp for an
  * example of how to toggle between ICACHE and IRAM in your build.
  *
- * The default is to use ICACHE.
+ * ~The default is to use ICACHE.~
+ * For now revert default back to IRAM
+ * define UMM_INIT_USE_ICACHE to use ICACHE/IROM
  */
-// #define UMM_INIT_USE_IRAM 1
-
+#ifdef UMM_INIT_USE_ICACHE
+#undef UMM_INIT_USE_IRAM
+#else
+#undef UMM_INIT_USE_IRAM
+#define UMM_INIT_USE_IRAM 1
+#endif
 
 /*
  * Start addresses and the size of the heap
