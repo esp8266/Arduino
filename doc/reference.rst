@@ -35,6 +35,10 @@ and have several limitations:
   that ``String``, ``std::string``, ``std::vector`` and other classes which
   use contiguous memory that may be resized must be used with extreme care
   (ensuring strings aren't changed, vector elements aren't added, etc.).
+  The underlying problem, an allocation address could be actively in use at
+  the instant of an interrupt. Upon return, the address actively in use may
+  be invalid after an ISR uses ``realloc`` or ``free`` against the same
+  allocation.
 
 * The C++ ``new`` and ``delete`` operators must NEVER be used in an ISR. Their
   call path is not in IRAM. Using any routines or objects that use the ``new``
