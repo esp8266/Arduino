@@ -87,7 +87,7 @@ static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur) {
 
 /* ------------------------------------------------------------------------ */
 
-static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int line) {
+static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, int line, const void *caller) {
     uintptr_t ptr = (uintptr_t)vptr;
 
     if (ptr != 0) {
@@ -114,6 +114,7 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
         }
 
         if (!poison) {
+            DBGLOG_ERROR("called from %p\n", caller);
             if (file) {
                 __panic_func(file, line, "");
             } else {
@@ -135,10 +136,10 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
 
 /* ------------------------------------------------------------------------ */
 
-void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) {
+void *umm_poison_realloc_flc(void *ptr, size_t size, const char *file, int line, const void *caller) {
     void *ret;
 
-    ptr = get_unpoisoned_check_neighbors(ptr, file, line);
+    ptr = get_unpoisoned_check_neighbors(ptr, file, line, caller);
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
@@ -150,9 +151,9 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) 
 
 /* ------------------------------------------------------------------------ */
 
-void umm_poison_free_fl(void *ptr, const char *file, int line) {
+void umm_poison_free_flc(void *ptr, const char *file, int line, const void *caller) {
 
-    ptr = get_unpoisoned_check_neighbors(ptr, file, line);
+    ptr = get_unpoisoned_check_neighbors(ptr, file, line, caller);
 
     umm_free(ptr);
 }
@@ -366,7 +367,7 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
  * Saturated unsigned add
  * Poison added to allocation size requires overflow protection.
  */
-static size_t umm_uadd_sat(const size_t a, const size_t b) {
+size_t umm_uadd_sat(const size_t a, const size_t b) {
     size_t r = a + b;
     if (r < a) {
         return SIZE_MAX;

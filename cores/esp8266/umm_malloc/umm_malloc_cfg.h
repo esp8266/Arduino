@@ -616,8 +616,8 @@ extern void *umm_poison_realloc(void *ptr, size_t size);
 extern void  umm_poison_free(void *ptr);
 extern bool  umm_poison_check(void);
 // Local Additions to better report location in code of the caller.
-void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line);
-void  umm_poison_free_fl(void *ptr, const char *file, int line);
+void *umm_poison_realloc_flc(void *ptr, size_t size, const char *file, int line, const void *caller);
+void  umm_poison_free_flc(void *ptr, const char *file, int line, const void *caller);
 #if defined(UMM_POISON_CHECK_LITE)
 /*
     * We can safely do individual poison checks at free and realloc and stay
