@@ -797,6 +797,70 @@ bool wifi_set_country(wifi_country_t *country);
   */
 bool wifi_get_country(wifi_country_t *country);
 
+#if (NONOSDK >= (0x30000))
+
+typedef enum {
+    SYSTEM_PARTITION_INVALID = 0,
+    SYSTEM_PARTITION_BOOTLOADER,            /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_OTA_1,                 /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_OTA_2,                 /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_RF_CAL,                /* user must define this partition */
+    SYSTEM_PARTITION_PHY_DATA,              /* user must define this partition */
+    SYSTEM_PARTITION_SYSTEM_PARAMETER,      /* user must define this partition */
+    SYSTEM_PARTITION_AT_PARAMETER,
+    SYSTEM_PARTITION_SSL_CLIENT_CERT_PRIVKEY,
+    SYSTEM_PARTITION_SSL_CLIENT_CA,
+    SYSTEM_PARTITION_SSL_SERVER_CERT_PRIVKEY,
+    SYSTEM_PARTITION_SSL_SERVER_CA,
+    SYSTEM_PARTITION_WPA2_ENTERPRISE_CERT_PRIVKEY,
+    SYSTEM_PARTITION_WPA2_ENTERPRISE_CA,
+    
+    SYSTEM_PARTITION_CUSTOMER_BEGIN = 100,  /* user can define partition after here */
+    SYSTEM_PARTITION_MAX
+} partition_type_t;
+
+typedef struct {
+    partition_type_t type;    /* the partition type */
+    uint32_t addr;            /* the partition address */
+    uint32_t size;            /* the partition size */
+} partition_item_t;
+
+/**
+  * @brief     regist partition table information, user MUST call it in user_pre_init()
+  *
+  * @param     partition_table: the partition table
+  * @param     partition_num:   the partition number in partition table
+  * @param     map:             the flash map
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool system_partition_table_regist(
+        const partition_item_t* partition_table,
+        uint32_t partition_num,
+        uint32_t map
+    );
+
+/**
+  * @brief     get ota partition size
+  *
+  * @return    the size of ota partition
+  */
+uint32_t system_partition_get_ota_partition_size(void);
+
+/**
+  * @brief     get partition information
+  *
+  * @param     type:             the partition type
+  * @param     partition_item:   the point to store partition information
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool system_partition_get_item(partition_type_t type, partition_item_t* partition_item);
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif
