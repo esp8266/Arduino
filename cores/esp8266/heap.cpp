@@ -45,7 +45,8 @@
  *    tested. This option is enabled when Tools->Debug: Serial is selected or
  *    Tools->Debug level: "CORE" is selected. While coverage is not 100%, a
  *    sketch is less likely to have strange behavior from heavy heap access with
- *    interrupts disabled.
+ *    interrupts disabled. If needed, continue reading "UMM_POISON_CHECK" for
+ *    more details.
  *
  *  * UMM_POISON_CHECK - Adds and presets 4 bytes of poison at the beginning and
  *    end of each allocation. For each Heap API call, a complete sweep through
@@ -101,6 +102,8 @@ extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((
 #include <sys/reent.h>
 #include <user_interface.h>
 
+#include "heap_cb.h"
+
 extern "C" {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,7 +136,7 @@ extern "C" {
 #undef realloc
 #undef free
 
-#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK)
+#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(HEAP_DEBUG_PROBE_PSFLC_CB)
 // All other debug wrappers that do not require handling poison
 #define UMM_MALLOC_FL(s,f,l,c)    umm_malloc(s)
 #define UMM_CALLOC_FL(n,s,f,l,c)  umm_calloc(n,s)
@@ -197,10 +200,11 @@ extern "C" {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// OOM - this structure variable is always in use by abi.cpp
+// OOM - this structure variable is always in use by abi.cpp - except for
+// C++ Exceptions "enabled"  builds.
 //
-// Always track last failed caller and size requested
-//
+// When building with C++ Exceptions "disabled" or debug build,
+// always track last failed caller and size requested
 #if defined(DEBUG_ESP_OOM)
 struct umm_last_fail_alloc {
     const void *addr;
@@ -210,6 +214,8 @@ struct umm_last_fail_alloc {
 } _umm_last_fail_alloc = {NULL, 0, NULL, 0};
 
 #else
+// Note for the least used case "(defined(__cpp_exceptions) &&
+// !defined(DEBUG_ESP_OOM))", we only capture details for LIBC calls.
 struct umm_last_fail_alloc {
     const void *addr;
     size_t size;
@@ -268,6 +274,7 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psflc(void *ptr, size_t si
         _umm_last_fail_alloc.line = line;
         print_loc(size, file, line, caller);
         xt_wsr_ps(saved_ps);
+        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, file, line, caller);
         return false;
     }
     return true;
@@ -276,18 +283,19 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psflc(void *ptr, size_t si
 #define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, f, l, c) ({ (void)p, (void)s, (void)f; (void)l; (void)c; true; })
 
 #elif defined(ENABLE_THICK_DEBUG_WRAPPERS)
-static bool IRAM_ATTR oom_check__log_last_fail_psc(void *ptr, size_t size, const void* caller) {
+static bool IRAM_ATTR oom_check__log_last_fail_atomic_psc(void *ptr, size_t size, const void* caller) {
     if (0 != (size) && 0 == ptr) {
         // Need to ensure changes to umm_last_fail_alloc are atomic.
         uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
         _umm_last_fail_alloc.addr = caller;
         _umm_last_fail_alloc.size = size;
         xt_wsr_ps(saved_ps);
+        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, NULL, 0, caller);
         return false;
     }
     return true;
 }
-#define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, f, l, c) oom_check__log_last_fail_psc(p, s, c)
+#define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, f, l, c) oom_check__log_last_fail_atomic_psc(p, s, c)
 #define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, f, l, c) ({ (void)p, (void)s, (void)f; (void)l; (void)c; true; })
 
 #else
@@ -298,6 +306,7 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
     if (0 != (size) && 0 == ptr) {
         _umm_last_fail_alloc.addr = caller;
         _umm_last_fail_alloc.size = size;
+        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, NULL, 0, caller);
         return false;
     }
     return true;
@@ -356,6 +365,7 @@ void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, cons
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     void* ret = UMM_MALLOC_FL(size, file, line, caller);
+    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_malloc_cb_id, ret, size, file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
 }
@@ -366,6 +376,7 @@ void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, 
     POISON_CHECK__PANIC_FL(file, line, caller);
     size_t total_size = umm_umul_sat(count, size);
     void* ret = UMM_CALLOC_FL(1, total_size, file, line, caller);
+    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_calloc_cb_id, ret, size, file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line, caller);
     return ret;
 }
@@ -373,7 +384,9 @@ void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, 
 void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line, const void *caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
+    ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_in_cb_id, ptr, size, file, line, caller);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line, caller);
+    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_out_cb_id, ret, size, file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
@@ -382,6 +395,7 @@ void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, in
 void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, [[maybe_unused]] const void *caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
+    ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_free_cb_id, ptr, 0, file, line, caller);
     UMM_FREE_FL(ptr, file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
 }
@@ -579,10 +593,10 @@ void system_show_malloc(void)
 #endif
 }
 
-#if !defined(__cpp_exceptions)
+#if defined(DEBUG_ESP_OOM) || !defined(__cpp_exceptions) || defined(DEBUG_ESP_PORT)
 ///////////////////////////////////////////////////////////////////////////////
 // heap allocator for "new" (ABI) - To support collecting OOM info, always defined
-void* _heap_abi_malloc(size_t size, bool unhandle, const void* caller)
+void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
 {
     [[maybe_unused]] const char *file = NULL;
     [[maybe_unused]] const int line = 0;
@@ -591,16 +605,15 @@ void* _heap_abi_malloc(size_t size, bool unhandle, const void* caller)
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     void* ret = UMM_MALLOC_FL(size, file, line, caller);
-    if (!OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller) && unhandle) {
-        __unhandled_exception(PSTR("OOM"));
-    }
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     #else
     void* ret = UMM_MALLOC(size);
-    // Always do some level of OOM check
-    if (!OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, file, line, caller) && unhandle) {
+    // minimum OOM check
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, file, line, caller)
+    #endif
+    if (!ok && unhandled) {
         __unhandled_exception(PSTR("OOM"));
     }
-    #endif
     return ret;
 }
 #endif
@@ -617,23 +630,7 @@ void* _heap_abi_malloc(size_t size, bool unhandle, const void* caller)
 // Replacement C++ delete operator to capture callers address
 //
 #include <bits/c++config.h>
-
-#if !_GLIBCXX_HOSTED
-// A freestanding C runtime may not provide "free" -- but there is no
-// other reasonable way to implement "operator delete".
-namespace std
-{
-_GLIBCXX_BEGIN_NAMESPACE_VERSION
-  extern "C" void free(void*);
-_GLIBCXX_END_NAMESPACE_VERSION
-} // namespace
-#pragma message("!_GLIBCXX_HOSTED")
-#else
-// #pragma message("_GLIBCXX_HOSTED")
-// This is the path taken
 #include <cstdlib>
-#endif
-
 #include "new"
 
 // The sized deletes are defined in other files.

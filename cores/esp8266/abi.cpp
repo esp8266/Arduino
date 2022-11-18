@@ -24,12 +24,46 @@
 using __cxxabiv1::__guard;
 
 // Debugging helper, last allocation which returned NULL
-extern "C" void *_heap_abi_malloc(size_t size, bool unhandle, const void* const caller);
+extern "C" void *_heap_abi_malloc(size_t size, bool unhandled, const void* const caller);
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-#if !defined(__cpp_exceptions)
+#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT))
+/*
+  When built with C++ Exceptions: "enabled", track caller address of Last OOM.
+  * For debug build, force enable Last OOM tracking.
+  * With the option "DEBUG_ESP_OOM," always do Last OOM tracking.
+  * Otherwise, disable Last OOM tracking. The build relies on the weak link to
+    the default C++ exception handler.
+*/
+
+// Debug replacement adaptation from ".../new_op.cc".
+using std::new_handler;
+using std::bad_alloc;
+
+void * operator new (std::size_t size)
+{
+    void *p;
+
+    /* malloc (0) is unpredictable; avoid it.  */
+    if (__builtin_expect(size == 0, false)) {
+        size = 1;
+    }
+
+    while (0 == (p = _heap_abi_malloc(size, false, __builtin_return_address(0)))) {
+        new_handler handler = std::get_new_handler();
+        if (!handler) {
+            throw(bad_alloc());
+        }
+        handler();
+    }
+
+    return p;
+}
+#elif !defined(__cpp_exceptions)
+// When doing builds with C++ Exceptions "disabled", always save details of
+// the last OOM event.
 
 // overwrite weak operators new/new[] definitions
 
