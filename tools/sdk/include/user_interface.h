@@ -25,6 +25,26 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
+#if defined(NONOSDK3V0)
+#define NONOSDK (0x30000-1)
+#elif defined(NONOSDK300)
+#define NONOSDK (0x30000)
+#elif defined(NONOSDK301)
+#define NONOSDK (0x30100)
+#elif defined(NONOSDK302)
+#define NONOSDK (0x30200)
+#elif defined(NONOSDK303)
+#define NONOSDK (0x30300)
+#elif defined(NONOSDK304)
+#define NONOSDK (0x30400)
+#elif defined(NONOSDK305)
+#define NONOSDK (0x30500)
+#elif defined(NONOSDK306)
+#define NONOSDK (0x30600)
+#else
+#define NONOSDK (0x22100)
+#endif
+
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
 
@@ -249,12 +269,18 @@ typedef struct {
 struct station_config {
     uint8 ssid[32];
     uint8 password[64];
+#if (NONOSDK >= (0x30200))
+    uint8 channel;
+#endif
     uint8 bssid_set;    // Note: If bssid_set is 1, station will just connect to the router
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000-1))
     bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
+#endif
+#if (NONOSDK >= (0x30200))
+    bool all_channel_scan;
 #endif
 };
 
@@ -438,7 +464,7 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000-1))
 
 typedef enum {
     MIN_SLEEP_T,
