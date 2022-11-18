@@ -271,7 +271,7 @@ extern "C"
         return true;
     }
 
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000-1))
 
     bool wifi_set_sleep_level(sleep_level_t level)
     {
