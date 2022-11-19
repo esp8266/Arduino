@@ -454,6 +454,9 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         break;
     }
 
+    extern uint32_t user_rf_cal_sector_set(void);
+    user_rf_cal_sector_set();
+
     const partition_item_t at_partition_table[] =
     {
         { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
