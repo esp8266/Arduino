@@ -609,7 +609,7 @@ void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
     #else
     void* ret = UMM_MALLOC(size);
     // minimum OOM check
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, file, line, caller)
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, file, line, caller);
     #endif
     if (!ok && unhandled) {
         __unhandled_exception(PSTR("OOM"));
