@@ -81,7 +81,7 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 
 uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs, int value)
 {
-  attach(pin, minUs, maxUs, _valueUs);
+  attach(pin, minUs, maxUs);
   write(value);
   return pin;
 }
