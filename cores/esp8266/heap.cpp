@@ -19,48 +19,68 @@
  * either a "thin wrapper" or a "thick wrapper" to capture Heap debug info and
  * diagnostics.
  *
- * Protect ISR call paths to malloc APIs and pvPortMalloc APIs with IRAM_ATTR.
- * "new" and _malloc_r (LIBC) are not expected to be called from an ISR and are
- * not safe.
+ * Even though ISRs should not perform Heap API calls, we protect the call path
+ * with IRAM_ATTR for malloc APIs and pvPortMalloc APIs. "new" and _malloc_r
+ * (LIBC) are unprotected.
  *
- * Iventory of debug options supported by this modules
+ * Inventory of debug options supported by this modules
  *
- *  * DEBUG_ESP_OOM - Monitors all "allocating" Heap API families for failure
- *    and saves the last failure for postmortem to display. Additionally if
- *    system OS print is enabled (system_get_os_print == true), a diagnostic
- *    message can be printed at the time of the OOM event. To furthor assist in
- *    debugging, "fancy macros" redefine malloc, calloc, and realloc to their
- *    matching cousins in the portable malloc family, These allow the capturing
- *    of the file name and line number of the caller that had the OOM event.
+ *  * DEBUG_ESP_OOM - Monitors all "allocating" Heap API families for an
+ *    out-of-memory result and saves the Last OOM for Postmortem to display.
+ *    Additionally, if system OS print is enabled (system_get_os_print() ==
+ *    true) , print a diagnostic message at the time of the OOM event. To
+ *    further assist in debugging, "fancy macros" redefine malloc, calloc, and
+ *    realloc to their matching cousins in the portable malloc family.
+ *    Identifies the file name and line number of the caller where the OOM event
+ *    occurred.
  *
- *    When DEBUG_ESP_OOM is not selected, use a minimized version to monitor for
- *    OOM from LIBC and the C++ operator "new".  These wrappers check for an
- *    out-of-memory result, saving the caller address of the last fail. Report
- *    last fail at Postmortem.
+ *    When DEBUG_ESP_OOM is not selected, use a minimized Last OOM wrapper to
+ *    track LIBC and the C++ operator "new".  These wrappers only save the
+ *    caller address and size of the Last OOM - and report details at
+ *    Postmortem. No Last OOM tracking for the "new" operator with the non-debug
+ *    build and option C++ Exceptions: "enabled".
+ *
+ *    You may select DEBUG_ESP_OOM through the Arduino IDE, Tools->Debug level:
+ *    "OOM". Or, enable via a build option define.
+ *
+ *    DEBUG_ESP_WITHINISR - Monitors in-flash Heap APIs for calls from ISRs.
+ *    If they occur, print a message with the address of the caller.
+ *
+ *    Considerations:
+ *    * There may be some rare special case where 'new', 'delete', or LIBC's
+ *      _malloc_r APIs are called with interrupts disabled.
+ *    * If called from within an ISR, we could have crash before reaching
+ *      this code.
+ *
+ *    Enable via a build option define.
  *
  *  * UMM_POISON_CHECK_LITE - A much lighter version of UMM_POISON_CHECK.
  *    Adds and presets an extra 4 bytes of poison at the beginning and end of
  *    each allocation. On each call to free or realloc, test the current
  *    allocation's poison areas, then each active allocation's neighbor is
- *    tested. This option is enabled when Tools->Debug: Serial is selected or
- *    Tools->Debug level: "CORE" is selected. While coverage is not 100%, a
- *    sketch is less likely to have strange behavior from heavy heap access with
- *    interrupts disabled. If needed, continue reading "UMM_POISON_CHECK" for
- *    more details.
+ *    tested. During each successful malloc/calloc, check the neighbors of the
+ *    free block before resizing to fulfill the request.
  *
- *  * UMM_POISON_CHECK - Adds and presets 4 bytes of poison at the beginning and
- *    end of each allocation. For each Heap API call, a complete sweep through
- *    every allocation is performed, verifying that all poison bytes are
- *    correct. This check runs with interrupts disabled and may affect WiFi
- *    performance and maybe system stability.
+ *    In the absence of other UMM_POISON_... options, this option assumes
+ *    "enabled" when Tools->Debug: Serial is selected or Tools->Debug level:
+ *    "CORE" is selected. Otherwise, you may enable it via a build option
+ *    definition.
+ *
+ *    While coverage is not 100%, a sketch is less likely to have strange
+ *    behavior from heavy heap access with interrupts disabled. Also, with
+ *    UMM_POISON_CHECK_LITE, more caller context is available at "poison fail."
+ *    If you need more perspective, continue reading "UMM_POISON_CHECK."
+ *
+ *  * UMM_POISON_CHECK - Adds and presets 4 bytes of poison at the beginning
+ *    and end of each allocation. At each Heap API call, performs a global Heap
+ *    poison data verification. This check runs with interrupts disabled and may
+ *    affect WiFi performance and possibly system stability.
  *
  *    As the number of active heap allocations grows, this option will cause
  *    increasingly long periods with interrupts disabled, adversely affecting
  *    time-critical sketches.
  *
  *    Enable via a build option define.
- *
- *    UMM_POISON_CHECK_LITE is a better alternative.
  *
  *  * UMM_INTEGRITY_CHECK - will verify that the Heap is semantically correct
  *    and that all the block indexes make sense. While it can catch errors
@@ -77,8 +97,10 @@
  *    rather than general debugging. It will detect heap corruption; however, it
  *    offers little aid in determining who did it.
  *
- *    UMM_POISON_CHECK_LITE should detect most would-be heap corruptions with
- *    lower overhead.
+ *    While not as comprehensive as UMM_INTEGRITY_CHECK, using
+ *    UMM_POISON_CHECK_LITE should reveal most heap corruptions with lower
+ *    overhead.
+ *
  */
 
 #include <stdlib.h>
@@ -120,10 +142,9 @@ extern "C" {
 #undef STATIC_ALWAYS_INLINE
 #undef ENABLE_THICK_DEBUG_WRAPPERS
 
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(UMM_POISON_CHECK_LITE)
 /*
- * With either of these defines, umm_malloc will build with umm_poison_*
- * wrappers for each Heap API.
+ * umm_malloc will build with umm_poison_* wrappers for each Heap API.
  *
  * Support debug wrappers that need to include handling poison
  */
@@ -136,7 +157,22 @@ extern "C" {
 #undef realloc
 #undef free
 
-#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(HEAP_DEBUG_PROBE_PSFLC_CB)
+#elif defined(UMM_POISON_CHECK)
+/*
+ * umm_malloc will build with umm_poison_* wrappers for each Heap API.
+ *
+ * Support debug wrappers that need to include handling poison
+ */
+#define UMM_MALLOC_FL(s,f,l,c)    umm_poison_malloc(s)
+#define UMM_CALLOC_FL(n,s,f,l,c)  umm_poison_calloc(n,s)
+#define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc(p,s)
+#define UMM_FREE_FL(p,f,l,c)      umm_poison_free(p)
+#define ENABLE_THICK_DEBUG_WRAPPERS
+
+#undef realloc
+#undef free
+
+#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(DEBUG_ESP_WITHINISR) || defined(HEAP_DEBUG_PROBE_PSFLC_CB)
 // All other debug wrappers that do not require handling poison
 #define UMM_MALLOC_FL(s,f,l,c)    umm_malloc(s)
 #define UMM_CALLOC_FL(n,s,f,l,c)  umm_calloc(n,s)
@@ -317,6 +353,22 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
 #endif
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Monitor Heap APIs in flash for calls from ISRs
+//
+#if DEBUG_ESP_WITHINISR
+#define DEBUG_HEAP_PRINTF ets_uart_printf
+static void isr_check__flash_not_safe(const void *caller) {
+    if (ETS_INTR_WITHINISR()) { // Assumes, non-zero INTLEVEL means in ISR
+        DEBUG_HEAP_PRINTF("\nIn-flash, Heap API call from %p with Interrupts Disabled.\n", caller);
+    }
+}
+#define ISR_CHECK__LOG_NOT_SAFE(c) isr_check__flash_not_safe(c)
+#else
+#define ISR_CHECK__LOG_NOT_SAFE(c) do { (void)c; } while(false)
+#endif
+
+
 #ifdef ENABLE_THICK_DEBUG_WRAPPERS
 ///////////////////////////////////////////////////////////////////////////////
 // Thick Heap API wrapper for debugging: malloc, pvPortMalloc, "new", and
@@ -324,27 +376,17 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
 //
 // While UMM_INTEGRITY_CHECK and UMM_POISON_CHECK are included, the Arduino IDE
 // has no selection to build with them. Both are CPU intensive and can adversly
-// effect the WiFi operation. We use option UMM_POISON_CHECK_LITE instead of
-// UMM_POISON_CHECK. This is include in the debug build when you select the
-// Debug Port. For completeness they are all included in the list below. Both
-// UMM_INTEGRITY_CHECK and UMM_POISON_CHECK can be enabled by a build define.
+// effect the WiFi operation. For completeness they are all included in the
+// list below. Both UMM_INTEGRITY_CHECK and UMM_POISON_CHECK can be enabled by
+// build defines.
 //
-// The thinking behind the ordering of Integrity Check, Full Poison Check, and
-// the specific *alloc function.
+// A debug build will use option UMM_POISON_CHECK_LITE by default. If explicitly
+// specifying UMM_POISON_CHECK_LITE or UMM_POISON_CHECK, only one is permitted
+// in a Build.
 //
-// 1. Integrity Check - verifies the heap management information is not corrupt.
-//    This allows any other testing, that walks the heap, to run safely.
-//
-// 2. Place Full Poison Check before or after a specific *alloc function?
-//    a. After, when the *alloc function operates on an existing allocation.
-//    b. Before, when the *alloc function creates a new, not modified, allocation.
-//
-//    In a free() or realloc() call, the focus is on their allocation. It is
-//    checked 1st and reported on 1ST if an error exists. Full Poison Check is
-//    done after.
-//
-//    For malloc(), calloc(), and zalloc() Full Poison Check is done 1st since
-//    these functions do not modify an existing allocation.
+// When selected, do Integrity Check first. Verifies the heap management
+// information is not corrupt. Followed by Full Poison Check before *alloc
+// operation.
 //
 #undef malloc
 #undef calloc
@@ -384,10 +426,10 @@ void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, 
 void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line, const void *caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
+    POISON_CHECK__PANIC_FL(file, line, caller);
     ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_in_cb_id, ptr, size, file, line, caller);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line, caller);
     ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_out_cb_id, ret, size, file, line, caller);
-    POISON_CHECK__PANIC_FL(file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
 }
@@ -395,9 +437,9 @@ void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, in
 void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, [[maybe_unused]] const void *caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
+    POISON_CHECK__PANIC_FL(file, line, caller);
     ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_free_cb_id, ptr, 0, file, line, caller);
     UMM_FREE_FL(ptr, file, line, caller);
-    POISON_CHECK__PANIC_FL(file, line, caller);
 }
 
 
@@ -499,31 +541,39 @@ void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, const void
 void* _malloc_r(struct _reent* unused, size_t size)
 {
     (void) unused;
-    void* ret = _heap_pvPortMalloc(size, NULL, 0, __builtin_return_address(0));
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    void* ret = _heap_pvPortMalloc(size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
     return ret;
 }
 
 void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
-    void* ret = _heap_pvPortCalloc(count, size, NULL, 0, __builtin_return_address(0));
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    void* ret = _heap_pvPortCalloc(count, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
     return ret;
 }
 
 void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
 {
     (void) unused;
-    void* ret = _heap_pvPortRealloc(ptr, size, NULL, 0, __builtin_return_address(0));
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    void* ret = _heap_pvPortRealloc(ptr, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
     return ret;
 }
 
 void _free_r(struct _reent* unused, void* ptr)
 {
     (void) unused;
-    _heap_vPortFree(ptr, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    _heap_vPortFree(ptr, NULL, 0, caller);
 }
 
 
@@ -602,9 +652,11 @@ void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
     [[maybe_unused]] const int line = 0;
 
     #ifdef ENABLE_THICK_DEBUG_WRAPPERS
+    ISR_CHECK__LOG_NOT_SAFE(caller);
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     void* ret = UMM_MALLOC_FL(size, file, line, caller);
+    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_abi_malloc_cb_id, ret, size, file, line, caller);
     bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     #else
     void* ret = UMM_MALLOC(size);
@@ -639,11 +691,15 @@ void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
 // These function replace their weak counterparts tagged with _GLIBCXX_WEAK_DEFINITION
 void operator delete(void* ptr) noexcept
 {
-    _heap_vPortFree(ptr, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    _heap_vPortFree(ptr, NULL, 0, caller);
 }
 
 void operator delete(void* ptr, std::size_t) noexcept
 {
-    _heap_vPortFree(ptr, NULL, 0, __builtin_return_address(0));
+    void *caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    _heap_vPortFree(ptr, NULL, 0, caller);
 }
 #endif

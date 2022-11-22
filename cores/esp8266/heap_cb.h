@@ -10,9 +10,17 @@
  * ets_uart_printf(...)).
  *
  * Example:
- *   extern "C" void my_user_bp(const char* f, int l, const void* c) {
- *     (void)f; (void)l; (void)c;
- *     __asm__ __volatile__("break 1, 0;" ::: "memory");
+ *   const char watch_module[] PROGMEM STORE_ATTR = __FILE__; // assigned from file to monitor
+ *
+ *   extern const char watch_module[];
+ *
+ *   extern "C" void my_user_bp(heap_api_cb_id id, void *ptr, size_t size,
+ *     const char* file, int line, const void *caller) {
+ *     (void)ptr; (void)size; (void)file; (void)line; (void)caller;
+ *
+ *     if (watch_module == file && id == heap_poison_lite_cb_id) {
+ *       __asm__ __volatile__("break 1, 0;" ::: "memory");
+ *     }
  *   }
  *
  *   -DHEAP_DEBUG_PROBE_PSFLC_CB='my_user_bp'

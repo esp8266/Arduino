@@ -126,7 +126,8 @@ static void *get_poisoned(void *vptr, size_t size_w_poison) {
 
     return (void *)ptr;
 }
-
+#endif
+#if defined(UMM_POISON_CHECK)
 /*
  * Takes "poisoned" pointer (i.e. pointer returned from `get_poisoned()`),
  * and checks that the poison of this particular block is still there.
@@ -154,7 +155,8 @@ static void *get_unpoisoned(void *vptr) {
 }
 
 /* }}} */
-
+#endif
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 /* ------------------------------------------------------------------------ */
 
 void *umm_poison_malloc(size_t size) {
@@ -190,6 +192,9 @@ void *umm_poison_calloc(size_t num, size_t item_size) {
 
     return ret;
 }
+
+#endif  // #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(UMM_POISON_CHECK)
 
 /* ------------------------------------------------------------------------ */
 
@@ -251,6 +256,6 @@ bool umm_poison_check(void) {
 
 /* ------------------------------------------------------------------------ */
 
-#endif
+#endif  // #if defined(UMM_POISON_CHECK)
 
 #endif  // defined(BUILD_UMM_MALLOC_C)

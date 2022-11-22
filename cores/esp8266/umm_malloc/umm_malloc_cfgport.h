@@ -216,4 +216,138 @@ extern char _heap_start[];
 #error "Specify at least one of these build options: (UMM_STATS or UMM_STATS_FULL) and/or UMM_INFO and/or UMM_INLINE_METRICS"
 #endif
 
+
+////////////////////////////////////////////////////////////////////////////////
+/*
+ * -D UMM_POISON_CHECK :
+ * -D UMM_POISON_CHECK_LITE :
+ * -D UMM_POISON_NONE
+ *
+ * Enables heap poisoning: add predefined value (poison) before and after each
+ * allocation, and check before each heap operation that no poison is
+ * corrupted.
+ *
+ * Other than the poison itself, we need to store exact user-requested length
+ * for each buffer, so that overrun by just 1 byte will be always noticed.
+ *
+ * Customizations:
+ *
+ *    UMM_POISON_SIZE_BEFORE:
+ *      Number of poison bytes before each block, e.g. 4
+ *    UMM_POISON_SIZE_AFTER:
+ *      Number of poison bytes after each block e.g. 4
+ *    UMM_POISONED_BLOCK_LEN_TYPE
+ *      Type of the exact buffer length, e.g. `uint16_t`
+ *
+ * NOTE: each allocated buffer is aligned by 4 bytes. But when poisoning is
+ * enabled, actual pointer returned to user is shifted by
+ * `(sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE)`.
+ * It's your responsibility to make resulting pointers aligned appropriately.
+ *
+ * If poison corruption is detected, the message is printed and user-provided
+ * callback is called: `UMM_HEAP_CORRUPTION_CB()`
+ *
+ * UMM_POISON_CHECK - does a global heap check on all active allocation at
+ * every alloc API call. May exceed 10us due to critical section with IRQs
+ * disabled.
+ *
+ * UMM_POISON_CHECK_LITE - checks the allocation presented at realloc()
+ * and free(). Expands the poison check on the current allocation to
+ * include its nearest allocated neighbors in the heap.
+ * umm_malloc() will also checks the neighbors of the selected allocation
+ * before use.
+ *
+ * UMM_POISON_NONE - No UMM_POISON... checking.
+ *
+ * Status: TODO?: UMM_POISON_CHECK_LITE is a new option. We could propose for
+ * upstream; however, the upstream version has much of the framework for calling
+ * poison check on each alloc call refactored out. Not sure how this will be
+ * received.
+ */
+
+/*
+ * Compatibility for deprecated UMM_POISON
+ */
+#if defined(UMM_POISON) && !defined(UMM_POISON_CHECK) && !defined(UMM_POISON_NONE)
+#define UMM_POISON_CHECK_LITE
+#endif
+
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_CORE)
+#if !defined(UMM_POISON_CHECK) && !defined(UMM_POISON_CHECK_LITE) && !defined(UMM_POISON_NONE)
+/*
+#define UMM_POISON_CHECK
+ */
+#define UMM_POISON_CHECK_LITE
+#endif
+#endif
+
+#if defined(UMM_POISON_CHECK) && defined(UMM_POISON_CHECK_LITE)
+// There can only be one.
+#error "Build options UMM_POISON_NONE, UMM_POISON_CHECK and UMM_POISON_CHECK_LITE are mutually exclusive."
+#endif
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+#if defined(UMM_POISON_NONE)
+#error "Build options UMM_POISON_NONE, UMM_POISON_CHECK and UMM_POISON_CHECK_LITE are mutually exclusive."
+#endif
+
+#define UMM_POISON_SIZE_BEFORE (4)
+#define UMM_POISON_SIZE_AFTER (4)
+#define UMM_POISONED_BLOCK_LEN_TYPE uint32_t
+
+extern void *umm_poison_malloc(size_t size);
+extern void *umm_poison_calloc(size_t num, size_t size);
+#endif
+
+#if defined(UMM_POISON_CHECK_LITE)
+/*
+ * Local Additions to better report location in code of the caller.
+ *
+ * We can safely do individual poison checks at free and realloc and stay
+ * under 10us or close.
+ */
+extern void *umm_poison_realloc_flc(void *ptr, size_t size, const char *file, int line, const void *caller);
+extern void  umm_poison_free_flc(void *ptr, const char *file, int line, const void *caller);
+// No meaningful information is conveyed with panic() for fail. Save space used abort().
+#define POISON_CHECK_NEIGHBORS(c) \
+    do { \
+        if (!check_poison_neighbors(_context, c)) { \
+            DBGLOG_ERROR("This bad block is in a neighbor allocation near free memory %p\n", (void *)&UMM_BLOCK(c)); \
+            abort(); \
+        } \
+    } while (false)
+/*
+ * Nullify any POISON_CHECK for UMM_POISON_CHECK builds.
+ */
+#define POISON_CHECK() 1
+
+#elif defined(UMM_POISON_CHECK)
+extern void *umm_poison_realloc(void *ptr, size_t size);
+extern void  umm_poison_free(void *ptr);
+extern bool  umm_poison_check(void);
+/* Not normally enabled. A full heap poison check may exceed 10us. */
+#define POISON_CHECK() umm_poison_check()
+#define POISON_CHECK_NEIGHBORS(c) do {} while (false)
+
+#else
+#define POISON_CHECK() 1
+#define POISON_CHECK_NEIGHBORS(c) do {} while (false)
+#endif
+
+
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+/*
+ * Overhead adjustments needed for free_blocks to express the number of bytes
+ * that can actually be allocated.
+ */
+#define UMM_OVERHEAD_ADJUST ( \
+    umm_block_size() / 2 + \
+    UMM_POISON_SIZE_BEFORE + \
+    UMM_POISON_SIZE_AFTER + \
+    sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
+
+#else
+#define UMM_OVERHEAD_ADJUST  (umm_block_size() / 2)
+#endif
+
 #endif

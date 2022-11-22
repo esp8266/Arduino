@@ -81,9 +81,6 @@ static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur) {
 
     return true;
 }
-#endif
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 
 /* ------------------------------------------------------------------------ */
 #include "heap_cb.h"
@@ -95,7 +92,6 @@ static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, 
 
         ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
-        #if defined(UMM_POISON_CHECK_LITE)
         UMM_CRITICAL_DECL(id_poison);
         uint16_t c;
         bool poison = true;
@@ -106,13 +102,13 @@ static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, 
             c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
 
             UMM_CRITICAL_ENTRY(id_poison);
-            if (! check_poison_block(&UMM_BLOCK(c))) {
+            if (!check_poison_block(&UMM_BLOCK(c))) {
                 DBGLOG_ERROR("Allocation address %p\n", vptr);
                 size_t size = *(size_t *)ptr;
                 _HEAP_DEBUG_PROBE_PSFLC_CB(heap_poison_lite_cb_id, (void *)ptr, size, file, line, caller);
                 poison = false;
             } else
-            if (! check_poison_neighbors(_context, c)) {
+            if (!check_poison_neighbors(_context, c)) {
                 DBGLOG_ERROR("This bad block is in a neighbor allocation near: %p\n", vptr);
                 _HEAP_DEBUG_PROBE_PSFLC_CB(heap_poison_lite_neighbor_cb_id, (void *)ptr, 0, file, line, caller);
                 poison = false;
@@ -125,21 +121,13 @@ static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, 
         }
 
         if (!poison) {
-            DBGLOG_ERROR("Called from %p\n", caller);
+            DBGLOG_ERROR("Caller near %p\n", caller);
             if (file) {
                 __panic_func(file, line, "");
             } else {
                 abort();
             }
         }
-        #else
-        /*
-         *  No need to check poison here. POISON_CHECK() has already done a
-         *  full heap check.
-         */
-        (void)file;
-        (void)line;
-        #endif
     }
 
     return (void *)ptr;

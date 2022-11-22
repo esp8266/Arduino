@@ -29,7 +29,7 @@ extern "C" void *_heap_abi_malloc(size_t size, bool unhandled, const void* const
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT))
+#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR))
 /*
   When built with C++ Exceptions: "enabled", track caller address of Last OOM.
   * For debug build, force enable Last OOM tracking.
