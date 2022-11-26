@@ -313,6 +313,15 @@ bool WiFiClient::flush(unsigned int maxWaitMs)
     return _client->wait_until_acked(maxWaitMs);
 }
 
+// Api for heap saving. Must be call just before WiFiClient::stop().
+void WiFiClient::abortTimeWait() 
+{
+    if (!_client) return;
+    tcp_pcb* p;
+    p = _client->getPCB();
+    if (p) tcp_abort(p);
+}
+
 bool WiFiClient::stop(unsigned int maxWaitMs)
 {
     if (!_client)
