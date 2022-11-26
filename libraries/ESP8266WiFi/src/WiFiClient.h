@@ -103,6 +103,17 @@ public:
   friend class WiFiServer;
 
   using Print::write;
+  
+  // Api for saving precious heap.
+  // When Client class is used by a Server: Client = Server.available(), sockets in TIME_WAIT remain after
+  // issuing Client.stop by the Server application.
+  // This reduce drastically the heap memory in case of multiple client connections to the server ending
+  // with a Server shutdown and an ESP8266 reboot after some hours because of insufficient heap memory.
+  // This API is provided to free heap memory by mean of closing sockets just before issuing a Client.stop
+  // by the Server.
+  // The Server must use this API just before calling Client.stop
+  // Note: none of the proposed methode e.g. tcpCleanup and tcp_kill_timewait works properly.
+  void abortTimeWait(); 
 
   static void stopAll();
   static void stopAllExcept(WiFiClient * c);
