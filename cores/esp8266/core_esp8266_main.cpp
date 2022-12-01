@@ -464,14 +464,17 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
     };
     system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
-
-    extern void user_rf_pre_init();
-    void user_rf_pre_init();
 }
 
 #endif
 
 extern "C" void user_init(void) {
+
+#if (NONOSDK >= (0x30000))
+    extern void user_rf_pre_init();
+    user_rf_pre_init();
+#endif
+
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
