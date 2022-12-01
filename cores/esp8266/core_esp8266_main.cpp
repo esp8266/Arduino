@@ -464,6 +464,9 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
     };
     system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
+
+    extern void user_rf_pre_init();
+    void user_rf_pre_init();
 }
 
 #endif
