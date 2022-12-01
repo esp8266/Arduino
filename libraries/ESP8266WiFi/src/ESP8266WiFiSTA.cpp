@@ -61,7 +61,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
 
-#if (NONOSDK >= (0x30000-1))
+#if (NONOSDK >= (0x30000 - 1))
     static_assert(sizeof(station_config) == 116, "struct station_config has changed, please update comparison function");
 #else
     static_assert(sizeof(station_config) == 112, "struct station_config has changed, please update comparison function");
@@ -94,7 +94,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
         return false;
     }
 
-#if (NONOSDK >= (0x30000-1))
+#if (NONOSDK >= (0x30000 - 1))
     if(lhs.open_and_wep_mode_disable != rhs.open_and_wep_mode_disable) {
         return false;
     }
@@ -166,7 +166,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
-#if (NONOSDK >= (0x30000-1))
+#if (NONOSDK >= (0x30000 - 1))
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 #endif
 #if (NONOSDK >= (0x30200))

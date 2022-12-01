@@ -26,7 +26,7 @@
 #define __USER_INTERFACE_H__
 
 #if defined(NONOSDK3V0)
-#define NONOSDK (0x30000-1)
+#define NONOSDK (0x30000 - 1)
 #elif defined(NONOSDK300)
 #define NONOSDK (0x30000)
 #elif defined(NONOSDK301)
@@ -276,7 +276,7 @@ struct station_config {
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
-#if (NONOSDK >= (0x30000-1))
+#if (NONOSDK >= (0x30000 - 1))
     bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
 #endif
 #if (NONOSDK >= (0x30200))
@@ -464,7 +464,7 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
-#if (NONOSDK >= (0x30000-1))
+#if (NONOSDK >= (0x30000 - 1))
 
 typedef enum {
     MIN_SLEEP_T,
