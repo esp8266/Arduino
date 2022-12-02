@@ -74,6 +74,35 @@ SECTIONS
     _dport0_data_end = ABSOLUTE(.);
   } >dport0_0_seg :dport0_0_phdr
 
+#ifdef FREE_MORE_DRAM
+  .irom0.text1 : ALIGN(4)
+  {
+    *(.sdk.version)
+    *libc.a:lib_a-dtoa.o                (.rodata .rodata.*)
+    *libc.a:lib_a-gdtoa-gethex.o        (.rodata .rodata.*)
+    *libc.a:lib_a-impure.o              (.rodata .rodata.*)
+    *libc.a:lib_a-lcltime.o             (.rodata .rodata.*)
+    *libc.a:lib_a-lnumeric.o            (.rodata .rodata.*)
+    *libc.a:lib_a-locale.o              (.rodata .rodata.* .data)
+    *libc.a:lib_a-mprec.o               (.rodata .rodata.*)
+    *libc.a:lib_a-nano-svfprintf.o      (.rodata .rodata.*)
+    *libc.a:lib_a-nano-svfscanf.o       (.rodata .rodata.*)
+    *libc.a:lib_a-nano-vfprintf_float.o (.rodata .rodata.*)
+    *libc.a:lib_a-nano-vfprintf.o       (.rodata .rodata.*)
+    *libc.a:lib_a-nano-vfscanf_float.o  (.rodata .rodata.*)
+    *libc.a:lib_a-nano-vfscanf_i.o      (.rodata .rodata.*)
+    *libc.a:lib_a-rand.o                (.rodata .rodata.*)
+    *libc.a:lib_a-strtod.o              (.rodata .rodata.*)
+    *libc.a:lib_a-tzset_r.o             (.rodata .rodata.*)
+    *libc.a:lib_a-tzvars.o              (.rodata .rodata.*)
+    *liblwip2-536.a:                    (.rodata .rodata.memp_pools .rodata.tcp_pcb_lists .rodata.dns_mquery_v4group .rodata.ip_addr_broadcast .rodata.ip_addr_any)
+    *liblwip2-1460.a:                   (.rodata .rodata.memp_pools .rodata.tcp_pcb_lists .rodata.dns_mquery_v4group .rodata.ip_addr_broadcast .rodata.ip_addr_any)
+    *libnet80211.a:ieee80211_input.o    (.rodata .rodata.* .data) 
+    *libphy.a:phy_chip_v6.o             (.rodata .rodata.*)
+    *libpp.a:esf_buf.o                  (.rodata .rodata.*)
+  } >irom0_0_seg :irom0_0_phdr
+#endif
+
   .data : ALIGN(4)
   {
     _data_start = ABSOLUTE(.);
@@ -249,32 +278,6 @@ SECTIONS
 
     /* std::make_shared */
     *(.rodata._ZZNSt19_Sp_make_shared_tag5_S_tiEvE5__tag)
-
-#ifdef FREE_MORE_DRAM
-    *(.sdk.version)
-    *libc.a:lib_a-dtoa.o                (.rodata .rodata.*)
-    *libc.a:lib_a-gdtoa-gethex.o        (.rodata .rodata.*)
-    *libc.a:lib_a-impure.o              (.rodata .rodata.*)
-    *libc.a:lib_a-lcltime.o             (.rodata .rodata.*)
-    *libc.a:lib_a-lnumeric.o            (.rodata .rodata.*)
-    *libc.a:lib_a-locale.o              (.rodata .rodata.* .data)
-    *libc.a:lib_a-mprec.o               (.rodata .rodata.*)
-    *libc.a:lib_a-nano-svfprintf.o      (.rodata .rodata.*)
-    *libc.a:lib_a-nano-svfscanf.o       (.rodata .rodata.*)
-    *libc.a:lib_a-nano-vfprintf_float.o (.rodata .rodata.*)
-    *libc.a:lib_a-nano-vfprintf.o       (.rodata .rodata.*)
-    *libc.a:lib_a-nano-vfscanf_float.o  (.rodata .rodata.*)
-    *libc.a:lib_a-nano-vfscanf_i.o      (.rodata .rodata.*)
-    *libc.a:lib_a-rand.o                (.rodata .rodata.*)
-    *libc.a:lib_a-strtod.o              (.rodata .rodata.*)
-    *libc.a:lib_a-tzset_r.o             (.rodata .rodata.*)
-    *libc.a:lib_a-tzvars.o              (.rodata .rodata.*)
-    *liblwip2-536.a:                    (.rodata .rodata.memp_pools .rodata.tcp_pcb_lists .rodata.dns_mquery_v4group .rodata.ip_addr_broadcast .rodata.ip_addr_any)
-    *liblwip2-1460.a:                   (.rodata .rodata.memp_pools .rodata.tcp_pcb_lists .rodata.dns_mquery_v4group .rodata.ip_addr_broadcast .rodata.ip_addr_any)
-    *libnet80211.a:ieee80211_input.o    (.rodata .rodata.* .data)
-    *libphy.a:phy_chip_v6.o             (.rodata .rodata.*)
-    *libpp.a:esf_buf.o                  (.rodata .rodata.*)
-#endif
 
     . = ALIGN(4);
     *(.gcc_except_table .gcc_except_table.*)
