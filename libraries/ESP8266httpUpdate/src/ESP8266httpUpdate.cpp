@@ -61,6 +61,15 @@ void ESP8266HTTPUpdate::setAuthorization(const String &auth)
     _auth = auth;
 }
 
+/**
+ * set the Timeout for the http request
+ * @param httpClientTimeout const int& millis
+ */
+void ESP8266HTTPUpdate::setClientTimeout(const int &httpClientTimeout)
+{
+    _httpClientTimeout = httpClientTimeout;
+}
+
 HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url, const String& currentVersion)
 {
     HTTPClient http;
