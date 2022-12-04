@@ -130,6 +130,8 @@ public:
     int getLastError(void);
     String getLastErrorString(void);
 
+    void setClientTimeout(const int &);
+
 protected:
     t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion, bool spiffs = false);
     bool runUpdate(Stream& in, uint32_t size, const String& md5, int command = U_FLASH);
