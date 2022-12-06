@@ -196,7 +196,7 @@ nonosdk_version = NONOSDK_VERSIONS[0]
 NONOSDK_PREFIX = "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_"
 for define in env["CPPDEFINES"]:
     if isinstance(define, (tuple, list)):
-        define, _ = define
+        define, *_ = define
     if define.startswith(NONOSDK_PREFIX):
         for version in NONOSDK_VERSIONS:
             name, _ = version
@@ -204,7 +204,7 @@ for define in env["CPPDEFINES"]:
                 nonosdk_version = version
 
 NONOSDK_LIBPATH=join(FRAMEWORK_DIR, "tools", "sdk", "lib", nonosdk_version[1])
-assert(isdir(NONOSDK_LIBPATH))
+assert isdir(NONOSDK_LIBPATH)
 
 env.Append(
     CPPDEFINES=[(nonosdk_version[1], 1)],
@@ -336,7 +336,7 @@ elif "PIO_FRAMEWORK_ARDUINO_MMU_CUSTOM" in flatten_cppdefines:
     for flag in env["CPPDEFINES"]:
         define = flag
         if isinstance(flag, (tuple, list)):
-            define, _ = flag
+            define, *_ = flag
         if define.startswith("MMU_"):
             mmu_flags.append(flag)
 # PIO_FRAMEWORK_ARDUINO_MMU_CACHE32_IRAM32 (default)
