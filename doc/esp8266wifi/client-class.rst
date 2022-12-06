@@ -29,6 +29,35 @@ Default input value 0 means that effective value is left at the discretion of th
 
 ``stop()`` returns ``false`` in case of an issue when closing the client (for instance a timed-out ``flush``). Depending on implementation, its parameter can be passed to ``flush()``.
 
+abort
+~~~~~
+
+.. code:: cpp
+
+   void abort();
+
+
+Originally proposed in `#8738 <https://github.com/esp8266/Arduino/pull/8738>`__
+Unlike ``stop()``, immediately shuts down internal connection object.
+
+Under usual circumstances, we either enter ``CLOSE_WAIT`` or ``TIME_WAIT`` state. But, the connection object is not freed right away, and requires us to either
+* wait until ``malloc()`` returns ``NULL`` when our TCP stack tries to allocate memory for a new connection
+* manually call ``tcp_kill_timewait()`` to forcibly stop the 'oldest' connection
+
+This API frees up resources used by the connection. Consider using it instead of ``stop()`` if your application handles a lot of clients and frequently runs out of available heap memory.
+
+*Example:*
+
+.. code:: cpp
+   # define MIN_HEAP_FREE 20000 // or whatever min available heap memory convienent for your application 
+   auto client = server.accept();
+   // ... do something with the client object ...
+   if (ESP.getFreeHeap() >= MIN_HEAP_FREE) {
+     client.stop();
+   } else {
+     client.abort();
+   }
+
 setNoDelay
 ~~~~~~~~~~
 

@@ -104,57 +104,6 @@ public:
 
   using Print::write;
   
-// Api for saving heap when Client class is used by a Server (WiFiServer class): Client = Server.available(). 
-
-// Suppose the local end is the server and the remote end is the client, we will deal with heap memory at the local end.
-  
-// When the local application (server) decides to close an active connection with a remote end it issues an Client.stop.
-// the stop() function calls the close() function of ClientContext class which in turn calls tcp_close.
-// The connexion is closed by tcp_close and the protocol control block (pcb) can be put in the following states depending 
-// on the requests sent by the remote: CLOSING, FIN_WAIT_1 and FIN_WAIT_2. In theses states pcbs are not freed, then consume 
-// some memory heap.  
-// If an acknowledgment from the remote end is received, the pcb enter in TIME_WAIT state for some minutes but pcbs in TIME_WAIT
-// state are not freed. Then consume some heap memory. 
-// TIME_WAIT pcbs are automatically freed after some minutes or can be freed for instance issuing an tcp_kill_timewait() 
-// in the local application which will free the oldest pcb in TIME_WAIT state.
-    
-// If the connection is first closed from the remote end (the client), the local end (server) receive a connection termination request. It then
-// acknowledge it and enter in CLOSE_WAIT state waiting for a connection termination request from the local application. 
-// It then send a termination request and enter in LAST_ACK state until it receive an acknowledgment from the remote end.
-// After receiving the acknowledgment it enter in ClOSED state and the local pcb is freed leaving some room in the heap memory.
-  
-// To summarize, when a connexion termination request is send by one end (remote or local), the local pcb is not freed immediatly.
-// This pcb can be in the following states: FIN_WAIT_1, FIN_WAIT_2, CLOSING, TIME_WAIT, CLOSE_WAIT, LAST_ACK. 
-// As a consequence, some old pcbs from old closed connections can still consume heap memory.
-  
-// The local application can call tcp_kill_timewait hoping it will free some TIME_WAIT state pcbs. But if the server
-// receive frequent connections requests and close them after sending whatever it has to send, there may be zero pcbs 
-// in TIME_WAIT state among all previously closed pcbs.
-  
-// In case of insufficient memory to accept a new connection, lwip has developped a strategy: it successively tries 
-// to kill the oldest pcb in TIME_WAIT state, or in LAST_ACK state or in CLOSING state or the oldest active connection 
-// with lower priority than the new one.
-
-// A a matter of fact this "urgent" strategy is deployed only when very few heap memory remain available (less than some kb).
-// In case of success, Client.available returns a valid Client but the local application will crash when sending or receiving
-// data from the client (Client.read ou readuntil or available) because this need more heap memory and just some kb were 
-// freed in lwip to allocate the new pcb structure ans start the new connection.  
-
-// The propose API is intended to avoid this drawback by calling the abort function of ClientContext which in turn 
-// calls tcp_abort which calls tcp_abandon. The connection is aborted and notified to the client with a RESET 
-// and the pcb and ressources associated are immediately released increasing the available heap memory.
-
-// This API can be used in two ways:
-
-// WiFiClient Client;
-// 1- Replace every Client.stop() with Client.abort()
-// or
-// 2- In conjonction with Client.stop in the following style:
-//    # define MIN_HEAP_FREE 20000 // or whatever min available heap memory convienent for your application 
-//    if ( ESP.getFreeHeap() >= MIN_HEAP_FREE ) Client.stop();
-//    else Client.abort();
-  void abort(); 
-      
   static void stopAll();
   static void stopAllExcept(WiFiClient * c);
 
@@ -198,6 +147,10 @@ public:
 
   virtual bool outputCanTimeout () override { return connected(); }
   virtual bool inputCanTimeout () override { return connected(); }
+
+  // Immediately stops this client instance.
+  // Unlike stop(), does not wait to gracefuly shutdown the connection.
+  void abort();
 
 protected:
 
