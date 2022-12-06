@@ -404,7 +404,77 @@ extern "C" void flashinit (void);
 uint32_t __flashindex;
 #endif
 
+#if (NONOSDK >= (0x30000))
+
+extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
+{
+    uint32_t rf_cal = 0;
+    uint32_t phy_data = 0;
+    uint32_t system_parameter = 0;
+
+    switch (system_get_flash_size_map())
+    {
+    case FLASH_SIZE_2M:
+        rf_cal = 0x3b000;
+        phy_data = 0x3c000;
+        system_parameter = 0x3d000;
+        break;
+    case FLASH_SIZE_4M_MAP_256_256:
+        rf_cal = 0x7b000;
+        phy_data = 0x7c000;
+        system_parameter = 0x7d000;
+        break;
+    case FLASH_SIZE_8M_MAP_512_512:
+        rf_cal = 0xfb000;
+        phy_data = 0xfc000;
+        system_parameter = 0xfd000;
+        break;
+    case FLASH_SIZE_16M_MAP_512_512:
+    case FLASH_SIZE_16M_MAP_1024_1024:
+        rf_cal = 0x1fb000;
+        phy_data = 0x1fc000;
+        system_parameter = 0x1fd000;
+        break;
+    case FLASH_SIZE_32M_MAP_512_512:
+    case FLASH_SIZE_32M_MAP_1024_1024:
+    case FLASH_SIZE_32M_MAP_2048_2048:
+        rf_cal = 0x3fb000;
+        phy_data = 0x3fc000;
+        system_parameter = 0x3fd000;
+        break;
+    case FLASH_SIZE_64M_MAP_1024_1024:
+        rf_cal = 0x7fb000;
+        phy_data = 0x7fc000;
+        system_parameter = 0x7fd000;
+        break;
+    case FLASH_SIZE_128M_MAP_1024_1024:
+        rf_cal = 0xffb000;
+        phy_data = 0xffc000;
+        system_parameter = 0xffd000;
+        break;
+    }
+
+    extern uint32_t user_rf_cal_sector_set(void);
+    user_rf_cal_sector_set();
+
+    const partition_item_t at_partition_table[] =
+    {
+        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
+        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
+        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
+    };
+    system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
+}
+
+#endif
+
 extern "C" void user_init(void) {
+
+#if (NONOSDK >= (0x30000))
+    extern void user_rf_pre_init();
+    user_rf_pre_init();
+#endif
+
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
