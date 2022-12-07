@@ -1,6 +1,13 @@
 #!/bin/bash
 # set -e
 
+single_sdk="${2}"
+if [[ -n "$single_sdk" ]]; then
+  if [[ "NONOSDK" != "${single_sdk:0:7}" ]]; then
+    single_sdk=""
+  fi
+fi
+
 add_path_ifexist() {
   if [[ -d $1 ]]; then
     export PATH=$( realpath $1 ):$PATH
@@ -24,6 +31,10 @@ EOF
 }
 
 list_sdks() {
+  if [[ -n "$single_sdk" ]]; then
+    echo -e "$single_sdk"
+    return
+  fi
   cat <<EOF
 NONOSDK22x_190313
 NONOSDK22x_190703
@@ -68,7 +79,7 @@ analyze() {
   done
   echo ""
 
-  find . -name eap.o -exec md5sum {} \; | sort
+  find . -name eap.o -exec md5sum {} \; | sort -k2
   echo ""
 
   unset prev_sdk

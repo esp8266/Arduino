@@ -81,12 +81,28 @@ elif [[ ${VERSION} == "NONOSDK22x"* ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "3059" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
 	patchFile "eap.o" "26356" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
-elif [[ ${VERSION} == "NONOSDK3V0"* ]]; then
+elif [[ ${VERSION} == "NONOSDK3V0" ]]; then
 	addSymbol_system_func1 "0x60"
 	patchFile "eap.o" "3059" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
 	patchFile "eap.o" "26356" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
-elif [[ ${VERSION} == "NONOSDK3"* ]]; then
+elif [[ ${VERSION} == "NONOSDK300" ]]; then
 	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "19204" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+elif [[ ${VERSION} == "NONOSDK301" ]]; then
+	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "26364" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+elif [[ ${VERSION} == "NONOSDK302" ]]; then
+	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+elif [[ ${VERSION} == "NONOSDK303" ]]; then
+	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+elif [[ ${VERSION} == "NONOSDK304" ]]; then
+	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "19376" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+elif [[ ${VERSION} == "NONOSDK305" ]]; then
+	addSymbol_system_func1 "0x54"
+	patchFile "eap.o" "67670" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 else
 	echo "WARN: Unknown address for system_func1() called by system_restart_local()"
 fi
