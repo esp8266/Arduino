@@ -35,8 +35,7 @@
     // Minor changes only line number changed
     #define SDK_LEAK_LINE 831
 #elif defined(NONOSDK305)
-    // Freed up IRAM ??
-    // Moved from `.text.eap_peer_config_deinit` to `eap_peer_config_deinit`
+    // Changed from `.text.eap_peer_config_deinit` to `eap_peer_config_deinit`
     #define SDK_LEAK_LINE 831
 #else
     #define SDK_LEAK_LINE 799

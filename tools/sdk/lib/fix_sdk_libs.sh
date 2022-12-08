@@ -42,6 +42,35 @@ patchFile() {
 	fi
 }
 
+grepPatchFile() {
+	local SDKVER OLDNAME NEWNAME FILES OLDNAME64 NEWNAME64 FILE OFFSET PATTERN
+	SDKVER="${1}"
+	OLDNAME="${2}"
+	NEWNAME="${3}"
+	FILES="${4}"
+  [[ "${SDKVER:0:9}" != "NONOSDK30" ]] && return
+	if [[ -z "${FILES}" ]]; then
+		echo "grepPatchFile: bad input: file specification required"
+		exit 1
+  fi
+	if [[ "${#OLDNAME}" != "${#NEWNAME}" ]]; then
+		echo "grepPatchFile: bad input: old name ${OLDNAME}(${#OLDNAME}) and new name ${NEWNAME}(${#NEWNAME}) must be the same length."
+		exit 1
+	fi
+	OLDNAME64=( `echo -n "${OLDNAME}" | base64 -w0` )
+	NEWNAME64=( `echo -n "${NEWNAME}" | base64 -w0` )
+
+  while read -u3 FILE OFFSET PATTERN; do
+		if [[ "${#OLDNAME}" == "${#PATTERN}" ]] && [[ "${OLDNAME}" == "${PATTERN}" ]]; then
+			patchFile "$FILE" "$OFFSET" "${#PATTERN}" "${OLDNAME64}" "${NEWNAME64}"
+		else
+			echo "grepPatchFile: bad parameters FILE=${FILE} OFFSET=${OFFSET} PATTERN=${PATTERN}"
+			exit 1
+		fi
+  done 3< <( grep --with-filename --byte-offset --only-matching --text "${OLDNAME}" $FILES | tr ":" " " )
+	return
+}
+
 # # xtensa-lx106-elf-ar x libwpa2.a eap.o
 if [[ "--shell" == "$1" ]]; then
 	# need to poke around a bit
@@ -88,21 +117,29 @@ elif [[ ${VERSION} == "NONOSDK3V0" ]]; then
 elif [[ ${VERSION} == "NONOSDK300" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "19204" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	# v3.0.0 and up use a non-standard pvPortMalloc.
+	# SDK Library global replace
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a' #
 elif [[ ${VERSION} == "NONOSDK301" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26364" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
 elif [[ ${VERSION} == "NONOSDK302" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
 elif [[ ${VERSION} == "NONOSDK303" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
 elif [[ ${VERSION} == "NONOSDK304" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "19376" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
 elif [[ ${VERSION} == "NONOSDK305" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "67670" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
 else
 	echo "WARN: Unknown address for system_func1() called by system_restart_local()"
 fi
