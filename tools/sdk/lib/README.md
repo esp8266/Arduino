@@ -1,10 +1,13 @@
-## Adding new SDKs
+## Adding a new SDK library
 
-- Create a new directory for the new SDK
+- Create a directory for the new SDK.
 - Copy .a files from SDK `lib` directory to the new directory
-- Run `./eval_fix_sdks.sh --analyze`.
-- Use above results to update `fix_sdk_libs.sh` to handle new SDK
-- Once `fix_sdk_libs.sh` has been updated. You can run `./eval_fix_sdks.sh --patch` to do a batch run of `fix_sdk_libs.sh` against each SDK.
+- Add the new SDK directory to those supported in `eval_fix_sdks.sh` and `fix_sdk_libs.sh`.
+- To support WPA2 Enterprise connections, some patches are  reguired review `wpa2_eap_patch.cpp` and `eval_fix_sdks.sh` for details.
+- Use `./eval_fix_sdks.sh --analyze` to aid in finding relevant differences.
+  - Also, you can compare two SDKs with something like `./eval_fix_sdks.sh --analyze "NONOSDK305\nNONOSDK306"`
+- Apply updates to `fix_sdk_libs.sh` and `wpa2_eap_patch.cpp`. You can run `./eval_fix_sdks.sh --patch` to do a batch run of `fix_sdk_libs.sh` against each SDK.
+- If you used this section, you can skip _Updating SDK libraries_.
 
 ## Updating SDK libraries
 

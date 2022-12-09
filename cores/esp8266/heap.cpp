@@ -387,6 +387,7 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
     return heap_vPortFree(ptr, file, line);
 }
 
+#if (NONOSDK >= (0x30000))
 ////////////////////////////////////////////////////////////////////////////////
 /*
   New for NON-OS SDK 3.0.0 and up
@@ -424,4 +425,19 @@ void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
     return heap_pvPortZalloc(size, file, line);
 }
 
+/*
+  uint32_t IRAM_ATTR user_iram_memory_is_enabled(void)
+  {
+    return CONFIG_ENABLE_IRAM_MEMORY;
+  }
+
+  We do not need the function user_iram_memory_is_enabled().
+  1. It was used by mem_manager.o which was replaced with this custom heap
+     implementation. IRAM memory selection is handled differently.
+  2. In libmain.a, Cache_Read_Enable_New uses it for cache size. However, When
+     using IRAM for memory or running with 48K IRAM for code, we use a
+     replacement Cache_Read_Enable to correct the cache size ignoring
+     Cache_Read_Enable_New's selected value.
+*/
+#endif
 };

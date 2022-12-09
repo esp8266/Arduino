@@ -24,10 +24,10 @@
     defined(NONOSDK304)        || \
     defined(NONOSDK305)
 
-// eap_peer_config_deinit() - For this list of SDKs there is no significant
+// eap_peer_config_deinit() - For this list of SDKs there are no significant
 // changes in the function. Just the line number reference for when vPortFree
 // is called. When vPortFree is called, register a12 continues to hold a pointer
-// to the  struct StateMachine. Our cleanup routine should continue to work.
+// to the struct StateMachine. Our cleanup routine should continue to work.
 #if defined(NONOSDK300) || defined(NONOSDK301)
     // Minor changes only line number changed
     #define SDK_LEAK_LINE 809
@@ -35,7 +35,9 @@
     // Minor changes only line number changed
     #define SDK_LEAK_LINE 831
 #elif defined(NONOSDK305)
-    // Changed from `.text.eap_peer_config_deinit` to `eap_peer_config_deinit`
+    // At v3.0.5 Espressif moved `.text.eap_peer_config_deinit` to
+    // `eap_peer_config_deinit` then later in latest git they moved it
+    // back. For our linker script both are placed in flash.
     #define SDK_LEAK_LINE 831
 #else
     #define SDK_LEAK_LINE 799
@@ -165,10 +167,9 @@ void patch_wpa2_eap_vPortFree_a12(void *ptr, const char* file, int line, void* a
         return;
     }
 #elif defined(NONOSDK302) || defined(NONOSDK303) || defined(NONOSDK304) || defined(NONOSDK305)
-    // WPA2 Enterpise connections appear to work without crashing
-    // wpa2_sm_rx_eapol() has a few changes between NONOSDK301 and NONOSDK302.
-    // Double free appears fixed; however, still has memory leak.
-    // TODO: evaluate the unasm functions
+    // It looks like double free is fixed. WPA2 Enterpise connections work
+    // without crashing. wpa2_sm_rx_eapol() has a few changes between NONOSDK301
+    // and NONOSDK302. However, this set of releases still have memory leaks.
 #else
     // This is not needed because the call was NO-OPed in the library.
     // Keep code snippit for reference.
