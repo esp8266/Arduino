@@ -401,6 +401,8 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
   problem.
 
   WPA2 Enterprise connect crashing is fixed at v3.0.2 and up.
+
+  Not used for unreleased version NONOSDK3V0.
 */
 void* IRAM_ATTR pvEsprMalloc(size_t size, const char* file, int line, bool iram)
 {
