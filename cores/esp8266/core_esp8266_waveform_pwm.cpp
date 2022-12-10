@@ -97,7 +97,7 @@ static WVFState wvfState;
 static IRAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
 
-static void initTimer() {
+static __attribute__((noinline)) void initTimer() {
   if (!timerRunning) {
     timer1_disable();
     ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
