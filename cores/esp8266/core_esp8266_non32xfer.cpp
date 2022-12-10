@@ -26,6 +26,9 @@
  * Code taken directly from @pvvx's public domain code in
  * https://github.com/pvvx/esp8266web/blob/master/app/sdklib/system/app_main.c
  *
+ * In Espressif versions NONOSDK v3.0.0+ a similar feature was added
+ * load_non_32_wide_handler. Theirs is always loaded. Add weak attribute to
+ * theirs so we can choose by adding an alias to ours.
  *
  */
 
@@ -158,6 +161,7 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cau
   panic();
 }
 
+#if (NONOSDK < (0x30000 - 1))
 /*
   To operate reliably, this module requires the new
   `_xtos_set_exception_handler` from `exc-sethandler.cpp` and
@@ -174,5 +178,16 @@ void install_non32xfer_exception_handler(void) {
       non32xfer_exception_handler);
   }
 }
+#else
+void install_non32xfer_exception_handler(void) __attribute__((weak));
+// No need for install for v3.0.x SDK - call_user_start will do the job.
+// Need this one for build dependencies
+void install_non32xfer_exception_handler(void) {}
+#endif
+
+#if defined(NON32XFER_HANDLER)
+// Override weak symbol in libmain.c:user_exceptions.o
+extern void load_non_32_wide_handler(struct __exception_frame *ef, int cause) __attribute__((alias("non32xfer_exception_handler")));
+#endif
 
 };

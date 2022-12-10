@@ -114,32 +114,39 @@ elif [[ ${VERSION} == "NONOSDK3V0" ]]; then
 	addSymbol_system_func1 "0x60"
 	patchFile "eap.o" "3059" "2" "wAA=" "8CA=" # WPA2-Enterprise patch which replaces a double-free with nop, see #8082
 	patchFile "eap.o" "26356" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK300" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "19204" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	# v3.0.0 and up use a non-standard pvPortMalloc.
 	# SDK Library global replace
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a' #
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK301" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26364" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK302" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK303" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "26536" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK304" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "19376" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 elif [[ ${VERSION} == "NONOSDK305" ]]; then
 	addSymbol_system_func1 "0x54"
 	patchFile "eap.o" "67670" "9" "dlBvcnRGcmVl" "ejJFYXBGcmVl"   # special vPortFree to recover leaked memory
 	grepPatchFile "${VERSION}" "pvPortMalloc" "pvEsprMalloc" '*.a'
+	xtensa-lx106-elf-objcopy --weaken-symbol load_non_32_wide_handler libmain.a
 else
 	echo "WARN: Unknown address for system_func1() called by system_restart_local()"
 fi
