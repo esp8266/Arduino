@@ -58,7 +58,7 @@ Servo::~Servo() {
 
 uint8_t Servo::attach(int pin)
 {
-  return attach(pin, DEFAULT_MIN_PULSE_WIDTH, DEFAULT_MAX_PULSE_WIDTH);
+  return attach(pin, _minUs, _maxUs);
 }
 
 uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
@@ -94,7 +94,6 @@ void Servo::detach()
     delay(REFRESH_INTERVAL / 1000); // long enough to complete active period under all circumstances.
     stopWaveform(_pin);
     _attached = false;
-    _valueUs = DEFAULT_NEUTRAL_PULSE_WIDTH;
   }
 }
 
