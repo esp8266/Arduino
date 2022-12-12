@@ -407,6 +407,7 @@ uint32_t __flashindex;
 
 #if (NONOSDK >= (0x30000))
 
+extern "C" uint8_t uart_rx_one_char_block();
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
     // For SDKs 3.0.0 and later, place phy_data readonly overlay on top of the
@@ -418,8 +419,8 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     // sectors of flash memory. PHY_INIT_DATA is special. It is a one time read
     // of 128 bytes of data that is provided by a one time spoofed flash read.
     uint32_t phy_data = EEPROM_start - 0x40200000u;
-    uint32_t rf_cal = phy_data + 0x1000;
-    uint32_t system_parameter = rf_cal + 0x1000;
+    uint32_t rf_cal = phy_data + 0x1000u;
+    uint32_t system_parameter = rf_cal + 0x1000u;
 
     // All the examples I find, show the partition table in the global address space.
     static partition_item_t at_partition_table[] =
@@ -439,58 +440,78 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     extern uint32_t user_rf_cal_sector_set(void);
     user_rf_cal_sector_set(); // Start spoofing logic
 
-#ifdef DEV_DEBUG_PRINT
-    // Deeper debugging maybe delete this block later
-    extern void set_pll(void);
-    set_pll();  // fix printing for 115200 bps
-    ets_uart_printf(PSTR("\n\nConfig info referenced for system partition table registration:\n"));
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("PHY_DATA"), phy_data);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("RF_CAL"), rf_cal);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("SYSTEM_PARAMETER"), system_parameter);
-    ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("chip_size"), flashchip->chip_size, flashchip->chip_size);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("EEPROM_start"), EEPROM_start);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_start"), FS_start);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_end"), FS_end);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_page"), FS_page);
-    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_block"), FS_block);
-#if !defined(FLASH_MAP_SUPPORT)
+    // -DALLOW_SMALL_FLASH_SIZE=1
+    // Allows for small flash-size builds targeted for multiple devices,
+    // commonly IoT, of varying flash sizes.
+    const char *chip_sz_str = NULL;
+#if !defined(FLASH_MAP_SUPPORT) & defined(DEBUG_ESP_PORT) & !defined(ALLOW_SMALL_FLASH_SIZE)
+    // Note, system_partition_table_regist would only catch when the build flash
+    // size value set by the Arduino IDE Tools menu is larger than firmware
+    // image value detected and updated on the fly by esptool.
     uint32_t configured_chip_size = system_parameter + 4096 * 3;
     // flashchip->chip_size is updated by the SDK. The size is based on the
     // value patched into the .bin header by esptool.
     // system_get_flash_size_map() returns that patched value.
-    if (flashchip->chip_size != configured_chip_size)
-    {
-      // For this message and postmortem to be readable, the console speed may
-      // need to be 74880 bps.
-      ets_uart_printf(PSTR("\nMissmatch between actual(%u) vs configured(%u) flash size\n"), flashchip->chip_size, configured_chip_size);
-      // Full stop to avoid possible stored flash data corruption. This
-      // missmatch does not occur with flash size selection "Mapping defined by
-      // Hardware and Sketch".
-      abort();
+    if (flashchip->chip_size != configured_chip_size) {
+        // Full stop to avoid possible stored flash data corruption. This
+        // mismatch will not occur with flash size selection "Mapping defined by
+        // Hardware and Sketch".
+        chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n\n");
     }
 #endif
-#endif
-    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
-    {
-      // We will land here anytime the build flash size value set by the Arduino
-      // IDE Tools menu mismatches the firmware image value detected and updated
-      // on the fly by esptool.
-      //
-      // The SDKs PLL CPU clock calibration hasn't run. For this message and
-      // postmortem to be readable, the console speed may need to be 74880 bps.
-      //
-      // Because SDK v3.0.x always has a non-32-bit wide exception handler
-      // installed, we can use PROGMEM strings with Boot ROM print functions.
-      ets_uart_printf(PSTR("\nSystem partition table registration failed!\n"));
 
-      //C What is the best action on failure?
-      //C * The above printf maybe redundant. `system_partition_table_regist`
-      //C   appears to print specific failure messages. most of the time.
-      //C * Things will not get better by rebooting.
-      //C * Most likely the error message was not readable - mismatched console speed
-      //C * Expressif example do a `while(true){};` on fail. HWDT appears to be
-      //C   off and the device freezes.
-      abort();
+    if (chip_sz_str || !system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map())) {
+        // user_pre_init() is called very early in the SDK startup. When called,
+        // the PLL CPU clock calibration hasn't not run. Since we are failing, the
+        // calibration will never complete. And the process will repeat over and
+        // over. The effective data rate will always be 74880 bps. If we had a
+        // successful boot, the effective data rate would be 115200 on a restart
+        // or HWDT. This hack relies on the CPU clock calibration never having
+        // completed.
+
+        // After flashing, the Arduino Serial Monitor needs a moment to reconnect.
+        // This also allows time for the FIFO to clear and the host serial port time
+        // to clear any framing errors.
+        ets_delay_us(200u * 1000u); // For an uncalibrated CPU Clock, this is close enough.
+
+        #if !defined(F_CRYSTAL)
+        #define F_CRYSTAL 26000000
+        #endif
+        // For print messages to be readable, the UART clock rate is based on the
+        // precalibration rate.
+        if (F_CRYSTAL != 40000000) {
+            uart_div_modify(0, F_CRYSTAL * 2 / 115200);
+            ets_delay_us(150);
+        }
+        ets_uart_printf("\n\n");
+        do {
+            // Because SDK v3.0.x always has a non-32-bit wide exception handler
+            // installed, we can use PROGMEM strings with Boot ROM print functions.
+#ifdef DEBUG_ESP_CORE
+            ets_uart_printf(PSTR("Config info referenced for system partition table registration:\n"));
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("PHY_DATA"), phy_data);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("RF_CAL"), rf_cal);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("SYSTEM_PARAMETER"), system_parameter);
+            ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("chip_size"), flashchip->chip_size, flashchip->chip_size);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("EEPROM_start"), EEPROM_start);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_start"), FS_start);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_end"), FS_end);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_page"), FS_page);
+            ets_uart_printf(PSTR("  %-18s 0x%08X\n\n"), PSTR("FS_block"), FS_block);
+#endif
+            if (chip_sz_str) {
+                ets_uart_printf(chip_sz_str);
+            } else {
+#if defined(DEBUG_ESP_CORE) | defined(DEBUG_ESP_PORT)
+                // Now that the UART speed is corrected and messages will
+                // display, run system_partition_table_regist again.
+                system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
+#endif
+                ets_uart_printf(PSTR("System partition table registration failed!\n\n"));
+            }
+            uart_rx_one_char_block(); // Someone said hello - repeat message
+        } while(true);
+
     }
 }
 #endif // #if (NONOSDK >= (0x30000))
