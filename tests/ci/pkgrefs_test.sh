@@ -2,8 +2,10 @@
 
 set -ev
 
+root=$(git rev-parse --show-toplevel)
+
 fail=0
-for i in $(cat "$TRAVIS_BUILD_DIR/package/package_esp8266com_index.template.json" | jq '.packages[0]."tools" | .[] | .systems[] | "\(.url) \(.checksum)"' | sort -u | sed 's/ /@/'); do
+for i in $(cat "$root/package/package_esp8266com_index.template.json" | jq '.packages[0]."tools" | .[] | .systems[] | "\(.url) \(.checksum)"' | sort -u | sed 's/ /@/'); do
     url=$(echo $i | sed 's/@/ /' | cut -f2 -d\" | cut -f1 -d' ')
     sha=$(echo $i | sed 's/@/ /' | cut -f2 -d\" | cut -f2 -d' ' | cut -f2 -d:)
     echo "INFO:  Checking $url"

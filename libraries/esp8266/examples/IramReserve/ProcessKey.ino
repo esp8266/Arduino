@@ -1,6 +1,7 @@
 #include <esp8266_undocumented.h>
 void crashMeIfYouCan(void) __attribute__((weak));
 int divideA_B(int a, int b);
+int divideA_B_bp(int a, int b);
 
 int* nullPointer = NULL;
 

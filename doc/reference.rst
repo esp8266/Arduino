@@ -27,15 +27,22 @@ and have several limitations:
   or use a scheduled function (which will be called outside of the interrupt
   context when it is safe) to do long-running work.
 
-* Memory operations can be dangerous and should be avoided in interrupts.
-  Calls to ``new`` or ``malloc`` should be minimized because they may require
-  a long running time if memory is fragmented.  Calls to ``realloc`` and
-  ``free`` must NEVER be called.  Using any routines or objects which call
-  ``free`` or ``realloc`` themselves is also forbidden for the same reason.
-  This means that ``String``, ``std::string``, ``std::vector`` and other
-  classes which use contiguous memory that may be resized must be used with
-  extreme care (ensuring strings aren't changed, vector elements aren't
-  added, etc.).
+* Heap API operations can be dangerous and should be avoided in interrupts.
+  Calls to ``malloc`` should be minimized because they may require a long
+  running time if memory is fragmented.  Calls to ``realloc`` and ``free``
+  must NEVER be called. Using any routines or objects which call ``free`` or
+  ``realloc`` themselves is also forbidden for the same reason. This means
+  that ``String``, ``std::string``, ``std::vector`` and other classes which
+  use contiguous memory that may be resized must be used with extreme care
+  (ensuring strings aren't changed, vector elements aren't added, etc.).
+  The underlying problem, an allocation address could be actively in use at
+  the instant of an interrupt. Upon return, the address actively in use may
+  be invalid after an ISR uses ``realloc`` or ``free`` against the same
+  allocation.
+
+* The C++ ``new`` and ``delete`` operators must NEVER be used in an ISR. Their
+  call path is not in IRAM. Using any routines or objects that use the ``new``
+  or ``delete`` operator is also forbidden.
 
 Digital IO
 ----------

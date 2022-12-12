@@ -1,5 +1,11 @@
 :orphan:
 
+IDE example
+^^^^^^^^^^^
+
+- For the currently installed Core, see Arduino IDE > *Examples* > *ESP8266WiFi* > *WiFiScan*.
+- For the latest development version, see `WiFiScan.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiScan/WiFiScan.ino>`__.
+
 Scan
 ~~~~
 

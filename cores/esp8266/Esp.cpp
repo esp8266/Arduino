@@ -219,13 +219,15 @@ uint16_t EspClass::getVcc(void)
 
 uint32_t EspClass::getFreeHeap(void)
 {
-    return system_get_free_heap_size();
+    return umm_free_heap_size_lw();
 }
 
+#if defined(UMM_INFO)
 uint32_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
 }
+#endif
 
 uint32_t EspClass::getFreeContStack()
 {

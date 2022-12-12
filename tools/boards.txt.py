@@ -621,6 +621,21 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
+    ( 'd1_wroom_02', {
+        'name': 'LOLIN(WEMOS) D1 ESP-WROOM-02',
+        'opts': {
+            '.build.board': 'ESP8266_WEMOS_D1WROOM02',
+            '.build.variant': 'd1_mini',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_26',
+            '2M',
+            ],
+        'serial': '921',
+        'desc': [ 'No real product pages. See: https://www.instructables.com/How-to-Use-Wemos-ESP-Wroom-02-D1-Mini-WiFi-Module-/ or https://www.arduino-tech.com/wemos-esp-wroom-02-mainboard-d1-mini-wifi-module-esp826618650-battery/ ' ],
+    }),
     ( 'd1_mini_clone', {
         'name': 'LOLIN(WEMOS) D1 mini (clone)',
         'opts': {
@@ -1083,6 +1098,10 @@ macros = {
         ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
         ( '.menu.FlashFreq.26', '26MHz' ),
         ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
+        ]),
+
+    'flashfreq_26': collections.OrderedDict([
+        ( '.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -1651,6 +1670,18 @@ def sdk ():
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
                         ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                        ('.menu.sdk.nonosdk300', 'nonos-sdk 3.0.0'),
+                        ('.menu.sdk.nonosdk300.build.sdk', 'NONOSDK300'),
+                        ('.menu.sdk.nonosdk301', 'nonos-sdk 3.0.1'),
+                        ('.menu.sdk.nonosdk301.build.sdk', 'NONOSDK301'),
+                        ('.menu.sdk.nonosdk302', 'nonos-sdk 3.0.2'),
+                        ('.menu.sdk.nonosdk302.build.sdk', 'NONOSDK302'),
+                        ('.menu.sdk.nonosdk303', 'nonos-sdk 3.0.3'),
+                        ('.menu.sdk.nonosdk303.build.sdk', 'NONOSDK303'),
+                        ('.menu.sdk.nonosdk304', 'nonos-sdk 3.0.4'),
+                        ('.menu.sdk.nonosdk304.build.sdk', 'NONOSDK304'),
+                        ('.menu.sdk.nonosdk305', 'nonos-sdk 3.0.5'),
+                        ('.menu.sdk.nonosdk305.build.sdk', 'NONOSDK305'),
                     ])
            }
 
