@@ -945,7 +945,7 @@ extern "C" bool SigningVerifier_verify(PublicKey *_pubKey, UpdaterHashClass *has
     }
     br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
     bool ret = vrfy((const unsigned char *)signature, signatureLen, hash->oid(), hash->len(), _pubKey->getRSA(), vrf);
-    if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
+    if (!ret || memcmp(vrf, hash->hash(), std::min(HashLengthMax, hash->len())) ) {
       return false;
     } else {
       return true;
