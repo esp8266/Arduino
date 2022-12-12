@@ -407,105 +407,30 @@ uint32_t __flashindex;
 
 #if (NONOSDK >= (0x30000))
 
-#if 0
-extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
-{
-    uint32_t rf_cal = 0;
-    uint32_t phy_data = 0;
-    uint32_t system_parameter = 0;
-
-    switch (system_get_flash_size_map())
-    {
-    case FLASH_SIZE_2M:
-        rf_cal = 0x3b000;
-        phy_data = 0x3c000;
-        system_parameter = 0x3d000;
-        break;
-    case FLASH_SIZE_4M_MAP_256_256:
-        rf_cal = 0x7b000;
-        phy_data = 0x7c000;
-        system_parameter = 0x7d000;
-        break;
-    case FLASH_SIZE_8M_MAP_512_512:
-        rf_cal = 0xfb000;
-        phy_data = 0xfc000;
-        system_parameter = 0xfd000;
-        break;
-    case FLASH_SIZE_16M_MAP_512_512:
-    case FLASH_SIZE_16M_MAP_1024_1024:
-        rf_cal = 0x1fb000;
-        phy_data = 0x1fc000;
-        system_parameter = 0x1fd000;
-        break;
-    case FLASH_SIZE_32M_MAP_512_512:
-    case FLASH_SIZE_32M_MAP_1024_1024:
-    case FLASH_SIZE_32M_MAP_2048_2048:
-        rf_cal = 0x3fb000;
-        phy_data = 0x3fc000;
-        system_parameter = 0x3fd000;
-        break;
-    case FLASH_SIZE_64M_MAP_1024_1024:
-        rf_cal = 0x7fb000;
-        phy_data = 0x7fc000;
-        system_parameter = 0x7fd000;
-        break;
-    case FLASH_SIZE_128M_MAP_1024_1024:
-        rf_cal = 0xffb000;
-        phy_data = 0xffc000;
-        system_parameter = 0xffd000;
-        break;
-    }
-
-    extern uint32_t user_rf_cal_sector_set(void);
-    user_rf_cal_sector_set();
-
-    static partition_item_t at_partition_table[] =
-    {
-        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
-        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
-        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
-    };
-#ifdef DEV_DEBUG_PRINT
-    extern void set_pll(void);
-    set_pll();  // fix printing at 115200 bps
-    ets_uart_printf("\n\nConfig info referenced for system partition table registration:\n");
-    ets_uart_printf("  %-17s 0x%08X\n", "PHY_DATA", phy_data);
-    ets_uart_printf("  %-17s 0x%08X\n", "RF_CAL", rf_cal);
-    ets_uart_printf("  %-17s 0x%08X\n", "EEPROM Address", EEPROM_start - 0x40200000u);
-    ets_uart_printf("  %-17s 0x%08X\n", "SYSTEM_PARAMETER", system_parameter);
-    ets_uart_printf("  %-17s 0x%08X %u\n", "chip_size", flashchip->chip_size, flashchip->chip_size);
-    ets_uart_printf("  %-17s 0x%08X\n", "EEPROM_start", EEPROM_start);
-    ets_uart_printf("  %-17s 0x%08X\n", "FS_start", FS_start);
-    ets_uart_printf("  %-17s 0x%08X\n", "FS_end", FS_end);
-    ets_uart_printf("  %-17s 0x%08X\n", "FS_page", FS_page);
-    ets_uart_printf("  %-17s 0x%08X\n", "FS_block", FS_block);
-    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
-    {
-      ets_uart_printf("\nSystem partition table registration failed!\n");
-      panic();
-    }
-#else
-    system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
-#endif
-}
-
-#else
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
     // For SDKs 3.0.0 and later, place phy_data readonly overlay on top of the
     // EEPROM address. For older SDKs without a system partition, RF_CAL and
     // PHY_DATA shared the same flash segment.
+    //
+    // For the Arduino ESP8266 core, the sectors for "EEPROM +0x1000", "RF_CAL
+    // +0x1000", and "SYSTEM_PARAMETERs +0x3000" are positioned in the last five
+    // sectors of flash memory. PHY_INIT_DATA is special. It is a one time read
+    // of 128 bytes of data that is provided by a one time spoofed flash read.
     uint32_t phy_data = EEPROM_start - 0x40200000u;
     uint32_t rf_cal = phy_data + 0x1000;
     uint32_t system_parameter = rf_cal + 0x1000;
 
-    // Examples show partition table in global address space
+    // All the examples I find, show the partition table in the global address space.
     static partition_item_t at_partition_table[] =
     {
         { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
         { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
         { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
     };
+    // SDK 3.0's `system_partition_table_regist` is FOTA-centric. It will report
+    // on BOOT, OTA1, and OTA2 being missing. We are Non-FOTA. I don't see
+    // anything we can do about this. Other than maybe turning off os_print.
 
     // For SDKs v3.0.0 and later, the functions `uint32
     // user_rf_cal_sector_set(void)` and `void user_rf_pre_init(void)` are not
@@ -515,34 +440,20 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     user_rf_cal_sector_set(); // Start spoofing logic
 
 #ifdef DEV_DEBUG_PRINT
+    // Deeper debugging maybe delete this block later
     extern void set_pll(void);
     set_pll();  // fix printing for 115200 bps
-    ets_uart_printf("\n\nConfig info referenced for system partition table registration:\n");
-    ets_uart_printf("  %-18s 0x%08X\n", "PHY_DATA", phy_data);
-    ets_uart_printf("  %-18s 0x%08X\n", "RF_CAL", rf_cal);
-    ets_uart_printf("  %-18s 0x%08X\n", "SYSTEM_PARAMETER", system_parameter);
-    ets_uart_printf("  %-18s 0x%08X %u\n", "ota_1_sz", user_bin_sz, user_bin_sz);
-    ets_uart_printf("  %-18s 0x%08X %u\n", "chip_size", flashchip->chip_size, flashchip->chip_size);
-    ets_uart_printf("  %-18s 0x%08X\n", "EEPROM_start", EEPROM_start);
-    ets_uart_printf("  %-18s 0x%08X\n", "FS_start", FS_start);
-    ets_uart_printf("  %-18s 0x%08X\n", "FS_end", FS_end);
-    ets_uart_printf("  %-18s 0x%08X\n", "FS_page", FS_page);
-    ets_uart_printf("  %-18s 0x%08X\n", "FS_block", FS_block);
-    uint32_t configured_chip_size = system_parameter + 4096 * 3;
-    if (flashchip->chip_size != configured_chip_size)
-    {
-      ets_uart_printf("\nMissmatch between actual(%u) vs configured(%u) flash size\n", flashchip->chip_size, configured_chip_size);
-      panic();
-    }
-    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
-    {
-      ets_uart_printf("\nSystem partition table registration failed!\n");
-      panic();
-    }
-
-#else
-//+ restore conditional for final or remove - to be discussed
-#if 1 // defined(FLASH_MAP_SUPPORT) && defined(DEBUG_ESP_CORE)
+    ets_uart_printf(PSTR("\n\nConfig info referenced for system partition table registration:\n"));
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("PHY_DATA"), phy_data);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("RF_CAL"), rf_cal);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("SYSTEM_PARAMETER"), system_parameter);
+    ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("chip_size"), flashchip->chip_size, flashchip->chip_size);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("EEPROM_start"), EEPROM_start);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_start"), FS_start);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_end"), FS_end);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_page"), FS_page);
+    ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_block"), FS_block);
+#if !defined(FLASH_MAP_SUPPORT)
     uint32_t configured_chip_size = system_parameter + 4096 * 3;
     // flashchip->chip_size is updated by the SDK. The size is based on the
     // value patched into the .bin header by esptool.
@@ -551,23 +462,38 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     {
       // For this message and postmortem to be readable, the console speed may
       // need to be 74880 bps.
-      ets_uart_printf("\nMissmatch between actual(%u) vs configured(%u) flash size\n", flashchip->chip_size, configured_chip_size);
+      ets_uart_printf(PSTR("\nMissmatch between actual(%u) vs configured(%u) flash size\n"), flashchip->chip_size, configured_chip_size);
       // Full stop to avoid possible stored flash data corruption. This
       // missmatch does not occur with flash size selection "Mapping defined by
       // Hardware and Sketch".
-      panic();
+      abort();
     }
 #endif
+#endif
+    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
+    {
+      // We will land here anytime the build flash size value set by the Arduino
+      // IDE Tools menu mismatches the firmware image value detected and updated
+      // on the fly by esptool.
+      //
+      // The SDKs PLL CPU clock calibration hasn't run. For this message and
+      // postmortem to be readable, the console speed may need to be 74880 bps.
+      //
+      // Because SDK v3.0.x always has a non-32-bit wide exception handler
+      // installed, we can use PROGMEM strings with Boot ROM print functions.
+      ets_uart_printf(PSTR("\nSystem partition table registration failed!\n"));
 
-    system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
-    // No test for failure !!!
-    // How to handle failure ???
-    // It appears the PLL calibration for CPU clock has not run.
-    // Postmortem will be unreadable.
-#endif
+      //C What is the best action on failure?
+      //C * The above printf maybe redundant. `system_partition_table_regist`
+      //C   appears to print specific failure messages. most of the time.
+      //C * Things will not get better by rebooting.
+      //C * Most likely the error message was not readable - mismatched console speed
+      //C * Expressif example do a `while(true){};` on fail. HWDT appears to be
+      //C   off and the device freezes.
+      abort();
+    }
 }
-#endif
-#endif
+#endif // #if (NONOSDK >= (0x30000))
 
 extern "C" void user_init(void) {
 
