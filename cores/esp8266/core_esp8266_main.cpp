@@ -39,6 +39,7 @@ extern "C" {
 #include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
 #include "core_esp8266_vm.h"
+#include "flash_hal.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -406,6 +407,7 @@ uint32_t __flashindex;
 
 #if (NONOSDK >= (0x30000))
 
+#if 0
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
     uint32_t rf_cal = 0;
@@ -457,22 +459,121 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     extern uint32_t user_rf_cal_sector_set(void);
     user_rf_cal_sector_set();
 
-    const partition_item_t at_partition_table[] =
+    static partition_item_t at_partition_table[] =
     {
         { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
         { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
         { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
     };
+#ifdef DEV_DEBUG_PRINT
+    extern void set_pll(void);
+    set_pll();  // fix printing at 115200 bps
+    ets_uart_printf("\n\nConfig info referenced for system partition table registration:\n");
+    ets_uart_printf("  %-17s 0x%08X\n", "PHY_DATA", phy_data);
+    ets_uart_printf("  %-17s 0x%08X\n", "RF_CAL", rf_cal);
+    ets_uart_printf("  %-17s 0x%08X\n", "EEPROM Address", EEPROM_start - 0x40200000u);
+    ets_uart_printf("  %-17s 0x%08X\n", "SYSTEM_PARAMETER", system_parameter);
+    ets_uart_printf("  %-17s 0x%08X %u\n", "chip_size", flashchip->chip_size, flashchip->chip_size);
+    ets_uart_printf("  %-17s 0x%08X\n", "EEPROM_start", EEPROM_start);
+    ets_uart_printf("  %-17s 0x%08X\n", "FS_start", FS_start);
+    ets_uart_printf("  %-17s 0x%08X\n", "FS_end", FS_end);
+    ets_uart_printf("  %-17s 0x%08X\n", "FS_page", FS_page);
+    ets_uart_printf("  %-17s 0x%08X\n", "FS_block", FS_block);
+    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
+    {
+      ets_uart_printf("\nSystem partition table registration failed!\n");
+      panic();
+    }
+#else
     system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
+#endif
 }
 
+#else
+extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
+{
+    // For SDKs 3.0.0 and later, place phy_data readonly overlay on top of the
+    // EEPROM address. For older SDKs without a system partition, RF_CAL and
+    // PHY_DATA shared the same flash segment.
+    uint32_t phy_data = EEPROM_start - 0x40200000u;
+    uint32_t rf_cal = phy_data + 0x1000;
+    uint32_t system_parameter = rf_cal + 0x1000;
+
+    // Examples show partition table in global address space
+    static partition_item_t at_partition_table[] =
+    {
+        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
+        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
+        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
+    };
+
+    // For SDKs v3.0.0 and later, the functions `uint32
+    // user_rf_cal_sector_set(void)` and `void user_rf_pre_init(void)` are not
+    // called by the SDK. We need these called to start and stop spoofing logic
+    // for flash read of PHY Init data.
+    extern uint32_t user_rf_cal_sector_set(void);
+    user_rf_cal_sector_set(); // Start spoofing logic
+
+#ifdef DEV_DEBUG_PRINT
+    extern void set_pll(void);
+    set_pll();  // fix printing for 115200 bps
+    ets_uart_printf("\n\nConfig info referenced for system partition table registration:\n");
+    ets_uart_printf("  %-18s 0x%08X\n", "PHY_DATA", phy_data);
+    ets_uart_printf("  %-18s 0x%08X\n", "RF_CAL", rf_cal);
+    ets_uart_printf("  %-18s 0x%08X\n", "SYSTEM_PARAMETER", system_parameter);
+    ets_uart_printf("  %-18s 0x%08X %u\n", "ota_1_sz", user_bin_sz, user_bin_sz);
+    ets_uart_printf("  %-18s 0x%08X %u\n", "chip_size", flashchip->chip_size, flashchip->chip_size);
+    ets_uart_printf("  %-18s 0x%08X\n", "EEPROM_start", EEPROM_start);
+    ets_uart_printf("  %-18s 0x%08X\n", "FS_start", FS_start);
+    ets_uart_printf("  %-18s 0x%08X\n", "FS_end", FS_end);
+    ets_uart_printf("  %-18s 0x%08X\n", "FS_page", FS_page);
+    ets_uart_printf("  %-18s 0x%08X\n", "FS_block", FS_block);
+    uint32_t configured_chip_size = system_parameter + 4096 * 3;
+    if (flashchip->chip_size != configured_chip_size)
+    {
+      ets_uart_printf("\nMissmatch between actual(%u) vs configured(%u) flash size\n", flashchip->chip_size, configured_chip_size);
+      panic();
+    }
+    if (!system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map()))
+    {
+      ets_uart_printf("\nSystem partition table registration failed!\n");
+      panic();
+    }
+
+#else
+//+ restore conditional for final or remove - to be discussed
+#if 1 // defined(FLASH_MAP_SUPPORT) && defined(DEBUG_ESP_CORE)
+    uint32_t configured_chip_size = system_parameter + 4096 * 3;
+    // flashchip->chip_size is updated by the SDK. The size is based on the
+    // value patched into the .bin header by esptool.
+    // system_get_flash_size_map() returns that patched value.
+    if (flashchip->chip_size != configured_chip_size)
+    {
+      // For this message and postmortem to be readable, the console speed may
+      // need to be 74880 bps.
+      ets_uart_printf("\nMissmatch between actual(%u) vs configured(%u) flash size\n", flashchip->chip_size, configured_chip_size);
+      // Full stop to avoid possible stored flash data corruption. This
+      // missmatch does not occur with flash size selection "Mapping defined by
+      // Hardware and Sketch".
+      panic();
+    }
+#endif
+
+    system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
+    // No test for failure !!!
+    // How to handle failure ???
+    // It appears the PLL calibration for CPU clock has not run.
+    // Postmortem will be unreadable.
+#endif
+}
+#endif
 #endif
 
 extern "C" void user_init(void) {
 
 #if (NONOSDK >= (0x30000))
     extern void user_rf_pre_init();
-    user_rf_pre_init();
+    user_rf_pre_init(); // Stop spoofing logic
 #endif
 
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -496,7 +597,7 @@ extern "C" void user_init(void) {
     install_vm_exception_handler();
 #endif
 
-#if defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)
+#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
     install_non32xfer_exception_handler();
 #endif
 
