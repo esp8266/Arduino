@@ -404,7 +404,7 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
 
   Not used for unreleased version NONOSDK3V0.
 */
-void* IRAM_ATTR pvEsprMalloc(size_t size, const char* file, int line, bool iram)
+void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool iram)
 {
     if (iram) {
         HeapSelectIram ephemeral;
