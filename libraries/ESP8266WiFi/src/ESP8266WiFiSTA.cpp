@@ -358,6 +358,17 @@ bool ESP8266WiFiSTAClass::reconnect() {
  * @return  one value of wl_status_t enum
  */
 bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
+{
+    return disconnect(wifioff, false);
+}
+
+/**
+ * Disconnect from the network
+ * @param wifioff
+ * @param eraseap
+ * @return  one value of wl_status_t enum
+ */
+bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
     bool ret = false;
 
     // Read current config.
