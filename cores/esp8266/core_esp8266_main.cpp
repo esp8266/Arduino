@@ -401,8 +401,12 @@ extern "C" void __disableWiFiAtBootTime (void)
 
 #if FLASH_MAP_SUPPORT
 #include "flash_hal.h"
-extern "C" void flashinit (void);
+extern "C" bool flashinit (void);
+#if (NONOSDK >= (0x30000))
+uint32_t __flashindex __attribute__((section(".noinit")));
+#else
 uint32_t __flashindex;
+#endif
 #endif
 
 #if (NONOSDK >= (0x30000))
@@ -410,24 +414,47 @@ uint32_t __flashindex;
 extern "C" uint8_t uart_rx_one_char_block();
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
+    const char *flash_map_str = NULL;
+#if FLASH_MAP_SUPPORT
+    __flashindex = 0;
+    if (!flashinit()) {
+        flash_map_str = PSTR("flashinit failed\n");
+    }
+#endif
+
     // For SDKs 3.0.0 and later, place phy_data readonly overlay on top of the
     // EEPROM address. For older SDKs without a system partition, RF_CAL and
     // PHY_DATA shared the same flash segment.
     //
-    // For the Arduino ESP8266 core, the sectors for "EEPROM +0x1000", "RF_CAL
-    // +0x1000", and "SYSTEM_PARAMETERs +0x3000" are positioned in the last five
-    // sectors of flash memory. PHY_INIT_DATA is special. It is a one time read
-    // of 128 bytes of data that is provided by a one time spoofed flash read.
+    // For the Arduino ESP8266 core, the sectors for "EEPROM = size - 0x5000",
+    // "RF_CAL =  size - 0x4000", and "SYSTEM_PARAMETER = size - 0x3000" are
+    // positioned in the last five sectors of flash memory. PHY_INIT_DATA is
+    // special. It is a one time read of 128 bytes of data that is provided by a
+    // one time spoofed flash read.
+#if FLASH_MAP_SUPPORT
+    uint32_t flash_size = __flashdesc[__flashindex].flash_size_kb * 1024u;
+#else
+    // flashchip->chip_size is updated by the SDK. The size is based on the
+    // value patched into the .bin header by esptool.
+    // system_get_flash_size_map() returns that patched value.
+    uint32_t flash_size = flashchip->chip_size;
+#endif
+    // Always put RF_CAL and system_parameter in the last 4 sectors of flash chip.
+    uint32_t rf_cal = flash_size - 0x4000u;
+    uint32_t system_parameter = flash_size - 0x3000u;
+
+    // system_partition_table_regist will not allow partitions to overlap.
+    // EEPROM_start is a good choice for phy_data overlay. The SDK does not need
+    // to know about it. So we can omit it from the table not used until after
+    // user_init() begins. So it should be safe from conflicts.
     uint32_t phy_data = EEPROM_start - 0x40200000u;
-    uint32_t rf_cal = phy_data + 0x1000u;
-    uint32_t system_parameter = rf_cal + 0x1000u;
 
     // All the examples I find, show the partition table in the global address space.
     static partition_item_t at_partition_table[] =
     {
-        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
-        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
-        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
+        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 }, // type 5
+        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 }, // type 4
+        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 }, // type 6
     };
     // SDK 3.0's `system_partition_table_regist` is FOTA-centric. It will report
     // on BOOT, OTA1, and OTA2 being missing. We are Non-FOTA. I don't see
@@ -444,14 +471,12 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     // Allows for small flash-size builds targeted for multiple devices,
     // commonly IoT, of varying flash sizes.
     const char *chip_sz_str = NULL;
+
+    [[maybe_unused]] uint32_t configured_chip_size = phy_data + 4096 * 5;
 #if !defined(FLASH_MAP_SUPPORT) & defined(DEBUG_ESP_PORT) & !defined(ALLOW_SMALL_FLASH_SIZE)
-    // Note, system_partition_table_regist would only catch when the build flash
+    // Note, system_partition_table_regist will only catch when the build flash
     // size value set by the Arduino IDE Tools menu is larger than firmware
     // image value detected and updated on the fly by esptool.
-    uint32_t configured_chip_size = system_parameter + 4096 * 3;
-    // flashchip->chip_size is updated by the SDK. The size is based on the
-    // value patched into the .bin header by esptool.
-    // system_get_flash_size_map() returns that patched value.
     if (flashchip->chip_size != configured_chip_size) {
         // Full stop to avoid possible stored flash data corruption. This
         // mismatch will not occur with flash size selection "Mapping defined by
@@ -460,14 +485,25 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     }
 #endif
 
-    if (chip_sz_str || !system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map())) {
+#if FLASH_MAP_SUPPORT & defined(DEBUG_ESP_PORT)
+    // This should never fail everything traces back to the results of spi_flash_get_id()
+    if (flash_size != flashchip->chip_size) {
+        chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n\n");
+    }
+#endif
+
+    if (flash_map_str || chip_sz_str || !system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map())) {
         // user_pre_init() is called very early in the SDK startup. When called,
         // the PLL CPU clock calibration hasn't not run. Since we are failing, the
         // calibration will never complete. And the process will repeat over and
         // over. The effective data rate will always be 74880 bps. If we had a
         // successful boot, the effective data rate would be 115200 on a restart
         // or HWDT. This hack relies on the CPU clock calibration never having
-        // completed.
+        // completed. This assumes we are starting from a hard reset.
+
+        // A possible exception would be a soft reset after flashing. In which
+        // case the message will not be readable until after a hard reset or
+        // power cycle.
 
         // After flashing, the Arduino Serial Monitor needs a moment to reconnect.
         // This also allows time for the FIFO to clear and the host serial port time
@@ -493,25 +529,40 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("RF_CAL"), rf_cal);
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("SYSTEM_PARAMETER"), system_parameter);
             ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("chip_size"), flashchip->chip_size, flashchip->chip_size);
+#if FLASH_MAP_SUPPORT
+            ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("flash_size"), flash_size, flash_size);
+#else
+            ets_uart_printf(PSTR("  %-18s 0x%08X %u\n"), PSTR("config_flash_size"), configured_chip_size, configured_chip_size);
+#endif
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("EEPROM_start"), EEPROM_start);
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_start"), FS_start);
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_end"), FS_end);
             ets_uart_printf(PSTR("  %-18s 0x%08X\n"), PSTR("FS_page"), FS_page);
             ets_uart_printf(PSTR("  %-18s 0x%08X\n\n"), PSTR("FS_block"), FS_block);
 #endif
+
+#if FLASH_MAP_SUPPORT
+            if (flash_map_str) {
+                ets_uart_printf(flash_map_str);
+            } else
+#endif
+#if !defined(FLASH_MAP_SUPPORT) & defined(DEBUG_ESP_PORT) & !defined(ALLOW_SMALL_FLASH_SIZE)
             if (chip_sz_str) {
                 ets_uart_printf(chip_sz_str);
-            } else {
+            } else
+#endif
+            {
 #if defined(DEBUG_ESP_CORE) | defined(DEBUG_ESP_PORT)
                 // Now that the UART speed is corrected and messages will
-                // display, run system_partition_table_regist again.
+                // display, run system_partition_table_regist again to repeat
+                // the error messages.
                 system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
 #endif
                 ets_uart_printf(PSTR("System partition table registration failed!\n\n"));
             }
+
             uart_rx_one_char_block(); // Someone said hello - repeat message
         } while(true);
-
     }
 }
 #endif // #if (NONOSDK >= (0x30000))
@@ -551,8 +602,10 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-#if FLASH_MAP_SUPPORT
-    flashinit();
+#if FLASH_MAP_SUPPORT & (NONOSDK < 0x30000)
+    if (!flashinit()) {
+        panic();
+    }
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi
