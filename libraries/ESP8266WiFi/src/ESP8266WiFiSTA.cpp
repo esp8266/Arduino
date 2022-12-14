@@ -378,7 +378,7 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
     if (eraseap) {
         memset(&conf.ssid, 0, sizeof(conf.ssid));
         memset(&conf.password, 0, sizeof(conf.password));
-    };
+    }
 
     // API Reference: wifi_station_disconnect() need to be called after system initializes and the ESP8266 Station mode is enabled.
     if (WiFi.getMode() & WIFI_STA)
