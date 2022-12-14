@@ -91,10 +91,10 @@ public:
   virtual uint8_t connected() override;
   virtual operator bool() override;
 
-  IPAddress remoteIP();
-  uint16_t  remotePort();
-  IPAddress localIP();
-  uint16_t  localPort();
+  virtual IPAddress remoteIP();
+  virtual uint16_t  remotePort();
+  virtual IPAddress localIP();
+  virtual uint16_t  localPort();
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
@@ -103,7 +103,7 @@ public:
   friend class WiFiServer;
 
   using Print::write;
-
+  
   static void stopAll();
   static void stopAllExcept(WiFiClient * c);
 
@@ -147,6 +147,10 @@ public:
 
   virtual bool outputCanTimeout () override { return connected(); }
   virtual bool inputCanTimeout () override { return connected(); }
+
+  // Immediately stops this client instance.
+  // Unlike stop(), does not wait to gracefuly shutdown the connection.
+  void abort();
 
 protected:
 

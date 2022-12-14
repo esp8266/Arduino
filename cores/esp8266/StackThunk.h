@@ -41,7 +41,7 @@ extern uint32_t stack_thunk_get_stack_bot();
 extern uint32_t stack_thunk_get_cont_sp();
 extern uint32_t stack_thunk_get_max_usage();
 extern void stack_thunk_dump_stack();
-extern void stack_thunk_fatal_overflow();
+extern void stack_thunk_fatal_smashing();
 
 // Globals required for thunking operation
 extern uint32_t *stack_thunk_ptr;
@@ -75,7 +75,7 @@ thunk_"#fcnToThunk":\n\
   l32i.n a15, a15, 0    /* A15 now has contents of last stack entry */\n\
   l32r a0, .LC_STACK_VALUE"#fcnToThunk" /* A0 now has the check value */\n\
   beq a0, a15, .L1"#fcnToThunk"\n\
-  call0 stack_thunk_fatal_overflow\n\
+  call0 stack_thunk_fatal_smashing\n\
 .L1"#fcnToThunk":\n\
   movi a15, stack_thunk_save  /* Restore A1(SP) */\n\
   l32i.n a1, a15, 0\n\

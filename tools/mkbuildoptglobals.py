@@ -680,6 +680,7 @@ def parse_args():
     parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
     parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
     parser.add_argument('--debug', action='store_true', required=False, default=False)
+    parser.add_argument('-DDEBUG_ESP_PORT', nargs='?', action='store', const="", default="", help='Add mkbuildoptglobals.extra_flags={build.debug_port} to platform.local.txt')
     parser.add_argument('--ci', action='store_true', required=False, default=False)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
@@ -721,6 +722,12 @@ def main():
     print_dbg(f"globals_name:           {globals_name}")
     print_dbg(f"build_path_core:        {build_path_core}")
     print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
+    print_dbg(f"DDEBUG_ESP_PORT:        {args.DDEBUG_ESP_PORT}")
+
+    if len(args.DDEBUG_ESP_PORT):
+        build_opt_signature = build_opt_signature[:-1] + ":debug@"
+
+    print_dbg(f"build_opt_signature:    {build_opt_signature}")
 
     if args.ci:
         # Requires CommonHFile.h to never be checked in.

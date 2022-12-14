@@ -376,6 +376,17 @@ uint16_t WiFiClient::localPort()
     return _client->getLocalPort();
 }
 
+// Api for heap saving. Optional use instead of WiFiClient::stop to systematically retreive some heap memory
+// and avoiding server crashes in case of frequent clients connections.
+void WiFiClient::abort()
+{
+    if (!_client)
+        return;
+
+    flush(0); // Flush output buffer. Don't make any use of return boolean.
+	_client->abort(); // Wich in turn calls tcp_abort which calls tcp_abandon().
+}
+
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {

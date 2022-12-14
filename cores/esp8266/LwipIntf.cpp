@@ -1,3 +1,25 @@
+/*
+  LwipIntf.cpp
+
+  Arduino interface for lwIP generic callbacks and functions
+
+  Original Copyright (c) 2020 esp8266 Arduino All rights reserved.
+  This file is part of the esp8266 Arduino core environment.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 extern "C"
 {
@@ -15,6 +37,17 @@ extern "C"
 
 #include "debug.h"
 #include "LwipIntf.h"
+
+// wifi_station_hostname is SDK's station(=global) hostname location
+// - It is never nullptr but wifi_station_get_hostname()
+//   can return nullptr when STA is down
+// - Because WiFi is started in off mode at boot time,
+//   wifi_station_set/get_hostname() is now no more used
+//   because setting hostname firt does not work anymore
+// - wifi_station_hostname is overwritten by SDK when wifi is
+//   woken up in WiFi::mode()
+//
+extern "C" char* wifi_station_hostname;
 
 // args      | esp order    arduino order
 // ----      + ---------    -------------
@@ -66,7 +99,7 @@ bool LwipIntf::ipAddressReorder(const IPAddress& local_ip, const IPAddress& arg1
 */
 String LwipIntf::hostname(void)
 {
-    return wifi_station_get_hostname();
+    return wifi_station_hostname;
 }
 
 /**
@@ -75,7 +108,7 @@ String LwipIntf::hostname(void)
 */
 const char* LwipIntf::getHostname(void)
 {
-    return wifi_station_get_hostname();
+    return wifi_station_hostname;
 }
 
 /**
@@ -136,12 +169,9 @@ bool LwipIntf::hostname(const char* aHostname)
         DEBUGV("hostname '%s' is not compliant with RFC952\n", aHostname);
     }
 
-    bool ret = wifi_station_set_hostname(aHostname);
-    if (!ret)
-    {
-        DEBUGV("WiFi.hostname(%s): wifi_station_set_hostname() failed\n", aHostname);
-        return false;
-    }
+    bool ret = true;
+
+    strcpy(wifi_station_hostname, aHostname);
 
     // now we should inform dhcp server for this change, using lwip_renew()
     // looping through all existing interface
@@ -149,7 +179,7 @@ bool LwipIntf::hostname(const char* aHostname)
     for (netif* intf = netif_list; intf; intf = intf->next)
     {
         // unconditionally update all known interfaces
-        intf->hostname = wifi_station_get_hostname();
+        intf->hostname = wifi_station_hostname;
 
         if (netif_dhcp_data(intf) != nullptr)
         {

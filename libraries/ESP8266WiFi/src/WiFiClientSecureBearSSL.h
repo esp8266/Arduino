@@ -284,6 +284,11 @@ class WiFiClientSecure : public WiFiClient {
     void flush() override { (void)flush(0); }
     void stop() override { (void)stop(0); }
 
+    IPAddress remoteIP() override { return _ctx->remoteIP(); }
+    uint16_t  remotePort() override { return _ctx->remotePort(); }
+    IPAddress localIP() override { return _ctx->localIP(); }
+    uint16_t  localPort() override { return _ctx->localPort(); }
+
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _ctx->setSession(session); }
 

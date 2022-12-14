@@ -27,9 +27,14 @@
 
 #include "ESP8266mDNS.h"
 #include "LEAmDNS_Priv.h"
-#include <LwipIntf.h>  // LwipIntf::stateUpCB()
+#include <LwipIntf.h>
 #include <lwip/igmp.h>
 #include <lwip/prot/dns.h>
+
+// should be defined at build time
+#ifndef ARDUINO_BOARD_ID
+#define ARDUINO_BOARD_ID "generic"
+#endif
 
 namespace esp8266
 {
@@ -40,16 +45,6 @@ namespace esp8266
 namespace MDNSImplementation
 {
 
-/**
-    STRINGIZE
-*/
-#ifndef STRINGIZE
-#define STRINGIZE(x) #x
-#endif
-#ifndef STRINGIZE_VALUE_OF
-#define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
-#endif
-
     /**
         INTERFACE
     */
@@ -59,7 +54,7 @@ namespace MDNSImplementation
     */
     MDNSResponder::MDNSResponder(void) :
         m_pServices(0), m_pUDPContext(0), m_pcHostname(0), m_pServiceQueries(0),
-        m_fnServiceTxtCallback(0)
+        m_fnServiceTxtCallback(0), m_bLwipCb(false), m_bRestarting(false)
     {
     }
 
@@ -94,15 +89,34 @@ namespace MDNSImplementation
             bResult = _restart();
         }
 
-        LwipIntf::stateUpCB(
-            [this](netif* intf)
-            {
-                (void)intf;
-                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-                    PSTR("[MDNSResponder] new Interface '%c%c' is UP! restarting\n"), intf->name[0],
-                    intf->name[1]));
-                _restart();
+        if (bResult && !m_bLwipCb)
+        {
+            bool bCallback = LwipIntf::statusChangeCB(
+                [this](netif*)
+                {
+                    if (m_bRestarting)
+                    {
+                        return;
+                    }
+
+                    m_bRestarting = true;
+                    schedule_function(
+                        [this]()
+                        {
+                            DEBUG_EX_INFO(
+                                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: restarting "
+                                                           "after interface status changed\n")););
+                            _restart();
+                            m_bRestarting = false;
+                        });
+                });
+            DEBUG_EX_ERR(if (!bCallback) {
+                DEBUG_OUTPUT.printf_P(
+                    PSTR("[MDNSResponder] begin: FAILED LwipIntf::statusChangeCB!\n"));
             });
+            m_bLwipCb = bCallback;
+        }
+
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"),
                                   (p_pcHostname ?: "-"));
@@ -1258,7 +1272,7 @@ namespace MDNSImplementation
         {
             if ((!addServiceTxt(hService, "tcp_check", "no"))
                 || (!addServiceTxt(hService, "ssh_upload", "no"))
-                || (!addServiceTxt(hService, "board", STRINGIZE_VALUE_OF(ARDUINO_BOARD)))
+                || (!addServiceTxt(hService, "board", ARDUINO_BOARD_ID))
                 || (!addServiceTxt(hService, "auth_upload", (p_bAuthUpload) ? "yes" : "no")))
             {
                 removeService(hService);
@@ -1284,7 +1298,7 @@ namespace MDNSImplementation
         // Join multicast group(s)
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         {
-            if (netif_is_up(pNetIf))
+            if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
             {
 #ifdef MDNS_IP4_SUPPORT
                 ip_addr_t multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
@@ -1340,7 +1354,7 @@ namespace MDNSImplementation
 
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         {
-            if (netif_is_up(pNetIf))
+            if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
             {
                 bResult = true;
 

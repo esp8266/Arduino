@@ -39,12 +39,11 @@ Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_inde
 Documentation: [https://arduino-esp8266.readthedocs.io/en/3.0.2/](https://arduino-esp8266.readthedocs.io/en/3.0.2/)
 
 ### Using git version
-[![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
 Also known as latest git or master branch.
 
-- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is on the [Arduino website](https://www.arduino.cc/en/software).
-- Follow the [instructions in the documentation](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
+- When using [Arduino IDE](https://www.arduino.cc/en/software), follow [our instructions here](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version).
+- When using [PlatformIO](https://platformio.org/install), refer to [platformio/espressif8266 platform documentation](https://docs.platformio.org/en/stable/platforms/espressif8266.html#using-arduino-framework-with-staging-version).
 
 ### Using PlatformIO
 

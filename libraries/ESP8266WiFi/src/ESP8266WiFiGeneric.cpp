@@ -49,6 +49,9 @@ extern "C" {
 #include "debug.h"
 #include "include/WiFiState.h"
 
+// see comments on wifi_station_hostname in LwipIntf.cpp
+extern "C" char* wifi_station_hostname; // sdk's hostname location
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
@@ -300,7 +303,7 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
 
     */
 
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000 - 1))
 
 #ifdef DEBUG_ESP_WIFI
     if (listenInterval && type == WIFI_NONE_SLEEP)
@@ -331,9 +334,9 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
             }
         }
     }
-#else  // !defined(NONOSDK3V0)
+#else  // (NONOSDK >= (0x30000 - 1))
     (void)listenInterval;
-#endif // !defined(NONOSDK3V0)
+#endif // (NONOSDK >= (0x30000 - 1))
 
     bool ret = wifi_set_sleep_type((sleep_type_t) type);
     if (!ret) {
@@ -419,7 +422,10 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
         return true;
     }
 
+    char backup_hostname [33] { 0 }; // hostname is 32 chars long (RFC)
+
     if (m != WIFI_OFF && wifi_fpm_get_sleep_type() != NONE_SLEEP_T) {
+        memcpy(backup_hostname, wifi_station_hostname, sizeof(backup_hostname));
         // wifi starts asleep by default
         wifi_fpm_do_wakeup();
         wifi_fpm_close();
@@ -451,6 +457,9 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
             return false; //timeout
         }
     }
+
+    if (backup_hostname[0])
+        memcpy(wifi_station_hostname, backup_hostname, sizeof(backup_hostname));
 
     return ret;
 }
@@ -562,10 +571,10 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
  * @return interval
  */
 uint8_t ESP8266WiFiGenericClass::getListenInterval () {
-#ifndef NONOSDK3V0
-    return 0;
-#else
+#if (NONOSDK >= (0x30000 - 1))
     return wifi_get_listen_interval();
+#else
+    return 0;
 #endif
 }
 
@@ -574,10 +583,10 @@ uint8_t ESP8266WiFiGenericClass::getListenInterval () {
  * @return true if max level
  */
 bool ESP8266WiFiGenericClass::isSleepLevelMax () {
-#ifndef NONOSDK3V0
-    return false;
-#else
+#if (NONOSDK >= (0x30000 - 1))
     return wifi_get_sleep_level() == MAX_SLEEP_T;
+#else
+    return false;
 #endif
 }
 
