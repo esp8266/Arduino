@@ -353,28 +353,29 @@ bool ESP8266WiFiSTAClass::reconnect() {
 }
 
 /**
- * Disconnect from the network
- * @param wifioff
+ * Disconnect from the network with clearing saved credentials
+ * @param wifioff Bool indicating whether STA should be disabled.
  * @return  one value of wl_status_t enum
  */
 bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
-    return disconnect(wifioff, false);
+    // Disconnect with clearing saved credentials.
+    return disconnect(wifioff, true);
 }
 
 /**
  * Disconnect from the network
- * @param wifioff
- * @param eraseap
+ * @param wifioff Bool indicating whether STA should be disabled. 
+ * @param eraseCredentials Bool indicating whether saved credentials should be erased.
  * @return  one value of wl_status_t enum
  */
-bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
+bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
     bool ret = false;
 
     // Read current config.
     struct station_config conf;
     wifi_station_get_config(&conf);
 
-    if (eraseap) {
+    if (eraseCredentials) {
         memset(&conf.ssid, 0, sizeof(conf.ssid));
         memset(&conf.password, 0, sizeof(conf.password));
     }

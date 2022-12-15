@@ -50,7 +50,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         bool reconnect();
 
         bool disconnect(bool wifioff = false);
-        bool disconnect(bool wifioff, bool eraseap);
+        bool disconnect(bool wifioff, bool eraseCredentials);
 
         bool isConnected();
 
