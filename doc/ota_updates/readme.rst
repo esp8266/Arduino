@@ -501,7 +501,7 @@ In case OTA update fails dead after entering modifications in your sketch, you c
 HTTP Server
 -----------
 
-``ESPhttpUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
+``ESP8266HTTPUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
 
 Note that by default this class closes all other connections except the one used by the update, this is because the update method blocks. This means that if there's another application receiving data then TCP packets will build up in the buffer leading to out of memory errors causing the OTA update to fail. There's also a limited number of receive buffers available and all may be used up by other applications.
 
@@ -523,6 +523,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
@@ -535,6 +537,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
