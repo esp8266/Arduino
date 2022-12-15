@@ -39,7 +39,6 @@ extern "C" {
 #include <umm_malloc/umm_malloc.h>
 #include <core_esp8266_non32xfer.h>
 #include "core_esp8266_vm.h"
-#include "flash_hal.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -414,6 +413,10 @@ uint32_t __flashindex;
 #define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
 extern "C" uint8_t uart_rx_one_char_block();
 
+#if ! FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+#endif
+
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
     const char *flash_map_str = NULL;
@@ -487,6 +490,11 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
             chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n");
             continue;
         }
+        #elif defined(ALLOW_SMALL_FLASH_SIZE) && !defined(FLASH_MAP_SUPPORT)
+        // Note, while EEPROM is confined to a smaller flash size, we are still
+        // placing RF_CAL and SYSTEM_PARAMETER at the end of flash. To prevent
+        // this, esptool or its equal needs to not update the flash size in the
+        // .bin image.
         #endif
 
         #if FLASH_MAP_SUPPORT & defined(DEBUG_ESP_PORT)
