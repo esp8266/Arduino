@@ -208,6 +208,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate] Server header:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - code: %d\n", code);
     DEBUG_HTTP_UPDATE("[httpUpdate]  - len: %d\n", len);
+    if(code != HTTP_CODE_OK) {
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - payload: %s\n", http.getString().c_str());
+    }
 
     String md5;
     if (_md5Sum.length()) {
