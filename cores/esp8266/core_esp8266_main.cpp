@@ -565,11 +565,11 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
                     uint32_t size = __flashdesc[i].flash_size_kb << 10;
                     ETS_PRINTF(PSTR("  [%02u] 0x%08X %8u\n"), i, size, size);
                 }
+                #endif
                 ETS_PRINTF(PSTR("Reference info:\n"));
                 uint32_t flash_chip_size = 1 << ((spi_flash_get_id() >> 16) & 0xff);
                 ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("fn(spi_flash_get_id())"), flash_chip_size, flash_chip_size);
                 ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("bin_chip_size"), flashchip->chip_size, flashchip->chip_size);
-                #endif
             } else
             #endif
             if (chip_sz_str) {
