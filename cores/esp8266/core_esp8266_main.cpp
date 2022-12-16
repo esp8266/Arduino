@@ -482,7 +482,7 @@ extern "C" void user_init(void) {
 
 #if FLASH_MAP_SUPPORT
     const char *err_msg = flashinit();
-    if (err_msg) __unhandled_exception(err_msg);
+    if (err_msg) __panic_func(err_msg, 0, NULL);
 #endif
 
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
