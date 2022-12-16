@@ -408,7 +408,7 @@ void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool 
 {
     if (iram) {
         HeapSelectIram ephemeral;
-        return heap_pvPortMalloc(size, file, line);;
+        return heap_pvPortMalloc(size, file, line);
     } else {
         HeapSelectDram ephemeral;
         return heap_pvPortMalloc(size, file, line);;
