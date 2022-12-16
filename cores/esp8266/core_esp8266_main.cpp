@@ -400,7 +400,7 @@ extern "C" void __disableWiFiAtBootTime (void)
 
 #if FLASH_MAP_SUPPORT
 #include "flash_hal.h"
-extern "C" void flashinit (void);
+extern "C" const char *flashinit (void);
 uint32_t __flashindex;
 #endif
 
@@ -480,6 +480,11 @@ extern "C" void user_init(void) {
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
+#if FLASH_MAP_SUPPORT
+    const char *err_msg = flashinit();
+    if (err_msg) __unhandled_exception(err_msg);
+#endif
+
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
@@ -502,9 +507,6 @@ extern "C" void user_init(void) {
 
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
-#endif
-#if FLASH_MAP_SUPPORT
-    flashinit();
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi
