@@ -26,10 +26,14 @@
  * Code taken directly from @pvvx's public domain code in
  * https://github.com/pvvx/esp8266web/blob/master/app/sdklib/system/app_main.c
  *
+ * In Espressif versions NONOSDK v3.0.0+ a similar feature was added
+ * load_non_32_wide_handler. Theirs is always loaded. Add weak attribute to
+ * theirs so we can choose by adding an alias to ours.
  *
  */
 
 #include <Arduino.h>
+#include <user_interface.h>
 #define VERIFY_C_ASM_EXCEPTION_FRAME_STRUCTURE
 #include <esp8266_undocumented.h>
 #include <core_esp8266_non32xfer.h>
@@ -58,10 +62,13 @@ extern "C" {
 
 #define EXCCAUSE_LOAD_STORE_ERROR 3 /* Non 32-bit read/write error */
 
+#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000 - 1))
 static fn_c_exception_handler_t old_c_handler = NULL;
+#endif
 
+#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
 static
-IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cause)
+IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, [[maybe_unused]] int cause)
 {
   do {
     uint32_t insn, excvaddr;
@@ -138,6 +145,7 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cau
   } while(false);
 
 /* Fail request, die */
+#if (NONOSDK < (0x30000 - 1))
   /*
     The old handler points to the SDK. Be alert for HWDT when Calling with
     INTLEVEL != 0. I cannot create it any more. I thought I saw this as a
@@ -148,16 +156,23 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, int cau
     old_c_handler(ef, cause);
     return;
   }
-
+#endif
   /*
     Calling _xtos_unhandled_exception(ef, cause) in the Boot ROM, gets us a
     hardware wdt.
 
     Use panic instead as a fall back. It will produce a stack trace.
    */
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_MMU)
   panic();
+#else
+  // For non-debug builds, save on resources
+  abort();
+#endif
 }
+#endif // #if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
 
+#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000 - 1))
 /*
   To operate reliably, this module requires the new
   `_xtos_set_exception_handler` from `exc-sethandler.cpp` and
@@ -174,5 +189,17 @@ void install_non32xfer_exception_handler(void) {
       non32xfer_exception_handler);
   }
 }
+#else
+// For v3.0.x SDKs, no need for install - call_user_start will do the job.
+// Need this for build dependencies
+void install_non32xfer_exception_handler(void) __attribute__((weak));
+void install_non32xfer_exception_handler(void) {}
+#endif
+
+#if defined(NON32XFER_HANDLER)
+// For SDKs 3.0.x, we made load_non_32_wide_handler in
+// libmain.c:user_exceptions.o a weak symbol allowing this override to work.
+extern void load_non_32_wide_handler(struct __exception_frame *ef, int cause) __attribute__((alias("non32xfer_exception_handler")));
+#endif
 
 };
