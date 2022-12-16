@@ -5,11 +5,43 @@
  * modules.
  *
  */
-
 #include <string.h>
 #include <ets_sys.h>
 #include <pgmspace.h>
 #include "coredecls.h"
+
+#if defined(NONOSDK22x_190703) || \
+    defined(NONOSDK22x_191122) || \
+    defined(NONOSDK22x_191105) || \
+    defined(NONOSDK22x_191124) || \
+    defined(NONOSDK22x_190313) || \
+    defined(NONOSDK221)        || \
+    defined(NONOSDK3V0)        || \
+    defined(NONOSDK300)        || \
+    defined(NONOSDK301)        || \
+    defined(NONOSDK302)        || \
+    defined(NONOSDK303)        || \
+    defined(NONOSDK304)        || \
+    defined(NONOSDK305)
+
+// eap_peer_config_deinit() - For this list of SDKs there are no significant
+// changes in the function. Just the line number reference for when vPortFree
+// is called. When vPortFree is called, register a12 continues to hold a pointer
+// to the struct StateMachine. Our cleanup routine should continue to work.
+#if defined(NONOSDK300) || defined(NONOSDK301)
+    // Minor changes only line number changed
+    #define SDK_LEAK_LINE 809
+#elif defined(NONOSDK302) || defined(NONOSDK303) || defined(NONOSDK304)
+    // Minor changes only line number changed
+    #define SDK_LEAK_LINE 831
+#elif defined(NONOSDK305)
+    // At v3.0.5 Espressif moved `.text.eap_peer_config_deinit` to
+    // `eap_peer_config_deinit` then later in latest git they moved it
+    // back. For our linker script both are placed in flash.
+    #define SDK_LEAK_LINE 831
+#else
+    #define SDK_LEAK_LINE 799
+#endif
 
 #ifdef  DEBUG_WPA2_EAP_PATCH
 #include "esp8266_undocumented.h"
@@ -100,7 +132,7 @@ struct StateMachine { // size 200 bytes
  * same line.
  */
 void patch_wpa2_eap_vPortFree_a12(void *ptr, const char* file, int line, void* a12) {
-    if (799 == line) {
+    if (SDK_LEAK_LINE == line) {
         // This caller is eap_peer_config_deinit()
         struct StateMachine* sm = (struct StateMachine*)a12;
         if (ptr == sm->config[0]) {
@@ -126,20 +158,37 @@ void patch_wpa2_eap_vPortFree_a12(void *ptr, const char* file, int line, void* a
         }
 #endif
     }
-#if 0
-    // This is not needed because the call was NO-OPed in the library. This code
-    // snippit is just to show how a future memory free issue might be resolved.
-    else if (672 == line) {
+
+#if defined(NONOSDK300) || defined(NONOSDK301)
+    else if (682 == line) {
         // This caller is wpa2_sm_rx_eapol()
         // 1st of a double free
         // let the 2nd free handle it.
         return;
     }
+#elif defined(NONOSDK302) || defined(NONOSDK303) || defined(NONOSDK304) || defined(NONOSDK305)
+    // It looks like double free is fixed. WPA2 Enterpise connections work
+    // without crashing. wpa2_sm_rx_eapol() has a few changes between NONOSDK301
+    // and NONOSDK302. However, this set of releases still have memory leaks.
+#else
+    // This is not needed because the call was NO-OPed in the library.
+    // Keep code snippit for reference.
+    // else if (672 == line) {
+    //     // This caller is wpa2_sm_rx_eapol()
+    //     // 1st of a double free
+    //     // let the 2nd free handle it.
+    //     return;
+    // }
 #endif
     vPortFree(ptr, file, line);
 }
 
 };
+
+#else
+#error "Internal error: A new SDK has been added. This module must be updated."
+#error "  Need to test WPA2 Enterpise connectivity."
+#endif
 
 /*
  * This will minimize code space for non-wifi enterprise sketches which do not
