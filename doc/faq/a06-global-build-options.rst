@@ -1,3 +1,5 @@
+:orphan:
+
 How to specify global build defines and options
 ===============================================
 
@@ -18,13 +20,16 @@ signature line must be alone on a single line. The block comment ending
 compiler command-line options just as you would have for the GCC @file
 command option.
 
-Actions taken in processing comment block to create ``build.opt`` \* for
-each line, white space is trimmed \* blank lines are skipped \* lines
-starting with ``*``, ``//``, or ``#`` are skipped \* the remaining
-results are written to build tree\ ``/core/build.opt`` \* multiple
-``/*@create-file:build.opt@`` ``*/`` comment blocks are not allowed \*
-``build.opt`` is finished with a ``-include ...`` command, which
-references the global .h its contents were extracted from.
+Actions taken in processing comment block to create ``build.opt``
+
+-  for each line, white space is trimmed
+-  blank lines are skipped
+-  lines starting with ``*``, ``//``, or ``#`` are skipped
+-  the remaining results are written to build tree\ ``/core/build.opt``
+-  multiple ``/*@create-file:build.opt@`` ``*/`` comment blocks are not
+   allowed
+-  ``build.opt`` is finished with a ``-include ...`` command, which
+   references the global .h its contents were extracted from.
 
 Example Sketch: ``LowWatermark.ino``
 
@@ -89,6 +94,72 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
    #endif
 
+Separate production and debug build options
+===========================================
+
+If your production and debug build option requirements are different,
+adding ``mkbuildoptglobals.extra_flags={build.debug_port}`` to
+``platform.local.txt`` will create separate build option groups for
+debugging and production. For the production build option group, the “C”
+block comment starts with ``/*@create-file:build.opt@``, as previously
+defined. For the debugging group, the new “C” block comment starts with
+``/*@create-file:build.opt:debug@``. You make your group selection
+through “Arduino->Tools->Debug port” by selecting or disabling the
+“Debug port.”
+
+Options common to both debug and production builds must be included in
+both groups. Neither of the groups is required. You may also omit either
+or both.
+
+Reminder with this change, any old “sketch” with only a “C” block
+comment starting with ``/*@create-file:build.opt@`` would not use a
+``build.opt`` file for the debug case. Update old sketches as needed.
+
+Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
+
+.. code:: cpp
+
+   /*@create-file:build.opt:debug@
+   // Debug build options
+   -DMYTITLE1="\"Running on \""
+   -DUMM_STATS_FULL=1
+
+   //-fanalyzer
+
+   // Removing the optimization for "sibling and tail recursive calls" may fill
+   // in some gaps in the stack decoder report. Preserves the stack frames
+   // created at each level as you call down to the next.
+   -fno-optimize-sibling-calls
+   */
+
+   /*@create-file:build.opt@
+   // Production build options
+   -DMYTITLE1="\"Running on \""
+   -DUMM_STATS_FULL=1
+   -O3
+   */
+
+   #ifndef LOWWATERMARK_INO_GLOBALS_H
+   #define LOWWATERMARK_INO_GLOBALS_H
+
+   #if defined(__cplusplus)
+   #define MYTITLE2 "Empty"
+   #endif
+
+   #if !defined(__cplusplus) && !defined(__ASSEMBLER__)
+   #define MYTITLE2 "Full"
+   #endif
+
+   #ifdef DEBUG_ESP_PORT
+   // Global Debug defines
+   // ...
+   #else
+   // Global Production defines
+   // ...
+   #endif
+
+   #endif
+
 Aggressively cache compiled core
 ================================
 
@@ -108,10 +179,12 @@ multiple Sketches are open, they can no longer reliably share one cached
 of ``core.a`` cached. Other sketches will use this cached version for
 their builds.
 
-There are two solutions to this issue: 1. Turn off the “Aggressively
-Cache Compiled core” feature, by setting ``compiler.cache_core=false``.
+There are two solutions to this issue:
+
+1. Turn off the “Aggressively Cache Compiled core” feature, by setting
+   ``compiler.cache_core=false``.
 2. Rely on the not ideal fail-safe, aggressive cache workaround built
-into the script.
+   into the script.
 
 Using “compiler.cache_core=false”
 ---------------------------------
@@ -145,11 +218,16 @@ When you switch between Sketch windows, core will be recompiled and the
 cache updated. The workaround logic is reset when Arduino IDE is
 completely shutdown and restarted.
 
-The workaround is not perfect. These issues may be of concern: 1. Dirty
-temp space. Arduino build cache files left over from a previous run or
-boot. 2. Arduino command-line options: \* override default
-preferences.txt file. \* override a preference, specifically
-``compiler.cache_core``. 3. Multiple versions of the Arduino IDE running
+The workaround is not perfect. These issues may be of concern:
+
+1. Dirty temp space. Arduino build cache files left over from a previous
+   run or boot.
+2. Arduino command-line options:
+
+   -  override default preferences.txt file.
+   -  override a preference, specifically ``compiler.cache_core``.
+
+3. Multiple versions of the Arduino IDE running
 
 **Dirty temp space**
 

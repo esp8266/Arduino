@@ -236,3 +236,29 @@ The ``networkItem`` is a zero based index of network discovered during scan. All
     6: UPC Wi-Free, Ch:11 (-79dBm)
 
 For code samples please refer to separate section with `examples <scan-examples.rst>`__ dedicated specifically to the Scan Class.
+
+getScanInfoByIndex
+^^^^^^^^^^^^^^^^^^
+
+Similar to the ``getNetworkInfo``, but instead returns a pointer to the Nth ``bss_info`` structure which is internally used by the NONOS SDK.
+
+.. code:: cpp
+
+    WiFi.getScanInfoByIndex(networkItem) 
+
+The ``networkItem`` is a zero based index of network discovered during scan. Function will return ``nullptr`` when ``networkItem`` is greater than the number of networks in the scan result or when there are no scan results available.
+
+.. code:: cpp
+
+    auto n = WiFi.scanNetworks(false, true);
+    if (n <= 0) {
+        // scan failed or there are no results
+        return;
+    }
+
+    for (int i = 0; i < n; i++)
+        const auto* info = WiFi.getScanInfoByIndex(i)
+        // ... use the raw data from the bss_info structure ...
+    }
+
+See ``tools/sdk/include/user_interface.h`` for all available fields and `examples <scan-examples.rst>`__.
