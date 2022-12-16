@@ -63,8 +63,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
   if (!path) { path = "/"; }
 
   Serial.printf("Trying: %s:443...", host);
-  client->connect(host, port);
-  if (!client->connected()) {
+  if (!client->connect(host, port)) {
     Serial.printf("*** Can't connect. ***\n-------\n");
     return;
   }
@@ -76,7 +75,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
   client->write("\r\nUser-Agent: ESP8266\r\n");
   client->write("\r\n");
   uint32_t to = millis() + 5000;
-  if (client->connected()) {
+  while (client->available()) {
     do {
       char tmp[32];
       memset(tmp, 0, 32);
