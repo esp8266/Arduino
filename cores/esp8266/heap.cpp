@@ -356,25 +356,25 @@ void system_show_malloc(void)
 void* IRAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortMalloc(size,  file, line);;
+    return heap_pvPortMalloc(size, file, line);;
 }
 
 void* IRAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortCalloc(count, size,  file, line);
+    return heap_pvPortCalloc(count, size, file, line);
 }
 
 void* IRAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortRealloc(ptr, size,  file, line);
+    return heap_pvPortRealloc(ptr, size, file, line);
 }
 
 void* IRAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortZalloc(size,  file, line);
+    return heap_pvPortZalloc(size, file, line);
 }
 
 void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
@@ -384,7 +384,62 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
     // correct context. umm_malloc free internally determines the correct heap.
     HeapSelectDram ephemeral;
 #endif
-    return heap_vPortFree(ptr,  file, line);
+    return heap_vPortFree(ptr, file, line);
 }
 
+#if (NONOSDK >= (0x30000))
+////////////////////////////////////////////////////////////////////////////////
+/*
+  New for NON-OS SDK 3.0.0 and up
+  Needed for WPA2 Enterprise support. This was not present in SDK pre 3.0
+
+  The NON-OS SDK 3.0.x has breaking changes to pvPortMalloc. They added one more
+  argument for selecting a heap. To avoid breaking the build, I renamed their
+  broken version pvEsprMalloc. To be used, the LIBS need to be edited.
+
+  They also added pvPortZallocIram and pvPortCallocIram, which are not a
+  problem.
+
+  WPA2 Enterprise connect crashing is fixed at v3.0.2 and up.
+
+  Not used for unreleased version NONOSDK3V0.
+*/
+void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool iram)
+{
+    if (iram) {
+        HeapSelectIram ephemeral;
+        return heap_pvPortMalloc(size, file, line);
+    } else {
+        HeapSelectDram ephemeral;
+        return heap_pvPortMalloc(size, file, line);
+    }
+}
+
+void* IRAM_ATTR pvPortCallocIram(size_t count, size_t size, const char* file, int line)
+{
+    HeapSelectIram ephemeral;
+    return heap_pvPortCalloc(count, size, file, line);
+}
+
+void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
+{
+    HeapSelectIram ephemeral;
+    return heap_pvPortZalloc(size, file, line);
+}
+
+/*
+  uint32_t IRAM_ATTR user_iram_memory_is_enabled(void)
+  {
+    return CONFIG_ENABLE_IRAM_MEMORY;
+  }
+
+  We do not need the function user_iram_memory_is_enabled().
+  1. It was used by mem_manager.o which was replaced with this custom heap
+     implementation. IRAM memory selection is handled differently.
+  2. In libmain.a, Cache_Read_Enable_New uses it for cache size. However, When
+     using IRAM for memory or running with 48K IRAM for code, we use a
+     replacement Cache_Read_Enable to correct the cache size ignoring
+     Cache_Read_Enable_New's selected value.
+*/
+#endif
 };
