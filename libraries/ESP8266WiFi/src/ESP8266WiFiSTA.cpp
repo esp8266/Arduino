@@ -371,13 +371,23 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
 bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
     bool ret = false;
 
-    // Read current config.
-    struct station_config conf;
-    wifi_station_get_config(&conf);
-
     if (eraseCredentials) {
+        // Read current config.
+        struct station_config conf;
+        wifi_station_get_config(&conf);
+
+        // Erase credentials.
         memset(&conf.ssid, 0, sizeof(conf.ssid));
         memset(&conf.password, 0, sizeof(conf.password));
+
+        // Store modiffied config.
+        ETS_UART_INTR_DISABLE();
+        if(WiFi._persistent) {
+            wifi_station_set_config(&conf);
+        } else {
+            wifi_station_set_config_current(&conf);
+        }
+        ETS_UART_INTR_ENABLE();
     }
 
     // API Reference: wifi_station_disconnect() need to be called after system initializes and the ESP8266 Station mode is enabled.
@@ -385,15 +395,6 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
         ret = wifi_station_disconnect();
     else
         ret = true;
-
-    ETS_UART_INTR_DISABLE();
-    if(WiFi._persistent) {
-        wifi_station_set_config(&conf);
-    } else {
-        wifi_station_set_config_current(&conf);
-    }
-
-    ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
         WiFi.enableSTA(false);
