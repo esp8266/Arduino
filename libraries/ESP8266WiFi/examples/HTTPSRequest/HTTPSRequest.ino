@@ -77,7 +77,7 @@ void setup() {
   client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + github_host + "\r\n" + "User-Agent: BuildFailureDetectorESP8266\r\n" + "Connection: close\r\n\r\n");
 
   Serial.println("Request sent");
-  while (client.connected()) {
+  while (client.available()) {
     String line = client.readStringUntil('\n');
     if (line == "\r") {
       Serial.println("Headers received");

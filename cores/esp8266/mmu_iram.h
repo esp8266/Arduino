@@ -56,7 +56,8 @@ extern "C" {
  #define DEV_DEBUG_PRINT
  */
 
-#if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
+#if (defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)) && !defined(HOST_MOCK)
+// Errors follow when `#include <esp8266_peri.h>` is present when running CI HOST
 #include <esp8266_peri.h>
 
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}

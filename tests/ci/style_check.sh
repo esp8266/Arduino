@@ -4,12 +4,15 @@
 
 set -e -x
 
-root=$(git rev-parse --show-toplevel)
-${root}/tests/restyle.sh
-
-# Revert changes which formatter might have done to the submodules,
-# as we don't want to fail the build because of the 3rd party libraries
 git --version || true
-git submodule foreach --recursive 'git reset --hard'
+root=$(git rev-parse --show-toplevel)
 
-git diff --exit-code -- $TRAVIS_BUILD_DIR
+# Run formatter and compare what changed in the git tree.
+# Also revert changes which formatter might have done to the submodules,
+# as we don't want to fail the build because of the 3rd party libraries
+
+cd $root
+./tests/restyle.sh
+
+git submodule foreach --recursive 'git reset --hard'
+git diff --exit-code

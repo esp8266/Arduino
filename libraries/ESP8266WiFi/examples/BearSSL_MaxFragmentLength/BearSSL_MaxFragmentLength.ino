@@ -44,8 +44,7 @@ int fetchNoMaxFragmentLength() {
 
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
-  client.connect("tls.mbed.org", 443);
-  if (client.connected()) {
+  if (client.connect("tls.mbed.org", 443)) {
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
     fetch(&client);
@@ -81,8 +80,7 @@ int fetchMaxFragmentLength() {
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
   Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
   if (mfln) { client.setBufferSizes(512, 512); }
-  client.connect("tls.mbed.org", 443);
-  if (client.connected()) {
+  if (client.connect("tls.mbed.org", 443)) {
     Serial.printf("MFLN status: %s\n", client.getMFLNStatus() ? "true" : "false");
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();

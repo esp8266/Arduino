@@ -48,7 +48,9 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
 
         bool reconnect();
+
         bool disconnect(bool wifioff = false);
+        bool disconnect(bool wifioff, bool eraseCredentials);
 
         bool isConnected();
 

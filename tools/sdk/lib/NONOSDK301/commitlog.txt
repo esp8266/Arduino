@@ -1,0 +1,1150 @@
+    feat: Update at bin v1.7.1
+    feat: Update SDK version v3.0.1 and AT version 1.7.1
+    fix(net80211): Fix some net80211 bugs
+    
+    - fix(net80211): fix crash with fake beacon frame
+    - fix(net80211): Have no check phy mode configured by user when connect AP
+    - fix(net80211): Use random seqno when sending auth packet to AP
+
+    Bugfix/fix some ap use error mac send ip packet
+    feat(phy): Update phy version 1145
+    feat(phy): Update phy lib version 1143
+    fix(net80211): fix memleak when scaning if in softap+station mode
+    
+    - ESPCS-35
+
+    fix(net80211): Remove wme info by default
+    bugfix: Revert MR89 which commit id is 97167a72
+    
+    - Ruturn OK when sending UDP if there is no memory
+    - N8266-24
+
+    feat: De-swap uart before restart
+    feat: Remove phy freq trace api and disable freq trace in at project by default
+    feat: Support the latest toolchain version
+    fix(pp): Clear nmi status firstly when enter wdev irq
+    feat(pp): Sync code from esp32 about esf_buf
+    feat(partition_table): Just print log when check partition table fail
+    fix: fix bug the default hostname is illegal
+    feat(lib_version): Update lib version for commit id a0c4877
+    Feature/code optimize
+    feat(lib): Recompile lwip, mbedtls and driver lib
+    feat: Add some flags in Makefile to reduce bin size
+    feat: Recompile internal libs with -ffunction-sections and -fdata-sections
+    refactor(driver): New toolchain can compile driver code
+    feat(espnow): Add broadcast packets support for espnow
+    fix(wifi): Prohibit sending probe request when passive scan mode
+    fix(net80211): Connect wrong AP if there is a hidden ssid AP around
+    fix(pp): Disable receiving ampdu packet
+    fix(net80211): fix some AP does not support status code 37 in ADDBA response
+    fix(net80211): Connect some AP with only 11b mode fail
+    fix: Add header file or function declaration to avoid compile error
+    fix(net80211): Fix CCMP encryption was incompatible with some AP
+    
+    See WACS-69!
+
+    feat(version): Update SDK version v3.0.1-dev
+    fix(net80211): Support associate with AP with LDPC
+    fix(net80211): It Should return ERR_MEM if malloc fail
+    fix(system): PMK does not update if the AP is not connected
+    
+    See TW25093!
+
+    fix(version): Update external SDK version to 3.0.0
+    fix(system): The memory is over 0x3fffc000 when malloc
+    fix: It can't get time if set sntp server by calling sntp_setserver
+    fix: sint32_t and int32_t in c_types.h are inconsistent
+    docs(partition_table): Add document about partition table
+
+commit 4bf0aefee37ac1f272b793c2403c53a0c122b570
+Merge: 7f59bc6 02b5158
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Jul 15 19:02:49 2019 +0800
+
+    Merge branch 'feature/update_version' into 'release/v3.0.0'
+    
+    feat: Update at bin v1.7.1
+    
+    See merge request sdk/ESP8266_NONOS_SDK!217
+
+commit 02b5158460391bce7704e2d90a339542ac030e04
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Jul 15 19:02:49 2019 +0800
+
+    feat: Update at bin v1.7.1
+
+commit 7f59bc6036c1b685b80190b9db9585a49867751a
+Merge: 9d591d1 36cc169
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Jul 15 18:11:42 2019 +0800
+
+    Merge branch 'feature/update_version' into 'release/v3.0.0'
+    
+    feat: Update SDK version v3.0.1 and AT version 1.7.1
+    
+    See merge request sdk/ESP8266_NONOS_SDK!216
+
+commit 36cc169e773286a2d0fef3ae7e610ffc20bce3b5
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Jul 15 18:11:42 2019 +0800
+
+    feat: Update SDK version v3.0.1 and AT version 1.7.1
+
+commit 9d591d14491a07a506b868d60f4ec12894702dc3
+Merge: fc04170 d83a671
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Jul 3 15:56:00 2019 +0800
+
+    Merge branch 'bugfix/fix_some_net8011_bugs' into 'release/v3.0.0'
+    
+    fix(net80211): Fix some net80211 bugs
+    
+    See merge request sdk/ESP8266_NONOS_SDK!214
+
+commit d83a671dea54eed2934400158b0153ce5d4a24c3
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Jul 3 15:56:00 2019 +0800
+
+    fix(net80211): Fix some net80211 bugs
+    
+    - fix(net80211): fix crash with fake beacon frame
+    - fix(net80211): Have no check phy mode configured by user when connect AP
+    - fix(net80211): Use random seqno when sending auth packet to AP
+
+commit fc041703e0d900b8f4814f4f499e62599c626fae
+Merge: 3d5e347 800ef1c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Jun 28 17:34:45 2019 +0800
+
+    Merge branch 'bugfix/fix_some_ap_use_error_mac_send_ip_packet' into 'release/v3.0.0'
+    
+    Bugfix/fix some ap use error mac send ip packet
+    
+    See merge request sdk/ESP8266_NONOS_SDK!211
+
+commit 800ef1c80e4f98a673f0486a167dbe8d5133bb64
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Jun 28 17:33:11 2019 +0800
+
+    feat(lwip): Recompile lwip lib
+
+commit ffc37ff3c25481e7ac00cdc8c1bc0583f3c894ff
+Author: Zhang Jun Hao <zhangjunhao@espressif.com>
+Date:   Fri Jun 28 10:24:23 2019 +0800
+
+    fix(lwip): fix some ap use error mac send ip packet
+
+commit 3d5e347e2f2560db4fa437572700c61e6b5a48b1
+Merge: e4434aa 5f8ca54
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Jun 28 17:25:17 2019 +0800
+
+    Merge branch 'bugfix/create_AT_ssl_fail_if_no_cert_or_ca_partition' into 'release/v3.0.0'
+    
+    fix(at): Create AT SSL fail if there is no cert or ca partitio
+    
+    See merge request sdk/ESP8266_NONOS_SDK!210
+
+commit 5f8ca54d3161855f523e30db779ed4decd9db1a0
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Jun 28 17:25:17 2019 +0800
+
+    fix(at): Create AT SSL fail if there is no cert or ca partitio
+
+commit e4434aa730e78c63040ace360493aef420ec267c
+Merge: 39ec2d4 325d3c2
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 23 16:53:43 2019 +0800
+
+    Merge branch 'cherry-pick-7a31cb7e' into 'release/v3.0.0'
+    
+    feat(phy): Update phy version 1145
+    
+    See merge request sdk/ESP8266_NONOS_SDK!206
+
+commit 325d3c283cca60f9ca6a58da6488ee7134079f09
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 23 08:50:55 2019 +0000
+
+    Merge branch 'feature/update_phy' into 'master'
+    
+    feat(phy): Update phy version 1145
+    
+    See merge request sdk/ESP8266_NONOS_SDK!205
+    
+    (cherry picked from commit 7a31cb7e48aff8f7d96fa5bccc2ba535b9c446a1)
+    
+    11bd2ed4 feat(phy): Update phy version 1145
+
+commit 39ec2d4573eb77fda73f6afcf6dd1b3c41e74fcd
+Merge: e766eeb fa6efa3
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Apr 17 13:57:55 2019 +0800
+
+    Merge branch 'cherry-pick-8631a0d1-2' into 'release/v3.0.0'
+    
+    feat(phy): Update phy lib version 1143
+    
+    See merge request sdk/ESP8266_NONOS_SDK!203
+
+commit fa6efa33e1f089b0ea281fcf50388ccc68a3189b
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Apr 17 05:51:01 2019 +0000
+
+    Merge branch 'feature/update_phy' into 'master'
+    
+    feat(phy): Update phy lib version 1143
+    
+    See merge request sdk/ESP8266_NONOS_SDK!202
+    
+    (cherry picked from commit 8631a0d1ae2a4864d7a11ece3c772664a3935f8f)
+    
+    4c3a389e feat(phy): Update phy lib version 1143
+
+commit e766eebaa085a37ee25f0d7396fa48fddb24f8ef
+Merge: 40408e4 4201b46
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 17:16:57 2019 +0800
+
+    Merge branch 'feature/recompile_lwip' into 'release/v3.0.0'
+    
+    fix(lwip): fix some dhcp bugs
+    
+    See merge request sdk/ESP8266_NONOS_SDK!198
+
+commit 4201b46957c8216371e44c797e7a038e1c0dd38a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 17:12:59 2019 +0800
+
+    fix(lwip): fix some dhcp bugs
+    
+    - Remove some dhcp options in rebind state
+    - Add t0 for dhcp lease time
+    - Change t2 to 0.875*t0
+
+commit 40408e4350dbd79fb7eb37db8e21582757462af5
+Merge: ec123a2 4516ac7
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 17:11:31 2019 +0800
+
+    Merge branch 'cherry-pick-11535c43' into 'release/v3.0.0'
+    
+    fix(lwip): fix some dhcp bugs
+    
+    See merge request sdk/ESP8266_NONOS_SDK!195
+
+commit 4516ac7c08e90f015bace77f6219011cb83da392
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 09:05:41 2019 +0000
+
+    Merge branch 'bugfix/fix_some_dhcp_bugs' into 'master'
+    
+    fix(lwip): fix some dhcp bugs
+    
+    See merge request sdk/ESP8266_NONOS_SDK!191
+    
+    (cherry picked from commit 11535c43cc2960dcca09182f41ea5ba3916de4bd)
+    
+    959a873f fix(lwip): fix some dhcp bugs
+
+commit ec123a2827e08396064aea4956ec07b9fc894ab4
+Merge: 44d7b09 f269170
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:42:28 2019 +0800
+
+    Merge branch 'bugfix/scan_memleak' into 'release/v3.0.0'
+    
+    fix(net80211): fix memleak when scaning if in softap+station mode
+    
+    See merge request sdk/ESP8266_NONOS_SDK!188
+
+commit f2691700edb63a60ac66d82f06216c4bed49c39d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:37:38 2019 +0800
+
+    fix(net80211): fix memleak when scaning if in softap+station mode
+    
+    - ESPCS-35
+
+commit 44d7b094b16dfe4b0f97693e6736b3edaea5dd47
+Merge: 1c52778 6580ca3
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:23:42 2019 +0800
+
+    Merge branch 'bugfix/remove_wme_info' into 'release/v3.0.0'
+    
+    fix(net80211): Remove wme info by default
+    
+    See merge request sdk/ESP8266_NONOS_SDK!187
+
+commit 6580ca35e9f8f85d11100c1ad3d2ed27d4b26381
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:19:28 2019 +0800
+
+    fix(net80211): Remove wme info by default
+    
+    - https://github.com/espressif/ESP8266_RTOS_SDK/issues/539
+
+commit 1c527784a890067a773b830f248d0f93443443cc
+Merge: a510750 937f05c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:07:24 2019 +0800
+
+    Merge branch 'bugfix/revert_MR89' into 'release/v3.0.0'
+    
+    bugfix: Revert MR89 which commit id is 97167a72
+    
+    See merge request sdk/ESP8266_NONOS_SDK!186
+
+commit 937f05c5dd4f581f773195989e0dafaa3d36cb66
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 15:00:52 2019 +0800
+
+    bugfix: Revert MR89 which commit id is 97167a72
+    
+    - Ruturn OK when sending UDP if there is no memory
+    - N8266-24
+
+commit a51075035531d587ef7a3857e4133f6d5e100067
+Merge: 529b0ff c5516d0
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 14:44:31 2019 +0800
+
+    Merge branch 'feature/deswap_uart_before_restart' into 'release/v3.0.0'
+    
+    feat: De-swap uart before restart
+    
+    See merge request sdk/ESP8266_NONOS_SDK!185
+
+commit c5516d0ecb05b3a6871c3993fae0503b7d4be66a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Apr 16 14:34:55 2019 +0800
+
+    feat: De-swap uart before restart
+
+commit 529b0ff8f6b9889f15d506edd59b47778f23abc4
+Merge: 3149119 a88fa71
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Mar 18 18:08:46 2019 +0800
+
+    Merge branch 'bugfix/iram_function_is_in_irom_text' into 'release/v3.0.0'
+    
+    fix(at): Replace default function attribute with IRAM_ATTR
+    
+    See merge request sdk/ESP8266_NONOS_SDK!181
+
+commit a88fa71ed086ae9cba2c88683f58cf41bb11e85c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Mar 18 18:00:37 2019 +0800
+
+    fix(at): Replace default function attribute with IRAM_ATTR
+    
+    - N8266-23
+
+commit 31491190aafcf14d04035d7dfd52e786204bf2d7
+Merge: bede935 004cc26
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 15:23:26 2019 +0800
+
+    Merge branch 'feature/recompile_lwip_lib' into 'release/v3.0.0'
+    
+    feat(lwip): Recompile llib to fix the string bug in the mdns_set_hostname
+    
+    See merge request sdk/ESP8266_NONOS_SDK!177
+
+commit bede935dbdab4855a50ce8b4532f3738397a9402
+Merge: e355238 15442ee
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 15:17:30 2019 +0800
+
+    Merge branch 'cherry-pick-0db44ba5' into 'release/v3.0.0'
+    
+    fix(mdns): Fix the bug of set mDNS information
+    
+    See merge request sdk/ESP8266_NONOS_SDK!174
+
+commit 004cc2699196e4aa4edb147177498b20a51f6376
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 15:15:26 2019 +0800
+
+    feat(lwip): Recompile lwip lib to fix the string bug in the mdns_set_hostname
+    
+    - https://github.com/espressif/ESP8266_NONOS_SDK/issues/97
+
+commit e35523847ca2c8e39adb300a1b2d449fae05adc7
+Merge: 427f263 855cd08
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 15:12:49 2019 +0800
+
+    Merge branch 'cherry-pick-0db44ba5-2' into 'release/v3.0.0'
+    
+    fix(mdns): Fix the bug of set mDNS information
+    
+    See merge request sdk/ESP8266_NONOS_SDK!175
+
+commit 855cd08fc3675b9322facee5d52700c1dcec895a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 07:02:38 2019 +0000
+
+    Merge branch 'bugfix/mdns' into 'master'
+    
+    fix(mdns): Fix the bug of set mDNS information.
+    
+    See merge request sdk/ESP8266_NONOS_SDK!168
+    
+    (cherry picked from commit 0db44ba5722a44679a6c3bd1485bd327ae1ef110)
+    
+    cc2270a6 fix(mdns): Fix the bug of set mDNS information.
+
+commit 15442eef3cd83e527713bb42737cc3050648121d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 07:02:38 2019 +0000
+
+    Merge branch 'bugfix/mdns' into 'master'
+    
+    fix(mdns): Fix the bug of set mDNS information.
+    
+    See merge request sdk/ESP8266_NONOS_SDK!168
+    
+    (cherry picked from commit 0db44ba5722a44679a6c3bd1485bd327ae1ef110)
+    
+    cc2270a6 fix(mdns): Fix the bug of set mDNS information.
+
+commit 427f263a2daf1d44bc607afab6b0dd1176b7592d
+Merge: 071f7ed dbfe875
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 14:39:21 2019 +0800
+
+    Merge branch 'feature/recomile_lwip_lib' into 'release/v3.0.0'
+    
+    feat(lwip): Recompile llib to fix ping issue
+    
+    See merge request sdk/ESP8266_NONOS_SDK!172
+
+commit dbfe8752d186f2a45334757ce6b58e4e118ea28b
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 14:37:49 2019 +0800
+
+    feat(lwip): Recompile lwip lib to fix ping issue
+    
+    - https://github.com/espressif/ESP8266_NONOS_SDK/issues/188
+    - N8266-1
+
+commit 071f7ed9adef301a0db706aa95d0d5cfebf5cd0e
+Merge: 3f47368 62d8d4d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 14:35:01 2019 +0800
+
+    Merge branch 'cherry-pick-7abbcc2f' into 'release/v3.0.0'
+    
+    fix(ping): fix the bug of ping result report application takes long time
+    
+    See merge request sdk/ESP8266_NONOS_SDK!169
+
+commit 62d8d4d262a015b1fc8b43230e2532f1f4bd5fff
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 06:16:18 2019 +0000
+
+    Merge branch 'bugfix/ping_time' into 'master'
+    
+    fix(ping): fix the bug of ping result report application takes long time
+    
+    See merge request sdk/ESP8266_NONOS_SDK!163
+    
+    (cherry picked from commit 7abbcc2f925745340185aced74273ea7e642cfb9)
+    
+    d3523192 fix(ping): fix the bug of ping result report application takes long time.
+
+commit 3f47368d594aee853acc1d621d0928486162fac6
+Merge: 38b9a6d 0286b3a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 11:34:40 2019 +0800
+
+    Merge branch 'bugfix/jsonparse_strcmp_value' into 'release/v3.0.0'
+    
+    fix(json): The value jsonparse_strcmp_value returns is incorrect sometimes
+    
+    See merge request sdk/ESP8266_NONOS_SDK!165
+
+commit 0286b3a5a7764891665323fa22c7eacea8f10608
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 11:32:38 2019 +0800
+
+    feat(json): Recompile json lwip
+
+commit 1ee88246f838300d373a7cfff89103e1439aa19c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 11:29:42 2019 +0800
+
+    fix(json): The value jsonparse_strcmp_value returns is incorrect sometimes
+    
+    - https://github.com/espressif/ESP8266_NONOS_SDK/issues/173
+    - N8266-20
+
+commit 38b9a6db274886d5394868629350f6af9e5cf116
+Merge: 89693b4 4cac675
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Mar 15 10:42:14 2019 +0800
+
+    Merge branch 'feature/add_json_source_code' into 'release/v3.0.0'
+    
+    feat: Add json source code
+    
+    See merge request sdk/ESP8266_NONOS_SDK!164
+
+commit 4cac675bd391eee8eb86ecfcdf827430c736beb4
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Mar 14 21:41:26 2019 +0800
+
+    feat: Add json source code
+
+commit 89693b42639acd15611aea8767271f5c5d2bbb8a
+Merge: f4cbca7 5939cd5
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Mar 14 16:37:35 2019 +0800
+
+    Merge branch 'cherry-pick-fa67274d-2' into 'release/v3.0.0'
+    
+    fix: sync a bug fix of dns_enqueue with RTOS SDK.
+    
+    See merge request sdk/ESP8266_NONOS_SDK!158
+
+commit 5939cd555a0652c6729275b18f14866ce0b4807d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Mar 14 16:33:17 2019 +0800
+
+    feat(lwip): Recompile lwip lib
+    
+    - https://github.com/espressif/ESP8266_NONOS_SDK/issues/198
+    - N8266-18
+
+commit bdcde0d7a979ffe904c5708dc3676e06ed113ab2
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Mar 14 06:34:35 2019 +0000
+
+    Merge branch 'bugfix/dns_queue' into 'master'
+    
+    sync a bug fix of dns_enqueue with RTOS SDK.
+    
+    See merge request sdk/ESP8266_NONOS_SDK!156
+    
+    (cherry picked from commit fa67274d1ee6205bfc8492394c800f83db2630d1)
+    
+    af2aebb0 fix(dns): sync a bug fix of dns_enqueue with RTOS SDK.
+
+commit f4cbca76557a81d9a50123be8bbf702a1cf6d167
+Merge: 9148573 7268469
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Mar 13 11:24:36 2019 +0800
+
+    Merge branch 'cherry-pick-f8234db1' into 'release/v3.0.0'
+    
+    feat: Remove phy freq trace api and disable freq trace in at project by default
+    
+    See merge request sdk/ESP8266_NONOS_SDK!154
+
+commit 7268469f2570a63232bf52c7b5d405a9f995ca9c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Mar 13 03:22:18 2019 +0000
+
+    Merge branch 'feature/remove_phy_freq_trace' into 'master'
+    
+    feat: Remove phy freq trace api and disable freq trace in at project by default
+    
+    See merge request sdk/ESP8266_NONOS_SDK!153
+    
+    (cherry picked from commit f8234db11df0a2ed76761080f3549e55671b2bbb)
+    
+    80ce106f feat: Remove phy freq trace api and disable freq trace in at project by default
+
+commit 914857385f645ce9d8de0c4ffe0f71281818494e
+Merge: 16aecfb a378214
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 17:09:43 2019 +0800
+
+    Merge branch 'featur/compile_for_the_latest_toolchain' into 'release/v3.0.0'
+    
+    feat: Support the latest toolchain version
+    
+    See merge request sdk/ESP8266_NONOS_SDK!148
+
+commit a378214ff67dceb9a930ae59cb62ac4be6e0aae9
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 17:07:58 2019 +0800
+
+    feat: Recompile lwip and mbedtls lib
+
+commit 78497e12a2b605a7be24d2a5d9f9526573ca0dff
+Author: liuhan <liuhan@espressif.com>
+Date:   Mon Feb 25 16:21:04 2019 +0800
+
+    feat: Support the latest toolchain version
+
+commit 16aecfb348549f1316e17643dc51f1f15ce1866e
+Merge: 51c24a9 87ae423
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 17:04:06 2019 +0800
+
+    Merge branch 'bugfix/wdev_int_status_overlap' into 'release/v3.0.0'
+    
+    fix(pp): Clear nmi status firstly when enter wdev irq
+    
+    See merge request sdk/ESP8266_NONOS_SDK!147
+
+commit 87ae423fd044e529b1774a7894c699bce358d421
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:59:30 2019 +0800
+
+    fix(pp): Clear nmi status firstly when enter wdev irq
+
+commit 51c24a982d6292e1917b9c37c7b6c91f37295f62
+Merge: 6cfbe2c 1d2b4d3
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:35:06 2019 +0800
+
+    Merge branch 'bugfix/lock_buffer_list_before_check_esf_buffer' into 'release/v3.0.0'
+    
+    feat(pp): Sync code from esp32 about esf_buf
+    
+    See merge request sdk/ESP8266_NONOS_SDK!146
+
+commit 1d2b4d3f6969b62b0d8bee3c4c18458dc7f9befe
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:25:03 2019 +0800
+
+    feat(pp): Sync code from esp32 about esf_buf
+    
+    See
+    https://gitlab.espressif.cn:6688/idf/esp-idf/merge_requests/4212 and
+    https://gitlab.espressif.cn:6688/idf/esp-idf/merge_requests/4373
+
+commit 6cfbe2c3d48da9bcf68ed71b7377fc98a8528f06
+Merge: 361f40e 9cf8ee9
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:20:31 2019 +0800
+
+    Merge branch 'feature/partition_check' into 'release/v3.0.0'
+    
+    feat(partition_table): Just print log when check partition table fail
+    
+    See merge request sdk/ESP8266_NONOS_SDK!145
+
+commit 9cf8ee9ff5d91f88a513faad704add53f3ae300e
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:18:10 2019 +0800
+
+    feat(partition_table): Just print log when check partition table fail
+
+commit 361f40eacc5949be8cc730d28960e1b5e8c5f201
+Merge: 47c938f 611c8b8
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:14:35 2019 +0800
+
+    Merge branch 'bugfix/illegal_hostname' into 'release/v3.0.0'
+    
+    fix: fix bug the default hostname is illegal
+    
+    See merge request sdk/ESP8266_NONOS_SDK!144
+
+commit 611c8b850a5b12e180d130175fe5748d3f456975
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Mar 12 16:10:39 2019 +0800
+
+    fix: fix bug the default hostname is illegal
+
+commit 47c938f459ecd025a46c88d3f502fe302e5c4869
+Merge: a0c4877 a611c3f
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 17:38:44 2019 +0800
+
+    Merge branch 'feature/forget_VERSION_in_a0c487' into 'release/v3.0.0'
+    
+    feat(lib_version): Update lib version for commit id a0c4877
+    
+    See merge request sdk/ESP8266_NONOS_SDK!136
+
+commit a611c3fb65f8687a72d9ba26c9820151f770b8f3
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 17:34:12 2019 +0800
+
+    feat(lib_version): Update lib version for commit id a0c4877
+
+commit a0c48772136642e385ebb4c216653ab36d2122df
+Merge: 78a41f6 0c1c6aa
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:29:23 2019 +0800
+
+    Merge branch 'feature/code_optimize' into 'release/v3.0.0'
+    
+    Feature/code optimize
+    
+    See merge request sdk/ESP8266_NONOS_SDK!131
+
+commit 0c1c6aa86f47045c51edd91c7042acd66586de39
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:28:03 2019 +0800
+
+    feat(lib): Recompile lwip, mbedtls and driver lib
+
+commit 32124083e8e1175ddea8020af40355a4cc0b43f9
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Feb 21 11:55:12 2019 +0800
+
+    feat: Add some flags in Makefile to reduce bin size
+
+commit c5208c0a28dffcfa6462aeb1674063005d6bdf09
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:21:27 2019 +0800
+
+    feat: Recompile internal libs with -ffunction-sections and -fdata-sections
+
+commit 78a41f65f495379a9ebfb06ec90b8c9ebd5f2930
+Merge: 315c9f0 acdb73c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:08:29 2019 +0800
+
+    Merge branch 'feature/add_vendor_class_id_option_in_dhcp' into 'release/v3.0.0'
+    
+    feat(lwip): add vendor class id option in lwip
+    
+    See merge request sdk/ESP8266_NONOS_SDK!130
+
+commit acdb73c691ccee482499bd8bf4ef91876fa248b7
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:07:15 2019 +0800
+
+    feat(lib): Recompile lwip core
+
+commit 99286663acfb1f8fba08150d8886faeee9778450
+Author: Zhang Jun Hao <zhangjunhao@espressif.com>
+Date:   Wed Feb 20 21:22:43 2019 +0800
+
+    feat(lwip): add vendor class id option in lwip
+
+commit 315c9f04d9b79e2f00940f6566c20ea371574b8f
+Merge: 8adb0ee cb22e03
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:02:35 2019 +0800
+
+    Merge branch 'bugfix/remove_fast_reconnect' into 'release/v3.0.0'
+    
+    fix(lwip): remove fast reconnect when ip lost
+    
+    See merge request sdk/ESP8266_NONOS_SDK!129
+
+commit cb22e0385e8681a953ef1c13d7bb2b1b02847cf4
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 16:00:20 2019 +0800
+
+    feat(lib): Recompile lwip core
+
+commit 22eaa42fd66146c3b481372aedf6dfbf8645b9f5
+Author: Zhang Jun Hao <zhangjunhao@espressif.com>
+Date:   Wed Feb 20 21:01:56 2019 +0800
+
+    fix(lwip): remove fast reconnect when ip lost
+
+commit 8adb0eec17efcd0becd45e6e2d69985f1f364b42
+Merge: ab10e3c 9ce0fb2
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 15:55:58 2019 +0800
+
+    Merge branch 'bugfix/remove_server_id_option_in_dhcp_renew_pkt' into 'release/v3.0.0'
+    
+    fix(lwip): remove server id option in dhcp renew packet
+    
+    See merge request sdk/ESP8266_NONOS_SDK!128
+
+commit 9ce0fb245319a4f5fc9da365bf8667564c8a4a28
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sun Feb 24 15:54:08 2019 +0800
+
+    feat(lib): Recompile lwip core
+
+commit 72de821e423dccd61f42477f8e59005b62a6be29
+Author: Zhang Jun Hao <zhangjunhao@espressif.com>
+Date:   Wed Feb 20 20:36:53 2019 +0800
+
+    fix(lwip): remove server id option in dhcp renew packet
+
+commit ab10e3c8ef75d11670d54bb26803288b2f4e9001
+Merge: 0926b64 f0105eb
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 17:26:38 2019 +0800
+
+    Merge branch 'cherry-pick-3b23f9d9' into 'release/v3.0.0'
+    
+    refactor(driver): New toolchain can compile driver code
+    
+    See merge request sdk/ESP8266_NONOS_SDK!117
+
+commit f0105eb26b121b4f1dfaec6489b3ab06634e3916
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 09:24:20 2019 +0000
+
+    Merge branch 'feature/refactor_driver' into 'master'
+    
+    refactor(driver): New toolchain can compile driver code
+    
+    See merge request sdk/ESP8266_NONOS_SDK!105
+    
+    (cherry picked from commit 3b23f9d9a9f85407a59b5fbb503a247b8fda3fc4)
+    
+    157404e8 refactor(driver): New toolchain can compile driver code
+
+commit 0926b6412cf11457b6fd52c6b7233556425114cb
+Merge: af94413 6939de1
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 17:23:40 2019 +0800
+
+    Merge branch 'feature/add_broad_support_for_espnow' into 'release/v3.0.0'
+    
+    feat(espnow): Add broadcast packets support for espnow
+    
+    See merge request sdk/ESP8266_NONOS_SDK!116
+
+commit 6939de12f33957b9650631e21da3446c93ecfa4a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 17:16:15 2019 +0800
+
+    feat(espnow): Add broadcast packets support for espnow
+
+commit af944137670f1d0d4809ffdc7f4f66ac4875083e
+Merge: b897db1 93c9616
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 17:08:41 2019 +0800
+
+    Merge branch 'bugfix/prohibit_sending_probe_request_when_passive_scan' into 'release/v3.0.0'
+    
+    fix(wifi): Prohibit sending probe request when passive scan mode
+    
+    See merge request sdk/ESP8266_NONOS_SDK!115
+
+commit 93c9616b7ec13e1b6cb82884f6aa2cf0a93e6806
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Feb 15 16:59:51 2019 +0800
+
+    fix(wifi): Prohibit sending probe request when passive scan mode
+
+commit b897db16d7a7a207b82334c7da8a8a6cd888b222
+Merge: 4925f83 ac2e392
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 20:06:07 2018 +0800
+
+    Merge branch 'bugfix/connect_wrong_ap' into 'release/v3.0.0'
+    
+    fix(net80211): Connect wrong AP if there is a hidden ssid AP around
+    
+    See merge request sdk/ESP8266_NONOS_SDK!104
+
+commit ac2e392a03e1574e2a114bb2223b104eeed199cb
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 20:04:18 2018 +0800
+
+    fix(net80211): Connect wrong AP if there is a hidden ssid AP around
+
+commit 4925f83a524342e954a778e3fe9014bc129cc943
+Merge: ee158f9 a38448d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:56:42 2018 +0800
+
+    Merge branch 'bugfix/disable_ampdu_packet' into 'release/v3.0.0'
+    
+    fix(pp): Disable receiving ampdu packet
+    
+    See merge request sdk/ESP8266_NONOS_SDK!103
+
+commit a38448d2a41db57064e243e8fbe1ecd6c7aa2010
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:55:18 2018 +0800
+
+    fix(pp): Disable receiving ampdu packet
+
+commit ee158f9ea6bf8160ada7c37c3da42fd4e54f5333
+Merge: 303282a 2aff60d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:45:24 2018 +0800
+
+    Merge branch 'bugfix/fix_status_code_37_in_ADDBA' into 'release/v3.0.0'
+    
+    fix(net80211): fix some AP does not support status code 37 in ADDBA response
+    
+    See merge request sdk/ESP8266_NONOS_SDK!102
+
+commit 2aff60d7a1d8b8c8e06425f7829deb5a97c42d95
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:43:35 2018 +0800
+
+    fix(net80211): fix some AP does not support status code 37 in ADDBA response
+
+commit 303282af193337e378e64cfc697439a1e1c79d6a
+Merge: 24e77ad 614163e
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:36:00 2018 +0800
+
+    Merge branch 'bugfix/connect_some_ap_with_only_11b_fail' into 'release/v3.0.0'
+    
+    fix(net80211): Connect some AP with only 11b mode fail
+    
+    See merge request sdk/ESP8266_NONOS_SDK!101
+
+commit 614163e16da9fd51c62a52b0607e1f2b97f5e1a5
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 19:34:20 2018 +0800
+
+    fix(net80211): Connect some AP with only 11b mode fail
+
+commit 24e77ad69673aed795324dc385b695fe6063b106
+Merge: 5518e86 75f7dc9
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 17:33:52 2018 +0800
+
+    Merge branch 'cherry-pick-8c3f4c83' into 'release/v3.0.0'
+    
+    fix: Add header file or function declaration to avoid compile error
+    
+    See merge request sdk/ESP8266_NONOS_SDK!100
+
+commit 75f7dc92431722575a688e589517b9fdf5d41135
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Thu Dec 27 09:30:24 2018 +0000
+
+    fix: Add header file or function declaration to avoid compile error
+    
+    See merge request sdk/ESP8266_NONOS_SDK!99
+    
+    (cherry picked from commit 8c3f4c839f727d0da8b16a211f59cc1aff017173)
+    
+    b885739a fix: Add header file or function declaration to avoid compile error
+
+commit 5518e8697274dc038757445725b0ec6568a81183
+Merge: 9c9d02a 123b9cb
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 17:04:14 2018 +0800
+
+    Merge branch 'bugfix/domain_length_check' into 'release/v3.0.0'
+    
+    fix(at): AT should return error directly when domain lenght is 64
+    
+    See merge request sdk/ESP8266_NONOS_SDK!93
+
+commit 123b9cba4666f0e65f804039b257eee0ee13cd8c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 17:02:12 2018 +0800
+
+    fix(at): AT should return error directly when domain lenght is 64
+    
+    See WACS-87!
+
+commit 9c9d02a2a9cac47d3afdafc5b737289cc0fa6dfe
+Merge: 17dfaf4 29d9a82
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:51:49 2018 +0800
+
+    Merge branch 'bugfix/CCMP_encryption' into 'release/v3.0.0'
+    
+    fix(net80211): Fix CCMP encryption was incompatible with some AP
+    
+    See merge request sdk/ESP8266_NONOS_SDK!92
+
+commit 29d9a8203cf218f0abdd7d46d13ab4937a4038f1
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:49:56 2018 +0800
+
+    fix(net80211): Fix CCMP encryption was incompatible with some AP
+    
+    See WACS-69!
+
+commit 17dfaf44772fe3df383c5f37321c7cc022a6401e
+Merge: e178e33 a3387a6
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:43:57 2018 +0800
+
+    Merge branch 'feature/update_sdk_version' into 'release/v3.0.0'
+    
+    feat(version): Update SDK version v3.0.1-dev
+    
+    See merge request sdk/ESP8266_NONOS_SDK!91
+
+commit a3387a6ef44a7286a70505e75df7fbfb5b607c26
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:42:52 2018 +0800
+
+    feat(version): Update SDK version v3.0.1-dev
+
+commit e178e33e3e5b6f56ab68d7db84e175063b102c60
+Merge: 5f17428 bb2060a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:37:54 2018 +0800
+
+    Merge branch 'bugfix/support_LDPC' into 'release/v3.0.0'
+    
+    fix(net80211): Support associate with AP with LDPC
+    
+    See merge request sdk/ESP8266_NONOS_SDK!90
+
+commit bb2060ae92e72bb900a282bd062adf71e0d1e5b4
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:36:33 2018 +0800
+
+    fix(net80211): Support associate with AP with LDPC
+
+commit 5f17428eb8a732ca2c643335bb5cef7da6c24313
+Merge: 8d0a803 97167a7
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:26:31 2018 +0800
+
+    Merge branch 'bugfix/return_error_when_esp_buf_malloc_fail' into 'release/v3.0.0'
+    
+    fix(net80211): It Should return ERR_MEM if malloc fail
+    
+    See merge request sdk/ESP8266_NONOS_SDK!89
+
+commit 97167a7206ecbf215cc43d01467da8fadbf6abc2
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:23:27 2018 +0800
+
+    fix(net80211): It Should return ERR_MEM if malloc fail
+
+commit 8d0a803ca4d728d1742f0587d1082d6a9ed90c65
+Merge: b731c3f 190c345
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:16:58 2018 +0800
+
+    Merge branch 'bugfix/update_pmk_error' into 'release/v3.0.0'
+    
+    fix(system): PMK does not update if the AP is not connected
+    
+    See merge request sdk/ESP8266_NONOS_SDK!88
+
+commit 190c345154231daa79c03e23ea1035cdd6d0c1e7
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue Dec 11 16:14:31 2018 +0800
+
+    fix(system): PMK does not update if the AP is not connected
+    
+    See TW25093!
+
+commit b731c3f94ef2cc999f02bd51171db487c2a58fa4
+Merge: 0825624 34740c2
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Nov 12 14:32:19 2018 +0800
+
+    Merge branch 'cherry-pick-9fb3bb21' into 'release/v3.0.0'
+    
+    fix(at_sdio): sdio AT cannot run normally
+    
+    See merge request sdk/ESP8266_NONOS_SDK!73
+
+commit 34740c203b1a249384382b7121b0cd2fb55eec85
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon Nov 12 06:29:55 2018 +0000
+
+    Merge branch 'bugfix/sdio_at_abnormal' into 'master'
+    
+    fix(at_sdio): sdio AT cannot run normally
+    
+    See merge request sdk/ESP8266_NONOS_SDK!72
+    
+    (cherry picked from commit 9fb3bb21e23efd840f2823dfe8a6096cabd3c0af)
+    
+    dc39ec5e fix(at_sdio): sdio AT cannot run normally
+
+commit 08256248c055fd2dbee537f0927f7eca4019f6de
+Merge: 86c46d0 4f6441a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Nov 2 19:21:48 2018 +0800
+
+    Merge branch 'bugfix/update_sdk_version' into 'release/v3.0.0'
+    
+    fix(version): Update external SDK version to 3.0.0
+    
+    See merge request sdk/ESP8266_NONOS_SDK!71
+
+commit 4f6441a5c15f5fb496c50c12f1b0554046ef8158
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Nov 2 19:20:23 2018 +0800
+
+    fix(version): Update external SDK version to 3.0.0
+
+commit 86c46d0804d2233ce78911c3df8ac360caf13ed3
+Merge: 8d697cb df33bf0
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 15:52:21 2018 +0800
+
+    Merge branch 'bugfix/tw25877' into 'release/v3.0.0'
+    
+    fix(system): The memory is over 0x3fffc000 when malloc
+    
+    See merge request sdk/ESP8266_NONOS_SDK!58
+
+commit df33bf0dcba21403a21b54888ce0e6b34bcb5dd5
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 15:40:02 2018 +0800
+
+    fix(system): The memory is over 0x3fffc000 when malloc
+
+commit 8d697cb79f14342a142b6d48e74be8555e0c7353
+Merge: 2943aec c222bb6
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 15:05:54 2018 +0800
+
+    Merge branch 'bugfix/tw25142_sntpserver' into 'release/v3.0.0'
+    
+    fix: It can't get time if set sntp server by calling sntp_setserver
+    
+    See merge request sdk/ESP8266_NONOS_SDK!57
+
+commit c222bb66271cde72c81fbeef4344f50570704510
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 15:01:30 2018 +0800
+
+    feat(lib): Recompile lwip lib
+
+commit e9a191dd563bbc4583bc8e89cc2dda65f4a67c37
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Aug 29 18:34:47 2018 +0800
+
+    fix: It can't get time if set sntp server by calling sntp_setserver
+
+commit 2943aec7b52339da814fc34e9d18a64f38b55128
+Merge: 71df728 5b0af8f
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 14:48:41 2018 +0800
+
+    Merge branch 'cherry-pick-db72f79a' into 'release/v3.0.0'
+    
+    fix: sint32_t and int32_t in c_types.h are inconsistent
+    
+    See merge request sdk/ESP8266_NONOS_SDK!55
+
+commit 5b0af8ff7895af501a7fb9497e11ae4cd145cf3f
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed Sep 5 01:52:55 2018 +0000
+
+    Merge branch 'bugfix/tw25950' into 'master'
+    
+    fix: sint32_t and int32_t in c_types.h are inconsistent
+    
+    See merge request sdk/ESP8266_NONOS_SDK!54
+    
+    (cherry picked from commit db72f79aff582ec313ea5b7fed0ff5a6475634d6)
+    
+    6d79fef9 fix: sint32_t and int32_t in c_types.h are inconsistent
+
+commit 71df72853fe81f64b1310ee5638e6d57fe03b7a5
+Merge: ecc66c5 f0a97a5
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Aug 24 10:32:41 2018 +0800
+
+    Merge branch 'doc/add_partition_table' into 'release/v3.0.0'
+    
+    docs(partition_table): Add document about partition table
+    
+    See merge request sdk/ESP8266_NONOS_SDK!49
+
+commit f0a97a59f8d30b2d26b39a0c37f465d2ae60d44d
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Aug 24 10:29:34 2018 +0800
+
+    docs(partition_table): Add document about partition table
