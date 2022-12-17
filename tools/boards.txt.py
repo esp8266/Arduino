@@ -1670,6 +1670,18 @@ def sdk ():
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
                         ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
                         ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                        ('.menu.sdk.nonosdk300', 'nonos-sdk 3.0.0'),
+                        ('.menu.sdk.nonosdk300.build.sdk', 'NONOSDK300'),
+                        ('.menu.sdk.nonosdk301', 'nonos-sdk 3.0.1'),
+                        ('.menu.sdk.nonosdk301.build.sdk', 'NONOSDK301'),
+                        ('.menu.sdk.nonosdk302', 'nonos-sdk 3.0.2'),
+                        ('.menu.sdk.nonosdk302.build.sdk', 'NONOSDK302'),
+                        ('.menu.sdk.nonosdk303', 'nonos-sdk 3.0.3'),
+                        ('.menu.sdk.nonosdk303.build.sdk', 'NONOSDK303'),
+                        ('.menu.sdk.nonosdk304', 'nonos-sdk 3.0.4'),
+                        ('.menu.sdk.nonosdk304.build.sdk', 'NONOSDK304'),
+                        ('.menu.sdk.nonosdk305', 'nonos-sdk 3.0.5'),
+                        ('.menu.sdk.nonosdk305.build.sdk', 'NONOSDK305'),
                     ])
            }
 
