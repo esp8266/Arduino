@@ -691,23 +691,23 @@ void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool 
 {
     if (iram) {
         HeapSelectIram ephemeral;
-        return heap_pvPortMalloc(size, file, line);
+        return _heap_pvPortMalloc(size, file, line, __builtin_return_address(0));
     } else {
         HeapSelectDram ephemeral;
-        return heap_pvPortMalloc(size, file, line);
+        return _heap_pvPortMalloc(size, file, line, __builtin_return_address(0));
     }
 }
 
 void* IRAM_ATTR pvPortCallocIram(size_t count, size_t size, const char* file, int line)
 {
     HeapSelectIram ephemeral;
-    return heap_pvPortCalloc(count, size, file, line);
+    return _heap_pvPortCalloc(count, size, file, line, __builtin_return_address(0));
 }
 
 void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
 {
     HeapSelectIram ephemeral;
-    return heap_pvPortZalloc(size, file, line);
+    return _heap_pvPortCalloc(1, size, file, line, __builtin_return_address(0));
 }
 
 /*
