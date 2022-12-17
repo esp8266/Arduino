@@ -427,7 +427,7 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
     uint32_t phy_data = 0;
     uint32_t rf_cal = 0;
     uint32_t system_parameter = 0;
-    [[maybe_unused]] partition_item_t *_at_partition_table = NULL;
+    [[maybe_unused]] const partition_item_t *_at_partition_table = NULL;
     size_t _at_partition_table_sz = 0;
 
     do {
@@ -479,7 +479,7 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         // -DALLOW_SMALL_FLASH_SIZE=1
         // Allows for small flash-size builds targeted for multiple devices,
         // commonly IoT, of varying flash sizes.
-        #if !defined(FLASH_MAP_SUPPORT) & !defined(ALLOW_SMALL_FLASH_SIZE)
+        #if !defined(FLASH_MAP_SUPPORT) && !defined(ALLOW_SMALL_FLASH_SIZE)
         // Note, system_partition_table_regist will only catch when the build
         // flash size value set by the Arduino IDE Tools menu is larger than
         // the firmware image value detected and updated on the fly by esptool.
@@ -497,7 +497,7 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         // .bin image.
         #endif
 
-        #if FLASH_MAP_SUPPORT & defined(DEBUG_ESP_PORT)
+        #if FLASH_MAP_SUPPORT && defined(DEBUG_ESP_PORT)
         // I don't think this will ever fail. Everything traces back to the results of spi_flash_get_id()
         if (flash_size != flashchip->chip_size) {
             chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n");
@@ -506,14 +506,14 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
         #endif
 
         // All the examples I find, show the partition table in the global address space.
-        static partition_item_t at_partition_table[] =
+        static const partition_item_t at_partition_table[] =
         {
             { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 }, // type 5
             { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 }, // type 4
             { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 }, // type 6
         };
         _at_partition_table = at_partition_table;
-        _at_partition_table_sz = sizeof(at_partition_table) / sizeof(at_partition_table[0]);
+        _at_partition_table_sz = std::size(at_partition_table);
         // SDK 3.0's `system_partition_table_regist` is FOTA-centric. It will report
         // on BOOT, OTA1, and OTA2 being missing. We are Non-FOTA. I don't see
         // anything we can do about this. Other than maybe turning off os_print.
@@ -554,7 +554,7 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
             ETS_PRINTF("\n\n");
             // Because SDK v3.0.x always has a non-32-bit wide exception handler
             // installed, we can use PROGMEM strings with Boot ROM print functions.
-#if defined(DEBUG_ESP_CORE) | defined(DEBUG_ESP_PORT) // DEBUG_ESP_CORE => verbose
+#if defined(DEBUG_ESP_CORE) || defined(DEBUG_ESP_PORT) // DEBUG_ESP_CORE => verbose
             #if FLASH_MAP_SUPPORT
             if (flash_map_str) {
                 ETS_PRINTF(flash_map_str);
@@ -654,7 +654,7 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-#if FLASH_MAP_SUPPORT & (NONOSDK < 0x30000)
+#if FLASH_MAP_SUPPORT && (NONOSDK < 0x30000)
     if (!flashinit()) {
         panic();
     }
