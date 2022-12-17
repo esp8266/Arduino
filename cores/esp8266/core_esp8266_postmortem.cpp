@@ -43,23 +43,26 @@ enum rst_reason_sw
     REASON_USER_SWEXCEPTION_RST = 254
 };
 
+// Confirmed on 12/17/22: s_pm is in the .bss section and is in the
+// _bss_start/end range to be zeroed by the SDK this happens after the SDK first
+// calls to Cache_Read_Enable_New.
 static struct PostmortemInfo {
-    int user_reset_reason;    // REASON_DEFAULT_RST;
+    int user_reset_reason = REASON_DEFAULT_RST;
 
     // These will be pointers to PROGMEM const strings
-    const char* panic_file;   // 0;
-    int panic_line;           // 0;
-    const char* panic_func;   // 0;
-    const char* panic_what;   // 0;
+    const char* panic_file = 0;
+    int panic_line = 0;
+    const char* panic_func = 0;
+    const char* panic_what = 0;
 
     // Our wiring for abort() and C++ exceptions
-    bool abort_called;        // false;
-    const char* unhandled_exception; // NULL;
+    bool abort_called = false;
+    const char* unhandled_exception = NULL;
 
     // Common way to notify about where the stack smashing happened
     // (but, **only** if caller uses our handler function)
-    uint32_t stacksmash_addr; // 0;
-} s_pm = {REASON_DEFAULT_RST, 0, 0, 0, 0, false, NULL, 0};
+    uint32_t stacksmash_addr = 0;
+} s_pm;
 
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
 extern struct umm_last_fail_alloc {
