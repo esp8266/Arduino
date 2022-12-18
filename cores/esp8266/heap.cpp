@@ -743,9 +743,9 @@ void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
 
 #else
 // For sdk3_pvPortMalloc, the bool argument is ignored and intentionally omitted.
-extern "C" void* sdk3_pvPortMalloc(size_t size, const char* file, int line) __attribute__ ((alloc_size(1), malloc, alias("pvPortMalloc")));
-extern "C" void* pvPortCallocIram(size_t count, size_t size, const char* file, int line) __attribute__((alloc_size(1, 2), malloc, alias("pvPortCalloc")));
-extern "C" void* pvPortZallocIram(size_t size, const char* file, int line) __attribute__((alloc_size(1), malloc, alias("pvPortZalloc")));
+extern "C" void* sdk3_pvPortMalloc(size_t size, const char* file, int line) __attribute__ ((alloc_size(1), malloc, nothrow, alias("pvPortMalloc")));
+extern "C" void* pvPortCallocIram(size_t count, size_t size, const char* file, int line) __attribute__((alloc_size(1, 2), malloc, nothrow, alias("pvPortCalloc")));
+extern "C" void* pvPortZallocIram(size_t size, const char* file, int line) __attribute__((alloc_size(1), malloc, nothrow, alias("pvPortZalloc")));
 #define CONFIG_IRAM_MEMORY 0
 #endif  // #ifdef UMM_HEAP_IRAM
 
