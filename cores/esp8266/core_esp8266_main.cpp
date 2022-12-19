@@ -400,79 +400,230 @@ extern "C" void __disableWiFiAtBootTime (void)
 
 #if FLASH_MAP_SUPPORT
 #include "flash_hal.h"
-extern "C" void flashinit (void);
+extern "C" bool flashinit (void);
+#if (NONOSDK >= (0x30000))
+uint32_t __flashindex __attribute__((section(".noinit")));
+#else
 uint32_t __flashindex;
+#endif
 #endif
 
 #if (NONOSDK >= (0x30000))
+#undef ETS_PRINTF
+#define ETS_PRINTF(...) ets_uart_printf(__VA_ARGS__)
+extern "C" uint8_t uart_rx_one_char_block();
+
+#if ! FLASH_MAP_SUPPORT
+#include "flash_hal.h"
+#endif
 
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
-    uint32_t rf_cal = 0;
+    const char *flash_map_str = NULL;
+    const char *chip_sz_str = NULL;
+    const char *table_regist_str = NULL;
+    [[maybe_unused]] uint32_t ld_config_chip_size = 0;
+    uint32_t flash_size = 0;
     uint32_t phy_data = 0;
+    uint32_t rf_cal = 0;
     uint32_t system_parameter = 0;
+    [[maybe_unused]] const partition_item_t *_at_partition_table = NULL;
+    size_t _at_partition_table_sz = 0;
 
-    switch (system_get_flash_size_map())
-    {
-    case FLASH_SIZE_2M:
-        rf_cal = 0x3b000;
-        phy_data = 0x3c000;
-        system_parameter = 0x3d000;
-        break;
-    case FLASH_SIZE_4M_MAP_256_256:
-        rf_cal = 0x7b000;
-        phy_data = 0x7c000;
-        system_parameter = 0x7d000;
-        break;
-    case FLASH_SIZE_8M_MAP_512_512:
-        rf_cal = 0xfb000;
-        phy_data = 0xfc000;
-        system_parameter = 0xfd000;
-        break;
-    case FLASH_SIZE_16M_MAP_512_512:
-    case FLASH_SIZE_16M_MAP_1024_1024:
-        rf_cal = 0x1fb000;
-        phy_data = 0x1fc000;
-        system_parameter = 0x1fd000;
-        break;
-    case FLASH_SIZE_32M_MAP_512_512:
-    case FLASH_SIZE_32M_MAP_1024_1024:
-    case FLASH_SIZE_32M_MAP_2048_2048:
-        rf_cal = 0x3fb000;
-        phy_data = 0x3fc000;
-        system_parameter = 0x3fd000;
-        break;
-    case FLASH_SIZE_64M_MAP_1024_1024:
-        rf_cal = 0x7fb000;
-        phy_data = 0x7fc000;
-        system_parameter = 0x7fd000;
-        break;
-    case FLASH_SIZE_128M_MAP_1024_1024:
-        rf_cal = 0xffb000;
-        phy_data = 0xffc000;
-        system_parameter = 0xffd000;
-        break;
-    }
+    do {
+        #if FLASH_MAP_SUPPORT
+        if (!flashinit()) {
+            flash_map_str = PSTR("flashinit: flash size missing from FLASH_MAP table\n");
+            continue;
+        }
+        #endif
 
-    extern uint32_t user_rf_cal_sector_set(void);
-    user_rf_cal_sector_set();
+        // For SDKs 3.0.0 and later, place phy_data readonly overlay on top of
+        // the EEPROM address. For older SDKs without a system partition, RF_CAL
+        // and PHY_DATA shared the same flash segment.
+        //
+        // For the Arduino ESP8266 core, the sectors for "EEPROM = size -
+        // 0x5000", "RF_CAL =  size - 0x4000", and "SYSTEM_PARAMETER = size -
+        // 0x3000" are positioned in the last five sectors of flash memory.
+        // PHY_INIT_DATA is special. It is a one time read of 128 bytes of data
+        // that is provided by a spoofed flash read.
+        #if FLASH_MAP_SUPPORT
+        flash_size = __flashdesc[__flashindex].flash_size_kb * 1024u;
+        #else
+        // flashchip->chip_size is updated by the SDK. The size is based on the
+        // value patched into the .bin header by esptool.
+        // system_get_flash_size_map() returns that patched value.
+        flash_size = flashchip->chip_size;
+        #endif
 
-    const partition_item_t at_partition_table[] =
-    {
-        { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 },
-        { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 },
-        { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 },
-    };
-    system_partition_table_regist(at_partition_table, sizeof(at_partition_table) / sizeof(at_partition_table[0]), system_get_flash_size_map());
-}
+        // For all configurations, place RF_CAL and system_parameter in the
+        // last 4 sectors of the flash chip.
+        rf_cal = flash_size - 0x4000u;
+        system_parameter = flash_size - 0x3000u;
 
+        // The system_partition_table_regist will not allow partitions to
+        // overlap. EEPROM_start is a good choice for phy_data overlay. The SDK
+        // does not need to know about EEPROM_start. So we can omit it from the
+        // table. The real EEPROM access is after user_init() begins long after
+        // the PHY_DATA read. So it should be safe from conflicts.
+        phy_data = EEPROM_start - 0x40200000u;
+
+        // For SDKs 3.0 builds, "sdk3_begin_phy_data_spoof and
+        // user_rf_cal_sector_set" starts and stops the spoofing logic in
+        // `core_esp8266_phy.cpp`.
+        extern void sdk3_begin_phy_data_spoof();
+        sdk3_begin_phy_data_spoof();
+
+        ld_config_chip_size = phy_data + 4096 * 5;
+
+        // -DALLOW_SMALL_FLASH_SIZE=1
+        // Allows for small flash-size builds targeted for multiple devices,
+        // commonly IoT, of varying flash sizes.
+        #if !defined(FLASH_MAP_SUPPORT) && !defined(ALLOW_SMALL_FLASH_SIZE)
+        // Note, system_partition_table_regist will only catch when the build
+        // flash size value set by the Arduino IDE Tools menu is larger than
+        // the firmware image value detected and updated on the fly by esptool.
+        if (flashchip->chip_size != ld_config_chip_size) {
+            // Stop to avoid possible stored flash data corruption. This
+            // mismatch will not occur with flash size selection "Mapping
+            // defined by Hardware and Sketch".
+            chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n");
+            continue;
+        }
+        #elif defined(ALLOW_SMALL_FLASH_SIZE) && !defined(FLASH_MAP_SUPPORT)
+        // Note, while EEPROM is confined to a smaller flash size, we are still
+        // placing RF_CAL and SYSTEM_PARAMETER at the end of flash. To prevent
+        // this, esptool or its equal needs to not update the flash size in the
+        // .bin image.
+        #endif
+
+        #if FLASH_MAP_SUPPORT && defined(DEBUG_ESP_PORT)
+        // I don't think this will ever fail. Everything traces back to the results of spi_flash_get_id()
+        if (flash_size != flashchip->chip_size) {
+            chip_sz_str = PSTR("Flash size mismatch, check that the build setting matches the device.\n");
+            continue;
+        }
+        #endif
+
+        // All the examples I find, show the partition table in the global address space.
+        static const partition_item_t at_partition_table[] =
+        {
+            { SYSTEM_PARTITION_PHY_DATA,         phy_data,         0x1000 }, // type 5
+            { SYSTEM_PARTITION_RF_CAL,           rf_cal,           0x1000 }, // type 4
+            { SYSTEM_PARTITION_SYSTEM_PARAMETER, system_parameter, 0x3000 }, // type 6
+        };
+        _at_partition_table = at_partition_table;
+        _at_partition_table_sz = std::size(at_partition_table);
+        // SDK 3.0's `system_partition_table_regist` is FOTA-centric. It will report
+        // on BOOT, OTA1, and OTA2 being missing. We are Non-FOTA. I don't see
+        // anything we can do about this. Other than maybe turning off os_print.
+        if (!system_partition_table_regist(at_partition_table, _at_partition_table_sz, system_get_flash_size_map())) {
+            table_regist_str = PSTR("System partition table registration failed!\n");
+            continue;
+        }
+    } while(false);
+
+    if (chip_sz_str || flash_map_str || table_regist_str) {
+        // user_pre_init() is called very early in the SDK startup. When called,
+        // the PLL CPU clock calibration hasn't not run. Since we are failing, the
+        // calibration will never complete. And the process will repeat over and
+        // over. The effective data rate will always be 74880 bps. If we had a
+        // successful boot, the effective data rate would be 115200 on a restart
+        // or HWDT. This hack relies on the CPU clock calibration never having
+        // completed. This assumes we are starting from a hard reset.
+
+        // A possible exception would be a soft reset after flashing. In which
+        // case the message will not be readable until after a hard reset or
+        // power cycle.
+
+        // After flashing, the Arduino Serial Monitor needs a moment to
+        // reconnect. This also allows time for the FIFO to clear and the host
+        // serial port to clear any framing errors.
+        ets_delay_us(200u * 1000u); // For an uncalibrated CPU Clock, this is close enough.
+
+        #if !defined(F_CRYSTAL)
+        #define F_CRYSTAL 26000000
+        #endif
+        // For print messages to be readable, the UART clock rate is based on the
+        // precalibration rate.
+        if (F_CRYSTAL != 40000000) {
+            uart_div_modify(0, F_CRYSTAL * 2 / 115200);
+            ets_delay_us(150);
+        }
+        do {
+            ETS_PRINTF("\n\n");
+            // Because SDK v3.0.x always has a non-32-bit wide exception handler
+            // installed, we can use PROGMEM strings with Boot ROM print functions.
+#if defined(DEBUG_ESP_CORE) || defined(DEBUG_ESP_PORT) // DEBUG_ESP_CORE => verbose
+            #if FLASH_MAP_SUPPORT
+            if (flash_map_str) {
+                ETS_PRINTF(flash_map_str);
+                #if defined(DEBUG_ESP_CORE)
+                size_t num = __flashindex; // On failure __flashindex is the size of __flashdesc[]; :/
+                ETS_PRINTF(PSTR("Table of __flashdesc[%u].flash_size_kb entries converted to bytes:\n"), num);
+                for (size_t i = 0; i < num; i++) {
+                    uint32_t size = __flashdesc[i].flash_size_kb << 10;
+                    ETS_PRINTF(PSTR("  [%02u] 0x%08X %8u\n"), i, size, size);
+                }
+                #endif
+                ETS_PRINTF(PSTR("Reference info:\n"));
+                uint32_t flash_chip_size = 1 << ((spi_flash_get_id() >> 16) & 0xff);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("fn(spi_flash_get_id())"), flash_chip_size, flash_chip_size);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("bin_chip_size"), flashchip->chip_size, flashchip->chip_size);
+            } else
+            #endif
+            if (chip_sz_str) {
+                ETS_PRINTF(chip_sz_str);
+            } else
+            if (table_regist_str) {
+                ETS_PRINTF(table_regist_str);
+                // (printing now works) repeat ...regist error messages
+                system_partition_table_regist(_at_partition_table, _at_partition_table_sz, system_get_flash_size_map());
+            }
+            if (chip_sz_str || table_regist_str) {
+                ETS_PRINTF(PSTR("Reference info:\n"));
+                #if FLASH_MAP_SUPPORT
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("fn(...ex].flash_size_kb)"), flash_size, flash_size);
+                uint32_t flash_chip_size = 1 << ((spi_flash_get_id() >> 16) & 0xff);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("fn(spi_flash_get_id())"), flash_chip_size, flash_chip_size);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("bin_chip_size"), flashchip->chip_size, flashchip->chip_size);
+                #else
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("config_flash_size"), ld_config_chip_size, ld_config_chip_size);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X %8u\n"), PSTR("bin_chip_size"), flashchip->chip_size, flashchip->chip_size);
+                #endif
+                #if defined(DEBUG_ESP_CORE)
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("PHY_DATA"), phy_data);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("RF_CAL"), rf_cal);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("SYSTEM_PARAMETER"), system_parameter);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("EEPROM_start"), EEPROM_start);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("FS_start"), FS_start);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("FS_end"), FS_end);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("FS_page"), FS_page);
+                ETS_PRINTF(PSTR("  %-24s 0x%08X\n"), PSTR("FS_block"), FS_block);
+                #endif
+            }
+#else
+            if (flash_map_str) {
+                ETS_PRINTF(flash_map_str);
+            } else
+            if (chip_sz_str) {
+                ETS_PRINTF(chip_sz_str);
+            } else
+            if (table_regist_str) {
+                ETS_PRINTF(table_regist_str);
+            }
 #endif
+            uart_rx_one_char_block(); // Someone said hello - repeat message
+        } while(true);
+    }
+}
+#endif // #if (NONOSDK >= (0x30000))
 
 extern "C" void user_init(void) {
 
 #if (NONOSDK >= (0x30000))
     extern void user_rf_pre_init();
-    user_rf_pre_init();
+    user_rf_pre_init(); // Stop spoofing logic
 #endif
 
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -503,8 +654,10 @@ extern "C" void user_init(void) {
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
 #endif
-#if FLASH_MAP_SUPPORT
-    flashinit();
+#if FLASH_MAP_SUPPORT && (NONOSDK < 0x30000)
+    if (!flashinit()) {
+        panic();
+    }
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi

@@ -33,21 +33,21 @@ extern "C" {
 #include <FlashMap.h>
 
 extern uint32_t spi_flash_get_id (void); // <user_interface.h>
-extern void flashinit(void);
+extern bool flashinit(void);
 extern uint32_t __flashindex;
 extern const flash_map_s __flashdesc[];
 
 #define FLASH_MAP_SETUP_CONFIG(conf) FLASH_MAP_SETUP_CONFIG_ATTR(,conf)
 #define FLASH_MAP_SETUP_CONFIG_ATTR(attr, conf...) \
   const flash_map_s __flashdesc[] PROGMEM = conf; \
-  void flashinit (void) attr; \
-  void flashinit (void) \
+  bool flashinit (void) attr; \
+  bool flashinit (void) \
   { \
     uint32_t flash_chip_size_kb = 1 << (((spi_flash_get_id() >> 16) & 0xff) - 10); \
     for (__flashindex = 0; __flashindex < sizeof(__flashdesc) / sizeof(__flashdesc[0]); __flashindex++) \
       if (__flashdesc[__flashindex].flash_size_kb == flash_chip_size_kb) \
-        return; \
-    panic(); /* configuration not found */ \
+        return true; \
+    return false; /* configuration not found */ \
   }
 
 #define EEPROM_start (__flashdesc[__flashindex].eeprom_start)
