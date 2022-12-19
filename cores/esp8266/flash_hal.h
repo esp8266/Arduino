@@ -41,12 +41,6 @@ extern const flash_map_s __flashdesc[];
 #define QUOTE(a) __STRINGIFY(a)
 #endif
 
-#ifdef DEBUG_ESP_CORE
-#define DEBUG_FLASH_MAP_NOT_FOUND " flashinit: configuration not found"
-#else
-#define DEBUG_FLASH_MAP_NOT_FOUND
-#endif
-
 #define FLASH_MAP_SETUP_CONFIG(conf) FLASH_MAP_SETUP_CONFIG_ATTR(,conf)
 #define FLASH_MAP_SETUP_CONFIG_ATTR(attr, conf...) \
   const flash_map_s __flashdesc[] PROGMEM = conf; \
@@ -57,7 +51,7 @@ extern const flash_map_s __flashdesc[];
     for (__flashindex = 0; __flashindex < sizeof(__flashdesc) / sizeof(__flashdesc[0]); __flashindex++) \
       if (__flashdesc[__flashindex].flash_size_kb == flash_chip_size_kb) \
         return NULL; \
-    static const char fail_msg[] PROGMEM = __FILE__ ":" QUOTE(__LINE__) DEBUG_FLASH_MAP_NOT_FOUND ; \
+    static const char fail_msg[] PROGMEM = __FILE__ ":" QUOTE(__LINE__) " flashinit: configuration not found" ; \
     return fail_msg; /* configuration not found */ \
   }
 

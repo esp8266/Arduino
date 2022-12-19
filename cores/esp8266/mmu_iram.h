@@ -46,6 +46,19 @@ extern "C" {
 */
 #endif
 
+#if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU) || defined(DEBUG_ESP_CORE) || defined(DEBUG_ESP_PORT)
+/*
+ * Early adjustment for CPU crystal frequency will allow early debug printing to
+ * be readable before the SDK initialization is complete.
+ *
+ * It is unknown if there are any side effects with SDK startup, but a
+ * possibility. Out of an abundance of caution, limit the use of mmu_set_pll for
+ * handling printing in failure cases that finish with a reboot. Or for other
+ * rare debug contexts.
+ */
+extern void mmu_set_pll(void);
+#endif
+
 /*
  * DEV_DEBUG_PRINT:
  *   Debug printing macros for printing before before, during, and after
@@ -63,11 +76,10 @@ extern "C" {
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
 #if defined(DEV_DEBUG_PRINT)
-extern void set_pll(void);
 extern void dbg_set_pll(void);
 
 #define DBG_MMU_PRINTF(fmt, ...) \
-set_pll(); \
+mmu_set_pll(); \
 uart_buff_switch(0); \
 ets_uart_printf(fmt, ##__VA_ARGS__); \
 DBG_MMU_FLUSH(0)
