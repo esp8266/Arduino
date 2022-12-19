@@ -428,8 +428,8 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 
     do {
         #if FLASH_MAP_SUPPORT
-        if (!flashinit()) {
-            flash_map_str = PSTR("flashinit: flash size missing from FLASH_MAP table\n");
+        flash_map_str = flashinit();
+        if (flash_map_str) {
             continue;
         }
         #endif
