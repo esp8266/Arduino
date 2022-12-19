@@ -395,21 +395,34 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
 
   The NON-OS SDK 3.0.x has breaking changes to pvPortMalloc. They added one more
   argument for selecting a heap. To avoid breaking the build, I renamed their
-  broken version pvEsprMalloc. To be used, the LIBS need to be edited.
+  breaking version to sdk3_pvPortMalloc. To complete the fix, the LIBS need to
+  be edited.
 
-  They also added pvPortZallocIram and pvPortCallocIram, which are not a
-  problem.
+  Also in the release are low-level functions pvPortZallocIram and
+  pvPortCallocIram, which are not documented in the Espressif NONOS SDK manual.
+  No issues in providing replacements. For the non-Arduino ESP8266 applications,
+  pvPortZallocIram and pvPortCallocIram would have been selected through the
+  macros like os_malloc defined in `mem.h`.
+
+  OOM - Implementation strategy - Native v3.0 SDK
+  * For functions `pvPortMalloc(,,,true);` and `pvPortMallocIram(,,,);` on a
+    failed IRAM alloc, try DRAM.
+  * For function `pvPortMalloc(,,,false);` use DRAM only - on fail, do not
+    try IRAM.
 
   WPA2 Enterprise connect crashing is fixed at v3.0.2 and up.
 
   Not used for unreleased version NONOSDK3V0.
 */
+#ifdef UMM_HEAP_IRAM
 void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool iram)
 {
     if (iram) {
         HeapSelectIram ephemeral;
-        return heap_pvPortMalloc(size, file, line);
-    } else {
+        void* ret = heap_pvPortMalloc(size, file, line);
+        if (ret) return ret;
+    }
+    {
         HeapSelectDram ephemeral;
         return heap_pvPortMalloc(size, file, line);
     }
@@ -417,29 +430,54 @@ void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool 
 
 void* IRAM_ATTR pvPortCallocIram(size_t count, size_t size, const char* file, int line)
 {
-    HeapSelectIram ephemeral;
-    return heap_pvPortCalloc(count, size, file, line);
+    {
+        HeapSelectIram ephemeral;
+        void* ret = heap_pvPortCalloc(count, size, file, line);
+        if (ret) return ret;
+    }
+    {
+        HeapSelectDram ephemeral;
+        return heap_pvPortCalloc(count, size, file, line);
+    }
 }
 
 void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
 {
-    HeapSelectIram ephemeral;
-    return heap_pvPortZalloc(size, file, line);
+    {
+        HeapSelectIram ephemeral;
+        void* ret = heap_pvPortZalloc(size, file, line);
+        if (ret) return ret;
+    }
+    {
+        HeapSelectDram ephemeral;
+        return heap_pvPortZalloc(size, file, line);
+    }
 }
+#define CONFIG_IRAM_MEMORY 1
+
+#else
+// For sdk3_pvPortMalloc, the bool argument is ignored and intentionally omitted.
+extern "C" void* sdk3_pvPortMalloc(size_t size, const char* file, int line) __attribute__ ((alloc_size(1), malloc, nothrow, alias("pvPortMalloc")));
+extern "C" void* pvPortCallocIram(size_t count, size_t size, const char* file, int line) __attribute__((alloc_size(1, 2), malloc, nothrow, alias("pvPortCalloc")));
+extern "C" void* pvPortZallocIram(size_t size, const char* file, int line) __attribute__((alloc_size(1), malloc, nothrow, alias("pvPortZalloc")));
+#define CONFIG_IRAM_MEMORY 0
+#endif  // #ifdef UMM_HEAP_IRAM
 
 /*
-  uint32_t IRAM_ATTR user_iram_memory_is_enabled(void)
-  {
-    return CONFIG_ENABLE_IRAM_MEMORY;
-  }
-
   We do not need the function user_iram_memory_is_enabled().
   1. It was used by mem_manager.o which was replaced with this custom heap
-     implementation. IRAM memory selection is handled differently.
+     implementation. IRAM memory selection is handled differently for
+     Arduino ESP8266.
   2. In libmain.a, Cache_Read_Enable_New uses it for cache size. However, When
      using IRAM for memory or running with 48K IRAM for code, we use a
      replacement Cache_Read_Enable to correct the cache size ignoring
      Cache_Read_Enable_New's selected value.
+  3. Create a linker conflicts in the event the sketch author tries to control
+     IRAM heap through this method.
 */
-#endif
+uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
+{
+    return  CONFIG_IRAM_MEMORY;
+}
+#endif // #if (NONOSDK >= (0x30000))
 };
