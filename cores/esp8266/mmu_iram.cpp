@@ -122,43 +122,15 @@ void IRAM_ATTR Cache_Read_Disable(void) {
 }
 #endif
 
-/*
- * Early adjustment for CPU crystal frequency, so debug printing will work.
- * This should not be left enabled all the time in Cashe_Read..., I am concerned
- * that there may be unknown interference with the NONOS SDK startup.
- *
- * Inspired by:
- * https://github.com/pvvx/esp8266web/blob/2e25559bc489487747205db2ef171d48326b32d4/app/sdklib/system/app_main.c#L581-L591
- */
-extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
-extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
-
-extern "C" void IRAM_ATTR set_pll(void)
-{
-#if !defined(F_CRYSTAL)
-#define F_CRYSTAL 26000000
-#endif
-  if (F_CRYSTAL != 40000000) {
-    // At Boot ROM(-BIOS) start, it assumes a 40MHz crystal.
-    // If it is not, we assume a 26MHz crystal.
-    // There is no support for 24MHz crustal at this time.
-    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
-      // Assume 26MHz crystal
-      // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
-      // set 80MHz PLL CPU
-      rom_i2c_writeReg(103,4,1,136);
-      rom_i2c_writeReg(103,4,2,145);
-    }
-  }
-}
-
 //C This was used to probe at different stages of boot the state of the PLL
 //C register. I think we can get rid of this one.
+extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
+extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
 extern "C" void IRAM_ATTR dbg_set_pll(void)
 {
   char r103_4_1 = rom_i2c_readReg(103,4,1);
   char r103_4_2 = rom_i2c_readReg(103,4,2);
-  set_pll();
+  mmu_set_pll();
   ets_uart_printf("\nrom_i2c_readReg(103,4,1) == %u\n", r103_4_1);
   ets_uart_printf(  "rom_i2c_readReg(103,4,2) == %u\n", r103_4_2);
 }
@@ -195,6 +167,38 @@ extern void Cache_Read_Disable(void);
 #else   // #if (MMU_ICACHE_SIZE == 0x4000)
 extern void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 #endif  // #if (MMU_ICACHE_SIZE == 0x4000)
+
+/*
+ * Early adjustment for CPU crystal frequency will allow early debug printing to
+ * be readable before the SDK initialization is complete.
+ * This should not be left enabled all the time in Cashe_Read..., I am concerned
+ * that there may be unknown interference with the NONOS SDK startup.
+ * It does low-level calls that could clash with the SDKs startup.
+ *
+ * Inspired by:
+ * https://github.com/pvvx/esp8266web/blob/2e25559bc489487747205db2ef171d48326b32d4/app/sdklib/system/app_main.c#L581-L591
+ */
+extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
+extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
+
+extern "C" void IRAM_ATTR mmu_set_pll(void)
+{
+#if !defined(F_CRYSTAL)
+#define F_CRYSTAL 26000000
+#endif
+  if (F_CRYSTAL != 40000000) {
+    // At Boot ROM(-BIOS) start, it assumes a 40MHz crystal.
+    // If it is not, we assume a 26MHz crystal.
+    // There is no support for 24MHz crustal at this time.
+    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
+      // Assume 26MHz crystal
+      // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
+      // set 80MHz PLL CPU
+      rom_i2c_writeReg(103,4,1,136);
+      rom_i2c_writeReg(103,4,2,145);
+    }
+  }
+}
 
 /*
  * This wrapper is for running code early from IROM (flash) before the SDK
