@@ -195,7 +195,13 @@ class WiFiClientSecureCtx : public WiFiClient {
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
 
+    int _pollRecvBuffer(); // If there's a buffer with some pending data, return it's length
+                           // If there's no buffer, poll the engine and store any received data there and return the length
+                           // (which also may change the internal state, e.g. make us disconnected)
+
     bool _clientConnected(); // Is the underlying socket alive?
+    bool _engineConnected(); // Are both socket and the bearssl engine alive?
+
     std::shared_ptr<unsigned char> _alloc_iobuf(size_t sz);
     void _freeSSL();
     int _run_until(unsigned target, bool blocking = true);

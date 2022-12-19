@@ -353,30 +353,48 @@ bool ESP8266WiFiSTAClass::reconnect() {
 }
 
 /**
- * Disconnect from the network
- * @param wifioff
+ * Disconnect from the network with clearing saved credentials
+ * @param wifioff Bool indicating whether STA should be disabled.
  * @return  one value of wl_status_t enum
  */
 bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
+    // Disconnect with clearing saved credentials.
+    return disconnect(wifioff, true);
+}
+
+/**
+ * Disconnect from the network
+ * @param wifioff Bool indicating whether STA should be disabled. 
+ * @param eraseCredentials Bool indicating whether saved credentials should be erased.
+ * @return  one value of wl_status_t enum
+ */
+bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
     bool ret = false;
-    struct station_config conf;
-    *conf.ssid = 0;
-    *conf.password = 0;
+
+    if (eraseCredentials) {
+        // Read current config.
+        struct station_config conf;
+        wifi_station_get_config(&conf);
+
+        // Erase credentials.
+        memset(&conf.ssid, 0, sizeof(conf.ssid));
+        memset(&conf.password, 0, sizeof(conf.password));
+
+        // Store modiffied config.
+        ETS_UART_INTR_DISABLE();
+        if(WiFi._persistent) {
+            wifi_station_set_config(&conf);
+        } else {
+            wifi_station_set_config_current(&conf);
+        }
+        ETS_UART_INTR_ENABLE();
+    }
 
     // API Reference: wifi_station_disconnect() need to be called after system initializes and the ESP8266 Station mode is enabled.
     if (WiFi.getMode() & WIFI_STA)
         ret = wifi_station_disconnect();
     else
         ret = true;
-
-    ETS_UART_INTR_DISABLE();
-    if(WiFi._persistent) {
-        wifi_station_set_config(&conf);
-    } else {
-        wifi_station_set_config_current(&conf);
-    }
-
-    ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
         WiFi.enableSTA(false);
