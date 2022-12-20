@@ -627,7 +627,7 @@ extern "C" void user_init(void) {
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
-#if FLASH_MAP_SUPPORT
+#if FLASH_MAP_SUPPORT && (NONOSDK < (0x30000))
     const char *err_msg = flashinit();
     if (err_msg) __panic_func(err_msg, 0, NULL);
 #endif
