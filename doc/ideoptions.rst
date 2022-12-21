@@ -222,10 +222,19 @@ Erase Flash
 Espressif Firmware
 ~~~~~~~~~~~~~~~~~~
 
-There are a number of available espressif firmwares.  The first / default
-choice is fine.  Only try with others after reading on the issue tracker
-that something has to be tried with them.  Note that Espressif obsoleted
-all of them at the time of writing.
+- 2.2.1+100 (190703) - **default**
+- 2.2.1+119 (191122)
+- 2.2.1+113 (191105)
+- 2.2.1+111 (191024)
+- 2.2.1+61 (190313)
+- 2.2.1 (legacy)
+- 3.0.5 (experimental)
+
+See our issue tracker in regards to default version selection
+- `#6724 (comment) <https://github.com/esp8266/Arduino/pull/6724#issuecomment-556243781>`__
+- `#6826 <https://github.com/esp8266/Arduino/pull/6826>`__
+
+Notice that 3.x.x is provided **as-is** and remains **experimental**.
 
 SSL Support
 ~~~~~~~~~~~
