@@ -400,12 +400,8 @@ extern "C" void __disableWiFiAtBootTime (void)
 
 #if FLASH_MAP_SUPPORT
 #include "flash_hal.h"
-extern "C" bool flashinit (void);
-#if (NONOSDK >= (0x30000))
-uint32_t __flashindex __attribute__((section(".noinit")));
-#else
+extern "C" const char *flashinit (void);
 uint32_t __flashindex;
-#endif
 #endif
 
 #if (NONOSDK >= (0x30000))
@@ -432,8 +428,8 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 
     do {
         #if FLASH_MAP_SUPPORT
-        if (!flashinit()) {
-            flash_map_str = PSTR("flashinit: flash size missing from FLASH_MAP table\n");
+        flash_map_str = flashinit();
+        if (flash_map_str) {
             continue;
         }
         #endif
@@ -631,6 +627,11 @@ extern "C" void user_init(void) {
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
+#if FLASH_MAP_SUPPORT && (NONOSDK < (0x30000))
+    const char *err_msg = flashinit();
+    if (err_msg) __panic_func(err_msg, 0, NULL);
+#endif
+
     init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
@@ -653,11 +654,6 @@ extern "C" void user_init(void) {
 
 #if defined(MMU_IRAM_HEAP)
     umm_init_iram();
-#endif
-#if FLASH_MAP_SUPPORT && (NONOSDK < 0x30000)
-    if (!flashinit()) {
-        panic();
-    }
 #endif
     preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
     __disableWiFiAtBootTime(); // default weak function disables WiFi

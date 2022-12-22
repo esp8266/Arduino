@@ -149,6 +149,9 @@ void __wrap_system_restart_local() {
         }
         ets_putc('\n');
     }
+    else if (s_pm.panic_file) {
+        ets_printf_P(PSTR("\nPanic %S\n"), s_pm.panic_file);
+    }
     else if (s_pm.unhandled_exception) {
         ets_printf_P(PSTR("\nUnhandled C++ exception: %S\n"), s_pm.unhandled_exception);
     }
