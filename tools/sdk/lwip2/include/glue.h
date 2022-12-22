@@ -118,20 +118,4 @@ err_glue_t	glue2esp_linkoutput		(int netif_idx, void* ref2save, void* data, size
 #define lwip_xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state) :: "memory"); state;}))
 #define lwip_xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
-// quickfix: workaround for definition of __PRI32(x) in inttypes.h
-// it has changed with recent version of xtensa-gcc
-// __INT32 is missing
-// gcc-4.x:    __PRI32(x) is __STRINGIFY(l##x)
-// gcc-10.2.0: __PRI32(x) is __INT32 __STRINGIFY(x)
-#include <inttypes.h>
-#if !defined(__INT8)
-#define __INT8
-#endif
-#if !defined(__INT16)
-#define __INT16
-#endif
-#if !defined(__INT32)
-#define __INT32 "l"
-#endif
-
 #endif // GLUE_H
