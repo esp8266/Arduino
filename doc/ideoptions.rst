@@ -219,8 +219,10 @@ Erase Flash
 
 -  ``All Flash``: WiFi settings and Filesystems are erased.
 
-Espressif Firmware
+NONOS SDK Version
 ~~~~~~~~~~~~~~~~~~
+
+Our Core is based on [Espressif NONOS SDK](https://github.com/espressif/ESP8266_NONOS_SDK).
 
 - **2.2.1+100 (190703)** (default)
 - 2.2.1+119 (191122)

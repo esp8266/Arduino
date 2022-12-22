@@ -1745,7 +1745,7 @@ def all_boards ():
     print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
-    print('menu.sdk=Espressif FW')
+    print('menu.sdk=NONOS SDK Version')
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
