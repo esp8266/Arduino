@@ -65,7 +65,7 @@ void loop() {
 
       // file found at server
       if (httpCode == HTTP_CODE_OK) {
-        const String& payload = http.getString();
+        const String payload = http.getString();
         Serial.println("received payload:\n<<");
         Serial.println(payload);
         Serial.println(">>");
