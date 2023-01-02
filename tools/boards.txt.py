@@ -1668,8 +1668,8 @@ def sdk ():
                         ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
-                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                        ('.menu.sdk.nonosdk305', 'nonos-sdk 3.0.5 (experimental)'),
+                        ('.menu.sdk.nonosdk305.build.sdk', 'NONOSDK305'),
                     ])
            }
 
@@ -1745,7 +1745,7 @@ def all_boards ():
     print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
-    print('menu.sdk=Espressif FW')
+    print('menu.sdk=NONOS SDK Version')
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')

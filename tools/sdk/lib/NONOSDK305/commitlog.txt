@@ -1,0 +1,147 @@
+    feat: Update sdk version header file 3.0.5
+    feat(core): update core version to b29dcd3
+    feat: Update sdk version header file 3.0.4
+    fix: It sometimes crashes after disable sntp
+    fix: Sometimes the parameter is missing because of power down when erasing or writing the flash
+
+commit 7b5b35da98ad9ee2de7afc63277d4933027ae91c
+Merge: bd63c1f 26bedd0
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Oct 15 11:40:39 2021 +0000
+
+    Merge branch 'feature/update_at_bin' into 'release/v3.0.5'
+    
+    feat: Update at bin to 1.7.5
+    
+    See merge request sdk/ESP8266_NONOS_SDK!296
+
+commit 26bedd0c7afd8a090670fb352f1f8a811b4f1839
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Oct 15 18:06:49 2021 +0800
+
+    feat: Update at bin to 1.7.5
+
+commit 38d251e1decafb56bae94e67f62ec425c6e5fe64
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri Oct 15 18:04:52 2021 +0800
+
+    feat: Update sdk version header file 3.0.5
+
+commit bd63c1f81aae4bfb1b569e880a24fa73be81c713
+Merge: b1c14cd dae389b
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Sat Oct 9 03:57:00 2021 +0000
+
+    Merge branch 'feature/update_core_v3.0.5' into 'release/v3.0.5'
+    
+    feat(core): update core version to b29dcd3
+    
+    See merge request sdk/ESP8266_NONOS_SDK!293
+
+commit dae389b804ad7c796d4dd62fab9ec346208507ac
+Author: Chen Wu <chenwu@espressif.com>
+Date:   Sat Oct 9 11:37:28 2021 +0800
+
+    feat(core): update core version to b29dcd3
+
+commit b1c14cdb08e2f39b654933f887b4f997b291982f
+Merge: 5677e37 43dfa5a
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed May 27 16:56:15 2020 +0800
+
+    Merge branch 'feature/update_at_bin' into 'master'
+    
+    feat: Update at bin to 1.7.4.0
+    
+    See merge request sdk/ESP8266_NONOS_SDK!283
+
+commit 43dfa5a7f919c3537929c1e36822118414da7d7f
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed May 27 10:22:50 2020 +0800
+
+    feat: Update at bin to 1.7.4.0
+
+commit 5677e379adf43032c8c05dde7816854409f9a8e8
+Merge: 8c0e419 9fbceb4
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed May 27 09:52:55 2020 +0800
+
+    Merge branch 'feature/update_sdk_version_h' into 'master'
+    
+    feat: Update sdk version header file 3.0.4
+    
+    See merge request sdk/ESP8266_NONOS_SDK!282
+
+commit 9fbceb4bc837521a09a790ee8db6dd1166e55498
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Wed May 27 09:50:30 2020 +0800
+
+    feat: Update sdk version header file 3.0.4
+
+commit 8c0e419de1173347c4b9d073a2d891d3575c018a
+Merge: f537843 13e436f
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue May 26 15:35:24 2020 +0800
+
+    Merge branch 'bugfix/N8266-67' into 'master'
+    
+    fix: It sometimes crashes after disable sntp
+    
+    See merge request sdk/ESP8266_NONOS_SDK!281
+
+commit 13e436f6214993e1f322c24f20a431fef8a123ca
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue May 26 10:55:57 2020 +0800
+
+    feat: Update lwip lib to 5623f48f
+
+commit 5623f48f5e2dd1f45c25b9f2cad2314924a3cb00
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue May 26 10:52:30 2020 +0800
+
+    fix: It sometimes crashes after disable sntp
+
+commit f5378436fde39c0693df25efb51174b56f79dcc2
+Merge: c2ddeca da9767c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri May 22 17:45:10 2020 +0800
+
+    Merge branch 'bugfix/parameter_missing' into 'master'
+    
+    fix: Sometimes the parameter is missing because of power down when erasing or writing the flash
+    
+    See merge request sdk/ESP8266_NONOS_SDK!280
+
+commit da9767c316e0e0dca9c00d91fbdac44ada62b29c
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Fri May 22 17:26:39 2020 +0800
+
+    fix: Sometimes the parameter is missing because of power down when erasing or writing the flash
+
+commit c2ddeca67fe849a0a243ee50a28f8c81b8bba59a
+Merge: b2831d5 613a042
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue May 12 11:17:23 2020 +0800
+
+    Merge branch 'feature/compatible_with_16M_512_512_in_at_nano' into 'master'
+    
+    feat: Compatible with 16M 512 512 in at nano
+    
+    See merge request sdk/ESP8266_NONOS_SDK!279
+
+commit 613a042bc35823e7a48b0870a6562008f34009a9
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Tue May 12 10:06:16 2020 +0800
+
+    feat: Compatible with 16M 512 512 in at nano
+
+commit b2831d57b3c51e421bf35fc902d177ea57ba6e13
+Merge: b77cb8c 369b9bc
+Author: Xu Chun Guang <xuchunguang@espressif.com>
+Date:   Mon May 11 20:04:36 2020 +0800
+
+    Merge branch 'bugfix/workaround_ota' into 'master'
+    
+    Bugfix/workaround ota
+    
+    See merge request sdk/ESP8266_NONOS_SDK!277

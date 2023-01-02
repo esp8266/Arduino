@@ -71,13 +71,16 @@ mkdir -p ${outdir}
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
 .git
+.git-blame-ignore-revs
+.github
 .gitignore
 .gitmodules
-.travis.yml
-package
+ISSUE_TEMPLATE.md
 doc
+package
 EOF
 # Also include all files which are ignored by git
+# TODO: .gitattributes helper for the above?
 git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' ${srcdir}/ ${outdir}/
