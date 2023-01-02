@@ -85,7 +85,7 @@ extern "C"
             config->bssid[i] = i;
         config->threshold.rssi     = 1;
         config->threshold.authmode = AUTH_WPA_PSK;
-#if (NONOSDK >= (0x30000 - 1))
+#if (NONOSDK >= (0x30000))
         config->open_and_wep_mode_disable = true;
 #endif
 #if (NONOSDK >= (0x30200))
@@ -215,7 +215,7 @@ extern "C"
         return STATION_MODE;
     }
 
-#if (NONOSDK >= (0x30000 - 1))
+#if (NONOSDK >= (0x30000))
 
     sleep_level_t wifi_get_sleep_level(void)
     {
@@ -271,7 +271,7 @@ extern "C"
         return true;
     }
 
-#if (NONOSDK >= (0x30000 - 1))
+#if (NONOSDK >= (0x30000))
 
     bool wifi_set_sleep_level(sleep_level_t level)
     {
