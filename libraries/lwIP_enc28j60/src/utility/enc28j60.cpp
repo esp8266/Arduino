@@ -743,7 +743,8 @@ uint16_t ENC28J60::phyread(uint8_t reg)
     writereg(MIREGADR, reg);
     writereg(MICMD, MICMD_MIIRD);
     // wait until the PHY read completes
-    while(readreg(MISTAT) & MISTAT_BUSY) {
+    while (readreg(MISTAT) & MISTAT_BUSY)
+    {
         delayMicroseconds(15);
     }
     writereg(MICMD, 0);
