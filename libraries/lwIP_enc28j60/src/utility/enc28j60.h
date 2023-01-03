@@ -83,10 +83,7 @@ public:
         Check physical link
         @return true when physical link is up
     */
-    bool isLinked() const
-    {
-        return true;  //XXX TODO
-    }
+    bool isLinked();
 
     /**
         Report whether ::isLinked() API is implemented
@@ -94,7 +91,7 @@ public:
     */
     constexpr bool isLinkDetectable() const
     {
-        return false;
+        return true;
     }
 
 protected:
@@ -150,6 +147,8 @@ private:
 
     // Previously defined in contiki/core/sys/clock.h
     void clock_delay_usec(uint16_t dt);
+
+    uint16_t phyread(uint8_t reg);
 
     uint8_t   _bank;
     int8_t    _cs;
