@@ -83,7 +83,7 @@ public:
         Check physical link
         @return true when physical link is up
     */
-    bool isLinked ()
+    bool isLinked()
     {
         return wizphy_getphylink() == PHY_LINK_ON;
     }
@@ -92,7 +92,7 @@ public:
         Report whether ::isLinked() API is implemented
         @return true when ::isLinked() API is implemented
     */
-    constexpr bool isLinkDetectable () const
+    constexpr bool isLinkDetectable() const
     {
         return true;
     }

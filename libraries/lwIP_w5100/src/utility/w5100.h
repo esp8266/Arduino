@@ -83,16 +83,16 @@ public:
         Check physical link
         @return true when physical link is up
     */
-    bool isLinked () const
+    bool isLinked() const
     {
-        return true; //XXX TODO
+        return true;  //XXX TODO
     }
 
     /**
         Report whether ::isLinked() API is implemented
         @return true when ::isLinked() API is implemented
     */
-    constexpr bool isLinkDetectable () const
+    constexpr bool isLinkDetectable() const
     {
         return false;
     }
