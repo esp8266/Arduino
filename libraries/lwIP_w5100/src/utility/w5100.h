@@ -79,6 +79,24 @@ public:
     */
     uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
+    /**
+        Check physical link
+        @return true when physical link is up
+    */
+    bool isLinked () const
+    {
+        return true; //XXX TODO
+    }
+
+    /**
+        Report whether ::isLinked() API is implemented
+        @return true when ::isLinked() API is implemented
+    */
+    constexpr bool isLinkDetectable () const
+    {
+        return false;
+    }
+
 protected:
     static constexpr bool interruptIsPossible()
     {
