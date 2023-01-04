@@ -243,9 +243,6 @@ SECTIONS
     /* Fundamental type info */
     *(.rodata._ZTIPKc .rodata._ZTIc .rodata._ZTIv .rodata._ZTSv .rodata._ZTSc .rodata._ZTSPKc .rodata._ZTSi .rodata._ZTIi)
 
-    /* std::make_shared */
-    *(.rodata._ZZNSt19_Sp_make_shared_tag5_S_tiEvE5__tag)
-
     . = ALIGN(4);
     *(.gcc_except_table .gcc_except_table.*)
     . = ALIGN(4);
