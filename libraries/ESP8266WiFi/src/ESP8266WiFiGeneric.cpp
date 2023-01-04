@@ -642,10 +642,11 @@ static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t ti
     // We need to wait for c/b to fire *or* we exit on our own timeout
     // (which also requires us to notify the c/b that it is supposed to delete the pending obj)
     case ERR_INPROGRESS:
+        // Re-check every 10ms, we expect this to happen fast
         esp_delay(timeout_ms,
             [&]() {
                 return !pending->done;
-            });
+            }, 10);
 
         if (pending->done) {
             if ((pending->addr).isSet()) {
