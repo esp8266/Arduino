@@ -27,6 +27,11 @@ IPAddress::IPAddress(const IPAddress& from)
     ip_addr_copy(_ip, from._ip);
 }
 
+IPAddress::IPAddress(IPAddress&& from)
+{
+    ip_addr_copy(_ip, from._ip);
+}
+
 IPAddress::IPAddress() {
     _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
 }

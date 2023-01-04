@@ -24,6 +24,7 @@
 
 #include <cstring>
 #include <list>
+#include <memory>
 #include <type_traits>
 
 #include <coredecls.h>
@@ -597,60 +598,68 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+namespace {
 
-static bool _dns_lookup_pending = false;
+struct _dns_found_result {
+    IPAddress addr;
+    bool done;
+};
+
+}
+
+static void _dns_found_callback(const char *, const ip_addr_t *, void *);
 
 static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType) {
-    if (_dns_lookup_pending) {
-        DEBUG_WIFI_GENERIC("[hostByName] DNS lookup still in progress\n");
-        return 0;
-    }
-
-    ip_addr_t addr;
-    err_t err;
-
-    aResult = static_cast<uint32_t>(INADDR_NONE);
-    if(aResult.fromString(aHostname)) {
+    if (aResult.fromString(aHostname)) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s is IP!\n", aHostname);
         return 1;
     }
 
+    static_assert(std::is_same_v<uint8_t, std::underlying_type_t<decltype(resolveType)>>, "");
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    switch (resolveType) {
-    case DNSResolveType::DNS_AddrType_IPv4:
-    case DNSResolveType::DNS_AddrType_IPv6:
-    case DNSResolveType::DNS_AddrType_IPv4_IPv6:
-    case DNSResolveType::DNS_AddrType_IPv6_IPv4:
-        static_assert(std::is_same_v<uint8_t, std::underlying_type_t<decltype(resolveType)>>, "");
-        err = dns_gethostbyname_addrtype(aHostname, &addr,
-                &wifi_dns_found_callback, &aResult,
-                static_cast<uint8_t>(resolveType));
-        _dns_lookup_pending = true;
-        break;
-    default:
-        return 0;
-    }
+
+    ip_addr_t addr;
+    auto pending = std::make_unique<_dns_found_result>(
+        _dns_found_result{
+            .addr = IPADDR_NONE,
+            .done = false,
+        });
+
+    err_t err = dns_gethostbyname_addrtype(aHostname,
+        &addr, &_dns_found_callback, pending.get(),
+        static_cast<uint8_t>(resolveType));
 
     switch (err) {
+    // Address already known
     case ERR_OK:
-        aResult = IPAddress(&addr);
+        aResult = addr;
         break;
-    // will resume on timeout or when wifi_dns_found_callback fires
+
+    // We are no longer able to issue requests
+    case ERR_MEM:
+        break;
+
+    // We need to wait for c/b to fire *or* we exit on our own timeout
+    // (which also requires us to notify the c/b that it is supposed to delete the pending obj)
     case ERR_INPROGRESS:
         esp_delay(timeout_ms,
-            []() {
-                return _dns_lookup_pending;
+            [&]() {
+                return !pending->done;
             });
 
-        if (aResult.isSet()) {
-            err = ERR_OK;
+        if (pending->done) {
+            if ((pending->addr).isSet()) {
+                aResult = pending->addr;
+                err = ERR_OK;
+            }
         } else {
+            pending.release();
+            pending->done = true;
             err = ERR_TIMEOUT;
         }
-    }
 
-    _dns_lookup_pending = false;
+        break;
+    }
 
     if (err == ERR_OK) {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
@@ -693,16 +702,19 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+static void _dns_found_callback(const char *, const ip_addr_t *ipaddr, void *arg)
 {
-    (void) name;
-    if (!_dns_lookup_pending) {
+    auto result = reinterpret_cast<_dns_found_result *>(arg);
+    if (result->done) {
+        delete result;
         return;
     }
-    if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
+
+    if (ipaddr) {
+        result->addr = IPAddress(ipaddr);
     }
-    _dns_lookup_pending = false; // resume hostByName
+
+    result->done = true;
     esp_schedule();
 }
 
