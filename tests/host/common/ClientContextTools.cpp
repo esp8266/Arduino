@@ -44,7 +44,7 @@ err_t dns_gethostbyname_addrtype(const char* hostname, ip_addr_t* addr, dns_foun
         return ERR_TIMEOUT;
 
     uint32_t tmp;
-    std::memcpy(&tmp, hbn->h_addr_list, sizeof(tmp));
+    std::memcpy(&tmp, hbn->h_addr_list[0], sizeof(tmp));
     addr->addr = tmp;
 
     return ERR_OK;
