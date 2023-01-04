@@ -10,13 +10,6 @@ using EthernetUDP    = WiFiUDP;
 using EthernetClient = WiFiClient;
 using EthernetServer = ArduinoWiFiServer;
 
-enum EthernetLinkStatus
-{
-    Unknown,
-    LinkON,
-    LinkOFF
-};
-
 enum
 {
     DHCP_CHECK_NONE        = 0,
@@ -40,7 +33,6 @@ public:
         LwipIntfDev<RawDev>(cs, spi, intr)
     {
         _hardwareStatus = EthernetNoHardware;
-        _linkStatus     = Unknown;
     }
 
     // Arduino-Ethernet API compatibility, order can be either:
@@ -70,7 +62,6 @@ public:
         if (ret)
         {
             _hardwareStatus = EthernetHardwareFound;
-            _linkStatus     = LinkON;
         }
 
         return ret;
@@ -81,19 +72,13 @@ public:
         return _hardwareStatus;
     }
 
-    EthernetLinkStatus linkStatus() const
-    {
-        return _linkStatus;
-    }
-
     int maintain() const
     {
         return DHCP_CHECK_NONE;
     }
 
 protected:
-    HardwareStatus     _hardwareStatus;
-    EthernetLinkStatus _linkStatus;
+    HardwareStatus _hardwareStatus;
 };
 
 using ArduinoWiznet5500lwIP = ArduinoEthernet<Wiznet5500>;
