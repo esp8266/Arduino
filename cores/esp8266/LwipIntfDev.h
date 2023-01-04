@@ -100,9 +100,11 @@ public:
     void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
+    // (and ethernet link status is not detectable or is up)
     bool connected()
     {
-        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
+        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr))
+               && (!RawDev::isLinkDetectable() || RawDev::isLinked());
     }
 
     bool routable()
