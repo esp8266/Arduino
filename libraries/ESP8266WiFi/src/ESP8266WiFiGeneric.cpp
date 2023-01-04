@@ -653,8 +653,8 @@ static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t ti
                 err = ERR_OK;
             }
         } else {
-            pending.release();
             pending->done = true;
+            pending.release();
             err = ERR_TIMEOUT;
         }
 
