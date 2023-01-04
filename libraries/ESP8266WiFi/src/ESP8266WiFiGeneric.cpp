@@ -667,7 +667,10 @@ static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t ti
     }
 
     DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n",
-        aHostname, lwip_strerr(err), static_cast<int>(err));
+            aHostname,
+            (err == ERR_TIMEOUT) ? "Timeout" :
+            (err == ERR_INPROGRESS) ? "No response" :
+                "Unknown", static_cast<int>(err));
 
     return 0;
 }
@@ -702,9 +705,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-static void _dns_found_callback(const char *, const ip_addr_t *ipaddr, void *arg)
+static void _dns_found_callback(const char*, const ip_addr_t* ipaddr, void* arg)
 {
-    auto result = reinterpret_cast<_dns_found_result *>(arg);
+    auto result = reinterpret_cast<_dns_found_result*>(arg);
     if (result->done) {
         delete result;
         return;
