@@ -22,8 +22,10 @@
 
  */
 
+#include <cstring>
 #include <list>
-#include <string.h>
+#include <type_traits>
+
 #include <coredecls.h>
 #include <PolledTimeout.h>
 #include "ESP8266WiFi.h"
@@ -599,6 +601,68 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
 
 static bool _dns_lookup_pending = false;
 
+static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType) {
+    if (_dns_lookup_pending) {
+        DEBUG_WIFI_GENERIC("[hostByName] DNS lookup still in progress\n");
+        return 0;
+    }
+
+    ip_addr_t addr;
+    err_t err;
+
+    aResult = static_cast<uint32_t>(INADDR_NONE);
+    if(aResult.fromString(aHostname)) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is IP!\n", aHostname);
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+    switch (resolveType) {
+    case DNSResolveType::DNS_AddrType_IPv4:
+    case DNSResolveType::DNS_AddrType_IPv6:
+    case DNSResolveType::DNS_AddrType_IPv4_IPv6:
+    case DNSResolveType::DNS_AddrType_IPv6_IPv4:
+        static_assert(std::is_same_v<uint8_t, std::underlying_type_t<decltype(resolveType)>>, "");
+        err = dns_gethostbyname_addrtype(aHostname, &addr,
+                &wifi_dns_found_callback, &aResult,
+                static_cast<uint8_t>(resolveType));
+        _dns_lookup_pending = true;
+        break;
+    default:
+        return 0;
+    }
+
+    switch (err) {
+    case ERR_OK:
+        aResult = IPAddress(&addr);
+        break;
+    // will resume on timeout or when wifi_dns_found_callback fires
+    case ERR_INPROGRESS:
+        esp_delay(timeout_ms,
+            []() {
+                return _dns_lookup_pending;
+            });
+
+        if (aResult.isSet()) {
+            err = ERR_OK;
+        } else {
+            err = ERR_TIMEOUT;
+        }
+    }
+
+    _dns_lookup_pending = false;
+
+    if (err == ERR_OK) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n",
+        aHostname, lwip_strerr(err), static_cast<int>(err));
+
+    return 0;
+}
+
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
@@ -608,99 +672,18 @@ static bool _dns_lookup_pending = false;
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
-    return hostByName(aHostname, aResult, 10000);
+    return hostByNameImpl(aHostname, aResult, DNSDefaultTimeoutMs, DNSResolveTypeDefault);
 }
-
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    ip_addr_t addr;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
-
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-#if LWIP_IPV4 && LWIP_IPV6
-    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,LWIP_DNS_ADDRTYPE_DEFAULT);
-#else
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
-#endif
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        // Will resume on timeout or when wifi_dns_found_callback fires.
-        // The final argument, intvl_ms, to esp_delay influences how frequently
-        // the scheduled recurrent functions (Schedule.h) are probed; here, to allow
-        // the ethernet driver perform work.
-        esp_delay(timeout_ms, []() { return _dns_lookup_pending; }, 1);
-        _dns_lookup_pending = false;
-        if(aResult.isSet()) {
-            err = ERR_OK;
-        }
-    }
-
-    if(err == ERR_OK) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
-        return 1;
-    }
-    
-    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n", aHostname, lwip_strerr(err), (int)err);
-    return 0;
+    return hostByNameImpl(aHostname, aResult, timeout_ms, DNSResolveTypeDefault);
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType)
 {
-    ip_addr_t addr;
-    err_t err;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
-
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    switch(resolveType)
-    {
-      // Use selected addrtype
-      case DNSResolveType::DNS_AddrType_IPv4:
-      case DNSResolveType::DNS_AddrType_IPv6:
-      case DNSResolveType::DNS_AddrType_IPv4_IPv6:
-      case DNSResolveType::DNS_AddrType_IPv6_IPv4:
-         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, (uint8_t) resolveType);
-	 break;
-      default:
-         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, LWIP_DNS_ADDRTYPE_DEFAULT); // If illegal type, use default.
-	 break;
-    }
-
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        // will resume on timeout or when wifi_dns_found_callback fires
-        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
-        _dns_lookup_pending = false;
-        // will return here when dns_found_callback fires
-        if(aResult.isSet()) {
-            err = ERR_OK;
-        }
-    }
-
-    if(err == ERR_OK) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-    return 0;
+    return hostByNameImpl(aHostname, aResult, timeout_ms, resolveType);
 }
 #endif
 
