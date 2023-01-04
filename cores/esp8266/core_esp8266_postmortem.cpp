@@ -110,6 +110,18 @@ static void cut_here() {
     ets_putc('\n');
 }
 
+volatile static struct core_regs {
+    uint32_t pc;
+    uint32_t ps;
+    uint32_t sar;
+    uint32_t vpri;
+    uint32_t a[16]; //a0..a15
+    uint32_t litbase;
+    uint32_t sr176;
+    uint32_t sr208;
+    uint32_t valid;
+} core_regs;
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
     uint32_t sp_dump = sp;
@@ -234,6 +246,48 @@ void __wrap_system_restart_local() {
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
+    ets_printf_P("\n---- begin regs ----\n");
+    if (!core_regs.valid) {
+      // TODO - Any opdates to SDK or this function, verify 0xa0 offset!!! Maybe add intelligence to look nearby for expc1??
+      uint32_t *frame = (uint32_t*)(sp_dump + 0xa0); // Fixed depending on the OS and this function!!!
+      core_regs.pc = frame[0];
+      core_regs.ps = frame[1];
+      core_regs.vpri = frame[2];
+      core_regs.sar = frame[3];
+      core_regs.a[0] = frame[4];
+      core_regs.a[1] = ((uint32_t)frame) + 80; // ??
+      core_regs.a[2] = frame[5];
+      core_regs.a[3] = frame[6];
+      core_regs.a[4] = frame[7];
+      core_regs.a[5] = frame[8];
+      core_regs.a[6] = frame[9];
+      core_regs.a[7] = frame[10];
+      core_regs.a[8] = frame[11];
+      core_regs.a[9] = frame[12];
+      core_regs.a[10] = frame[13];
+      core_regs.a[11] = frame[14];
+      core_regs.a[12] = frame[15];
+      core_regs.a[13] = frame[16];
+      core_regs.a[14] = frame[17];
+      core_regs.a[15] = frame[18];
+      core_regs.litbase = frame[19];
+    }
+
+    for (volatile uint32_t *r = &core_regs.pc; r < &core_regs.valid; r++) {
+        ets_printf_P("%08x\n", *r);
+    }
+    ets_printf_P("---- end regs ----\n");
+
+    ets_printf_P("\n---- begin core ----\n");
+    uint8_t *ram = (uint8_t*)0x3FFE8000;
+    while (ram < (uint8_t*)0x40000000) {
+      for (size_t i=0; i<64; i++) { ets_printf_P("%02X", ram[i]); }
+      ets_printf_P("\n");
+      ram += 64;
+      system_soft_wdt_feed();
+    }
+    ets_printf_P("---- end core ----\n");
+
     ets_delay_us(10000);
     __real_system_restart_local();
 }
@@ -274,7 +328,72 @@ static void IRAM_ATTR uart1_write_char_d(char c) {
     USF(1) = c;
 }
 
+
+void  __attribute__ ((noinline)) _preserve_regs(volatile struct core_regs *dest, int junk);
+
+asm ("	.align 4\n\
+	.global _preserve_regs\n\
+	.literal_position\n\
+_preserve_regs: \n\
+	addi    a1, a1, -32\n\
+	s32i    a15, a1, 28\n\
+	mov     a15, a1\n\
+	s32i    a2, a15, 0\n\
+	s32i    a3, a15, 4\n\
+	movi    a3, .\n\
+	s32i    a3, a2, 0    /* PC */\n\
+	rsr     a3, ps\n\
+	s32i    a3, a2, 0x04 /* PS */\n\
+        rsr     a3, SAR\n\
+        s32i    a3, a2, 0x08 /* SAR */\n\
+	s32i    a0, a2, 0x10 /* A0 */\n\
+	s32i    a1, a2, 0x14 /* A1 */\n\
+	s32i    a2, a2, 0x18 /* A2 */\n\
+	s32i    a3, a2, 0x1c /* A3 */\n\
+	s32i    a4, a2, 0x20 /* A4 */\n\
+	s32i    a5, a2, 0x24 /* A5 */\n\
+	s32i    a6, a2, 0x28 /* A6 */\n\
+	s32i    a7, a2, 0x2c /* A7 */\n\
+	s32i    a8, a2, 0x30 /* A8 */\n\
+	s32i    a9, a2, 0x34 /* A9 */\n\
+	s32i    a10, a2, 0x38 /* A10 */\n\
+	s32i    a11, a2, 0x3c /* A11 */\n\
+	s32i    a12, a2, 0x40 /* A12 */\n\
+	s32i    a13, a2, 0x44 /* A13 */\n\
+	s32i    a14, a2, 0x48 /* A14 */\n\
+	s32i    a15, a2, 0x4c /* A15 */\n\
+        rsr     a3, LITBASE\n\
+        s32i    a3, a2, 0x50 /*LITBASE */\n\
+        rsr     a3, 176\n\
+        s32i    a3, a2, 0x54\n\
+        rsr     a3, 208\n\
+        s32i    a3, a2, 0x58\n\
+	mov.n   a1, a15\n\
+	l32i.n  a15, sp, 28\n\
+	addi    sp, sp, 32\n\
+	ret.n\n");
+
+static uint32_t _pc;
+static uint32_t _a1;
+static uint32_t _a15;
+
+#define CATCH() \
+    register uint32_t a1 asm("a1"); \
+    register uint32_t a15 asm("a15"); \
+    uint32_t pc; \
+    __asm__ __volatile__ ("movi %0, ." : "=r" (pc)); \
+    _pc = pc;\
+    _a1 = a1;\
+    _a15 = a15;
+
 static void raise_exception() {
+    _preserve_regs(&core_regs, 0);
+    core_regs.valid = 1;
+
+    core_regs.pc    = _pc;
+    core_regs.a[1]  = _a1;
+    core_regs.a[15] = _a15;
+
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
@@ -286,16 +405,19 @@ static void raise_exception() {
 }
 
 void abort() {
+    CATCH();
     s_abort_called = true;
     raise_exception();
 }
 
 void __unhandled_exception(const char *str) {
+    CATCH();
     s_unhandled_exception = str;
     raise_exception();
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
+    CATCH();
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
@@ -305,6 +427,7 @@ void __assert_func(const char *file, int line, const char *func, const char *wha
 }
 
 void __panic_func(const char* file, int line, const char* func) {
+    CATCH();
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
