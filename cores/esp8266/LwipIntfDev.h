@@ -46,6 +46,13 @@
 #define DEFAULT_MTU 1500
 #endif
 
+enum EthernetLinkStatus
+{
+    Unknown,
+    LinkON,
+    LinkOFF
+};
+
 template<class RawDev>
 class LwipIntfDev: public LwipIntf, public RawDev
 {
@@ -93,9 +100,11 @@ public:
     void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
+    // (and ethernet link status is not detectable or is up)
     bool connected()
     {
-        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
+        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr))
+               && (!RawDev::isLinkDetectable() || RawDev::isLinked());
     }
 
     bool routable()
@@ -105,6 +114,9 @@ public:
 
     // ESP8266WiFi API compatibility
     wl_status_t status();
+
+    // Arduino Ethernet compatibility
+    EthernetLinkStatus linkStatus();
 
 protected:
     err_t netif_init();
@@ -280,6 +292,12 @@ template<class RawDev>
 wl_status_t LwipIntfDev<RawDev>::status()
 {
     return _started ? (connected() ? WL_CONNECTED : WL_DISCONNECTED) : WL_NO_SHIELD;
+}
+
+template<class RawDev>
+EthernetLinkStatus LwipIntfDev<RawDev>::linkStatus()
+{
+    return RawDev::isLinkDetectable() ? _started && RawDev::isLinked() ? LinkON : LinkOFF : Unknown;
 }
 
 template<class RawDev>

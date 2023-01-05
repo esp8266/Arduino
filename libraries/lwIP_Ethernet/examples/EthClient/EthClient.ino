@@ -52,6 +52,8 @@ void loop() {
   Serial.print(':');
   Serial.println(port);
 
+  Serial.printf("Link sense: %d (detectable: %d)\n", eth.isLinked(), eth.isLinkDetectable());
+
   // Use WiFiClient class to create TCP connections
   // (this class could have been named TCPClient)
   WiFiClient client;
