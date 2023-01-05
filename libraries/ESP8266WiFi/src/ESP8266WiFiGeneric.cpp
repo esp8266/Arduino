@@ -22,8 +22,11 @@
 
  */
 
+#include <cstring>
 #include <list>
-#include <string.h>
+#include <memory>
+#include <type_traits>
+
 #include <coredecls.h>
 #include <PolledTimeout.h>
 #include "ESP8266WiFi.h"
@@ -595,9 +598,83 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+namespace {
 
-static bool _dns_lookup_pending = false;
+struct _dns_found_result {
+    IPAddress addr;
+    bool done;
+};
+
+}
+
+static void _dns_found_callback(const char *, const ip_addr_t *, void *);
+
+static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType) {
+    if (aResult.fromString(aHostname)) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is IP!\n", aHostname);
+        return 1;
+    }
+
+    static_assert(std::is_same_v<uint8_t, std::underlying_type_t<decltype(resolveType)>>, "");
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
+
+    ip_addr_t addr;
+    auto pending = std::make_unique<_dns_found_result>(
+        _dns_found_result{
+            .addr = IPADDR_NONE,
+            .done = false,
+        });
+
+    err_t err = dns_gethostbyname_addrtype(aHostname,
+        &addr, &_dns_found_callback, pending.get(),
+        static_cast<uint8_t>(resolveType));
+
+    switch (err) {
+    // Address already known
+    case ERR_OK:
+        aResult = addr;
+        break;
+
+    // We are no longer able to issue requests
+    case ERR_MEM:
+        break;
+
+    // We need to wait for c/b to fire *or* we exit on our own timeout
+    // (which also requires us to notify the c/b that it is supposed to delete the pending obj)
+    case ERR_INPROGRESS:
+        // Re-check every 10ms, we expect this to happen fast
+        esp_delay(timeout_ms,
+            [&]() {
+                return !pending->done;
+            }, 10);
+
+        if (pending->done) {
+            if ((pending->addr).isSet()) {
+                aResult = pending->addr;
+                err = ERR_OK;
+            }
+        } else {
+            pending->done = true;
+            pending.release();
+            err = ERR_TIMEOUT;
+        }
+
+        break;
+    }
+
+    if (err == ERR_OK) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n",
+            aHostname,
+            (err == ERR_TIMEOUT) ? "Timeout" :
+            (err == ERR_INPROGRESS) ? "No response" :
+                "Unknown", static_cast<int>(err));
+
+    return 0;
+}
 
 /**
  * Resolve the given hostname to an IP address.
@@ -608,99 +685,18 @@ static bool _dns_lookup_pending = false;
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
-    return hostByName(aHostname, aResult, 10000);
+    return hostByNameImpl(aHostname, aResult, DNSDefaultTimeoutMs, DNSResolveTypeDefault);
 }
-
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    ip_addr_t addr;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
-
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-#if LWIP_IPV4 && LWIP_IPV6
-    err_t err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult,LWIP_DNS_ADDRTYPE_DEFAULT);
-#else
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
-#endif
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        // Will resume on timeout or when wifi_dns_found_callback fires.
-        // The final argument, intvl_ms, to esp_delay influences how frequently
-        // the scheduled recurrent functions (Schedule.h) are probed; here, to allow
-        // the ethernet driver perform work.
-        esp_delay(timeout_ms, []() { return _dns_lookup_pending; }, 1);
-        _dns_lookup_pending = false;
-        if(aResult.isSet()) {
-            err = ERR_OK;
-        }
-    }
-
-    if(err == ERR_OK) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
-        return 1;
-    }
-    
-    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %s (%d)!\n", aHostname, lwip_strerr(err), (int)err);
-    return 0;
+    return hostByNameImpl(aHostname, aResult, timeout_ms, DNSResolveTypeDefault);
 }
 
 #if LWIP_IPV4 && LWIP_IPV6
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms, DNSResolveType resolveType)
 {
-    ip_addr_t addr;
-    err_t err;
-    aResult = static_cast<uint32_t>(INADDR_NONE);
-
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    switch(resolveType)
-    {
-      // Use selected addrtype
-      case DNSResolveType::DNS_AddrType_IPv4:
-      case DNSResolveType::DNS_AddrType_IPv6:
-      case DNSResolveType::DNS_AddrType_IPv4_IPv6:
-      case DNSResolveType::DNS_AddrType_IPv6_IPv4:
-         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, (uint8_t) resolveType);
-	 break;
-      default:
-         err = dns_gethostbyname_addrtype(aHostname, &addr, &wifi_dns_found_callback, &aResult, LWIP_DNS_ADDRTYPE_DEFAULT); // If illegal type, use default.
-	 break;
-    }
-
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        // will resume on timeout or when wifi_dns_found_callback fires
-        esp_delay(timeout_ms, []() { return _dns_lookup_pending; });
-        _dns_lookup_pending = false;
-        // will return here when dns_found_callback fires
-        if(aResult.isSet()) {
-            err = ERR_OK;
-        }
-    }
-
-    if(err == ERR_OK) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-    return 0;
+    return hostByNameImpl(aHostname, aResult, timeout_ms, resolveType);
 }
 #endif
 
@@ -710,16 +706,19 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+static void _dns_found_callback(const char*, const ip_addr_t* ipaddr, void* arg)
 {
-    (void) name;
-    if (!_dns_lookup_pending) {
+    auto result = reinterpret_cast<_dns_found_result*>(arg);
+    if (result->done) {
+        delete result;
         return;
     }
-    if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
+
+    if (ipaddr) {
+        result->addr = IPAddress(ipaddr);
     }
-    _dns_lookup_pending = false; // resume hostByName
+
+    result->done = true;
     esp_schedule();
 }
 
