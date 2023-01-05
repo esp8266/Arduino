@@ -79,6 +79,21 @@ public:
     */
     virtual uint16_t readFrame(uint8_t* buffer, uint16_t bufsize);
 
+    /**
+        Check physical link
+        @return true when physical link is up
+    */
+    bool isLinked();
+
+    /**
+        Report whether ::isLinked() API is implemented
+        @return true when ::isLinked() API is implemented
+    */
+    constexpr bool isLinkDetectable() const
+    {
+        return true;
+    }
+
 protected:
     static constexpr bool interruptIsPossible()
     {
@@ -132,6 +147,8 @@ private:
 
     // Previously defined in contiki/core/sys/clock.h
     void clock_delay_usec(uint16_t dt);
+
+    uint16_t phyread(uint8_t reg);
 
     uint8_t   _bank;
     int8_t    _cs;
