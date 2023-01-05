@@ -83,6 +83,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& hos
     return handleUpdate(http, currentVersion, false);
 }
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(HTTPClient& httpClient, const String& currentVersion)
+{
+    return handleUpdate(httpClient, currentVersion, false);
+}
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateFS(HTTPClient& httpClient, const String& currentVersion)
+{
+    return handleUpdate(httpClient, currentVersion, true);
+}
+
 /**
  * return error code as int
  * @return int error code

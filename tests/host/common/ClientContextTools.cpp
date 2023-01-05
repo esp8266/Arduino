@@ -37,16 +37,25 @@
 
 #include <netdb.h>  // gethostbyname
 
-err_t dns_gethostbyname(const char* hostname, ip_addr_t* addr, dns_found_callback found,
-                        void* callback_arg)
+err_t dns_gethostbyname_addrtype(const char* hostname, ip_addr_t* addr, dns_found_callback, void*,
+                                 u8 type)
 {
-    (void)callback_arg;
-    (void)found;
-    struct hostent* hbn = gethostbyname(hostname);
+    auto* hbn = gethostbyname(hostname);
     if (!hbn)
         return ERR_TIMEOUT;
-    addr->addr = *(uint32_t*)hbn->h_addr_list[0];
+
+    uint32_t tmp;
+    std::memcpy(&tmp, hbn->h_addr_list[0], sizeof(tmp));
+    addr->addr = tmp;
+
     return ERR_OK;
+}
+
+err_t dns_gethostbyname_addrtype(const char* hostname, ip_addr_t* addr, dns_found_callback found,
+                                 void* callback_arg)
+{
+    return dns_gethostbyname_addrtype(hostname, addr, found, callback_arg,
+                                      LWIP_DNS_ADDRTYPE_DEFAULT);
 }
 
 static struct tcp_pcb mock_tcp_pcb;

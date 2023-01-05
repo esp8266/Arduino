@@ -94,8 +94,9 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  * @param max_connection    Max simultaneous connected clients, 0 - 8. https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832
+ * @param beacon_interval   set arbitrary beacon interval (influences DTIM)
  */
-bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection) {
+bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
@@ -138,7 +139,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
     conf.channel = channel;
     conf.ssid_hidden = ssid_hidden;
     conf.max_connection = max_connection;
-    conf.beacon_interval = 100;
+    conf.beacon_interval = beacon_interval;
 
     struct softap_config conf_compare;
     if(WiFi._persistent){
@@ -189,8 +190,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
     return ret;
 }
 
-bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection) {
-    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection);
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
+    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection, beacon_interval);
 }
 
 /**
