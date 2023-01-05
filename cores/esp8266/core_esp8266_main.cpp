@@ -648,7 +648,7 @@ extern "C" void user_init(void) {
     install_vm_exception_handler();
 #endif
 
-#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
+#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000)))
     install_non32xfer_exception_handler();
 #endif
 
