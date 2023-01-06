@@ -202,3 +202,38 @@ The following points assume work in a direct clone of the repository, and not in
     * In main README.md go to "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
 --------------COPY ABOVE THIS LINE--------------
 ```
+
+## Updating a SSH deploy key
+
+A SSH private/public key pair is required to update the master JSON (the final step of the release process).  Sometimes GitHub will expire one side or the other of that key, and a new one will need to be regenerated and installed in the https://github.com/esp8266/esp8266.github.io (JSON) and https://github.com/esp8266/Arduino (core) repos.
+
+1. Generate a new public/private SSH key pair:
+````
+$ ssh-keygen -t ed25519 -C earlephilhower@yahoo.com   (**replace with your GH user account email**)
+    Generating public/private ed25519 key pair.
+    Enter file in which to save the key (/home/earle/.ssh/id_ed25519): deploy_key
+    Enter passphrase (empty for no passphrase):       (**use no passphrase**)
+    Enter same passphrase again:
+    Your identification has been saved in deploy_key
+    Your public key has been saved in deploy_key.pub
+    The key fingerprint is:
+    ...
+````
+
+2. Copy the contents of `deploy_key.pub` to the clipboard:
+````
+$ cat deploy_key.pub
+    ssh-ed25519 AAA..... earlephilhower@yahoo.com
+````
+
+3. Install the deploy key to GH.io.  Go to https://github.com/esp8266/esp8266.github.io and the `Settings->Deploy Keys` and `Add deploy key`.  Paste the (public key) string into the box and select `Allow writes` and hit OK.
+
+4. Convert the `deploy_key` private key to a 1-line base64 representation and copy it to the clipboard.
+````
+$ base64 -w 0 < deploy_key && echo ""
+    yEvYm.....  (**note this must be one single long line, hence the "-w 0"**)
+````
+
+5. Install the private key to the core repo.  Go to https://github.com/esp8266/Arduino and select `Settings->Secrets->Actions` and add or update a `Repository secret` called `GHCI_DEPLOY_KEY`.  Paste the 1-line base64 contents of your clipboard to the box and hit OK.
+
+6. If the release failed in the `Update master JSON file` action, from the GH web interface run the `Actions->Release XXX->Re-run failed jobs` to re-run it and check its output.
