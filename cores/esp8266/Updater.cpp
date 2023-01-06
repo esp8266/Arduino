@@ -248,12 +248,12 @@ bool UpdaterClass::end(bool evenIfRemaining){
     uint32_t sigLen = 0;
 
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] expected sigLen: %lu\n"), expectedSigLen);
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] expected sigLen: %u\n"), expectedSigLen);
 #endif
     if (expectedSigLen > 0) {
       ESP.flashRead(sigLenAddr, &sigLen, SigSize);
 #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen from flash: %lu\n"), sigLen);
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen from flash: %u\n"), sigLen);
 #endif
     }
 
@@ -272,7 +272,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       }
       binSize -= (sigLen + SigSize);
 #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted size (without the signature and sigLen): %lu\n"), binSize);
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted size (without the signature and sigLen): %zu\n"), binSize);
 #endif
     }
 
