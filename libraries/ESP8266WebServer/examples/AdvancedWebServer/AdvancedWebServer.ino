@@ -32,6 +32,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <StreamString.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -47,14 +48,14 @@ const int led = 13;
 
 void handleRoot() {
   digitalWrite(led, 1);
-  char temp[400];
   int sec = millis() / 1000;
   int min = sec / 60;
   int hr = min / 60;
 
-  snprintf(temp, 400,
-
-           "<html>\
+  StreamString temp;
+  temp.reserve(500);  // Preallocate a large chunk to avoid memory fragmentation
+  temp.printf("\
+<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
     <title>ESP8266 Demo</title>\
@@ -68,9 +69,8 @@ void handleRoot() {
     <img src=\"/test.svg\" />\
   </body>\
 </html>",
-
-           hr, min % 60, sec % 60);
-  server.send(200, "text/html", temp);
+              hr, min % 60, sec % 60);
+  server.send(200, "text/html", temp.c_str());
   digitalWrite(led, 0);
 }
 
