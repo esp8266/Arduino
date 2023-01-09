@@ -20,10 +20,8 @@
 
  */
 
-
 #ifndef CORE_ESP8266_FEATURES_H
 #define CORE_ESP8266_FEATURES_H
-
 
 #define CORE_HAS_LIBB64
 #define CORE_HAS_BASE64_CLASS
@@ -130,7 +128,7 @@ void enablePhaseLockedWaveform(void);
 
 // Determine when the sketch runs on ESP8285
 #if !defined(CORE_MOCK)
-bool __attribute__((const, nothrow)) esp_is_8285();
+bool esp_is_8285() __attribute__((const, nothrow));
 #else
 inline bool esp_is_8285()
 {
