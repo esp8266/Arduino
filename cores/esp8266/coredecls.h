@@ -28,10 +28,11 @@ void __disableWiFiAtBootTime (void) __attribute__((noinline));
 void __real_system_restart_local() __attribute__((noreturn));
 
 uint32_t sqrt32(uint32_t n);
-uint32_t crc32(const void* data, size_t length, uint32_t crc);
 
 #ifdef __cplusplus
 }
+
+uint32_t crc32(const void* data, size_t length, uint32_t crc = 0xffffffff);
 
 #include <functional>
 
