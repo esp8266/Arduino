@@ -33,9 +33,10 @@
 #define WIFI_HAS_EVENT_CALLBACK
 #define WIFI_IS_OFF_AT_BOOT
 
-#include <stdlib.h> // malloc()
+#include <stdbool.h> // bool
 #include <stddef.h> // size_t
 #include <stdint.h>
+#include <stdlib.h> // malloc()
 
 #ifndef __STRINGIFY
 #define __STRINGIFY(a) #a

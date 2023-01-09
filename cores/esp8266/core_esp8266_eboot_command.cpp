@@ -29,7 +29,7 @@ extern "C" {
 
 static uint32_t eboot_command_calculate_crc32(const struct eboot_command* cmd)
 {
-    return crc32((const uint8_t*) cmd, offsetof(struct eboot_command, crc32));
+    return crc32((const uint8_t*) cmd, offsetof(struct eboot_command, crc32), 0xffffffff);
 }
 
 int eboot_command_read(struct eboot_command* cmd)
