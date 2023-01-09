@@ -13,7 +13,7 @@
 #if defined(NONOSDK22x_190703) || \
     defined(NONOSDK22x_191122) || \
     defined(NONOSDK22x_191105) || \
-    defined(NONOSDK22x_191124) || \
+    defined(NONOSDK22x_191024) || \
     defined(NONOSDK22x_190313) || \
     defined(NONOSDK221)        || \
     defined(NONOSDK305)
