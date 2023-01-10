@@ -20,6 +20,7 @@
 
 from __future__ import print_function
 import argparse
+import io
 import re
 import os
 import subprocess
@@ -33,36 +34,72 @@ fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 crcsize_offset = 4096 + 16
 crcval_offset =  4096 + 16 + 4
 
+
+class Elf2BinException(Exception):
+    pass
+
+
 def get_elf_entry(elf, path):
-    p = subprocess.Popen([path + "/xtensa-lx106-elf-readelf", '-h', elf], stdout=subprocess.PIPE, universal_newlines=True )
-    lines = p.stdout.readlines()
-    for line in lines:
+    result = subprocess.run(
+        [os.path.join(path, "xtensa-lx106-elf-readelf"), "-h", elf],
+        check=True,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+    )
+
+    lines = io.StringIO(result.stdout)
+    for line in lines.readlines():
         if 'Entry point address' in line:
             words = re.split('\s+', line)
             entry_point = words[-2]
             return int(entry_point, 16)
-    raise Exception('Unable to find entry point in file "' + elf + '"')
+
+    raise Elf2BinException(f'Unable to find entry point in file "{elf}"')
+
 
 def get_segment_size_addr(elf, segment, path):
-    p = subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, universal_newlines=True )
-    lines = p.stdout.readlines()
-    for line in lines:
+    result = subprocess.run(
+        [os.path.join(path, "xtensa-lx106-elf-objdump"), "-h", "-j", segment, elf],
+        check=True,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+    )
+
+    lines = io.StringIO(result.stdout)
+    for line in lines.readlines():
         if segment in line:
             words = re.split('\s+', line)
             size = int(words[3], 16)
             addr = int(words[4], 16)
             return [ size, addr ]
-    raise Exception('Unable to find size and start point in file "' + elf + '" for "' + segment + '"')
+
+    raise Elf2BinException(
+        f'Unable to find size and start point in file "{elf}" for "{segment}"'
+    )
+
 
 def read_segment(elf, segment, path):
     fd, tmpfile = tempfile.mkstemp()
     os.close(fd)
-    subprocess.check_call([path + "/xtensa-lx106-elf-objcopy", '-O', 'binary', '--only-section=' + segment, elf, tmpfile], stdout=subprocess.PIPE)
-    with open(tmpfile, "rb") as f:
-        raw = f.read()
-    os.remove(tmpfile)
+    try:
+        subprocess.check_call(
+            [
+                os.path.join(path, "xtensa-lx106-elf-objcopy"),
+                "-O",
+                "binary",
+                f"--only-section={segment}",
+                elf,
+                tmpfile,
+            ],
+            stdout=subprocess.PIPE,
+        )
+        with open(tmpfile, "rb") as f:
+            raw = f.read()
+    finally:
+        os.remove(tmpfile)
 
     return raw
+
 
 def write_bin(out, args, elf, segments, to_addr):
     entry = int(get_elf_entry( elf, args.path ))
@@ -85,7 +122,7 @@ def write_bin(out, args, elf, segments, to_addr):
         try:
             for data in raw:
                 checksum = checksum ^ ord(data)
-        except Exception:
+        except:
             for data in raw:
                 checksum = checksum ^ data
     total_size += 1
@@ -95,10 +132,13 @@ def write_bin(out, args, elf, segments, to_addr):
     out.write(bytearray([checksum]))
     if to_addr != 0:
         if total_size + 8 > to_addr:
-            raise Exception('Bin image of ' + elf + ' is too big, actual size ' + str(total_size  + 8) + ', target size ' + str(to_addr) + '.')
+            raise Elf2BinException(
+                f'Bin image of "{elf}" is too big! Actual size {str(total_size  + 8)}, target size {str(to_addr)}'
+            )
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1
+
 
 def crc8266(ldata):
     "Return the CRC of ldata using same algorithm as eboot"
@@ -119,6 +159,7 @@ def crc8266(ldata):
                 crc = int(crc ^ 0x04c11db7)
     return crc
 
+
 def store_word(raw, offset, val):
     "Place a 4-byte word in 8266-dependent order in the raw image"
     raw[offset] = val & 255
@@ -126,6 +167,7 @@ def store_word(raw, offset, val):
     raw[offset + 2] = (val >> 16) & 255
     raw[offset + 3] = (val >> 24) & 255
     return raw
+
 
 def add_crc(out):
     with open(out, "rb") as binfile:
@@ -141,15 +183,16 @@ def add_crc(out):
     with open(out, "wb") as binfile:
         binfile.write(raw)
 
+
 def gzip_bin(mode, out):
     import gzip
 
     firmware_path = out
-    gzip_path = firmware_path + '.gz'
-    orig_path = firmware_path + '.orig'
+    gzip_path = f"{firmware_path}.gz"
+    orig_path = f"{firmware_path}.orig"
     if os.path.exists(gzip_path):
         os.remove(gzip_path)
-    print('GZipping firmware ' + firmware_path)
+    print(f'GZipping firmware {firmware_path}')
     with open(firmware_path, 'rb') as firmware_file, \
             gzip.open(gzip_path, 'wb') as dest:
         data = firmware_file.read()
@@ -162,9 +205,10 @@ def gzip_bin(mode, out):
     if mode == "PIO":
         if os.path.exists(orig_path):
             os.remove(orig_path)
-        print('Moving original firmware to ' + orig_path)
+        print(f'Moving original firmware to {orig_path}')
         os.rename(firmware_path, orig_path)
         os.rename(gzip_path, firmware_path)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
@@ -179,8 +223,7 @@ def main():
 
     args = parser.parse_args()
 
-    print('Creating BIN file "{out}" using "{eboot}" and "{app}"'.format(
-        out=args.out, eboot=args.eboot, app=args.app))
+    print(f'Creating BIN file "{args.out}" using "{args.eboot}" and "{args.app}"')
 
     with open(args.out, "wb") as out:
         def wrapper(**kwargs):
