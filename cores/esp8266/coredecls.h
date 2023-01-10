@@ -1,6 +1,5 @@
 
-#ifndef __COREDECLS_H
-#define __COREDECLS_H
+#pragma once
 
 #include "core_esp8266_features.h"
 
@@ -76,6 +75,16 @@ inline void esp_delay(const uint32_t timeout_ms, T&& blocked) {
     esp_delay(timeout_ms, std::forward<T>(blocked), timeout_ms);
 }
 
-#endif // __cplusplus
+template <typename T>
+auto compute_gcd (T a, T b)
+{
+    while (b)
+    {
+        auto t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
 
-#endif // __COREDECLS_H
+#endif // __cplusplus

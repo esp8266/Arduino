@@ -34,7 +34,17 @@ static uint32_t micros_overflow_count = 0;
 #define REPEAT 1
 
 void __delay(unsigned long ms) {
-    esp_delay(ms);
+
+    // default "userland" delay() will call recurrent scheduled functions
+    // based on best effort according to their respective requirements
+
+    if (recurrent_max_grain_mS == 0)
+        update_recurrent_grain();
+    const auto start_ms = millis();
+    do
+    {
+        run_scheduled_recurrent_functions();
+    } while (!esp_try_delay(start_ms, ms, recurrent_max_grain_mS));
 }
 
 void delay(unsigned long ms) __attribute__ ((weak, alias("__delay"))); 
