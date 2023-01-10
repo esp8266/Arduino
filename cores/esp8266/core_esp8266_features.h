@@ -31,7 +31,7 @@
 #define WIFI_HAS_EVENT_CALLBACK
 #define WIFI_IS_OFF_AT_BOOT
 
-//#include <stdbool.h> // bool
+#include <stdbool.h> // bool
 #include <stddef.h> // size_t
 #include <stdint.h>
 #include <stdlib.h> // malloc()
