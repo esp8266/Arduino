@@ -36,3 +36,9 @@ cat << EOF > features.c
 EOF
 
 $gcc -c features.c
+
+cat << EOF > sdk.c
+#include <version.h>
+EOF
+
+$gcc -c sdk.c
