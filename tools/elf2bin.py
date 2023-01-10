@@ -43,6 +43,7 @@ def get_elf_entry(elf, path):
     result = subprocess.run(
         [os.path.join(path, "xtensa-lx106-elf-readelf"), "-h", elf],
         check=True,
+        timeout=15,
         stdout=subprocess.PIPE,
         universal_newlines=True,
     )
@@ -61,6 +62,7 @@ def get_segment_size_addr(elf, segment, path):
     result = subprocess.run(
         [os.path.join(path, "xtensa-lx106-elf-objdump"), "-h", "-j", segment, elf],
         check=True,
+        timeout=15,
         stdout=subprocess.PIPE,
         universal_newlines=True,
     )
