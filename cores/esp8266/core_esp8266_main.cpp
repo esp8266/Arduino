@@ -162,11 +162,22 @@ extern "C" void __esp_delay(unsigned long ms) {
 
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
-bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms) {
+bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, uint32_t intvl_ms) {
     uint32_t expired = millis() - start_ms;
     if (expired >= timeout_ms) {
         return true;
     }
+
+    if (intvl_ms == 0)
+    {
+        // run_recurrent_scheduled_functions() is called from esp_delay()->esp_suspend()
+        // intvl_ms is set according to recurrent schedule functions
+        // intervals based on their respective requirements
+        if (recurrent_max_grain_mS == 0)
+            update_recurrent_grain();
+        intvl_ms = recurrent_max_grain_mS;
+    }
+
     esp_delay(std::min((timeout_ms - expired), intvl_ms));
     return false;
 }

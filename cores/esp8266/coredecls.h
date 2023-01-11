@@ -54,7 +54,8 @@ inline void esp_suspend(T&& blocked) {
 // Otherwise returns false after delaying for the relative
 // remainder of timeout_ms, or an absolute intvl_ms, whichever is shorter.
 // The delay may be asynchronously cancelled, before that timeout is reached.
-bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
+// intvl_ms==0 will adapt to recurrent scheduled functions and run them accordingly
+bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, uint32_t intvl_ms);
 
 // This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
 // Whenever it is resumed, as well as every intvl_ms millisconds, it performs
@@ -72,7 +73,7 @@ inline void esp_delay(const uint32_t timeout_ms, T&& blocked, const uint32_t int
 // it keeps delaying for the remainder of the original timeout_ms period.
 template <typename T>
 inline void esp_delay(const uint32_t timeout_ms, T&& blocked) {
-    esp_delay(timeout_ms, std::forward<T>(blocked), timeout_ms);
+    esp_delay(timeout_ms, std::forward<T>(blocked), 0);
 }
 
 template <typename T>

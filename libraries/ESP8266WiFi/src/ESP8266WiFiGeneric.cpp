@@ -646,7 +646,7 @@ static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t ti
         esp_delay(timeout_ms,
             [&]() {
                 return !pending->done;
-            }, 10);
+            });
 
         if (pending->done) {
             if ((pending->addr).isSet()) {
