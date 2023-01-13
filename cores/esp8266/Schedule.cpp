@@ -155,6 +155,15 @@ void update_recurrent_grain ()
             // no recurrent function, set grain to max
             recurrent_max_grain_mS = std::numeric_limits<decltype(recurrent_max_grain_mS)>::max();
     }
+
+#if 1
+    static uint32_t last_grain = 0;
+    if (recurrent_max_grain_mS != last_grain)
+    {
+        ::printf("grain4rsf: %u -> %u\n", last_grain, recurrent_max_grain_mS);
+        last_grain = recurrent_max_grain_mS;
+    }
+#endif
 }
 
 void run_scheduled_functions()
