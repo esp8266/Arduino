@@ -1,6 +1,5 @@
 
-#ifndef __COREDECLS_H
-#define __COREDECLS_H
+#pragma once
 
 #include "core_esp8266_features.h"
 
@@ -55,14 +54,15 @@ inline void esp_suspend(T&& blocked) {
 // Try to delay until timeout_ms has expired since start_ms.
 // Returns true if timeout_ms has completely expired on entry.
 // Otherwise returns false after delaying for the relative
-// remainder of timeout_ms, or an absolute intvl_ms, whichever is shorter.
+// remainder of timeout_ms, or an absolute intvl_ms, whichever is shorter
+// and possibly amended by recurrent scheduled functions timing grain.
 // The delay may be asynchronously cancelled, before that timeout is reached.
 bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
 
 // This overload of esp_delay() delays for a duration of at most timeout_ms milliseconds.
-// Whenever it is resumed, as well as every intvl_ms millisconds, it performs
-// the blocked callback, and if that returns true, it keeps delaying for the remainder
-// of the original timeout_ms period.
+// Whenever it is resumed, as well as at most every intvl_ms millisconds and depending on
+// recurrent scheduled functions, it performs the blocked callback, and if that returns true,
+// it keeps delaying for the remainder of the original timeout_ms period.
 template <typename T>
 inline void esp_delay(const uint32_t timeout_ms, T&& blocked, const uint32_t intvl_ms) {
     const auto start_ms = millis();
@@ -79,5 +79,3 @@ inline void esp_delay(const uint32_t timeout_ms, T&& blocked) {
 }
 
 #endif // __cplusplus
-
-#endif // __COREDECLS_H
