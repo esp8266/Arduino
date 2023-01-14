@@ -39,12 +39,10 @@
 // scheduled function happen more often: every yield() (vs every loop()),
 // and time resolution is microsecond (vs millisecond). Details are below.
 
-// recurrent_max_grain_mS is used by delay() to let a chance to all
-// recurrent functions to accomplish their duty per their timing
-// requirement.
-// When it is 0, update_recurrent_grain() can be called to recalculate it.
-extern uint32_t recurrent_max_grain_mS;
-void update_recurrent_grain ();
+// compute_recurrent_grain() is used by delay() to give a chance to all
+// recurrent functions to run per their timing requirement.
+
+uint32_t compute_recurrent_grain ();
 
 // scheduled functions called once:
 //

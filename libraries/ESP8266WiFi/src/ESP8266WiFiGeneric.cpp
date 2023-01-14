@@ -451,8 +451,7 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
     //tasks to wait correctly.
     constexpr unsigned int timeoutValue = 1000; //1 second
     if(can_yield()) {
-        // The final argument, intvl_ms, to esp_delay determines at least
-        // how frequently wifi_get_opmode() is checked
+        // check opmode every 100ms or give up after timeout
         esp_delay(timeoutValue, [m]() { return wifi_get_opmode() != m; }, 100);
 
         //if at this point mode still hasn't been reached, give up
@@ -642,7 +641,7 @@ static int hostByNameImpl(const char* aHostname, IPAddress& aResult, uint32_t ti
     // We need to wait for c/b to fire *or* we exit on our own timeout
     // (which also requires us to notify the c/b that it is supposed to delete the pending obj)
     case ERR_INPROGRESS:
-        // esp_delay will be interrupted by found callback
+        // sleep until dns_found_callback is called or timeout is reached
         esp_delay(timeout_ms, [&]() { return !pending->done; });
 
         if (pending->done) {

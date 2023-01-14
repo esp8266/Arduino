@@ -78,18 +78,4 @@ inline void esp_delay(const uint32_t timeout_ms, T&& blocked) {
     esp_delay(timeout_ms, std::forward<T>(blocked), timeout_ms);
 }
 
-// Greatest Common Divisor Euclidian algorithm
-// one entry may be 0, the other is returned
-template <typename T>
-auto compute_gcd (T a, T b)
-{
-    while (b)
-    {
-        auto t = b;
-        b = a % b;
-        a = t;
-    }
-    return a;
-}
-
 #endif // __cplusplus
