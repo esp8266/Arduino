@@ -90,7 +90,7 @@ static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
         [&status]() {
             status = WiFi.status();
             return status != WL_CONNECTED && status != WL_CONNECT_FAILED;
-        }, 0);
+        }, 100);
 
     // Check status
     if (status == WL_CONNECTED) {
@@ -242,7 +242,7 @@ int8_t ESP8266WiFiMulti::startScan()
         [&scanResult]() {
             scanResult = WiFi.scanComplete();
             return scanResult < 0;
-        }, 0);
+        }, 100);
     // Check for scan timeout which may occur when scan does not report completion
     if (scanResult < 0) {
         DEBUG_WIFI_MULTI("[WIFIM] Scan timeout\n");

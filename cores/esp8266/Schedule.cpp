@@ -151,19 +151,16 @@ void update_recurrent_grain ()
                 // round to the upper millis
                 recurrent_max_grain_mS = recurrent_max_grain_uS <= 1000? 1: (recurrent_max_grain_uS + 999) / 1000;
         }
-        if (recurrent_max_grain_mS == 0)
-            // no recurrent function, set grain to max
-            recurrent_max_grain_mS = std::numeric_limits<decltype(recurrent_max_grain_mS)>::max();
-    }
 
-#if 1
-    static uint32_t last_grain = 0;
-    if (recurrent_max_grain_mS != last_grain)
-    {
-        ::printf("grain4rsf: %u -> %u\n", last_grain, recurrent_max_grain_mS);
-        last_grain = recurrent_max_grain_mS;
-    }
+#ifdef DEBUG_ESP_CORE
+        static uint32_t last_grain = 0;
+        if (recurrent_max_grain_mS != last_grain)
+        {
+            ::printf(":rsf %u->%u\n", last_grain, recurrent_max_grain_mS);
+            last_grain = recurrent_max_grain_mS;
+        }
 #endif
+    }
 }
 
 void run_scheduled_functions()
