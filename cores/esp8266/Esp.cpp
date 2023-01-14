@@ -471,7 +471,7 @@ bool EspClass::checkFlashCRC() {
     uint32_t firstPart = (uintptr_t)&__crc_len - 0x40200000; // How many bytes to check before the 1st CRC val
 
     // Start the checksum
-    uint32_t crc = crc32((const void*)0x40200000, firstPart, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, firstPart);
     // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
