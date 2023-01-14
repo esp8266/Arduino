@@ -138,7 +138,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     return true;
 }
 
-uint32_t compute_recurrent_grain ()
+uint32_t compute_scheduled_recurrent_grain ()
 {
     if (recurrent_max_grain_mS == 0)
     {

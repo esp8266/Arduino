@@ -172,7 +172,7 @@ bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
     }
 
     // compute greatest chunked delay with respect to scheduled recurrent functions
-    uint32_t grain_ms = std::gcd(intvl_ms, compute_recurrent_grain());
+    uint32_t grain_ms = std::gcd(intvl_ms, compute_scheduled_recurrent_grain());
 
     // recurrent scheduled functions will be called from esp_delay()->esp_suspend()
     esp_delay(grain_ms > 0 ?
