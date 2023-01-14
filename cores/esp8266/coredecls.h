@@ -53,7 +53,7 @@ inline void esp_suspend(T&& blocked) {
 // Returns true if timeout_ms has completely expired on entry.
 // Otherwise returns false after delaying for the relative
 // remainder of timeout_ms, or an absolute intvl_ms, whichever is shorter
-// and possibly amended by recurrent scheduled fuctions timing grain.
+// and possibly amended by recurrent scheduled functions timing grain.
 // The delay may be asynchronously cancelled, before that timeout is reached.
 bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms);
 

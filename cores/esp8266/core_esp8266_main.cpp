@@ -168,7 +168,7 @@ bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
         return true; // expired
     }
 
-    // possibly recompute recurrent scheduled function common timing grain
+    // possibly recompute recurrent scheduled functions common timing grain
     update_recurrent_grain();
 
     // update intvl_ms according to this grain

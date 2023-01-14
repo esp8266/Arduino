@@ -84,8 +84,8 @@ static void printWiFiStatus(wl_status_t status)
 static wl_status_t waitWiFiConnect(uint32_t connectTimeoutMs)
 {
     wl_status_t status = WL_CONNECT_FAILED;
-    // The final argument, intvl_ms, to esp_delay influences how frequently
-    // the scheduled recurrent functions (Schedule.h) are probed.
+    // The final argument, intvl_ms, to esp_delay determines
+    // the max ms interval at which status is checked
     esp_delay(connectTimeoutMs,
         [&status]() {
             status = WiFi.status();
@@ -236,8 +236,8 @@ int8_t ESP8266WiFiMulti::startScan()
     WiFi.scanNetworks(true);
 
     // Wait for WiFi scan change or timeout
-    // The final argument, intvl_ms, to esp_delay influences how frequently
-    // the scheduled recurrent functions (Schedule.h) are probed.
+    // The final argument, intvl_ms, to esp_delay determines
+    // the max ms interval at which status is checked
     esp_delay(WIFI_SCAN_TIMEOUT_MS,
         [&scanResult]() {
             scanResult = WiFi.scanComplete();

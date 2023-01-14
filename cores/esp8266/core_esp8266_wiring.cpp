@@ -34,8 +34,8 @@ static uint32_t micros_overflow_count = 0;
 #define REPEAT 1
 
 void __delay(unsigned long ms) {
-    // use API letting recurrent scheduled functions run in background
-    // but stay blocked in delay until ms is expired
+    // Use API letting recurrent scheduled functions run in background
+    // but stay blocked in delay until ms is expired.
     esp_delay(ms, [](){ return true; });
 }
 

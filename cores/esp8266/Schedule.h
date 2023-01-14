@@ -42,7 +42,7 @@
 // recurrent_max_grain_mS is used by delay() to let a chance to all
 // recurrent functions to accomplish their duty per their timing
 // requirement.
-// When it is 0, update_recurrent_grain() can be called to recalculate it
+// When it is 0, update_recurrent_grain() can be called to recalculate it.
 extern uint32_t recurrent_max_grain_mS;
 void update_recurrent_grain ();
 
