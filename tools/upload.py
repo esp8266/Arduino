@@ -65,7 +65,7 @@ if erase_addr:
 
 try:
     esptool.main(cmdline)
-except esptool.FatalError as e:
+except Exception as e:
     sys.stderr.write('\nA fatal esptool.py error occurred: %s' % e)
 finally:
     if erase_file:
