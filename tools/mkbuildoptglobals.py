@@ -447,7 +447,6 @@ def find_preferences_txt(runtime_ide_path):
         # verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
             return [fqfn, None]
-
         # It is never simple. Arduino from the Windows APP store or the download
         # Windows 8 and up option will save "preferences.txt" in one location.
         # The downloaded Windows 7 (and up version) will put "preferences.txt"
@@ -462,7 +461,9 @@ def find_preferences_txt(runtime_ide_path):
                 print_err("Multiple 'preferences.txt' files found:")
                 print_err("  " + fqfn)
                 print_err("  " + fqfn2)
-            return [fqfn, None]
+                return [fqfn, fqfn2]
+            else:
+                return [fqfn, None]
         elif os.path.exists(fqfn2):
             return [fqfn2, None]
     elif "Darwin" == platform_name:
