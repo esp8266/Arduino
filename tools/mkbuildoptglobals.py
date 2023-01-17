@@ -510,15 +510,17 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
         # This should never fail.
         file_fqfn = find_preferences_txt(runtime_ide_path)
         if file_fqfn[0] != None:
-            print_msg(f"Using preferences from '{file_fqfn[0]}'")
             val0 = get_preferences_txt(file_fqfn[0], key)
             val1 = val0
             if file_fqfn[1] != None:
                 val1 = get_preferences_txt(file_fqfn[1], key)
             if val0 == val1:    # We can safely ignore that there were two preferences.txt files
+                print_msg(f"Using preferences from '{file_fqfn[0]}'")
                 return val0
             else:
                 print_err(f"Found too many preferences.txt files with different values for '{key}'")
+                print_err(f"  '{file_fqfn[0]}'")
+                print_err(f"  '{file_fqfn[1]}'")
                 raise UserWarning
         else:
             # Something is wrong with the installation or our understanding of the installation.
@@ -595,13 +597,13 @@ def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
         caching_enabled = check_preferences_txt(ide_path, preferences_fqfn)
     except UserWarning:
         if os.path.exists(source_globals_h_fqfn):
-            caching_enabled = None
             print_err(f"  runtime_ide_version: {args.runtime_ide_version}")
-            print_err(f"  This must be resolved to use '{globals_name}'")
+            print_err(f"  When using '{globals_name}', resolve these issues for better build performance.")
+            print_err(f"  Using safe-mode")
             print_err(f"  Read more at {docs_url}")
-        else:
-            # We can quietly ignore the problem because we are not needed.
-            caching_enabled = True
+            # fall-through fail case - assume the worst case - safe-mode
+        # else case - We can quietly ignore the problem because we are not needed
+        caching_enabled = True
 
     return caching_enabled
 
@@ -742,7 +744,7 @@ def main():
 
     use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
     if use_aggressive_caching_workaround == None:
-        # Specific rrror messages already buffered
+        # Specific error messages already buffered
         handle_error(1)
 
     print_dbg(f"first_time:             {first_time}")
