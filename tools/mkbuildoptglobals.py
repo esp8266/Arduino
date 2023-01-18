@@ -529,16 +529,19 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
 
 def touch(fname, times=None):
     with open(fname, "ab") as file:
-        os.utime(file.fileno(), times)
+        file.close();
+    os.utime(fname, times)
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
     global debug_enabled
     # touch both files with the same timestamp
     touch(globals_h_fqfn)
     with open(globals_h_fqfn, "rb") as file:
-        ts = os.stat(file.fileno())
-        with open(commonhfile_fqfn, "ab") as file2:
-            os.utime(file2.fileno(), ns=(ts.st_atime_ns, ts.st_mtime_ns))
+        file.close()
+    with open(commonhfile_fqfn, "ab") as file2:
+        file2.close()
+    ts = os.stat(globals_h_fqfn)
+    os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
     if debug_enabled:
         print_dbg("After synchronous_touch")
