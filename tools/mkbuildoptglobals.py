@@ -451,19 +451,19 @@ def find_preferences_txt(runtime_ide_path):
         # Windows 8 and up option will save "preferences.txt" in one location.
         # The downloaded Windows 7 (and up version) will put "preferences.txt"
         # in a different location. When both are present due to various possible
-        # scenarios, use the more modern.
+        # scenarios, give preference to the APP store.
         fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt")
         # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19 from APP store
-        fqfn2 = os.path.expanduser("~\AppData\local\Arduino15\preferences.txt")
+        fqfn2 = os.path.normpath(os.getenv("LOCALAPPDATA") + "\Arduino15\preferences.txt")
         # Path for Windows 7 and up - verified on Windows 10 with Arduino IDE 1.8.19
         if os.path.exists(fqfn):
             if os.path.exists(fqfn2):
                 print_err("Multiple 'preferences.txt' files found:")
                 print_err("  " + fqfn)
                 print_err("  " + fqfn2)
-                return [fqfn, None]
-            else:
                 return [fqfn, fqfn2]
+            else:
+                return [fqfn, None]
         elif os.path.exists(fqfn2):
             return [fqfn2, None]
     elif "Darwin" == platform_name:
@@ -529,16 +529,19 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
 
 def touch(fname, times=None):
     with open(fname, "ab") as file:
-        os.utime(file.fileno(), times)
+        file.close();
+    os.utime(fname, times)
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
     global debug_enabled
     # touch both files with the same timestamp
     touch(globals_h_fqfn)
     with open(globals_h_fqfn, "rb") as file:
-        ts = os.stat(file.fileno())
-        with open(commonhfile_fqfn, "ab") as file2:
-            os.utime(file2.fileno(), ns=(ts.st_atime_ns, ts.st_mtime_ns))
+        file.close()
+    with open(commonhfile_fqfn, "ab") as file2:
+        file2.close()
+    ts = os.stat(globals_h_fqfn)
+    os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
     if debug_enabled:
         print_dbg("After synchronous_touch")
