@@ -47,7 +47,19 @@ struct ip_addr: ipv4_addr { };
 
 class IPAddress: public Printable {
     private:
+
         ip_addr_t _ip;
+
+        // Access the raw byte array containing the address.  Because this returns a pointer
+        // to the internal structure rather than a copy of the address this function should only
+        // be used when you know that the usage of the returned uint8_t* will be transient and not
+        // stored.
+        uint8_t* raw_address() {
+            return reinterpret_cast<uint8_t*>(&v4());
+        }
+        const uint8_t* raw_address() const {
+            return reinterpret_cast<const uint8_t*>(&v4());
+        }
 
     public:
         IPAddress();
