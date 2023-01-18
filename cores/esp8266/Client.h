@@ -38,7 +38,13 @@ class Client: public Stream {
         virtual void stop() = 0;
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
-
+    protected:
+        uint8_t* rawIPAddress(IPAddress& addr) {
+            return addr.raw_address();
+        }
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
+            return addr.raw_address();
+        }
 };
 
 #endif

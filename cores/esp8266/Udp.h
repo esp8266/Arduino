@@ -82,7 +82,15 @@ class UDP: public Stream {
         virtual IPAddress remoteIP() =0;
         // Return the port of the host who sent the current incoming packet
         virtual uint16_t remotePort() =0;
+    protected:
 
+        uint8_t* rawIPAddress(IPAddress& addr) {
+            return addr.raw_address();
+        }
+
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
+            return addr.raw_address();
+        }
 };
 
 #endif
