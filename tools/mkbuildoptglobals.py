@@ -415,6 +415,7 @@ def discover_1st_time_run(build_path):
         count += 1
     return 0 == count
 
+
 def get_preferences_txt(file_fqfn, key):
     # Get Key Value, key is allowed to be missing.
     # We assume file file_fqfn exists
