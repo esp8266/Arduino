@@ -73,7 +73,7 @@ Here is a rough overview of the effective release process. See the section below
 
     * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
 
-    * Prepare release notes in Markdown format.
+    * Prepare release notes in Markdown format. Either use the `git log --oneline` output and sort through it manually, or use Github draft release and press 'Generate release notes' (see https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes)
 
     * For changes that are breaking, duplicate those changes and put the duplicate lines into a separate group called Breaking Changes. That group should go at the top of the Changelog. The original lines for the breaking changes should be marked by appending "(Breaking change)" to the line. Example:
 
@@ -99,11 +99,11 @@ Here is a rough overview of the effective release process. See the section below
       - Documentation
       - Boards
 
-   * Not all commit descriptions which come from `git log` will explain changes well. Reword items as necessary, with the goal that a general user of this project should be able to understand what the change is related to. Preserve references to PRs or issues (`#XXXX`).
+   * Not all commit descriptions which come from `git log` or PR titles will explain changes well. Reword items as necessary, with the goal that a general user of this project should be able to understand what the change is related to. Preserve references to PRs or issues (`#XXXX`).
 
    * Aggregate minor fixes (e.g. typos, small documentation changes) in a few items. Focus on preparing a good overview of the release for the users, rather than mentioning every change.
 
-   * When done, put release notes into a private [Gist](https://gist.github.com) or [firepad](https://demo.firepad.io) and send the link to other maintainers for review.
+   * When done, put release notes into a private [Gist](https://gist.github.com) or [HedgeDoc note](https://hedgedoc.org/) and send the link to other maintainers for review.
 
 The following points assume work in a direct clone of the repository, and not in a personal fork.
 
@@ -141,13 +141,13 @@ The following points assume work in a direct clone of the repository, and not in
 
 8. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases.
 
-9. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+9. Check that the boards manager package .zip file has been successfully uploaded as a release asset.
 
 10. Check that the package index downloaded from https://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
 11. Navigate to release list in Github here https://github.com/esp8266/Arduino/releases, press "Edit" button to edit release description, paste release notes, and publish it.
 
-12. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version (the milestone should be empty per point 2 above)
+12. Close the milestone associated with the released version (the milestone should be empty per point 1 above)
 
 13. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
 
@@ -186,13 +186,13 @@ The following points assume work in a direct clone of the repository, and not in
 
 - [ ] 8. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases.
 
-- [ ] 9. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+- [ ] 9. Check that the boards manager package .zip file has been successfully uploaded as a release asset.
 
 - [ ] 10. Check that the package index downloaded from https://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
 - [ ] 11. Navigate to [release list in Github](https://github.com/esp8266/Arduino/releases), press "Edit" button to edit release description, paste release notes, and publish it.
 
-- [ ] 12. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version (the milestone should be empty per point 1 above)
+- [ ] 12. Close the milestone associated with the released version (the milestone should be empty per point 1 above)
 
 - [ ] 13. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
 
@@ -202,3 +202,35 @@ The following points assume work in a direct clone of the repository, and not in
     * In main README.md go to "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
 --------------COPY ABOVE THIS LINE--------------
 ```
+
+## Updating a SSH deploy key
+
+A SSH private/public key pair is required to update the master JSON (the final step of the release process).  Sometimes GitHub will expire one side or the other of that key, and a new one will need to be regenerated and installed in the https://github.com/esp8266/esp8266.github.io (JSON) and https://github.com/esp8266/Arduino (core) repos.
+
+1. Generate a new public/private SSH key pair with an empty passphrase:
+```console
+$ ssh-keygen -f deploy_key -t ed25519 -N '' -C earlephilhower@yahoo.com  (**replace with your GH user account email**)
+Generating public/private ed25519 key pair.
+Your identification has been saved in deploy_key
+Your public key has been saved in deploy_key.pub
+The key fingerprint is:
+...
+```
+
+2. Copy the contents of `deploy_key.pub` to the clipboard:
+```console
+$ cat deploy_key.pub
+ssh-ed25519 AAA..... earlephilhower@yahoo.com
+```
+
+3. Install the deploy key for esp8266.github.io repository.  Go to https://github.com/esp8266/esp8266.github.io and the `Settings->Deploy Keys` and `Add deploy key`.  Paste the (public key) string into the box and select `Allow writes` and hit OK.
+
+4. Convert the `deploy_key` private key to a 1-line base64 representation and copy it to the clipboard.
+```console
+$ base64 -w 0 < deploy_key && echo ""
+yEvYm.....  (**note this must be one single long line, hence the "-w 0"**)
+```
+
+5. Install the private key to the Core repo.  Go to https://github.com/esp8266/Arduino and select `Settings->Secrets->Actions` and add or update a `Repository secret` called `GHCI_DEPLOY_KEY`.  Paste the 1-line base64 contents of your clipboard to the box and hit OK.
+
+6. If the release failed in the `Update master JSON file` action, from the GitHub web interface run the `Actions->Release XXX->Re-run failed jobs` to re-run it and check its output.

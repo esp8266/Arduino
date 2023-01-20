@@ -49,6 +49,7 @@ This API frees up resources used by the connection. Consider using it instead of
 *Example:*
 
 .. code:: cpp
+
    # define MIN_HEAP_FREE 20000 // or whatever min available heap memory convienent for your application 
    auto client = server.accept();
    // ... do something with the client object ...

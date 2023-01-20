@@ -13,28 +13,16 @@
 #if defined(NONOSDK22x_190703) || \
     defined(NONOSDK22x_191122) || \
     defined(NONOSDK22x_191105) || \
-    defined(NONOSDK22x_191124) || \
+    defined(NONOSDK22x_191024) || \
     defined(NONOSDK22x_190313) || \
     defined(NONOSDK221)        || \
-    defined(NONOSDK3V0)        || \
-    defined(NONOSDK300)        || \
-    defined(NONOSDK301)        || \
-    defined(NONOSDK302)        || \
-    defined(NONOSDK303)        || \
-    defined(NONOSDK304)        || \
     defined(NONOSDK305)
 
 // eap_peer_config_deinit() - For this list of SDKs there are no significant
 // changes in the function. Just the line number reference for when vPortFree
 // is called. When vPortFree is called, register a12 continues to hold a pointer
 // to the struct StateMachine. Our cleanup routine should continue to work.
-#if defined(NONOSDK300) || defined(NONOSDK301)
-    // Minor changes only line number changed
-    #define SDK_LEAK_LINE 809
-#elif defined(NONOSDK302) || defined(NONOSDK303) || defined(NONOSDK304)
-    // Minor changes only line number changed
-    #define SDK_LEAK_LINE 831
-#elif defined(NONOSDK305)
+#if defined(NONOSDK305)
     // At v3.0.5 Espressif moved `.text.eap_peer_config_deinit` to
     // `eap_peer_config_deinit` then later in latest git they moved it
     // back. For our linker script both are placed in flash.

@@ -62,11 +62,11 @@ extern "C" {
 
 #define EXCCAUSE_LOAD_STORE_ERROR 3 /* Non 32-bit read/write error */
 
-#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000 - 1))
+#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000))
 static fn_c_exception_handler_t old_c_handler = NULL;
 #endif
 
-#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
+#if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000)))
 static
 IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, [[maybe_unused]] int cause)
 {
@@ -145,7 +145,7 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, [[maybe
   } while(false);
 
 /* Fail request, die */
-#if (NONOSDK < (0x30000 - 1))
+#if (NONOSDK < (0x30000))
   /*
     The old handler points to the SDK. Be alert for HWDT when Calling with
     INTLEVEL != 0. I cannot create it any more. I thought I saw this as a
@@ -170,9 +170,9 @@ IRAM_ATTR void non32xfer_exception_handler(struct __exception_frame *ef, [[maybe
   abort();
 #endif
 }
-#endif // #if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000 - 1)))
+#endif // #if defined(NON32XFER_HANDLER) || (defined(MMU_IRAM_HEAP) && (NONOSDK < (0x30000)))
 
-#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000 - 1))
+#if (defined(NON32XFER_HANDLER) || defined(MMU_IRAM_HEAP)) && (NONOSDK < (0x30000))
 /*
   To operate reliably, this module requires the new
   `_xtos_set_exception_handler` from `exc-sethandler.cpp` and

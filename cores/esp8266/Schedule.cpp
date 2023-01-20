@@ -17,6 +17,7 @@
 */
 
 #include <assert.h>
+#include <numeric>
 
 #include "Schedule.h"
 #include "PolledTimeout.h"
@@ -34,6 +35,7 @@ static scheduled_fn_t* sFirst = nullptr;
 static scheduled_fn_t* sLast = nullptr;
 static scheduled_fn_t* sUnused = nullptr;
 static int sCount = 0;
+static uint32_t recurrent_max_grain_mS = 0;
 
 typedef std::function<bool(void)> mRecFuncT;
 struct recurrent_fn_t
@@ -130,7 +132,37 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     }
     rLast = item;
 
+    // grain needs to be recomputed
+    recurrent_max_grain_mS = 0;
+
     return true;
+}
+
+uint32_t compute_scheduled_recurrent_grain ()
+{
+    if (recurrent_max_grain_mS == 0)
+    {
+        if (rFirst)
+        {
+            uint32_t recurrent_max_grain_uS = rFirst->callNow.getTimeout();
+            for (auto it = rFirst->mNext; it; it = it->mNext)
+                recurrent_max_grain_uS = std::gcd(recurrent_max_grain_uS, it->callNow.getTimeout());
+            if (recurrent_max_grain_uS)
+                // round to the upper millis
+                recurrent_max_grain_mS = recurrent_max_grain_uS <= 1000? 1: (recurrent_max_grain_uS + 999) / 1000;
+        }
+
+#ifdef DEBUG_ESP_CORE
+        static uint32_t last_grain = 0;
+        if (recurrent_max_grain_mS != last_grain)
+        {
+            ::printf(":rsf %u->%u\n", last_grain, recurrent_max_grain_mS);
+            last_grain = recurrent_max_grain_mS;
+        }
+#endif
+    }
+
+    return recurrent_max_grain_mS;
 }
 
 void run_scheduled_functions()
@@ -226,6 +258,9 @@ void run_scheduled_recurrent_functions()
             }
 
             delete(to_ditch);
+
+            // grain needs to be recomputed
+            recurrent_max_grain_mS = 0;
         }
         else
         {
