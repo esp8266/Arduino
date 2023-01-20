@@ -117,7 +117,8 @@ void Ticker::_static_callback()
 
     // it is technically allowed to call either schedule or detach
     // *during* callback execution. allow both to happen
-    auto tmp = std::move(_callback);
+    decltype(_callback) tmp;
+    std::swap(tmp, _callback);
 
     std::visit([](auto&& callback) {
         using T = std::decay_t<decltype(callback)>;
@@ -135,7 +136,7 @@ void Ticker::_static_callback()
         return;
     }
 
-    _callback = std::move(tmp);
+    std::swap(tmp, _callback);
 
     if (_repeat) {
         if (_tick) {
