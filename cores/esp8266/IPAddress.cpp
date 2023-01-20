@@ -107,7 +107,7 @@ bool IPAddress::fromString4(const char *address) {
 
 IPAddress& IPAddress::operator=(const uint8_t *address) {
     uint32_t value;
-    std::memcpy(&value, address, sizeof(value));
+    memcpy_P(&value, address, sizeof(value));
 
     *this = value;
     return *this;
@@ -125,7 +125,7 @@ bool IPAddress::operator==(const uint8_t* addr) const {
     }
 
     uint32_t value;
-    std::memcpy(&value, addr, sizeof(value));
+    memcpy_P(&value, addr, sizeof(value));
 
     return v4() == value;
 }
