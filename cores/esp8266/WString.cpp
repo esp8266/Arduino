@@ -820,7 +820,7 @@ void String::replace(const String &find, const String &replace) {
         if (size == len())
             return;
         if (size > capacity() && !changeBuffer(size))
-            return; // XXX: tell user!
+            return;
         int index = len() - 1;
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
             readFrom = wbuffer() + index + find.len();
