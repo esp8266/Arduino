@@ -227,7 +227,11 @@ Other Function Calls
     bool  enableAP (bool enable)
     int  hostByName (const char *aHostname, IPAddress &aResult)
 
-    appeared with SDK pre-V3:
+
+Also, when using NONOS SDK v3:
+
+.. code:: cpp
+
     uint8_t getListenInterval ();
     bool isSleepLevelMax ();
 

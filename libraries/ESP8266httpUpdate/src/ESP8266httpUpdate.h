@@ -120,7 +120,9 @@ public:
     t_httpUpdate_return update(WiFiClient& client, const String& host, uint16_t port, const String& uri = "/",
                                const String& currentVersion = "");
     t_httpUpdate_return updateFS(WiFiClient& client, const String& url, const String& currentVersion = "");
-
+    t_httpUpdate_return update(HTTPClient& httpClient, const String& currentVersion = "");
+    t_httpUpdate_return updateFS(HTTPClient& httpClient, const String& currentVersion = "");
+    
     // Notification callbacks
     void onStart(HTTPUpdateStartCB cbOnStart)          { _cbStart = cbOnStart; }
     void onEnd(HTTPUpdateEndCB cbOnEnd)                { _cbEnd = cbOnEnd; }

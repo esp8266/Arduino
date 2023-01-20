@@ -67,7 +67,7 @@ void loop() {
 
       http.end();
     } else {
-      Serial.printf("[HTTP} Unable to connect\n");
+      Serial.println("[HTTP] Unable to connect");
     }
   }
 
