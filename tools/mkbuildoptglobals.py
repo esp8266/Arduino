@@ -416,68 +416,6 @@ def discover_1st_time_run(build_path):
     return 0 == count
 
 
-def find_preferences_txt(runtime_ide_path):
-    """
-    Check for perferences.txt in well-known locations. Most OSs have two
-    possibilities. When "portable" is present, it takes priority. Otherwise, the
-    remaining path wins. However, Windows has two. Depending on the install
-    source, the APP store or website download, both may appear and create an
-    ambiguous result.
-
-    Return two item list - Two non "None" items indicate an ambiguous state.
-
-    OS Path list for Arduino IDE 1.6.0 and newer
-      from: https://www.arduino.cc/en/hacking/preferences
-    """
-    platform_name = platform.system()
-    if "Linux" == platform_name:
-        # Test for portable 1ST
-        # <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
-        # For more on portable mode see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        fqfn = os.path.normpath(runtime_ide_path + "/portable/preferences.txt")
-        # Linux - verified with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-        fqfn = os.path.expanduser("~/.arduino15/preferences.txt")
-        # Linux - verified with Arduino IDE 1.8.18 and 2.0 RC5 64bit and AppImage
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-    elif "Windows" == platform_name:
-        fqfn = os.path.normpath(runtime_ide_path + "\portable\preferences.txt")
-        # verified on Windows 10 with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-        # It is never simple. Arduino from the Windows APP store or the download
-        # Windows 8 and up option will save "preferences.txt" in one location.
-        # The downloaded Windows 7 (and up version) will put "preferences.txt"
-        # in a different location. When both are present due to various possible
-        # scenarios, give preference to the APP store.
-        fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt")
-        # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19 from APP store
-        fqfn2 = os.path.normpath(os.getenv("LOCALAPPDATA") + "\Arduino15\preferences.txt")
-        # Path for Windows 7 and up - verified on Windows 10 with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            if os.path.exists(fqfn2):
-                print_err("Multiple 'preferences.txt' files found:")
-                print_err("  " + fqfn)
-                print_err("  " + fqfn2)
-                return [fqfn, fqfn2]
-            else:
-                return [fqfn, None]
-        elif os.path.exists(fqfn2):
-            return [fqfn2, None]
-    elif "Darwin" == platform_name:
-        # Portable is not compatable with Mac OS X
-        # see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt")
-        # Mac OS X - unverified
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-
-    print_err("File preferences.txt not found on " + platform_name)
-    return [None, None]
-
-
 def get_preferences_txt(file_fqfn, key):
     # Get Key Value, key is allowed to be missing.
     # We assume file file_fqfn exists
@@ -505,27 +443,12 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
         else:
             print_err(f"Override preferences file '{preferences_file}' not found.")
 
-    elif runtime_ide_path != None:
-        # For a particular install, search the expected locations for platform.txt
-        # This should never fail.
-        file_fqfn = find_preferences_txt(runtime_ide_path)
-        if file_fqfn[0] != None:
-            print_msg(f"Using preferences from '{file_fqfn[0]}'")
-            val0 = get_preferences_txt(file_fqfn[0], key)
-            val1 = val0
-            if file_fqfn[1] != None:
-                val1 = get_preferences_txt(file_fqfn[1], key)
-            if val0 == val1:    # We can safely ignore that there were two preferences.txt files
-                return val0
-            else:
-                print_err(f"Found too many preferences.txt files with different values for '{key}'")
-                raise UserWarning
-        else:
-            # Something is wrong with the installation or our understanding of the installation.
-            print_err("'preferences.txt' file missing from well known locations.")
-
-    return None
-
+    # Referencing the preferences.txt for an indication of shared "core.a"
+    # caching is unreliable. There are too many places reference.txt can be
+    # stored and no hints of which the Arduino build might be using. Unless
+    # directed otherwise, assume "core.a" caching true.
+    print_msg(f"Assume aggressive 'core.a' caching enabled.")
+    return True
 
 def touch(fname, times=None):
     with open(fname, "ab") as file:
@@ -555,12 +478,8 @@ def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
 def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
     global docs_url
     print_dbg(f"runtime_ide_version: {args.runtime_ide_version}")
-    if args.runtime_ide_version < 10802: # CI also has version 10607 --  and args.runtime_ide_version != 10607:
-        # Aggresive core caching - not implemented before version 1.8.2
-        # Note, Arduino IDE 2.0 rc5 has version 1.6.7 and has aggressive caching.
-        print_dbg(f"Old version ({args.runtime_ide_version}) of Arduino IDE no aggressive caching option")
-        return False
-    elif args.cache_core != None:
+
+    if args.cache_core != None:
         print_msg(f"Preferences override, this prebuild script assumes the 'compiler.cache_core' parameter is set to {args.cache_core}")
         print_msg(f"To change, modify 'mkbuildoptglobals.extra_flags=(--cache_core | --no_cache_core)' in 'platform.local.txt'")
         return args.cache_core
@@ -594,19 +513,7 @@ def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
                     preferences_fqfn = os.path.expanduser(preferences_fqfn)
                 print_dbg(f"determine_cache_state: preferences_fqfn: {preferences_fqfn}")
 
-    try:
-        caching_enabled = check_preferences_txt(ide_path, preferences_fqfn)
-    except UserWarning:
-        if os.path.exists(source_globals_h_fqfn):
-            caching_enabled = None
-            print_err(f"  runtime_ide_version: {args.runtime_ide_version}")
-            print_err(f"  This must be resolved to use '{globals_name}'")
-            print_err(f"  Read more at {docs_url}")
-        else:
-            # We can quietly ignore the problem because we are not needed.
-            caching_enabled = True
-
-    return caching_enabled
+    return check_preferences_txt(ide_path, preferences_fqfn)
 
 
 """
@@ -744,9 +651,6 @@ def main():
             print_dbg("First run since Arduino IDE started.")
 
     use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
-    if use_aggressive_caching_workaround == None:
-        # Specific rrror messages already buffered
-        handle_error(1)
 
     print_dbg(f"first_time:             {first_time}")
     print_dbg(f"use_aggressive_caching_workaround: {use_aggressive_caching_workaround}")
