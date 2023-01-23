@@ -165,7 +165,7 @@ public:
     bool next()
     {
         _inbufsize = 0;
-        _inoffset = 0;
+        _inoffset  = 0;
         mockUDPFillInBuf(_sock, _inbuf, _inbufsize, addrsize, addr, _dstport);
         if (_inbufsize > 0)
         {
@@ -284,7 +284,7 @@ private:
 
     char   _inbuf[CCBUFSIZE];
     size_t _inbufsize = 0;
-    size_t _inoffset = 0;
+    size_t _inoffset  = 0;
     char   _outbuf[CCBUFSIZE];
     size_t _outbufsize = 0;
 

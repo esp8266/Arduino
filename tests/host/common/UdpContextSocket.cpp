@@ -166,8 +166,8 @@ size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& a
     return ccinbufsize += ret;
 }
 
-size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int timeout_ms, char* ccinbuf,
-                        size_t& ccinbufsize)
+size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int timeout_ms,
+                        char* ccinbuf, size_t& ccinbufsize)
 {
     (void)sock;
     (void)timeout_ms;

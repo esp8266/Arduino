@@ -238,7 +238,8 @@ namespace MDNSImplementation
                     if (pService->m_ProbeInformation.m_ProbingStatus != ProbingStatus_InProgress)
                     {
                         // reply with service description (check MDNSResponder::_announce() comments)
-                        u8ReplyMaskForQuestion |= (ContentFlag_SRV | ContentFlag_TXT | ContentFlag_PTR_NAME | ContentFlag_PTR_TYPE);
+                        u8ReplyMaskForQuestion |= (ContentFlag_SRV | ContentFlag_TXT
+                                                   | ContentFlag_PTR_NAME | ContentFlag_PTR_TYPE);
                     }
 
                     u8HostOrServiceReplies |= (pService->m_u8ReplyMask |= u8ReplyMaskForQuestion);

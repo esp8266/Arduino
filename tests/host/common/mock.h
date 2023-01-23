@@ -160,8 +160,8 @@ int    mockUDPSocket();
 bool   mockUDPListen(int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
 size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize,
                         uint8_t addr[16], uint16_t& port);
-size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int timeout_ms, char* ccinbuf,
-                        size_t& ccinbufsize);
+size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int timeout_ms,
+                        char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4,
                     uint16_t port);
 
