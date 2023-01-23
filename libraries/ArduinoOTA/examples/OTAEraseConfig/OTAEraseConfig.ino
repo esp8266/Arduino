@@ -1,3 +1,8 @@
+/*
+  This example is a variation on BasicOTA.
+
+  After a successful update if will always erase WiFi Settings and reset.
+*/
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
@@ -11,9 +16,46 @@
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
+struct YourEEPROMData {
+  // list of parameters you need to keep
+  // ...
+
+  uint32_t sdkCrc; //add this one
+};
+
+bool checkSdkCrc() {
+  size_t length = strlen(SDK_VERSION);
+  uint32_t sdkVersionCrc = crc32(SDK_VERSION, length);
+
+  uint32_t savedSdkVersionCrc;
+  EEPROM.begin((sizeof(struct YourEEPROMData) + 3) & ~3);
+  EEPROM.get(offsetof(struct YourEEPROMData, sdkCrc), savedSdkVersionCrc);
+
+  if (sdkVersionCrc == savedSdkVersionCrc) {
+    return EEPROM.end();
+  }
+
+  // Remember new SDK CRC
+  EEPROM.put(offsetof(struct YourEEPROMData, sdkVersionCrc);
+  if (EEPROM.commit() && EEPROM.end()) {
+    // Erase WiFi settings and reset
+    ArduinoOTA.eraseConfigAndReset();
+  }
+
+  return false;
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
+
+  Serial.println("Check for changes in SDK Version:");
+  if (checkSdkCrc()) {
+    Serial.println("  SDK version changed and update to saved details failed.");
+  } else {
+    Serial.println("  SDK version has not changed.");
+  }
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -48,6 +90,16 @@ void setup() {
   });
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");
+    /*
+      By calling "ArduinoOTA.setRebootOnSuccess(true, true);", this example
+      will always erases the "WiFi Settings" as part of an OTA update.
+
+      Modify the calling of "ArduinoOTA.setRebootOnSuccess(true, true);"
+      to meet your requirements.
+    */
+    if (true) {
+      ArduinoOTA.setRebootOnSuccess(true, true); // reboot = true, eraseConfig = true
+    }
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));

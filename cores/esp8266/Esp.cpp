@@ -31,6 +31,7 @@
 #include "umm_malloc/umm_malloc.h"
 #include <pgmspace.h>
 #include "reboot_uart_dwnld.h"
+#include "hardware_reset.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -518,14 +519,19 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
     return &resetInfo;
 }
 
-bool EspClass::eraseConfig(void) {
-    const size_t cfgSize = 0x4000;
+bool EspClass::eraseConfig(bool reset) {
+    const size_t cfgSize = 0x4000;  // Sectors: RF_CAL + SYSTEMPARAM[3]
     size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 
     for (size_t offset = 0; offset < cfgSize; offset += SPI_FLASH_SEC_SIZE) {
         if (!flashEraseSector((cfgAddr + offset) / SPI_FLASH_SEC_SIZE)) {
             return false;
         }
+    }
+
+    if (reset) {
+        // Must be called in WiFi.mode(WIFI_OFF) state.
+        hardware_reset();
     }
 
     return true;

@@ -24,10 +24,11 @@ extern "C" {
 #include <ESP8266mDNS.h>
 #endif
 
-#ifdef DEBUG_ESP_OTA
-#ifdef DEBUG_ESP_PORT
+#if defined(DEBUG_ESP_OTA) && defined(DEBUG_ESP_PORT)
 #define OTA_DEBUG DEBUG_ESP_PORT
-#endif
+#define OTA_DEBUG_PRINTF(fmt, ...) OTA_DEBUG.printf_P(PSTR(fmt),  ##__VA_ARGS__)
+#else
+#define OTA_DEBUG_PRINTF(...)
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
@@ -89,8 +90,9 @@ void ArduinoOTAClass::setPasswordHash(const char * password) {
   }
 }
 
-void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
+void ArduinoOTAClass::setRebootOnSuccess(bool reboot, bool eraseConfig){
   _rebootOnSuccess = reboot;
+  _eraseConfig = eraseConfig;
 }
 
 void ArduinoOTAClass::begin(bool useMDNS) {
@@ -119,7 +121,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-  
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS) {
     MDNS.begin(_hostname.c_str());
@@ -133,9 +135,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
 #endif
   _initialized = true;
   _state = OTA_IDLE;
-#ifdef OTA_DEBUG
-  OTA_DEBUG.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
-#endif
+  OTA_DEBUG_PRINTF("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
 }
 
 int ArduinoOTAClass::parseInt(){
@@ -243,13 +243,11 @@ void ArduinoOTAClass::_runUpdate() {
   IPAddress ota_ip = _ota_ip;
 
   if (!Update.begin(_size, _cmd)) {
-#ifdef OTA_DEBUG
-    OTA_DEBUG.println("Update Begin Error");
-#endif
+    OTA_DEBUG_PRINTF("Update Begin Error\n");
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
-    
+
     StreamString ss;
     Update.printError(ss);
     _udp_ota->append("ERR: ", 5);
@@ -275,9 +273,7 @@ void ArduinoOTAClass::_runUpdate() {
 
   WiFiClient client;
   if (!client.connect(_ota_ip, _ota_port)) {
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Connect Failed\n");
-#endif
+    OTA_DEBUG_PRINTF("Connect Failed\n");
     _udp_ota->listen(IP_ADDR_ANY, _port);
     if (_error_callback) {
       _error_callback(OTA_CONNECT_ERROR);
@@ -293,9 +289,7 @@ void ArduinoOTAClass::_runUpdate() {
     while (!client.available() && waited--)
       delay(1);
     if (!waited){
-#ifdef OTA_DEBUG
-      OTA_DEBUG.printf("Receive Failed\n");
-#endif
+      OTA_DEBUG_PRINTF("Receive Failed\n");
       _udp_ota->listen(IP_ADDR_ANY, _port);
       if (_error_callback) {
         _error_callback(OTA_RECEIVE_ERROR);
@@ -320,18 +314,26 @@ void ArduinoOTAClass::_runUpdate() {
     client.flush();
     delay(1000);
     client.stop();
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Update Success\n");
-#endif
+    OTA_DEBUG_PRINTF("Update Success\n");
     if (_end_callback) {
       _end_callback();
     }
     if(_rebootOnSuccess){
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Rebooting...\n");
-#endif
+      OTA_DEBUG_PRINTF("Rebooting...\n");
       //let serial/network finish tasks that might be given in _end_callback
       delay(100);
+      if (_eraseConfig) {
+        OTA_DEBUG_PRINTF("Erase Config and Hard Reset ...\n");
+        eraseConfigAndReset(); // returns on ESP.eraseConfig failure
+        OTA_DEBUG_PRINTF("ESP.eraseConfig(true) failed!\n");
+        //C What is the best action to take on failure?
+        //C  1) On failure, we could invalidate eboot_command buffer -
+        //C     aborting the flash update.
+        //C  2) Or, just leave it znc restart.
+        if (_error_callback) {
+          _error_callback(OTA_ERASE_SETTINGS_ERROR);
+        }
+      }
       ESP.restart();
     }
   } else {
@@ -357,10 +359,14 @@ void ArduinoOTAClass::end() {
     }
 #endif
     _state = OTA_IDLE;
-    #ifdef OTA_DEBUG
-    OTA_DEBUG.printf("OTA server stopped.\n");
-    #endif    
+    OTA_DEBUG_PRINTF("OTA server stopped.\n");
 }
+
+void ArduinoOTAClass::eraseConfigAndReset() {
+    WiFi.mode(WIFI_OFF);
+    ESP.eraseConfig(true);    // No return testing - Only returns on failure
+}
+
 //this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {
