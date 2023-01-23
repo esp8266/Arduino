@@ -187,23 +187,6 @@ size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int
     return retsize;
 }
 
-/*
-void mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize)
-{
-    // poor man buffer
-    memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
-    ccinbufsize -= copied;
-}
-
-size_t mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf,
-                   size_t& ccinbufsize)
-{
-    size_t copied = mockUDPPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
-    mockUDPSwallow(copied, ccinbuf, ccinbufsize);
-    return copied;
-}
-*/
-
 size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4,
                     uint16_t port)
 {
