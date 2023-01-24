@@ -21,7 +21,7 @@
 #else
 #define CONSOLE Serial
 #endif
-#define DEBUG_PRINTF(fmt, ...) CONSOLE.printf_P(PSTR(fmt),  ##__VA_ARGS__)
+#define DEBUG_PRINTF(fmt, ...) CONSOLE.printf_P(PSTR(fmt), ##__VA_ARGS__)
 #else
 #define DEBUG_PRINTF(...)
 #endif
@@ -55,7 +55,7 @@ bool checkSdkCrc() {
     return true;
   }
 
-  const char *sdkVerStr = ESP.getSdkVersion();
+  const char* sdkVerStr = ESP.getSdkVersion();
   uint32_t sdkVersionCrc = crc32(sdkVerStr, strlen(sdkVerStr));
 
   uint32_t savedSdkVersionCrc;
@@ -75,7 +75,7 @@ bool checkSdkCrc() {
     // Erase WiFi Settings and Reset
     DEBUG_PRINTF("  EEPROM update successful. New SDK CRC saved.\r\n");
     DEBUG_PRINTF("  Erase config and reset: ...\r\n");
-    ArduinoOTA.eraseConfigAndReset(); // Only returns on fail
+    ArduinoOTA.eraseConfigAndReset();  // Only returns on fail
     DEBUG_PRINTF("  ArduinoOTA.eraseConfigAndReset() failed!\r\n");
 
   } else {
