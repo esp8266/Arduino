@@ -46,7 +46,8 @@ class ArduinoOTAClass
     void setPasswordHash(const char *password);
 
     //Sets if the device should be rebooted after successful update. Default true
-    //Sets eraseConfig conditional on RebootOnSuccess. Default false
+    //"eraseConfig" selects to erase WiFi Settings in conjunction with a reboot
+    //after a successful update. Default false - Legacy behavior
     void setRebootOnSuccess(bool reboot, bool eraseConfig = false);
 
     //Sets flag to erase WiFi Settings at reboot/reset.
@@ -70,8 +71,8 @@ class ArduinoOTAClass
     //Ends the ArduinoOTA service
     void end();
 
-    //Has the effect of Arduino IDE Tools "Erase Flash" with "+ WiFi Settings"
-    //selection. Only returns on failure to erase flash.
+    //Has the effect of the "+ WiFi Settings" in the Arduino IDE Tools "Erase
+    //Flash" selection. Only returns on erase flash failure.
     void eraseConfigAndReset();
 
     //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.

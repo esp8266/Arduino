@@ -1,11 +1,11 @@
 /*
   This example is a variation on BasicOTA.
 
-  Some logic has been added to check if the running SDK Version has changed.
-  If so, erase WiFi Settings and reset.
+  Logic added to look for a change in SDK Version. If so, erase the WiFi
+  Settings and Reset the system.
 
-  I have added a lot of debug printing because, with all reboots, it can get
-  confusing when verifying that it works.
+  Added extra debug printing to aid in cutting through the confusion of the
+  multiple reboots.
 */
 
 #include <ESP8266WiFi.h>
@@ -38,18 +38,19 @@ struct YourEEPROMData {
   // list of parameters you need to keep
   // ...
 
-  // To efficiently save and compare SDK version strings, we use their CRC32
-  // value. They always take up the same amount of space, making them easy to
-  // compare and store in EEPROM.
+  // To efficiently save and compare SDK version strings, we use their computed
+  // CRC32 value.
   uint32_t sdkCrc;
 };
 
 bool checkSdkCrc() {
   auto reason = ESP.getResetInfoPtr()->reason;
-  // Boot guard
-  // Only runs at reset to avoid a crash loop trying to erase flash.
-  // With the line below, an OTA update that does a software restart, no SDK
-  // check will occur until after a hard reset. Remove at your discretion.
+  // In this example, the OTA update does a software restart. As coded, SDK
+  // version checks are only performed after a hard reset. Change the lines
+  // below at your discretion.
+  //
+  // Boot loop guard
+  // Limit crash loops erasing flash. Only run at Power On or Hardware Reset.
   if (REASON_DEFAULT_RST != reason && REASON_EXT_SYS_RST != reason) {
     DEBUG_PRINTF("  Boot loop guard - SDK version not checked. To perform check, do a hardware reset.\r\n");
     return true;
@@ -149,7 +150,7 @@ void setup() {
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
     } else if (error == OTA_ERASE_SETTINGS_ERROR) {
-      Serial.println("Failed to erase WiFi Settings");
+      Serial.println("Erase WiFi Settings Failed");
     }
   });
   ArduinoOTA.begin();

@@ -1,7 +1,8 @@
 /*
   This example is a variation on BasicOTA.
 
-  After a successful update if will always erase WiFi Settings and reset.
+  As is, this example will "always" erase WiFi Settings and reset after a
+  successful update. You can make this conditional.
 */
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -55,11 +56,13 @@ void setup() {
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");
     /*
-      By calling "ArduinoOTA.setRebootOnSuccess(true, true);", this example
-      will always erases the "WiFi Settings" as part of an OTA update.
+      By calling "ArduinoOTA.setRebootOnSuccess(true, true);", this example will
+      always erase the "WiFi Settings" as part of an OTA update.
 
-      Modify the calling of "ArduinoOTA.setRebootOnSuccess(true, true);"
-      to meet your requirements.
+      Without the call to "ArduinoOTA.setRebootOnSuccess," the system restarts
+      without touching the WiFi Settings legacy behavior.
+
+      Update the conditional below to meet your requirements.
     */
     if (true) {
       ArduinoOTA.setRebootOnSuccess(true, true);  // reboot = true, eraseConfig = true
@@ -81,7 +84,7 @@ void setup() {
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
     } else if (error == OTA_ERASE_SETTINGS_ERROR) {
-      Serial.println("Failed to erase WiFi Settings");
+      Serial.println("Erase WiFi Settings Failed");
     }
   });
   ArduinoOTA.begin();
