@@ -197,6 +197,15 @@ bool String::reserve(unsigned int size) {
     return false;
 }
 
+#ifdef DEBUG_ESP_PORT
+static void identifyString (const String& badOne)
+{
+    DEBUGV("[String] '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s': ",
+        badOne.c_str(),
+        badOne.length() > OOM_STRING_BORDER_DISPLAY? badOne.c_str() + std::max((int)badOne.length() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
+}
+#endif
+
 bool String::changeBuffer(unsigned int maxStrLen) {
     // Can we use SSO here to avoid allocation?
     if (maxStrLen < sizeof(sso.buff) - 1) {
@@ -218,16 +227,19 @@ bool String::changeBuffer(unsigned int maxStrLen) {
     }
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
-#ifdef DEBUG_ESP_OOM
+#ifdef DEBUG_ESP_PORT
     if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
-        DEBUGV("[String] Reallocating large String(%d -> %d bytes) '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s'\n",
-            len(), maxStrLen, c_str(),
-            len() > OOM_STRING_BORDER_DISPLAY? c_str() + std::max((int)len() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
+        identifyString(*this);
+        DEBUGV("Reallocating large String(%d -> %d bytes)\n", len(), maxStrLen);
     }
 #endif
     // Make sure we can fit newsize in the buffer
     if (newSize > CAPACITY_MAX) {
+#ifdef DEBUG_ESP_PORT
+        identifyString(*this);
+        DEBUGV("Maximum capacity reached (" STR(CAPACITY_MAX) ")\n");
+#endif
         return false;
     }
     uint16_t oldLen = len();
@@ -247,6 +259,10 @@ bool String::changeBuffer(unsigned int maxStrLen) {
         setBuffer(newbuffer);
         return true;
     }
+#ifdef DEBUG_ESP_PORT
+    identifyString(*this);
+    DEBUGV("OOM: %d -> %d bytes\n", isSSO() ? 0: capacity(), newSize);
+#endif
     return false;
 }
 
@@ -804,7 +820,7 @@ void String::replace(const String &find, const String &replace) {
         if (size == len())
             return;
         if (size > capacity() && !changeBuffer(size))
-            return; // XXX: tell user!
+            return;
         int index = len() - 1;
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
             readFrom = wbuffer() + index + find.len();
