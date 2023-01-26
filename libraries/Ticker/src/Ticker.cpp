@@ -115,6 +115,11 @@ void Ticker::_static_callback()
         }
     }
 
+    // it is technically allowed to call either schedule or detach
+    // *during* callback execution. allow both to happen
+    decltype(_callback) tmp;
+    std::swap(tmp, _callback);
+
     std::visit([](auto&& callback) {
         using T = std::decay_t<decltype(callback)>;
         if constexpr (std::is_same_v<T, callback_ptr_t>) {
@@ -122,7 +127,16 @@ void Ticker::_static_callback()
         } else if constexpr (std::is_same_v<T, callback_function_t>) {
             callback();
         }
-    }, _callback);
+    }, tmp);
+
+    // ...and move ourselves back only when object is in a valid state
+    // * ticker was not detached, zeroing timer pointer
+    // * nothing else replaced callback variant
+    if ((_timer == nullptr) || !std::holds_alternative<std::monostate>(_callback)) {
+        return;
+    }
+
+    std::swap(tmp, _callback);
 
     if (_repeat) {
         if (_tick) {
