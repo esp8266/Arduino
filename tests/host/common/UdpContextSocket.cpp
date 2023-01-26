@@ -166,14 +166,14 @@ size_t mockUDPFillInBuf(int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& a
     return ccinbufsize += ret;
 }
 
-size_t mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf,
-                        size_t& ccinbufsize)
+size_t mockUDPPeekBytes(int sock, char* dst, size_t offset, size_t usersize, int timeout_ms,
+                        char* ccinbuf, size_t& ccinbufsize)
 {
     (void)sock;
     (void)timeout_ms;
-    if (usersize > CCBUFSIZE)
+    if (offset + usersize > CCBUFSIZE)
         fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE,
-                usersize - CCBUFSIZE, usersize);
+                offset + usersize - CCBUFSIZE, offset + usersize);
 
     size_t retsize = 0;
     if (ccinbufsize)
@@ -183,23 +183,8 @@ size_t mockUDPPeekBytes(int sock, char* dst, size_t usersize, int timeout_ms, ch
         if (retsize > ccinbufsize)
             retsize = ccinbufsize;
     }
-    memcpy(dst, ccinbuf, retsize);
+    memcpy(dst, ccinbuf + offset, retsize);
     return retsize;
-}
-
-void mockUDPSwallow(size_t copied, char* ccinbuf, size_t& ccinbufsize)
-{
-    // poor man buffer
-    memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
-    ccinbufsize -= copied;
-}
-
-size_t mockUDPRead(int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf,
-                   size_t& ccinbufsize)
-{
-    size_t copied = mockUDPPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
-    mockUDPSwallow(copied, ccinbuf, ccinbufsize);
-    return copied;
 }
 
 size_t mockUDPWrite(int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4,
