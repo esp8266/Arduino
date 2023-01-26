@@ -323,16 +323,17 @@ void ArduinoOTAClass::_runUpdate() {
       //let serial/network finish tasks that might be given in _end_callback
       delay(100);
       if (_eraseConfig) {
-        OTA_DEBUG_PRINTF("Erase Config and Hard Reset ...\n");
-        eraseConfigAndReset(); // returns on ESP.eraseConfig failure
-        OTA_DEBUG_PRINTF("ESP.eraseConfig(true) failed!\n");
+        eraseConfigAndReset();  // returns on failure
         //C What is the best action to take on failure?
         //C  1) On failure, we could invalidate eboot_command buffer -
         //C     aborting the flash update.
-        //C  2) Or, just leave it znc restart.
+        //C  2) Just ignore it and restart.
+        //C  3) Retry forever
         if (_error_callback) {
           _error_callback(OTA_ERASE_SETTINGS_ERROR);
         }
+        _state = OTA_ERASEWIFI;
+        return;
       }
       ESP.restart();
     }
@@ -363,8 +364,15 @@ void ArduinoOTAClass::end() {
 }
 
 void ArduinoOTAClass::eraseConfigAndReset() {
-    WiFi.mode(WIFI_OFF);
+  OTA_DEBUG_PRINTF("Erase Config and Hard Reset ...\n");
+  if (WiFi.mode(WIFI_OFF)) {
     ESP.eraseConfig(true);    // No return testing - Only returns on failure
+    OTA_DEBUG_PRINTF("  ESP.eraseConfig(true) failed!\n");
+  } else {
+    OTA_DEBUG_PRINTF("  WiFi.mode(WIFI_OFF) Timeout!\n");
+  }
+
+  delay(2000);  // force a gap between retries
 }
 
 //this needs to be called in the loop()
@@ -372,6 +380,11 @@ void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {
     _runUpdate();
     _state = OTA_IDLE;
+  }
+
+  if (_state == OTA_ERASEWIFI) {
+    eraseConfigAndReset();
+    return;
   }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)

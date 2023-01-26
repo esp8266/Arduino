@@ -10,7 +10,8 @@ class UdpContext;
 typedef enum {
   OTA_IDLE,
   OTA_WAITAUTH,
-  OTA_RUNUPDATE
+  OTA_RUNUPDATE,
+  OTA_ERASEWIFI
 } ota_state_t;
 
 typedef enum {
