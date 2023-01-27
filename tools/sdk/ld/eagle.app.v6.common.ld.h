@@ -142,6 +142,11 @@ SECTIONS
 
     /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
     *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
+    *(.text._ZNK8delegate6detail12DelegateImplIPvvEclEv) /* delegate::detail::DelegateImpl<void*, void>::operator()() const */
+    *(.text._ZNK8delegate6detail12DelegateImplIPvvEcvbEv) /* delegate::detail::DelegateImpl<void*, void>::operator bool() const */
+
+    /* same thing for circular_queue structure methods used in swserial */
+    *(.text._ZNK14circular_queue*E9availableEv) /* circular_queue<any, any>::available() const */
   } >iram1_0_seg :iram1_0_phdr
 
   .irom0.text : ALIGN(4)
