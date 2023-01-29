@@ -6,6 +6,9 @@
 
 #ifdef DEBUG_ESP_CORE
 #define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ##__VA_ARGS__)
+#define DEBUG_LEAF_FUNCTION(...) __asm__ __volatile__("" ::: "a0", "memory")
+#else
+#define DEBUG_LEAF_FUNCTION(...)
 #endif
 
 #ifndef DEBUGV
