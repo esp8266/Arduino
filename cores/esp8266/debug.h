@@ -4,9 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define _DEBUG_LEAF_FUNCTION(...) __asm__ __volatile__("" ::: "a0", "memory")
+
 #ifdef DEBUG_ESP_CORE
 #define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ##__VA_ARGS__)
-#define DEBUG_LEAF_FUNCTION(...) __asm__ __volatile__("" ::: "a0", "memory")
+#define DEBUG_LEAF_FUNCTION _DEBUG_LEAF_FUNCTION
 #else
 #define DEBUG_LEAF_FUNCTION(...)
 #endif

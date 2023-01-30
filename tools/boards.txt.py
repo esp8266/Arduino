@@ -1355,9 +1355,9 @@ def all_debug ():
             ( '.menu.dbg.Disabled', 'Disabled' ),
             ( '.menu.dbg.Disabled.build.debug_port', '' ),
             ( '.menu.dbg.Serial', 'Serial' ),
-            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
+            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial -fno-optimize-sibling-calls' ),
             ( '.menu.dbg.Serial1', 'Serial1' ),
-            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
+            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1 -fno-optimize-sibling-calls' ),
             ( '.menu.lvl.None____', 'None' ),
             ( '.menu.lvl.None____.build.debug_level', '' ),
         ])

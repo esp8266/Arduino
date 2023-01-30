@@ -279,22 +279,30 @@ dropped. The same procedure applies to crashes caused by exceptions.
     able to correctly decode the stack trace dropped by some other
     application not compiled and loaded from your Arduino IDE.
 
-    To improve the results of the Exception Decoder, you can add
-    `-fno-optimize-sibling-calls` to your build options. For details on how
-    to do this, review `Global Build Options <a06-global-build-options.rst>`__.
-    Turning off this optimization allows more caller addresses to be written
-    to the stack aiding in crash decoding. Because of the limited stack space,
-    there is the potential that removing this optimization could overflow the
-    stack and cause a crash.
+    When you select a ``Debug port:`` on the Arduino IDE Tools menu, it turns off
+    ``optimize-sibling-calls``. Turning off this optimization allows more caller
+    addresses to be written to the stack, improving the results from the
+    Exception Decoder. Without this option, the callers involved in the crash
+    may be missing from the results. Because of the limited stack space, there
+    is the remote possibility that removing this optimization could lead to more
+    frequent stack overflows. You only want to do this in a debug setting.
+
+    If you are not using the "Debug port" and need to improve the results of the
+    Exception Decoder, you can add ``-fno-optimize-sibling-calls`` to your build
+    options. For details on how to do this, review `Global Build Options
+    <a06-global-build-options.rst>`__.
+
+    For non-Arduino IDE build platforms, you may need to research how to add
+    build options.
 
     A crash in a leaf function may not leave the caller's address on the stack.
     The return address can stay in a register for the duration of the call.
     Resulting in a crash report identifying the crashing function without a
     trace of who called. You can encourage the compiler to save the caller's
     return address by adding an inline assembly trick
-    `__asm__ __volatile__("" ::: "a0", "memory");` at the beginning of the
+    ``__asm__ __volatile__("" ::: "a0", "memory");`` at the beginning of the
     function's body. Or instead, for a debug build conditional option, use the
-    macro `DEBUG_LEAF_FUNCTION()` from `#include <debug.h>`.
+    macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``.
 
 
 Other Causes for Crashes

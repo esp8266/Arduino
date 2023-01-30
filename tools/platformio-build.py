@@ -206,6 +206,14 @@ env.Append(
 )
 
 #
+# debug
+#
+for define in env["CCFLAGS"]:
+    if "DEBUG_ESP_PORT" in define:
+        env.Append(CCFLAGS=["-fno-optimize-sibling-calls"])
+        break
+
+#
 # lwIP
 #
 flatten_cppdefines = env.Flatten(env["CPPDEFINES"])
