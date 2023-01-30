@@ -206,14 +206,6 @@ env.Append(
 )
 
 #
-# debug
-#
-for define in env["CCFLAGS"]:
-    if "DEBUG_ESP_PORT" in define:
-        env.Append(CCFLAGS=["-fno-optimize-sibling-calls"])
-        break
-
-#
 # lwIP
 #
 flatten_cppdefines = env.Flatten(env["CPPDEFINES"])
@@ -256,6 +248,12 @@ else:
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
     lwip_lib = "lwip2-536-feat"
+
+#
+# debug
+#
+if "DEBUG_ESP_PORT" in flatten_cppdefines:
+    env.Append(CCFLAGS=["-fno-optimize-sibling-calls"])
 
 #
 # Waveform

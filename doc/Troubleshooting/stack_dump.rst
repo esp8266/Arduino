@@ -64,4 +64,4 @@ It's possible to decode the Stack to readable information. For more info see the
 
    ESP Exception Decoder
 
-For more on troubleshooting, read `My ESP Crashes <../faq/a02-my-esp-crashes.rst>`__.
+For more on troubleshooting, read `FAQ: My ESP Crashes <../faq/a02-my-esp-crashes.rst>`__.
