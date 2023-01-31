@@ -253,7 +253,7 @@ else:
 # debug
 #
 if "DEBUG_ESP_PORT" in flatten_cppdefines:
-    env.Append(CCFLAGS=["-fno-optimize-sibling-calls"])
+    env.Append(CCFLAGS=[("-Os"), ("-fno-optimize-sibling-calls")])
 
 #
 # Waveform
