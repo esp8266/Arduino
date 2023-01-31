@@ -110,7 +110,6 @@ static void cut_here() {
     ets_putc('\n');
 }
 
-static void postmortem_report(uint32_t sp_dump) __attribute__((used));
 /*
   Add some assembly to grab the stack pointer and pass it as an argument before
   it grows for the target function. Should stabilize the stack offsets, used to
@@ -130,7 +129,7 @@ asm(
     ".size __wrap_system_restart_local, .-__wrap_system_restart_local\n\t"
 );
 
-void postmortem_report(uint32_t sp_dump) {
+static void postmortem_report(uint32_t sp_dump) {
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
     if (s_user_reset_reason == REASON_DEFAULT_RST)
@@ -220,7 +219,7 @@ void postmortem_report(uint32_t sp_dump) {
         offset = 64 + 16 + 256;
     }
     else if (rst_info.reason == REASON_WDT_RST) {
-        offset = 0x10;
+        offset = 16;
     }
     else if (rst_info.reason == REASON_USER_SWEXCEPTION_RST) {
         offset = 16;
