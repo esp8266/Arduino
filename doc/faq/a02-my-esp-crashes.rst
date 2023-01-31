@@ -299,7 +299,7 @@ build options.
 
 For projects that become too large to flash with a global debug build option,
 you could target the optimization to specific modules of interest by adding
-`#pragma GCC optimize("Og")`.
+``#pragma GCC optimize("Og")``.
 
 A crash in a leaf function may not leave the caller's address on the stack.
 The return address can stay in a register for the duration of the call.
