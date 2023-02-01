@@ -128,7 +128,7 @@ void setup() {
 
   // Read previous resets (Deep Sleeps) from RTC memory, if any
   uint32_t crcOfData = crc32((uint8_t*)&nv->rtcData.rstCount, sizeof(nv->rtcData.rstCount));
-  if ((crcOfData = nv->rtcData.crc32) && (resetCause == "Deep-Sleep Wake")) {
+  if ((crcOfData == nv->rtcData.crc32) && (resetCause == "Deep-Sleep Wake")) {
     resetCount = nv->rtcData.rstCount;  // read the previous reset count
     resetCount++;
   }
