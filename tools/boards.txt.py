@@ -1045,6 +1045,7 @@ macros = {
         ( '.build.core', 'esp8266' ),
         ( '.build.variant', 'generic' ),
         ( '.build.spiffs_pagesize', '256' ),
+        ( '.build.debug_optim', '' ),
         ( '.build.debug_port', '' ),
         ( '.build.debug_level', '' ),
         ]),
@@ -1355,15 +1356,17 @@ def all_debug ():
             ( '.menu.dbg.Disabled', 'Disabled' ),
             ( '.menu.dbg.Disabled.build.debug_port', '' ),
             ( '.menu.dbg.Serial', 'Serial' ),
-            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls' ),
+            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
             ( '.menu.dbg.Serial1', 'Serial1' ),
-            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls' ),
-            ( '.menu.dbg.Serial-dbg', 'Serial (full debug)' ),
-            ( '.menu.dbg.Serial-dbg.build.debug_port', '-DDEBUG_ESP_PORT=Serial -Og' ),
-            ( '.menu.dbg.Serial1-dbg', 'Serial1 (full debug)' ),
-            ( '.menu.dbg.Serial1-dbg.build.debug_port', '-DDEBUG_ESP_PORT=Serial1 -Og' ),
+            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
             ( '.menu.lvl.None____', 'None' ),
             ( '.menu.lvl.None____.build.debug_level', '' ),
+            ( '.menu.optim.Smallest', 'None' ),
+            ( '.menu.optim.Smallest.build.debug_optim', '' ),
+            ( '.menu.optim.Lite', 'Lite' ),
+            ( '.menu.optim.Lite.build.debug_optim', '-fno-optimize-sibling-calls' ),
+            ( '.menu.optim.Full', 'Optimum' ),
+            ( '.menu.optim.Full.build.debug_optim', '-Og' ),
         ])
 
     for optlist in options:
@@ -1744,6 +1747,7 @@ def all_boards ():
     print('menu.ResetMethod=Reset Method')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
+    print('menu.optim=Debug Priority')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=C++ Exceptions')

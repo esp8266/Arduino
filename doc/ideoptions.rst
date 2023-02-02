@@ -129,6 +129,34 @@ There are a number of options.
 - The other ones may be used when asked by a maintainer or if you are a
   developper trying to debug some issues.
 
+Debug Priority
+~~~~~~~~~~~~~~
+
+Due to the limited resources on the device, the compiler's default optimizations
+focus on creating the smallest code size (``.bin`` file). For the GCC compiler,
+the option ``-Os`` contains the base set of optimizations we use. This set is
+fine for release but not ideal for debugging.
+
+Our available view of a crash is the `Stack Dump <Troubleshooting/stack_dump.rst>`__
+For some situations, the optimizer doesn't write caller return addresses to the
+stack. When we crash, the list of functions called is missing. And when the
+crash occurs in a leaf function, there is seldom if ever any evidence of who
+called.
+
+``Debug Priority`` for a more complete Exception Decoder report change selection.
+- ``Lite`` uses ``-fno-optimize-sibling-calls`` to modify the ``-Os`` option
+  set - to place more caller addresses on the Stack.
+- ``Optimum`` uses the ``-Og`` option. GCC considers this the ideal optimization
+  for the "edit-compile-debug cycle" ... "producing debuggable code". You can
+  review the specifics at
+  `GCC's Optimize Options <https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html>`__
+  From their list of the optimization flags that are suppressed, it should yield
+  a better matchup between crash address and source code than we get with
+  ``Lite`` selection. The code size will be larger than the ``Lite`` selection.
+  This option will also address the leaf function issue in a later compiler
+  update.
+- ``None`` no changes for debugging continue using ``-Os``.
+
 lwIP variant
 ~~~~~~~~~~~~
 

@@ -281,17 +281,17 @@ dropped. The same procedure applies to crashes caused by exceptions.
 Improving Exception Decoder Results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you select a ``Debug port`` on the Arduino IDE Tools menu, it turns off
-``optimize-sibling-calls``. Turning off this optimization allows more caller
-addresses to be written to the stack, improving the results from the
-Exception Decoder. Without this option, the callers involved in the crash
-may be missing from the results. Because of the limited stack space, there
-is the remote possibility that removing this optimization could lead to more
-frequent stack overflows. You only want to do this in a debug setting.
+When you select ``Debug Priority: Lite`` on the Arduino IDE Tools menu, it
+turns off ``optimize-sibling-calls``. Turning off this optimization allows more
+caller addresses to be written to the stack, improving the results from the
+Exception Decoder. Without this option, the callers involved in the crash may be
+missing from the results. Because of the limited stack space, there is the
+remote possibility that removing this optimization could lead to more frequent
+stack overflows. You only want to do this in a debug setting.
 
-If you are not using the ``Debug port`` and need to improve the results of the
-Exception Decoder, you can add ``-Og`` or ``-fno-optimize-sibling-calls``
-to your build options. For details on how to do this, review
+If you are not using the ``Debug Priority`` and need to improve the results of
+the Exception Decoder, you can add ``-Og`` or ``-fno-optimize-sibling-calls``
+to your build options. For details on how to do this, read
 `Global Build Options <a06-global-build-options.rst>`__.
 
 For non-Arduino IDE build platforms, you may need to research how to add

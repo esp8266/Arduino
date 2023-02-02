@@ -17,6 +17,7 @@ menu.FlashFreq=Flash Frequency
 menu.ResetMethod=Reset Method
 menu.dbg=Debug port
 menu.lvl=Debug Level
+menu.optim=Debug Priority
 menu.ip=lwIP Variant
 menu.vt=VTables
 menu.exception=C++ Exceptions
@@ -40,6 +41,7 @@ generic.build.mcu=esp8266
 generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.spiffs_pagesize=256
+generic.build.debug_optim=
 generic.build.debug_port=
 generic.build.debug_level=
 generic.menu.xtal.80=80 MHz
@@ -392,15 +394,17 @@ generic.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 generic.menu.dbg.Disabled=Disabled
 generic.menu.dbg.Disabled.build.debug_port=
 generic.menu.dbg.Serial=Serial
-generic.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+generic.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 generic.menu.dbg.Serial1=Serial1
-generic.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-generic.menu.dbg.Serial-dbg=Serial (full debug)
-generic.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-generic.menu.dbg.Serial1-dbg=Serial1 (full debug)
-generic.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+generic.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 generic.menu.lvl.None____=None
 generic.menu.lvl.None____.build.debug_level=
+generic.menu.optim.Smallest=None
+generic.menu.optim.Smallest.build.debug_optim=
+generic.menu.optim.Lite=Lite
+generic.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+generic.menu.optim.Full=Optimum
+generic.menu.optim.Full.build.debug_optim=-Og
 generic.menu.lvl.SSL=SSL
 generic.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 generic.menu.lvl.TLS_MEM=TLS_MEM
@@ -506,6 +510,7 @@ esp8285.serial.disableRTS=true
 esp8285.build.mcu=esp8266
 esp8285.build.core=esp8266
 esp8285.build.spiffs_pagesize=256
+esp8285.build.debug_optim=
 esp8285.build.debug_port=
 esp8285.build.debug_level=
 esp8285.menu.xtal.80=80 MHz
@@ -741,15 +746,17 @@ esp8285.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 esp8285.menu.dbg.Disabled=Disabled
 esp8285.menu.dbg.Disabled.build.debug_port=
 esp8285.menu.dbg.Serial=Serial
-esp8285.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+esp8285.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 esp8285.menu.dbg.Serial1=Serial1
-esp8285.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-esp8285.menu.dbg.Serial-dbg=Serial (full debug)
-esp8285.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-esp8285.menu.dbg.Serial1-dbg=Serial1 (full debug)
-esp8285.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+esp8285.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 esp8285.menu.lvl.None____=None
 esp8285.menu.lvl.None____.build.debug_level=
+esp8285.menu.optim.Smallest=None
+esp8285.menu.optim.Smallest.build.debug_optim=
+esp8285.menu.optim.Lite=Lite
+esp8285.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+esp8285.menu.optim.Full=Optimum
+esp8285.menu.optim.Full.build.debug_optim=-Og
 esp8285.menu.lvl.SSL=SSL
 esp8285.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 esp8285.menu.lvl.TLS_MEM=TLS_MEM
@@ -856,6 +863,7 @@ gen4iod.serial.disableRTS=true
 gen4iod.build.mcu=esp8266
 gen4iod.build.core=esp8266
 gen4iod.build.spiffs_pagesize=256
+gen4iod.build.debug_optim=
 gen4iod.build.debug_port=
 gen4iod.build.debug_level=
 gen4iod.menu.xtal.80=80 MHz
@@ -1013,15 +1021,17 @@ gen4iod.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 gen4iod.menu.dbg.Disabled=Disabled
 gen4iod.menu.dbg.Disabled.build.debug_port=
 gen4iod.menu.dbg.Serial=Serial
-gen4iod.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+gen4iod.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 gen4iod.menu.dbg.Serial1=Serial1
-gen4iod.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-gen4iod.menu.dbg.Serial-dbg=Serial (full debug)
-gen4iod.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-gen4iod.menu.dbg.Serial1-dbg=Serial1 (full debug)
-gen4iod.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+gen4iod.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 gen4iod.menu.lvl.None____=None
 gen4iod.menu.lvl.None____.build.debug_level=
+gen4iod.menu.optim.Smallest=None
+gen4iod.menu.optim.Smallest.build.debug_optim=
+gen4iod.menu.optim.Lite=Lite
+gen4iod.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+gen4iod.menu.optim.Full=Optimum
+gen4iod.menu.optim.Full.build.debug_optim=-Og
 gen4iod.menu.lvl.SSL=SSL
 gen4iod.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 gen4iod.menu.lvl.TLS_MEM=TLS_MEM
@@ -1127,6 +1137,7 @@ huzzah.serial.disableRTS=true
 huzzah.build.mcu=esp8266
 huzzah.build.core=esp8266
 huzzah.build.spiffs_pagesize=256
+huzzah.build.debug_optim=
 huzzah.build.debug_port=
 huzzah.build.debug_level=
 huzzah.menu.xtal.80=80 MHz
@@ -1229,15 +1240,17 @@ huzzah.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATU
 huzzah.menu.dbg.Disabled=Disabled
 huzzah.menu.dbg.Disabled.build.debug_port=
 huzzah.menu.dbg.Serial=Serial
-huzzah.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+huzzah.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 huzzah.menu.dbg.Serial1=Serial1
-huzzah.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-huzzah.menu.dbg.Serial-dbg=Serial (full debug)
-huzzah.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-huzzah.menu.dbg.Serial1-dbg=Serial1 (full debug)
-huzzah.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+huzzah.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 huzzah.menu.lvl.None____=None
 huzzah.menu.lvl.None____.build.debug_level=
+huzzah.menu.optim.Smallest=None
+huzzah.menu.optim.Smallest.build.debug_optim=
+huzzah.menu.optim.Lite=Lite
+huzzah.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+huzzah.menu.optim.Full=Optimum
+huzzah.menu.optim.Full.build.debug_optim=-Og
 huzzah.menu.lvl.SSL=SSL
 huzzah.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 huzzah.menu.lvl.TLS_MEM=TLS_MEM
@@ -1343,6 +1356,7 @@ wifi_slot.serial.disableRTS=true
 wifi_slot.build.mcu=esp8266
 wifi_slot.build.core=esp8266
 wifi_slot.build.spiffs_pagesize=256
+wifi_slot.build.debug_optim=
 wifi_slot.build.debug_port=
 wifi_slot.build.debug_level=
 wifi_slot.menu.xtal.80=80 MHz
@@ -1539,15 +1553,17 @@ wifi_slot.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FE
 wifi_slot.menu.dbg.Disabled=Disabled
 wifi_slot.menu.dbg.Disabled.build.debug_port=
 wifi_slot.menu.dbg.Serial=Serial
-wifi_slot.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+wifi_slot.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 wifi_slot.menu.dbg.Serial1=Serial1
-wifi_slot.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-wifi_slot.menu.dbg.Serial-dbg=Serial (full debug)
-wifi_slot.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-wifi_slot.menu.dbg.Serial1-dbg=Serial1 (full debug)
-wifi_slot.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+wifi_slot.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifi_slot.menu.lvl.None____=None
 wifi_slot.menu.lvl.None____.build.debug_level=
+wifi_slot.menu.optim.Smallest=None
+wifi_slot.menu.optim.Smallest.build.debug_optim=
+wifi_slot.menu.optim.Lite=Lite
+wifi_slot.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+wifi_slot.menu.optim.Full=Optimum
+wifi_slot.menu.optim.Full.build.debug_optim=-Og
 wifi_slot.menu.lvl.SSL=SSL
 wifi_slot.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifi_slot.menu.lvl.TLS_MEM=TLS_MEM
@@ -1665,6 +1681,7 @@ arduino-esp8266.build.mcu=esp8266
 arduino-esp8266.build.core=esp8266
 arduino-esp8266.build.variant=generic
 arduino-esp8266.build.spiffs_pagesize=256
+arduino-esp8266.build.debug_optim=
 arduino-esp8266.build.debug_port=
 arduino-esp8266.build.debug_level=
 arduino-esp8266.menu.xtal.80=80 MHz
@@ -1767,15 +1784,17 @@ arduino-esp8266.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DL
 arduino-esp8266.menu.dbg.Disabled=Disabled
 arduino-esp8266.menu.dbg.Disabled.build.debug_port=
 arduino-esp8266.menu.dbg.Serial=Serial
-arduino-esp8266.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+arduino-esp8266.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 arduino-esp8266.menu.dbg.Serial1=Serial1
-arduino-esp8266.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-arduino-esp8266.menu.dbg.Serial-dbg=Serial (full debug)
-arduino-esp8266.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-arduino-esp8266.menu.dbg.Serial1-dbg=Serial1 (full debug)
-arduino-esp8266.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+arduino-esp8266.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 arduino-esp8266.menu.lvl.None____=None
 arduino-esp8266.menu.lvl.None____.build.debug_level=
+arduino-esp8266.menu.optim.Smallest=None
+arduino-esp8266.menu.optim.Smallest.build.debug_optim=
+arduino-esp8266.menu.optim.Lite=Lite
+arduino-esp8266.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+arduino-esp8266.menu.optim.Full=Optimum
+arduino-esp8266.menu.optim.Full.build.debug_optim=-Og
 arduino-esp8266.menu.lvl.SSL=SSL
 arduino-esp8266.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 arduino-esp8266.menu.lvl.TLS_MEM=TLS_MEM
@@ -1882,6 +1901,7 @@ espmxdevkit.serial.disableRTS=true
 espmxdevkit.build.mcu=esp8266
 espmxdevkit.build.core=esp8266
 espmxdevkit.build.spiffs_pagesize=256
+espmxdevkit.build.debug_optim=
 espmxdevkit.build.debug_port=
 espmxdevkit.build.debug_level=
 espmxdevkit.menu.xtal.80=80 MHz
@@ -2016,15 +2036,17 @@ espmxdevkit.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_
 espmxdevkit.menu.dbg.Disabled=Disabled
 espmxdevkit.menu.dbg.Disabled.build.debug_port=
 espmxdevkit.menu.dbg.Serial=Serial
-espmxdevkit.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espmxdevkit.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espmxdevkit.menu.dbg.Serial1=Serial1
-espmxdevkit.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espmxdevkit.menu.dbg.Serial-dbg=Serial (full debug)
-espmxdevkit.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espmxdevkit.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espmxdevkit.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espmxdevkit.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espmxdevkit.menu.lvl.None____=None
 espmxdevkit.menu.lvl.None____.build.debug_level=
+espmxdevkit.menu.optim.Smallest=None
+espmxdevkit.menu.optim.Smallest.build.debug_optim=
+espmxdevkit.menu.optim.Lite=Lite
+espmxdevkit.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espmxdevkit.menu.optim.Full=Optimum
+espmxdevkit.menu.optim.Full.build.debug_optim=-Og
 espmxdevkit.menu.lvl.SSL=SSL
 espmxdevkit.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espmxdevkit.menu.lvl.TLS_MEM=TLS_MEM
@@ -2131,6 +2153,7 @@ oak.serial.disableRTS=true
 oak.build.mcu=esp8266
 oak.build.core=esp8266
 oak.build.spiffs_pagesize=256
+oak.build.debug_optim=
 oak.build.debug_port=
 oak.build.debug_level=
 oak.menu.xtal.80=80 MHz
@@ -2233,15 +2256,17 @@ oak.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES
 oak.menu.dbg.Disabled=Disabled
 oak.menu.dbg.Disabled.build.debug_port=
 oak.menu.dbg.Serial=Serial
-oak.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+oak.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 oak.menu.dbg.Serial1=Serial1
-oak.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-oak.menu.dbg.Serial-dbg=Serial (full debug)
-oak.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-oak.menu.dbg.Serial1-dbg=Serial1 (full debug)
-oak.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+oak.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 oak.menu.lvl.None____=None
 oak.menu.lvl.None____.build.debug_level=
+oak.menu.optim.Smallest=None
+oak.menu.optim.Smallest.build.debug_optim=
+oak.menu.optim.Lite=Lite
+oak.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+oak.menu.optim.Full=Optimum
+oak.menu.optim.Full.build.debug_optim=-Og
 oak.menu.lvl.SSL=SSL
 oak.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 oak.menu.lvl.TLS_MEM=TLS_MEM
@@ -2356,6 +2381,7 @@ espduino.serial.disableRTS=true
 espduino.build.mcu=esp8266
 espduino.build.core=esp8266
 espduino.build.spiffs_pagesize=256
+espduino.build.debug_optim=
 espduino.build.debug_port=
 espduino.build.debug_level=
 espduino.menu.xtal.80=80 MHz
@@ -2457,15 +2483,17 @@ espduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEA
 espduino.menu.dbg.Disabled=Disabled
 espduino.menu.dbg.Disabled.build.debug_port=
 espduino.menu.dbg.Serial=Serial
-espduino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espduino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espduino.menu.dbg.Serial1=Serial1
-espduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espduino.menu.dbg.Serial-dbg=Serial (full debug)
-espduino.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espduino.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espduino.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espduino.menu.lvl.None____=None
 espduino.menu.lvl.None____.build.debug_level=
+espduino.menu.optim.Smallest=None
+espduino.menu.optim.Smallest.build.debug_optim=
+espduino.menu.optim.Lite=Lite
+espduino.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espduino.menu.optim.Full=Optimum
+espduino.menu.optim.Full.build.debug_optim=-Og
 espduino.menu.lvl.SSL=SSL
 espduino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espduino.menu.lvl.TLS_MEM=TLS_MEM
@@ -2571,6 +2599,7 @@ espectro.serial.disableRTS=true
 espectro.build.mcu=esp8266
 espectro.build.core=esp8266
 espectro.build.spiffs_pagesize=256
+espectro.build.debug_optim=
 espectro.build.debug_port=
 espectro.build.debug_level=
 espectro.menu.xtal.80=80 MHz
@@ -2673,15 +2702,17 @@ espectro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEA
 espectro.menu.dbg.Disabled=Disabled
 espectro.menu.dbg.Disabled.build.debug_port=
 espectro.menu.dbg.Serial=Serial
-espectro.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espectro.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espectro.menu.dbg.Serial1=Serial1
-espectro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espectro.menu.dbg.Serial-dbg=Serial (full debug)
-espectro.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espectro.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espectro.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espectro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espectro.menu.lvl.None____=None
 espectro.menu.lvl.None____.build.debug_level=
+espectro.menu.optim.Smallest=None
+espectro.menu.optim.Smallest.build.debug_optim=
+espectro.menu.optim.Lite=Lite
+espectro.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espectro.menu.optim.Full=Optimum
+espectro.menu.optim.Full.build.debug_optim=-Og
 espectro.menu.lvl.SSL=SSL
 espectro.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espectro.menu.lvl.TLS_MEM=TLS_MEM
@@ -2787,6 +2818,7 @@ espino.serial.disableRTS=true
 espino.build.mcu=esp8266
 espino.build.core=esp8266
 espino.build.spiffs_pagesize=256
+espino.build.debug_optim=
 espino.build.debug_port=
 espino.build.debug_level=
 espino.menu.xtal.80=80 MHz
@@ -2892,15 +2924,17 @@ espino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATU
 espino.menu.dbg.Disabled=Disabled
 espino.menu.dbg.Disabled.build.debug_port=
 espino.menu.dbg.Serial=Serial
-espino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espino.menu.dbg.Serial1=Serial1
-espino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espino.menu.dbg.Serial-dbg=Serial (full debug)
-espino.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espino.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espino.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espino.menu.lvl.None____=None
 espino.menu.lvl.None____.build.debug_level=
+espino.menu.optim.Smallest=None
+espino.menu.optim.Smallest.build.debug_optim=
+espino.menu.optim.Lite=Lite
+espino.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espino.menu.optim.Full=Optimum
+espino.menu.optim.Full.build.debug_optim=-Og
 espino.menu.lvl.SSL=SSL
 espino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espino.menu.lvl.TLS_MEM=TLS_MEM
@@ -3006,6 +3040,7 @@ espresso_lite_v1.serial.disableRTS=true
 espresso_lite_v1.build.mcu=esp8266
 espresso_lite_v1.build.core=esp8266
 espresso_lite_v1.build.spiffs_pagesize=256
+espresso_lite_v1.build.debug_optim=
 espresso_lite_v1.build.debug_port=
 espresso_lite_v1.build.debug_level=
 espresso_lite_v1.menu.xtal.80=80 MHz
@@ -3111,15 +3146,17 @@ espresso_lite_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -D
 espresso_lite_v1.menu.dbg.Disabled=Disabled
 espresso_lite_v1.menu.dbg.Disabled.build.debug_port=
 espresso_lite_v1.menu.dbg.Serial=Serial
-espresso_lite_v1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espresso_lite_v1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espresso_lite_v1.menu.dbg.Serial1=Serial1
-espresso_lite_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espresso_lite_v1.menu.dbg.Serial-dbg=Serial (full debug)
-espresso_lite_v1.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espresso_lite_v1.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espresso_lite_v1.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espresso_lite_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espresso_lite_v1.menu.lvl.None____=None
 espresso_lite_v1.menu.lvl.None____.build.debug_level=
+espresso_lite_v1.menu.optim.Smallest=None
+espresso_lite_v1.menu.optim.Smallest.build.debug_optim=
+espresso_lite_v1.menu.optim.Lite=Lite
+espresso_lite_v1.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espresso_lite_v1.menu.optim.Full=Optimum
+espresso_lite_v1.menu.optim.Full.build.debug_optim=-Og
 espresso_lite_v1.menu.lvl.SSL=SSL
 espresso_lite_v1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espresso_lite_v1.menu.lvl.TLS_MEM=TLS_MEM
@@ -3225,6 +3262,7 @@ espresso_lite_v2.serial.disableRTS=true
 espresso_lite_v2.build.mcu=esp8266
 espresso_lite_v2.build.core=esp8266
 espresso_lite_v2.build.spiffs_pagesize=256
+espresso_lite_v2.build.debug_optim=
 espresso_lite_v2.build.debug_port=
 espresso_lite_v2.build.debug_level=
 espresso_lite_v2.menu.xtal.80=80 MHz
@@ -3330,15 +3368,17 @@ espresso_lite_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -D
 espresso_lite_v2.menu.dbg.Disabled=Disabled
 espresso_lite_v2.menu.dbg.Disabled.build.debug_port=
 espresso_lite_v2.menu.dbg.Serial=Serial
-espresso_lite_v2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espresso_lite_v2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espresso_lite_v2.menu.dbg.Serial1=Serial1
-espresso_lite_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espresso_lite_v2.menu.dbg.Serial-dbg=Serial (full debug)
-espresso_lite_v2.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espresso_lite_v2.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espresso_lite_v2.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espresso_lite_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espresso_lite_v2.menu.lvl.None____=None
 espresso_lite_v2.menu.lvl.None____.build.debug_level=
+espresso_lite_v2.menu.optim.Smallest=None
+espresso_lite_v2.menu.optim.Smallest.build.debug_optim=
+espresso_lite_v2.menu.optim.Lite=Lite
+espresso_lite_v2.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espresso_lite_v2.menu.optim.Full=Optimum
+espresso_lite_v2.menu.optim.Full.build.debug_optim=-Og
 espresso_lite_v2.menu.lvl.SSL=SSL
 espresso_lite_v2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espresso_lite_v2.menu.lvl.TLS_MEM=TLS_MEM
@@ -3453,6 +3493,7 @@ sonoff.serial.disableRTS=true
 sonoff.build.mcu=esp8266
 sonoff.build.core=esp8266
 sonoff.build.spiffs_pagesize=256
+sonoff.build.debug_optim=
 sonoff.build.debug_port=
 sonoff.build.debug_level=
 sonoff.menu.xtal.80=80 MHz
@@ -3587,15 +3628,17 @@ sonoff.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATU
 sonoff.menu.dbg.Disabled=Disabled
 sonoff.menu.dbg.Disabled.build.debug_port=
 sonoff.menu.dbg.Serial=Serial
-sonoff.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+sonoff.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 sonoff.menu.dbg.Serial1=Serial1
-sonoff.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-sonoff.menu.dbg.Serial-dbg=Serial (full debug)
-sonoff.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-sonoff.menu.dbg.Serial1-dbg=Serial1 (full debug)
-sonoff.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+sonoff.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 sonoff.menu.lvl.None____=None
 sonoff.menu.lvl.None____.build.debug_level=
+sonoff.menu.optim.Smallest=None
+sonoff.menu.optim.Smallest.build.debug_optim=
+sonoff.menu.optim.Lite=Lite
+sonoff.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+sonoff.menu.optim.Full=Optimum
+sonoff.menu.optim.Full.build.debug_optim=-Og
 sonoff.menu.lvl.SSL=SSL
 sonoff.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 sonoff.menu.lvl.TLS_MEM=TLS_MEM
@@ -3701,6 +3744,7 @@ inventone.serial.disableRTS=true
 inventone.build.mcu=esp8266
 inventone.build.core=esp8266
 inventone.build.spiffs_pagesize=256
+inventone.build.debug_optim=
 inventone.build.debug_port=
 inventone.build.debug_level=
 inventone.menu.xtal.80=80 MHz
@@ -3803,15 +3847,17 @@ inventone.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FE
 inventone.menu.dbg.Disabled=Disabled
 inventone.menu.dbg.Disabled.build.debug_port=
 inventone.menu.dbg.Serial=Serial
-inventone.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+inventone.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 inventone.menu.dbg.Serial1=Serial1
-inventone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-inventone.menu.dbg.Serial-dbg=Serial (full debug)
-inventone.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-inventone.menu.dbg.Serial1-dbg=Serial1 (full debug)
-inventone.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+inventone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 inventone.menu.lvl.None____=None
 inventone.menu.lvl.None____.build.debug_level=
+inventone.menu.optim.Smallest=None
+inventone.menu.optim.Smallest.build.debug_optim=
+inventone.menu.optim.Lite=Lite
+inventone.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+inventone.menu.optim.Full=Optimum
+inventone.menu.optim.Full.build.debug_optim=-Og
 inventone.menu.lvl.SSL=SSL
 inventone.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 inventone.menu.lvl.TLS_MEM=TLS_MEM
@@ -3917,6 +3963,7 @@ d1_wroom_02.serial.disableRTS=true
 d1_wroom_02.build.mcu=esp8266
 d1_wroom_02.build.core=esp8266
 d1_wroom_02.build.spiffs_pagesize=256
+d1_wroom_02.build.debug_optim=
 d1_wroom_02.build.debug_port=
 d1_wroom_02.build.debug_level=
 d1_wroom_02.menu.xtal.80=80 MHz
@@ -4035,15 +4082,17 @@ d1_wroom_02.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_
 d1_wroom_02.menu.dbg.Disabled=Disabled
 d1_wroom_02.menu.dbg.Disabled.build.debug_port=
 d1_wroom_02.menu.dbg.Serial=Serial
-d1_wroom_02.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1_wroom_02.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1_wroom_02.menu.dbg.Serial1=Serial1
-d1_wroom_02.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1_wroom_02.menu.dbg.Serial-dbg=Serial (full debug)
-d1_wroom_02.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1_wroom_02.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1_wroom_02.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1_wroom_02.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_wroom_02.menu.lvl.None____=None
 d1_wroom_02.menu.lvl.None____.build.debug_level=
+d1_wroom_02.menu.optim.Smallest=None
+d1_wroom_02.menu.optim.Smallest.build.debug_optim=
+d1_wroom_02.menu.optim.Lite=Lite
+d1_wroom_02.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1_wroom_02.menu.optim.Full=Optimum
+d1_wroom_02.menu.optim.Full.build.debug_optim=-Og
 d1_wroom_02.menu.lvl.SSL=SSL
 d1_wroom_02.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_wroom_02.menu.lvl.TLS_MEM=TLS_MEM
@@ -4149,6 +4198,7 @@ d1_mini.serial.disableRTS=true
 d1_mini.build.mcu=esp8266
 d1_mini.build.core=esp8266
 d1_mini.build.spiffs_pagesize=256
+d1_mini.build.debug_optim=
 d1_mini.build.debug_port=
 d1_mini.build.debug_level=
 d1_mini.menu.xtal.80=80 MHz
@@ -4251,15 +4301,17 @@ d1_mini.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 d1_mini.menu.dbg.Disabled=Disabled
 d1_mini.menu.dbg.Disabled.build.debug_port=
 d1_mini.menu.dbg.Serial=Serial
-d1_mini.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1_mini.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1_mini.menu.dbg.Serial1=Serial1
-d1_mini.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1_mini.menu.dbg.Serial-dbg=Serial (full debug)
-d1_mini.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1_mini.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1_mini.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1_mini.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini.menu.lvl.None____=None
 d1_mini.menu.lvl.None____.build.debug_level=
+d1_mini.menu.optim.Smallest=None
+d1_mini.menu.optim.Smallest.build.debug_optim=
+d1_mini.menu.optim.Lite=Lite
+d1_mini.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1_mini.menu.optim.Full=Optimum
+d1_mini.menu.optim.Full.build.debug_optim=-Og
 d1_mini.menu.lvl.SSL=SSL
 d1_mini.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini.menu.lvl.TLS_MEM=TLS_MEM
@@ -4365,6 +4417,7 @@ d1_mini_clone.serial.disableRTS=true
 d1_mini_clone.build.mcu=esp8266
 d1_mini_clone.build.core=esp8266
 d1_mini_clone.build.spiffs_pagesize=256
+d1_mini_clone.build.debug_optim=
 d1_mini_clone.build.debug_port=
 d1_mini_clone.build.debug_level=
 d1_mini_clone.menu.xtal.80=80 MHz
@@ -4484,15 +4537,17 @@ d1_mini_clone.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWI
 d1_mini_clone.menu.dbg.Disabled=Disabled
 d1_mini_clone.menu.dbg.Disabled.build.debug_port=
 d1_mini_clone.menu.dbg.Serial=Serial
-d1_mini_clone.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1_mini_clone.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1_mini_clone.menu.dbg.Serial1=Serial1
-d1_mini_clone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1_mini_clone.menu.dbg.Serial-dbg=Serial (full debug)
-d1_mini_clone.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1_mini_clone.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1_mini_clone.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1_mini_clone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_clone.menu.lvl.None____=None
 d1_mini_clone.menu.lvl.None____.build.debug_level=
+d1_mini_clone.menu.optim.Smallest=None
+d1_mini_clone.menu.optim.Smallest.build.debug_optim=
+d1_mini_clone.menu.optim.Lite=Lite
+d1_mini_clone.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1_mini_clone.menu.optim.Full=Optimum
+d1_mini_clone.menu.optim.Full.build.debug_optim=-Og
 d1_mini_clone.menu.lvl.SSL=SSL
 d1_mini_clone.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_clone.menu.lvl.TLS_MEM=TLS_MEM
@@ -4598,6 +4653,7 @@ d1_mini_lite.serial.disableRTS=true
 d1_mini_lite.build.mcu=esp8266
 d1_mini_lite.build.core=esp8266
 d1_mini_lite.build.spiffs_pagesize=256
+d1_mini_lite.build.debug_optim=
 d1_mini_lite.build.debug_port=
 d1_mini_lite.build.debug_level=
 d1_mini_lite.menu.xtal.80=80 MHz
@@ -4732,15 +4788,17 @@ d1_mini_lite.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP
 d1_mini_lite.menu.dbg.Disabled=Disabled
 d1_mini_lite.menu.dbg.Disabled.build.debug_port=
 d1_mini_lite.menu.dbg.Serial=Serial
-d1_mini_lite.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1_mini_lite.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1_mini_lite.menu.dbg.Serial1=Serial1
-d1_mini_lite.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1_mini_lite.menu.dbg.Serial-dbg=Serial (full debug)
-d1_mini_lite.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1_mini_lite.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1_mini_lite.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1_mini_lite.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_lite.menu.lvl.None____=None
 d1_mini_lite.menu.lvl.None____.build.debug_level=
+d1_mini_lite.menu.optim.Smallest=None
+d1_mini_lite.menu.optim.Smallest.build.debug_optim=
+d1_mini_lite.menu.optim.Lite=Lite
+d1_mini_lite.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1_mini_lite.menu.optim.Full=Optimum
+d1_mini_lite.menu.optim.Full.build.debug_optim=-Og
 d1_mini_lite.menu.lvl.SSL=SSL
 d1_mini_lite.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_lite.menu.lvl.TLS_MEM=TLS_MEM
@@ -4846,6 +4904,7 @@ d1_mini_pro.serial.disableRTS=true
 d1_mini_pro.build.mcu=esp8266
 d1_mini_pro.build.core=esp8266
 d1_mini_pro.build.spiffs_pagesize=256
+d1_mini_pro.build.debug_optim=
 d1_mini_pro.build.debug_port=
 d1_mini_pro.build.debug_level=
 d1_mini_pro.menu.xtal.80=80 MHz
@@ -4940,15 +4999,17 @@ d1_mini_pro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_
 d1_mini_pro.menu.dbg.Disabled=Disabled
 d1_mini_pro.menu.dbg.Disabled.build.debug_port=
 d1_mini_pro.menu.dbg.Serial=Serial
-d1_mini_pro.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1_mini_pro.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1_mini_pro.menu.dbg.Serial1=Serial1
-d1_mini_pro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1_mini_pro.menu.dbg.Serial-dbg=Serial (full debug)
-d1_mini_pro.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1_mini_pro.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1_mini_pro.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1_mini_pro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_pro.menu.lvl.None____=None
 d1_mini_pro.menu.lvl.None____.build.debug_level=
+d1_mini_pro.menu.optim.Smallest=None
+d1_mini_pro.menu.optim.Smallest.build.debug_optim=
+d1_mini_pro.menu.optim.Lite=Lite
+d1_mini_pro.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1_mini_pro.menu.optim.Full=Optimum
+d1_mini_pro.menu.optim.Full.build.debug_optim=-Og
 d1_mini_pro.menu.lvl.SSL=SSL
 d1_mini_pro.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_pro.menu.lvl.TLS_MEM=TLS_MEM
@@ -5054,6 +5115,7 @@ d1.serial.disableRTS=true
 d1.build.mcu=esp8266
 d1.build.core=esp8266
 d1.build.spiffs_pagesize=256
+d1.build.debug_optim=
 d1.build.debug_port=
 d1.build.debug_level=
 d1.menu.xtal.80=80 MHz
@@ -5156,15 +5218,17 @@ d1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=
 d1.menu.dbg.Disabled=Disabled
 d1.menu.dbg.Disabled.build.debug_port=
 d1.menu.dbg.Serial=Serial
-d1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+d1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 d1.menu.dbg.Serial1=Serial1
-d1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-d1.menu.dbg.Serial-dbg=Serial (full debug)
-d1.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-d1.menu.dbg.Serial1-dbg=Serial1 (full debug)
-d1.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+d1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1.menu.lvl.None____=None
 d1.menu.lvl.None____.build.debug_level=
+d1.menu.optim.Smallest=None
+d1.menu.optim.Smallest.build.debug_optim=
+d1.menu.optim.Lite=Lite
+d1.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+d1.menu.optim.Full=Optimum
+d1.menu.optim.Full.build.debug_optim=-Og
 d1.menu.lvl.SSL=SSL
 d1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1.menu.lvl.TLS_MEM=TLS_MEM
@@ -5270,6 +5334,7 @@ agruminolemon.serial.disableRTS=true
 agruminolemon.build.mcu=esp8266
 agruminolemon.build.core=esp8266
 agruminolemon.build.spiffs_pagesize=256
+agruminolemon.build.debug_optim=
 agruminolemon.build.debug_port=
 agruminolemon.build.debug_level=
 agruminolemon.menu.xtal.80=80 MHz
@@ -5388,15 +5453,17 @@ agruminolemon.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWI
 agruminolemon.menu.dbg.Disabled=Disabled
 agruminolemon.menu.dbg.Disabled.build.debug_port=
 agruminolemon.menu.dbg.Serial=Serial
-agruminolemon.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+agruminolemon.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 agruminolemon.menu.dbg.Serial1=Serial1
-agruminolemon.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-agruminolemon.menu.dbg.Serial-dbg=Serial (full debug)
-agruminolemon.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-agruminolemon.menu.dbg.Serial1-dbg=Serial1 (full debug)
-agruminolemon.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+agruminolemon.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 agruminolemon.menu.lvl.None____=None
 agruminolemon.menu.lvl.None____.build.debug_level=
+agruminolemon.menu.optim.Smallest=None
+agruminolemon.menu.optim.Smallest.build.debug_optim=
+agruminolemon.menu.optim.Lite=Lite
+agruminolemon.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+agruminolemon.menu.optim.Full=Optimum
+agruminolemon.menu.optim.Full.build.debug_optim=-Og
 agruminolemon.menu.lvl.SSL=SSL
 agruminolemon.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 agruminolemon.menu.lvl.TLS_MEM=TLS_MEM
@@ -5502,6 +5569,7 @@ nodemcu.serial.disableRTS=true
 nodemcu.build.mcu=esp8266
 nodemcu.build.core=esp8266
 nodemcu.build.spiffs_pagesize=256
+nodemcu.build.debug_optim=
 nodemcu.build.debug_port=
 nodemcu.build.debug_level=
 nodemcu.menu.xtal.80=80 MHz
@@ -5604,15 +5672,17 @@ nodemcu.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 nodemcu.menu.dbg.Disabled=Disabled
 nodemcu.menu.dbg.Disabled.build.debug_port=
 nodemcu.menu.dbg.Serial=Serial
-nodemcu.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+nodemcu.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 nodemcu.menu.dbg.Serial1=Serial1
-nodemcu.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-nodemcu.menu.dbg.Serial-dbg=Serial (full debug)
-nodemcu.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-nodemcu.menu.dbg.Serial1-dbg=Serial1 (full debug)
-nodemcu.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+nodemcu.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 nodemcu.menu.lvl.None____=None
 nodemcu.menu.lvl.None____.build.debug_level=
+nodemcu.menu.optim.Smallest=None
+nodemcu.menu.optim.Smallest.build.debug_optim=
+nodemcu.menu.optim.Lite=Lite
+nodemcu.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+nodemcu.menu.optim.Full=Optimum
+nodemcu.menu.optim.Full.build.debug_optim=-Og
 nodemcu.menu.lvl.SSL=SSL
 nodemcu.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 nodemcu.menu.lvl.TLS_MEM=TLS_MEM
@@ -5718,6 +5788,7 @@ nodemcuv2.serial.disableRTS=true
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.core=esp8266
 nodemcuv2.build.spiffs_pagesize=256
+nodemcuv2.build.debug_optim=
 nodemcuv2.build.debug_port=
 nodemcuv2.build.debug_level=
 nodemcuv2.menu.xtal.80=80 MHz
@@ -5824,15 +5895,17 @@ nodemcuv2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FE
 nodemcuv2.menu.dbg.Disabled=Disabled
 nodemcuv2.menu.dbg.Disabled.build.debug_port=
 nodemcuv2.menu.dbg.Serial=Serial
-nodemcuv2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+nodemcuv2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 nodemcuv2.menu.dbg.Serial1=Serial1
-nodemcuv2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-nodemcuv2.menu.dbg.Serial-dbg=Serial (full debug)
-nodemcuv2.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-nodemcuv2.menu.dbg.Serial1-dbg=Serial1 (full debug)
-nodemcuv2.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+nodemcuv2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 nodemcuv2.menu.lvl.None____=None
 nodemcuv2.menu.lvl.None____.build.debug_level=
+nodemcuv2.menu.optim.Smallest=None
+nodemcuv2.menu.optim.Smallest.build.debug_optim=
+nodemcuv2.menu.optim.Lite=Lite
+nodemcuv2.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+nodemcuv2.menu.optim.Full=Optimum
+nodemcuv2.menu.optim.Full.build.debug_optim=-Og
 nodemcuv2.menu.lvl.SSL=SSL
 nodemcuv2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 nodemcuv2.menu.lvl.TLS_MEM=TLS_MEM
@@ -5938,6 +6011,7 @@ modwifi.serial.disableRTS=true
 modwifi.build.mcu=esp8266
 modwifi.build.core=esp8266
 modwifi.build.spiffs_pagesize=256
+modwifi.build.debug_optim=
 modwifi.build.debug_port=
 modwifi.build.debug_level=
 modwifi.menu.xtal.80=80 MHz
@@ -6071,15 +6145,17 @@ modwifi.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 modwifi.menu.dbg.Disabled=Disabled
 modwifi.menu.dbg.Disabled.build.debug_port=
 modwifi.menu.dbg.Serial=Serial
-modwifi.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+modwifi.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 modwifi.menu.dbg.Serial1=Serial1
-modwifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-modwifi.menu.dbg.Serial-dbg=Serial (full debug)
-modwifi.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-modwifi.menu.dbg.Serial1-dbg=Serial1 (full debug)
-modwifi.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+modwifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 modwifi.menu.lvl.None____=None
 modwifi.menu.lvl.None____.build.debug_level=
+modwifi.menu.optim.Smallest=None
+modwifi.menu.optim.Smallest.build.debug_optim=
+modwifi.menu.optim.Lite=Lite
+modwifi.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+modwifi.menu.optim.Full=Optimum
+modwifi.menu.optim.Full.build.debug_optim=-Og
 modwifi.menu.lvl.SSL=SSL
 modwifi.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 modwifi.menu.lvl.TLS_MEM=TLS_MEM
@@ -6185,6 +6261,7 @@ phoenix_v1.serial.disableRTS=true
 phoenix_v1.build.mcu=esp8266
 phoenix_v1.build.core=esp8266
 phoenix_v1.build.spiffs_pagesize=256
+phoenix_v1.build.debug_optim=
 phoenix_v1.build.debug_port=
 phoenix_v1.build.debug_level=
 phoenix_v1.menu.xtal.80=80 MHz
@@ -6290,15 +6367,17 @@ phoenix_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_F
 phoenix_v1.menu.dbg.Disabled=Disabled
 phoenix_v1.menu.dbg.Disabled.build.debug_port=
 phoenix_v1.menu.dbg.Serial=Serial
-phoenix_v1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+phoenix_v1.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 phoenix_v1.menu.dbg.Serial1=Serial1
-phoenix_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-phoenix_v1.menu.dbg.Serial-dbg=Serial (full debug)
-phoenix_v1.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-phoenix_v1.menu.dbg.Serial1-dbg=Serial1 (full debug)
-phoenix_v1.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+phoenix_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 phoenix_v1.menu.lvl.None____=None
 phoenix_v1.menu.lvl.None____.build.debug_level=
+phoenix_v1.menu.optim.Smallest=None
+phoenix_v1.menu.optim.Smallest.build.debug_optim=
+phoenix_v1.menu.optim.Lite=Lite
+phoenix_v1.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+phoenix_v1.menu.optim.Full=Optimum
+phoenix_v1.menu.optim.Full.build.debug_optim=-Og
 phoenix_v1.menu.lvl.SSL=SSL
 phoenix_v1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 phoenix_v1.menu.lvl.TLS_MEM=TLS_MEM
@@ -6404,6 +6483,7 @@ phoenix_v2.serial.disableRTS=true
 phoenix_v2.build.mcu=esp8266
 phoenix_v2.build.core=esp8266
 phoenix_v2.build.spiffs_pagesize=256
+phoenix_v2.build.debug_optim=
 phoenix_v2.build.debug_port=
 phoenix_v2.build.debug_level=
 phoenix_v2.menu.xtal.80=80 MHz
@@ -6509,15 +6589,17 @@ phoenix_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_F
 phoenix_v2.menu.dbg.Disabled=Disabled
 phoenix_v2.menu.dbg.Disabled.build.debug_port=
 phoenix_v2.menu.dbg.Serial=Serial
-phoenix_v2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+phoenix_v2.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 phoenix_v2.menu.dbg.Serial1=Serial1
-phoenix_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-phoenix_v2.menu.dbg.Serial-dbg=Serial (full debug)
-phoenix_v2.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-phoenix_v2.menu.dbg.Serial1-dbg=Serial1 (full debug)
-phoenix_v2.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+phoenix_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 phoenix_v2.menu.lvl.None____=None
 phoenix_v2.menu.lvl.None____.build.debug_level=
+phoenix_v2.menu.optim.Smallest=None
+phoenix_v2.menu.optim.Smallest.build.debug_optim=
+phoenix_v2.menu.optim.Lite=Lite
+phoenix_v2.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+phoenix_v2.menu.optim.Full=Optimum
+phoenix_v2.menu.optim.Full.build.debug_optim=-Og
 phoenix_v2.menu.lvl.SSL=SSL
 phoenix_v2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 phoenix_v2.menu.lvl.TLS_MEM=TLS_MEM
@@ -6623,6 +6705,7 @@ eduinowifi.serial.disableRTS=true
 eduinowifi.build.mcu=esp8266
 eduinowifi.build.core=esp8266
 eduinowifi.build.spiffs_pagesize=256
+eduinowifi.build.debug_optim=
 eduinowifi.build.debug_port=
 eduinowifi.build.debug_level=
 eduinowifi.menu.xtal.80=80 MHz
@@ -6725,15 +6808,17 @@ eduinowifi.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_F
 eduinowifi.menu.dbg.Disabled=Disabled
 eduinowifi.menu.dbg.Disabled.build.debug_port=
 eduinowifi.menu.dbg.Serial=Serial
-eduinowifi.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+eduinowifi.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 eduinowifi.menu.dbg.Serial1=Serial1
-eduinowifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-eduinowifi.menu.dbg.Serial-dbg=Serial (full debug)
-eduinowifi.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-eduinowifi.menu.dbg.Serial1-dbg=Serial1 (full debug)
-eduinowifi.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+eduinowifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 eduinowifi.menu.lvl.None____=None
 eduinowifi.menu.lvl.None____.build.debug_level=
+eduinowifi.menu.optim.Smallest=None
+eduinowifi.menu.optim.Smallest.build.debug_optim=
+eduinowifi.menu.optim.Lite=Lite
+eduinowifi.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+eduinowifi.menu.optim.Full=Optimum
+eduinowifi.menu.optim.Full.build.debug_optim=-Og
 eduinowifi.menu.lvl.SSL=SSL
 eduinowifi.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 eduinowifi.menu.lvl.TLS_MEM=TLS_MEM
@@ -6839,6 +6924,7 @@ wiolink.serial.disableRTS=true
 wiolink.build.mcu=esp8266
 wiolink.build.core=esp8266
 wiolink.build.spiffs_pagesize=256
+wiolink.build.debug_optim=
 wiolink.build.debug_port=
 wiolink.build.debug_level=
 wiolink.menu.xtal.80=80 MHz
@@ -6941,15 +7027,17 @@ wiolink.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 wiolink.menu.dbg.Disabled=Disabled
 wiolink.menu.dbg.Disabled.build.debug_port=
 wiolink.menu.dbg.Serial=Serial
-wiolink.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+wiolink.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 wiolink.menu.dbg.Serial1=Serial1
-wiolink.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-wiolink.menu.dbg.Serial-dbg=Serial (full debug)
-wiolink.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-wiolink.menu.dbg.Serial1-dbg=Serial1 (full debug)
-wiolink.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+wiolink.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wiolink.menu.lvl.None____=None
 wiolink.menu.lvl.None____.build.debug_level=
+wiolink.menu.optim.Smallest=None
+wiolink.menu.optim.Smallest.build.debug_optim=
+wiolink.menu.optim.Lite=Lite
+wiolink.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+wiolink.menu.optim.Full=Optimum
+wiolink.menu.optim.Full.build.debug_optim=-Og
 wiolink.menu.lvl.SSL=SSL
 wiolink.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wiolink.menu.lvl.TLS_MEM=TLS_MEM
@@ -7055,6 +7143,7 @@ blynk.serial.disableRTS=true
 blynk.build.mcu=esp8266
 blynk.build.core=esp8266
 blynk.build.spiffs_pagesize=256
+blynk.build.debug_optim=
 blynk.build.debug_port=
 blynk.build.debug_level=
 blynk.menu.xtal.80=80 MHz
@@ -7157,15 +7246,17 @@ blynk.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATUR
 blynk.menu.dbg.Disabled=Disabled
 blynk.menu.dbg.Disabled.build.debug_port=
 blynk.menu.dbg.Serial=Serial
-blynk.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+blynk.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 blynk.menu.dbg.Serial1=Serial1
-blynk.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-blynk.menu.dbg.Serial-dbg=Serial (full debug)
-blynk.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-blynk.menu.dbg.Serial1-dbg=Serial1 (full debug)
-blynk.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+blynk.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 blynk.menu.lvl.None____=None
 blynk.menu.lvl.None____.build.debug_level=
+blynk.menu.optim.Smallest=None
+blynk.menu.optim.Smallest.build.debug_optim=
+blynk.menu.optim.Lite=Lite
+blynk.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+blynk.menu.optim.Full=Optimum
+blynk.menu.optim.Full.build.debug_optim=-Og
 blynk.menu.lvl.SSL=SSL
 blynk.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 blynk.menu.lvl.TLS_MEM=TLS_MEM
@@ -7271,6 +7362,7 @@ thing.serial.disableRTS=true
 thing.build.mcu=esp8266
 thing.build.core=esp8266
 thing.build.spiffs_pagesize=256
+thing.build.debug_optim=
 thing.build.debug_port=
 thing.build.debug_level=
 thing.menu.xtal.80=80 MHz
@@ -7373,15 +7465,17 @@ thing.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATUR
 thing.menu.dbg.Disabled=Disabled
 thing.menu.dbg.Disabled.build.debug_port=
 thing.menu.dbg.Serial=Serial
-thing.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+thing.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 thing.menu.dbg.Serial1=Serial1
-thing.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-thing.menu.dbg.Serial-dbg=Serial (full debug)
-thing.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-thing.menu.dbg.Serial1-dbg=Serial1 (full debug)
-thing.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+thing.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 thing.menu.lvl.None____=None
 thing.menu.lvl.None____.build.debug_level=
+thing.menu.optim.Smallest=None
+thing.menu.optim.Smallest.build.debug_optim=
+thing.menu.optim.Lite=Lite
+thing.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+thing.menu.optim.Full=Optimum
+thing.menu.optim.Full.build.debug_optim=-Og
 thing.menu.lvl.SSL=SSL
 thing.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 thing.menu.lvl.TLS_MEM=TLS_MEM
@@ -7487,6 +7581,7 @@ thingdev.serial.disableRTS=true
 thingdev.build.mcu=esp8266
 thingdev.build.core=esp8266
 thingdev.build.spiffs_pagesize=256
+thingdev.build.debug_optim=
 thingdev.build.debug_port=
 thingdev.build.debug_level=
 thingdev.menu.xtal.80=80 MHz
@@ -7589,15 +7684,17 @@ thingdev.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEA
 thingdev.menu.dbg.Disabled=Disabled
 thingdev.menu.dbg.Disabled.build.debug_port=
 thingdev.menu.dbg.Serial=Serial
-thingdev.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+thingdev.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 thingdev.menu.dbg.Serial1=Serial1
-thingdev.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-thingdev.menu.dbg.Serial-dbg=Serial (full debug)
-thingdev.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-thingdev.menu.dbg.Serial1-dbg=Serial1 (full debug)
-thingdev.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+thingdev.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 thingdev.menu.lvl.None____=None
 thingdev.menu.lvl.None____.build.debug_level=
+thingdev.menu.optim.Smallest=None
+thingdev.menu.optim.Smallest.build.debug_optim=
+thingdev.menu.optim.Lite=Lite
+thingdev.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+thingdev.menu.optim.Full=Optimum
+thingdev.menu.optim.Full.build.debug_optim=-Og
 thingdev.menu.lvl.SSL=SSL
 thingdev.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 thingdev.menu.lvl.TLS_MEM=TLS_MEM
@@ -7703,6 +7800,7 @@ esp210.build.mcu=esp8266
 esp210.build.core=esp8266
 esp210.build.variant=generic
 esp210.build.spiffs_pagesize=256
+esp210.build.debug_optim=
 esp210.build.debug_port=
 esp210.build.debug_level=
 esp210.menu.xtal.80=80 MHz
@@ -7805,15 +7903,17 @@ esp210.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATU
 esp210.menu.dbg.Disabled=Disabled
 esp210.menu.dbg.Disabled.build.debug_port=
 esp210.menu.dbg.Serial=Serial
-esp210.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+esp210.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 esp210.menu.dbg.Serial1=Serial1
-esp210.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-esp210.menu.dbg.Serial-dbg=Serial (full debug)
-esp210.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-esp210.menu.dbg.Serial1-dbg=Serial1 (full debug)
-esp210.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+esp210.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 esp210.menu.lvl.None____=None
 esp210.menu.lvl.None____.build.debug_level=
+esp210.menu.optim.Smallest=None
+esp210.menu.optim.Smallest.build.debug_optim=
+esp210.menu.optim.Lite=Lite
+esp210.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+esp210.menu.optim.Full=Optimum
+esp210.menu.optim.Full.build.debug_optim=-Og
 esp210.menu.lvl.SSL=SSL
 esp210.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 esp210.menu.lvl.TLS_MEM=TLS_MEM
@@ -7919,6 +8019,7 @@ espinotee.serial.disableRTS=true
 espinotee.build.mcu=esp8266
 espinotee.build.core=esp8266
 espinotee.build.spiffs_pagesize=256
+espinotee.build.debug_optim=
 espinotee.build.debug_port=
 espinotee.build.debug_level=
 espinotee.menu.xtal.80=80 MHz
@@ -8021,15 +8122,17 @@ espinotee.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FE
 espinotee.menu.dbg.Disabled=Disabled
 espinotee.menu.dbg.Disabled.build.debug_port=
 espinotee.menu.dbg.Serial=Serial
-espinotee.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+espinotee.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 espinotee.menu.dbg.Serial1=Serial1
-espinotee.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-espinotee.menu.dbg.Serial-dbg=Serial (full debug)
-espinotee.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-espinotee.menu.dbg.Serial1-dbg=Serial1 (full debug)
-espinotee.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+espinotee.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espinotee.menu.lvl.None____=None
 espinotee.menu.lvl.None____.build.debug_level=
+espinotee.menu.optim.Smallest=None
+espinotee.menu.optim.Smallest.build.debug_optim=
+espinotee.menu.optim.Lite=Lite
+espinotee.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+espinotee.menu.optim.Full=Optimum
+espinotee.menu.optim.Full.build.debug_optim=-Og
 espinotee.menu.lvl.SSL=SSL
 espinotee.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espinotee.menu.lvl.TLS_MEM=TLS_MEM
@@ -8135,6 +8238,7 @@ wifi_kit_8.serial.disableRTS=true
 wifi_kit_8.build.mcu=esp8266
 wifi_kit_8.build.core=esp8266
 wifi_kit_8.build.spiffs_pagesize=256
+wifi_kit_8.build.debug_optim=
 wifi_kit_8.build.debug_port=
 wifi_kit_8.build.debug_level=
 wifi_kit_8.menu.xtal.80=80 MHz
@@ -8237,15 +8341,17 @@ wifi_kit_8.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_F
 wifi_kit_8.menu.dbg.Disabled=Disabled
 wifi_kit_8.menu.dbg.Disabled.build.debug_port=
 wifi_kit_8.menu.dbg.Serial=Serial
-wifi_kit_8.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+wifi_kit_8.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 wifi_kit_8.menu.dbg.Serial1=Serial1
-wifi_kit_8.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-wifi_kit_8.menu.dbg.Serial-dbg=Serial (full debug)
-wifi_kit_8.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-wifi_kit_8.menu.dbg.Serial1-dbg=Serial1 (full debug)
-wifi_kit_8.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+wifi_kit_8.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifi_kit_8.menu.lvl.None____=None
 wifi_kit_8.menu.lvl.None____.build.debug_level=
+wifi_kit_8.menu.optim.Smallest=None
+wifi_kit_8.menu.optim.Smallest.build.debug_optim=
+wifi_kit_8.menu.optim.Lite=Lite
+wifi_kit_8.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+wifi_kit_8.menu.optim.Full=Optimum
+wifi_kit_8.menu.optim.Full.build.debug_optim=-Og
 wifi_kit_8.menu.lvl.SSL=SSL
 wifi_kit_8.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifi_kit_8.menu.lvl.TLS_MEM=TLS_MEM
@@ -8351,6 +8457,7 @@ wifiduino.serial.disableRTS=true
 wifiduino.build.mcu=esp8266
 wifiduino.build.core=esp8266
 wifiduino.build.spiffs_pagesize=256
+wifiduino.build.debug_optim=
 wifiduino.build.debug_port=
 wifiduino.build.debug_level=
 wifiduino.menu.xtal.80=80 MHz
@@ -8453,15 +8560,17 @@ wifiduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FE
 wifiduino.menu.dbg.Disabled=Disabled
 wifiduino.menu.dbg.Disabled.build.debug_port=
 wifiduino.menu.dbg.Serial=Serial
-wifiduino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+wifiduino.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 wifiduino.menu.dbg.Serial1=Serial1
-wifiduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-wifiduino.menu.dbg.Serial-dbg=Serial (full debug)
-wifiduino.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-wifiduino.menu.dbg.Serial1-dbg=Serial1 (full debug)
-wifiduino.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+wifiduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifiduino.menu.lvl.None____=None
 wifiduino.menu.lvl.None____.build.debug_level=
+wifiduino.menu.optim.Smallest=None
+wifiduino.menu.optim.Smallest.build.debug_optim=
+wifiduino.menu.optim.Lite=Lite
+wifiduino.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+wifiduino.menu.optim.Full=Optimum
+wifiduino.menu.optim.Full.build.debug_optim=-Og
 wifiduino.menu.lvl.SSL=SSL
 wifiduino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifiduino.menu.lvl.TLS_MEM=TLS_MEM
@@ -8584,6 +8693,7 @@ wifinfo.serial.disableRTS=true
 wifinfo.build.mcu=esp8266
 wifinfo.build.core=esp8266
 wifinfo.build.spiffs_pagesize=256
+wifinfo.build.debug_optim=
 wifinfo.build.debug_port=
 wifinfo.build.debug_level=
 wifinfo.menu.xtal.80=80 MHz
@@ -8725,15 +8835,17 @@ wifinfo.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEAT
 wifinfo.menu.dbg.Disabled=Disabled
 wifinfo.menu.dbg.Disabled.build.debug_port=
 wifinfo.menu.dbg.Serial=Serial
-wifinfo.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+wifinfo.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 wifinfo.menu.dbg.Serial1=Serial1
-wifinfo.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-wifinfo.menu.dbg.Serial-dbg=Serial (full debug)
-wifinfo.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-wifinfo.menu.dbg.Serial1-dbg=Serial1 (full debug)
-wifinfo.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+wifinfo.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifinfo.menu.lvl.None____=None
 wifinfo.menu.lvl.None____.build.debug_level=
+wifinfo.menu.optim.Smallest=None
+wifinfo.menu.optim.Smallest.build.debug_optim=
+wifinfo.menu.optim.Lite=Lite
+wifinfo.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+wifinfo.menu.optim.Full=Optimum
+wifinfo.menu.optim.Full.build.debug_optim=-Og
 wifinfo.menu.lvl.SSL=SSL
 wifinfo.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifinfo.menu.lvl.TLS_MEM=TLS_MEM
@@ -8839,6 +8951,7 @@ cw01.serial.disableRTS=true
 cw01.build.mcu=esp8266
 cw01.build.core=esp8266
 cw01.build.spiffs_pagesize=256
+cw01.build.debug_optim=
 cw01.build.debug_port=
 cw01.build.debug_level=
 cw01.menu.xtal.80=80 MHz
@@ -8944,15 +9057,17 @@ cw01.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURE
 cw01.menu.dbg.Disabled=Disabled
 cw01.menu.dbg.Disabled.build.debug_port=
 cw01.menu.dbg.Serial=Serial
-cw01.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial -Os -fno-optimize-sibling-calls
+cw01.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 cw01.menu.dbg.Serial1=Serial1
-cw01.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Os -fno-optimize-sibling-calls
-cw01.menu.dbg.Serial-dbg=Serial (full debug)
-cw01.menu.dbg.Serial-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial -Og
-cw01.menu.dbg.Serial1-dbg=Serial1 (full debug)
-cw01.menu.dbg.Serial1-dbg.build.debug_port=-DDEBUG_ESP_PORT=Serial1 -Og
+cw01.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 cw01.menu.lvl.None____=None
 cw01.menu.lvl.None____.build.debug_level=
+cw01.menu.optim.Smallest=None
+cw01.menu.optim.Smallest.build.debug_optim=
+cw01.menu.optim.Lite=Lite
+cw01.menu.optim.Lite.build.debug_optim=-fno-optimize-sibling-calls
+cw01.menu.optim.Full=Optimum
+cw01.menu.optim.Full.build.debug_optim=-Og
 cw01.menu.lvl.SSL=SSL
 cw01.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 cw01.menu.lvl.TLS_MEM=TLS_MEM
