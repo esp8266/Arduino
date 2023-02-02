@@ -1362,9 +1362,9 @@ def all_debug ():
             ( '.menu.lvl.None____', 'None' ),
             ( '.menu.lvl.None____.build.debug_level', '' ),
             ( '.menu.optim.Smallest', 'None' ),
-            ( '.menu.optim.Smallest.build.debug_optim', '' ),
+            ( '.menu.optim.Smallest.build.debug_optim', '-Os' ),
             ( '.menu.optim.Lite', 'Lite' ),
-            ( '.menu.optim.Lite.build.debug_optim', '-fno-optimize-sibling-calls' ),
+            ( '.menu.optim.Lite.build.debug_optim', '-Os -fno-optimize-sibling-calls' ),
             ( '.menu.optim.Full', 'Optimum' ),
             ( '.menu.optim.Full.build.debug_optim', '-Og' ),
         ])
@@ -1747,7 +1747,7 @@ def all_boards ():
     print('menu.ResetMethod=Reset Method')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
-    print('menu.optim=Debug Priority')
+    print('menu.optim=Debug Optimization')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=C++ Exceptions')

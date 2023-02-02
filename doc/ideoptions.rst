@@ -127,35 +127,25 @@ There are a number of options.
 - The last (``NoAssert - NDEBUG``) is even quieter than the first (some
   internal guards are skipped to save more flash).
 - The other ones may be used when asked by a maintainer or if you are a
-  developper trying to debug some issues.
+  developer trying to debug some issues.
 
-Debug Priority
-~~~~~~~~~~~~~~
+Debug Optimization
+~~~~~~~~~~~~~~~~~~
 
-Due to the limited resources on the device, the compiler's default optimizations
-focus on creating the smallest code size (``.bin`` file). For the GCC compiler,
-the option ``-Os`` contains the base set of optimizations we use. This set is
-fine for release but not ideal for debugging.
+Due to the limited resources on the device, our default compiler optimizations
+focus on creating the smallest code size (``.bin`` file). That is fine for
+release but not ideal for debugging.
 
-Our available view of a crash is the `Stack Dump <Troubleshooting/stack_dump.rst>`__
-For some situations, the optimizer doesn't write caller return addresses to the
-stack. When we crash, the list of functions called is missing. And when the
-crash occurs in a leaf function, there is seldom if ever any evidence of who
-called.
-
-``Debug Priority`` for a more complete Exception Decoder report change selection.
-- ``Lite`` uses ``-fno-optimize-sibling-calls`` to modify the ``-Os`` option
-  set - to place more caller addresses on the Stack.
-- ``Optimum`` uses the ``-Og`` option. GCC considers this the ideal optimization
-  for the "edit-compile-debug cycle" ... "producing debuggable code". You can
-  review the specifics at
-  `GCC's Optimize Options <https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html>`__
-  From their list of the optimization flags that are suppressed, it should yield
-  a better matchup between crash address and source code than we get with
-  ``Lite`` selection. The code size will be larger than the ``Lite`` selection.
-  This option will also address the leaf function issue in a later compiler
-  update.
+``Debug Optimization`` use to improve Exception Decoder results.
+- ``Lite`` impact on code size uses ``-fno-optimize-sibling-calls`` to alter
+  the ``-Os`` compiler option to place more caller addresses on the Stack.
+- ``Optimum`` offers better quality stack content for the Exception Decoder at
+  the expense of a larger code size. It uses the ``-Og`` compiler option.
+  It turns off more optimizations that can make debugging difficult.
 - ``None`` no changes for debugging continue using ``-Os``.
+
+For more topic depth, read `Improving Exception Decoder Results <faq/a02-my-esp-crashes.rst#improving-exception-decoder-results>`__
+
 
 lwIP variant
 ~~~~~~~~~~~~
