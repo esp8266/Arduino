@@ -144,6 +144,9 @@ release but not ideal for debugging.
   It turns off more optimizations that can make debugging difficult.
 - ``None`` no changes for debugging continue using ``-Os``.
 
+Take note some sketches may start working after changing the optimization.
+Or fail less often.
+
 For more topic depth, read `Improving Exception Decoder Results <faq/a02-my-esp-crashes.rst#improving-exception-decoder-results>`__
 
 
