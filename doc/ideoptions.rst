@@ -137,15 +137,18 @@ focus on creating the smallest code size (``.bin`` file). That is fine for
 release but not ideal for debugging.
 
 ``Debug Optimization`` use to improve Exception Decoder results.
+
 - ``Lite`` impact on code size uses ``-fno-optimize-sibling-calls`` to alter
   the ``-Os`` compiler option to place more caller addresses on the Stack.
 - ``Optimum`` offers better quality stack content for the Exception Decoder at
-  the expense of a larger code size. It uses the ``-Og`` compiler option.
-  It turns off more optimizations that can make debugging difficult.
+  the expense of a larger code size. It uses the ``-Og`` compiler option, which
+  turns off optimizations that can make debugging difficult while keeping
+  others.
 - ``None`` no changes for debugging continue using ``-Os``.
 
-Take note some sketches may start working after changing the optimization.
-Or fail less often.
+Take note some sketches may start working after changing the optimization. Or
+fail less often. And it is also possible (not likely) that source code that
+was working with ``-Os`` may break with ``-Og``.
 
 For more topic depth, read `Improving Exception Decoder Results <faq/a02-my-esp-crashes.rst#improving-exception-decoder-results>`__
 

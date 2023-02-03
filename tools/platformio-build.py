@@ -206,13 +206,6 @@ env.Append(
 )
 
 #
-# debug
-#
-for type in env["build_type"]):
-    if type.startsWith("debug"):
-        env.Append(some_extra_options=["-Og"])
-
-#
 # lwIP
 #
 flatten_cppdefines = env.Flatten(env["CPPDEFINES"])
@@ -255,14 +248,6 @@ else:
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
     )
     lwip_lib = "lwip2-536-feat"
-
-#D #
-#D # debug
-#D #
-#D if "DEBUG_ESP_PORT" in flatten_cppdefines:
-#D     env.Append(CCFLAGS=[("-Os"), ("-fno-optimize-sibling-calls")])
-#D     env.Append(CCFLAGS=["-Og"])
-#D if "BUILD_TYPE" in
 
 #
 # Waveform
