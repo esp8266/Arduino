@@ -302,10 +302,10 @@ When you select ``Debug Optimization: Lite`` on the Arduino IDE Tools menu, it
 turns off ``optimize-sibling-calls``. Turning off this optimization allows more
 caller addresses to be written to the stack, improving the results from the
 Exception Decoder. Without this option, the callers involved in the crash may be
-missing from the results. Because of the limited stack space, there is the
-remote possibility that removing this optimization could lead to more frequent
-stack overflows. You only want to do this in a debug setting. This option does
-not help the chained function issue.
+missing from the Decoder results. Because of the limited stack space, there is
+the remote possibility that removing this optimization could lead to more
+frequent stack overflows. You only want to do this in a debug setting. This
+option does not help the chained function issue.
 
 When you select ``Debug Optimization: Optimum``, you get an even more complete
 stack trace. For example, chained function calls may show up. This selection

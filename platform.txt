@@ -44,7 +44,7 @@ build.stdcpp_level=-std=gnu++17
 
 build.stacksmash_flags=
 
-# legacy fallback
+# Default - never leave undefined
 build.debug_optim=-Os
 
 build.float=-u _printf_float -u _scanf_float

@@ -57,11 +57,12 @@ the hex after are the stack dump.
 Decode
 ~~~~~~
 
-It's possible to decode the Stack to readable information. For more info see the `Esp Exception Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ tool.
+It's possible to decode the Stack to readable information.
+You can get a copy and read about the `Esp Exception Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ tool.
+
+For a troubleshooting example using the Exception Decoder Tool, read `FAQ: My ESP Crashes <../faq/a02-my-esp-crashes.rst#exception-decoder>`__.
 
 .. figure:: ESP_Exception_Decoderp.png
    :alt: ESP Exception Decoder
 
    ESP Exception Decoder
-
-For more on troubleshooting, read `FAQ: My ESP Crashes <../faq/a02-my-esp-crashes.rst>`__.
