@@ -306,7 +306,7 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
     bool operator != (const compare_s& o) { return memcmp(this, &o, sizeof(o)) != 0; }
   };
   static compare_s last { false, 0, HC_NONE };
-  compare_s now = { _currentClient.connected(), _currentClient.available(), _currentStatus };
+  compare_s now { _currentClient.connected(), _currentClient.available(), _currentStatus };
 
   if (last != now)
   {
