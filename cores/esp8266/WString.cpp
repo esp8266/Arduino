@@ -200,7 +200,7 @@ bool String::reserve(unsigned int size) {
 #ifdef DEBUG_ESP_PORT
 static void identifyString (const String& badOne)
 {
-    DEBUGV("[String] '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s': ",
+    DEBUG_ESP_PORT.printf("[String] '%." STR(OOM_STRING_BORDER_DISPLAY) "s ... %." STR(OOM_STRING_BORDER_DISPLAY) "s': ",
         badOne.c_str(),
         badOne.length() > OOM_STRING_BORDER_DISPLAY? badOne.c_str() + std::max((int)badOne.length() - OOM_STRING_BORDER_DISPLAY, OOM_STRING_BORDER_DISPLAY): "");
 }
@@ -231,14 +231,14 @@ bool String::changeBuffer(unsigned int maxStrLen) {
     if (!isSSO() && capacity() >= OOM_STRING_THRESHOLD_REALLOC_WARN && maxStrLen > capacity()) {
         // warn when badly re-allocating
         identifyString(*this);
-        DEBUGV("Reallocating large String(%d -> %d bytes)\n", len(), maxStrLen);
+        DEBUG_ESP_PORT.printf("Reallocating large String(%d -> %d bytes)\n", len(), maxStrLen);
     }
 #endif
     // Make sure we can fit newsize in the buffer
     if (newSize > CAPACITY_MAX) {
 #ifdef DEBUG_ESP_PORT
         identifyString(*this);
-        DEBUGV("Maximum capacity reached (" STR(CAPACITY_MAX) ")\n");
+        DEBUG_ESP_PORT.printf("Maximum capacity reached (" STR(CAPACITY_MAX) ")\n");
 #endif
         return false;
     }
@@ -261,7 +261,7 @@ bool String::changeBuffer(unsigned int maxStrLen) {
     }
 #ifdef DEBUG_ESP_PORT
     identifyString(*this);
-    DEBUGV("OOM: %d -> %d bytes\n", isSSO() ? 0: capacity(), newSize);
+    DEBUG_ESP_PORT.printf("OOM: %d -> %zu bytes\n", isSSO() ? 0: capacity(), newSize);
 #endif
     return false;
 }
