@@ -296,12 +296,30 @@ void ESP8266WebServerTemplate<ServerType>::handleClient() {
   bool keepCurrentClient = false;
   bool callYield = false;
 
-  DBGWS("http-server loop: conn=%d avail=%d status=%s\n",
-    _currentClient.connected(), _currentClient.available(),
-    _currentStatus==HC_NONE?"none":
-    _currentStatus==HC_WAIT_READ?"wait-read":
-    _currentStatus==HC_WAIT_CLOSE?"wait-close":
-    "??");
+#ifdef DEBUG_ESP_HTTP_SERVER
+
+  struct compare_s
+  {
+    uint8_t connected;
+    int available;
+    HTTPClientStatus status;
+    bool operator != (const compare_s& o) { return memcmp(this, &o, sizeof(o)) != 0; }
+  };
+  static compare_s last { false, 0, HC_NONE };
+  compare_s now = { _currentClient.connected(), _currentClient.available(), _currentStatus };
+
+  if (last != now)
+  {
+    DBGWS("http-server loop: conn=%d avail=%d status=%s\n",
+      _currentClient.connected(), _currentClient.available(),
+      _currentStatus==HC_NONE?"none":
+      _currentStatus==HC_WAIT_READ?"wait-read":
+      _currentStatus==HC_WAIT_CLOSE?"wait-close":
+      "??");
+    last = now;
+  }
+
+#endif // DEBUG_ESP_HTTP_SERVER
 
   if (_currentClient.connected() || _currentClient.available()) {
     if (_currentClient.available() && _keepAlive) {
