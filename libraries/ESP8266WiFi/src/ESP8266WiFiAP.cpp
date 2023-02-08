@@ -26,6 +26,8 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiAP.h"
 
+#include <LwipDhcpServer-NonOS.h>
+
 extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
@@ -37,7 +39,6 @@ extern "C" {
 }
 
 #include "debug.h"
-#include "LwipDhcpServer.h"
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -93,8 +94,9 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  * @param max_connection    Max simultaneous connected clients, 0 - 8. https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832
+ * @param beacon_interval   set arbitrary beacon interval (influences DTIM)
  */
-bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection) {
+bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
@@ -104,13 +106,13 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
 
     size_t ssid_len = ssid ? strlen(ssid) : 0;
     if(ssid_len == 0 || ssid_len > 32) {
-        DEBUG_WIFI("[AP] SSID length %u, too long or missing!\n", ssid_len);
+        DEBUG_WIFI("[AP] SSID length %zu, too long or missing!\n", ssid_len);
         return false;
     }
 
     size_t psk_len = psk ? strlen(psk) : 0;
     if(psk_len > 0 && (psk_len > 64 || psk_len < 8)) {
-        DEBUG_WIFI("[AP] fail psk length %u, too long or short!\n", psk_len);
+        DEBUG_WIFI("[AP] fail psk length %zu, too long or short!\n", psk_len);
         return false;
     }
 
@@ -137,7 +139,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
     conf.channel = channel;
     conf.ssid_hidden = ssid_hidden;
     conf.max_connection = max_connection;
-    conf.beacon_interval = 100;
+    conf.beacon_interval = beacon_interval;
 
     struct softap_config conf_compare;
     if(WiFi._persistent){
@@ -166,33 +168,30 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
-    dhcpSoftAP.end();
+    wifi_softap_dhcps_stop();
 
     // check IP config
     struct ip_info ip;
     if(wifi_get_ip_info(SOFTAP_IF, &ip)) {
         if(ip.ip.addr == 0x00000000) {
-            // Invalid config
             DEBUG_WIFI("[AP] IP config Invalid resetting...\n");
-            //192.168.4.1 , 192.168.4.1 , 255.255.255.0
-            ret = softAPConfig(0x0104A8C0, 0x0104A8C0, 0x00FFFFFF);
-            if(!ret) {
-                DEBUG_WIFI("[AP] softAPConfig failed!\n");
-                ret = false;
-            }
+            ret = softAPConfig(
+                IPAddress(192, 168, 4, 1),
+                IPAddress(192, 168, 4, 1),
+                IPAddress(255, 255, 255, 0));
         }
     } else {
         DEBUG_WIFI("[AP] wifi_get_ip_info failed!\n");
         ret = false;
     }
 
-    dhcpSoftAP.begin(&ip);
+    wifi_softap_dhcps_start();
 
     return ret;
 }
 
-bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection) {
-    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection);
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
+    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection, beacon_interval);
 }
 
 /**
@@ -224,10 +223,10 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     info.gw.addr = gateway.v4();
     info.netmask.addr = subnet.v4();
 
-    if(!wifi_softap_dhcps_stop()) {
-        DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
-    }
-
+    // use SDK function for dhcps, not just server.begin()
+    // setting info with static IPs will fail otherwise
+    // (TODO: dhcps_flag seems to store 'SDK' DHCPs status)
+    wifi_softap_dhcps_stop();
     if(!wifi_set_ip_info(SOFTAP_IF, &info)) {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
@@ -244,30 +243,17 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
-    if(!dhcpSoftAP.set_dhcps_lease(&dhcp_lease))
+    auto& server = softAPDhcpServer();
+    if(!server.set_dhcps_lease(&dhcp_lease))
     {
-        DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
+        DEBUG_WIFI("[APConfig] server set_dhcps_lease failed!\n");
         ret = false;
     }
 
-    // set lease time to 720min --> 12h
-    if(!dhcpSoftAP.set_dhcps_lease_time(720))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_lease_time failed!\n");
-        ret = false;
-    }
+    // send ROUTER option with netif's gateway IP
+    server.setRouter(true);
 
-    uint8 mode = info.gw.addr ? 1 : 0;
-    if(!dhcpSoftAP.set_dhcps_offer_option(OFFER_ROUTER, &mode))
-    {
-        DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
-        ret = false;
-    }
-
-    if(!wifi_softap_dhcps_start()) {
-        DEBUG_WIFI("[APConfig] wifi_softap_dhcps_start failed!\n");
-        ret = false;
-    }
+    wifi_softap_dhcps_start();
 
     // check config
     if(wifi_get_ip_info(SOFTAP_IF, &info)) {
@@ -291,7 +277,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 /**
  * Disconnect from the network (close AP)
  * @param wifioff disable mode?
- * @return one value of wl_status_t enum
+ * @return operation success
  */
 bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     bool ret;
@@ -388,4 +374,12 @@ String ESP8266WiFiAPClass::softAPPSK() const {
     psk.concat(ptr, strnlen(ptr, sizeof(config.password)));
 
     return psk;
+}
+
+/**
+ * Get the static DHCP server instance attached to the softAP interface
+ * @return DhcpServer instance.
+ */
+DhcpServer& ESP8266WiFiAPClass::softAPDhcpServer() {
+    return getNonOSDhcpServer();
 }

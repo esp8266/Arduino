@@ -23,9 +23,8 @@
 
 #if defined(CORE_MOCK)
 
-constexpr bool __byteAddressable(const void* addr)
+constexpr bool __byteAddressable(const void*)
 {
-    (void)addr;
     return true;
 }
 
@@ -34,7 +33,7 @@ constexpr bool __byteAddressable(const void* addr)
 #include <sys/config.h>
 
 // returns true when addr can be used without "pgm_" functions or non32xfer service
-constexpr bool __byteAddressable(const void* addr)
+inline bool __byteAddressable(const void* addr)
 {
     return addr < (const void*)(XCHAL_DATARAM0_VADDR + XCHAL_DATARAM0_SIZE);
 }

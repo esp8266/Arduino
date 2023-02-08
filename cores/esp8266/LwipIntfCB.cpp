@@ -1,44 +1,78 @@
+/*
+  LwipIntfCB.cpp
+
+  network generic callback implementation
+
+  Original Copyright (c) 2020 esp8266 Arduino All rights reserved.
+  This file is part of the esp8266 Arduino core environment.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include <LwipIntf.h>
 #include <Schedule.h>
 #include <debug.h>
 
-#define NETIF_STATUS_CB_SIZE 3
+static constexpr size_t LwipIntfCallbacks = 3;
 
-static int netifStatusChangeListLength = 0;
-LwipIntf::CBType netifStatusChangeList [NETIF_STATUS_CB_SIZE];
+static LwipIntf::CBType callbacks[LwipIntfCallbacks];
+static size_t           size = 0;
 
+// override empty weak function from glue-lwip
 extern "C" void netif_status_changed(struct netif* netif)
 {
-    // override the default empty weak function
-    for (int i = 0; i < netifStatusChangeListLength; i++)
+    for (size_t index = 0; index < size; ++index)
     {
-        netifStatusChangeList[i](netif);
+        callbacks[index](netif);
     }
 }
 
-bool LwipIntf::stateChangeSysCB(LwipIntf::CBType&& cb)
+bool LwipIntf::statusChangeCB(LwipIntf::CBType cb)
 {
-    if (netifStatusChangeListLength >= NETIF_STATUS_CB_SIZE)
+    if (size < LwipIntfCallbacks)
     {
+        callbacks[size++] = std::move(cb);
+        return true;
+    }
 #if defined(DEBUG_ESP_CORE)
-        DEBUGV("NETIF_STATUS_CB_SIZE is too low\n");
+    DEBUGV("LwipIntf::CB %zu/%zu, cannot add more!\n", size, size);
 #endif
-        return false;
-    }
 
-    netifStatusChangeList[netifStatusChangeListLength++] = cb;
-    return true;
+    return false;
 }
 
-bool LwipIntf::stateUpCB(LwipIntf::CBType&& cb)
+bool LwipIntf::stateUpCB(LwipIntf::CBType cb)
 {
-    return stateChangeSysCB([cb](netif * nif)
-    {
-        if (netif_is_up(nif))
-            schedule_function([cb, nif]()
+    return statusChangeCB(
+        [cb](netif* interface)
         {
-            cb(nif);
+            if (netif_is_up(interface))
+            {
+                cb(interface);
+            }
         });
-    });
+}
+
+bool LwipIntf::stateDownCB(LwipIntf::CBType cb)
+{
+    return statusChangeCB(
+        [cb](netif* interface)
+        {
+            if (!netif_is_up(interface))
+            {
+                cb(interface);
+            }
+        });
 }

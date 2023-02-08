@@ -21,8 +21,6 @@
 */
 
 
-#define LWIP_INTERNAL
-
 extern "C" {
     #include "osapi.h"
     #include "ets_sys.h"
@@ -109,8 +107,31 @@ bool WiFiServer::hasClient() {
     return false;
 }
 
+size_t WiFiServer::hasClientData() {
+    ClientContext *next = _unclaimed;
+    while (next) {
+        size_t s = next->getSize();
+        // return the amount of data available from the first connection that has any
+        if (s) return s;
+        next = next->next();
+    }
+    return 0;
+}
+
+bool WiFiServer::hasMaxPendingClients() {
+#if TCP_LISTEN_BACKLOG
+    return ((struct tcp_pcb_listen *)_listen_pcb)->accepts_pending >= MAX_PENDING_CLIENTS_PER_PORT;
+#else
+    return false;
+#endif
+}
+
 WiFiClient WiFiServer::available(byte* status) {
     (void) status;
+    return accept();
+}
+
+WiFiClient WiFiServer::accept() {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
 
@@ -152,18 +173,6 @@ void WiFiServer::stop() {
     close();
 }
 
-size_t WiFiServer::write(uint8_t b) {
-    return write(&b, 1);
-}
-
-size_t WiFiServer::write(const uint8_t *buffer, size_t size) {
-    // write to all clients
-    // not implemented
-    (void) buffer;
-    (void) size;
-    return 0;
-}
-
 template<typename T>
 T* slist_append_tail(T* head, T* item) {
     if (!head)
@@ -175,7 +184,7 @@ T* slist_append_tail(T* head, T* item) {
     return head;
 }
 
-long WiFiServer::_accept(tcp_pcb* apcb, long err) {
+err_t WiFiServer::_accept(tcp_pcb* apcb, err_t err) {
     (void) err;
     DEBUGV("WS:ac\r\n");
 
@@ -201,7 +210,7 @@ void WiFiServer::_discard(ClientContext* client) {
     DEBUGV("WS:dis\r\n");
 }
 
-long WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, long err) {
+err_t WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, err_t err) {
     return reinterpret_cast<WiFiServer*>(arg)->_accept(newpcb, err);
 }
 

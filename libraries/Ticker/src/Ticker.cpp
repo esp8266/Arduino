@@ -23,49 +23,127 @@
 #include "eagle_soc.h"
 #include "osapi.h"
 
+#include <Arduino.h>
 #include "Ticker.h"
 
-Ticker::Ticker()
-    : _timer(nullptr) {}
+// ETSTimer is part of the instance, and we don't have any state besides
+// the things required for the callback. Allow copies and moves, but
+// disable any member copies and default-init + detach() instead.
 
 Ticker::~Ticker()
 {
     detach();
 }
 
-void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, void* arg)
+Ticker::Ticker(const Ticker&)
 {
-    if (_timer)
-    {
+}
+
+Ticker& Ticker::operator=(const Ticker&)
+{
+    detach();
+    return *this;
+}
+
+Ticker::Ticker(Ticker&& other) noexcept
+{
+    other.detach();
+}
+
+Ticker& Ticker::operator=(Ticker&& other) noexcept
+{
+    other.detach();
+    detach();
+    return *this;
+}
+
+void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
+{
+    if (_timer) {
         os_timer_disarm(_timer);
-    }
-    else
-    {
-        _timer = &_etsTimer;
+    } else {
+        _timer = &_timer_internal;
     }
 
-    os_timer_setfn(_timer, callback, arg);
-    os_timer_arm(_timer, milliseconds, repeat);
+    os_timer_setfn(_timer,
+        [](void* ptr) {
+            reinterpret_cast<Ticker*>(ptr)->_static_callback();
+        }, this);
+
+    _repeat = repeat;
+
+    // whenever duration excedes this limit, make timer repeatable N times
+    // in case it is really repeatable, it will reset itself and continue as usual
+    size_t total = 0;
+    if (milliseconds > DurationMax) {
+        total = 1;
+        while (milliseconds > DurationMax) {
+            total *= 2;
+            milliseconds /= 2;
+        }
+        _tick.reset(new callback_tick_t{
+            .total = total,
+            .count = 0,
+        });
+        repeat = true;
+    }
+
+    os_timer_arm(_timer, milliseconds.count(), repeat);
 }
 
 void Ticker::detach()
 {
-    if (!_timer)
-        return;
-
-    os_timer_disarm(_timer);
-    _timer = nullptr;
-    _callback_function = nullptr;
+    if (_timer) {
+        os_timer_disarm(_timer);
+        _timer = nullptr;
+        _tick.reset(nullptr);
+        _callback = std::monostate{};
+    }
 }
 
 bool Ticker::active() const
 {
-    return _timer;
+    return _timer != nullptr;
 }
 
-void Ticker::_static_callback(void* arg)
+void Ticker::_static_callback()
 {
-    Ticker* _this = reinterpret_cast<Ticker*>(arg);
-    if (_this && _this->_callback_function)
-        _this->_callback_function();
+    if (_tick) {
+        ++_tick->count;
+        if (_tick->count < _tick->total) {
+            return;
+        }
+    }
+
+    // it is technically allowed to call either schedule or detach
+    // *during* callback execution. allow both to happen
+    decltype(_callback) tmp;
+    std::swap(tmp, _callback);
+
+    std::visit([](auto&& callback) {
+        using T = std::decay_t<decltype(callback)>;
+        if constexpr (std::is_same_v<T, callback_ptr_t>) {
+            callback.func(callback.arg);
+        } else if constexpr (std::is_same_v<T, callback_function_t>) {
+            callback();
+        }
+    }, tmp);
+
+    // ...and move ourselves back only when object is in a valid state
+    // * ticker was not detached, zeroing timer pointer
+    // * nothing else replaced callback variant
+    if ((_timer == nullptr) || !std::holds_alternative<std::monostate>(_callback)) {
+        return;
+    }
+
+    std::swap(tmp, _callback);
+
+    if (_repeat) {
+        if (_tick) {
+            _tick->count = 0;
+        }
+        return;
+    }
+
+    detach();
 }

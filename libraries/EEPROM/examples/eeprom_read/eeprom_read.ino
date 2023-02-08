@@ -32,9 +32,7 @@ void loop() {
 
   // there are only 512 bytes of EEPROM, from 0 to 511, so if we're
   // on address 512, wrap around to address 0
-  if (address == 512) {
-    address = 0;
-  }
+  if (address == 512) { address = 0; }
 
   delay(500);
 }

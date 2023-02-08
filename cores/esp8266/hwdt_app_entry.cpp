@@ -180,7 +180,9 @@
  * tool performing hardware reset and exiting, then the serial monitor
  * re-engaging. This is not an issue that needs to be addressed here.
  */
- #define DEBUG_ESP_HWDT_PRINT_GREETING
+ #ifndef DEBUG_ESP_HWDT_PRINT_GREETING
+ #define DEBUG_ESP_HWDT_PRINT_GREETING (1)
+ #endif
 
 
 /*
@@ -275,6 +277,8 @@
 #include <esp8266_peri.h>
 #include <uart.h>
 #include <pgmspace.h>
+#include "umm_malloc/umm_malloc.h"
+#include "mmu_iram.h"
 
 extern "C" {
 #include <user_interface.h>
@@ -952,13 +956,13 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
                 /* Print separate ctx: cont stack */
 
                 /* Check if cont stack is yielding to SYS */
-                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
-                    ctx_cont_ptr = (const uint32_t *)((uintptr_t)g_pcont->sp_yield - 8u);
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_suspend) {
+                    ctx_cont_ptr = (const uint32_t *)((uintptr_t)g_pcont->sp_suspend - 8u);
                 }
                 print_stack((uintptr_t)ctx_cont_ptr, (uintptr_t)g_pcont->stack_end, PRINT_STACK::CONT);
             } else {
-                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_yield) {
-                    ETS_PRINTF("\nCont stack is yielding. Active stack starts at 0x%08X.\n", (uint32_t)g_pcont->sp_yield - 8u);
+                if (0 == hwdt_info.cont_integrity && 0 != g_pcont->pc_suspend) {
+                    ETS_PRINTF("\nCont stack is yielding. Active stack starts at 0x%08X.\n", (uint32_t)g_pcont->sp_suspend - 8u);
                 }
             }
 
@@ -994,7 +998,7 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
     }
 #endif
 
-#if defined(DEBUG_ESP_HWDT_PRINT_GREETING)
+#if DEBUG_ESP_HWDT_PRINT_GREETING
     ETS_PRINTF("\n\nHardware WDT Stack Dump - enabled\n\n");
 #else
     ETS_PRINTF("\n\n");
@@ -1006,6 +1010,18 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
     }
 #endif
 }
+
+#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
+static void printSanityCheck() {
+  ETS_PRINTF("\n\nsys_stack_first:         %p\n", sys_stack_first);
+  ETS_PRINTF(    "CONT_STACK:              %p\n", CONT_STACK);
+  ETS_PRINTF(    "g_pcont:                 %p\n", g_pcont);
+  ETS_PRINTF(    "ROM_STACK:               %p\n", ROM_STACK);
+  ETS_PRINTF(    "get_noextra4k_g_pcont(): %p\n", get_noextra4k_g_pcont());
+  ETS_PRINTF(    "g_rom_stack:             %p\n", g_rom_stack);
+  ETS_PRINTF(    "g_rom_stack_A16_sz:      0x%08X\n\n", g_rom_stack_A16_sz);
+}
+#endif //DEBUG_ESP_HWDT_DEV_DEBUG
 
 /*
  * Using Cache_Read_Enable/Cache_Read_Disable to reduce IRAM usage. Moved
@@ -1019,34 +1035,11 @@ STATIC void IRAM_MAYBE handle_hwdt(void) {
  * https://richard.burtons.org/2015/06/12/esp8266-cache_read_enable/.
  * Additional insight can be gleemed from reviewing the ESP8266_RTOS_SDK.
  * (eg. ../components/bootloader_support/src/bootloader_utility.c)
+ *
+ * The logic to use Cache_Read_Enable and Cache_Read_Disable has been
+ * generalized into a wrapper function, mmu_wrap_irom_fn, and moved to
+ * mmu_iram.cpp.
  */
-#define ICACHE_SIZE_32 1
-#define ICACHE_SIZE_16 0
-
-extern "C" void Cache_Read_Disable(void);
-extern "C" void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
-
-#ifndef USE_IRAM
-static void IRAM_ATTR __attribute__((noinline)) handle_hwdt_icache() __attribute__((used));
-void handle_hwdt_icache() {
-  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
-  handle_hwdt();
-  Cache_Read_Disable();
-}
-#endif // USE_IRAM
-
-
-#if defined(DEBUG_ESP_HWDT_DEV_DEBUG) && !defined(USE_IRAM)
-static void printSanityCheck() {
-  ETS_PRINTF("\n\nsys_stack_first:         %p\n", sys_stack_first);
-  ETS_PRINTF(    "CONT_STACK:              %p\n", CONT_STACK);
-  ETS_PRINTF(    "g_pcont:                 %p\n", g_pcont);
-  ETS_PRINTF(    "ROM_STACK:               %p\n", ROM_STACK);
-  ETS_PRINTF(    "get_noextra4k_g_pcont(): %p\n", get_noextra4k_g_pcont());
-  ETS_PRINTF(    "g_rom_stack:             %p\n", g_rom_stack);
-  ETS_PRINTF(    "g_rom_stack_A16_sz:      0x%08X\n\n", g_rom_stack_A16_sz);
-}
-#endif //DEBUG_ESP_HWDT_DEV_DEBUG
 
 /*
    hwdt_pre_sdk_init() is the result of a hook for development diagnotics which
@@ -1071,9 +1064,8 @@ void hwdt_pre_sdk_init(void) {
 #endif
 }
 
-static void IRAM_ATTR __attribute__((noinline)) hwdt_pre_sdk_init_icache(void) __attribute__((used));
+static void __attribute__((noinline)) hwdt_pre_sdk_init_icache(void) __attribute__((used));
 void hwdt_pre_sdk_init_icache(void) {
-  Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
 #ifdef DEBUG_ESP_HWDT_UART_SPEED
   const uint32_t uart_divisor = set_uart_speed(0, DEBUG_ESP_HWDT_UART_SPEED);
 #endif
@@ -1085,7 +1077,6 @@ void hwdt_pre_sdk_init_icache(void) {
       adjust_uart_speed(uart_divisor);
   }
 #endif
-  Cache_Read_Disable();
 }
 
 /*
@@ -1106,6 +1097,7 @@ asm  (
     ".literal .umm_init, umm_init\n\t"
     ".literal .call_user_start, call_user_start\n\t"
     ".literal .get_noextra4k_g_pcont, get_noextra4k_g_pcont\n\t"
+    ".literal .mmu_wrap_irom_fn, mmu_wrap_irom_fn\n\t"
     ".align  4\n\t"
     ".global app_entry_redefinable\n\t"
     ".type   app_entry_redefinable, @function\n\t"
@@ -1129,7 +1121,9 @@ asm  (
 #ifdef USE_IRAM
     "call0   handle_hwdt\n\t"
 #else
-    "call0   handle_hwdt_icache\n\t"
+    "l32r    a0, .mmu_wrap_irom_fn\n\t"
+    "movi    a2, handle_hwdt\n\t"
+    "callx0  a0\n\t"
 #endif
     /*
      *  Use new calculated SYS stack from top.
@@ -1160,7 +1154,9 @@ asm  (
     /*
      * Allow for running additional diagnotics supplied at link time.
      */
-    "call0    hwdt_pre_sdk_init_icache\n\t"
+    "l32r     a0, .mmu_wrap_irom_fn\n\t"
+    "movi     a2, hwdt_pre_sdk_init_icache\n\t"
+    "callx0   a0\n\t"
 
     // In case somebody cares, leave things as we found them
     // - Restore ROM BSS zeros.
@@ -1174,7 +1170,12 @@ asm  (
      * improvements could possibly use hwdt_pre_sdk_init() to run other early
      * diagnostic tools.
      */
+#ifdef UMM_INIT_USE_IRAM
     "l32r     a0, .umm_init\n\t"
+#else
+    "l32r     a0, .mmu_wrap_irom_fn\n\t"
+    "l32r     a2, .umm_init\n\t"
+#endif
     "callx0   a0\n\t"
 
     "l32r     a3, .call_user_start\n\t"

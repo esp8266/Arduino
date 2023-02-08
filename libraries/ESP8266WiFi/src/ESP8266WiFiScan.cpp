@@ -36,9 +36,7 @@ extern "C" {
 }
 
 #include "debug.h"
-
-extern "C" void esp_schedule();
-extern "C" void esp_yield();
+#include <coredecls.h>
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- Private functions ------------------------------------------------
@@ -94,11 +92,13 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
         ESP8266WiFiScanClass::_scanStarted = true;
 
         if(ESP8266WiFiScanClass::_scanAsync) {
-            delay(0); // time for the OS to trigger the scan
+            esp_yield(); // time for the OS to trigger the scan
             return WIFI_SCAN_RUNNING;
         }
 
-        esp_yield(); // will resume when _scanDone fires
+        // will resume when _scanDone fires
+        esp_suspend([]() { return !ESP8266WiFiScanClass::_scanComplete && ESP8266WiFiScanClass::_scanStarted; });
+
         return ESP8266WiFiScanClass::_scanCount;
     } else {
         return WIFI_SCAN_FAILED;
@@ -147,6 +147,14 @@ void ESP8266WiFiScanClass::scanDelete() {
     _scanComplete = false;
 }
 
+/**
+ * returns const pointer to the requested scanned wifi entry for furthor parsing.
+ * @param networkItem int
+ * @return struct bss_info*, may be NULL
+ */
+const bss_info *ESP8266WiFiScanClass::getScanInfoByIndex(int i) {
+    return reinterpret_cast<const bss_info*>(_getScanInfoByIndex(i));
+};
 
 /**
  * loads all infos from a scanned wifi in to the ptr parameters
@@ -322,7 +330,7 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
     ESP8266WiFiScanClass::_scanStarted = false;
     ESP8266WiFiScanClass::_scanComplete = true;
 
-    if(!ESP8266WiFiScanClass::_scanAsync) {
+    if (!ESP8266WiFiScanClass::_scanAsync) {
         esp_schedule(); // resume scanNetworks
     } else if (ESP8266WiFiScanClass::_onComplete) {
         ESP8266WiFiScanClass::_onComplete(ESP8266WiFiScanClass::_scanCount);

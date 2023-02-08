@@ -138,7 +138,7 @@ SECTIONS
 
     *(.text.app_entry*)  /* The main startup code */
 
-    *(.text.gdbstub*, .text.gdb_init)    /* Any GDB hooks */
+    *(.text.gdbstub* .text.gdb_init)    /* Any GDB hooks */
 
     /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
     *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
@@ -155,12 +155,30 @@ SECTIONS
     LONG(0x00000000);
 
     *(.ver_number)
-    *.c.o(.literal*, .text*)
-    *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal*, EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
-    *.cc.o(.literal*, .text*)
+    *.c.o(.literal* .text*)
+    *.cpp.o(EXCLUDE_FILE (umm_malloc.cpp.o) .literal* EXCLUDE_FILE (umm_malloc.cpp.o) .text*)
+    *.cc.o(.literal* .text*)
 #ifdef VTABLES_IN_FLASH
     *(.rodata._ZTV*) /* C++ vtables */
 #endif
+
+    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
+    /*  C++ constructor and destructor tables, properly ordered:  */
+    __init_array_start = ABSOLUTE(.);
+    KEEP (*crtbegin.o(.ctors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+    KEEP (*(SORT(.ctors.*)))
+    KEEP (*(.ctors))
+    __init_array_end = ABSOLUTE(.);
+    KEEP (*crtbegin.o(.dtors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+    KEEP (*(SORT(.dtors.*)))
+    KEEP (*(.dtors))
+    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
+    _bss_table_start = ABSOLUTE(.);
+    LONG(_bss_start)
+    LONG(_bss_end)
+    _bss_table_end = ABSOLUTE(.);
 
     *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
     *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
@@ -220,7 +238,7 @@ SECTIONS
     *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
-    *(.irom.exceptiontext, .rodata.exceptiontext)
+    *(.irom.exceptiontext .rodata.exceptiontext)
     *(.rodata.*__exception_what__*) /* G++ seems to throw out templatized section attributes */
 
     /* c++ typeof IDs, etc. */

@@ -182,7 +182,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
     if (!isForm) {
       if (contentLength) {
         // add key=value: plain={body} (post json or other data)
-        RequestArgument& arg = _currentArgs[_currentArgCount++];
+        RequestArgument& arg = _currentArgs[_currentArgCount];
         arg.key = F("plain");
         arg.value = plainBuf;
         _currentArgsHavePlain = 1;

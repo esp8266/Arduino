@@ -82,40 +82,48 @@ done
 git submodule update --init
 
 export HOME="${TMPCI}"
-export TRAVIS_BUILD_DIR="${TMPCI}"
+export ESP8266_ARDUINO_BUILD_DIR="${TMPCI}"
 export BUILD_TYPE="$BUILD_TYPE"
 
 if [ "$BUILD_TYPE" = "build" ]; then
     tests/build.sh
+
 elif [ "$BUILD_TYPE" = "build_even" ]; then
-    BUILD_PARITY=even tests/build.sh
+    tests/build.sh even
+
 elif [ "$BUILD_TYPE" = "build_odd" ]; then
-    BUILD_PARITY=odd tests/build.sh
+    tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = "debug_even" ]; then
-    BUILD_PARITY=even tests/debug.sh
+    env ESP8266_ARDUINO_DEBUG=debug tests/build.sh even
+
 elif [ "$BUILD_TYPE" = "debug_odd" ]; then
-    BUILD_PARITY=odd tests/debug.sh
+    env ESP8266_ARDUINO_DEBUG=debug tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = "build6" ]; then
-    tests/build6.sh
+    env ESP8266_ARDUINO_LWIP=lm6f tests/build.sh
+
 elif [ "$BUILD_TYPE" = "build6_even" ]; then
-    BUILD_PARITY=even tests/build6.sh
+    env ESP8266_ARDUINO_LWIP=lm6f tests/build.sh even
+
 elif [ "$BUILD_TYPE" = "build6_odd" ]; then
-    BUILD_PARITY=odd tests/build6.sh
+    env ESP8266_ARDUINO_LWIP=lm6f tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = "platformio" ]; then
-    tests/platformio.sh
+    env ESP8266_ARDUINO_BUILDER=platformio tests/build.sh
+
 elif [ "$BUILD_TYPE" = "platformio_even" ]; then
-    BUILD_PARITY=even tests/platformio.sh
+    env ESP8266_ARDUINO_BUILDER=platformio tests/build.sh even
+
 elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
-    BUILD_PARITY=odd tests/platformio.sh
+    env ESP8266_ARDUINO_BUILDER=platformio tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = host ]; then
     tests/ci/host_test.sh
 
 elif [ "$BUILD_TYPE" = style ]; then
-    tests/ci/install_astyle.sh
+    tests/ci/style_check.sh
+    tests/restyle.sh
 
 else
     echo "BUILD_TYPE not set or invalid"

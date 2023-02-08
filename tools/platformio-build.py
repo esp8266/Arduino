@@ -59,7 +59,13 @@ if gzip_fw:
     gzip_switch = ["--gzip", "PIO"]
 
 env.Append(
-    ASFLAGS=["-x", "assembler-with-cpp"],
+    ASFLAGS=[
+        "-mlongcalls",
+        "-mtext-section-literals",
+    ],
+    ASPPFLAGS=[
+        "-x", "assembler-with-cpp",
+    ],
 
     # General options that are passed to the C compiler (C only; not C++)
     CFLAGS=[
@@ -78,7 +84,6 @@ env.Append(
         "-mtext-section-literals",
         "-falign-functions=4",
         "-U__STRICT_ANSI__",
-        "-D_GNU_SOURCE",
         "-ffunction-sections",
         "-fdata-sections",
         "-Wall",
@@ -119,8 +124,10 @@ env.Append(
         ("F_CPU", "$BOARD_F_CPU"),
         "__ets__",
         "ICACHE_FLASH",
+        "_GNU_SOURCE",
         ("ARDUINO", 10805),
         ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
+        ("ARDUINO_BOARD_ID", '\\"%s\\"' % env.BoardConfig().id),
         "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
         "LWIP_OPEN_SRC"
     ],
@@ -166,54 +173,43 @@ env.Append(
     )
 )
 
-# copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
-env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
-
-flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
-
 #
 # SDK
 #
-if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK3V0", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0")]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK221" in flatten_cppdefines:
-    #(previous default)
-    env.Append(
-        CPPDEFINES=[("NONOSDK221", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221")]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190313" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x_190313", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190313")]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191024" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x_191024", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191024")]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191105" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x_191105", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191105")]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_191122" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x_191122", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_191122")]
-    )
-else: #(default) if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x_190703" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("NONOSDK22x_190703", 1)],
-        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x_190703")]
-    )
+NONOSDK_VERSIONS = (
+    ("SDK22x_190703", "NONOSDK22x_190703"),
+    ("SDK221", "NONOSDK221"),
+    ("SDK22x_190313", "NONOSDK22x_190313"),
+    ("SDK22x_191024", "NONOSDK22x_191024"),
+    ("SDK22x_191105", "NONOSDK22x_191105"),
+    ("SDK22x_191122", "NONOSDK22x_191122"),
+    ("SDK305", "NONOSDK305"),
+)
+nonosdk_version = NONOSDK_VERSIONS[0]
+
+NONOSDK_PREFIX = "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_"
+for define in env["CPPDEFINES"]:
+    if isinstance(define, (tuple, list)):
+        define, *_ = define
+    if define.startswith(NONOSDK_PREFIX):
+        for version in NONOSDK_VERSIONS:
+            name, _ = version
+            if define.endswith(name):
+                nonosdk_version = version
+
+NONOSDK_LIBPATH=join(FRAMEWORK_DIR, "tools", "sdk", "lib", nonosdk_version[1])
+assert isdir(NONOSDK_LIBPATH)
+
+env.Append(
+    CPPDEFINES=[(nonosdk_version[1], 1)],
+    LIBPATH=[NONOSDK_LIBPATH],
+)
 
 #
 # lwIP
 #
+flatten_cppdefines = env.Flatten(env["CPPDEFINES"])
+
 lwip_lib = None
 if "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
@@ -334,7 +330,7 @@ elif "PIO_FRAMEWORK_ARDUINO_MMU_CUSTOM" in flatten_cppdefines:
     for flag in env["CPPDEFINES"]:
         define = flag
         if isinstance(flag, (tuple, list)):
-            define, _ = flag
+            define, *_ = flag
         if define.startswith("MMU_"):
             mmu_flags.append(flag)
 # PIO_FRAMEWORK_ARDUINO_MMU_CACHE32_IRAM32 (default)

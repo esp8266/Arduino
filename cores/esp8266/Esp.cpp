@@ -26,7 +26,7 @@
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
-
+#include "flash_hal.h"
 #include "coredecls.h"
 #include "umm_malloc/umm_malloc.h"
 #include <pgmspace.h>
@@ -115,20 +115,18 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-extern "C" void esp_yield();
-
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep_instant(time_us);
-    esp_yield();
+    esp_suspend();
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
@@ -200,7 +198,7 @@ void EspClass::reset(void)
 void EspClass::restart(void)
 {
     system_restart();
-    esp_yield();
+    esp_suspend();
 }
 
 [[noreturn]] void EspClass::rebootIntoUartDownloadMode()
@@ -221,13 +219,15 @@ uint16_t EspClass::getVcc(void)
 
 uint32_t EspClass::getFreeHeap(void)
 {
-    return system_get_free_heap_size();
+    return umm_free_heap_size_lw();
 }
 
-uint16_t EspClass::getMaxFreeBlockSize(void)
+#if defined(UMM_INFO)
+uint32_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
 }
+#endif
 
 uint32_t EspClass::getFreeContStack()
 {
@@ -293,6 +293,9 @@ uint32_t EspClass::getFlashChipRealSize(void)
 
 uint32_t EspClass::getFlashChipSize(void)
 {
+#if FLASH_MAP_SUPPORT
+    return getFlashChipRealSize();
+#else
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
@@ -300,6 +303,7 @@ uint32_t EspClass::getFlashChipSize(void)
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
     }
     return 0;
+#endif
 }
 
 uint32_t EspClass::getFlashChipSpeed(void)
@@ -325,6 +329,7 @@ FlashMode_t EspClass::getFlashChipMode(void)
     return mode;
 }
 
+#if !FLASH_MAP_SUPPORT
 uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
     switch(byte & 0x0F) {
         case 0x0: // 4 Mbit (512KB)
@@ -345,6 +350,7 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return 0;
     }
 }
+#endif
 
 uint32_t EspClass::magicFlashChipSpeed(uint8_t byte) {
     switch(byte & 0x0F) {
@@ -465,7 +471,7 @@ bool EspClass::checkFlashCRC() {
     uint32_t firstPart = (uintptr_t)&__crc_len - 0x40200000; // How many bytes to check before the 1st CRC val
 
     // Start the checksum
-    uint32_t crc = crc32((const void*)0x40200000, firstPart, 0xffffffff);
+    uint32_t crc = crc32((const void*)0x40200000, firstPart);
     // Pretend the 2 words of crc/len are zero to be idempotent
     crc = crc32(z, 8, crc);
     // Finish the CRC calculation over the rest of flash
@@ -614,14 +620,12 @@ uint32_t EspClass::getSketchSize() {
     return result;
 }
 
-extern "C" uint32_t _FS_start;
-
 uint32_t EspClass::getFreeSketchSpace() {
 
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)FS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
@@ -671,7 +675,46 @@ bool EspClass::flashEraseSector(uint32_t sector) {
     return rc == 0;
 }
 
+// Adapted from the old version of `flash_hal_write()` (before 3.0.0), which was used for SPIFFS to allow
+// writing from both unaligned u8 buffers and to an unaligned offset on flash.
+// Updated version re-uses some of the code from RTOS, replacing individual methods for block & page
+// writes with just a single one
+// https://github.com/espressif/ESP8266_RTOS_SDK/blob/master/components/spi_flash/src/spi_flash.c
+// (if necessary, we could follow the esp-idf code and introduce flash chip drivers controling more than just writing methods?)
+
+// This is a generic writer that does not cross page boundaries.
+// Offset, data address and size *must* be 4byte aligned.
+static SpiFlashOpResult spi_flash_write_page_break(uint32_t offset, uint32_t *data, size_t size) {
+    static constexpr uint32_t PageSize { FLASH_PAGE_SIZE };
+    size_t size_page_aligned = PageSize - (offset % PageSize);
+
+    // most common case, we don't cross a page and simply write the data
+    if (size < size_page_aligned) {
+        return spi_flash_write(offset, data, size);
+    }
+
+    // otherwise, write the initial part and continue writing breaking each page interval
+    SpiFlashOpResult result = SPI_FLASH_RESULT_ERR;
+    if ((result = spi_flash_write(offset, data, size_page_aligned)) != SPI_FLASH_RESULT_OK) {
+        return result;
+    }
+
+    const auto last_page = (size - size_page_aligned) / PageSize;
+    for (uint32_t page = 0; page < last_page; ++page) {
+        if ((result = spi_flash_write(offset + size_page_aligned, data + (size_page_aligned >> 2), PageSize)) != SPI_FLASH_RESULT_OK) {
+            return result;
+        }
+
+        size_page_aligned += PageSize;
+    }
+
+    // finally, the remaining data
+    return spi_flash_write(offset + size_page_aligned, data + (size_page_aligned >> 2), size - size_page_aligned);
+}
+
 #if PUYA_SUPPORT
+// Special wrapper for spi_flash_write *only for PUYA flash chips*
+// Already handles paging, could be used as a `spi_flash_write_page_break` replacement
 static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     if (data == nullptr) {
       return SPI_FLASH_RESULT_ERR;
@@ -718,195 +761,129 @@ static SpiFlashOpResult spi_flash_write_puya(uint32_t offset, uint32_t *data, si
 }
 #endif
 
-bool EspClass::flashReplaceBlock(uint32_t address, const uint8_t *value, uint32_t byteCount) {
-    uint32_t alignedAddress = (address & ~3);
-    uint32_t alignmentOffset = address - alignedAddress;
+static constexpr size_t Alignment { 4 };
 
-    if (alignedAddress != ((address + byteCount - 1) & ~3)) {
-        // Only one 4 byte block is supported
-        return false;
-    }
-#if PUYA_SUPPORT
-    if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-        uint8_t tempData[4] __attribute__((aligned(4)));
-        if (spi_flash_read(alignedAddress, (uint32_t *)tempData, 4) != SPI_FLASH_RESULT_OK) {
-            return false;
-        }
-        for (size_t i = 0; i < byteCount; i++) {
-            tempData[i + alignmentOffset] &= value[i];
-        }
-        if (spi_flash_write(alignedAddress, (uint32_t *)tempData, 4) != SPI_FLASH_RESULT_OK) {
-            return false;
-        }
-    }
-    else
-#endif // PUYA_SUPPORT
-    {
-        uint32_t tempData;
-        if (spi_flash_read(alignedAddress, &tempData, 4) != SPI_FLASH_RESULT_OK) {
-            return false;
-        }
-        memcpy((uint8_t *)&tempData + alignmentOffset, value, byteCount);
-        if (spi_flash_write(alignedAddress, &tempData, 4) != SPI_FLASH_RESULT_OK) {
-            return false;
-        }
-    }
-    return true;
+template <typename T>
+static T aligned(T value) {
+    static constexpr auto Mask = Alignment - 1;
+    return (value + Mask) & ~Mask;
 }
+
+template <typename T>
+static T alignBefore(T value) {
+    return aligned(value) - Alignment;
+}
+
+static bool isAlignedAddress(uint32_t address) {
+    return (address & (Alignment - 1)) == 0;
+}
+
+static bool isAlignedSize(size_t size) {
+    return (size & (Alignment - 1)) == 0;
+}
+
+static bool isAlignedPointer(const uint8_t *ptr) {
+    return isAlignedAddress(reinterpret_cast<uint32_t>(ptr));
+}
+
 
 size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size) {
-    size_t sizeLeft = (size & ~3);
-    size_t currentOffset = 0;
-    // Memory is unaligned, so we need to copy it to an aligned buffer
-    uint32_t alignedData[FLASH_PAGE_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
-    // Handle page boundary
-    bool pageBreak = ((address % 4) != 0) && ((address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
+    auto flash_write = [](uint32_t address, uint8_t *data, size_t size) {
+        return spi_flash_write(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
+    };
 
-    if (pageBreak) {
-        size_t byteCount = 4 - (address % 4);
+    auto flash_read = [](uint32_t address, uint8_t *data, size_t size) {
+        return spi_flash_read(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
+    };
 
-        if (!flashReplaceBlock(address, data, byteCount)) {
+    constexpr size_t BufferSize { FLASH_PAGE_SIZE };
+    alignas(alignof(uint32_t)) uint8_t buf[BufferSize];
+
+    size_t written = 0;
+
+    if (!isAlignedAddress(address)) {
+        auto before_address = alignBefore(address);
+        auto offset = address - before_address;
+        auto wlen = std::min(Alignment - offset, size);
+
+        if (!flash_read(before_address, &buf[0], Alignment)) {
             return 0;
         }
-        // We will now have aligned address, so we can cross page boundaries
-        currentOffset += byteCount;
-        // Realign size to 4
-        sizeLeft = (size - byteCount) & ~3;
-    }
 
-    while (sizeLeft) {
-        size_t willCopy = std::min(sizeLeft, sizeof(alignedData));
-        memcpy(alignedData, data + currentOffset, willCopy);
-        // We now have address, data and size aligned to 4 bytes, so we can use aligned write
-        if (!flashWrite(address + currentOffset, alignedData, willCopy))
-        {
+#if PUYA_SUPPORT
+        if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
+            for (size_t i = 0; i < wlen ; ++i) {
+                buf[offset + i] &= data[i];
+            }
+        } else {
+#endif
+            memcpy(&buf[offset], data, wlen);
+#if PUYA_SUPPORT
+        }
+#endif
+
+        if (!flash_write(before_address, &buf[0], Alignment)) {
             return 0;
         }
-        sizeLeft -= willCopy;
-        currentOffset += willCopy;
+
+        address += wlen;
+        data += wlen;
+        written += wlen;
+        size -= wlen;
     }
 
-    return currentOffset;
-}
+    while (size > 0) {
+        auto len = std::min(size, BufferSize);
+        auto wlen = aligned(len);
 
-bool EspClass::flashWritePageBreak(uint32_t address, const uint8_t *data, size_t size) {
-    if (size > 4) {
-        return false;
-    }
-    size_t pageLeft = FLASH_PAGE_SIZE - (address % FLASH_PAGE_SIZE);
-    size_t offset = 0;
-    size_t sizeLeft = size;
-    if (pageLeft > 3) {
-        return false;
+        if (wlen != len) {
+            auto partial = wlen - Alignment;
+            if (!flash_read(address + partial, &buf[partial], Alignment)) {
+                return written;
+            }
+        }
+
+        memcpy(&buf[0], data, len);
+        if (!flashWrite(address, reinterpret_cast<const uint32_t *>(&buf[0]), wlen)) {
+            return written;
+        }
+
+        address += len;
+        data += len;
+        written += len;
+        size -= len;
     }
 
-    if (!flashReplaceBlock(address, data, pageLeft)) {
-        return false;
-    }
-    offset += pageLeft;
-    sizeLeft -= pageLeft;
-    // We replaced last 4-byte block of the page, now we write the remainder in next page
-    if (!flashReplaceBlock(address + offset, data + offset, sizeLeft)) {
-        return false;
-    }
-    return true;
+    return written;
 }
 
 bool EspClass::flashWrite(uint32_t address, const uint32_t *data, size_t size) {
-    SpiFlashOpResult rc = SPI_FLASH_RESULT_OK;
-    bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + size - 1) / FLASH_PAGE_SIZE));
-
-    if ((uintptr_t)data % 4 != 0 || size % 4 != 0 || pageBreak) {
-        return false;
-    }
+    SpiFlashOpResult result;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
-        rc = spi_flash_write_puya(address, const_cast<uint32_t *>(data), size);
+        result = spi_flash_write_puya(address, const_cast<uint32_t *>(data), size);
     }
     else
-#endif // PUYA_SUPPORT
+#endif
     {
-        rc = spi_flash_write(address, const_cast<uint32_t *>(data), size);
+        result = spi_flash_write_page_break(address, const_cast<uint32_t *>(data), size);
     }
-    return rc == SPI_FLASH_RESULT_OK;
+    return result == SPI_FLASH_RESULT_OK;
 }
 
 bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
-    if (size == 0) {
-        return true;
-    }
-
-    size_t sizeLeft = size & ~3;
-    size_t currentOffset = 0;
-
-    if (sizeLeft) {
-        if ((uintptr_t)data % 4 != 0) {
-            size_t written = flashWriteUnalignedMemory(address, data, size);
-            if (!written) {
-                return false;
-            }
-            currentOffset += written;
-            sizeLeft -= written;
-        } else {
-            bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
-
-            if (pageBreak) {
-                while (sizeLeft) {
-                    // We cannot cross page boundary, but the write must be 4 byte aligned,
-                    // so this is the maximum amount we can write
-                    size_t pageBoundary = (FLASH_PAGE_SIZE - ((address + currentOffset) % FLASH_PAGE_SIZE)) & ~3;
-
-                    if (sizeLeft > pageBoundary) {
-                        // Aligned write up to page boundary
-                        if (!flashWrite(address + currentOffset, (uint32_t *)(data + currentOffset), pageBoundary)) {
-                            return false;
-                        }
-                        currentOffset += pageBoundary;
-                        sizeLeft -= pageBoundary;
-                        // Cross the page boundary
-                        if (!flashWritePageBreak(address + currentOffset, data + currentOffset, 4)) {
-                            return false;
-                        }
-                        currentOffset += 4;
-                        sizeLeft -= 4;
-                    } else {
-                        // We do not cross page boundary
-                        if (!flashWrite(address + currentOffset, (uint32_t *)(data + currentOffset), sizeLeft)) {
-                            return false;
-                        }
-                        currentOffset += sizeLeft;
-                        sizeLeft = 0;
-                    }
-                }
-            } else {
-                // Pointer is properly aligned and write does not cross page boundary,
-                // so use aligned write
-                if (!flashWrite(address, (uint32_t *)data, sizeLeft)) {
-                    return false;
-                }
-                currentOffset = sizeLeft;
-                sizeLeft = 0;
-            }
+    if (data && size) {
+        if (!isAlignedAddress(address)
+         || !isAlignedPointer(data)
+         || !isAlignedSize(size))
+        {
+            return flashWriteUnalignedMemory(address, data, size) == size;
         }
-    }
-    sizeLeft = size - currentOffset;
-    if (sizeLeft > 0) {
-        // Size was not aligned, so we have some bytes left to write, we also need to recheck for
-        // page boundary crossing
-        bool pageBreak = ((address % 4) != 0 && (address / FLASH_PAGE_SIZE) != ((address + sizeLeft - 1) / FLASH_PAGE_SIZE));
 
-        if (pageBreak) {
-            // Cross the page boundary
-            if (!flashWritePageBreak(address + currentOffset, data + currentOffset, sizeLeft)) {
-                return false;
-            }
-        } else {
-            // Just write partial block
-            flashReplaceBlock(address + currentOffset, data + currentOffset, sizeLeft);
-        }
+        return flashWrite(address, reinterpret_cast<const uint32_t *>(data), size);
     }
 
-    return true;
+    return false;
 }
 
 bool EspClass::flashRead(uint32_t address, uint8_t *data, size_t size) {
@@ -914,23 +891,24 @@ bool EspClass::flashRead(uint32_t address, uint8_t *data, size_t size) {
     size_t currentOffset = 0;
 
     if ((uintptr_t)data % 4 != 0) {
-        uint32_t alignedData[FLASH_PAGE_SIZE / sizeof(uint32_t)] __attribute__((aligned(4)));
+        constexpr size_t BufferSize { FLASH_PAGE_SIZE / sizeof(uint32_t) };
+        alignas(alignof(uint32_t)) uint32_t buf[BufferSize];
         size_t sizeLeft = sizeAligned;
 
         while (sizeLeft) {
-            size_t willCopy = std::min(sizeLeft, sizeof(alignedData));
+            size_t willCopy = std::min(sizeLeft, BufferSize);
             // We read to our aligned buffer and then copy to data
-            if (!flashRead(address + currentOffset, alignedData, willCopy))
+            if (!flashRead(address + currentOffset, &buf[0], willCopy))
             {
                 return false;
             }
-            memcpy(data + currentOffset, alignedData, willCopy);
+            memcpy(data + currentOffset, &buf[0], willCopy);
             sizeLeft -= willCopy;
             currentOffset += willCopy;
         }
     } else {
         // Pointer is properly aligned, so use aligned read
-        if (!flashRead(address, (uint32_t *)data, sizeAligned)) {
+        if (!flashRead(address, reinterpret_cast<uint32_t *>(data), sizeAligned)) {
             return false;
         }
         currentOffset = sizeAligned;
@@ -938,10 +916,10 @@ bool EspClass::flashRead(uint32_t address, uint8_t *data, size_t size) {
 
     if (currentOffset < size) {
         uint32_t tempData;
-        if (spi_flash_read(address + currentOffset, &tempData, 4) != SPI_FLASH_RESULT_OK) {
+        if (spi_flash_read(address + currentOffset, &tempData, sizeof(tempData)) != SPI_FLASH_RESULT_OK) {
             return false;
         }
-        memcpy((uint8_t *)data + currentOffset, &tempData, size - currentOffset);
+        memcpy(data + currentOffset, &tempData, size - currentOffset);
     }
 
     return true;
@@ -971,7 +949,7 @@ String EspClass::getSketchMD5()
     md5.begin();
     while( lengthLeft > 0) {
         size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
-        if (!flashRead(offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)) {
+        if (!flashRead(offset, reinterpret_cast<uint32_t *>(buf.get()), (readBytes + 3) & ~3)) {
             return emptyString;
         }
         md5.add(buf.get(), readBytes);

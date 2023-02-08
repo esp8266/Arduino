@@ -26,11 +26,9 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
-extern "C" void esp_yield();
-extern "C" void esp_schedule();
-
 #include <assert.h>
 #include <esp_priv.h>
+#include <coredecls.h>
 
 bool getDefaultPrivateGlobalSyncValue ();
 
@@ -145,11 +143,8 @@ public:
         }
         _connect_pending = true;
         _op_start_time = millis();
-        for (decltype(_timeout_ms) i = 0; _connect_pending && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-               // will resume on timeout or when _connected or _notify_error fires
-        }
+        // will resume on timeout or when _connected or _notify_error fires
+        esp_delay(_timeout_ms, [this]() { return this->_connect_pending; });
         _connect_pending = false;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -352,7 +347,7 @@ public:
                 last_sent = millis();
             }
 
-            delay(0); // from sys or os context
+            esp_yield(); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 // peer has closed or all bytes are sent and acked
@@ -458,9 +453,10 @@ protected:
     void _notify_error()
     {
         if (_connect_pending || _send_waiting) {
+            // resume connect or _write_from_source
             _send_waiting = false;
             _connect_pending = false;
-            esp_schedule(); // break delay in connect or _write_from_source
+            esp_schedule();
         }
     }
 
@@ -487,11 +483,8 @@ protected:
             }
 
             _send_waiting = true;
-            for (decltype(_timeout_ms) i = 0; _send_waiting && i < _timeout_ms; i++) {
-               // Give scheduled functions a chance to run (e.g. Ethernet uses recurrent)
-               delay(1);
-               // will resume on timeout or when _write_some_from_cb or _notify_error fires
-            }
+            // will resume on timeout or when _write_some_from_cb or _notify_error fires
+            esp_delay(_timeout_ms, [this]() { return this->_send_waiting; });
             _send_waiting = false;
         } while(true);
 
@@ -561,8 +554,9 @@ protected:
     void _write_some_from_cb()
     {
         if (_send_waiting) {
+            // resume _write_from_source
             _send_waiting = false;
-            esp_schedule(); // break delay in _write_from_source
+            esp_schedule();
         }
     }
 
@@ -649,8 +643,9 @@ protected:
         (void) pcb;
         assert(pcb == _pcb);
         if (_connect_pending) {
+            // resume connect
             _connect_pending = false;
-            esp_schedule(); // break delay in connect
+            esp_schedule();
         }
         return ERR_OK;
     }

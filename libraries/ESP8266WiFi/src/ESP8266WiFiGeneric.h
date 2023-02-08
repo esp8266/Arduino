@@ -24,6 +24,10 @@
 #define ESP8266WIFIGENERIC_H_
 
 #include "ESP8266WiFiType.h"
+
+#include <IPAddress.h>
+#include <lwip/dns.h>
+
 #include <functional>
 #include <memory>
 
@@ -44,11 +48,14 @@ typedef void (*WiFiEventCb)(WiFiEvent_t);
 
 enum class DNSResolveType: uint8_t
 {
-    DNS_AddrType_IPv4 = 0,	// LWIP_DNS_ADDRTYPE_IPV4 = 0
-    DNS_AddrType_IPv6,		// LWIP_DNS_ADDRTYPE_IPV6 = 1
-    DNS_AddrType_IPv4_IPv6,	// LWIP_DNS_ADDRTYPE_IPV4_IPV6 = 2
-    DNS_AddrType_IPv6_IPv4	// LWIP_DNS_ADDRTYPE_IPV6_IPV4 = 3
+    DNS_AddrType_IPv4 = LWIP_DNS_ADDRTYPE_IPV4,
+    DNS_AddrType_IPv6 = LWIP_DNS_ADDRTYPE_IPV6,
+    DNS_AddrType_IPv4_IPv6 = LWIP_DNS_ADDRTYPE_IPV4_IPV6,
+    DNS_AddrType_IPv6_IPv4 = LWIP_DNS_ADDRTYPE_IPV6_IPV4,
 };
+
+inline constexpr auto DNSDefaultTimeoutMs = 10000;
+inline constexpr auto DNSResolveTypeDefault = static_cast<DNSResolveType>(LWIP_DNS_ADDRTYPE_DEFAULT);
 
 struct WiFiState;
 

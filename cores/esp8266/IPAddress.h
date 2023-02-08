@@ -61,17 +61,16 @@ class IPAddress: public Printable {
             return reinterpret_cast<const uint8_t*>(&v4());
         }
 
-        void ctor32 (uint32_t);
-
     public:
-        // Constructors
         IPAddress();
-        IPAddress(const IPAddress& from);
+        IPAddress(const IPAddress&);
+        IPAddress(IPAddress&&);
+
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
-        IPAddress(uint32_t address) { ctor32(address); }
-        IPAddress(u32_t address) { ctor32(address); }
-        IPAddress(int address) { ctor32(address); }
-        IPAddress(const uint8_t *address);
+        IPAddress(uint32_t address) { *this = address; }
+        IPAddress(unsigned long address) { *this = address; }
+        IPAddress(int address) { *this = address; }
+        IPAddress(const uint8_t *address) { *this = address; }
 
         bool fromString(const char *address);
         bool fromString(const String &address) { return fromString(address.c_str()); }
@@ -80,16 +79,14 @@ class IPAddress: public Printable {
         // to a four-byte uint8_t array is expected
         operator uint32_t() const { return isV4()? v4(): (uint32_t)0; }
         operator uint32_t()       { return isV4()? v4(): (uint32_t)0; }
-        operator u32_t()    const { return isV4()? v4():    (u32_t)0; }
-        operator u32_t()          { return isV4()? v4():    (u32_t)0; }
 
         bool isSet () const;
         operator bool () const { return isSet(); } // <-
         operator bool ()       { return isSet(); } // <- both are needed
 
         // generic IPv4 wrapper to uint32-view like arduino loves to see it
-        const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
-              u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
+        const uint32_t& v4() const { return ip_2_ip4(&_ip)->addr; }
+              uint32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
 
         bool operator==(const IPAddress& addr) const {
             return ip_addr_cmp(&_ip, &addr._ip);
@@ -100,14 +97,14 @@ class IPAddress: public Printable {
         bool operator==(uint32_t addr) const {
             return isV4() && v4() == addr;
         }
-        bool operator==(u32_t addr) const {
-            return isV4() && v4() == addr;
+        bool operator==(unsigned long addr) const {
+            return isV4() && v4() == (uint32_t)addr;
         }
         bool operator!=(uint32_t addr) const {
             return !(isV4() && v4() == addr);
         }
-        bool operator!=(u32_t addr) const {
-            return !(isV4() && v4() == addr);
+        bool operator!=(unsigned long addr) const {
+            return isV4() && v4() != (uint32_t)addr;
         }
         bool operator==(const uint8_t* addr) const;
 
@@ -117,11 +114,18 @@ class IPAddress: public Printable {
 
         // Overloaded index operator to allow getting and setting individual octets of the address
         uint8_t operator[](int index) const {
-            return isV4()? *(raw_address() + index): 0;
+            if (!isV4()) {
+                return 0;
+            }
+
+            return ip4_addr_get_byte_val(*ip_2_ip4(&_ip), index);
         }
+
         uint8_t& operator[](int index) {
             setV4();
-            return *(raw_address() + index);
+
+            uint8_t* ptr = reinterpret_cast<uint8_t*>(&v4());
+            return *(ptr + index);
         }
 
         // Overloaded copy operators to allow initialisation of IPAddress objects from other types

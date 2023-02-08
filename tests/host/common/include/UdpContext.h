@@ -37,17 +37,14 @@ extern netif netif0;
 class UdpContext
 {
 public:
-
     typedef std::function<void(void)> rxhandler_t;
 
-    UdpContext(): _on_rx(nullptr), _refcnt(0)
+    UdpContext() : _on_rx(nullptr), _refcnt(0)
     {
         _sock = mockUDPSocket();
     }
 
-    ~UdpContext()
-    {
-    }
+    ~UdpContext() { }
 
     void ref()
     {
@@ -64,7 +61,7 @@ public:
 
     bool connect(const ip_addr_t* addr, uint16_t port)
     {
-        _dst = *addr;
+        _dst     = *addr;
         _dstport = port;
         return true;
     }
@@ -103,7 +100,7 @@ public:
     void setMulticastTTL(int ttl)
     {
         (void)ttl;
-        //mockverbose("TODO: UdpContext::setMulticastTTL\n");
+        // mockverbose("TODO: UdpContext::setMulticastTTL\n");
     }
 
     netif* getInputNetif() const
@@ -120,12 +117,12 @@ public:
 
     size_t getSize()
     {
-        return _inbufsize;
+        return _inbufsize - _inoffset;
     }
 
     size_t tell() const
     {
-        return 0;
+        return _inoffset;
     }
 
     void seek(const size_t pos)
@@ -135,7 +132,7 @@ public:
             mockverbose("UDPContext::seek too far (%zd >= %zd)\n", pos, _inbufsize);
             exit(EXIT_FAILURE);
         }
-        mockUDPSwallow(pos, _inbuf, _inbufsize);
+        _inoffset = pos;
     }
 
     bool isValidOffset(const size_t pos) const
@@ -156,18 +153,19 @@ public:
     IPAddress getDestAddress()
     {
         mockverbose("TODO: implement UDP getDestAddress\n");
-        return 0; //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
+        return 0;  // ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
     }
 
     uint16_t getLocalPort()
     {
         mockverbose("TODO: implement UDP getLocalPort\n");
-        return 0; //
+        return 0;  //
     }
 
     bool next()
     {
         _inbufsize = 0;
+        _inoffset  = 0;
         mockUDPFillInBuf(_sock, _inbuf, _inbufsize, addrsize, addr, _dstport);
         if (_inbufsize > 0)
         {
@@ -185,20 +183,23 @@ public:
 
     size_t read(char* dst, size_t size)
     {
-        return mockUDPRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        //return mockUDPRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        auto ret = mockUDPPeekBytes(_sock, dst, _inoffset, size, _timeout_ms, _inbuf, _inbufsize);
+        _inoffset += ret;
+        return ret;
     }
 
     int peek()
     {
         char c;
-        return mockUDPPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize) ? : -1;
+        return mockUDPPeekBytes(_sock, &c, _inoffset, 1, _timeout_ms, _inbuf, _inbufsize) ?: -1;
     }
 
     void flush()
     {
-        //mockverbose("UdpContext::flush() does not follow arduino's flush concept\n");
-        //exit(EXIT_FAILURE);
-        // would be:
+        // mockverbose("UdpContext::flush() does not follow arduino's flush concept\n");
+        // exit(EXIT_FAILURE);
+        //  would be:
         _inbufsize = 0;
     }
 
@@ -206,7 +207,8 @@ public:
     {
         if (size + _outbufsize > sizeof _outbuf)
         {
-            mockverbose("UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE, (size + _outbufsize));
+            mockverbose("UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE,
+                        (size + _outbufsize));
             exit(EXIT_FAILURE);
         }
 
@@ -217,9 +219,10 @@ public:
 
     err_t trySend(ip_addr_t* addr = 0, uint16_t port = 0, bool keepBuffer = true)
     {
-        uint32_t dst = addr ? addr->addr : _dst.addr;
-        uint16_t dstport = port ? : _dstport;
-        size_t wrt = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
+        uint32_t dst     = addr ? addr->addr : _dst.addr;
+        uint16_t dstport = port ?: _dstport;
+        size_t   wrt
+            = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
         err_t ret = _outbufsize ? ERR_OK : ERR_ABRT;
         if (!keepBuffer || wrt == _outbufsize)
             cancelBuffer();
@@ -239,7 +242,7 @@ public:
     bool sendTimeout(ip_addr_t* addr, uint16_t port,
                      esp8266::polledTimeout::oneShotFastMs::timeType timeoutMs)
     {
-        err_t err;
+        err_t                                 err;
         esp8266::polledTimeout::oneShotFastMs timeout(timeoutMs);
         while (((err = trySend(addr, port)) != ERR_OK) && !timeout)
             delay(0);
@@ -250,15 +253,14 @@ public:
 
     void mock_cb(void)
     {
-        if (_on_rx) _on_rx();
+        if (_on_rx)
+            _on_rx();
     }
 
 public:
-
     static uint32_t staticMCastAddr;
 
 private:
-
     void translate_addr()
     {
         if (addrsize == 4)
@@ -267,22 +269,23 @@ private:
             memcpy(&ipv4, addr, 4);
             ip4_addr_set_u32(&ip_2_ip4(_dst), ipv4);
             // ^ this is a workaround for "type-punned pointer" with "*(uint32*)addr"
-            //ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
+            // ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
         }
         else
             mockverbose("TODO unhandled udp address of size %d\n", (int)addrsize);
     }
 
-    int _sock = -1;
+    int         _sock = -1;
     rxhandler_t _on_rx;
-    int _refcnt = 0;
+    int         _refcnt = 0;
 
     ip_addr_t _dst;
-    uint16_t _dstport;
+    uint16_t  _dstport;
 
-    char _inbuf [CCBUFSIZE];
+    char   _inbuf[CCBUFSIZE];
     size_t _inbufsize = 0;
-    char _outbuf [CCBUFSIZE];
+    size_t _inoffset  = 0;
+    char   _outbuf[CCBUFSIZE];
     size_t _outbufsize = 0;
 
     int _timeout_ms = 0;
@@ -291,11 +294,11 @@ private:
     uint8_t addr[16];
 };
 
-extern "C" inline err_t igmp_joingroup(const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
+extern "C" inline err_t igmp_joingroup(const ip4_addr_t* ifaddr, const ip4_addr_t* groupaddr)
 {
     (void)ifaddr;
     UdpContext::staticMCastAddr = groupaddr->addr;
     return ERR_OK;
 }
 
-#endif//UDPCONTEXT_H
+#endif  // UDPCONTEXT_H

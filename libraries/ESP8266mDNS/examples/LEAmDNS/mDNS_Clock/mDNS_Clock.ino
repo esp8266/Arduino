@@ -43,39 +43,38 @@
    Global defines and vars
 */
 
-#define TIMEZONE_OFFSET     1                                   // CET
-#define DST_OFFSET          1                                   // CEST
-#define UPDATE_CYCLE        (1 * 1000)                          // every second
+#define TIMEZONE_OFFSET 1        // CET
+#define DST_OFFSET 1             // CEST
+#define UPDATE_CYCLE (1 * 1000)  // every second
 
-#define SERVICE_PORT        80                                  // HTTP port
+#define SERVICE_PORT 80  // HTTP port
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define STAPSK  "your-password"
+#define STAPSK "your-password"
 #endif
 
-const char*                   ssid                    = STASSID;
-const char*                   password                = STAPSK;
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
-char*                         pcHostDomain            = 0;        // Negotiated host domain
-bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
+char* pcHostDomain = 0;                        // Negotiated host domain
+bool bHostDomainConfirmed = false;             // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService hMDNSService = 0;  // The handle of the clock service in the MDNS responder
 
 // HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
-ESP8266WebServer              server(SERVICE_PORT);
+ESP8266WebServer server(SERVICE_PORT);
 
 /*
    getTimeString
 */
 const char* getTimeString(void) {
 
-  static char   acTimeString[32];
+  static char acTimeString[32];
   time_t now = time(nullptr);
   ctime_r(&now, acTimeString);
-  size_t    stLength;
-  while (((stLength = strlen(acTimeString))) &&
-         ('\n' == acTimeString[stLength - 1])) {
-    acTimeString[stLength - 1] = 0; // Remove trailing line break...
+  size_t stLength;
+  while (((stLength = strlen(acTimeString))) && ('\n' == acTimeString[stLength - 1])) {
+    acTimeString[stLength - 1] = 0;  // Remove trailing line break...
   }
   return acTimeString;
 }
@@ -186,7 +185,8 @@ void handleHTTPRequest() {
   Serial.println("HTTP Request");
 
   // Get current time
-  time_t now = time(nullptr);;
+  time_t now = time(nullptr);
+  ;
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
 
@@ -231,10 +231,9 @@ void setup(void) {
   // Setup MDNS responder
   MDNS.setHostProbeResultCallback(hostProbeResult);
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!MDNS.begin(pcHostDomain))) {
+  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) || (!MDNS.begin(pcHostDomain))) {
     Serial.println("Error setting up MDNS responder!");
-    while (1) { // STOP
+    while (1) {  // STOP
       delay(1000);
     }
   }

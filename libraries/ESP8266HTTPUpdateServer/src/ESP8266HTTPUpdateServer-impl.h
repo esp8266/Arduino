@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <coredecls.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
@@ -58,8 +59,24 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
       _server->send_P(200, PSTR("text/html"), serverIndex);
     });
 
+    // handler for the /update form page - preflight options
+    _server->on(path.c_str(), HTTP_OPTIONS, [&](){
+	    _server->sendHeader("Access-Control-Allow-Headers", "*");
+	    _server->sendHeader("Access-Control-Allow-Origin", "*");
+	    _server->send(200, F("text/html"), String(F("y")));
+    },[&](){
+		_authenticated = (_username == emptyString || _password == emptyString || _server->authenticate(_username.c_str(), _password.c_str()));
+      if(!_authenticated){
+        if (_serial_output)
+          Serial.printf("Unauthenticated Update\n");
+        return;
+      }
+    });
+	
     // handler for the /update form POST (once file upload finishes)
     _server->on(path.c_str(), HTTP_POST, [&](){
+	    _server->sendHeader("Access-Control-Allow-Headers", "*");
+	    _server->sendHeader("Access-Control-Allow-Origin", "*");
       if(!_authenticated)
         return _server->requestAuthentication();
       if (Update.hasError()) {
@@ -88,11 +105,10 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
           return;
         }
 
-        WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "filesystem") {
-          size_t fsSize = ((size_t) &_FS_end - (size_t) &_FS_start);
+          size_t fsSize = ((size_t)FS_end - (size_t)FS_start);
           close_all_fs();
           if (!Update.begin(fsSize, U_FS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
@@ -110,7 +126,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         }
       } else if(_authenticated && upload.status == UPLOAD_FILE_END && !_updaterError.length()){
         if(Update.end(true)){ //true to set the size to the current progress
-          if (_serial_output) Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+          if (_serial_output) Serial.printf("Update Success: %zu\nRebooting...\n", upload.totalSize);
         } else {
           _setUpdaterError();
         }
@@ -119,7 +135,7 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
         Update.end();
         if (_serial_output) Serial.println("Update was aborted");
       }
-      delay(0);
+      esp_yield();
     });
 }
 
