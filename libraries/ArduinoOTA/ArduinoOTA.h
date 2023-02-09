@@ -10,8 +10,7 @@ class UdpContext;
 typedef enum {
   OTA_IDLE,
   OTA_WAITAUTH,
-  OTA_RUNUPDATE,
-  OTA_ERASEWIFI
+  OTA_RUNUPDATE
 } ota_state_t;
 
 typedef enum {
@@ -22,6 +21,12 @@ typedef enum {
   OTA_END_ERROR,
   OTA_ERASE_SETTINGS_ERROR
 } ota_error_t;
+
+typedef enum {
+  OTA_ERASE_CFG_NO = 0,
+  OTA_ERASE_CFG_IGNORE_ERROR,
+  OTA_ERASE_CFG_ABORT_ON_ERROR
+} ota_erase_cfg_t;
 
 class ArduinoOTAClass
 {
@@ -48,8 +53,8 @@ class ArduinoOTAClass
 
     //Sets if the device should be rebooted after successful update. Default true
     //"eraseConfig" selects to erase WiFi Settings in conjunction with a reboot
-    //after a successful update. Default false - Legacy behavior
-    void setRebootOnSuccess(bool reboot, bool eraseConfig = false);
+    //after a successful update. Default OTA_ERASE_CFG_NO - Legacy behavior
+    void setRebootOnSuccess(bool reboot, ota_erase_cfg_t eraseConfig = OTA_ERASE_CFG_NO);
 
     //Sets flag to erase WiFi Settings at reboot/reset.
     void setEraseConfig(bool eraseConfig = true);
@@ -96,7 +101,7 @@ class ArduinoOTAClass
     bool _initialized = false;
     bool _rebootOnSuccess = true;
     bool _useMDNS = true;
-    bool _eraseConfig = false;
+    ota_erase_cfg_t _eraseConfig = OTA_ERASE_CFG_NO;
     ota_state_t _state = OTA_IDLE;
     int _size = 0;
     int _cmd = 0;

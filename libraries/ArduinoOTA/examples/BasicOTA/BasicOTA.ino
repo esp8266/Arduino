@@ -64,8 +64,6 @@ void setup() {
       Serial.println("Receive Failed");
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
-    } else if (error == OTA_ERASE_SETTINGS_ERROR) {
-      Serial.println("Erase WiFi Settings Failed");
     }
   });
   ArduinoOTA.begin();

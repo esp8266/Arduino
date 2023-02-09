@@ -3,6 +3,7 @@
 #endif
 #include <functional>
 #include <WiFiUdp.h>
+#include <eboot_command.h>
 #include "ArduinoOTA.h"
 #include "MD5Builder.h"
 #include "StreamString.h"
@@ -90,7 +91,7 @@ void ArduinoOTAClass::setPasswordHash(const char * password) {
   }
 }
 
-void ArduinoOTAClass::setRebootOnSuccess(bool reboot, bool eraseConfig){
+void ArduinoOTAClass::setRebootOnSuccess(bool reboot, ota_erase_cfg_t eraseConfig){
   _rebootOnSuccess = reboot;
   _eraseConfig = eraseConfig;
 }
@@ -322,18 +323,22 @@ void ArduinoOTAClass::_runUpdate() {
       OTA_DEBUG_PRINTF("Rebooting...\n");
       //let serial/network finish tasks that might be given in _end_callback
       delay(100);
-      if (_eraseConfig) {
+      if (OTA_ERASE_CFG_NO != _eraseConfig) {
         eraseConfigAndReset();  // returns on failure
-        //C What is the best action to take on failure?
-        //C  1) On failure, we could invalidate eboot_command buffer -
-        //C     aborting the flash update.
-        //C  2) Just ignore it and restart.
-        //C  3) Retry forever
         if (_error_callback) {
           _error_callback(OTA_ERASE_SETTINGS_ERROR);
         }
-        _state = OTA_ERASEWIFI;
-        return;
+        if (OTA_ERASE_CFG_ABORT_ON_ERROR == _eraseConfig) {
+          eboot_command_clear();
+          return;
+        }
+#ifdef OTA_DEBUG
+        else if (OTA_ERASE_CFG_IGNORE_ERROR == _eraseConfig) {
+          // Fallthrough and restart
+        } else {
+          panic();
+        }
+#endif
       }
       ESP.restart();
     }
@@ -371,8 +376,6 @@ void ArduinoOTAClass::eraseConfigAndReset() {
   } else {
     OTA_DEBUG_PRINTF("  WiFi.mode(WIFI_OFF) Timeout!\n");
   }
-
-  delay(2000);  // force a gap between retries
 }
 
 //this needs to be called in the loop()
@@ -380,11 +383,6 @@ void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {
     _runUpdate();
     _state = OTA_IDLE;
-  }
-
-  if (_state == OTA_ERASEWIFI) {
-    eraseConfigAndReset();
-    return;
   }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
