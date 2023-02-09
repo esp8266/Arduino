@@ -17,7 +17,13 @@
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
-extern void ets_wdt_enable(void);
+/*
+  After Power Enable Pin, EXT_RST, or HWDT event, at "main()" in eboot, WDT is
+  disabled. Key WDT hardware registers are zero.
+
+  After "ESP.restart()" and other soft restarts, at "main()" in eboot, WDT is enabled.
+*/
+extern void ets_wdt_enable(uint32_t mode, uint32_t arg1, uint32_t arg2);
 extern void ets_wdt_disable(void);
 
 int print_version(const uint32_t flash_addr)
@@ -241,12 +247,12 @@ int main()
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
-        ets_wdt_enable();
+        ets_wdt_enable(4, 12, 12);  // WDT about 13 secs.
 
         ets_printf("%d\n", res);
 #if 0
-	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
-	//beginning of the image in the empty area, see #7458. Disabling for now. 
+	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the
+	//beginning of the image in the empty area, see #7458. Disabling for now.
         //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
         ets_printf("cmp:");
@@ -257,7 +263,7 @@ int main()
             }
 
         ets_printf("%d\n", res);
-#endif	    
+#endif
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
