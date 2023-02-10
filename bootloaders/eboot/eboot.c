@@ -22,9 +22,34 @@
   disabled. Key WDT hardware registers are zero.
 
   After "ESP.restart()" and other soft restarts, at "main()" in eboot, WDT is enabled.
+
+  References for the under-documented ets_wdt_* API
+    https://mongoose-os.com/blog/esp8266-watchdog-timer/
+    http://cholla.mmto.org/esp8266/bootrom/boot.txt
+
+  After looking at esp8266-watchdog-timer some more, `ets_wdt_enable(4, 12, 12)`
+  is good for eboot's needs. From a ".map" the NON-OS SDK does not use the
+  ets_wdt_* APIs, so our choices are not too critical.
+  The SDK will set up the WDT as it wants it.
+
+  A rationale for keeping the ets_wdt_enable() line. If the system is not stable
+  during a "soft restart." The HWDT would provide a recovery reboot.
 */
 extern void ets_wdt_enable(uint32_t mode, uint32_t arg1, uint32_t arg2);
-extern void ets_wdt_disable(void);
+/*
+  "ets_wdt_disable"
+
+  Diables WDT, then feeds the dog.
+  For current modes other than 1 or 2, returns the current mode.
+  For current mode 1, calls ets_timer_disarm, then return the current mode.
+  For current mode 2, calls ets_isr_mask, then return the current mode.
+
+  I always see a value of 0xFFFFFFFF.
+
+  The value would normally be used with ets_wdt_restore; however, that is not an
+  option since a valid prior call to ets_wdt_enable() may not have been done.
+*/
+extern uint32_t ets_wdt_disable(void);
 
 int print_version(const uint32_t flash_addr)
 {

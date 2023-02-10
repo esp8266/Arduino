@@ -88,10 +88,15 @@ extern "C" {
   [[noreturn]] void hardware_reset(void) {
     volatile uint32_t* const rtc_mem = (volatile uint32_t *)0x60001100u;
 
-    // Block NMI WDT from disturbing out restart reason
+    // Block NMI or Software WDT from disturbing out restart reason
     xt_rsil(15);
 
-    // SDK restart reason location
+    // An HWDT reason would imply a fault or bug, but this reset was requested.
+    // Set hint reason to EXT_RST. From empirical evidence, an HWDT looks a lot
+    // like an EXT_RST. The WDT registers are reset to zero like an EXT_RST;
+    // however, the PLL initialization is still set. We can still read the Boot
+    // ROM serial output messages.
+    // SDK restart reason/hint location
     rtc_mem[0] = REASON_EXT_SYS_RST;
 
     // Disable WDT

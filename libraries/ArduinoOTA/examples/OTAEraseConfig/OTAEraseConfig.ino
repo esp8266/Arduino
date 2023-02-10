@@ -20,6 +20,7 @@ const char* password = STAPSK;
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
+  Serial.println(String("Reset Reason: ") + ESP.getResetReason());
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
