@@ -11,6 +11,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
 -  `Exception Decoder <#exception-decoder>`__
+-  `Improving Exception Decoder Results <#improving-exception-decoder-results>`__
 -  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
@@ -331,6 +332,12 @@ return address by adding an inline assembly trick
 function's body. Or instead, for a debug build conditional option, use the
 macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``. The ``-Og`` option
 will address the leaf function issue in a later compiler update.
+
+In some cases, adding ``#pragma GCC optimize("Og,no-ipa-pure-const")`` to a
+module as well as using ``DEBUG_LEAF_FUNCTION()`` in a leaf function were
+needed to display a complete call chain. Or use
+``#pragma GCC optimize("Os,no-inline,no-optimize-sibling-calls,no-ipa-pure-const")``
+if you require optimization ``-Os``.
 
 
 Other Causes for Crashes
