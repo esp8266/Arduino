@@ -187,6 +187,7 @@ from shutil import copyfile
 import glob
 import os
 import platform
+import traceback
 import sys
 import textwrap
 import time
@@ -304,7 +305,6 @@ def add_include_line(build_opt_fqfn, include_fqfn):
         print("add_include_line: Created " + include_fqfn)
     with open(build_opt_fqfn, 'a', encoding="utf-8") as build_opt:
         build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
-
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     """
@@ -655,6 +655,10 @@ def main():
     print_dbg(f"first_time:             {first_time}")
     print_dbg(f"use_aggressive_caching_workaround: {use_aggressive_caching_workaround}")
 
+    if not os.path.exists(build_path_core):
+        os.makedirs(build_path_core)
+        print_msg("Clean build, created dir " + build_path_core)
+
     if first_time or \
     not use_aggressive_caching_workaround or \
     not os.path.exists(commonhfile_fqfn):
@@ -666,10 +670,6 @@ def main():
     if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
         touch(commonhfile_fqfn)
         print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
-
-    if not os.path.exists(build_path_core):
-        os.makedirs(build_path_core)
-        print_msg("Clean build, created dir " + build_path_core)
 
     if os.path.exists(source_globals_h_fqfn):
         print_msg("Using global include from " + source_globals_h_fqfn)
@@ -750,4 +750,10 @@ def main():
     handle_error(0)   # commit print buffer
 
 if __name__ == '__main__':
-    sys.exit(main())
+    rc = 1
+    try:
+        rc = main()
+    except:
+        print_err(traceback.format_exc())
+        handle_error(0)
+    sys.exit(rc)
