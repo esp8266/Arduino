@@ -193,6 +193,7 @@ import textwrap
 import time
 
 import locale
+import codecs
 
 # Need to work on signature line used for match to avoid conflicts with
 # existing embedded documentation methods.
@@ -204,6 +205,7 @@ docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-buil
 err_print_flag = False
 msg_print_buf = ""
 debug_enabled = False
+default_locale = (None, None)
 
 # Issues trying to address through buffered printing
 # 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
@@ -257,6 +259,7 @@ def handle_error(err_no):
     # on err_no != 0, commit print buffer to stderr and sys exist with err_no
     global msg_print_buf
     global err_print_flag
+    global default_locale
     if len(msg_print_buf):
         if err_no or err_print_flag:
             fd = sys.stderr
@@ -299,21 +302,14 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
     return True     # file changed
 
 def add_include_line(build_opt_fqfn, include_fqfn):
-    # Given that GCC will insert (or process as if interted) these lines into
-    # the command line. I assume that the contents of @file need to be encoded
-    # to match that of the shell running GCC runs. I am not 100% sure this API
-    # gives me that, but it appears to work.
-    #
-    # However, elsewhere when dealing with source code we continue to use 'utf-8',
-    # ref. https://gcc.gnu.org/onlinedocs/gcc-4.1.2/cpp/Character-sets.html
-    shell_encoding = locale.getdefaultlocale()[1]
+    global default_locale
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
-        with open(include_fqfn, 'w', encoding=shell_encoding):
+        with open(include_fqfn, 'w', encoding=default_locale[1]):
             pass
         print_msg("add_include_line: Created " + include_fqfn)
 
-    with open(build_opt_fqfn, 'a', encoding=shell_encoding) as build_opt:
+    with open(build_opt_fqfn, 'a', encoding=default_locale[1]) as build_opt:
         build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
@@ -323,8 +319,9 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     copy of Sketch.ino.globals.h.
     """
     global build_opt_signature
+    global default_locale
 
-    build_opt = open(build_opt_fqfn, 'w', encoding="utf-8")
+    build_opt = open(build_opt_fqfn, 'w', encoding=default_locale[1])
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
         return False
@@ -619,10 +616,18 @@ def main():
     global build_opt_signature
     global docs_url
     global debug_enabled
+    global default_locale
     num_include_lines = 1
 
-    def_locale = locale.getdefaultlocale()
-    print_msg(f'default locale: {def_locale}')
+    # Given that GCC will handle lines from an @file as if they were on
+    # the command line. I assume that the contents of @file need to be encoded
+    # to match that of the shell running GCC runs. I am not 100% sure this API
+    # gives me that, but it appears to work.
+    #
+    # However, elsewhere when dealing with source code we continue to use 'utf-8',
+    # ref. https://gcc.gnu.org/onlinedocs/gcc-4.1.2/cpp/Character-sets.html
+    default_locale = locale.getdefaultlocale()
+    print_msg(f'default locale: {default_locale}')
 
     args = parse_args()
     debug_enabled = args.debug
