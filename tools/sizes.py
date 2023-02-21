@@ -72,8 +72,10 @@ def get_segment_sizes(elf, path, mmu):
         (".bss", "BSS"),
     )
 
+    import locale
+    shell_encoding = locale.getdefaultlocale()[1]
     cmd = [os.path.join(path, "xtensa-lx106-elf-size"), "-A", elf]
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True) as proc:
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, encoding=shell_encoding) as proc:
         lines = proc.stdout.readlines()
         for line in lines:
             words = line.split()
