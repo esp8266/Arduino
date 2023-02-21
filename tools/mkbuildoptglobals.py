@@ -205,7 +205,7 @@ docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-buil
 err_print_flag = False
 msg_print_buf = ""
 debug_enabled = False
-default_locale = (None, None)
+default_encoding = None
 
 # Issues trying to address through buffered printing
 # 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
@@ -259,7 +259,6 @@ def handle_error(err_no):
     # on err_no != 0, commit print buffer to stderr and sys exist with err_no
     global msg_print_buf
     global err_print_flag
-    global default_locale
     if len(msg_print_buf):
         if err_no or err_print_flag:
             fd = sys.stderr
@@ -302,14 +301,14 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
     return True     # file changed
 
 def add_include_line(build_opt_fqfn, include_fqfn):
-    global default_locale
+    global default_encoding
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
-        with open(include_fqfn, 'w', encoding=default_locale[1]):
+        with open(include_fqfn, 'w', encoding=default_encoding):
             pass
         print_msg("add_include_line: Created " + include_fqfn)
 
-    with open(build_opt_fqfn, 'a', encoding=default_locale[1]) as build_opt:
+    with open(build_opt_fqfn, 'a', encoding=default_encoding) as build_opt:
         build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
@@ -319,9 +318,9 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     copy of Sketch.ino.globals.h.
     """
     global build_opt_signature
-    global default_locale
+    global default_encoding
 
-    build_opt = open(build_opt_fqfn, 'w', encoding=default_locale[1])
+    build_opt = open(build_opt_fqfn, 'w', encoding=default_encoding)
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
         return False
@@ -612,11 +611,53 @@ def parse_args():
     # ref nargs='*'', https://stackoverflow.com/a/4480202
     # ref no '--n' parameter, https://stackoverflow.com/a/21998252
 
+
+def get_encoding():
+    try:
+        from locale import getencoding
+    except ImportError:
+        # https://stackoverflow.com/a/23743499
+        return locale.getpreferredencoding(False) or locale.getdefaultlocale()[1]
+
+    return locale.getencoding()
+
+
+def show_value(desc, value):
+    print_dbg(f'{desc:<40} {value}')
+    return
+
+def locale_dbg():
+    show_value("get_encoding()", get_encoding())
+    show_value("locale.getdefaultlocale()", locale.getdefaultlocale())
+    show_value('sys.getfilesystemencoding()', sys.getfilesystemencoding())
+    show_value("sys.getdefaultencoding()", sys.getdefaultencoding())
+    show_value("locale.getpreferredencoding(False)", locale.getpreferredencoding(False))
+    try:
+        show_value("locale.getpreferredencoding()", locale.getpreferredencoding())
+    except:
+        pass
+    show_value("sys.stdout.encoding", sys.stdout.encoding)
+
+    # use current setting
+    show_value("locale.setlocale(locale.LC_ALL, None)", locale.setlocale(locale.LC_ALL, None))
+    try:
+        show_value("locale.getencoding()", locale.getencoding())
+    except:
+        pass
+    show_value("locale.getlocale()", locale.getlocale())
+
+    # use user setting
+    show_value("locale.setlocale(locale.LC_ALL, '')", locale.setlocale(locale.LC_ALL, ''))
+    # show_value("locale.getencoding()", locale.getencoding())
+    show_value("locale.getlocale()", locale.getlocale())
+    return
+
+
 def main():
     global build_opt_signature
     global docs_url
     global debug_enabled
-    global default_locale
+    global default_encoding
     num_include_lines = 1
 
     # Given that GCC will handle lines from an @file as if they were on
@@ -625,9 +666,8 @@ def main():
     # gives me that, but it appears to work.
     #
     # However, elsewhere when dealing with source code we continue to use 'utf-8',
-    # ref. https://gcc.gnu.org/onlinedocs/gcc-4.1.2/cpp/Character-sets.html
-    default_locale = locale.getdefaultlocale()
-    print_msg(f'default locale: {default_locale}')
+    # ref. https://gcc.gnu.org/onlinedocs/cpp/Character-sets.html
+    default_encoding = get_encoding()
 
     args = parse_args()
     debug_enabled = args.debug
@@ -640,6 +680,13 @@ def main():
     globals_name = os.path.basename(source_globals_h_fqfn)
     build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
     globals_h_fqfn = os.path.join(build_path_core, globals_name)
+
+    if debug_enabled:
+        locale_dbg()
+
+    default_locale = locale.getdefaultlocale()
+    print_msg(f'default locale:         {default_locale}')
+    print_msg(f'default_encoding:       {default_encoding}')
 
     print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
     print_dbg(f"runtime_ide_version:    {args.runtime_ide_version}")
