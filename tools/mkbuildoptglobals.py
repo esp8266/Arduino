@@ -193,7 +193,6 @@ import textwrap
 import time
 
 import locale
-import codecs
 
 # Need to work on signature line used for match to avoid conflicts with
 # existing embedded documentation methods.
