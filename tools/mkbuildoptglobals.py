@@ -612,14 +612,13 @@ def parse_args():
     # ref no '--n' parameter, https://stackoverflow.com/a/21998252
 
 
-def get_encoding():
-    try:
-        from locale import getencoding
-    except ImportError:
-        # https://stackoverflow.com/a/23743499
-        return locale.getpreferredencoding(False) or locale.getdefaultlocale()[1]
-
-    return locale.getencoding()
+# retrieve *system* encoding, not the one used by python internally
+if sys.version_info >= (3, 11):
+    def get_encoding():
+        return locale.getencoding()
+else:
+    def get_encoding():
+        return locale.getdefaultlocale()[1]
 
 
 def show_value(desc, value):
