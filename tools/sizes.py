@@ -21,8 +21,19 @@ import argparse
 import os
 import subprocess
 import sys
+import locale
 
 sys.stdout = sys.stderr
+
+
+# retrieve *system* encoding, not the one used by python internally
+if sys.version_info >= (3, 11):
+    def get_encoding():
+        return locale.getencoding()
+else:
+    def get_encoding():
+        return locale.getdefaultlocale()[1]
+
 
 def get_segment_sizes(elf, path, mmu):
     iram_size = 0
@@ -72,10 +83,8 @@ def get_segment_sizes(elf, path, mmu):
         (".bss", "BSS"),
     )
 
-    import locale
-    shell_encoding = locale.getdefaultlocale()[1]
     cmd = [os.path.join(path, "xtensa-lx106-elf-size"), "-A", elf]
-    with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, encoding=shell_encoding) as proc:
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, encoding=get_encoding()) as proc:
         lines = proc.stdout.readlines()
         for line in lines:
             words = line.split()
