@@ -274,7 +274,7 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
   if(is_file) {
     _addRequestHandler(new StaticFileRequestHandler<ServerType>(fs, path, uri, cache_header));
   } else {
-    _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));  
+    _addRequestHandler(new StaticDirectoryRequestHandler<ServerType>(fs, path, uri, cache_header));
   }
 }
 
@@ -420,18 +420,11 @@ void ESP8266WebServerTemplate<ServerType>::stop() {
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendHeader(const String& name, const String& value, bool first) {
-  String headerLine = name;
-  headerLine += F(": ");
-  headerLine += value;
-  headerLine += "\r\n";
-
-  if (first) {
-    _responseHeaders = headerLine + _responseHeaders;
-  }
-  else {
-    _responseHeaders += headerLine;
-  }
+void ESP8266WebServerTemplate<ServerType>::sendHeader(String&& name, String&& value, bool first) {
+    if (first)
+        _userHeaders.emplace_front(std::pair(name, value));
+    else
+        _userHeaders.emplace_back(std::pair(name, value));
 }
 
 template <typename ServerType>
@@ -440,44 +433,80 @@ void ESP8266WebServerTemplate<ServerType>::setContentLength(const size_t content
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
-    response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
-    response += String(code);
-    response += ' ';
-    response += responseCodeToString(code);
-    response += "\r\n";
+bool ESP8266WebServerTemplate<ServerType>::_streamIt (Stream& s) {
+    int len = s.streamRemaining();
+    int sent = s.sendAll(&_currentClient);
+    if (sent == len)
+        return true;
+    DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, len);
+    return false;
+}
+
+template <typename ServerType>
+template <typename K, typename V>
+bool ESP8266WebServerTemplate<ServerType>::_streamHeader (K name, V value)
+{
+    return _streamIt(name) && _streamItC(F(": ")) && _streamIt(value) && _streamItC(F("\r\n"));
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_sendHeader(int code, const char* content_type, size_t contentLength) {
+    if (   !_streamItC(F("HTTP/1."))
+        || !_streamIt(String(_currentVersion))
+        || !_streamItC(F(" "))
+        || !_streamIt(String(code))
+        || !_streamItC(F(" "))
+        || !_streamIt(responseCodeToString(code))
+        || !_streamItC(F("\r\n")))
+    {
+        return false;
+    }
 
     using namespace mime;
     if (!content_type)
         content_type = mimeTable[html].mimeType;
+    if (!_streamHeader(F("Content-Type"), content_type))
+        return false;
 
-    sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
-        sendHeader(String(FPSTR(Content_Length)), String(contentLength));
+        if (!_streamHeader(Content_Length, String(contentLength)))
+            return false;
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
-        sendHeader(String(FPSTR(Content_Length)), String(_contentLength));
-    } else if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
-      //let's do chunked
-      _chunked = true;
-      sendHeader(String(F("Accept-Ranges")),String(F("none")));
-      sendHeader(String(F("Transfer-Encoding")),String(F("chunked")));
+        if (!_streamHeader(Content_Length, String(_contentLength)))
+            return false;
+    } else if (_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
+        //let's do chunked
+        _chunked = true;
+        if (!_streamHeader(F("Accept-Ranges"), F("none")) || !_streamHeader(F("Transfer-Encoding"), F("chunked")))
+            return false;
     }
+
     if (_corsEnabled) {
-      sendHeader(String(F("Access-Control-Allow-Origin")), String("*"));
+        if (!_streamHeader(F("Access-Control-Allow-Origin"), F("*")))
+            return false;
     }
 
-    if (_keepAlive && _server.hasClient()) { // Disable keep alive if another client is waiting.
-      _keepAlive = false;
+    if (_keepAlive && _server.hasClient()) {
+        // Disable keep alive if another client is waiting.
+        _keepAlive = false;
     }
-    sendHeader(String(F("Connection")), String(_keepAlive ? F("keep-alive") : F("close")));
+    if (!_streamHeader(F("Connection"), String(_keepAlive ? F("keep-alive") : F("close")))) {
+        return false;
+    }
     if (_keepAlive) {
-      sendHeader(String(F("Keep-Alive")), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT);
+        if (!_streamHeader(F("Keep-Alive"), String(F("timeout=")) + HTTP_MAX_CLOSE_WAIT))
+            return false;
     }
 
+    for (const auto& kv: _userHeaders)
+        if (!_streamHeader(kv.first, kv.second))
+            return false;
+    _userHeaders.clear();
 
-    response += _responseHeaders;
-    response += "\r\n";
-    _responseHeaders = "";
+    if (!_streamItC(F("\r\n")))
+        return false;
+
+    return true;
 }
 
 template <typename ServerType>
@@ -503,13 +532,10 @@ void ESP8266WebServerTemplate<ServerType>::sendContent(const String& content) {
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, Stream* stream, size_t content_length /*= 0*/) {
-  String header;
   if (content_length == 0)
       content_length = std::max((ssize_t)0, stream->streamRemaining());
-  _prepareHeader(header, code, content_type, content_length);
-  size_t sent = StreamConstPtr(header).sendAll(&_currentClient);
-  if (sent != header.length())
-      DBGWS("HTTPServer: error: sent %zd on %u bytes\n", sent, header.length());
+  if (!_sendHeader(code, content_type, content_length))
+    return;
   if (content_length)
     return sendContent(stream, content_length);
 }
