@@ -179,8 +179,8 @@ public:
   }
 
   void setContentLength(const size_t contentLength);
-  void sendHeader(String&& name, String&& value, bool first = false);
-  void sendHeader(const String& name, const String& value, bool first = false);
+  template <typename S1, typename S2>
+  void sendHeader(S1 name, S2 value, bool first = false);
   void sendContent(const String& content);
   void sendContent(String& content) {
     sendContent((const String&)content);

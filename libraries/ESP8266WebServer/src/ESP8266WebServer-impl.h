@@ -420,7 +420,8 @@ void ESP8266WebServerTemplate<ServerType>::stop() {
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::sendHeader(String&& name, String&& value, bool first) {
+template <typename S1, typename S2>
+void ESP8266WebServerTemplate<ServerType>::sendHeader(S1 name, S2 value, bool first) {
     if (first)
         _userHeaders.emplace_front(std::pair(name, value));
     else
