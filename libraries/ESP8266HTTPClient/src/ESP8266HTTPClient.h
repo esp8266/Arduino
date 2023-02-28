@@ -215,8 +215,8 @@ public:
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
-	int writeToPrint(Print* print);
-    int writeToStream(Stream* stream);
+    template <typename S> int writeToPrint(S* print) [[deprecated]] { return writeToStream(print); }
+    template <typename S> int writeToStream(S* output);
     const String& getString(void);
     static String errorToString(int error);
 

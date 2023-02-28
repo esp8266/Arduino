@@ -629,23 +629,13 @@ WiFiClient* HTTPClient::getStreamPtr(void)
 
 /**
  * write all  message body / payload to Stream
- * @param stream Stream *
+ * @param output Print*(obsolete) / Stream*
  * @return bytes written ( negative values are error codes )
  */
-int HTTPClient::writeToStream(Stream * stream)
+template <typename S>
+int HTTPClient::writeToStream(S * output)
 {
-    return writeToPrint(stream);
-}
-
-/**
- * write all  message body / payload to Print
- * @param print Print *
- * @return bytes written ( negative values are error codes )
- */
-int HTTPClient::writeToPrint(Print * print)
-{
-
-    if(!print) {
+    if(!output) {
         return returnError(HTTPC_ERROR_NO_STREAM);
     }
 
@@ -662,7 +652,7 @@ int HTTPClient::writeToPrint(Print * print)
     if(_transferEncoding == HTTPC_TE_IDENTITY) {
         // len < 0: transfer all of it, with timeout
         // len >= 0: max:len, with timeout
-        ret = _client->sendSize(print, len);
+        ret = _client->sendSize(output, len);
 
         // do we have an error?
         if(_client->getLastSendReport() != Stream::Report::Success) {
@@ -690,7 +680,7 @@ int HTTPClient::writeToPrint(Print * print)
             // data left?
             if(len > 0) {
                 // read len bytes with timeout
-                int r = _client->sendSize(print, len);
+                int r = _client->sendSize(output, len);
                 if (_client->getLastSendReport() != Stream::Report::Success)
                     // not all data transferred
                     return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
