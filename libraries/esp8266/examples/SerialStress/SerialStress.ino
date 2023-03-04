@@ -2,7 +2,7 @@
 /*
   Serial read/write/verify/benchmark
   Using internal loopback
-  Using SoftwareSerial library for logging
+  Using EspSoftwareSerial library for logging
 
   Sketch meant for debugging only
   Released to public domain
@@ -57,7 +57,7 @@ void setup() {
 
   // using HardwareSerial0 pins,
   // so we can still log to the regular usbserial chips
-  SoftwareSerial::UART* ss = new SoftwareSerial::UART(3, 1);
+  EspSoftwareSerial::UART* ss = new EspSoftwareSerial::UART(3, 1);
   ss->begin(SSBAUD);
   ss->enableIntTx(false);
   logger = ss;

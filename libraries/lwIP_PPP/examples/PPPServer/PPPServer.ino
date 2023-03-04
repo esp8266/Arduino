@@ -36,7 +36,7 @@
 #define RX 13  // d1mini D7
 #define TX 15  // d1mini D8
 
-SoftwareSerial::UART ppplink(RX, TX);
+EspSoftwareSerial::UART ppplink(RX, TX);
 HardwareSerial& logger = Serial;
 PPPServer ppp(&ppplink);
 
