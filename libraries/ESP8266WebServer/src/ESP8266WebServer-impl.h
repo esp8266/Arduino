@@ -219,11 +219,11 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
     _srealm = String(realm);
   }
   if(mode == BASIC_AUTH) {
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String('\"'));
+    sendHeader(FPSTR(WWW_Authenticate), String(F("Basic realm=\"")) + _srealm + String('\"'));
   } else {
     _snonce=_getRandomHexString();
     _sopaque=_getRandomHexString();
-    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String('\"'));
+    sendHeader(FPSTR(WWW_Authenticate), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String('\"'));
   }
   using namespace mime;
   send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
@@ -420,12 +420,11 @@ void ESP8266WebServerTemplate<ServerType>::stop() {
 }
 
 template <typename ServerType>
-template <typename S1, typename S2>
-void ESP8266WebServerTemplate<ServerType>::sendHeader(S1 name, S2 value, bool first) {
+void ESP8266WebServerTemplate<ServerType>::_storeHeader(std::pair<String, String>&& nameValue, bool first) {
     if (first)
-        _userHeaders.emplace_front(std::pair(name, value));
+        _userHeaders.emplace_front(std::move(nameValue));
     else
-        _userHeaders.emplace_back(std::pair(name, value));
+        _userHeaders.emplace_back(std::move(nameValue));
 }
 
 template <typename ServerType>

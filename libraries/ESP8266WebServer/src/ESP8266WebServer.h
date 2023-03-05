@@ -179,8 +179,13 @@ public:
   }
 
   void setContentLength(const size_t contentLength);
+
   template <typename S1, typename S2>
-  void sendHeader(S1 name, S2 value, bool first = false);
+  void sendHeader(S1&& name, S2&& value, bool first = false)
+  {
+    _storeHeader(std::make_pair(String(std::forward<S1>(name)), String(std::forward<S2>(value))), first);
+  }
+
   void sendContent(const String& content);
   void sendContent(String& content) {
     sendContent((const String&)content);
@@ -309,6 +314,7 @@ protected:
   bool _streamIt (Stream& s);
   template <typename K, typename V>
   bool _streamHeader (K name, V value);
+  void _storeHeader(std::pair<String, String>&& nameValue, bool first);
 
   struct RequestArgument {
     String key;
