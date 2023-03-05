@@ -59,7 +59,7 @@
 
 #if SWAP_PINS
 #include <SoftwareSerial.h>
-EspSoftwareSerial::UART* logger = nullptr;
+SoftwareSerial* logger = nullptr;
 #else
 #define logger (&Serial1)
 #endif
@@ -85,7 +85,7 @@ void setup() {
   Serial.swap();
   // Hardware serial is now on RX:GPIO13 TX:GPIO15
   // use EspSoftwareSerial on regular RX(3)/TX(1) for logging
-  logger = new EspSoftwareSerial::UART(3, 1);
+  logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
   logger->enableIntTx(false);
   logger->println("\n\nUsing EspSoftwareSerial for logging");
