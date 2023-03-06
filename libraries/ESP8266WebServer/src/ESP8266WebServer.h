@@ -155,6 +155,40 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
+
+#if 0
+
+  void send(int code) { send(code, nullptr, nullptr); }
+
+  template <CT content_type, CD content>
+  void send(int code, CT&& content_type, CD&& content)
+  {
+      String(std::forward<CT>(content_type)) content_type_forwarded;
+      StreamConstPtr(std::forward<CD>(content)) content_forwarded;
+      send(code, content_type_forwarded.c_str(), &content_forwarded);
+  }
+
+  template <CT content_type, C content>
+  void send(int code, CT&& content_type, C&& content, size_t content_length)
+  {
+      String(std::forward<CT>(content_type)) content_type_forwarded;
+      StreamConstPtr(std::forward<CD>(content), content_length) content_forwarded;
+      send(code, content_type_forwarded.c_str(), &content_forwarded);
+  }
+  
+  template <CT content_type>
+  void send(int code, CT&& content_type, Stream* stream, size_t content_length = 0)
+  {
+      String(std::forward<CT>(content_type)) content_type_forwarded;
+      send(code, content_type_forwarded.c_str(), stream, content_length);
+  }
+
+send_P
+  
+    
+#else
+
+
   void send(int code, const char*   content_type = NULL, const String& content = emptyString) {
     return send(code, content_type, content.c_str(), content.length());
   }
@@ -184,6 +218,8 @@ public:
     StreamConstPtr ref(content, contentLength);
     return send(code, String(content_type).c_str(), &ref);
   }
+
+#endif
 
   void send(int code, const char* content_type, Stream* stream, size_t content_length = 0);
 
