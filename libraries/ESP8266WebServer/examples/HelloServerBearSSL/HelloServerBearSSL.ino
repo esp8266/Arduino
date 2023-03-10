@@ -30,6 +30,8 @@ BearSSL::ServerSessions serverCache(5);
 #define USING_INSECURE_CERTS_AND_KEYS_AND_CAS 1
 #include <ssl-tls-ca-key-cert-example.h>
 
+String bigChunk;
+
 const int led = 13;
 
 void handleRoot() {
@@ -56,9 +58,9 @@ void handleNotFound() {
 void handleChunked() {
   server.chunkedResponseModeStart(200, F("text/html"));
 
-  server.sendContent(F("chunk 1"));
+  server.sendContent(bigChunk);
   server.sendContent(F("chunk 2"));
-  server.sendContent(F("chunk 3"));
+  server.sendContent(bigChunk);
 
   server.chunkedResponseFinalize();
 }
@@ -100,6 +102,15 @@ void setup(void) {
   server.on("/chunks", handleChunked);
 
   server.onNotFound(handleNotFound);
+
+  // prepare chunk in ram for sending
+  constexpr int chunkLen = 4000;  // ~4KB chunk
+  bigChunk.reserve(chunkLen);
+  bigChunk = F("chunk of len ");
+  bigChunk += chunkLen;
+  String piece = F("-blah");
+  while (bigChunk.length() < chunkLen - piece.length())
+    bigChunk += piece;
 
   server.begin();
   Serial.println("HTTPS server started");
