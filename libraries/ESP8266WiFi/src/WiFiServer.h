@@ -109,6 +109,11 @@ protected:
 
   static err_t _s_accept(void *arg, tcp_pcb* newpcb, err_t err);
   static void _s_discard(void* server, ClientContext* ctx);
+
+#if CORE_MOCK
+  void _mockUnclaimed ();
+#endif
+
 };
 
 #endif

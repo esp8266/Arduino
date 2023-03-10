@@ -42,6 +42,17 @@ extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
 #define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
 #define pcb2int(x) ((int)(intptr_t)(x))
 
+template<typename T>
+T* slist_append_tail(T* head, T* item) {
+    if (!head)
+        return item;
+    T* last = head;
+    while(last->next())
+        last = last->next();
+    last->next(item);
+    return head;
+}
+
 // lwIP API side of WiFiServer
 
 WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
@@ -61,10 +72,21 @@ WiFiClient WiFiServer::available(uint8_t* status)
     return accept();
 }
 
-WiFiClient WiFiServer::accept()
+void WiFiServer::_mockUnclaimed()
 {
     if (hasClient())
-        return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
+        _unclaimed = slist_append_tail(_unclaimed, new ClientContext(serverAccept(pcb2int(_listen_pcb))));
+}
+
+WiFiClient WiFiServer::accept()
+{
+    _mockUnclaimed();
+    if (_unclaimed)
+    {
+        auto ctx = _unclaimed;
+        _unclaimed = _unclaimed->next();
+        return WiFiClient(ctx);
+    }
     return WiFiClient();
 }
 
