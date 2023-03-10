@@ -831,30 +831,30 @@ void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKey
     }
 }
 
-String HTTPClient::header(const char* name)
+const String& HTTPClient::header(const char* name)
 {
     for(size_t i = 0; i < _headerKeysCount; ++i) {
         if(_currentHeaders[i].key == name) {
             return _currentHeaders[i].value;
         }
     }
-    return String();
+    return emptyString;
 }
 
-String HTTPClient::header(size_t i)
+const String& HTTPClient::header(size_t i)
 {
     if(i < _headerKeysCount) {
         return _currentHeaders[i].value;
     }
-    return String();
+    return emptyString;
 }
 
-String HTTPClient::headerName(size_t i)
+const String& HTTPClient::headerName(size_t i)
 {
     if(i < _headerKeysCount) {
         return _currentHeaders[i].key;
     }
-    return String();
+    return emptyString;
 }
 
 int HTTPClient::headers()

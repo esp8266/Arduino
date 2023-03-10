@@ -36,6 +36,16 @@ void handleNotFound() {
   digitalWrite(led, 0);
 }
 
+void handleChunked() {
+  server.chunkedResponseModeStart(200, F("text/html"));
+
+  server.sendContent(F("chunk 1"));
+  server.sendContent(F("chunk 2"));
+  server.sendContent(F("chunk 3"));
+
+  server.chunkedResponseFinalize();
+}
+
 void setup(void) {
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
@@ -79,6 +89,8 @@ void setup(void) {
     gif_colored[18] = millis() % 256;
     server.send(200, "image/gif", gif_colored, sizeof(gif_colored));
   });
+
+  server.on("/chunks", handleChunked);
 
   server.onNotFound(handleNotFound);
 
