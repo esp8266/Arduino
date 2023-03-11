@@ -2,7 +2,7 @@
 /*
   Serial read/write/verify/benchmark
   Using internal loopback
-  Using SoftwareSerial library for logging
+  Using EspSoftwareSerial library for logging
 
   Sketch meant for debugging only
   Released to public domain
