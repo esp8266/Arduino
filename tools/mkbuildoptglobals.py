@@ -682,8 +682,6 @@ def main():
     if debug_enabled:
         locale_dbg()
 
-    default_locale = locale.getdefaultlocale()
-    print_msg(f'default locale:         {default_locale}')
     print_msg(f'default_encoding:       {default_encoding}')
 
     print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
