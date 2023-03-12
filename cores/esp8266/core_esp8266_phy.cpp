@@ -355,7 +355,7 @@ extern int __get_adc_mode(void)
 extern void __run_user_rf_pre_init(void) __attribute__((noinline, weak));
 extern void __run_user_rf_pre_init(void)
 {
-    return; // default do noting
+    return; // default do nothing
 }
 
 #if (NONOSDK >= (0x30000))

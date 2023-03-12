@@ -57,6 +57,8 @@ enum RFMode {
     RF_DISABLED = 4 // disable RF after deep-sleep wake up, just like modem sleep, there will be the smallest current.
 };
 
+#define RF_PRE_INIT() void __run_user_rf_pre_init()
+
 // compatibility definitions
 #define WakeMode RFMode
 #define WAKE_RF_DEFAULT  RF_DEFAULT
