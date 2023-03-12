@@ -424,6 +424,8 @@ extern "C" uint8_t uart_rx_one_char_block();
 #include "flash_hal.h"
 #endif
 
+extern "C" void user_rf_pre_init();
+
 extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 {
     const char *flash_map_str = NULL;
@@ -623,14 +625,29 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
             uart_rx_one_char_block(); // Someone said hello - repeat message
         } while(true);
     }
+    /*
+      The function user_rf_pre_init() is no longer called from SDK 3.0 and up.
+      The SDK manual and release notes skipped this detail. The 2023 ESP-FAQ
+      hints at the change with "* Call system_phy_set_powerup_option(3) in
+      function user_pre_init or user_rf_pre_init"
+      https://docs.espressif.com/_/downloads/espressif-esp-faq/en/latest/pdf/#page=14
+
+      Add call to user_rf_pre_init(), so we can still perform early calls like
+      system_phy_set_rfoption(rf_mode), system_phy_set_powerup_option(2), etc.
+
+      Placement, should this be at the beginning or end of user_pre_init()?
+      By the end, we have already registered the PHY_DATA partition.
+      SDK v2.2 called user_rf_pre_init() after reading PHY_DATA.
+    */
+    user_rf_pre_init();
 }
 #endif // #if (NONOSDK >= (0x30000))
 
 extern "C" void user_init(void) {
 
 #if (NONOSDK >= (0x30000))
-    extern void user_rf_pre_init();
-    user_rf_pre_init(); // Stop spoofing logic
+    extern void sdk3_end_phy_data_spoof(void);
+    sdk3_end_phy_data_spoof();
 #endif
 
     struct rst_info *rtc_info_ptr = system_get_rst_info();

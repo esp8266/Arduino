@@ -348,6 +348,11 @@ void sdk3_begin_phy_data_spoof(void)
 {
    spoof_init_data = true;
 }
+
+void sdk3_end_phy_data_spoof(void)
+{
+   spoof_init_data = false;
+}
 #else
 uint32_t user_rf_cal_sector_set(void)
 {
@@ -359,7 +364,9 @@ uint32_t user_rf_cal_sector_set(void)
 void user_rf_pre_init()
 {
     // *((volatile uint32_t*) 0x60000710) = 0;
+#if (NONOSDK < (0x30000))
     spoof_init_data = false;
+#endif
 
     int rf_mode = __get_rf_mode();
     if (rf_mode >= 0) {
