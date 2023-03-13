@@ -636,8 +636,8 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
       system_phy_set_rfoption(rf_mode), system_phy_set_powerup_option(2), etc.
 
       Placement, should this be at the beginning or end of user_pre_init()?
-      By the end, we have already registered the PHY_DATA partition.
-      SDK v2.2 called user_rf_pre_init() after reading PHY_DATA.
+      By the end, we have registered the PHY_DATA partition; however, PHY_DATA
+      read occurs after return and before user_init() is called.
     */
     user_rf_pre_init();
 }
