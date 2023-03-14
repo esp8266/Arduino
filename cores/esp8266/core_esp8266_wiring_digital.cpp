@@ -151,8 +151,7 @@ extern "C" {
         {
             interrupt_handler_t& handler = interrupt_handlers[pin];
             handler.userFunc = std::move(userFunc);
-            if (handler.userFunc)
-                handler.mode = mode;
+            handler.mode = handler.userFunc ?  mode : 0;
         }
 
         void IRAM_ATTR interrupt_handler(void *arg, void *frame);
