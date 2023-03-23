@@ -149,7 +149,9 @@ typedef enum {
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
-class HTTPClient
+class StreamString;
+
+class HTTPClient : public Stream
 {
 public:
     HTTPClient() = default;
@@ -220,6 +222,12 @@ public:
     const String& getString(void);
     static String errorToString(int error);
 
+    size_t write(uint8_t b);
+    size_t write(const uint8_t *buffer, size_t size);
+    int available();
+    int read();
+    int peek();
+
 protected:
     struct RequestArgument {
         String key;
@@ -232,8 +240,10 @@ protected:
     int returnError(int error);
     bool connect(void);
     bool sendHeader(const char * type);
+    bool endRequest(void);
     int handleHeaderResponse();
-    int writeToStreamDataBlock(Stream * stream, int len);
+    bool readChunkHeader(bool blocking = true);
+    bool readChunkTrailer(bool blocking = true);
 
     // The common pattern to use the class is to
     // {
@@ -271,6 +281,9 @@ protected:
     uint16_t _redirectLimit = 10;
     String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    String _chunkHeader;
+    uint32_t _chunkLen = 0;
+    uint32_t _chunkOffset = 0;
     std::unique_ptr<StreamString> _payload;
 };
 
