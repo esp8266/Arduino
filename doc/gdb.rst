@@ -380,4 +380,33 @@ breakpoint) command in GDB while debugging instead of the more common
 ``break`` command, since ``thb`` will remove the breakpoint once it is
 reached automatically and save you some trouble.
 
+Because of the single hardware breakpoint limitation, you must pay careful
+attention to the output from ``gdb`` when you set a breakpoint. If your
+breakpoint expression matches multiple locations, as in this example:
 
+.. code:: bash
+
+    (gdb) break loop
+    Breakpoint 1 at 0x40202c84: loop. (2 locations)
+
+Then you will be unable to ``continue``:
+
+.. code:: bash
+
+    (gdb) cont
+    Continuing.
+    Note: automatically using hardware breakpoints for read-only addresses.
+    Warning:
+    Cannot insert hardware breakpoint 1.
+    Could not insert hardware breakpoints:
+    You may have requested too many hardware breakpoints/watchpoints.
+
+You can resolve this situation by deleting the previous breakpoint and
+using a more specific breakpoint expression:
+
+.. code:: bash
+
+    (gdb) delete
+    Delete all breakpoints? (y or n) y
+    (gdb) break mysketch.ino:loop
+    Breakpoint 2 at 0x40202c84: file .../mysketch.ino, line 113.
