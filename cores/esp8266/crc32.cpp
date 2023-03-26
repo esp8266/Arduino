@@ -23,7 +23,7 @@
 #include "pgmspace.h"
 
 // moved from core_esp8266_eboot_command.cpp
-uint32_t crc32 (const void* data, size_t length, uint32_t crc /*= 0xffffffff*/)
+uint32_t crc32 (const void* data, size_t length, uint32_t crc)
 {
     const uint8_t* ldata = (const uint8_t*)data;
     while (length--)

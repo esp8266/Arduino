@@ -501,7 +501,7 @@ In case OTA update fails dead after entering modifications in your sketch, you c
 HTTP Server
 -----------
 
-``ESPhttpUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
+``ESP8266HTTPUpdate`` class can check for updates and download a binary file from HTTP web server. It is possible to download updates from every IP or domain address on the network or Internet.
 
 Note that by default this class closes all other connections except the one used by the update, this is because the update method blocks. This means that if there's another application receiving data then TCP packets will build up in the buffer leading to out of memory errors causing the OTA update to fail. There's also a limited number of receive buffers available and all may be used up by other applications.
 
@@ -523,6 +523,8 @@ Simple updater downloads the file every time the function is called.
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     ESPhttpUpdate.update(client, "192.168.0.2", 80, "/arduino.bin");
 
@@ -535,6 +537,8 @@ The server-side script can respond as follows: - response code 200, and send the
 
 .. code:: cpp
 
+    #include <ESP8266httpUpdate.h>
+    
     WiFiClient client;
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
     switch(ret) {
@@ -668,9 +672,29 @@ Updater class
 
 Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader (eboot) to load the new firmware on the next boot.
 
-**Note:** The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
+The following `Updater <https://github.com/esp8266/Arduino/tree/master/cores/esp8266/Updater.h` methods could be used to be notified about OTA progress:
 
-**Note:** For uncompressed firmware images, the Updater will change the flash mode bits if they differ from the flash mode the device is currently running at. This ensures that the flash mode is not changed to an incompatible mode when the device is in a remote or hard to access area. Compressed images are not modified, thus changing the flash mode in this instance could result in damage to the ESP8266 and/or flash memory chip or your device no longer be accessible via OTA, and requiring re-flashing via a serial connection `(per discussion in #7307) <https://github.com/esp8266/Arduino/issues/7307#issuecomment-631523053>`__.
+.. code:: cpp
+
+    using THandlerFunction_Progress = std::function<void(size_t, size_t)>;
+    void onProgress(THandlerFunction_Progress); // current and total number of bytes
+
+    using THandlerFunction_Error = std::function<void(uint8_t)>;
+    void onStart(THandlerFunction_Error); // error code
+
+    using THandlerFunction = std::function<void()>;
+    void onEnd(THandlerFunction);
+    void onError(THandlerFunction);
+
+Using RTC memory
+~~~~~~~~~~~~~~~~
+
+The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
+
+Flash mode and size
+~~~~~~~~~~~~~~~~~~~
+
+For uncompressed firmware images, the Updater will change the flash mode bits if they differ from the flash mode the device is currently running at. This ensures that the flash mode is not changed to an incompatible mode when the device is in a remote or hard to access area. Compressed images are not modified, thus changing the flash mode in this instance could result in damage to the ESP8266 and/or flash memory chip or your device no longer be accessible via OTA, and requiring re-flashing via a serial connection `(per discussion in #7307) <https://github.com/esp8266/Arduino/issues/7307#issuecomment-631523053>`__.
 
 Update process - memory view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

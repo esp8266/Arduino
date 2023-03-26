@@ -5,6 +5,13 @@
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
+extern "C" size_t umm_umul_sat(const size_t a, const size_t b);
+
+// z2EapFree: See wpa2_eap_patch.cpp for details
+extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((weak, alias("vPortFree"), nothrow));
+// I don't understand all the compiler noise around this alias.
+// Adding "__attribute__ ((nothrow))" seems to resolve the issue.
+// This may be relevant: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81824
 
 // Need FORCE_ALWAYS_INLINE to put HeapSelect class constructor/deconstructor in IRAM
 #define FORCE_ALWAYS_INLINE_HEAP_SELECT
@@ -153,7 +160,7 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
+    PTR_CHECK__LOG_LAST_FAIL(ret, umm_umul_sat(count, size));
     return ret;
 }
 
@@ -172,7 +179,7 @@ void IRAM_ATTR print_loc(size_t size, const char* file, int line)
         DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
 
         bool inISR = ETS_INTR_WITHINISR();
-        if (inISR && (uint32_t)file >= 0x40200000) {
+        if (NULL == file || (inISR && (uint32_t)file >= 0x40200000)) {
             DEBUG_HEAP_PRINTF("File: %p", file);
         } else if (!inISR && (uint32_t)file >= 0x40200000) {
             char buf[strlen_P(file) + 1];
@@ -247,8 +254,11 @@ void* IRAM_ATTR calloc(size_t count, size_t size)
     INTEGRITY_CHECK__ABORT();
     POISON_CHECK__ABORT();
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL(ret, count * size);
-    OOM_CHECK__PRINT_OOM(ret, size);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);// For logging purposes
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL(ret, total_size);
+    OOM_CHECK__PRINT_OOM(ret, total_size);
     return ret;
 }
 
@@ -287,8 +297,11 @@ void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, i
     INTEGRITY_CHECK__PANIC_FL(file, line);
     POISON_CHECK__PANIC_FL(file, line);
     void* ret = UMM_CALLOC(count, size);
-    PTR_CHECK__LOG_LAST_FAIL_FL(ret, count * size, file, line);
-    OOM_CHECK__PRINT_LOC(ret, size, file, line);
+    #if defined(DEBUG_ESP_OOM)
+    size_t total_size = umm_umul_sat(count, size);
+    #endif
+    PTR_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line);
+    OOM_CHECK__PRINT_LOC(ret, total_size, file, line);
     return ret;
 }
 
@@ -329,8 +342,10 @@ size_t IRAM_ATTR xPortWantedSizeAlign(size_t size)
 
 void system_show_malloc(void)
 {
+#ifdef UMM_INFO
     HeapSelectDram ephemeral;
     umm_info(NULL, true);
+#endif
 }
 
 /*
@@ -341,25 +356,25 @@ void system_show_malloc(void)
 void* IRAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortMalloc(size,  file, line);;
+    return heap_pvPortMalloc(size, file, line);;
 }
 
 void* IRAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortCalloc(count, size,  file, line);
+    return heap_pvPortCalloc(count, size, file, line);
 }
 
 void* IRAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortRealloc(ptr, size,  file, line);
+    return heap_pvPortRealloc(ptr, size, file, line);
 }
 
 void* IRAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
-    return heap_pvPortZalloc(size,  file, line);
+    return heap_pvPortZalloc(size, file, line);
 }
 
 void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
@@ -369,7 +384,98 @@ void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
     // correct context. umm_malloc free internally determines the correct heap.
     HeapSelectDram ephemeral;
 #endif
-    return heap_vPortFree(ptr,  file, line);
+    return heap_vPortFree(ptr, file, line);
 }
 
+#if (NONOSDK >= (0x30000))
+////////////////////////////////////////////////////////////////////////////////
+/*
+  New for NON-OS SDK 3.0.0 and up
+  Needed for WPA2 Enterprise support. This was not present in SDK pre 3.0
+
+  The NON-OS SDK 3.0.x has breaking changes to pvPortMalloc. They added one more
+  argument for selecting a heap. To avoid breaking the build, I renamed their
+  breaking version to sdk3_pvPortMalloc. To complete the fix, the LIBS need to
+  be edited.
+
+  Also in the release are low-level functions pvPortZallocIram and
+  pvPortCallocIram, which are not documented in the Espressif NONOS SDK manual.
+  No issues in providing replacements. For the non-Arduino ESP8266 applications,
+  pvPortZallocIram and pvPortCallocIram would have been selected through the
+  macros like os_malloc defined in `mem.h`.
+
+  OOM - Implementation strategy - Native v3.0 SDK
+  * For functions `pvPortMalloc(,,,true);` and `pvPortMallocIram(,,,);` on a
+    failed IRAM alloc, try DRAM.
+  * For function `pvPortMalloc(,,,false);` use DRAM only - on fail, do not
+    try IRAM.
+
+  WPA2 Enterprise connect crashing is fixed at v3.0.2 and up.
+*/
+#ifdef UMM_HEAP_IRAM
+void* IRAM_ATTR sdk3_pvPortMalloc(size_t size, const char* file, int line, bool iram)
+{
+    if (iram) {
+        HeapSelectIram ephemeral;
+        void* ret = heap_pvPortMalloc(size, file, line);
+        if (ret) return ret;
+    }
+    {
+        HeapSelectDram ephemeral;
+        return heap_pvPortMalloc(size, file, line);
+    }
+}
+
+void* IRAM_ATTR pvPortCallocIram(size_t count, size_t size, const char* file, int line)
+{
+    {
+        HeapSelectIram ephemeral;
+        void* ret = heap_pvPortCalloc(count, size, file, line);
+        if (ret) return ret;
+    }
+    {
+        HeapSelectDram ephemeral;
+        return heap_pvPortCalloc(count, size, file, line);
+    }
+}
+
+void* IRAM_ATTR pvPortZallocIram(size_t size, const char* file, int line)
+{
+    {
+        HeapSelectIram ephemeral;
+        void* ret = heap_pvPortZalloc(size, file, line);
+        if (ret) return ret;
+    }
+    {
+        HeapSelectDram ephemeral;
+        return heap_pvPortZalloc(size, file, line);
+    }
+}
+#define CONFIG_IRAM_MEMORY 1
+
+#else
+// For sdk3_pvPortMalloc, the bool argument is ignored and intentionally omitted.
+extern "C" void* sdk3_pvPortMalloc(size_t size, const char* file, int line) __attribute__ ((alloc_size(1), malloc, nothrow, alias("pvPortMalloc")));
+extern "C" void* pvPortCallocIram(size_t count, size_t size, const char* file, int line) __attribute__((alloc_size(1, 2), malloc, nothrow, alias("pvPortCalloc")));
+extern "C" void* pvPortZallocIram(size_t size, const char* file, int line) __attribute__((alloc_size(1), malloc, nothrow, alias("pvPortZalloc")));
+#define CONFIG_IRAM_MEMORY 0
+#endif  // #ifdef UMM_HEAP_IRAM
+
+/*
+  We do not need the function user_iram_memory_is_enabled().
+  1. It was used by mem_manager.o which was replaced with this custom heap
+     implementation. IRAM memory selection is handled differently for
+     Arduino ESP8266.
+  2. In libmain.a, Cache_Read_Enable_New uses it for cache size. However, When
+     using IRAM for memory or running with 48K IRAM for code, we use a
+     replacement Cache_Read_Enable to correct the cache size ignoring
+     Cache_Read_Enable_New's selected value.
+  3. Create a linker conflicts in the event the sketch author tries to control
+     IRAM heap through this method.
+*/
+uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
+{
+    return  CONFIG_IRAM_MEMORY;
+}
+#endif // #if (NONOSDK >= (0x30000))
 };

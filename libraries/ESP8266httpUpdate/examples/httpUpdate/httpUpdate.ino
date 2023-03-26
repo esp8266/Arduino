@@ -15,7 +15,7 @@
 
 #ifndef APSSID
 #define APSSID "APSSID"
-#define APPSK  "APPSK"
+#define APPSK "APPSK"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
@@ -23,22 +23,14 @@ ESP8266WiFiMulti WiFiMulti;
 void setup() {
 
   Serial.begin(115200);
-  // Serial.setDebugOutput(true);
+  // Serial.setDebugOutput(false);
 
   Serial.println();
-  Serial.println();
-  Serial.println();
 
-  for (uint8_t t = 4; t > 0; t--) {
-    Serial.printf("[SETUP] WAIT %d...\n", t);
-    Serial.flush();
-    delay(1000);
-  }
+  ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
-
-
 }
 
 void update_started() {
@@ -80,21 +72,14 @@ void loop() {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://server/file.bin");
     // Or:
-    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
+    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
     switch (ret) {
-      case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-        break;
+      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
 
-      case HTTP_UPDATE_NO_UPDATES:
-        Serial.println("HTTP_UPDATE_NO_UPDATES");
-        break;
+      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
 
-      case HTTP_UPDATE_OK:
-        Serial.println("HTTP_UPDATE_OK");
-        break;
+      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
     }
   }
 }
-

@@ -186,3 +186,17 @@ indeed off at boot and is powered on only when starting to be used with the
 regular API.
 
 Read more at `former WiFi persistent mode <../esp8266wifi/generic-class.rst#persistent>`__.
+
+How to resolve "undefined reference to ``flashinit``" error ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Please read `flash layout <../filesystem.rst>`__ documentation entry.
+
+How to specify global build defines and options?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By using a uniquely named `.h` file, macro definitions can be created and
+globally used. Additionally, compiler command-line options can be embedded in
+this file as a unique block comment.
+
+`Read more <a06-global-build-options.rst>`__.

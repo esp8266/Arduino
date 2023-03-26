@@ -45,17 +45,11 @@ void setup() {
 
   // if the file is available, write to it:
   if (dataFile) {
-    while (dataFile.available()) {
-      Serial.write(dataFile.read());
-    }
+    while (dataFile.available()) { Serial.write(dataFile.read()); }
     dataFile.close();
   }
   // if the file isn't open, pop up an error:
-  else {
-    Serial.println("error opening datalog.txt");
-  }
+  else { Serial.println("error opening datalog.txt"); }
 }
 
-void loop() {
-}
-
+void loop() {}

@@ -1,0 +1,107 @@
+# Cross-platform builds to ensure our Core and toolchain works
+
+name: Build IDE examples
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+
+  # Examples are built in parallel to avoid CI total job time limitation
+  sanity-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: false
+    - uses: actions/cache@v3
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
+    - name: Toolchain sanity checks
+      run: |
+        bash ./tests/sanity_check.sh
+
+  build-linux:
+    name: Linux - LwIP ${{ matrix.lwip }} (${{ matrix.chunk }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        lwip: ["default", "IPv6"]
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - uses: actions/cache@v3
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
+    - name: Build Sketches
+      env:
+        ESP8266_ARDUINO_BUILDER: "arduino"
+        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
+        ESP8266_ARDUINO_LWIP: ${{ matrix.lwip }}
+      run: |
+        bash ./tests/build.sh 8 ${{ matrix.chunk }}
+
+  # Just try to build at least one sketch, since we spend so much time with the matrix above
+  
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: false
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - uses: actions/cache@v3
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
+    - name: Build Sketch
+      env:
+        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
+        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
+        ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
+      run: |
+        bash ./tests/build.sh
+
+  build-mac:
+    name: macOS
+    runs-on: macOS-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: false
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - uses: actions/cache@v3
+      with:
+        path: ./tools/dist
+        key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
+    - name: Build Sketch
+      env:
+        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
+        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
+        ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
+      run: |
+        bash ./tests/build.sh

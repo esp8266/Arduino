@@ -25,6 +25,12 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
+#if defined(NONOSDK305)
+#define NONOSDK (0x30500)
+#else
+#define NONOSDK (0x22100)
+#endif
+
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
 
@@ -249,12 +255,18 @@ typedef struct {
 struct station_config {
     uint8 ssid[32];
     uint8 password[64];
+#if (NONOSDK >= (0x30200))
+    uint8 channel;
+#endif
     uint8 bssid_set;    // Note: If bssid_set is 1, station will just connect to the router
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000))
     bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
+#endif
+#if (NONOSDK >= (0x30200))
+    bool all_channel_scan;
 #endif
 };
 
@@ -382,17 +394,17 @@ void wifi_softap_free_station_info(void);
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
 
-#if 1 // dhcp server
-// these functions are open-source, in dhcp server,
-// which is now moved to lwIPDhcpServer.cpp (lwip2)
-// (but still there with lwip1)
+// esp8266/Arduino notice:
+// these dhcp functions are no longer provided by the lwip lib
+// only way to include them is to build our NonOS LwipDhcpServer helpers
+// (ref. libraries/ESP8266WiFi/src/ESP8266WiFiAP-DhcpServer.cpp)
+
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
 bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 uint32 wifi_softap_get_dhcps_lease_time(void);
 bool wifi_softap_set_dhcps_lease_time(uint32 minute);
 bool wifi_softap_reset_dhcps_lease_time(void);
 bool wifi_softap_add_dhcps_lease(uint8 *macaddr);	// add static lease on the list, this will be the next available @
-#endif // dhcp server
 
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
@@ -438,7 +450,7 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
-#ifdef NONOSDK3V0
+#if (NONOSDK >= (0x30000))
 
 typedef enum {
     MIN_SLEEP_T,
@@ -770,6 +782,70 @@ bool wifi_set_country(wifi_country_t *country);
   * @return false : fail
   */
 bool wifi_get_country(wifi_country_t *country);
+
+#if (NONOSDK >= (0x30000))
+
+typedef enum {
+    SYSTEM_PARTITION_INVALID = 0,
+    SYSTEM_PARTITION_BOOTLOADER,            /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_OTA_1,                 /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_OTA_2,                 /* user can't modify this partition address, but can modify size */
+    SYSTEM_PARTITION_RF_CAL,                /* user must define this partition */
+    SYSTEM_PARTITION_PHY_DATA,              /* user must define this partition */
+    SYSTEM_PARTITION_SYSTEM_PARAMETER,      /* user must define this partition */
+    SYSTEM_PARTITION_AT_PARAMETER,
+    SYSTEM_PARTITION_SSL_CLIENT_CERT_PRIVKEY,
+    SYSTEM_PARTITION_SSL_CLIENT_CA,
+    SYSTEM_PARTITION_SSL_SERVER_CERT_PRIVKEY,
+    SYSTEM_PARTITION_SSL_SERVER_CA,
+    SYSTEM_PARTITION_WPA2_ENTERPRISE_CERT_PRIVKEY,
+    SYSTEM_PARTITION_WPA2_ENTERPRISE_CA,
+    
+    SYSTEM_PARTITION_CUSTOMER_BEGIN = 100,  /* user can define partition after here */
+    SYSTEM_PARTITION_MAX
+} partition_type_t;
+
+typedef struct {
+    partition_type_t type;    /* the partition type */
+    uint32_t addr;            /* the partition address */
+    uint32_t size;            /* the partition size */
+} partition_item_t;
+
+/**
+  * @brief     regist partition table information, user MUST call it in user_pre_init()
+  *
+  * @param     partition_table: the partition table
+  * @param     partition_num:   the partition number in partition table
+  * @param     map:             the flash map
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool system_partition_table_regist(
+        const partition_item_t* partition_table,
+        uint32_t partition_num,
+        uint32_t map
+    );
+
+/**
+  * @brief     get ota partition size
+  *
+  * @return    the size of ota partition
+  */
+uint32_t system_partition_get_ota_partition_size(void);
+
+/**
+  * @brief     get partition information
+  *
+  * @param     type:             the partition type
+  * @param     partition_item:   the point to store partition information
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool system_partition_get_item(partition_type_t type, partition_item_t* partition_item);
+
+#endif
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,11 @@
+# see https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
+# make sure our actions stay up-to-date and we know about any updates.
+# most of the time, this happens for major releases.
+# (...unless we stop using version tags and switch to hashes...)
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

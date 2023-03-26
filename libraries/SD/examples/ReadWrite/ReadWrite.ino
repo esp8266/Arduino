@@ -57,9 +57,7 @@ void setup() {
     Serial.println("test.txt:");
 
     // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-      Serial.write(myFile.read());
-    }
+    while (myFile.available()) { Serial.write(myFile.read()); }
     // close the file:
     myFile.close();
   } else {
@@ -71,5 +69,3 @@ void setup() {
 void loop() {
   // nothing happens after setup
 }
-
-

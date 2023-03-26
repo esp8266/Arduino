@@ -28,7 +28,7 @@
 void *umm_info(void *ptr, bool force) {
     UMM_CRITICAL_DECL(id_info);
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     uint16_t blockNo = 0;
 
@@ -174,6 +174,14 @@ size_t umm_free_heap_size_core(umm_heap_context_t *_context) {
     return (size_t)_context->info.freeBlocks * sizeof(umm_block);
 }
 
+/*
+  When used as the fallback option for supporting exported function
+  `umm_free_heap_size_lw()`, the build option UMM_INLINE_METRICS is required.
+  Otherwise, umm_info() would be used to complete the operation, which uses a
+  time-consuming method for getting free Heap and runs with interrupts off,
+  which can negatively impact WiFi operations. Also, it cannot support calls
+  from ISRs, `umm_info()` runs from flash.
+*/
 size_t umm_free_heap_size(void) {
     #ifndef UMM_INLINE_METRICS
     umm_info(NULL, false);

@@ -27,6 +27,7 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 
+#include <LwipDhcpServer.h>
 
 class ESP8266WiFiAPClass {
 
@@ -36,8 +37,8 @@ class ESP8266WiFiAPClass {
 
     public:
 
-        bool softAP(const char* ssid, const char* psk = NULL, int channel = 1, int ssid_hidden = 0, int max_connection = 4);
-        bool softAP(const String& ssid,const String& psk = emptyString,int channel = 1,int ssid_hidden = 0,int max_connection = 4);
+        bool softAP(const char* ssid, const char* psk = NULL, int channel = 1, int ssid_hidden = 0, int max_connection = 4, int beacon_interval = 100);
+        bool softAP(const String& ssid,const String& psk = emptyString,int channel = 1,int ssid_hidden = 0,int max_connection = 4,int beacon_interval = 100);
         bool softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         bool softAPdisconnect(bool wifioff = false);
 
@@ -48,8 +49,10 @@ class ESP8266WiFiAPClass {
         uint8_t* softAPmacAddress(uint8_t* mac);
         String softAPmacAddress(void);
 
-	String softAPSSID() const;
-	String softAPPSK() const;
+        String softAPSSID() const;
+        String softAPPSK() const;
+
+        static DhcpServer& softAPDhcpServer();
 
     protected:
 

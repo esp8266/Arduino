@@ -1,64 +1,97 @@
 /*
-    lwIPDhcpServer-NonOS.cpp - DHCP server wrapper
+    NonOS DHCP server helpers
 
-    Copyright (c) 2020 esp8266 arduino. All rights reserved.
+    Copyright (c) 2020-2022 esp8266 arduino. All rights reserved.
     This file is part of the esp8266 core for Arduino environment.
-
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
-
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
-
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-// STARTS/STOPS DHCP SERVER ON WIFI AP INTERFACE
-// these functions must exists as-is with "C" interface,
-// nonos-sdk calls them at boot time and later
+#include "LwipDhcpServer-NonOS.h"
 
-#include <lwip/init.h> // LWIP_VERSION
-
+#include <lwip/init.h>
 #include <lwip/netif.h>
-#include "LwipDhcpServer.h"
 
-extern netif netif_git[2];
-
-// global DHCP instance for softAP interface
-DhcpServer dhcpSoftAP(&netif_git[SOFTAP_IF]);
+// Global static DHCP instance for softAP interface
+// (since the netif object never goes away, even when AP is disabled)
+// Initial version fully emulates nonos-sdk api in DhcpServer class,
+// before trying to further change it and possibly break legacy behaviour
+DhcpServer& getNonOSDhcpServer()
+{
+    extern netif      netif_git[2];
+    static DhcpServer server(&netif_git[SOFTAP_IF]);
+    return server;
+}
 
 extern "C"
 {
-
-    void dhcps_start(struct ip_info *info, netif* apnetif)
+    // `ip_info` is useless, since we get the information from the netif directly
+    // `netif` would be netif_git[SOFTAP_IF], which we get from the lwip2 glue
+    void dhcps_start(ip_info*, netif*)
     {
-        // apnetif is esp interface, replaced by lwip2's
-        // netif_git[SOFTAP_IF] interface in constructor
-        (void)apnetif;
-
-#if 0
-        // can't use C++ now, global ctors are not initialized yet
-        dhcpSoftAP.begin(info);
-#else
-        (void)info;
-        // initial version: emulate nonos-sdk in DhcpServer class before
-        //                  trying to change legacy behavor
-        // `fw_has_started_softap_dhcps` will be read in DhcpServer::DhcpServer
-        // which is called when c++ ctors are initialized, specifically
-        // dhcpSoftAP initialized with AP interface number above.
-        fw_has_started_softap_dhcps = 1;
-#endif
+        auto& server = getNonOSDhcpServer();
+        if (!server.isRunning())
+        {
+            server.begin();
+        }
     }
 
     void dhcps_stop()
     {
-        dhcpSoftAP.end();
+        auto& server = getNonOSDhcpServer();
+        if (server.isRunning())
+        {
+            server.end();
+        }
     }
 
-} // extern "C"
+    // providing the rest of the nonos-sdk API, which was originally removed in 3.0.0
+
+    bool wifi_softap_set_dhcps_lease(dhcps_lease* please)
+    {
+        auto& server = getNonOSDhcpServer();
+        return server.set_dhcps_lease(please);
+    }
+
+    bool wifi_softap_get_dhcps_lease(dhcps_lease* please)
+    {
+        auto& server = getNonOSDhcpServer();
+        return server.get_dhcps_lease(please);
+    }
+
+    uint32 wifi_softap_get_dhcps_lease_time()
+    {
+        auto& server = getNonOSDhcpServer();
+        return server.getLeaseTime();
+    }
+
+    bool wifi_softap_set_dhcps_lease_time(uint32 minutes)
+    {
+        auto& server = getNonOSDhcpServer();
+        server.setLeaseTime(minutes);
+        return true;
+    }
+
+    bool wifi_softap_reset_dhcps_lease_time()
+    {
+        auto& server = getNonOSDhcpServer();
+        server.resetLeaseTime();
+        return true;
+    }
+
+    bool wifi_softap_add_dhcps_lease(uint8* macaddr)
+    {
+        auto& server = getNonOSDhcpServer();
+        return server.add_dhcps_lease(macaddr);
+    }
+
+}  // extern "C"

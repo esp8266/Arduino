@@ -46,6 +46,19 @@ extern "C" {
 */
 #endif
 
+#if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU) || defined(DEBUG_ESP_CORE) || defined(DEBUG_ESP_PORT)
+/*
+ * Early adjustment for CPU crystal frequency will allow early debug printing to
+ * be readable before the SDK initialization is complete.
+ *
+ * It is unknown if there are any side effects with SDK startup, but a
+ * possibility. Out of an abundance of caution, limit the use of mmu_set_pll for
+ * handling printing in failure cases that finish with a reboot. Or for other
+ * rare debug contexts.
+ */
+extern void mmu_set_pll(void);
+#endif
+
 /*
  * DEV_DEBUG_PRINT:
  *   Debug printing macros for printing before before, during, and after
@@ -56,17 +69,17 @@ extern "C" {
  #define DEV_DEBUG_PRINT
  */
 
-#if defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
+#if (defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)) && !defined(HOST_MOCK)
+// Errors follow when `#include <esp8266_peri.h>` is present when running CI HOST
 #include <esp8266_peri.h>
 
 #define DBG_MMU_FLUSH(a) while((USS(a) >> USTXC) & 0xff) {}
 
 #if defined(DEV_DEBUG_PRINT)
-extern void set_pll(void);
 extern void dbg_set_pll(void);
 
 #define DBG_MMU_PRINTF(fmt, ...) \
-set_pll(); \
+mmu_set_pll(); \
 uart_buff_switch(0); \
 ets_uart_printf(fmt, ##__VA_ARGS__); \
 DBG_MMU_FLUSH(0)
@@ -79,6 +92,24 @@ DBG_MMU_FLUSH(0)
 #define DBG_MMU_FLUSH(...) do {} while(false)
 #define DBG_MMU_PRINTF(...) do {} while(false)
 #endif    // defined(DEV_DEBUG_PRINT) || defined(DEBUG_ESP_MMU)
+
+/*
+ * This wrapper is for running code from IROM (flash) before the SDK starts.
+ *
+ * Wraps a `void fn(void)` call with calls to enable and disable iCACHE.
+ * Allows a function that resides in IROM to run before the SDK starts.
+ *
+ * Do not use once the SDK has started.
+ *
+ * Because the SDK initialization code has not run, nearly all the SDK functions
+ * are not safe to call.
+ *
+ * Note printing at this early stage is complicated. To gain more insight,
+ * review DEV_DEBUG_PRINT build path in mmu_iram.cpp. To handle strings stored
+ * in IROM, review printing method and comments in hwdt_app_entry.cpp.
+ *
+ */
+void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void));
 
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {

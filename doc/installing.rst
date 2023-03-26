@@ -44,7 +44,7 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 3.x (https://python.org)
+-  Python ≥3.7 (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 -  Uninstalling any core version installed via Board Manager
@@ -114,7 +114,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd esp8266/tools
+       cd tools 
        python3 get.py
 
 -  Restart Arduino
@@ -193,8 +193,8 @@ Instructions - Other OS
 -  Download binary tools
 
    .. code:: bash
-
-       cd esp8266/tools
+       
+       cd tools
        python3 get.py
 
    If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as

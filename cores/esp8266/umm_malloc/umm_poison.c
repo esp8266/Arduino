@@ -8,15 +8,19 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define UMM_POISON_BLOCK_SIZE (UMM_POISON_SIZE_BEFORE + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_AFTER)
+
 /*
- * Yields a size of the poison for the block of size `s`.
+ * Yields the total size of a poison block of size `s`.
  * If `s` is 0, returns 0.
+ * If result overflows/wraps, return saturation value.
  */
-static size_t poison_size(size_t s) {
-    return s ? (UMM_POISON_SIZE_BEFORE +
-        sizeof(UMM_POISONED_BLOCK_LEN_TYPE) +
-        UMM_POISON_SIZE_AFTER)
-             : 0;
+static void add_poison_size(size_t *s) {
+    if (*s == 0) {
+        return;
+    }
+
+    *s = umm_uadd_sat(*s, UMM_POISON_BLOCK_SIZE);
 }
 
 /*
@@ -138,10 +142,8 @@ static void *get_unpoisoned(void *vptr) {
         ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
         umm_heap_context_t *_context = umm_get_ptr_context(vptr);
-        if (NULL == _context) {
-            panic();
-            return NULL;
-        }
+        NON_NULL_CONTEXT_ASSERT();
+
         /* Figure out which block we're in. Note the use of truncated division... */
         c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
 
@@ -158,7 +160,7 @@ static void *get_unpoisoned(void *vptr) {
 void *umm_poison_malloc(size_t size) {
     void *ret;
 
-    size += poison_size(size);
+    add_poison_size(&size);
 
     ret = umm_malloc(size);
 
@@ -171,9 +173,12 @@ void *umm_poison_malloc(size_t size) {
 
 void *umm_poison_calloc(size_t num, size_t item_size) {
     void *ret;
-    size_t size = item_size * num;
 
-    size += poison_size(size);
+    // Use saturated multiply.
+    // Rely on umm_malloc to supply the fail response as needed.
+    size_t size = umm_umul_sat(num, item_size);
+
+    add_poison_size(&size);
 
     ret = umm_malloc(size);
 
@@ -193,7 +198,7 @@ void *umm_poison_realloc(void *ptr, size_t size) {
 
     ptr = get_unpoisoned(ptr);
 
-    size += poison_size(size);
+    add_poison_size(&size);
     ret = umm_realloc(ptr, size);
 
     ret = get_poisoned(ret, size);
@@ -220,7 +225,7 @@ bool umm_poison_check(void) {
     bool ok = true;
     uint16_t cur;
 
-    UMM_INIT_HEAP;
+    UMM_CHECK_INITIALIZED();
 
     UMM_CRITICAL_ENTRY(id_poison);
     umm_heap_context_t *_context = umm_get_current_heap();
