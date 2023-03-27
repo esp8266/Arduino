@@ -182,6 +182,8 @@ static void postmortem_report(uint32_t sp_dump) {
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
+        ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
+            rst_info.exccause, /* Address executing at time of Soft WDT level-1 interrupt */ rst_info.epc1, 0, 0, 0, 0);
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
         ets_printf_P(PSTR("\nStack smashing detected.\n"));

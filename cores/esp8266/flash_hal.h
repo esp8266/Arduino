@@ -43,7 +43,7 @@ extern const flash_map_s __flashdesc[];
 
 #define FLASH_MAP_SETUP_CONFIG(conf) FLASH_MAP_SETUP_CONFIG_ATTR(,conf)
 #define FLASH_MAP_SETUP_CONFIG_ATTR(attr, conf...) \
-  const flash_map_s __flashdesc[] PROGMEM = conf; \
+  extern const flash_map_s __flashdesc[] PROGMEM attr = conf; \
   const char *flashinit (void) attr; \
   const char *flashinit (void) \
   { \

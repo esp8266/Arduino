@@ -44,7 +44,7 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 3.x (https://python.org)
+-  Python ≥3.7 (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 -  Uninstalling any core version installed via Board Manager
