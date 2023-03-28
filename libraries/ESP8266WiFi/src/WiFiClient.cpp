@@ -229,6 +229,7 @@ size_t WiFiClient::write(Stream& stream)
         return 0;
     }
     // core up to 2.7.4 was equivalent to this
+    _client->setTimeout(_timeout);
     return stream.sendAll(this);
 }
 
@@ -266,11 +267,13 @@ int WiFiClient::read()
 
 int WiFiClient::read(uint8_t* buf, size_t size)
 {
+    _client->setTimeout(_timeout);
     return (int)_client->read((char*)buf, size);
 }
 
 int WiFiClient::read(char* buf, size_t size)
 {
+    _client->setTimeout(_timeout);
     return (int)_client->read(buf, size);
 }
 
@@ -279,6 +282,7 @@ int WiFiClient::peek()
     if (!available())
         return -1;
 
+    _client->setTimeout(_timeout);
     return _client->peek();
 }
 
@@ -300,6 +304,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
         count = length;
     }
 
+    _client->setTimeout(_timeout);
     return _client->peekBytes((char *)buffer, count);
 }
 
@@ -454,6 +459,7 @@ const char* WiFiClient::peekBuffer ()
 // return number of byte accessible by peekBuffer()
 size_t WiFiClient::peekAvailable ()
 {
+    _client->setTimeout(_timeout);
     return _client? _client->peekAvailable(): 0;
 }
 

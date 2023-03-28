@@ -235,6 +235,11 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
+
+    // timeout management
+    unsigned long _userTimeout = 5000, _minimalTimeout = 0;
+    void setUpstreamTimeout (unsigned long timeout) { _userTimeout = timeout; }
+
 }; // class WiFiClientSecureCtx
 
 
@@ -263,25 +268,25 @@ class WiFiClientSecure : public WiFiClient {
     std::unique_ptr<WiFiClient> clone() const override { return std::unique_ptr<WiFiClient>(new WiFiClientSecure(*this)); }
 
     uint8_t status() override { return _ctx->status(); }
-    int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
-    int connect(const String& host, uint16_t port) override { return _ctx->connect(host, port); }
-    int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
+    int connect(IPAddress ip, uint16_t port) override { uto(); return _ctx->connect(ip, port); }
+    int connect(const String& host, uint16_t port) override { uto(); return _ctx->connect(host, port); }
+    int connect(const char* name, uint16_t port) override { uto(); return _ctx->connect(name, port); }
 
     uint8_t connected() override { return _ctx->connected(); }
-    size_t write(const uint8_t *buf, size_t size) override { return _ctx->write(buf, size); }
-    size_t write_P(PGM_P buf, size_t size) override { return _ctx->write_P(buf, size); }
-    size_t write(const char *buf) { return write((const uint8_t*)buf, strlen(buf)); }
-    size_t write_P(const char *buf) { return write_P((PGM_P)buf, strlen_P(buf)); }
-    size_t write(Stream& stream) /* Note this is not virtual */ { return _ctx->write(stream); }
-    int read(uint8_t *buf, size_t size) override { return _ctx->read(buf, size); }
-    int available() override { return _ctx->available(); }
-    int availableForWrite() override { return _ctx->availableForWrite(); }
-    int read() override { return _ctx->read(); }
-    int peek() override { return _ctx->peek(); }
-    size_t peekBytes(uint8_t *buffer, size_t length) override { return _ctx->peekBytes(buffer, length); }
+    size_t write(const uint8_t *buf, size_t size) override { uto(); return _ctx->write(buf, size); }
+    size_t write_P(PGM_P buf, size_t size) override { uto(); return _ctx->write_P(buf, size); }
+    size_t write(const char *buf) { uto(); return write((const uint8_t*)buf, strlen(buf)); }
+    size_t write_P(const char *buf) { uto(); return write_P((PGM_P)buf, strlen_P(buf)); }
+    size_t write(Stream& stream) /* Note this is not virtual */ { uto(); return _ctx->write(stream); }
+    int read(uint8_t *buf, size_t size) override { uto(); return _ctx->read(buf, size); }
+    int available() override { uto(); return _ctx->available(); }
+    int availableForWrite() override { uto(); return _ctx->availableForWrite(); }
+    int read() override { uto(); return _ctx->read(); }
+    int peek() override { uto(); return _ctx->peek(); }
+    size_t peekBytes(uint8_t *buffer, size_t length) override { uto(); return _ctx->peekBytes(buffer, length); }
     bool flush(unsigned int maxWaitMs) { return _ctx->flush(maxWaitMs); }
     bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
-    void flush() override { (void)flush(0); }
+    void flush() override { uto(); (void)flush(0); }
     void stop() override { (void)stop(0); }
 
     IPAddress remoteIP() override { return _ctx->remoteIP(); }
@@ -374,6 +379,10 @@ class WiFiClientSecure : public WiFiClient {
                       const X509List *client_CA_ta, int tls_min, int tls_max):
       _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
     }
+
+    // set _ctx user timeout according to Arduino's Stream::_timeout
+    // (set/getTimeout are not virtual: no easy way to propagate value)
+    inline void uto () { _ctx->setUpstreamTimeout(_timeout); }
 
 }; // class WiFiClientSecure
 
