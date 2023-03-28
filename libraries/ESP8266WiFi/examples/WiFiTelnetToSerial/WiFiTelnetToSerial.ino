@@ -31,7 +31,7 @@
     SWAP_PINS:
    0: use Serial1 for logging (legacy example)
    1: configure Hardware Serial port on RX:GPIO13 TX:GPIO15
-      and use SoftwareSerial for logging on
+      and use EspSoftwareSerial for logging on
       standard Serial pins RX:GPIO3 and TX:GPIO1
 */
 
@@ -84,11 +84,11 @@ void setup() {
 #if SWAP_PINS
   Serial.swap();
   // Hardware serial is now on RX:GPIO13 TX:GPIO15
-  // use SoftwareSerial on regular RX(3)/TX(1) for logging
+  // use EspSoftwareSerial on regular RX(3)/TX(1) for logging
   logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
   logger->enableIntTx(false);
-  logger->println("\n\nUsing SoftwareSerial for logging");
+  logger->println("\n\nUsing EspSoftwareSerial for logging");
 #else
   logger->begin(BAUD_LOGGER);
   logger->println("\n\nUsing Serial1 for logging");
