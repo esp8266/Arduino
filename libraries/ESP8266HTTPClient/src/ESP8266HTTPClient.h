@@ -42,8 +42,6 @@
 #define DEBUG_HTTPCLIENT(...) do { (void)0; } while (0)
 #endif
 
-#define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
-
 /// HTTP client errors
 #define HTTPC_ERROR_CONNECTION_FAILED   (-1)
 #define HTTPC_ERROR_SEND_HEADER_FAILED  (-2)
@@ -250,7 +248,7 @@ protected:
     String _host;
     uint16_t _port = 0;
     bool _reuse = true;
-    uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+    uint16_t _deferredTimeout = 0;
     bool _useHTTP10 = false;
 
     String _uri;

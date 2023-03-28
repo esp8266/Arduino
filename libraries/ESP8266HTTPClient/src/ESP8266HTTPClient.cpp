@@ -86,6 +86,10 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
 
     _port = (protocol == "https" ? 443 : 80);
     _client = client.clone();
+    if (_deferredTimeout) {
+        _client->setTimeout(_deferredTimeout);
+    }
+
 
     return beginInternal(url, protocol.c_str());
 }
@@ -109,6 +113,10 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     }
     
     _client = client.clone();
+    if (_deferredTimeout) {
+        _client->setTimeout(_deferredTimeout);
+    }
+
 
     clear();
 
@@ -308,9 +316,11 @@ void HTTPClient::setAuthorization(String auth)
  */
 void HTTPClient::setTimeout(uint16_t timeout)
 {
-    _tcpTimeout = timeout;
     if(connected()) {
         _client->setTimeout(timeout);
+    }
+    else {
+        _deferredTimeout = timeout;
     }
 }
 
@@ -794,8 +804,6 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-    _client->setTimeout(_tcpTimeout);
-
     if(!_client->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
@@ -978,7 +986,7 @@ int HTTPClient::handleHeaderResponse()
             }
 
         } else {
-            if((millis() - lastDataTime) > _tcpTimeout) {
+            if((millis() - lastDataTime) > _client.get()->getTimeout()) {
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
             esp_yield();

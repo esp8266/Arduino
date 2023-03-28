@@ -260,7 +260,7 @@ class WiFiClientSecure : public WiFiClient {
   public:
 
     WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { _owned = _ctx.get(); }
-    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { if (_ctx) _owned = _ctx.get(); }
+    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { if (_ctx) _owned = _ctx.get(); _timeout = rhs._timeout; }
     ~WiFiClientSecure() override { _ctx = nullptr; }
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default;

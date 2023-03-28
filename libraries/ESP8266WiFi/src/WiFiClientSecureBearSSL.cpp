@@ -465,8 +465,9 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
     return 0;
   }
 
+  _timeout = std::max(_userTimeout, _minimalTimeout);
   _startMillis = millis();
-  while ((_pollRecvBuffer() < (int) length) && ((millis() - _startMillis) < 5000)) {
+  while ((_pollRecvBuffer() < (int)length) && ((millis() - _startMillis) < _timeout)) {
     yield();
   }
 
@@ -1214,7 +1215,7 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   _x509_knownkey = nullptr;
 
   // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
-  if (ret) _minimalTimeout = 5000;
+  if (ret) _minimalTimeout = 0;
   _timeout = std::max(_userTimeout, _minimalTimeout);
 
   return ret;
