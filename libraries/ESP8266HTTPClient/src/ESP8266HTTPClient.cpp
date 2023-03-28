@@ -90,7 +90,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
         _client->setTimeout(_deferredTimeout);
     }
 
-
     return beginInternal(url, protocol.c_str());
 }
 
@@ -116,7 +115,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     if (_deferredTimeout) {
         _client->setTimeout(_deferredTimeout);
     }
-
 
     clear();
 
