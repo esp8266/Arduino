@@ -645,11 +645,6 @@ extern "C" void ICACHE_FLASH_ATTR user_pre_init(void)
 
 extern "C" void user_init(void) {
 
-#if (NONOSDK >= (0x30000))
-    extern void sdk3_end_phy_data_spoof(void);
-    sdk3_end_phy_data_spoof();
-#endif
-
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
