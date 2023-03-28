@@ -99,9 +99,15 @@ extern "C"
     }
     void stack_thunk_dump_stack() { }
 
+    void* umm_info(void*, bool)
+    {
+        return nullptr;
+    }
+
 // Thunking macro
 #define make_stack_thunk(fcnToThunk)
-};
+
+}; // extern "C"
 
 void configTime(int timezone, int daylightOffset_sec, const char* server1, const char* server2,
                 const char* server3)
