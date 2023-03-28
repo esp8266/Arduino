@@ -1,7 +1,7 @@
 /*
   This example is a variation on BasicOTA.
 
-  Logic added to look for a change in SDK Version. If so, erase the WiFi
+  Logic added to look for a change in SDK Version. If changed, erase the WiFi
   Settings and Reset the system.
 
   Added extra debug printing to aid in cutting through the confusion of the
