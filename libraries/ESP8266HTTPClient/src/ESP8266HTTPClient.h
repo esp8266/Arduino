@@ -217,7 +217,13 @@ public:
     WiFiClient* getStreamPtr(void);
 	int writeToPrint(Print* print);
     int writeToStream(Stream* stream);
-    const String& getString(void);
+
+    // In case of chunks = when size cannot be known in advance
+    // by the library, it might be useful to pre-reserve enough
+    // space instead of offending memory with a growing String
+    const String& getString() { return getString(0); }
+    const String& getString(int reserve);
+
     static String errorToString(int error);
 
 protected:
