@@ -70,8 +70,8 @@ namespace BearSSL {
 
 void WiFiClientSecureCtx::_clear() {
   // TLS handshake may take more than the 5 second default timeout
-  _minimalTimeout = 15000;
-  _timeout = std::max(_userTimeout, _minimalTimeout);
+  _negociationTimeout = _userFacingStream? _userFacingStream->getNegociationTimeout(): 15000;
+  updateStreamTimeout();
 
   _sc = nullptr;
   _sc_svr = nullptr;
@@ -104,7 +104,7 @@ void WiFiClientSecureCtx::_clearAuthenticationSettings() {
 }
 
 
-WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient() {
+WiFiClientSecureCtx::WiFiClientSecureCtx(const WiFiClientSecure* alter) : WiFiClient(), _userFacingStream(alter) {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -122,10 +122,11 @@ WiFiClientSecureCtx::~WiFiClientSecureCtx() {
   stack_thunk_del_ref();
 }
 
-WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
+WiFiClientSecureCtx::WiFiClientSecureCtx(const WiFiClientSecure* alter,
+                                     ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max):_userFacingStream(alter) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -142,11 +143,12 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
   }
 }
 
-WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
+WiFiClientSecureCtx::WiFiClientSecureCtx(const WiFiClientSecure* alter,
+                                     ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max): _userFacingStream(alter) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -248,8 +250,8 @@ void WiFiClientSecureCtx::_freeSSL() {
   // This connection is toast
   _handshake_done = false;
 
-  _minimalTimeout = 15000;
-  _timeout = std::max(_userTimeout, _minimalTimeout);
+  _negociationTimeout = _userFacingStream? _userFacingStream->getNegociationTimeout(): 15000;
+  updateStreamTimeout();
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
@@ -465,7 +467,7 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
     return 0;
   }
 
-  _timeout = std::max(_userTimeout, _minimalTimeout);
+  updateStreamTimeout();
   _startMillis = millis();
   while ((_pollRecvBuffer() < (int)length) && ((millis() - _startMillis) < _timeout)) {
     yield();
@@ -490,7 +492,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
 
   // _run_until() is called prior to inherited read/write methods
   // -> refreshing _timeout here, which is also used by ancestors
-  _timeout = std::max(_userTimeout, _minimalTimeout);
+  updateStreamTimeout();
   esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
 
   for (int no_work = 0; blocking || no_work < 2;) {
@@ -1215,8 +1217,8 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   _x509_knownkey = nullptr;
 
   // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
-  if (ret) _minimalTimeout = 0;
-  _timeout = std::max(_userTimeout, _minimalTimeout);
+  if (ret) _negociationTimeout = 0;
+  updateStreamTimeout();
 
   return ret;
 }
@@ -1682,4 +1684,9 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   return _SendAbort(probe, supportsLen);
 }
 
-};
+void WiFiClientSecureCtx::updateStreamTimeout ()
+{
+    _timeout = std::max(_userFacingStream? _userFacingStream->getTimeout(): 5000, _negociationTimeout);
+}
+
+};  // namespace BearSSL

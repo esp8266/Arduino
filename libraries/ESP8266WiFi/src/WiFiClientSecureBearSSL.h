@@ -31,9 +31,11 @@
 
 namespace BearSSL {
 
+class WiFiClientSecure;
+
 class WiFiClientSecureCtx : public WiFiClient {
   public:
-    WiFiClientSecureCtx();
+    WiFiClientSecureCtx(const WiFiClientSecure* alter);
     WiFiClientSecureCtx(const WiFiClientSecureCtx &rhs) = delete;
     ~WiFiClientSecureCtx() override;
 
@@ -216,10 +218,12 @@ class WiFiClientSecureCtx : public WiFiClient {
 
     // Methods for handling server.available() call which returns a client connection.
     friend class WiFiClientSecure; // access to private context constructors
-    WiFiClientSecureCtx(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
+    WiFiClientSecureCtx(const WiFiClientSecure* alter,
+                      ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
                       const X509List *client_CA_ta, int tls_min, int tls_max);
-    WiFiClientSecureCtx(ClientContext* client, const X509List *chain, const PrivateKey *sk,
+    WiFiClientSecureCtx(const WiFiClientSecure* alter,
+                      ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
                       const X509List *client_CA_ta, int tls_min, int tls_max);
 
@@ -237,8 +241,10 @@ class WiFiClientSecureCtx : public WiFiClient {
     uint8_t *_streamLoad(Stream& stream, size_t size);
 
     // timeout management
-    unsigned long _userTimeout = 5000, _minimalTimeout = 0;
-    void setUpstreamTimeout (unsigned long timeout) { _userTimeout = timeout; }
+    unsigned long _negociationTimeout = 0;                // negociation timeout
+    const WiFiClientSecure* _userFacingStream = nullptr;  // user-facing WiFiClientSecure
+    void setStream (const WiFiClientSecure* upStream) { _userFacingStream = upStream; }
+    void updateStreamTimeout ();
 
 }; // class WiFiClientSecureCtx
 
@@ -259,8 +265,10 @@ class WiFiClientSecure : public WiFiClient {
 
   public:
 
-    WiFiClientSecure():_ctx(new WiFiClientSecureCtx()) { _owned = _ctx.get(); }
-    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx) { if (_ctx) _owned = _ctx.get(); _timeout = rhs._timeout; }
+    WiFiClientSecure():_ctx(new WiFiClientSecureCtx(this)) { _owned = _ctx.get(); }
+    WiFiClientSecure(const WiFiClientSecure &rhs): _ctx(rhs._ctx), _userNegociationTimeout(rhs._userNegociationTimeout) {
+        if (_ctx) { _owned = _ctx.get(); _ctx->setStream(this); }
+    }
     ~WiFiClientSecure() override { _ctx = nullptr; }
 
     WiFiClientSecure& operator=(const WiFiClientSecure&) = default;
@@ -268,25 +276,25 @@ class WiFiClientSecure : public WiFiClient {
     std::unique_ptr<WiFiClient> clone() const override { return std::unique_ptr<WiFiClient>(new WiFiClientSecure(*this)); }
 
     uint8_t status() override { return _ctx->status(); }
-    int connect(IPAddress ip, uint16_t port) override { uto(); return _ctx->connect(ip, port); }
-    int connect(const String& host, uint16_t port) override { uto(); return _ctx->connect(host, port); }
-    int connect(const char* name, uint16_t port) override { uto(); return _ctx->connect(name, port); }
+    int connect(IPAddress ip, uint16_t port) override { return _ctx->connect(ip, port); }
+    int connect(const String& host, uint16_t port) override { return _ctx->connect(host, port); }
+    int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
 
     uint8_t connected() override { return _ctx->connected(); }
-    size_t write(const uint8_t *buf, size_t size) override { uto(); return _ctx->write(buf, size); }
-    size_t write_P(PGM_P buf, size_t size) override { uto(); return _ctx->write_P(buf, size); }
-    size_t write(const char *buf) { uto(); return write((const uint8_t*)buf, strlen(buf)); }
-    size_t write_P(const char *buf) { uto(); return write_P((PGM_P)buf, strlen_P(buf)); }
-    size_t write(Stream& stream) /* Note this is not virtual */ { uto(); return _ctx->write(stream); }
-    int read(uint8_t *buf, size_t size) override { uto(); return _ctx->read(buf, size); }
-    int available() override { uto(); return _ctx->available(); }
-    int availableForWrite() override { uto(); return _ctx->availableForWrite(); }
-    int read() override { uto(); return _ctx->read(); }
-    int peek() override { uto(); return _ctx->peek(); }
-    size_t peekBytes(uint8_t *buffer, size_t length) override { uto(); return _ctx->peekBytes(buffer, length); }
+    size_t write(const uint8_t *buf, size_t size) override { return _ctx->write(buf, size); }
+    size_t write_P(PGM_P buf, size_t size) override { return _ctx->write_P(buf, size); }
+    size_t write(const char *buf) { return write((const uint8_t*)buf, strlen(buf)); }
+    size_t write_P(const char *buf) { return write_P((PGM_P)buf, strlen_P(buf)); }
+    size_t write(Stream& stream) /* Note this is not virtual */ { return _ctx->write(stream); }
+    int read(uint8_t *buf, size_t size) override { return _ctx->read(buf, size); }
+    int available() override { return _ctx->available(); }
+    int availableForWrite() override { return _ctx->availableForWrite(); }
+    int read() override { return _ctx->read(); }
+    int peek() override { return _ctx->peek(); }
+    size_t peekBytes(uint8_t *buffer, size_t length) override { return _ctx->peekBytes(buffer, length); }
     bool flush(unsigned int maxWaitMs) { return _ctx->flush(maxWaitMs); }
     bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
-    void flush() override { uto(); (void)flush(0); }
+    void flush() override { (void)flush(0); }
     void stop() override { (void)stop(0); }
 
     IPAddress remoteIP() override { return _ctx->remoteIP(); }
@@ -363,26 +371,27 @@ class WiFiClientSecure : public WiFiClient {
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override { return _ctx->peekConsume(consume); }
 
+    // allowing to change timeout during negociation
+    void setNegociationTimeout (unsigned long timeout) { _userNegociationTimeout = timeout; }
+    unsigned long getNegociationTimeout () const { return _userNegociationTimeout; }
+
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;
+    unsigned long _userNegociationTimeout = 15000;  // negociation timeout initializer
 
     // Methods for handling server.available() call which returns a client connection.
     friend class WiFiServerSecure; // Server needs to access these constructors
     WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
                       const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
                       const X509List *client_CA_ta, int tls_min, int tls_max):
-      _ctx(new WiFiClientSecureCtx(client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
+      _ctx(new WiFiClientSecureCtx(this, client, chain, cert_issuer_key_type, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
     }
 
     WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
                       const X509List *client_CA_ta, int tls_min, int tls_max):
-      _ctx(new WiFiClientSecureCtx(client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
+      _ctx(new WiFiClientSecureCtx(this, client, chain, sk, iobuf_in_size, iobuf_out_size, cache, client_CA_ta, tls_min, tls_max)) {
     }
-
-    // set _ctx user timeout according to Arduino's Stream::_timeout
-    // (set/getTimeout are not virtual: no easy way to propagate value)
-    inline void uto () { _ctx->setUpstreamTimeout(_timeout); }
 
 }; // class WiFiClientSecure
 

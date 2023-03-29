@@ -110,7 +110,7 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
         _canReuse = false;
         disconnect(true);
     }
-    
+
     _client = client.clone();
     if (_deferredTimeout) {
         _client->setTimeout(_deferredTimeout);
@@ -491,7 +491,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
         //
         redirect = false;
         if (
-            _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS && 
+            _followRedirects != HTTPC_DISABLE_FOLLOW_REDIRECTS &&
             redirectCount < _redirectLimit &&
             _location.length() > 0
         ) {
@@ -504,7 +504,7 @@ int HTTPClient::sendRequest(const char * type, const uint8_t * payload, size_t s
                         // (the RFC require user to accept the redirection)
                         _followRedirects == HTTPC_FORCE_FOLLOW_REDIRECTS ||
                         // allow GET and HEAD methods without force
-                        !strcmp(type, "GET") || 
+                        !strcmp(type, "GET") ||
                         !strcmp(type, "HEAD")
                     ) {
                         redirectCount += 1;
