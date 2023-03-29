@@ -183,16 +183,24 @@ Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
 
 import argparse
-from shutil import copyfile
 import glob
+import locale
 import os
 import platform
-import traceback
 import sys
 import textwrap
 import time
+import traceback
 
-import locale
+from shutil import copyfile
+
+
+# Stay in sync with our bundled version
+PYTHON_REQUIRES = (3, 7)
+
+if sys.version_info < PYTHON_REQUIRES:
+    raise SystemExit(f"{__file__}\nMinimal supported version of Python is {PYTHON_REQUIRES[0]}.{PYTHON_REQUIRES[1]}")
+
 
 # Need to work on signature line used for match to avoid conflicts with
 # existing embedded documentation methods.
@@ -682,8 +690,6 @@ def main():
     if debug_enabled:
         locale_dbg()
 
-    default_locale = locale.getdefaultlocale()
-    print_msg(f'default locale:         {default_locale}')
     print_msg(f'default_encoding:       {default_encoding}')
 
     print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
