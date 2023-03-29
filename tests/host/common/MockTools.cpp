@@ -107,7 +107,7 @@ extern "C"
 // Thunking macro
 #define make_stack_thunk(fcnToThunk)
 
-}; // extern "C"
+};  // extern "C"
 
 void configTime(int timezone, int daylightOffset_sec, const char* server1, const char* server2,
                 const char* server3)
