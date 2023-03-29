@@ -330,8 +330,8 @@ trace of who called. You can encourage the compiler to save the caller's
 return address by adding an inline assembly trick
 ``__asm__ __volatile__("" ::: "a0", "memory");`` at the beginning of the
 function's body. Or instead, for a debug build conditional option, use the
-macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``. The ``-Og`` option
-will address the leaf function issue in a later compiler update.
+macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``. For compiler
+toolchain 3.2.0 and above, the ``-Og`` option is an alternative solution.
 
 In some cases, adding ``#pragma GCC optimize("Og,no-ipa-pure-const")`` to a
 module as well as using ``DEBUG_LEAF_FUNCTION()`` in a leaf function were
