@@ -41,11 +41,26 @@ void loop() {
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
+#if 1 // 1=secure, 0=insecure
+
     client->setFingerprint(fingerprint_sni_cloudflaressl_com);
+
+    // date needs to be setup
+    time_t now;
+    while (time(&now) < 24 * 3600) {
+      Serial.println("waiting for NTP time to be set...");
+      delay(1000);
+    }
+    Serial.printf("date: %s", ctime(&now));
+
+#else
     // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-    // client->setInsecure();
+    client->setInsecure();
+#endif
 
     HTTPClient https;
+    https.setTimeout(4000); // or: client->setTimeout(4000);
+    client->setNegociationTimeout(10000);
 
     Serial.print("[HTTPS] begin...\n");
     if (https.begin(*client, jigsaw_host, jigsaw_port)) {  // HTTPS
