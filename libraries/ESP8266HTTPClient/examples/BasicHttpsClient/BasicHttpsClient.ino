@@ -41,7 +41,7 @@ void loop() {
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
-#if 1 // 1=secure, 0=insecure
+#if 1  // 1=secure, 0=insecure
 
     client->setFingerprint(fingerprint_sni_cloudflaressl_com);
 
@@ -60,7 +60,7 @@ void loop() {
 #endif
 
     HTTPClient https;
-    https.setTimeout(4000); // or: client->setTimeout(4000);
+    https.setTimeout(4000);  // or: client->setTimeout(4000);
     client->setNegociationTimeout(10000);
 
     Serial.print("[HTTPS] begin...\n");
