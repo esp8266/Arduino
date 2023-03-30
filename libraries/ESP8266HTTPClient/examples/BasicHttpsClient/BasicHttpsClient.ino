@@ -62,6 +62,7 @@ void loop() {
         // file found at server
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
           String payload = https.getString();
+          //String payload = https.getString(1024);  // optionally pre-reserve string to avoid reallocations in chunk mode
           Serial.println(payload);
         }
       } else {
