@@ -13,6 +13,8 @@ const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 
+String bigChunk;
+
 const int led = 13;
 
 void handleRoot() {
@@ -34,6 +36,16 @@ void handleNotFound() {
   for (uint8_t i = 0; i < server.args(); i++) { message += " " + server.argName(i) + ": " + server.arg(i) + "\n"; }
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
+}
+
+void handleChunked() {
+  server.chunkedResponseModeStart(200, F("text/html"));
+
+  server.sendContent(bigChunk);
+  server.sendContent(F("chunk 2"));
+  server.sendContent(bigChunk);
+
+  server.chunkedResponseFinalize();
 }
 
 void setup(void) {
@@ -79,6 +91,8 @@ void setup(void) {
     gif_colored[18] = millis() % 256;
     server.send(200, "image/gif", gif_colored, sizeof(gif_colored));
   });
+
+  server.on("/chunks", handleChunked);
 
   server.onNotFound(handleNotFound);
 
@@ -141,6 +155,15 @@ void setup(void) {
 
   // Hook examples
   /////////////////////////////////////////////////////////
+
+  // prepare chunk in ram for sending
+  constexpr int chunkLen = 4000;  // ~4KB chunk
+  bigChunk.reserve(chunkLen);
+  bigChunk = F("chunk of len ");
+  bigChunk += chunkLen;
+  String piece = F("-blah");
+  while (bigChunk.length() < chunkLen - piece.length())
+    bigChunk += piece;
 
   server.begin();
   Serial.println("HTTP server started");
