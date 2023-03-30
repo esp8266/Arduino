@@ -46,6 +46,7 @@ void loop() {
     client->setFingerprint(fingerprint_sni_cloudflaressl_com);
 
     // date needs to be setup
+    configTime("UTC", "pool.ntp.org");
     time_t now;
     while (time(&now) < 24 * 3600) {
       Serial.println("waiting for NTP time to be set...");

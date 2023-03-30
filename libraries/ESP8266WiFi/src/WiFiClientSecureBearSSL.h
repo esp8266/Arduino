@@ -266,7 +266,7 @@ class WiFiClientSecure : public WiFiClient {
   public:
 
     WiFiClientSecure():_ctx(new WiFiClientSecureCtx(this)) { _owned = _ctx.get(); }
-    WiFiClientSecure(const WiFiClientSecure &rhs): _ctx(rhs._ctx), _userNegociationTimeout(rhs._userNegociationTimeout) {
+    WiFiClientSecure(const WiFiClientSecure &rhs): WiFiClient(), _ctx(rhs._ctx), _userNegociationTimeout(rhs._userNegociationTimeout) {
         if (_ctx) { _owned = _ctx.get(); _ctx->setStream(this); }
     }
     ~WiFiClientSecure() override { _ctx = nullptr; }
