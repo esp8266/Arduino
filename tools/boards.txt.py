@@ -1045,6 +1045,7 @@ macros = {
         ( '.build.core', 'esp8266' ),
         ( '.build.variant', 'generic' ),
         ( '.build.spiffs_pagesize', '256' ),
+        ( '.build.debug_optim', '' ),
         ( '.build.debug_port', '' ),
         ( '.build.debug_level', '' ),
         ]),
@@ -1360,6 +1361,12 @@ def all_debug ():
             ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
             ( '.menu.lvl.None____', 'None' ),
             ( '.menu.lvl.None____.build.debug_level', '' ),
+            ( '.menu.optim.Smallest', 'None' ),
+            ( '.menu.optim.Smallest.build.debug_optim', '-Os' ),
+            ( '.menu.optim.Lite', 'Lite' ),
+            ( '.menu.optim.Lite.build.debug_optim', '-Os -fno-optimize-sibling-calls' ),
+            ( '.menu.optim.Full', 'Optimum' ),
+            ( '.menu.optim.Full.build.debug_optim', '-Og' ),
         ])
 
     for optlist in options:
@@ -1740,6 +1747,7 @@ def all_boards ():
     print('menu.ResetMethod=Reset Method')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
+    print('menu.optim=Debug Optimization')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=C++ Exceptions')

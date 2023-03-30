@@ -61,10 +61,22 @@ WiFiClient WiFiServer::available(uint8_t* status)
     return accept();
 }
 
-WiFiClient WiFiServer::accept()
+void WiFiServer::_mockUnclaimed()
 {
     if (hasClient())
-        return WiFiClient(new ClientContext(serverAccept(pcb2int(_listen_pcb))));
+        _unclaimed
+            = slist_append_tail(_unclaimed, new ClientContext(serverAccept(pcb2int(_listen_pcb))));
+}
+
+WiFiClient WiFiServer::accept()
+{
+    _mockUnclaimed();
+    if (_unclaimed)
+    {
+        auto ctx   = _unclaimed;
+        _unclaimed = _unclaimed->next();
+        return WiFiClient(ctx);
+    }
     return WiFiClient();
 }
 
