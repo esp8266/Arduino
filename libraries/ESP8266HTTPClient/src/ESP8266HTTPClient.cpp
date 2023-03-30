@@ -639,10 +639,10 @@ const String& HTTPClient::getString(int reserve)
 
     _payload.reset(new StreamString());
 
-    if (_size > 0 && _size >= reserve)
-        reserve = _size + 1;
+    if (_size > 0 && _size > reserve)
+        reserve = _size;
 
-    if (reserve && !_payload->reserve(reserve)) {
+    if (reserve > 0 && !_payload->reserve(reserve)) {
         DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", reserve);
         return *_payload;
     }
