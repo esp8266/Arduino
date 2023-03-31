@@ -419,7 +419,6 @@ int WiFiClientSecureCtx::read() {
   if (1 == read(&c, 1)) {
     return c;
   }
-  DEBUG_BSSL("read: failed\n");
   return -1;
 }
 

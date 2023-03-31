@@ -639,7 +639,7 @@ WiFiClient* HTTPClient::getStreamPtr(void)
  * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
-const String& HTTPClient::getString(void)
+const String& HTTPClient::getString(int reserve)
 {
     if (_payload) {
         return *_payload;
@@ -647,12 +647,12 @@ const String& HTTPClient::getString(void)
 
     _payload.reset(new StreamString());
 
-    if(_size > 0) {
-        // try to reserve needed memory
-        if(!_payload->reserve((_size + 1))) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
-            return *_payload;
-        }
+    if (_size > 0 && _size > reserve)
+        reserve = _size;
+
+    if (reserve > 0 && !_payload->reserve(reserve)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", reserve);
+        return *_payload;
     }
 
     writeToStream(_payload.get());
@@ -740,30 +740,30 @@ void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKey
     }
 }
 
-String HTTPClient::header(const char* name)
+const String& HTTPClient::header(const char* name)
 {
     for(size_t i = 0; i < _headerKeysCount; ++i) {
         if(_currentHeaders[i].key == name) {
             return _currentHeaders[i].value;
         }
     }
-    return String();
+    return emptyString;
 }
 
-String HTTPClient::header(size_t i)
+const String& HTTPClient::header(size_t i)
 {
     if(i < _headerKeysCount) {
         return _currentHeaders[i].value;
     }
-    return String();
+    return emptyString;
 }
 
-String HTTPClient::headerName(size_t i)
+const String& HTTPClient::headerName(size_t i)
 {
     if(i < _headerKeysCount) {
         return _currentHeaders[i].key;
     }
-    return String();
+    return emptyString;
 }
 
 int HTTPClient::headers()

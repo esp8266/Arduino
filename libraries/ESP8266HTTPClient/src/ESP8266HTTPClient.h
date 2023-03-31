@@ -201,9 +201,9 @@ public:
 
     /// Response handling
     void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
-    String header(const char* name);   // get request header value by name
-    String header(size_t i);              // get request header value by number
-    String headerName(size_t i);          // get request header name by number
+    const String& header(const char* name);   // get request header value by name
+    const String& header(size_t i);           // get request header value by number
+    const String& headerName(size_t i);       // get request header name by number
     int headers();                     // get header count
     bool hasHeader(const char* name);  // check if header exists
 
@@ -215,7 +215,13 @@ public:
     WiFiClient* getStreamPtr(void);
     template <typename S> int writeToPrint(S* print) [[deprecated]] { return writeToStream(print); }
     template <typename S> int writeToStream(S* output);
-    const String& getString(void);
+
+    // In case of chunks = when size cannot be known in advance
+    // by the library, it might be useful to pre-reserve enough
+    // space instead of offending memory with a growing String
+    const String& getString() { return getString(0); }
+    const String& getString(int reserve);
+
     static String errorToString(int error);
 
 protected:
