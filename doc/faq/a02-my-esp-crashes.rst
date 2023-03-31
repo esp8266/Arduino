@@ -11,6 +11,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
 -  `Exception Decoder <#exception-decoder>`__
+-  `Improving Exception Decoder Results <#improving-exception-decoder-results>`__
 -  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
@@ -236,6 +237,7 @@ If you don't have any code for troubleshooting, use the example below:
 
     void loop(){}
 
+
 Enable the Out-Of-Memory (*OOM*) debug option (in the *Tools > Debug Level*
 menu), compile/flash/upload this code to your ESP (Ctrl+U) and start Serial
 Monitor (Ctrl+Shift+M).  You should shortly see ESP restarting every couple
@@ -270,31 +272,92 @@ Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ you can
 track down where the module is crashing whenever you see the stack trace
 dropped. The same procedure applies to crashes caused by exceptions.
 
-    Note: To decode the exact line of code where the application
+    Note, to decode the exact line of code where the application
     crashed, you need to use ESP Exception Decoder in context of sketch
     you have just loaded to the module for diagnosis. Decoder is not
     able to correctly decode the stack trace dropped by some other
     application not compiled and loaded from your Arduino IDE.
 
 
+Improving Exception Decoder Results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Due to the limited resources on the device, our default compiler optimizations
+focus on creating the smallest code size (``.bin`` file). The GCC compiler's
+option ``-Os`` contains the base set of optimizations used. This set is fine for
+release but not ideal for debugging.
+
+Our view of a crash is often the `Stack Dump <../Troubleshooting/stack_dump.rst>`__
+which gets copy/pasted into an Exception Decoder.
+For some situations, the optimizer doesn't write caller return addresses to the
+stack. When we crash, the list of functions called is missing. And when the
+crash occurs in a leaf function, there is seldom if ever any evidence of who
+called.
+
+With the ``-Os`` option, functions called once are inlined into the calling
+function. A chain of these functions can optimize down to the calling function.
+When the crash occurs in one of these chain functions, the actual location in
+the source code is no longer available.
+
+When you select ``Debug Optimization: Lite`` on the Arduino IDE Tools menu, it
+turns off ``optimize-sibling-calls``. Turning off this optimization allows more
+caller addresses to be written to the stack, improving the results from the
+Exception Decoder. Without this option, the callers involved in the crash may be
+missing from the Decoder results. Because of the limited stack space, there is
+the remote possibility that removing this optimization could lead to more
+frequent stack overflows. You only want to do this in a debug setting. This
+option does not help the chained function issue.
+
+When you select ``Debug Optimization: Optimum``, you get an even more complete
+stack trace. For example, chained function calls may show up. This selection
+uses the compiler option ``-Og``. GCC considers this the ideal optimization for
+the "edit-compile-debug cycle" ... "producing debuggable code." You can read the
+specifics at `GCC's Optimize Options <https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html>`__
+
+When global optimization creates build size issues or stack overflow issues,
+select ``Debug Optimization: None``, and use a targeted approach with
+``#pragma GCC optimize("Og")`` at the module level. Or, if you want to use a
+different set of optimizations, you can set optimizations through build options.
+Read more at `Global Build Options <a06-global-build-options.rst>`__.
+
+For non-Arduino IDE build platforms, you may need to research how to add build
+options. Some build platforms already use ``-Og`` for debug builds.
+
+A crash in a leaf function may not leave the caller's address on the stack.
+The return address can stay in a register for the duration of the call.
+Resulting in a crash report identifying the crashing function without a
+trace of who called. You can encourage the compiler to save the caller's
+return address by adding an inline assembly trick
+``__asm__ __volatile__("" ::: "a0", "memory");`` at the beginning of the
+function's body. Or instead, for a debug build conditional option, use the
+macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``. For compiler
+toolchain 3.2.0 and above, the ``-Og`` option is an alternative solution.
+
+In some cases, adding ``#pragma GCC optimize("Og,no-ipa-pure-const")`` to a
+module as well as using ``DEBUG_LEAF_FUNCTION()`` in a leaf function were
+needed to display a complete call chain. Or use
+``#pragma GCC optimize("Os,no-inline,no-optimize-sibling-calls,no-ipa-pure-const")``
+if you require optimization ``-Os``.
+
+
 Other Causes for Crashes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Interrupt Service Routines
-   By default, all functions are compiled into flash, which means that the 
-   cache may kick in for that code. However, the cache currently can't be used 
-   during hardware interrupts. That means that, if you use a hardware ISR, such as 
-   attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the 
-   IRAM_ATTR attribute declared. Not only that, but the entire function tree 
+   By default, all functions are compiled into flash, which means that the
+   cache may kick in for that code. However, the cache currently can't be used
+   during hardware interrupts. That means that, if you use a hardware ISR, such as
+   attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the
+   IRAM_ATTR attribute declared. Not only that, but the entire function tree
    called from the ISR must also have the IRAM_ATTR declared.
    Be aware that every function that has this attribute reduces available memory.
 
-   In addition, it is not possible to execute delay() or yield() from an ISR, 
+   In addition, it is not possible to execute delay() or yield() from an ISR,
    or do blocking operations, or operations that disable the interrupts, e.g.: read
    a DHT.
 
    Finally, an ISR has very high restrictions on timing for the executed code, meaning
-   that executed code should not take longer than a very few microseconds. It is 
+   that executed code should not take longer than a very few microseconds. It is
    considered best practice to set a flag within the ISR, and then from within the loop()
    check and clear that flag, and execute code.
 
@@ -303,7 +366,7 @@ Asynchronous Callbacks
    than ISRs, but some restrictions still apply.
    It is not possible to execute delay() or yield() from an asynchronous callback.
    Timing is not as tight as an ISR, but it should remain below a few milliseconds. This
-   is a guideline. The hard timing requirements depend on the WiFi configuration and 
+   is a guideline. The hard timing requirements depend on the WiFi configuration and
    amount of traffic. In general, the CPU must not be hogged by the user code, as the
    longer it is away from servicing the WiFi stack, the more likely that memory corruption
    can happen.
@@ -311,8 +374,8 @@ Asynchronous Callbacks
 Memory, memory, memory
    Running out of heap is the **most common cause for crashes**. Because the build process for
    the ESP leaves out exceptions (they use memory), memory allocations that fail will do
-   so silently. A typical example is when setting or concatenating a large String. If 
-   allocation has failed internally, then the internal string copy can corrupt data, and 
+   so silently. A typical example is when setting or concatenating a large String. If
+   allocation has failed internally, then the internal string copy can corrupt data, and
    the ESP will crash.
 
    In addition, doing many String concatenations in sequence, e.g.: using operator+()
@@ -348,9 +411,9 @@ Memory, memory, memory
    * If you use std libs like std::vector, make sure to call its ::reserve() method before filling it. This allows allocating only once, which reduces mem fragmentation, and makes sure that there are no empty unused slots left over in the container at the end.
 
 Stack
-   The amount of stack in the ESP is tiny at only 4KB. For normal development in large systems, it 
+   The amount of stack in the ESP is tiny at only 4KB. For normal development in large systems, it
    is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
-   
+
    * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
    * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and should be dynamically allocated instead (consider smart pointers).
    * Objects that have large data members, such as large arrays, should also be avoided on the stack, and should be dynamically allocated (consider smart pointers).
@@ -392,7 +455,7 @@ or `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core,
 types and versions of O/S, you need to provide exact information on what
 your application is about. Only then, people willing to look into your
 issue may be able to compare it to a configuration they are familiar with.
-If you are lucky, they may even attempt to reproduce your issue on their 
+If you are lucky, they may even attempt to reproduce your issue on their
 own equipment!
 This will be far more difficult if you provide only vague details,
 so somebody would need to ask you to find out what is really happening.

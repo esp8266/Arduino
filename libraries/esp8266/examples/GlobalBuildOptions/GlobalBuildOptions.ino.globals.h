@@ -8,7 +8,7 @@
  * this line is ignored
   *@create-file:build.opt@
   # this line is ignored
-  -O3
+  -Og
   // -fanalyzer
   -DUMM_STATS_FULL=1
 */

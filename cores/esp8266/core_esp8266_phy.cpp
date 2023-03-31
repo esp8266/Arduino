@@ -311,6 +311,9 @@ extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t 
         return __real_spi_flash_read(addr, dst, size);
     }
 
+#if (NONOSDK >= (0x30000))
+    spoof_init_data = false;
+#endif
     memcpy(dst, phy_init_data, sizeof(phy_init_data));
     ((uint8_t*)dst)[107] = __get_adc_mode();
     return 0;
@@ -361,7 +364,7 @@ extern void __run_user_rf_pre_init(void)
 #if (NONOSDK >= (0x30000))
 void sdk3_begin_phy_data_spoof(void)
 {
-   spoof_init_data = true;
+    spoof_init_data = true;
 }
 #else
 uint32_t user_rf_cal_sector_set(void)
@@ -374,7 +377,9 @@ uint32_t user_rf_cal_sector_set(void)
 void user_rf_pre_init()
 {
     // *((volatile uint32_t*) 0x60000710) = 0;
+#if (NONOSDK < (0x30000))
     spoof_init_data = false;
+#endif
 
     int rf_mode = __get_rf_mode();
     if (rf_mode >= 0) {
