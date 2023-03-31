@@ -9,10 +9,9 @@ This is the suggested installation method for end users.
 Prerequisites
 ~~~~~~~~~~~~~
 
--  Arduino 1.6.8, get it from `Arduino
-   website <https://www.arduino.cc/en/Main/OldSoftwareReleases#previous>`__.
 -  Internet connection
--  Python 3 interpreter (Mac/Linux only, Windows installation supplies its own)
+-  Arduino IDE 1.x or 2.x (https://www.arduino.cc/en/software)
+-  (macOS/Linux only) Python ≥3.7 (https://python.org)
 
 Instructions
 ~~~~~~~~~~~~
@@ -33,6 +32,7 @@ For more information on the Arduino Board Manager, see:
 
 - https://www.arduino.cc/en/guide/cores
 
+
 Using git version
 -----------------
 
@@ -42,12 +42,12 @@ developers.
 Prerequisites
 ~~~~~~~~~~~~~
 
--  Arduino 1.6.8 (or newer, current working version is 1.8.5)
--  git
+-  Internet connection
+-  Arduino IDE 1.x or 2.x (https://www.arduino.cc/en/software)
+-  git (https://git-scm.com)
 -  Python ≥3.7 (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
--  Internet connection
--  Uninstalling any core version installed via Board Manager
+-  **Uninstalling any core version installed via Board Manager**
 
 Instructions - Windows 10
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +59,7 @@ Instructions - Windows 10
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
 
 -  Open a command prompt (cmd) and go to Arduino default directory. This is typically the
-   *sketchbook* directory (usually ``C:\users\{username}\Documents\Arduino`` where the environment variable ``%USERPROFILE%`` usually contains ``C:\users\{username}``)
+   *sketchbook* directory (usually ``C:\Users\{username}\Documents\Arduino`` where the environment variable ``%USERPROFILE%`` usually contains ``C:\Users\{username}``)
    
 -  Clone this repository into hardware/esp8266com/esp8266 directory.
 
@@ -101,14 +101,15 @@ Instructions - Windows 10
                    --- boards.txt
                    --- LICENSE
 
--  Initialize the submodules
+-  Initialize submodules to fetch external libraries
 
    .. code:: bash
 
        cd %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266
        git submodule update --init   
   
-  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+  Not doing this step would cause build failure when attempting to include ``SoftwareSerial.h``, ``Ethernet.h``, etc.
+  See our `.gitmodules file <https://github.com/esp8266/Arduino/blob/master/.gitmodules>`__ for the full list.
   
 -  Download binary tools
 
@@ -181,14 +182,16 @@ Instructions - Other OS
                    --- boards.txt
                    --- LICENSE
 
--  Initialize the submodules
+-  Initialize submodules to fetch external libraries
 
    .. code:: bash
 
        cd esp8266
        git submodule update --init   
-  
-  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+
+
+  Not doing this step would cause build failure when attempting to include ``SoftwareSerial.h``, ``Ethernet.h``, etc.
+  See our `.gitmodules file <https://github.com/esp8266/Arduino/blob/master/.gitmodules>`__ for the full list.
 
 -  Download binary tools
 
@@ -197,9 +200,10 @@ Instructions - Other OS
        cd tools
        python3 get.py
 
-   If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
-   part of the default install).  To install you will need to use ``sudo yum install python3``, ``sudo apt install python3``, or ``brew install python3``
-   as appropriate.  On the Mac you may get an error message like:
+
+  If you get an error message stating that python3 is not found, you will need to install it (most modern UNIX-like OSes provide Python 3 as
+  part of the default install).  To install you will need to use ``sudo yum install python3``, ``sudo apt install python3``, or ``brew install python3``
+  as appropriate.  On the Mac you may get an error message like:
 
    .. code:: bash
 
@@ -214,7 +218,8 @@ Instructions - Other OS
            self._sslobj.do_handshake()
        ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1056)
 
-    This is because Homebrew on the Mac does not always install the required SSL certificates by default.  Install them manually (adjust the Python 3.7 as needed) with:
+
+  This is because Homebrew on the Mac does not always install the required SSL certificates by default.  Install them manually (adjust the Python 3.7 as needed) with:
 
     .. code:: bash
 
@@ -231,6 +236,44 @@ Instructions - Other OS
        git status
        git pull
 
+Maintaining
+~~~~~~~~~~~
+
+To keep up with the development branch
+
+.. code:: bash
+
+   git switch --recurse-submodules --discard-changes master
+   git pull --recurse-submodules
+   cd tools
+   python3 get.py
+
+Pull requests
+~~~~~~~~~~~~~
+
+To test not yet merged Pull Request, first you have to find its ID number. This is the sequence of digits right after the pull request title.
+
+Open terminal and cd into the directory where the repository was previously cloned. For example, 12345 is the Pull Request ID
+
+.. code:: bash
+
+   git fetch origin pull/12345/head
+   git switch --detach --recurse-submodules --discard-changes FETCH_HEAD
+
+When Pull Request updates packaged tools, make sure to also fetch their latest versions.
+
+.. code:: bash
+
+   cd tools
+   python3 get.py
+
+To go back to using the development branch
+
+.. code:: bash
+
+   git switch --recurse-submodules --discard-changes master
+   git pull --recurse-submodules
+
 Using PlatformIO
 ----------------
 
@@ -245,5 +288,6 @@ BeagleBone, CubieBoard).
 - `PlatformIO IDE <https://platformio.org/platformio-ide?utm_source=arduino-esp8266>`__
 - `PlatformIO Core <https://docs.platformio.org/en/latest/core.html?utm_source=arduino-esp8266>`__ (command line tool)
 - `Advanced usage <https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266>`__ - custom settings, uploading to LittleFS, Over-the-Air (OTA), staging version
+- `Using Arduino Framework Staging Version <https://docs.platformio.org/en/stable/platforms/espressif8266.html?utm_source=arduino-esp8266#using-arduino-framework-with-staging-version>`__ - install development version of the Core
 - `Integration with Cloud and Standalone IDEs <https://docs.platformio.org/en/latest/ide.html?utm_source=arduino-esp8266>`__ - Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
 - `Project Examples <https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266#examples>`__
