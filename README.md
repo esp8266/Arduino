@@ -77,6 +77,8 @@ Documentation for latest development version: https://arduino-esp8266.readthedoc
 If you find the forum useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
+Feel free to ask questions at our [Gitter channel](https://app.gitter.im/#/room/#esp8266_Arduino:gitter.im).
+
 If you encounter an issue which you think is a bug in the ESP8266 Arduino Core or the associated libraries, or if you want to propose an enhancement, you are welcome to submit it here on Github: https://github.com/esp8266/Arduino/issues.
 
 Please provide as much context as possible, as well as the information requested in the issue template:

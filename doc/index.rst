@@ -19,7 +19,5 @@ Welcome to ESP8266 Arduino Core's documentation!
    Boards <boards>
    FAQ <faq/readme>
 
-   Exception causes <exception_causes>
-   Debugging <Troubleshooting/debugging>
-   Stack Dump <Troubleshooting/stack_dump>
+   Troubleshooting <Troubleshooting/index>
    Using with Eclipse <eclipse/eclipse>

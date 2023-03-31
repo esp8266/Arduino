@@ -38,7 +38,7 @@ My ESP crashes running some code. How to troubleshoot it?
 The code may crash because of s/w bug or issue with your h/w. Before
 entering an issue report, please perform initial troubleshooting.
 
-`Read more <a02-my-esp-crashes.rst>`__.
+`Read more <../Troubleshooting/index.rst>`__.
 
 How can I get some extra KBs in flash ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
