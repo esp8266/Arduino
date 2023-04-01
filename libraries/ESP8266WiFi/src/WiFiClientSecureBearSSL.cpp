@@ -1678,4 +1678,9 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   return _SendAbort(probe, supportsLen);
 }
 
+void WiFiClientSecure::setTimeout (unsigned long timeout)
+{
+    _ctx->setNormalTimeout(timeout);
+}
+
 };  // namespace BearSSL
