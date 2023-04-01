@@ -63,12 +63,11 @@ void loop() {
     https.setTimeout(4000);  // or: client->setTimeout(4000);
     client->setHandshakeTimeout(10000);
 
-#if 1
+    // Try to reduce RAM footprint when SSL server allows it
     constexpr int sslbufsize = 1024;
     bool mfln = client->probeMaxFragmentLength(jigsaw_host, jigsaw_port, sslbufsize);
     Serial.printf("Can reduce SSL footprint to %d bytes in RAM: %s\n", sslbufsize, mfln ? "yes" : "no");
     if (mfln) { client->setBufferSizes(sslbufsize, sslbufsize); }
-#endif
 
     Serial.print("[HTTPS] begin...\n");
     if (https.begin(*client, jigsaw_host, jigsaw_port)) {  // HTTPS
