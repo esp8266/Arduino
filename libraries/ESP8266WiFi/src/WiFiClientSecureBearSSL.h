@@ -31,8 +31,6 @@
 
 namespace BearSSL {
 
-class WiFiClientSecure;
-
 class WiFiClientSecureCtx : public WiFiClient {
   public:
     WiFiClientSecureCtx();

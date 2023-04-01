@@ -222,7 +222,7 @@ void HTTPClient::disconnect(bool preserveClient)
         }
 
         if(_reuse && _canReuse) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp kept open for reuse\n");
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
             if(_client) {
