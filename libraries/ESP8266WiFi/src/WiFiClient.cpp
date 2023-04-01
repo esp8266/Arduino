@@ -216,6 +216,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);  // context write uses timeout
     return _client->write((const char*)buf, size);
 }
 
