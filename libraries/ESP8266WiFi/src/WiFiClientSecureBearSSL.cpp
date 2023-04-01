@@ -610,6 +610,13 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
 }
 
 bool WiFiClientSecureCtx::_wait_for_handshake() {
+
+#if defined(DEBUG_ESP_PORT)
+  if constexpr (F_CPU != 160000000L) {
+    DEBUG_ESP_PORT.printf_P((PGM_P)PSTR("BSSL: Please enable 160MHz build\n"));
+  }
+#endif
+
   _set_handshake_done(false); // refreshes _timeout
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
