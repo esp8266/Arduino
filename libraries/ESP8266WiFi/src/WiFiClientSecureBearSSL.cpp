@@ -201,12 +201,12 @@ bool WiFiClientSecureCtx::stop(unsigned int maxWaitMs) {
 }
 
 bool WiFiClientSecureCtx::flush(unsigned int maxWaitMs) {
-  auto savedNormal = _runtimeTimeout;
+  auto savedRuntime = _runtimeTimeout;
   auto savedHandshake = _handshakeTimeout;
   _runtimeTimeout = maxWaitMs;
   _handshakeTimeout = maxWaitMs;
   (void) _run_until(BR_SSL_SENDAPP);
-  _runtimeTimeout = savedNormal;
+  _runtimeTimeout = savedRuntime;
   _handshakeTimeout = savedHandshake;
   return WiFiClient::flush(maxWaitMs);
 }
@@ -1680,7 +1680,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 
 void WiFiClientSecure::setTimeout (unsigned long timeout)
 {
-    _ctx->setNormalTimeout(timeout);
+    _ctx->setRuntimeTimeout(timeout);
 }
 
 };  // namespace BearSSL
