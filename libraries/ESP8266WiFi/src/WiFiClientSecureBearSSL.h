@@ -147,7 +147,7 @@ class WiFiClientSecureCtx : public WiFiClient {
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override;
 
-    void setNormalTimeout (unsigned long timeout) { _normalTimeout = timeout; }
+    void setNormalTimeout (unsigned long timeout) { _runtimeTimeout = timeout; }
     void setHandshakeTimeout (unsigned long timeout) { _handshakeTimeout = timeout; }
     unsigned long getHandshakeTimeout () const { return _handshakeTimeout; }
 
@@ -242,10 +242,10 @@ class WiFiClientSecureCtx : public WiFiClient {
 
     // timeout management
 
-    unsigned long _updateStreamTimeout () { return _timeout = _handshake_done? _normalTimeout: _handshakeTimeout; }
+    unsigned long _updateStreamTimeout () { return _timeout = _handshake_done? _runtimeTimeout: _handshakeTimeout; }
     void _set_handshake_done (bool handshake_done) { _handshake_done = handshake_done; _updateStreamTimeout(); }
 
-    unsigned long _normalTimeout = 5000, _handshakeTimeout = 15000;
+    unsigned long _runtimeTimeout = 5000, _handshakeTimeout = 15000;
 
 }; // class WiFiClientSecureCtx
 
