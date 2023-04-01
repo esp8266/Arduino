@@ -1680,6 +1680,8 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 
 void WiFiClientSecure::setTimeout (unsigned long timeout)
 {
+  WiFiClient::setTimeout(timeout);
+  if (_ctx)
     _ctx->setRuntimeTimeout(timeout);
 }
 

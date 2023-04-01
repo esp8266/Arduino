@@ -242,7 +242,7 @@ class WiFiClientSecureCtx : public WiFiClient {
 
     // timeout management
 
-    unsigned long _updateStreamTimeout () { return _timeout = _handshake_done? _runtimeTimeout: _handshakeTimeout; }
+    unsigned long _updateStreamTimeout () { setTimeout(_handshake_done? _runtimeTimeout: _handshakeTimeout); return getTimeout(); }
     void _set_handshake_done (bool handshake_done) { _handshake_done = handshake_done; _updateStreamTimeout(); }
 
     unsigned long _runtimeTimeout = 5000, _handshakeTimeout = 15000;
