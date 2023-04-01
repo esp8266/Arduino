@@ -545,6 +545,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
         br_ssl_engine_sendrec_ack(_eng, wlen);
       }
       no_work = 0;
+      loopTimeout.reset();
       continue;
     }
 
@@ -588,6 +589,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
           br_ssl_engine_recvrec_ack(_eng, rlen);
         }
         no_work = 0;
+        loopTimeout.reset();
         continue;
       }
     }
