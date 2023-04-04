@@ -60,7 +60,7 @@ void loop() {
 #endif
 
     HTTPClient https;
-    https.setWalTime(10000);     // do not exceed 10s while getting data
+    https.setWallTime(10000);    // do not exceed 10s while getting data
     client->setWallTime(20000);  // do not exceed 20s during handshake
 
     // Try to reduce RAM footprint when SSL server allows it
