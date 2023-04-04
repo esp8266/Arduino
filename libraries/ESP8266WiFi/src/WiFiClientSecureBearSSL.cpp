@@ -31,7 +31,6 @@ extern "C" {
 }
 #include "debug.h"
 #include "ESP8266WiFi.h"
-#include "PolledTimeout.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
 #include "StackThunk.h"
@@ -68,6 +67,8 @@ extern "C" {
 
 namespace BearSSL {
 
+constexpr auto defaultWallTime = 10000UL;
+
 void WiFiClientSecureCtx::_clear() {
   _sc = nullptr;
   _sc_svr = nullptr;
@@ -80,7 +81,7 @@ void WiFiClientSecureCtx::_clear() {
   _now = 0; // You can override or ensure time() is correct w/configTime
   _ta = nullptr;
   setBufferSizes(16384, 512); // Minimum safe
-  _set_handshake_done(false); // refreshes _timeout
+  _handshake_done = false;
   _recvapp_buf = nullptr;
   _recvapp_len = 0;
   _oom_err = false;
@@ -100,7 +101,7 @@ void WiFiClientSecureCtx::_clearAuthenticationSettings() {
 }
 
 
-WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient() {
+WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient(), _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -121,7 +122,7 @@ WiFiClientSecureCtx::~WiFiClientSecureCtx() {
 WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max): _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -142,7 +143,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max): _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -201,13 +202,10 @@ bool WiFiClientSecureCtx::stop(unsigned int maxWaitMs) {
 }
 
 bool WiFiClientSecureCtx::flush(unsigned int maxWaitMs) {
-  auto savedRuntime = _runtimeTimeout;
-  auto savedHandshake = _handshakeTimeout;
-  _runtimeTimeout = maxWaitMs;
-  _handshakeTimeout = maxWaitMs;
+  auto savedTimeout = _timeout;
+  _timeout = std::max(1U, maxWaitMs);
   (void) _run_until(BR_SSL_SENDAPP);
-  _runtimeTimeout = savedRuntime;
-  _handshakeTimeout = savedHandshake;
+  _timeout = savedTimeout;
   return WiFiClient::flush(maxWaitMs);
 }
 
@@ -248,7 +246,7 @@ void WiFiClientSecureCtx::_freeSSL() {
   _recvapp_buf = nullptr;
   _recvapp_len = 0;
   // This connection is toast
-  _set_handshake_done(false); // refreshes _timeout
+  _handshake_done = false;
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
@@ -463,7 +461,6 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
     return 0;
   }
 
-  _updateStreamTimeout();
   _startMillis = millis();
   while ((_pollRecvBuffer() < (int)length) && ((millis() - _startMillis) < _timeout)) {
     yield();
@@ -486,10 +483,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
     return -1;
   }
 
-  // _run_until() is called prior to inherited read/write methods
-  // -> refreshing _timeout here, which is also used by ancestors
-  DEBUG_BSSL("_run_until starts, timeout=%lu\n", _updateStreamTimeout());
-  esp8266::polledTimeout::oneShotMs loopTimeout(_updateStreamTimeout());
+  esp8266::polledTimeout::oneShotMs loopTimeout(_timeout);
 
   for (int no_work = 0; blocking || no_work < 2;) {
     optimistic_yield(100);
@@ -617,7 +611,8 @@ bool WiFiClientSecureCtx::_wait_for_handshake() {
   }
 #endif
 
-  _set_handshake_done(false); // refreshes _timeout
+  _wallTime.reset();
+  _handshake_done = false;
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
     if (ret < 0) {
@@ -625,7 +620,11 @@ bool WiFiClientSecureCtx::_wait_for_handshake() {
       break;
     }
     if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
-      _set_handshake_done(true); // refreshes _timeout
+      _handshake_done = true;
+    }
+    if (_wallTime) {
+      DEBUG_BSSL("handshake too long\n");
+      break;
     }
     optimistic_yield(1000);
   }
@@ -1221,8 +1220,6 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   _x509_insecure = nullptr;
   _x509_knownkey = nullptr;
 
-  // _timeout has been refreshed to normal operation as _handshake_done turned to true
-
   return ret;
 }
 
@@ -1691,7 +1688,7 @@ void WiFiClientSecure::setTimeout (unsigned long timeout)
 {
   WiFiClient::setTimeout(timeout);
   if (_ctx)
-    _ctx->setRuntimeTimeout(timeout);
+    _ctx->setTimeout(timeout);
 }
 
 };  // namespace BearSSL

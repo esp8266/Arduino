@@ -28,6 +28,7 @@
 #include <bearssl/bearssl.h>
 #include "BearSSLHelpers.h"
 #include "CertStoreBearSSL.h"
+#include "PolledTimeout.h"
 
 namespace BearSSL {
 
@@ -147,9 +148,8 @@ class WiFiClientSecureCtx : public WiFiClient {
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override;
 
-    void setRuntimeTimeout (unsigned long timeout) { _runtimeTimeout = timeout; }
-    void setHandshakeTimeout (unsigned long timeout) { _handshakeTimeout = timeout; }
-    unsigned long getHandshakeTimeout () const { return _handshakeTimeout; }
+    // install a wall-time used during handshake
+    void setWallTime (unsigned long wallTime) { _wallTime.reset(wallTime?: esp8266::polledTimeout::oneShotMs::neverExpires); }
 
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
@@ -240,13 +240,7 @@ class WiFiClientSecureCtx : public WiFiClient {
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
 
-    // timeout management
-
-    unsigned long _updateStreamTimeout () { setTimeout(_handshake_done? _runtimeTimeout: _handshakeTimeout); return getTimeout(); }
-    void _set_handshake_done (bool handshake_done) { _handshake_done = handshake_done; _updateStreamTimeout(); }
-
-    unsigned long _runtimeTimeout = 5000, _handshakeTimeout = 15000;
-
+    esp8266::polledTimeout::oneShotMs _wallTime;
 }; // class WiFiClientSecureCtx
 
 
@@ -373,9 +367,8 @@ class WiFiClientSecure : public WiFiClient {
     // override setTimeout and forward to context
     virtual void setTimeout (unsigned long timeout) override;
 
-    // allowing user to set timeout used during handshake
-    void setHandshakeTimeout (unsigned long timeout) { _ctx->setHandshakeTimeout(timeout); }
-    unsigned long getHandshakeTimeout () const { return _ctx->getHandshakeTimeout(); }
+    // install a wall-time used during handshake
+    void setWallTime (unsigned long wallTime) { _ctx->setWallTime(wallTime); }
 
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;

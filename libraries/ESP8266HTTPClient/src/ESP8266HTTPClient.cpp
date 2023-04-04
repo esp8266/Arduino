@@ -86,9 +86,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& url) {
 
     _port = (protocol == "https" ? 443 : 80);
     _client = client.clone();
-    if (_deferredTimeout) {
-        _client->setTimeout(_deferredTimeout);
-    }
 
     return beginInternal(url, protocol.c_str());
 }
@@ -112,9 +109,6 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     }
 
     _client = client.clone();
-    if (_deferredTimeout) {
-        _client->setTimeout(_deferredTimeout);
-    }
 
     clear();
 
@@ -309,17 +303,12 @@ void HTTPClient::setAuthorization(String auth)
 }
 
 /**
- * set the timeout for the TCP connection
+ * set the wall time for operations
  * @param timeout unsigned int
  */
-void HTTPClient::setTimeout(uint16_t timeout)
+void HTTPClient::setWallTime(unsigned long wallTime)
 {
-    if(connected()) {
-        _client->setTimeout(timeout);
-    }
-    else {
-        _deferredTimeout = timeout;
-    }
+    _wallTime.reset(wallTime?: esp8266::polledTimeout::oneShotMs::neverExpires);
 }
 
 /**
@@ -885,7 +874,6 @@ bool HTTPClient::sendHeader(const char * type)
  */
 int HTTPClient::handleHeaderResponse()
 {
-
     if(!connected()) {
         return HTTPC_ERROR_NOT_CONNECTED;
     }
@@ -897,15 +885,13 @@ int HTTPClient::handleHeaderResponse()
     String transferEncoding;
 
     _transferEncoding = HTTPC_TE_IDENTITY;
-    unsigned long lastDataTime = millis();
+    _wallTime.reset();
 
     while(connected()) {
         size_t len = _client->available();
         if(len > 0) {
             int headerSeparator = -1;
             String headerLine = _client->readStringUntil('\n');
-
-            lastDataTime = millis();
 
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
@@ -984,7 +970,7 @@ int HTTPClient::handleHeaderResponse()
             }
 
         } else {
-            if((millis() - lastDataTime) > _client.get()->getTimeout()) {
+            if(_wallTime) {
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
             esp_yield();

@@ -29,6 +29,7 @@
 #include <Arduino.h>
 #include <StreamString.h>
 #include <WiFiClient.h>
+#include <PolledTimeout.h>
 
 #include <memory>
 
@@ -41,6 +42,8 @@
 #ifndef DEBUG_HTTPCLIENT
 #define DEBUG_HTTPCLIENT(...) do { (void)0; } while (0)
 #endif
+
+#define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
 
 /// HTTP client errors
 #define HTTPC_ERROR_CONNECTION_FAILED   (-1)
@@ -150,7 +153,7 @@ typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 class HTTPClient
 {
 public:
-    HTTPClient() = default;
+    HTTPClient(): _wallTime(HTTPCLIENT_DEFAULT_TCP_TIMEOUT) {};
     ~HTTPClient() = default;
     HTTPClient(HTTPClient&&) = default;
     HTTPClient& operator=(HTTPClient&&) = default;
@@ -175,7 +178,8 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setAuthorization(String auth);
-    void setTimeout(uint16_t timeout);
+    void setWallTime(unsigned long wallTime);
+    [[deprecated("use setWallTime() instead")]] void setTimeout(unsigned long wallTime) { setWallTime(wallTime); }
 
     // Redirections
     void setFollowRedirects(followRedirects_t follow);
@@ -254,7 +258,7 @@ protected:
     String _host;
     uint16_t _port = 0;
     bool _reuse = true;
-    uint16_t _deferredTimeout = 0;
+    esp8266::polledTimeout::oneShotMs _wallTime;
     bool _useHTTP10 = false;
 
     String _uri;
@@ -312,6 +316,7 @@ int HTTPClient::writeToStream(S * output)
         }
     } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
         int size = 0;
+        _wallTime.reset();
         while(1) {
             if(!connected()) {
                 return returnError(HTTPC_ERROR_CONNECTION_LOST);
@@ -355,6 +360,10 @@ int HTTPClient::writeToStream(S * output)
             char buf[2];
             auto trailing_seq_len = _client->readBytes((uint8_t*)buf, 2);
             if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
+            }
+
+            if (_wallTime) {
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 

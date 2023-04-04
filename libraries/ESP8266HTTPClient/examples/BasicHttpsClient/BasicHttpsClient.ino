@@ -60,8 +60,8 @@ void loop() {
 #endif
 
     HTTPClient https;
-    https.setTimeout(4000);  // or: client->setTimeout(4000);
-    client->setHandshakeTimeout(10000);
+    https.setWalTime(10000);     // do not exceed 10s while getting data
+    client->setWallTime(20000);  // do not exceed 20s during handshake
 
     // Try to reduce RAM footprint when SSL server allows it
     constexpr int sslbufsize = 1024;
