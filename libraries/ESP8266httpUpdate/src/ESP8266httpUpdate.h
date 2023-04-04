@@ -153,7 +153,7 @@ protected:
     String _auth;
     String _md5Sum;
 private:
-    int _httpClientTimeout;
+    unsigned long _httpWallTime;
     followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
 
     // Callbacks

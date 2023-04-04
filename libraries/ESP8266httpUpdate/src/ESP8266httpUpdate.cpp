@@ -28,12 +28,12 @@
 #include <flash_hal.h>
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000)
+        : _httpWallTime(8000)
 {
 }
 
-ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout)
+ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpWallTime)
+        : _httpWallTime(httpWallTime)
 {
 }
 
@@ -164,7 +164,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
-    http.setWallTime(_httpClientWallTime);
+    http.setWallTime(_httpWallTime);
     http.setFollowRedirects(_followRedirects);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-Chip-ID"), String(ESP.getChipId()));

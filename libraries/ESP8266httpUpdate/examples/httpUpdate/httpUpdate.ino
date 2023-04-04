@@ -27,7 +27,7 @@ void setup() {
 
   Serial.println();
 
-  ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
+  ESPhttpUpdate.setWallTime(2000);  // default was 8000
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
