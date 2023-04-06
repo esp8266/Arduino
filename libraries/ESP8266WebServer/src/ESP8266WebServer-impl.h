@@ -743,6 +743,7 @@ void ESP8266WebServerTemplate<ServerType>::_finalizeResponse() {
   if (_chunked) {
     sendContent(emptyString);
   }
+  _currentClient.flush();
 }
 
 template <typename ServerType>
