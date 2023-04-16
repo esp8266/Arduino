@@ -57,25 +57,24 @@ void setup() {
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");
     /*
-      By calling "ArduinoOTA.setRebootOnSuccess(true,
-      ArduinoOTA::OTA_ERASE_CFG_ABORT_ON_ERROR)," this example will erase the
-      "WiFi Settings" as part of an OTA update. When erasing WiFi Settings
-      fails, the OTA Update aborts, and eboot will not copy the new ".bin" in
-      place.
+      By calling "ArduinoOTA.setEraseConfig(ArduinoOTA::OTA_ERASE_CFG_ABORT_ON_ERROR),"
+      this example will erase the "WiFi Settings" as part of an OTA update. When
+      erasing WiFi Settings fails, the OTA Update aborts, and eboot will not
+      copy the new ".bin" in place.
 
-      Without the call to "ArduinoOTA.setRebootOnSuccess," the system restarts
-      without touching the WiFi Settings legacy behavior.
+      Without the call to "ArduinoOTA.setEraseConfig" legacy behavior, the
+      system restarts without touching the WiFi Settings.
 
-      Options for "eraseConfig" and how to handle failures:
+      Options for "setEraseConfig" to handle eraseConfig failures:
         OTA_ERASE_CFG_NO              - Do not erase WiFi Settings
         OTA_ERASE_CFG_IGNORE_ERROR    - Ignore the error and continue with update ".bin" copy
         OTA_ERASE_CFG_ABORT_ON_ERROR  - Cancel flash update copy at reboot
 
-      Update the conditional below to meet your requirements.
+      To meet unique requirements, you can make the call below conditional.
+      Also, this call could be enabled before ArduinoOTA.onEnd() and canceled
+      here with "ArduinoOTA.setEraseConfig(OTA_ERASE_CFG_NO)."
     */
-    if (true) {
-      ArduinoOTA.setRebootOnSuccess(true, OTA_ERASE_CFG_ABORT_ON_ERROR);
-    }
+    ArduinoOTA.setEraseConfig(OTA_ERASE_CFG_ABORT_ON_ERROR);
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));

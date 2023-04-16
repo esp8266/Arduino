@@ -519,7 +519,7 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
     return &resetInfo;
 }
 
-bool EspClass::eraseConfig(bool reset) {
+bool EspClass::eraseConfig(void) {
     const size_t cfgSize = 0x4000;  // Sectors: RF_CAL + SYSTEMPARAM[3]
     size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 
@@ -529,12 +529,16 @@ bool EspClass::eraseConfig(bool reset) {
         }
     }
 
+    return true;
+}
+
+bool EspClass::eraseConfigAndReset(void) {
+    bool reset = eraseConfig();
     if (reset) {
         // Must be called in WiFi.mode(WIFI_OFF) state.
         hardware_reset();
     }
-
-    return true;
+    return reset;
 }
 
 uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes)

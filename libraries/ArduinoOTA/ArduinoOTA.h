@@ -52,12 +52,11 @@ class ArduinoOTAClass
     void setPasswordHash(const char *password);
 
     //Sets if the device should be rebooted after successful update. Default true
-    //"eraseConfig" selects to erase WiFi Settings in conjunction with a reboot
-    //after a successful update. Default OTA_ERASE_CFG_NO - Legacy behavior
-    void setRebootOnSuccess(bool reboot, ota_erase_cfg_t eraseConfig = OTA_ERASE_CFG_NO);
+    void setRebootOnSuccess(bool reboot);
 
-    //Sets flag to erase WiFi Settings at reboot/reset.
-    void setEraseConfig(bool eraseConfig = true);
+    //Sets flag to erase WiFi Settings at reboot/reset. "eraseConfig" selects to
+    //abort erase on failure or ignore error and erase.
+    void setEraseConfig(ota_erase_cfg_t eraseConfig = OTA_ERASE_CFG_ABORT_ON_ERROR);
 
     //This callback will be called when OTA connection has begun
     void onStart(THandlerFunction fn);

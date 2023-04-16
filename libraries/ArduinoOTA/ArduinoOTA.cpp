@@ -91,8 +91,11 @@ void ArduinoOTAClass::setPasswordHash(const char * password) {
   }
 }
 
-void ArduinoOTAClass::setRebootOnSuccess(bool reboot, ota_erase_cfg_t eraseConfig){
+void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
   _rebootOnSuccess = reboot;
+}
+
+void ArduinoOTAClass::setEraseConfig(ota_erase_cfg_t eraseConfig){
   _eraseConfig = eraseConfig;
 }
 
@@ -371,8 +374,8 @@ void ArduinoOTAClass::end() {
 void ArduinoOTAClass::eraseConfigAndReset() {
   OTA_DEBUG_PRINTF("Erase Config and Hard Reset ...\n");
   if (WiFi.mode(WIFI_OFF)) {
-    ESP.eraseConfig(true);    // No return testing - Only returns on failure
-    OTA_DEBUG_PRINTF("  ESP.eraseConfig(true) failed!\n");
+    ESP.eraseConfigAndReset();  // No return testing - Only returns on failure
+    OTA_DEBUG_PRINTF("  ESP.eraseConfigAndReset() failed!\n");
   } else {
     OTA_DEBUG_PRINTF("  WiFi.mode(WIFI_OFF) Timeout!\n");
   }
