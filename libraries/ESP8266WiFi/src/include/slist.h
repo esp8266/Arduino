@@ -34,5 +34,15 @@ protected:
   T* _next;
 };
 
+template<typename T>
+T* slist_append_tail(T* head, T* item) {
+    if (!head)
+        return item;
+    T* last = head;
+    while(last->next())
+        last = last->next();
+    last->next(item);
+    return head;
+}
 
 #endif //SLIST_H
