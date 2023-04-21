@@ -563,6 +563,9 @@ void ICACHE_MAYBE umm_init(void) {
     // Note, full_init must be true for the primary heap, DRAM.
     umm_init_heap(UMM_HEAP_DRAM, (void *)UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE, true);
 
+#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+    umm_poison_critical = 0;
+#endif
     // upstream ref:
     //   Initialize the heap from linker supplied values */
     //   umm_init_heap(UMM_MALLOC_CFG_HEAP_ADDR, UMM_MALLOC_CFG_HEAP_SIZE);
