@@ -48,27 +48,11 @@ static size_t umm_uadd_sat(const size_t a, const size_t b);
 static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur);
 #endif
 
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-/*
-  The umm_poison logic runs outside the UMM_CRITICAL_* umbrella. When interrupt
-  routines do alloc calls, it is possible to interrupt an in-progress allocation
-  just before the poison is set, with a new alloc request resulting in a false
-  "poison check fail" against the in-progress allocation. The SDK does mallocs
-  from ISRs. SmartConfig can illustrate this issue.
-
-  Add POISON_CRITICAL_* to skip check when not the first.
-*/
-static int volatile umm_poison_critical __attribute__((section(".noinit")));
-
-#define POISON_CRITICAL_ENTRY() (umm_poison_critical++)
-#define POISON_CRITICAL_EXIT() (umm_poison_critical--)
-#define POISON_CRITICAL_GET_LEVEL() (umm_poison_critical)
-#endif
-
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
 void ICACHE_FLASH_ATTR umm_print_stats(int force);
 #endif
+
 
 
 int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));

@@ -138,16 +138,15 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
 void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) {
     void *ret;
 
-    POISON_CRITICAL_ENTRY();
-
     ptr = get_unpoisoned_check_neighbors(ptr, file, line);
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
-
-    ret = get_poisoned(ret, size);
-
-    POISON_CRITICAL_EXIT();
+    /*
+      "get_poisoned" is now called from umm_realloc while still in a critical
+      section. Before umm_realloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
@@ -156,11 +155,7 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) 
 
 void umm_poison_free_fl(void *ptr, const char *file, int line) {
 
-    POISON_CRITICAL_ENTRY();
-
     ptr = get_unpoisoned_check_neighbors(ptr, file, line);
-
-    POISON_CRITICAL_EXIT();
 
     umm_free(ptr);
 }

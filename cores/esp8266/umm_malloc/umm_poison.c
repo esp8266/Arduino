@@ -10,7 +10,6 @@
 
 #define UMM_POISON_BLOCK_SIZE (UMM_POISON_SIZE_BEFORE + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_AFTER)
 
-
 /*
  * Yields the total size of a poison block of size `s`.
  * If `s` is 0, returns 0.
@@ -75,11 +74,6 @@ static bool check_poison(const void *ptr, size_t poison_size,
  */
 static bool check_poison_block(umm_block *pblock) {
     bool ok = true;
-
-    if (1 != POISON_CRITICAL_GET_LEVEL()) {
-        // Nested checks are not safe
-        return ok;
-    }
 
     if (pblock->header.used.next & UMM_FREELIST_MASK) {
         DBGLOG_ERROR("check_poison_block is called for free block 0x%lx\n", (unsigned long)pblock);
@@ -166,15 +160,14 @@ static void *get_unpoisoned(void *vptr) {
 void *umm_poison_malloc(size_t size) {
     void *ret;
 
-    POISON_CRITICAL_ENTRY();
-
     add_poison_size(&size);
 
     ret = umm_malloc(size);
-
-    ret = get_poisoned(ret, size);
-
-    POISON_CRITICAL_EXIT();
+    /*
+      "get_poisoned" is now called from umm_malloc while still in a critical
+      section. Before umm_malloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
@@ -184,23 +177,18 @@ void *umm_poison_malloc(size_t size) {
 void *umm_poison_calloc(size_t num, size_t item_size) {
     void *ret;
 
-    POISON_CRITICAL_ENTRY();
-
     // Use saturated multiply.
     // Rely on umm_malloc to supply the fail response as needed.
     size_t size = umm_umul_sat(num, item_size);
+    size_t request_sz = size;
 
     add_poison_size(&size);
 
     ret = umm_malloc(size);
 
     if (NULL != ret) {
-        memset(ret, 0x00, size);
+        memset(ret, 0x00, request_sz);
     }
-
-    ret = get_poisoned(ret, size);
-
-    POISON_CRITICAL_EXIT();
 
     return ret;
 }
@@ -210,16 +198,15 @@ void *umm_poison_calloc(size_t num, size_t item_size) {
 void *umm_poison_realloc(void *ptr, size_t size) {
     void *ret;
 
-    POISON_CRITICAL_ENTRY();
-
     ptr = get_unpoisoned(ptr);
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
-
-    ret = get_poisoned(ret, size);
-
-    POISON_CRITICAL_EXIT();
+    /*
+      "get_poisoned" is now called from umm_realloc while still in a critical
+      section. Before umm_realloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
@@ -243,13 +230,6 @@ bool umm_poison_check(void) {
     bool ok = true;
     uint16_t cur;
 
-    if (0 != POISON_CRITICAL_GET_LEVEL()) {
-        // Nested checks are not safe. To arrive here implies we are in an
-        // interrupt context, and a previous sweep has not finished exiting.
-        return ok;
-    }
-    POISON_CRITICAL_ENTRY();
-
     UMM_CHECK_INITIALIZED();
 
     UMM_CRITICAL_ENTRY(id_poison);
@@ -270,8 +250,6 @@ bool umm_poison_check(void) {
         cur = UMM_NBLOCK(cur) & UMM_BLOCKNO_MASK;
     }
     UMM_CRITICAL_EXIT(id_poison);
-
-    POISON_CRITICAL_EXIT();
 
     return ok;
 }
