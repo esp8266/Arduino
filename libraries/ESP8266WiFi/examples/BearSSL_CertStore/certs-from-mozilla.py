@@ -47,7 +47,6 @@ for row in csvReader:
         if item.startswith("'-----BEGIN CERTIFICATE-----"):
             pems.append(item)
 del names[0] # Remove headers
-del pems[0] # Remove headers
 
 # Try and make ./data, skip if present
 try:
