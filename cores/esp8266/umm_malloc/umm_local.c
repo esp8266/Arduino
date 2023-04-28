@@ -142,8 +142,11 @@ void *umm_poison_realloc_flc(void *ptr, size_t size, const char *file, int line,
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
-
-    ret = get_poisoned(ret, size);
+    /*
+      "get_poisoned" is now called from umm_realloc while still in a critical
+      section. Before umm_realloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
