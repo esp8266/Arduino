@@ -33,6 +33,7 @@
 #include "gdb_hooks.h"
 #include "StackThunk.h"
 #include "coredecls.h"
+#include "umm_malloc/umm_malloc.h"
 
 extern "C" {
 
@@ -282,6 +283,11 @@ static void postmortem_report(uint32_t sp_dump) {
         // now outside from the "cut-here" zone, print correctly the `new` caller address,
         // idf-monitor.py will be able to decode this one and show exact location in sources
         ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)_umm_last_fail_alloc.addr);
+    }
+
+    size_t oom_count = umm_get_oom_count();
+    if (oom_count) {
+        ets_printf_P(PSTR("\nOOM Count: %u\n"), oom_count);
     }
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );

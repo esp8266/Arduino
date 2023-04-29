@@ -83,7 +83,6 @@ static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur) {
 }
 
 /* ------------------------------------------------------------------------ */
-#include "heap_cb.h"
 
 static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, int line, const void *caller) {
     uintptr_t ptr = (uintptr_t)vptr;
@@ -105,18 +104,15 @@ static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, 
             if (!check_poison_block(&UMM_BLOCK(c))) {
                 DBGLOG_ERROR("Allocation address %p\n", vptr);
                 size_t size = *(size_t *)ptr;
-                _HEAP_DEBUG_PROBE_PSFLC_CB(heap_poison_lite_cb_id, (void *)ptr, size, file, line, caller);
                 poison = false;
             } else
             if (!check_poison_neighbors(_context, c)) {
                 DBGLOG_ERROR("This bad block is in a neighbor allocation near: %p\n", vptr);
-                _HEAP_DEBUG_PROBE_PSFLC_CB(heap_poison_lite_neighbor_cb_id, (void *)ptr, 0, file, line, caller);
                 poison = false;
             }
             UMM_CRITICAL_EXIT(id_poison);
         } else {
             DBGLOG_ERROR("\nPointer %p is not a Heap address.\n", vptr);
-            _HEAP_DEBUG_PROBE_PSFLC_CB(heap_poison_lite_addr_cb_id, (void *)ptr, 0, file, line, caller);
             poison = false;
         }
 

@@ -124,8 +124,6 @@ extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((
 #include <sys/reent.h>
 #include <user_interface.h>
 
-#include "heap_cb.h"
-
 extern "C" {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -271,41 +269,26 @@ struct umm_last_fail_alloc {
 // OOM - Debug printing
 //
 // IRQ/ISR safe printing macros. Printing is controled according to the results
-// of system_get_os_print(). Also, being in a IRQ will prevent the printing of
+// of system_get_os_print(). Also, being in an IRQ may prevent the printing of
 // file names stored in PROGMEM. The PROGMEM address to the string is printed in
 // its place.
 #define DEBUG_HEAP_PRINTF ets_uart_printf
-
-static ALWAYS_INLINE bool withinISR(uint32_t ps) {
-  return (0 != (ps & 0x0fu));
+inline bool withinISR(uint32_t ps) {
+     return ((ps & 0x0f) != 0);
 }
-
-#if 0
-/*
-  ICACHE should be accessable from an ISR "IF" it has not been disabled for a
-  SPI bus transfer. TODO investagate further - `if (inISR && ! isCacheReady())`
- */
-#define SPIRDY              ESP8266_DREG(0x0C)  // CACHE_FLASH_CTRL_REG
-#define CACHE_READ_EN_BIT   BIT8                // eagle_soc.h in RTOS_SDK
-static ALWAYS_INLINE bool isCacheReady(void) {
-    return 0 != (SPIRDY & CACHE_READ_EN_BIT);
-}
-#endif
 
 static void IRAM_ATTR print_loc(bool inISR, size_t size, const char* file, int line, const void* caller) {
     if (system_get_os_print()) {
         DEBUG_HEAP_PRINTF(":oom %p(%d), File: ", caller, (int)size);
         if (file) {
-            if ((uint32_t)file >= 0x40200000) {
-                if (inISR) {
-                    DEBUG_HEAP_PRINTF("%p", file);
-                } else {
-                    char buf[strlen_P(file) + 1];
-                    strcpy_P(buf, file);
-                    DEBUG_HEAP_PRINTF(buf);
-                }
+            // Small code reduction by assuming file address is in PROGMEM
+            if (inISR) {
+                DEBUG_HEAP_PRINTF("%p", file);
             } else {
-                DEBUG_HEAP_PRINTF(file);
+                size_t sz = strlen_P(file);
+                char buf[sz + 1];
+                strcpy_P(buf, file);
+                DEBUG_HEAP_PRINTF(buf);
             }
         } else {
             DEBUG_HEAP_PRINTF("??");
@@ -326,7 +309,6 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psflc(void *ptr, size_t si
         _umm_last_fail_alloc.line = line;
         print_loc(withinISR(saved_ps), size, file, line, caller);
         xt_wsr_ps(saved_ps);
-        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, file, line, caller);
         return false;
     }
     return true;
@@ -342,7 +324,6 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psc(void *ptr, size_t size
         _umm_last_fail_alloc.addr = caller;
         _umm_last_fail_alloc.size = size;
         xt_wsr_ps(saved_ps);
-        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, NULL, 0, caller);
         return false;
     }
     return true;
@@ -358,7 +339,6 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
     if (0 != (size) && 0 == ptr) {
         _umm_last_fail_alloc.addr = caller;
         _umm_last_fail_alloc.size = size;
-        _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, NULL, 0, caller);
         return false;
     }
     return true;
@@ -423,7 +403,6 @@ void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, cons
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     void* ret = UMM_MALLOC_FL(size, file, line, caller);
-    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_malloc_cb_id, ret, size, file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
 }
@@ -434,7 +413,6 @@ void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, 
     POISON_CHECK__PANIC_FL(file, line, caller);
     size_t total_size = umm_umul_sat(count, size);
     void* ret = UMM_CALLOC_FL(1, total_size, file, line, caller);
-    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_calloc_cb_id, ret, size, file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line, caller);
     return ret;
 }
@@ -443,9 +421,7 @@ void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, in
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
-    ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_in_cb_id, ptr, size, file, line, caller);
     void* ret = UMM_REALLOC_FL(ptr, size, file, line, caller);
-    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_realloc_out_cb_id, ret, size, file, line, caller);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
 }
@@ -454,7 +430,6 @@ void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, [[maybe_un
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
-    ptr = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_free_cb_id, ptr, 0, file, line, caller);
     UMM_FREE_FL(ptr, file, line, caller);
 }
 
@@ -672,7 +647,6 @@ void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     void* ret = UMM_MALLOC_FL(size, file, line, caller);
-    ret = _HEAP_DEBUG_PROBE_PSFLC_CB(heap_abi_malloc_cb_id, ret, size, file, line, caller);
     bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     #else
     void* ret = UMM_MALLOC(size);
