@@ -275,26 +275,42 @@ struct umm_last_fail_alloc {
 // file names stored in PROGMEM. The PROGMEM address to the string is printed in
 // its place.
 #define DEBUG_HEAP_PRINTF ets_uart_printf
-static void IRAM_ATTR print_loc(size_t size, const char* file, int line, const void* caller)
-{
-    if (system_get_os_print()) {
-        DEBUG_HEAP_PRINTF(":oom(%d)@", (int)size);
 
+static ALWAYS_INLINE bool withinISR(uint32_t ps) {
+  return (0 != (ps & 0x0fu));
+}
+
+#if 0
+/*
+  ICACHE should be accessable from an ISR "IF" it has not been disabled for a
+  SPI bus transfer. TODO investagate further - `if (inISR && ! isCacheReady())`
+ */
+#define SPIRDY              ESP8266_DREG(0x0C)  // CACHE_FLASH_CTRL_REG
+#define CACHE_READ_EN_BIT   BIT8                // eagle_soc.h in RTOS_SDK
+static ALWAYS_INLINE bool isCacheReady(void) {
+    return 0 != (SPIRDY & CACHE_READ_EN_BIT);
+}
+#endif
+
+static void IRAM_ATTR print_loc(bool inISR, size_t size, const char* file, int line, const void* caller) {
+    if (system_get_os_print()) {
+        DEBUG_HEAP_PRINTF(":oom %p(%d), File: ", caller, (int)size);
         if (file) {
-            bool inISR = ETS_INTR_WITHINISR();
-            if (inISR && (uint32_t)file >= 0x40200000) {
-                DEBUG_HEAP_PRINTF("%p, File: %p", caller, file);
-            } else if (!inISR && (uint32_t)file >= 0x40200000) {
-                char buf[strlen_P(file) + 1];
-                strcpy_P(buf, file);
-                DEBUG_HEAP_PRINTF("%p, File: %s", caller, buf);
+            if ((uint32_t)file >= 0x40200000) {
+                if (inISR) {
+                    DEBUG_HEAP_PRINTF("%p", file);
+                } else {
+                    char buf[strlen_P(file) + 1];
+                    strcpy_P(buf, file);
+                    DEBUG_HEAP_PRINTF(buf);
+                }
             } else {
                 DEBUG_HEAP_PRINTF(file);
             }
-            DEBUG_HEAP_PRINTF(":%d\n", line);
         } else {
-            DEBUG_HEAP_PRINTF("%p\n", caller);
+            DEBUG_HEAP_PRINTF("??");
         }
+        DEBUG_HEAP_PRINTF(":%d\n", line);
     }
 }
 
@@ -308,7 +324,7 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psflc(void *ptr, size_t si
         _umm_last_fail_alloc.size = size;
         _umm_last_fail_alloc.file = file;
         _umm_last_fail_alloc.line = line;
-        print_loc(size, file, line, caller);
+        print_loc(withinISR(saved_ps), size, file, line, caller);
         xt_wsr_ps(saved_ps);
         _HEAP_DEBUG_PROBE_PSFLC_CB(heap_oom_cb_id, ptr, size, file, line, caller);
         return false;
