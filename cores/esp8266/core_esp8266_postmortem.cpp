@@ -181,7 +181,13 @@ static void postmortem_report(uint32_t sp_dump) {
             exccause, epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        ets_printf_P(PSTR("\nSoft WDT reset\n"));
+        ets_printf_P(PSTR("\nSoft WDT reset"));
+        const char infinite_loop[] = { 0x06, 0xff, 0xff };  // loop: j loop
+        if (0 == memcmp_P((void*)rst_info.epc1, infinite_loop, 3u)) {
+            // The SDK is riddled with these. They are usually preceded by an ets_printf.
+            ets_printf_P(PSTR(" - deliberate infinite loop detected"));
+        }
+        ets_putc('\n');
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
             rst_info.exccause, /* Address executing at time of Soft WDT level-1 interrupt */ rst_info.epc1, 0, 0, 0, 0);
     }
