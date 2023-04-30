@@ -183,7 +183,7 @@ static void postmortem_report(uint32_t sp_dump) {
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset"));
         const char infinite_loop[] = { 0x06, 0xff, 0xff };  // loop: j loop
-        if (0 == memcmp_P((void*)rst_info.epc1, infinite_loop, 3u)) {
+        if (0 == memcmp_P(infinite_loop, (PGM_VOID_P)rst_info.epc1, 3u)) {
             // The SDK is riddled with these. They are usually preceded by an ets_printf.
             ets_printf_P(PSTR(" - deliberate infinite loop detected"));
         }
