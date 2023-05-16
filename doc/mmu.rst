@@ -76,19 +76,28 @@ The Arduino IDE Tools menu option, ``MMU`` has the following selections:
 MMU related build defines and possible values. These values change as
 indicated with the menu options above:
 
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
-| ``#define``             | balanced     | IRAM         | shared (IRAM and Heap)             | not shared (IRAM and Heap)   |
-+=========================+==============+==============+====================================+==============================+
-| ``MMU_IRAM_SIZE``       | ``0x8000``   | ``0xC000``   | ``0xC000``                         | ``0x8000``                   |
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
-| ``MMU_ICACHE_SIZE``     | ``0x8000``   | ``0x4000``   | ``0x4000``                         | ``0x4000``                   |
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
-| ``MMU_IRAM_HEAP``       | --           | --           | defined, enables\ ``umm_malloc``   | --                           |
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
-| ``MMU_SEC_HEAP``        | --           | \*\*         | \*\*                               | ``0x40108000``               |
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
-| ``MMU_SEC_HEAP_SIZE``   | --           | \*\*         | \*\*                               | ``0x4000``                   |
-+-------------------------+--------------+--------------+------------------------------------+------------------------------+
++-------------+------------+------------+-------------+-------------+
+| ``#define`` | balanced   | IRAM       | shared      | not shared  |
+|             |            |            | (IRAM and   | (IRAM and   |
+|             |            |            | Heap)       | Heap)       |
++=============+============+============+=============+=============+
+| ``MMU_      | ``0x8000`` | ``0xC000`` | ``0xC000``  | ``0x8000``  |
+| IRAM_SIZE`` |            |            |             |             |
++-------------+------------+------------+-------------+-------------+
+| ``MMU_IC    | ``0x8000`` | ``0x4000`` | ``0x4000``  | ``0x4000``  |
+| ACHE_SIZE`` |            |            |             |             |
++-------------+------------+------------+-------------+-------------+
+| ``MMU_      | –          | –          | defined,    | –           |
+| IRAM_HEAP`` |            |            | e           |             |
+|             |            |            | nables\ ``u |             |
+|             |            |            | mm_malloc`` |             |
++-------------+------------+------------+-------------+-------------+
+| ``MMU       | –          | \*\*       | \*\*        | ``0         |
+| _SEC_HEAP`` |            |            |             | x40108000`` |
++-------------+------------+------------+-------------+-------------+
+| ``MMU_SEC_  | –          | \*\*       | \*\*        | ``0x4000``  |
+| HEAP_SIZE`` |            |            |             |             |
++-------------+------------+------------+-------------+-------------+
 
 \*\* This define is to an inline function that calculates the value,
 based on unused code space, requires ``#include <mmu_iram.h>``.
@@ -112,8 +121,8 @@ The Arduino IDE Tools menu option, ``Non-32-Bit Access`` has the following selec
       option ``16KB cache + 48KB IRAM and 2nd Heap (shared)``.
 
 IRAM, unlike DRAM, must be accessed as aligned full 32-bit words, no
-byte or short access. The pgm\_read macros are an option; however, the
-store operation remains an issue. For a block copy, ets\_memcpy appears
+byte or short access. The pgm_read macros are an option; however, the
+store operation remains an issue. For a block copy, ets_memcpy appears
 to work well as long as the byte count is rounded up to be evenly
 divided by 4, and source and destination addresses are 4 bytes aligned.
 
@@ -125,6 +134,11 @@ over-optimization.
 To get a sense of how memory access time is effected, see examples
 ``MMU48K`` and ``irammem`` in ``ESP8266``.
 
+NON-OS SDK v3.0.0 and above have builtin support for Non-32-Bit Access.
+Selecting ``Byte/Word access to IRAM/PROGMEM`` will override the builtin
+version with ours. However, there is no known reason to do this other
+than debugging.
+
 Miscellaneous
 -------------
 
@@ -133,41 +147,43 @@ For calls to ``umm_malloc`` with interrupts disabled.
 
 -  ``malloc`` will always allocate from the ``DRAM`` heap when called
    with interrupts disabled.
--  ``realloc`` with a NULL pointer will use ``malloc`` and return a
-   ``DRAM`` heap allocation. Note, calling ``realloc`` with interrupts
-   disabled is **not** officially supported. You are on your own if you
-   do this.
+
+   -  ``realloc`` with a NULL pointer will use ``malloc`` and return a
+      ``DRAM`` heap allocation. Note, calling ``realloc`` with
+      interrupts disabled is **not** officially supported. You are on
+      your own if you do this.
+
 -  If you must use IRAM memory in your ISR, allocate the memory in your
    init code. To reduce the time spent in the ISR, avoid non32-bit
    access that would trigger the exception handler. For short or byte
    access, consider using the inline functions described in section
-   "Performance Functions" below.
+   “Performance Functions” below.
 
 How to Select Heap
 ~~~~~~~~~~~~~~~~~~
 
 The ``MMU`` selection ``16KB cache + 48KB IRAM and 2nd Heap (shared)``
 allows you to use the standard heap API function calls (``malloc``,
-``calloc``, ``free``, ... ). to allocate memory from DRAM or IRAM. This
+``calloc``, ``free``, … ). to allocate memory from DRAM or IRAM. This
 selection can be made by instantiating the class ``HeapSelectIram`` or
 ``HeapSelectDram``. The usage is similar to that of the
 ``InterruptLock`` class. The default/initial heap source is DRAM. The
 class is in ``umm_malloc/umm_heap_select.h``.
 
-::
+.. code:: cpp
 
-      ...
-        char *bufferDram;
-        bufferDram = (char *)malloc(33);
-        char *bufferIram;
-        {
-            HeapSelectIram ephemeral;
-            bufferIram = (char *)malloc(33);
-        }
-      ...
-        free(bufferIram);
-        free(bufferDram);
-      ...
+     ...
+       char *bufferDram;
+       bufferDram = (char *)malloc(33);
+       char *bufferIram;
+       {
+           HeapSelectIram ephemeral;
+           bufferIram = (char *)malloc(33);
+       }
+     ...
+       free(bufferIram);
+       free(bufferDram);
+     ...
 
 ``free`` will always return memory to the correct heap. There is no need
 for tracking and selecting before freeing.
@@ -182,8 +198,9 @@ Classes:
 -  ``umm_get_current_heap_id()``
 -  ``umm_set_heap_by_id( ID value )``
 -  Possible ID values
--  ``UMM_HEAP_DRAM``
--  ``UMM_HEAP_IRAM``
+
+   -  ``UMM_HEAP_DRAM``
+   -  ``UMM_HEAP_IRAM``
 
 Also, an alternate stack select method API is available. This is not as
 easy as the class method; however, for some small set of cases, it may
@@ -201,9 +218,9 @@ a pointer:
 
 .. code:: cpp
 
-    bool mmu_is_iram(const void *addr);
-    bool mmu_is_dram(const void *addr);
-    bool mmu_is_icache(const void *addr);
+   bool mmu_is_iram(const void *addr);
+   bool mmu_is_dram(const void *addr);
+   bool mmu_is_icache(const void *addr);
 
 Performance Functions
 ~~~~~~~~~~~~~~~~~~~~~
@@ -213,23 +230,25 @@ exception handler reducing execution time and stack use, it comes at the
 cost of increased code size.
 
 These are an alternative to the ``pgm_read`` macros for reading from
-IRAM. When compiled with 'Debug Level: core' range checks are performed
+IRAM. When compiled with ‘Debug Level: core’ range checks are performed
 on the pointer value to make sure you are reading from the address range
 of IRAM, DRAM, or ICACHE.
 
 .. code:: cpp
 
-    uint8_t mmu_get_uint8(const void *p8);
-    uint16_t mmu_get_uint16(const uint16_t *p16);
-    int16_t mmu_get_int16(const int16_t *p16);
+   uint8_t mmu_get_uint8(const void *p8);
+   uint16_t mmu_get_uint16(const uint16_t *p16);
+   int16_t mmu_get_int16(const int16_t *p16);
 
 While these functions are intended for writing to IRAM, they will work
-with DRAM. When compiled with 'Debug Level: core', range checks are
+with DRAM. When compiled with ‘Debug Level: core’, range checks are
 performed on the pointer value to make sure you are writing to the
 address range of IRAM or DRAM.
 
 .. code:: cpp
 
-    uint8_t mmu_set_uint8(void *p8, const uint8_t val);
-    uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val);
-    int16_t mmu_set_int16(int16_t *p16, const int16_t val);
+   uint8_t mmu_set_uint8(void *p8, const uint8_t val);
+   uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val);
+   int16_t mmu_set_int16(int16_t *p16, const int16_t val);
+
+::

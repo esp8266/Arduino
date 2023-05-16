@@ -59,8 +59,24 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
       _server->send_P(200, PSTR("text/html"), serverIndex);
     });
 
+    // handler for the /update form page - preflight options
+    _server->on(path.c_str(), HTTP_OPTIONS, [&](){
+	    _server->sendHeader("Access-Control-Allow-Headers", "*");
+	    _server->sendHeader("Access-Control-Allow-Origin", "*");
+	    _server->send(200, F("text/html"), String(F("y")));
+    },[&](){
+		_authenticated = (_username == emptyString || _password == emptyString || _server->authenticate(_username.c_str(), _password.c_str()));
+      if(!_authenticated){
+        if (_serial_output)
+          Serial.printf("Unauthenticated Update\n");
+        return;
+      }
+    });
+	
     // handler for the /update form POST (once file upload finishes)
     _server->on(path.c_str(), HTTP_POST, [&](){
+	    _server->sendHeader("Access-Control-Allow-Headers", "*");
+	    _server->sendHeader("Access-Control-Allow-Origin", "*");
       if(!_authenticated)
         return _server->requestAuthentication();
       if (Update.hasError()) {
@@ -89,7 +105,6 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::setup(ESP8266WebServerTemplate
           return;
         }
 
-        WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "filesystem") {

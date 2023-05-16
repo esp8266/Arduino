@@ -106,6 +106,7 @@ void serial_printf(const char* fmt, ...)
 #define MACONX_BANK 0x02
 
 #define MACON1 0x00
+#define MACSTAT1 0x01
 #define MACON3 0x02
 #define MACON4 0x03
 #define MABBIPG 0x04
@@ -113,6 +114,16 @@ void serial_printf(const char* fmt, ...)
 #define MAIPGH 0x07
 #define MAMXFLL 0x0a
 #define MAMXFLH 0x0b
+#define MACON2 0x10
+#define MACSTAT2 0x11
+#define MICMD 0x12
+#define MIREGADR 0x14
+#define MIRDL 0x18
+#define MIRDH 0x19
+
+/* MICMD Register Bit Definitions */
+#define MICMD_MIISCAN 0x02
+#define MICMD_MIIRD 0x01
 
 #define MACON1_TXPAUS 0x08
 #define MACON1_RXPAUS 0x04
@@ -134,6 +145,9 @@ void serial_printf(const char* fmt, ...)
 #define MAADR6 0x01 /* MAADR<7:0> */
 #define MISTAT 0x0a
 #define EREVID 0x12
+
+/* MISTAT Register Bit Definitions */
+#define MISTAT_BUSY 0x01
 
 #define EPKTCNT_BANK 0x01
 #define ERXFCON 0x18
@@ -719,4 +733,27 @@ uint16_t ENC28J60::readFrameData(uint8_t* buffer, uint16_t framesize)
     // PRINTF("enc28j60: received_packets %d\n", received_packets);
 
     return _len;
+}
+
+uint16_t ENC28J60::phyread(uint8_t reg)
+{
+    // ( https://github.com/JAndrassy/EthernetENC/tree/master/src/utility/enc28j60.h )
+
+    setregbank(MACONX_BANK);
+    writereg(MIREGADR, reg);
+    writereg(MICMD, MICMD_MIIRD);
+    // wait until the PHY read completes
+    while (readreg(MISTAT) & MISTAT_BUSY)
+    {
+        delayMicroseconds(15);
+    }
+    writereg(MICMD, 0);
+    return (readreg(MIRDL) | readreg(MIRDH) << 8);
+}
+
+bool ENC28J60::isLinked()
+{
+    // ( https://github.com/JAndrassy/EthernetENC/tree/master/src/utility/enc28j60.h )
+
+    return !!(phyread(MACSTAT2) & 0x400);
 }

@@ -621,6 +621,21 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
+    ( 'd1_wroom_02', {
+        'name': 'LOLIN(WEMOS) D1 ESP-WROOM-02',
+        'opts': {
+            '.build.board': 'ESP8266_WEMOS_D1WROOM02',
+            '.build.variant': 'd1_mini',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_26',
+            '2M',
+            ],
+        'serial': '921',
+        'desc': [ 'No real product pages. See: https://www.instructables.com/How-to-Use-Wemos-ESP-Wroom-02-D1-Mini-WiFi-Module-/ or https://www.arduino-tech.com/wemos-esp-wroom-02-mainboard-d1-mini-wifi-module-esp826618650-battery/ ' ],
+    }),
     ( 'd1_mini_clone', {
         'name': 'LOLIN(WEMOS) D1 mini (clone)',
         'opts': {
@@ -1030,6 +1045,7 @@ macros = {
         ( '.build.core', 'esp8266' ),
         ( '.build.variant', 'generic' ),
         ( '.build.spiffs_pagesize', '256' ),
+        ( '.build.debug_optim', '' ),
         ( '.build.debug_port', '' ),
         ( '.build.debug_level', '' ),
         ]),
@@ -1083,6 +1099,10 @@ macros = {
         ( '.menu.FlashFreq.20.build.flash_freq', '20' ),
         ( '.menu.FlashFreq.26', '26MHz' ),
         ( '.menu.FlashFreq.26.build.flash_freq', '26' ),
+        ]),
+
+    'flashfreq_26': collections.OrderedDict([
+        ( '.build.flash_freq', '26' ),
         ]),
 
     'flashfreq_40': collections.OrderedDict([
@@ -1341,6 +1361,12 @@ def all_debug ():
             ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
             ( '.menu.lvl.None____', 'None' ),
             ( '.menu.lvl.None____.build.debug_level', '' ),
+            ( '.menu.optim.Smallest', 'None' ),
+            ( '.menu.optim.Smallest.build.debug_optim', '-Os' ),
+            ( '.menu.optim.Lite', 'Lite' ),
+            ( '.menu.optim.Lite.build.debug_optim', '-Os -fno-optimize-sibling-calls' ),
+            ( '.menu.optim.Full', 'Optimum' ),
+            ( '.menu.optim.Full.build.debug_optim', '-Og' ),
         ])
 
     for optlist in options:
@@ -1649,8 +1675,8 @@ def sdk ():
                         ('.menu.sdk.nonosdk_190313.build.sdk', 'NONOSDK22x_190313'),
                         ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
                         ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
-                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (180626 known issues)'),
-                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                        ('.menu.sdk.nonosdk305', 'nonos-sdk 3.0.5 (experimental)'),
+                        ('.menu.sdk.nonosdk305.build.sdk', 'NONOSDK305'),
                     ])
            }
 
@@ -1721,12 +1747,13 @@ def all_boards ():
     print('menu.ResetMethod=Reset Method')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
+    print('menu.optim=Debug Optimization')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.exception=C++ Exceptions')
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
-    print('menu.sdk=Espressif FW')
+    print('menu.sdk=NONOS SDK Version')
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')

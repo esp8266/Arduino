@@ -203,9 +203,9 @@ public:
 
     /// Response handling
     void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
-    String header(const char* name);   // get request header value by name
-    String header(size_t i);              // get request header value by number
-    String headerName(size_t i);          // get request header name by number
+    const String& header(const char* name);   // get request header value by name
+    const String& header(size_t i);           // get request header value by number
+    const String& headerName(size_t i);       // get request header name by number
     int headers();                     // get header count
     bool hasHeader(const char* name);  // check if header exists
 
@@ -215,9 +215,15 @@ public:
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
-	int writeToPrint(Print* print);
-    int writeToStream(Stream* stream);
-    const String& getString(void);
+    template <typename S> int writeToPrint(S* print) [[deprecated]] { return writeToStream(print); }
+    template <typename S> int writeToStream(S* output);
+
+    // In case of chunks = when size cannot be known in advance
+    // by the library, it might be useful to pre-reserve enough
+    // space instead of offending memory with a growing String
+    const String& getString() { return getString(0); }
+    const String& getString(int reserve);
+
     static String errorToString(int error);
 
 protected:
@@ -234,6 +240,7 @@ protected:
     bool sendHeader(const char * type);
     int handleHeaderResponse();
     int writeToStreamDataBlock(Stream * stream, int len);
+    static int StreamReportToHttpClientReport (Stream::Report streamSendError);
 
     // The common pattern to use the class is to
     // {
@@ -273,5 +280,94 @@ protected:
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     std::unique_ptr<StreamString> _payload;
 };
+
+/**
+ * write all  message body / payload to Stream
+ * @param output Print*(obsolete) / Stream*
+ * @return bytes written ( negative values are error codes )
+ */
+template <typename S>
+int HTTPClient::writeToStream(S * output)
+{
+    if(!output) {
+        return returnError(HTTPC_ERROR_NO_STREAM);
+    }
+
+    // Only return error if not connected and no data available, because otherwise ::getString() will return an error instead of an empty
+    // string when the server returned a http code 204 (no content)
+    if(!connected() && _transferEncoding != HTTPC_TE_IDENTITY && _size > 0) {
+        return returnError(HTTPC_ERROR_NOT_CONNECTED);
+    }
+
+    // get length of document (is -1 when Server sends no Content-Length header)
+    int len = _size;
+    int ret = 0;
+
+    if(_transferEncoding == HTTPC_TE_IDENTITY) {
+        // len < 0: transfer all of it, with timeout
+        // len >= 0: max:len, with timeout
+        ret = _client->sendSize(output, len);
+
+        // do we have an error?
+        if(_client->getLastSendReport() != Stream::Report::Success) {
+            return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
+        }
+    } else if(_transferEncoding == HTTPC_TE_CHUNKED) {
+        int size = 0;
+        while(1) {
+            if(!connected()) {
+                return returnError(HTTPC_ERROR_CONNECTION_LOST);
+            }
+            String chunkHeader = _client->readStringUntil('\n');
+
+            if(chunkHeader.length() <= 0) {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
+            }
+
+            chunkHeader.trim(); // remove \r
+
+            // read size of chunk
+            len = (uint32_t) strtol((const char *) chunkHeader.c_str(), NULL, 16);
+            size += len;
+            DEBUG_HTTPCLIENT("[HTTP-Client] read chunk len: %d\n", len);
+
+            // data left?
+            if(len > 0) {
+                // read len bytes with timeout
+                int r = _client->sendSize(output, len);
+                if (_client->getLastSendReport() != Stream::Report::Success)
+                    // not all data transferred
+                    return returnError(StreamReportToHttpClientReport(_client->getLastSendReport()));
+                ret += r;
+            } else {
+
+                // if no length Header use global chunk size
+                if(_size <= 0) {
+                    _size = size;
+                }
+
+                // check if we have write all data out
+                if(ret != _size) {
+                    return returnError(HTTPC_ERROR_STREAM_WRITE);
+                }
+                break;
+            }
+
+            // read trailing \r\n at the end of the chunk
+            char buf[2];
+            auto trailing_seq_len = _client->readBytes((uint8_t*)buf, 2);
+            if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
+            }
+
+            esp_yield();
+        }
+    } else {
+        return returnError(HTTPC_ERROR_ENCODING);
+    }
+
+    disconnect(true);
+    return ret;
+}
 
 #endif /* ESP8266HTTPClient_H_ */

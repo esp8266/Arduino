@@ -21,8 +21,6 @@
 */
 
 
-#define LWIP_INTERNAL
-
 extern "C" {
     #include "osapi.h"
     #include "ets_sys.h"
@@ -173,17 +171,6 @@ void WiFiServer::close() {
 
 void WiFiServer::stop() {
     close();
-}
-
-template<typename T>
-T* slist_append_tail(T* head, T* item) {
-    if (!head)
-        return item;
-    T* last = head;
-    while(last->next())
-        last = last->next();
-    last->next(item);
-    return head;
 }
 
 err_t WiFiServer::_accept(tcp_pcb* apcb, err_t err) {

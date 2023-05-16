@@ -8,7 +8,9 @@ import time
 import argparse
 import serial
 import subprocess
-import imp
+
+from importlib.machinery import SourceFileLoader
+
 try:
     from configparser import ConfigParser
 except:
@@ -278,12 +280,12 @@ def main():
     if args.env_file is not None:
         cfg = ConfigParser()
         cfg.optionxform = str
-        with args.env_file as fp:
-            cfg.readfp(fp)
+        with args.env_file as env:
+            cfg.read_file(env)
         env_vars = cfg.items('global')
     mocks = {}
     if args.mock is not None:
-        mocks_mod = imp.load_source('mocks', args.mock)
+        mocks_mod = SourceFileLoader('mocks', args.mock).load_module()
         mocks = mock_decorators.env
     with spawn_func(spawn_arg) as sp:
         ts = run_tests(sp, name, mocks, env_vars)

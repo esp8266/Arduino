@@ -195,7 +195,13 @@ class WiFiClientSecureCtx : public WiFiClient {
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
 
+    int _pollRecvBuffer(); // If there's a buffer with some pending data, return it's length
+                           // If there's no buffer, poll the engine and store any received data there and return the length
+                           // (which also may change the internal state, e.g. make us disconnected)
+
     bool _clientConnected(); // Is the underlying socket alive?
+    bool _engineConnected(); // Are both socket and the bearssl engine alive?
+
     std::shared_ptr<unsigned char> _alloc_iobuf(size_t sz);
     void _freeSSL();
     int _run_until(unsigned target, bool blocking = true);
@@ -277,6 +283,11 @@ class WiFiClientSecure : public WiFiClient {
     bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
     void flush() override { (void)flush(0); }
     void stop() override { (void)stop(0); }
+
+    IPAddress remoteIP() override { return _ctx->remoteIP(); }
+    uint16_t  remotePort() override { return _ctx->remotePort(); }
+    IPAddress localIP() override { return _ctx->localIP(); }
+    uint16_t  localPort() override { return _ctx->localPort(); }
 
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _ctx->setSession(session); }

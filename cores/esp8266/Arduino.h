@@ -33,6 +33,7 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
+#include "umm_malloc/umm_malloc_cfgport.h"
 #include "stdlib_noniso.h"
 #include "binary.h"
 #include "esp8266_peri.h"
@@ -269,10 +270,13 @@ long map(long, long, long, long, long);
 
 void setTZ(const char* tz);
 
-void configTime(int timezone, int daylightOffset_sec, const char* server1,
+// configure time using POSIX TZ string
+// server pointers *must remain valid* for the duration of the program
+void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
-void configTime(const char* tz, const char* server1,
+// configures with approximated TZ value. part of the old api, prefer configTime with TZ variable
+void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
 // esp32 api compatibility
@@ -290,6 +294,12 @@ bool getLocalTime(struct tm * info, uint32_t ms = 5000);
 #include "WCharacter.h"
 #include "WString.h"
 
+// configTime wrappers for temporary server{1,2,3} strings
+void configTime(int timezone, int daylightOffset_sec, String server1,
+    String server2 = String(), String server3 = String());
+void configTime(const char* tz, String server1,
+    String server2 = String(), String server3 = String());
+
 #include "HardwareSerial.h"
 #include "Esp.h"
 #include "Updater.h"
@@ -302,7 +312,8 @@ bool getLocalTime(struct tm * info, uint32_t ms = 5000);
 #endif
 
 #ifdef DEBUG_ESP_OOM
-// reinclude *alloc redefinition because of <cstdlib> undefining them
-// this is mandatory for allowing OOM *alloc definitions in .ino files
-#include "umm_malloc/umm_malloc_cfg.h"
+// Position *alloc redefinition at the end of Arduino.h because <cstdlib> would
+// have undefined them. Mandatory for supporting OOM and other debug alloc
+// definitions in .ino files
+#include "heap_api_debug.h"
 #endif

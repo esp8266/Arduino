@@ -94,8 +94,9 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  * @param max_connection    Max simultaneous connected clients, 0 - 8. https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832
+ * @param beacon_interval   set arbitrary beacon interval (influences DTIM)
  */
-bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection) {
+bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
@@ -138,7 +139,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
     conf.channel = channel;
     conf.ssid_hidden = ssid_hidden;
     conf.max_connection = max_connection;
-    conf.beacon_interval = 100;
+    conf.beacon_interval = beacon_interval;
 
     struct softap_config conf_compare;
     if(WiFi._persistent){
@@ -167,8 +168,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
         DEBUG_WIFI("[AP] softap config unchanged\n");
     }
 
-    auto& server = softAPDhcpServer();
-    server.end();
+    wifi_softap_dhcps_stop();
 
     // check IP config
     struct ip_info ip;
@@ -179,23 +179,19 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* psk, int channel, 
                 IPAddress(192, 168, 4, 1),
                 IPAddress(192, 168, 4, 1),
                 IPAddress(255, 255, 255, 0));
-            if(!ret) {
-                DEBUG_WIFI("[AP] softAPConfig failed!\n");
-                ret = false;
-            }
         }
     } else {
         DEBUG_WIFI("[AP] wifi_get_ip_info failed!\n");
         ret = false;
     }
 
-    server.begin();
+    wifi_softap_dhcps_start();
 
     return ret;
 }
 
-bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection) {
-    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection);
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& psk, int channel, int ssid_hidden, int max_connection, int beacon_interval) {
+    return softAP(ssid.c_str(), psk.c_str(), channel, ssid_hidden, max_connection, beacon_interval);
 }
 
 /**
@@ -227,9 +223,10 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     info.gw.addr = gateway.v4();
     info.netmask.addr = subnet.v4();
 
-    auto& server = softAPDhcpServer();
-    server.end();
-
+    // use SDK function for dhcps, not just server.begin()
+    // setting info with static IPs will fail otherwise
+    // (TODO: dhcps_flag seems to store 'SDK' DHCPs status)
+    wifi_softap_dhcps_stop();
     if(!wifi_set_ip_info(SOFTAP_IF, &info)) {
         DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
         ret = false;
@@ -246,14 +243,17 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
+    auto& server = softAPDhcpServer();
     if(!server.set_dhcps_lease(&dhcp_lease))
     {
-        DEBUG_WIFI("[APConfig] wifi_set_ip_info failed!\n");
+        DEBUG_WIFI("[APConfig] server set_dhcps_lease failed!\n");
         ret = false;
     }
 
-    server.setRouter(true); // send ROUTER option with netif's gateway IP
-    server.begin();
+    // send ROUTER option with netif's gateway IP
+    server.setRouter(true);
+
+    wifi_softap_dhcps_start();
 
     // check config
     if(wifi_get_ip_info(SOFTAP_IF, &info)) {
@@ -277,7 +277,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 /**
  * Disconnect from the network (close AP)
  * @param wifioff disable mode?
- * @return one value of wl_status_t enum
+ * @return operation success
  */
 bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     bool ret;

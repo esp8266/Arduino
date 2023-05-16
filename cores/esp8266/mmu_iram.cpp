@@ -122,43 +122,15 @@ void IRAM_ATTR Cache_Read_Disable(void) {
 }
 #endif
 
-/*
- * Early adjustment for CPU crystal frequency, so debug printing will work.
- * This should not be left enabled all the time in Cashe_Read..., I am concerned
- * that there may be unknown interference with the NONOS SDK startup.
- *
- * Inspired by:
- * https://github.com/pvvx/esp8266web/blob/2e25559bc489487747205db2ef171d48326b32d4/app/sdklib/system/app_main.c#L581-L591
- */
-extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
-extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
-
-extern "C" void IRAM_ATTR set_pll(void)
-{
-#if !defined(F_CRYSTAL)
-#define F_CRYSTAL 26000000
-#endif
-  if (F_CRYSTAL != 40000000) {
-    // At Boot ROM(-BIOS) start, it assumes a 40MHz crystal.
-    // If it is not, we assume a 26MHz crystal.
-    // There is no support for 24MHz crustal at this time.
-    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
-      // Assume 26MHz crystal
-      // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
-      // set 80MHz PLL CPU
-      rom_i2c_writeReg(103,4,1,136);
-      rom_i2c_writeReg(103,4,2,145);
-    }
-  }
-}
-
 //C This was used to probe at different stages of boot the state of the PLL
 //C register. I think we can get rid of this one.
+extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
+extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
 extern "C" void IRAM_ATTR dbg_set_pll(void)
 {
   char r103_4_1 = rom_i2c_readReg(103,4,1);
   char r103_4_2 = rom_i2c_readReg(103,4,2);
-  set_pll();
+  mmu_set_pll();
   ets_uart_printf("\nrom_i2c_readReg(103,4,1) == %u\n", r103_4_1);
   ets_uart_printf(  "rom_i2c_readReg(103,4,2) == %u\n", r103_4_2);
 }
@@ -197,9 +169,70 @@ extern void Cache_Read_Enable(uint8_t map, uint8_t p, uint8_t v);
 #endif  // #if (MMU_ICACHE_SIZE == 0x4000)
 
 /*
- * This wrapper is for running code from IROM (flash) before the SDK starts.
+ * Early adjustment for CPU crystal frequency will allow early debug printing to
+ * be readable before the SDK initialization is complete.
+ * This should not be left enabled all the time in Cashe_Read..., I am concerned
+ * that there may be unknown interference with the NONOS SDK startup.
+ * It does low-level calls that could clash with the SDKs startup.
+ *
+ * Inspired by:
+ * https://github.com/pvvx/esp8266web/blob/2e25559bc489487747205db2ef171d48326b32d4/app/sdklib/system/app_main.c#L581-L591
+ */
+extern "C" uint8_t rom_i2c_readReg(uint8_t block, uint8_t host_id, uint8_t reg_add);
+extern "C" void rom_i2c_writeReg(uint8_t block, uint8_t host_id, uint8_t reg_add, uint8_t data);
+
+extern "C" void IRAM_ATTR mmu_set_pll(void)
+{
+#if !defined(F_CRYSTAL)
+#define F_CRYSTAL 26000000
+#endif
+  if (F_CRYSTAL != 40000000) {
+    // At Boot ROM(-BIOS) start, it assumes a 40MHz crystal.
+    // If it is not, we assume a 26MHz crystal.
+    // There is no support for 24MHz crustal at this time.
+    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
+      // Assume 26MHz crystal
+      // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
+      // set 80MHz PLL CPU
+      rom_i2c_writeReg(103,4,1,136);
+      rom_i2c_writeReg(103,4,2,145);
+    }
+  }
+}
+
+/*
+ * This wrapper is for running code early from IROM (flash) before the SDK
+ * starts. Since the NONOS SDK will do a full and proper flash device init for
+ * speed and mode, we only do a minimum to make ICACHE functional, keeping IRAM
+ * use to a minimum. After the SDK has started, this function is not needed and
+ * must not be called.
  */
 void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void)) {
+  // Cache Read must be disabled. This is always the case on entry when called
+  // from the right context.
+  // Cache_Read_Disable();
+
+  // The SPI_CS_SETUP parameter has been observed set by RTOS SDK and NONOS SDK
+  // as part of flash init/configuration. It may be necessary for some flash
+  // chips to perform correctly with ICACHE hardware access. Turning on and
+  // leaving it on should be okay.
+  //
+  // One SPI bus clock cycle time is inserted between #CS active and 1st SPI bus
+  // clock cycle. The number of clock cycles is in SPI_CNTRL2 SPI_SETUP_TIME,
+  // defaults to 1.
+  SPI0U |= SPIUCSSETUP; // SPI_CS_SETUP or BIT5
+
+  // phy_get_bb_evm is the key function, called from fix_cache_bug in the NONOS
+  // SDK. This addition resolves the PUYA Flash issue with exception 0, when
+  // early Cache_Read_Enable is used.
+  extern uint32_t phy_get_bb_evm(void); // undocumented
+  phy_get_bb_evm();
+
+  // For early Cache_Read_Enable, only do ICACHE_SIZE_16. With this option,
+  // Cache_Read_Disable will fully restore the original register states. With
+  // ICACHE_SIZE_32, one bit is missed when disabling. Leave the full access
+  // calls for the NONOS SDK.
+  // This only works with image slice 0, which is all we do presently.
   Cache_Read_Enable(0, 0, ICACHE_SIZE_16);
   fn();
   Cache_Read_Disable();

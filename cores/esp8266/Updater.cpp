@@ -1,8 +1,11 @@
+#include <Arduino.h>
 #include "Updater.h"
 #include "eboot_command.h"
 #include <esp8266_peri.h>
 #include <PolledTimeout.h>
 #include "StackThunk.h"
+
+#include <memory>
 
 //#define DEBUG_UPDATER Serial
 
@@ -41,20 +44,21 @@ UpdaterClass::~UpdaterClass()
 #endif
 }
 
-UpdaterClass& UpdaterClass::onProgress(THandlerFunction_Progress fn) {
-    _progress_callback = fn;
-    return *this;
-}
-
-void UpdaterClass::_reset() {
-  if (_buffer)
+void UpdaterClass::_reset(bool callback) {
+  if (_buffer) {
     delete[] _buffer;
-  _buffer = 0;
+  }
+
+  _buffer = nullptr;
   _bufferLen = 0;
   _startAddress = 0;
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+
+  if (callback && _end_callback) {
+    _end_callback();
+  }
 
   if(_ledPin != -1) {
     digitalWrite(_ledPin, !_ledOn); // off
@@ -170,7 +174,13 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   } else {
     _bufferSize = 256;
   }
-  _buffer = new uint8_t[_bufferSize];
+  _buffer = new (std::nothrow) uint8_t[_bufferSize];
+  if (!_buffer) {
+    _setError(UPDATE_ERROR_OOM);
+    _reset(false);
+    return false;
+  }
+
   _command = command;
 
 #ifdef DEBUG_UPDATER
@@ -182,6 +192,11 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   if (!_verify) {
     _md5.begin();
   }
+
+  if (_start_callback) {
+    _start_callback();
+  }
+
   return true;
 }
 
@@ -224,71 +239,87 @@ bool UpdaterClass::end(bool evenIfRemaining){
   }
 
   if (_verify) {
+    // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
+    // contain a matching length field, preceded by the bytes of the signature itself.
+    // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    static constexpr uint32_t SigSize = sizeof(uint32_t);
     const uint32_t expectedSigLen = _verify->length();
-      // If expectedSigLen is non-zero, we expect the last four bytes of the buffer to
-      // contain a matching length field, preceded by the bytes of the signature itself.
-      // But if expectedSigLen is zero, we expect neither a signature nor a length field;
+    const uint32_t sigLenAddr = _startAddress + _size - SigSize;
     uint32_t sigLen = 0;
 
-    if (expectedSigLen > 0) {
-      ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
-    }
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] expected sigLen: %u\n"), expectedSigLen);
 #endif
+    if (expectedSigLen > 0) {
+      ESP.flashRead(sigLenAddr, &sigLen, SigSize);
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen from flash: %u\n"), sigLen);
+#endif
+    }
+
     if (sigLen != expectedSigLen) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
 
-    int binSize = _size;
+    auto binSize = _size;
     if (expectedSigLen > 0) {
-      _size -= (sigLen + sizeof(uint32_t) /* The siglen word */);
-    }
-    _hash->begin();
-#ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
-#endif
-      // Calculate the MD5 and hash using proper size
-    uint8_t buff[128] __attribute__((aligned(4)));
-    for(int i = 0; i < binSize; i += sizeof(buff)) {
-      ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
-      size_t read = std::min((int)sizeof(buff), binSize - i);
-      _hash->add(buff, read);
-    }
-    _hash->end();
-#ifdef DEBUG_UPDATER
-    unsigned char *ret = (unsigned char *)_hash->hash();
-    DEBUG_UPDATER.printf_P(PSTR("[Updater] Computed Hash:"));
-    for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
-    DEBUG_UPDATER.printf("\n");
-#endif
-
-    uint8_t *sig = nullptr; // Safe to free if we don't actually malloc
-    if (expectedSigLen > 0) {
-      sig = (uint8_t*)malloc(sigLen);
-      if (!sig) {
+      if (binSize < (sigLen + SigSize)) {
         _setError(UPDATE_ERROR_SIGN);
         _reset();
         return false;
       }
-      ESP.flashRead(_startAddress + binSize, sig, sigLen);
+      binSize -= (sigLen + SigSize);
 #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
-      for (size_t i=0; i<sigLen; i++) {
-        DEBUG_UPDATER.printf(" %02x", sig[i]);
-      }
-      DEBUG_UPDATER.printf("\n");
+      DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted size (without the signature and sigLen): %zu\n"), binSize);
 #endif
     }
-    if (!_verify->verify(_hash, (void *)sig, sigLen)) {
-      free(sig);
+
+    // Calculate hash of the payload, 128 bytes at a time
+    alignas(alignof(uint32_t)) uint8_t buff[128];
+
+    _hash->begin();
+    for (uint32_t offset = 0; offset < binSize; offset += sizeof(buff)) {
+      auto len = std::min(sizeof(buff), binSize - offset);
+      ESP.flashRead(_startAddress + offset, reinterpret_cast<uint32_t *>(&buff[0]), len);
+      _hash->add(buff, len);
+    }
+    _hash->end();
+
+#ifdef DEBUG_UPDATER
+    auto debugByteArray = [](const char *name, const unsigned char *hash, int len) {
+        DEBUG_UPDATER.printf_P("[Updater] %s:", name);
+        for (int i = 0; i < len; ++i) {
+            DEBUG_UPDATER.printf(" %02x", hash[i]);
+        }
+        DEBUG_UPDATER.printf("\n");
+    };
+    debugByteArray(PSTR("Computed Hash"),
+        reinterpret_cast<const unsigned char *>(_hash->hash()),
+        _hash->len());
+#endif
+
+    std::unique_ptr<uint8_t[]> sig;
+    if (expectedSigLen > 0) {
+      const uint32_t sigAddr = _startAddress + binSize;
+      sig.reset(new (std::nothrow) uint8_t[sigLen]);
+      if (!sig) {
+        _setError(UPDATE_ERROR_OOM);
+        _reset();
+        return false;
+      }
+      ESP.flashRead(sigAddr, sig.get(), sigLen);
+#ifdef DEBUG_UPDATER
+      debugByteArray(PSTR("Received Signature"), sig.get(), sigLen);
+#endif
+    }
+    if (!_verify->verify(_hash, sig.get(), sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
-    free(sig);
+
     _size = binSize; // Adjust size to remove signature, not part of bin payload
 
 #ifdef DEBUG_UPDATER
@@ -301,7 +332,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
 #ifdef DEBUG_UPDATER
-    else DEBUG_UPDATER.printf_P(PSTR("MD5 Success: %s\n"), _target_md5.c_str());
+    else DEBUG_UPDATER.printf_P(PSTR("[Updater] MD5 Success: %s\n"), _target_md5.c_str());
 #endif
   }
 
@@ -555,45 +586,79 @@ size_t UpdaterClass::writeStream(Stream &data, uint16_t streamTimeout) {
 
 void UpdaterClass::_setError(int error){
   _error = error;
+  if (_error_callback) {
+    _error_callback(error);
+  }
 #ifdef DEBUG_UPDATER
   printError(DEBUG_UPDATER);
 #endif
   _reset(); // Any error condition invalidates the entire update, so clear partial status
 }
 
-void UpdaterClass::printError(Print &out){
-  out.printf_P(PSTR("ERROR[%u]: "), _error);
-  if(_error == UPDATE_ERROR_OK){
-    out.println(F("No Error"));
-  } else if(_error == UPDATE_ERROR_WRITE){
-    out.println(F("Flash Write Failed"));
-  } else if(_error == UPDATE_ERROR_ERASE){
-    out.println(F("Flash Erase Failed"));
-  } else if(_error == UPDATE_ERROR_READ){
-    out.println(F("Flash Read Failed"));
-  } else if(_error == UPDATE_ERROR_SPACE){
-    out.println(F("Not Enough Space"));
-  } else if(_error == UPDATE_ERROR_SIZE){
-    out.println(F("Bad Size Given"));
-  } else if(_error == UPDATE_ERROR_STREAM){
-    out.println(F("Stream Read Timeout"));
-  } else if(_error == UPDATE_ERROR_NO_DATA){
-    out.println(F("No data supplied"));
-  } else if(_error == UPDATE_ERROR_MD5){
-    out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
-  } else if(_error == UPDATE_ERROR_SIGN){
-    out.println(F("Signature verification failed"));
-  } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
-    out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
-  } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
-    out.printf_P(PSTR("new Flash config wrong real: %d\n"), ESP.getFlashChipRealSize());
-  } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
-    out.println(F("Magic byte is wrong, not 0xE9"));
-  } else if (_error == UPDATE_ERROR_BOOTSTRAP){
-    out.println(F("Invalid bootstrapping state, reset ESP8266 before updating"));
-  } else {
-    out.println(F("UNKNOWN"));
+String UpdaterClass::getErrorString() const {
+  String out;
+
+  switch (_error) {
+  case UPDATE_ERROR_OK:
+    out = F("No Error");
+    break;
+  case UPDATE_ERROR_WRITE:
+    out = F("Flash Write Failed");
+    break;
+  case UPDATE_ERROR_ERASE:
+    out = F("Flash Erase Failed");
+    break;
+  case UPDATE_ERROR_READ:
+    out = F("Flash Read Failed");
+    break;
+  case UPDATE_ERROR_SPACE:
+    out = F("Not Enough Space");
+    break;
+  case UPDATE_ERROR_SIZE:
+    out = F("Bad Size Given");
+    break;
+  case UPDATE_ERROR_STREAM:
+    out = F("Stream Read Timeout");
+    break;
+  case UPDATE_ERROR_MD5:
+    out += F("MD5 verification failed: ");
+    out += F("expected: ") + _target_md5;
+    out += F(", calculated: ") + _md5.toString();
+    break;
+  case UPDATE_ERROR_FLASH_CONFIG:
+    out += F("Flash config wrong: ");
+    out += F("real: ") + String(ESP.getFlashChipRealSize(), 10);
+    out += F(", SDK: ") + String(ESP.getFlashChipSize(), 10);
+    break;
+  case UPDATE_ERROR_NEW_FLASH_CONFIG:
+    out += F("new Flash config wrong, real size: ");
+    out += String(ESP.getFlashChipRealSize(), 10);
+    break;
+  case UPDATE_ERROR_MAGIC_BYTE:
+    out = F("Magic byte is not 0xE9");
+    break;
+  case UPDATE_ERROR_BOOTSTRAP:
+    out = F("Invalid bootstrapping state, reset ESP8266 before updating");
+    break;
+  case UPDATE_ERROR_SIGN:
+    out = F("Signature verification failed");
+    break;
+  case UPDATE_ERROR_NO_DATA:
+    out = F("No data supplied");
+    break;
+  case UPDATE_ERROR_OOM:
+    out = F("Out of memory");
+    break;
+  default:
+    out = F("UNKNOWN");
+    break;
   }
+
+  return out;
+}
+
+void UpdaterClass::printError(Print &out){
+  out.printf_P(PSTR("ERROR[%hhu]: %s\n"), _error, getErrorString().c_str());
 }
 
 UpdaterClass Update;

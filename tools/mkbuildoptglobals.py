@@ -81,7 +81,7 @@ commonhfile.fqfn={build.core.path}/CommonHFile.h
 build.opt.fqfn={build.path}/core/build.opt
 mkbuildoptglobals.extra_flags=
 
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.path} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 """
@@ -183,13 +183,24 @@ Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
 
 import argparse
-from shutil import copyfile
 import glob
+import locale
 import os
 import platform
 import sys
 import textwrap
 import time
+import traceback
+
+from shutil import copyfile
+
+
+# Stay in sync with our bundled version
+PYTHON_REQUIRES = (3, 7)
+
+if sys.version_info < PYTHON_REQUIRES:
+    raise SystemExit(f"{__file__}\nMinimal supported version of Python is {PYTHON_REQUIRES[0]}.{PYTHON_REQUIRES[1]}")
+
 
 # Need to work on signature line used for match to avoid conflicts with
 # existing embedded documentation methods.
@@ -201,6 +212,7 @@ docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-buil
 err_print_flag = False
 msg_print_buf = ""
 debug_enabled = False
+default_encoding = None
 
 # Issues trying to address through buffered printing
 # 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
@@ -295,16 +307,16 @@ def copy_create_build_file(source_fqfn, build_target_fqfn):
                 pass
     return True     # file changed
 
-
 def add_include_line(build_opt_fqfn, include_fqfn):
+    global default_encoding
     if not os.path.exists(include_fqfn):
         # If file is missing, we need an place holder
-        with open(include_fqfn, 'w', encoding="utf-8"):
+        with open(include_fqfn, 'w', encoding=default_encoding):
             pass
-        print("add_include_line: Created " + include_fqfn)
-    with open(build_opt_fqfn, 'a', encoding="utf-8") as build_opt:
-        build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
+        print_msg("add_include_line: Created " + include_fqfn)
 
+    with open(build_opt_fqfn, 'a', encoding=default_encoding) as build_opt:
+        build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
 
 def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     """
@@ -313,8 +325,9 @@ def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
     copy of Sketch.ino.globals.h.
     """
     global build_opt_signature
+    global default_encoding
 
-    build_opt = open(build_opt_fqfn, 'w', encoding="utf-8")
+    build_opt = open(build_opt_fqfn, 'w', encoding=default_encoding)
     if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
         build_opt.close()
         return False
@@ -416,68 +429,6 @@ def discover_1st_time_run(build_path):
     return 0 == count
 
 
-def find_preferences_txt(runtime_ide_path):
-    """
-    Check for perferences.txt in well-known locations. Most OSs have two
-    possibilities. When "portable" is present, it takes priority. Otherwise, the
-    remaining path wins. However, Windows has two. Depending on the install
-    source, the APP store or website download, both may appear and create an
-    ambiguous result.
-
-    Return two item list - Two non "None" items indicate an ambiguous state.
-
-    OS Path list for Arduino IDE 1.6.0 and newer
-      from: https://www.arduino.cc/en/hacking/preferences
-    """
-    platform_name = platform.system()
-    if "Linux" == platform_name:
-        # Test for portable 1ST
-        # <Arduino IDE installation folder>/portable/preferences.txt (when used in portable mode)
-        # For more on portable mode see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        fqfn = os.path.normpath(runtime_ide_path + "/portable/preferences.txt")
-        # Linux - verified with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-        fqfn = os.path.expanduser("~/.arduino15/preferences.txt")
-        # Linux - verified with Arduino IDE 1.8.18 and 2.0 RC5 64bit and AppImage
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-    elif "Windows" == platform_name:
-        fqfn = os.path.normpath(runtime_ide_path + "\portable\preferences.txt")
-        # verified on Windows 10 with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-        # It is never simple. Arduino from the Windows APP store or the download
-        # Windows 8 and up option will save "preferences.txt" in one location.
-        # The downloaded Windows 7 (and up version) will put "preferences.txt"
-        # in a different location. When both are present due to various possible
-        # scenarios, use the more modern.
-        fqfn = os.path.expanduser("~\Documents\ArduinoData\preferences.txt")
-        # Path for "Windows app" - verified on Windows 10 with Arduino IDE 1.8.19 from APP store
-        fqfn2 = os.path.expanduser("~\AppData\local\Arduino15\preferences.txt")
-        # Path for Windows 7 and up - verified on Windows 10 with Arduino IDE 1.8.19
-        if os.path.exists(fqfn):
-            if os.path.exists(fqfn2):
-                print_err("Multiple 'preferences.txt' files found:")
-                print_err("  " + fqfn)
-                print_err("  " + fqfn2)
-                return [fqfn, None]
-            else:
-                return [fqfn, fqfn2]
-        elif os.path.exists(fqfn2):
-            return [fqfn2, None]
-    elif "Darwin" == platform_name:
-        # Portable is not compatable with Mac OS X
-        # see https://docs.arduino.cc/software/ide-v1/tutorials/PortableIDE
-        fqfn = os.path.expanduser("~/Library/Arduino15/preferences.txt")
-        # Mac OS X - unverified
-        if os.path.exists(fqfn):
-            return [fqfn, None]
-
-    print_err("File preferences.txt not found on " + platform_name)
-    return [None, None]
-
-
 def get_preferences_txt(file_fqfn, key):
     # Get Key Value, key is allowed to be missing.
     # We assume file file_fqfn exists
@@ -505,40 +456,28 @@ def check_preferences_txt(runtime_ide_path, preferences_file):
         else:
             print_err(f"Override preferences file '{preferences_file}' not found.")
 
-    elif runtime_ide_path != None:
-        # For a particular install, search the expected locations for platform.txt
-        # This should never fail.
-        file_fqfn = find_preferences_txt(runtime_ide_path)
-        if file_fqfn[0] != None:
-            print_msg(f"Using preferences from '{file_fqfn[0]}'")
-            val0 = get_preferences_txt(file_fqfn[0], key)
-            val1 = val0
-            if file_fqfn[1] != None:
-                val1 = get_preferences_txt(file_fqfn[1], key)
-            if val0 == val1:    # We can safely ignore that there were two preferences.txt files
-                return val0
-            else:
-                print_err(f"Found too many preferences.txt files with different values for '{key}'")
-                raise UserWarning
-        else:
-            # Something is wrong with the installation or our understanding of the installation.
-            print_err("'preferences.txt' file missing from well known locations.")
-
-    return None
-
+    # Referencing the preferences.txt for an indication of shared "core.a"
+    # caching is unreliable. There are too many places reference.txt can be
+    # stored and no hints of which the Arduino build might be using. Unless
+    # directed otherwise, assume "core.a" caching true.
+    print_msg(f"Assume aggressive 'core.a' caching enabled.")
+    return True
 
 def touch(fname, times=None):
     with open(fname, "ab") as file:
-        os.utime(file.fileno(), times)
+        file.close();
+    os.utime(fname, times)
 
 def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
     global debug_enabled
     # touch both files with the same timestamp
     touch(globals_h_fqfn)
     with open(globals_h_fqfn, "rb") as file:
-        ts = os.stat(file.fileno())
-        with open(commonhfile_fqfn, "ab") as file2:
-            os.utime(file2.fileno(), ns=(ts.st_atime_ns, ts.st_mtime_ns))
+        file.close()
+    with open(commonhfile_fqfn, "ab") as file2:
+        file2.close()
+    ts = os.stat(globals_h_fqfn)
+    os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
 
     if debug_enabled:
         print_dbg("After synchronous_touch")
@@ -552,12 +491,8 @@ def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
 def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
     global docs_url
     print_dbg(f"runtime_ide_version: {args.runtime_ide_version}")
-    if args.runtime_ide_version < 10802: # CI also has version 10607 --  and args.runtime_ide_version != 10607:
-        # Aggresive core caching - not implemented before version 1.8.2
-        # Note, Arduino IDE 2.0 rc5 has version 1.6.7 and has aggressive caching.
-        print_dbg(f"Old version ({args.runtime_ide_version}) of Arduino IDE no aggressive caching option")
-        return False
-    elif args.cache_core != None:
+
+    if args.cache_core != None:
         print_msg(f"Preferences override, this prebuild script assumes the 'compiler.cache_core' parameter is set to {args.cache_core}")
         print_msg(f"To change, modify 'mkbuildoptglobals.extra_flags=(--cache_core | --no_cache_core)' in 'platform.local.txt'")
         return args.cache_core
@@ -591,19 +526,7 @@ def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
                     preferences_fqfn = os.path.expanduser(preferences_fqfn)
                 print_dbg(f"determine_cache_state: preferences_fqfn: {preferences_fqfn}")
 
-    try:
-        caching_enabled = check_preferences_txt(ide_path, preferences_fqfn)
-    except UserWarning:
-        if os.path.exists(source_globals_h_fqfn):
-            caching_enabled = None
-            print_err(f"  runtime_ide_version: {args.runtime_ide_version}")
-            print_err(f"  This must be resolved to use '{globals_name}'")
-            print_err(f"  Read more at {docs_url}")
-        else:
-            # We can quietly ignore the problem because we are not needed.
-            caching_enabled = True
-
-    return caching_enabled
+    return check_preferences_txt(ide_path, preferences_fqfn)
 
 
 """
@@ -680,6 +603,7 @@ def parse_args():
     parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
     parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
     parser.add_argument('--debug', action='store_true', required=False, default=False)
+    parser.add_argument('-DDEBUG_ESP_PORT', nargs='?', action='store', const="", default="", help='Add mkbuildoptglobals.extra_flags={build.debug_port} to platform.local.txt')
     parser.add_argument('--ci', action='store_true', required=False, default=False)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
@@ -694,11 +618,62 @@ def parse_args():
     # ref nargs='*'', https://stackoverflow.com/a/4480202
     # ref no '--n' parameter, https://stackoverflow.com/a/21998252
 
+
+# retrieve *system* encoding, not the one used by python internally
+if sys.version_info >= (3, 11):
+    def get_encoding():
+        return locale.getencoding()
+else:
+    def get_encoding():
+        return locale.getdefaultlocale()[1]
+
+
+def show_value(desc, value):
+    print_dbg(f'{desc:<40} {value}')
+    return
+
+def locale_dbg():
+    show_value("get_encoding()", get_encoding())
+    show_value("locale.getdefaultlocale()", locale.getdefaultlocale())
+    show_value('sys.getfilesystemencoding()', sys.getfilesystemencoding())
+    show_value("sys.getdefaultencoding()", sys.getdefaultencoding())
+    show_value("locale.getpreferredencoding(False)", locale.getpreferredencoding(False))
+    try:
+        show_value("locale.getpreferredencoding()", locale.getpreferredencoding())
+    except:
+        pass
+    show_value("sys.stdout.encoding", sys.stdout.encoding)
+
+    # use current setting
+    show_value("locale.setlocale(locale.LC_ALL, None)", locale.setlocale(locale.LC_ALL, None))
+    try:
+        show_value("locale.getencoding()", locale.getencoding())
+    except:
+        pass
+    show_value("locale.getlocale()", locale.getlocale())
+
+    # use user setting
+    show_value("locale.setlocale(locale.LC_ALL, '')", locale.setlocale(locale.LC_ALL, ''))
+    # show_value("locale.getencoding()", locale.getencoding())
+    show_value("locale.getlocale()", locale.getlocale())
+    return
+
+
 def main():
     global build_opt_signature
     global docs_url
     global debug_enabled
+    global default_encoding
     num_include_lines = 1
+
+    # Given that GCC will handle lines from an @file as if they were on
+    # the command line. I assume that the contents of @file need to be encoded
+    # to match that of the shell running GCC runs. I am not 100% sure this API
+    # gives me that, but it appears to work.
+    #
+    # However, elsewhere when dealing with source code we continue to use 'utf-8',
+    # ref. https://gcc.gnu.org/onlinedocs/cpp/Character-sets.html
+    default_encoding = get_encoding()
 
     args = parse_args()
     debug_enabled = args.debug
@@ -712,6 +687,11 @@ def main():
     build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
     globals_h_fqfn = os.path.join(build_path_core, globals_name)
 
+    if debug_enabled:
+        locale_dbg()
+
+    print_msg(f'default_encoding:       {default_encoding}')
+
     print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
     print_dbg(f"runtime_ide_version:    {args.runtime_ide_version}")
     print_dbg(f"build_path:             {build_path}")
@@ -721,6 +701,12 @@ def main():
     print_dbg(f"globals_name:           {globals_name}")
     print_dbg(f"build_path_core:        {build_path_core}")
     print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
+    print_dbg(f"DDEBUG_ESP_PORT:        {args.DDEBUG_ESP_PORT}")
+
+    if len(args.DDEBUG_ESP_PORT):
+        build_opt_signature = build_opt_signature[:-1] + ":debug@"
+
+    print_dbg(f"build_opt_signature:    {build_opt_signature}")
 
     if args.ci:
         # Requires CommonHFile.h to never be checked in.
@@ -734,12 +720,13 @@ def main():
             print_dbg("First run since Arduino IDE started.")
 
     use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
-    if use_aggressive_caching_workaround == None:
-        # Specific rrror messages already buffered
-        handle_error(1)
 
     print_dbg(f"first_time:             {first_time}")
     print_dbg(f"use_aggressive_caching_workaround: {use_aggressive_caching_workaround}")
+
+    if not os.path.exists(build_path_core):
+        os.makedirs(build_path_core)
+        print_msg("Clean build, created dir " + build_path_core)
 
     if first_time or \
     not use_aggressive_caching_workaround or \
@@ -752,10 +739,6 @@ def main():
     if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
         touch(commonhfile_fqfn)
         print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
-
-    if not os.path.exists(build_path_core):
-        os.makedirs(build_path_core)
-        print_msg("Clean build, created dir " + build_path_core)
 
     if os.path.exists(source_globals_h_fqfn):
         print_msg("Using global include from " + source_globals_h_fqfn)
@@ -836,4 +819,10 @@ def main():
     handle_error(0)   # commit print buffer
 
 if __name__ == '__main__':
-    sys.exit(main())
+    rc = 1
+    try:
+        rc = main()
+    except:
+        print_err(traceback.format_exc())
+        handle_error(0)
+    sys.exit(rc)

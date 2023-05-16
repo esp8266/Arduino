@@ -1,9 +1,30 @@
+/*
+  LwipIntfDev.h
+
+  Arduino network template class for generic device
+
+  Original Copyright (c) 2020 esp8266 Arduino All rights reserved.
+  This file is part of the esp8266 Arduino core environment.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef _LWIPINTFDEV_H
 #define _LWIPINTFDEV_H
 
 // TODO:
-// remove all Serial.print
 // unchain pbufs
 
 #include <netif/ethernet.h>
@@ -24,6 +45,13 @@
 #ifndef DEFAULT_MTU
 #define DEFAULT_MTU 1500
 #endif
+
+enum EthernetLinkStatus
+{
+    Unknown,
+    LinkON,
+    LinkOFF
+};
 
 template<class RawDev>
 class LwipIntfDev: public LwipIntf, public RawDev
@@ -72,9 +100,11 @@ public:
     void setDefault(bool deflt = true);
 
     // true if interface has a valid IPv4 address
+    // (and ethernet link status is not detectable or is up)
     bool connected()
     {
-        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr));
+        return !!ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr))
+               && (!RawDev::isLinkDetectable() || RawDev::isLinked());
     }
 
     bool routable()
@@ -83,8 +113,10 @@ public:
     }
 
     // ESP8266WiFi API compatibility
-
     wl_status_t status();
+
+    // Arduino Ethernet compatibility
+    EthernetLinkStatus linkStatus();
 
 protected:
     err_t netif_init();
@@ -260,6 +292,12 @@ template<class RawDev>
 wl_status_t LwipIntfDev<RawDev>::status()
 {
     return _started ? (connected() ? WL_CONNECTED : WL_DISCONNECTED) : WL_NO_SHIELD;
+}
+
+template<class RawDev>
+EthernetLinkStatus LwipIntfDev<RawDev>::linkStatus()
+{
+    return RawDev::isLinkDetectable() ? _started && RawDev::isLinked() ? LinkON : LinkOFF : Unknown;
 }
 
 template<class RawDev>

@@ -28,21 +28,20 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   package:
     name: Update master JSON file
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: false
         fetch-depth: 0
     - name: Deploy updated JSON
       env:
-        TRAVIS_BUILD_DIR: ${{ github.workspace }}
         BUILD_TYPE: package
         CI_GITHUB_API_KEY: ${{ secrets.GITHUB_TOKEN }}
         GHCI_DEPLOY_KEY: ${{ secrets.GHCI_DEPLOY_KEY }}

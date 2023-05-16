@@ -19,8 +19,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#define LWIP_INTERNAL
-
 extern "C" {
 #include "osapi.h"
 #include "ets_sys.h"
@@ -81,6 +79,9 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
 }
 
 WiFiClientSecure WiFiServerSecure::accept() {
+#if CORE_MOCK
+  _mockUnclaimed();
+#endif
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
       WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _cache, _client_CA_ta, _tls_min, _tls_max);

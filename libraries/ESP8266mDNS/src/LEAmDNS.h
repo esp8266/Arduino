@@ -132,11 +132,6 @@ namespace esp8266
 namespace MDNSImplementation
 {
 
-// this should be defined at build time
-#ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
-#endif
-
 #define MDNS_IP4_SUPPORT
 #if LWIP_IPV6
 //#define MDNS_IP6_SUPPORT
@@ -1179,6 +1174,8 @@ namespace MDNSImplementation
         stcMDNSServiceQuery*              m_pServiceQueries;
         MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
         stcProbeInformation               m_HostProbeInformation;
+        bool                              m_bLwipCb;
+        bool                              m_bRestarting;
 
         /** CONTROL **/
         /* MAINTENANCE */

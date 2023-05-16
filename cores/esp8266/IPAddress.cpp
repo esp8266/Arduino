@@ -27,6 +27,11 @@ IPAddress::IPAddress(const IPAddress& from)
     ip_addr_copy(_ip, from._ip);
 }
 
+IPAddress::IPAddress(IPAddress&& from)
+{
+    ip_addr_copy(_ip, from._ip);
+}
+
 IPAddress::IPAddress() {
     _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
 }
@@ -36,24 +41,14 @@ bool IPAddress::isSet () const {
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
-    setV4();
-    (*this)[0] = first_octet;
-    (*this)[1] = second_octet;
-    (*this)[2] = third_octet;
-    (*this)[3] = fourth_octet;
-}
+    uint8_t addr[] {
+        first_octet,
+        second_octet,
+        third_octet,
+        fourth_octet,
+    };
 
-void IPAddress::ctor32(uint32_t address) {
-    setV4();
-    v4() = address;
-}
-
-IPAddress::IPAddress(const uint8_t *address) {
-    setV4();
-    (*this)[0] = address[0];
-    (*this)[1] = address[1];
-    (*this)[2] = address[2];
-    (*this)[3] = address[3];
+    *this = &addr[0];
 }
 
 bool IPAddress::fromString(const char *address) {
@@ -111,8 +106,10 @@ bool IPAddress::fromString4(const char *address) {
 }
 
 IPAddress& IPAddress::operator=(const uint8_t *address) {
-    setV4();
-    v4() = *reinterpret_cast<const uint32_t*>(address);
+    uint32_t value;
+    memcpy_P(&value, address, sizeof(value));
+
+    *this = value;
     return *this;
 }
 
@@ -123,7 +120,14 @@ IPAddress& IPAddress::operator=(uint32_t address) {
 }
 
 bool IPAddress::operator==(const uint8_t* addr) const {
-    return isV4() && v4() == *reinterpret_cast<const uint32_t*>(addr);
+    if (!isV4()) {
+        return false;
+    }
+
+    uint32_t value;
+    memcpy_P(&value, addr, sizeof(value));
+
+    return v4() == value;
 }
 
 size_t IPAddress::printTo(Print& p) const {

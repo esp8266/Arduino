@@ -303,12 +303,26 @@ extern int __real_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
 extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
 extern int __get_adc_mode();
 
+/*
+  Verified that the wide filtering of all 128 byte flash reads during
+  spoof_init_data continues to be safe for SDK 3.0.5
+  From start call to user_pre_init() to stop call with user_rf_pre_init().
+
+  flash read count during spoof_init_data 4
+    flash read  0x00000 8    // system_get_flash_size_map()
+    flash read  0x00000 4    // system_partition_table_regist()
+    flash read  0xFB000 128  // PHY_DATA (EEPROM address space)
+    flash read  0xFC000 628  // RC_CAL
+ */
 extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size)
 {
     if (!spoof_init_data || size != 128) {
         return __real_spi_flash_read(addr, dst, size);
     }
 
+#if (NONOSDK >= (0x30000))
+    spoof_init_data = false;
+#endif
     memcpy(dst, phy_init_data, sizeof(phy_init_data));
     ((uint8_t*)dst)[107] = __get_adc_mode();
     return 0;
@@ -329,23 +343,29 @@ extern int __get_adc_mode(void)
 extern void __run_user_rf_pre_init(void) __attribute__((weak));
 extern void __run_user_rf_pre_init(void)
 {
-    return; // default do noting
+    return; // default do nothing
 }
 
+#if (NONOSDK >= (0x30000))
+void sdk3_begin_phy_data_spoof(void)
+{
+    spoof_init_data = true;
+}
+#else
 uint32_t user_rf_cal_sector_set(void)
 {
     spoof_init_data = true;
     return flashchip->chip_size/SPI_FLASH_SEC_SIZE - 4;
 }
+#endif
 
 void user_rf_pre_init()
 {
     // *((volatile uint32_t*) 0x60000710) = 0;
+#if (NONOSDK < (0x30000))
     spoof_init_data = false;
-    volatile uint32_t* rtc_reg = (volatile uint32_t*) 0x60001000;
-    rtc_reg[30] = 0;
+#endif
 
-    system_set_os_print(0);
     int rf_mode = __get_rf_mode();
     if (rf_mode >= 0) {
         system_phy_set_rfoption(rf_mode);

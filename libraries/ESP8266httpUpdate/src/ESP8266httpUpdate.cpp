@@ -83,6 +83,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& hos
     return handleUpdate(http, currentVersion, false);
 }
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(HTTPClient& httpClient, const String& currentVersion)
+{
+    return handleUpdate(httpClient, currentVersion, false);
+}
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateFS(HTTPClient& httpClient, const String& currentVersion)
+{
+    return handleUpdate(httpClient, currentVersion, true);
+}
+
 /**
  * return error code as int
  * @return int error code
@@ -208,6 +218,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate] Server header:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - code: %d\n", code);
     DEBUG_HTTP_UPDATE("[httpUpdate]  - len: %d\n", len);
+    if(code != HTTP_CODE_OK) {
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - payload: %s\n", http.getString().c_str());
+    }
 
     String md5;
     if (_md5Sum.length()) {

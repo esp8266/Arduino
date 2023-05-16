@@ -1,2 +1,0 @@
-cd ${0%/*} 2>/dev/null
-python3 ../../../../tools/cert.py -s www.gitlab.com -n gitlab > certs.h

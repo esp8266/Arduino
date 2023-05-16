@@ -53,7 +53,7 @@ class Stream: public Print {
         unsigned long _startMillis;  // used for timeout measurement
         int timedRead();    // private method to read stream with timeout
         int timedPeek();    // private method to peek stream with timeout
-        int peekNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
+        int peekNextDigit(bool detectDecimal = false); // returns the next numeric digit in the stream or -1 if timeout
 
     public:
         virtual int available() = 0;
@@ -167,25 +167,49 @@ class Stream: public Print {
         // When result is 0 or less than requested maxLen, Print::getLastSend()
         // contains an error reason.
 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
         // transfers already buffered / immediately available data (no timeout)
         // returns number of transferred bytes
-        size_t sendAvailable (Print* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
-        size_t sendAvailable (Print& to) { return sendAvailable(&to); }
+        [[deprecated]] size_t sendAvailable (Print* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
+        [[deprecated]] size_t sendAvailable (Print& to) { return sendAvailable(&to); }
 
         // transfers data until timeout
         // returns number of transferred bytes
-        size_t sendAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
-        size_t sendAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
+        [[deprecated]] size_t sendAll (Print* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
+        [[deprecated]] size_t sendAll (Print& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
 
         // transfers data until a char is encountered (the char is swallowed but not transferred) with timeout
         // returns number of transferred bytes
-        size_t sendUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
-        size_t sendUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
+        [[deprecated]] size_t sendUntil (Print* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
+        [[deprecated]] size_t sendUntil (Print& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
 
         // transfers data until requested size or timeout
         // returns number of transferred bytes
-        size_t sendSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
-        size_t sendSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
+        [[deprecated]] size_t sendSize (Print* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
+        [[deprecated]] size_t sendSize (Print& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
+
+#pragma GCC diagnostic pop
+
+        // transfers already buffered / immediately available data (no timeout)
+        // returns number of transferred bytes
+        size_t sendAvailable (Stream* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
+        size_t sendAvailable (Stream& to) { return sendAvailable(&to); }
+
+        // transfers data until timeout
+        // returns number of transferred bytes
+        size_t sendAll (Stream* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
+        size_t sendAll (Stream& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
+
+        // transfers data until a char is encountered (the char is swallowed but not transferred) with timeout
+        // returns number of transferred bytes
+        size_t sendUntil (Stream* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
+        size_t sendUntil (Stream& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
+
+        // transfers data until requested size or timeout
+        // returns number of transferred bytes
+        size_t sendSize (Stream* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
+        size_t sendSize (Stream& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamRemaining () { return -1; }
@@ -202,7 +226,13 @@ class Stream: public Print {
         Report getLastSendReport () const { return _sendReport; }
 
     protected:
+        [[deprecated]]
         size_t sendGeneric (Print* to,
+                            const ssize_t len = -1,
+                            const int readUntilChar = -1,
+                            oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
+
+        size_t sendGeneric (Stream* to,
                             const ssize_t len = -1,
                             const int readUntilChar = -1,
                             oneShotMs::timeType timeoutMs = oneShotMs::neverExpires /* neverExpires=>getTimeout() */);
