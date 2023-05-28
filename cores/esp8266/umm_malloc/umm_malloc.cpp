@@ -909,6 +909,8 @@ void *umm_malloc(size_t size) {
 
     ptr = umm_malloc_core(_context, size);
 
+    ptr = POISON_CHECK_SET_POISON(ptr, size);
+
     UMM_CRITICAL_EXIT(id_malloc);
 
     return ptr;
@@ -1068,7 +1070,7 @@ void *umm_realloc(void *ptr, size_t size) {
         //  Case 2 - block + next block fits EXACTLY
     } else if ((blockSize + nextBlockSize) == blocks) {
         DBGLOG_DEBUG("exact realloc using next block - %i\n", blocks);
-        umm_assimilate_up(c);
+        umm_assimilate_up(_context, c);
         STATS__FREE_BLOCKS_UPDATE(-nextBlockSize);
         blockSize += nextBlockSize;
 
@@ -1087,8 +1089,9 @@ void *umm_realloc(void *ptr, size_t size) {
         STATS__FREE_BLOCKS_UPDATE(-prevBlockSize);
         STATS__FREE_BLOCKS_ISR_MIN();
         blockSize += prevBlockSize;
+        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);  // Fix allocation so ISR poison check is good
         UMM_CRITICAL_SUSPEND(id_realloc);
-        memmove((void *)&UMM_DATA(c), ptr, curSize);
+        UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
         UMM_CRITICAL_RESUME(id_realloc);
         //  Case 5 - prev block + block + next block fits
@@ -1108,8 +1111,9 @@ void *umm_realloc(void *ptr, size_t size) {
         #else
         blockSize += (prevBlockSize + nextBlockSize);
         #endif
+        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
         UMM_CRITICAL_SUSPEND(id_realloc);
-        memmove((void *)&UMM_DATA(c), ptr, curSize);
+        UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
         UMM_CRITICAL_RESUME(id_realloc);
 
@@ -1119,8 +1123,9 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks);
+            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
             UMM_CRITICAL_SUSPEND(id_realloc);
-            memcpy(ptr, oldptr, curSize);
+            UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core(_context, oldptr);
         } else {
@@ -1181,8 +1186,9 @@ void *umm_realloc(void *ptr, size_t size) {
             blockSize = blocks;
             #endif
         }
+        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
         UMM_CRITICAL_SUSPEND(id_realloc);
-        memmove((void *)&UMM_DATA(c), ptr, curSize);
+        UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
         UMM_CRITICAL_RESUME(id_realloc);
     } else if (blockSize >= blocks) { // 2
@@ -1198,8 +1204,9 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
+            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
             UMM_CRITICAL_SUSPEND(id_realloc);
-            memcpy(ptr, oldptr, curSize);
+            UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core(_context, oldptr);
         } else {
@@ -1223,8 +1230,9 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
+            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
             UMM_CRITICAL_SUSPEND(id_realloc);
-            memcpy(ptr, oldptr, curSize);
+            UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
             umm_free_core(_context, oldptr);
         } else {
@@ -1250,6 +1258,8 @@ void *umm_realloc(void *ptr, size_t size) {
 
     STATS__FREE_BLOCKS_MIN();
 
+    ptr = POISON_CHECK_SET_POISON(ptr, size);
+
     /* Release the critical section... */
     UMM_CRITICAL_EXIT(id_realloc);
 
@@ -1258,6 +1268,7 @@ void *umm_realloc(void *ptr, size_t size) {
 
 /* ------------------------------------------------------------------------ */
 
+#if !defined(UMM_POISON_CHECK) && !defined(UMM_POISON_CHECK_LITE)
 void *umm_calloc(size_t num, size_t item_size) {
     void *ret;
 
@@ -1273,6 +1284,7 @@ void *umm_calloc(size_t num, size_t item_size) {
 
     return ret;
 }
+#endif
 
 /* ------------------------------------------------------------------------ */
 
