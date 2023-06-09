@@ -357,6 +357,21 @@ class WiFiClientSecure : public WiFiClient {
 
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override { return _ctx->peekConsume(consume); }
+  
+    void keepAlive(uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    {
+      _ctx->keepAlive(idle_sec, intv_sec, count);
+    }
+
+    bool isKeepAliveEnabled() const { return _ctx->isKeepAliveEnabled(); };
+
+    uint16_t getKeepAliveIdle() const { return _ctx->getKeepAliveIdle(); };
+
+    uint16_t getKeepAliveInterval() const { return _ctx->getKeepAliveInterval(); };
+
+    uint8_t getKeepAliveCount() const { return _ctx->getKeepAliveCount(); };
+
+    void disableKeepAlive() { _ctx->disableKeepAlive(); };
 
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;
