@@ -120,6 +120,10 @@ static void cut_here() {
     ets_putc('\n');
 }
 
+static inline bool is_pc_valid(uint32_t pc) {
+    return pc >= XCHAL_INSTRAM0_VADDR && pc < (XCHAL_INSTROM0_VADDR + XCHAL_INSTROM0_SIZE);
+}
+
 /*
   Add some assembly to grab the stack pointer and pass it as an argument before
   it grows for the target function. Should stabilize the stack offsets, used to
@@ -135,7 +139,7 @@ asm(
     "\n"
 "__wrap_system_restart_local:\n\t"
     "mov          a2,     a1\n\t"
-    "j            postmortem_report\n\t"
+    "j.l          postmortem_report, a3\n\t"
     ".size __wrap_system_restart_local, .-__wrap_system_restart_local\n\t"
 );
 
@@ -193,7 +197,7 @@ static void postmortem_report(uint32_t sp_dump) {
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset"));
         const char infinite_loop[] = { 0x06, 0xff, 0xff };  // loop: j loop
-        if (0 == memcmp_P(infinite_loop, (PGM_VOID_P)rst_info.epc1, 3u)) {
+        if (is_pc_valid(rst_info.epc1) && 0 == memcmp_P(infinite_loop, (PGM_VOID_P)rst_info.epc1, 3u)) {
             // The SDK is riddled with these. They are usually preceded by an ets_printf.
             ets_printf_P(PSTR(" - deliberate infinite loop detected"));
         }
