@@ -293,4 +293,34 @@ class EspClass {
 
 extern EspClass ESP;
 
+/// RAII helper token class for forcedLightSleepBegin()/End().
+/// Cast to bool to check that forced light sleep can commence.
+/// The forced light sleep is entered when the token goes out of scope.
+/// Call cancel() to prevent sleeping.
+class ESPForcedLightSleepToken {
+private:
+    ESPForcedLightSleepToken() = delete;
+    ESPForcedLightSleepToken(const ESPForcedLightSleepToken&) = delete;
+    ESPForcedLightSleepToken& operator=(const ESPForcedLightSleepToken&) = delete;
+
+    bool isArmed = false;
+
+public:
+    ESPForcedLightSleepToken(uint32_t duration_us, void (*wakeupCb)()) {
+        isArmed = ESP.forcedLightSleepBegin(10 * 1000 * 1000, wakeupCb);
+    }
+    ~ESPForcedLightSleepToken() {
+        if (isArmed) ESP.forcedLightSleepEnd(false);
+    }
+    operator bool() {
+        return isArmed;
+    }
+    void cancel() {
+        if (isArmed) {
+            ESP.forcedLightSleepEnd(true);
+            isArmed = false;
+        }
+    }
+};
+
 #endif //ESP_H
