@@ -39,10 +39,10 @@
 // scheduled function happen more often: every yield() (vs every loop()),
 // and time resolution is microsecond (vs millisecond). Details are below.
 
-// get_scheduled_recurrent_delay() is used by delay() to give a chance to
+// get_scheduled_recurrent_delay_us() is used by delay() to give a chance to
 // all recurrent functions to run per their timing requirement.
 
-uint32_t get_scheduled_recurrent_delay();
+uint32_t get_scheduled_recurrent_delay_us();
 
 // scheduled functions called once:
 //
