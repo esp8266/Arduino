@@ -172,8 +172,16 @@ bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
     if (expired >= timeout_ms) {
         return true; // expired
     }
-    esp_delay(std::min((timeout_ms - expired), intvl_ms));
-    return false;
+
+    // compute greatest delay interval with respect to scheduled recurrent functions
+    uint32_t grain_ms = std::min(intvl_ms, compute_scheduled_recurrent_grain());
+
+    // recurrent scheduled functions will be called from esp_delay()->esp_suspend()
+    esp_delay(grain_ms > 0 ?
+        std::min((timeout_ms - expired), grain_ms) :
+        (timeout_ms - expired));
+
+    return false; // expiration must be checked again
 }
 
 extern "C" void __yield() {

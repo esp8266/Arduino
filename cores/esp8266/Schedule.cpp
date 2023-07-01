@@ -47,6 +47,7 @@ struct recurrent_fn_t
 
 static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
+static uint32_t rScheduleTarget = 0;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -117,6 +118,10 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
     item->mFunc = fn;
     item->alarm = alarm;
+//    if (!rScheduleTarget || rScheduleTarget > item.callNow.remaining())
+//    {
+//        rScheduleTarget = item.callNow.remaining();
+//    }
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
@@ -131,6 +136,11 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     rLast = item;
 
     return true;
+}
+
+uint32_t compute_scheduled_recurrent_grain()
+{
+    return 0;
 }
 
 void run_scheduled_functions()
