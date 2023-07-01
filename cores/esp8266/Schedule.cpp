@@ -119,14 +119,14 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     item->mFunc = fn;
     item->alarm = alarm;
 
+    esp8266::InterruptLock lockAllInterruptsInThisScope;
+
     // prevent new item overwriting an already expired rTarget.
-    const int32_t rRemaining = rTarget - micros();
-    if (!rFirst || (rRemaining > 0 && static_cast<uint32_t>(rRemaining) > item->callNow.remaining()))
+    const int32_t remaining = rTarget - micros();
+    if (!rFirst || (remaining > 0 && static_cast<uint32_t>(remaining) > item->callNow.remaining()))
     {
         rTarget = micros() + item->callNow.remaining();
     }
-
-    esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     if (rLast)
     {
@@ -145,8 +145,8 @@ uint32_t get_scheduled_recurrent_delay_us()
 {
     if (!rFirst) return ~static_cast<uint32_t>(0);
     // handle already expired rTarget.
-    const int32_t rRemaining = rTarget - micros();
-    return (rRemaining > 0) ? static_cast<uint32_t>(rRemaining) : 0;
+    const int32_t remaining = rTarget - micros();
+    return (remaining > 0) ? static_cast<uint32_t>(remaining) : 0;
 }
 
 void run_scheduled_functions()
@@ -209,12 +209,18 @@ void run_scheduled_recurrent_functions()
         fence = true;
     }
 
-    rTarget = micros() + current->callNow.remaining();
+    decltype(rLast) stop;
     recurrent_fn_t* prev = nullptr;
-    // prevent scheduling of new functions during this run
-    auto stop = rLast;
-
     bool done;
+
+    {
+        esp8266::InterruptLock lockAllInterruptsInThisScope;
+
+        // prevent scheduling of new functions during this run
+        stop = rLast;
+        rTarget = micros() + (~static_cast<decltype(micros())>(0) >> 1);
+    }
+
     do
     {
         done = current == stop;
@@ -246,14 +252,16 @@ void run_scheduled_recurrent_functions()
         }
         else
         {
-            prev = current;
-            current = current->mNext;
+            esp8266::InterruptLock lockAllInterruptsInThisScope;
+
             // prevent current item overwriting an already expired rTarget.
-            const int32_t rRemaining = rTarget - micros();
-            if (rRemaining > 0 && static_cast<uint32_t>(rRemaining) > current->callNow.remaining())
+            const int32_t remaining = rTarget - micros();
+            if (remaining > 0 && static_cast<uint32_t>(remaining) > current->callNow.remaining())
             {
                 rTarget = micros() + current->callNow.remaining();
             }
+            prev = current;
+            current = current->mNext;
         }
 
         if (yieldNow)
