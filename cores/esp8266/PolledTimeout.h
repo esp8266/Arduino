@@ -146,6 +146,7 @@ public:
   using timeType = typename TimePolicyT::timeType;
   static_assert(std::is_unsigned<timeType>::value == true, "timeType must be unsigned");
 
+  static constexpr timeType alwaysExpired   = 0;
   static constexpr timeType neverExpires    = std::numeric_limits<timeType>::max();
   static constexpr timeType rangeCompensate = TimePolicyT::rangeCompensate; //debug
 
@@ -176,7 +177,7 @@ public:
 
   bool canWait () const
   {
-    return _timeout != 0;
+    return _timeout != alwaysExpired;
   }
 
   // Resets, will trigger after this new timeout.
@@ -214,7 +215,7 @@ public:
 
   void resetToNeverExpires ()
   {
-    _timeout = 1; // because canWait() has precedence
+    _timeout = alwaysExpired + 1; // because canWait() has precedence
     _neverExpires = true;
   }
 
