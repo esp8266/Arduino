@@ -174,12 +174,10 @@ bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
     }
 
     // compute greatest delay interval with respect to scheduled recurrent functions
-    uint32_t grain_ms = std::min(intvl_ms, compute_scheduled_recurrent_grain());
+    const uint32_t max_delay_ms = std::min(intvl_ms, get_scheduled_recurrent_delay());
 
     // recurrent scheduled functions will be called from esp_delay()->esp_suspend()
-    esp_delay(grain_ms > 0 ?
-        std::min((timeout_ms - expired), grain_ms) :
-        (timeout_ms - expired));
+    esp_delay(std::min((timeout_ms - expired), max_delay_ms));
 
     return false; // expiration must be checked again
 }

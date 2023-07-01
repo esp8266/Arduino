@@ -39,10 +39,10 @@
 // scheduled function happen more often: every yield() (vs every loop()),
 // and time resolution is microsecond (vs millisecond). Details are below.
 
-// compute_scheduled_recurrent_grain() is used by delay() to give a chance to
+// get_scheduled_recurrent_delay() is used by delay() to give a chance to
 // all recurrent functions to run per their timing requirement.
 
-uint32_t compute_scheduled_recurrent_grain ();
+uint32_t get_scheduled_recurrent_delay();
 
 // scheduled functions called once:
 //

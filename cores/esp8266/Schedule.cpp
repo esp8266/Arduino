@@ -47,7 +47,7 @@ struct recurrent_fn_t
 
 static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
-static uint32_t rScheduleTarget = 0;
+static uint32_t rTarget;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -118,10 +118,13 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
     item->mFunc = fn;
     item->alarm = alarm;
-//    if (!rScheduleTarget || rScheduleTarget > item.callNow.remaining())
-//    {
-//        rScheduleTarget = item.callNow.remaining();
-//    }
+
+    // prevent new item overwriting an already expired rTarget.
+    const int32_t rRemaining = rTarget - millis();
+    if (!rFirst || (rRemaining > 0 && static_cast<uint32_t>(rRemaining) > item->callNow.remaining()))
+    {
+        rTarget = millis() + item->callNow.remaining();
+    }
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
@@ -138,9 +141,12 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     return true;
 }
 
-uint32_t compute_scheduled_recurrent_grain()
+uint32_t get_scheduled_recurrent_delay()
 {
-    return 0;
+    if (!rFirst) return ~static_cast<uint32_t>(0);
+    // handle already expired rTarget.
+    const int32_t rRemaining = rTarget - millis();
+    return (rRemaining > 0) ? static_cast<uint32_t>(rRemaining) : 0;
 }
 
 void run_scheduled_functions()
@@ -203,6 +209,7 @@ void run_scheduled_recurrent_functions()
         fence = true;
     }
 
+    rTarget = millis() + current->callNow.remaining();
     recurrent_fn_t* prev = nullptr;
     // prevent scheduling of new functions during this run
     auto stop = rLast;
@@ -241,6 +248,12 @@ void run_scheduled_recurrent_functions()
         {
             prev = current;
             current = current->mNext;
+            // prevent current item overwriting an already expired rTarget.
+            const int32_t rRemaining = rTarget - millis();
+            if (rRemaining > 0 && static_cast<uint32_t>(rRemaining) > current->callNow.remaining())
+            {
+                rTarget = millis() + current->callNow.remaining();
+            }
         }
 
         if (yieldNow)
