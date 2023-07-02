@@ -60,6 +60,13 @@ uint32_t get_scheduled_recurrent_delay_us();
 // * Run the lambda only once next time.
 // * A scheduled function can schedule a function.
 
+// get_scheduled_delay_us() is named for symmetry to get_scheduled_recurrent_delay_us,
+// despite the lack of specific delay times. Therefore it can return only one of two
+// values, viz. 0 in case of any pending scheduled functions, or a large delay time if
+// there is no function in the queue.
+
+uint32_t get_scheduled_delay_us();
+
 bool schedule_function (const std::function<void(void)>& fn);
 
 // Run all scheduled functions.

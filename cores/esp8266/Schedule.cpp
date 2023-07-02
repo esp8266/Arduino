@@ -149,6 +149,11 @@ uint32_t get_scheduled_recurrent_delay_us()
     return (remaining > 0) ? static_cast<uint32_t>(remaining) : 0;
 }
 
+uint32_t get_scheduled_delay_us()
+{
+    return sFirst ? 0 : ~static_cast<decltype(micros())>(0) >> 1;
+}
+
 void run_scheduled_functions()
 {
     // prevent scheduling of new functions during this run
