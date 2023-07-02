@@ -143,7 +143,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
 uint32_t get_scheduled_recurrent_delay_us()
 {
-    if (!rFirst) return ~static_cast<uint32_t>(0);
+    if (!rFirst) return ~static_cast<decltype(micros())>(0) >> 1;
     // handle already expired rTarget.
     const int32_t remaining = rTarget - micros();
     return (remaining > 0) ? static_cast<uint32_t>(remaining) : 0;
