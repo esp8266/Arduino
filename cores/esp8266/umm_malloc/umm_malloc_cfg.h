@@ -620,7 +620,10 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line);
 void  umm_poison_free_fl(void *ptr, const char *file, int line);
 #define POISON_CHECK_SET_POISON(p, s) get_poisoned(p, s)
 #define UMM_POISON_SKETCH_PTR(p) ((void*)((uintptr_t)p + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE))
-#define UMM_POISON_SKETCH_PTRSZ(s) (s - sizeof(UMM_POISONED_BLOCK_LEN_TYPE) - UMM_POISON_SIZE_BEFORE  - UMM_POISON_SIZE_AFTER)
+#define UMM_POISON_SKETCH_PTRSZ(p) (*(UMM_POISONED_BLOCK_LEN_TYPE *)p)
+#define UMM_POISON_MEMMOVE(t, p, s) memmove(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(p))
+#define UMM_POISON_MEMCPY(t, p, s) memcpy(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(p))
+
 #if defined(UMM_POISON_CHECK_LITE)
 /*
     * We can safely do individual poison checks at free and realloc and stay
@@ -641,12 +644,9 @@ void  umm_poison_free_fl(void *ptr, const char *file, int line);
 #define POISON_CHECK() 1
 #define POISON_CHECK_NEIGHBORS(c) do {} while (false)
 #define POISON_CHECK_SET_POISON(p, s) (p)
-#define UMM_POISON_SKETCH_PTR(p) (p)
-#define UMM_POISON_SKETCH_PTRSZ(s) (s)
+#define UMM_POISON_MEMMOVE(t, p, s) memmove((t), (p), (s))
+#define UMM_POISON_MEMCPY(t, p, s) memcpy((t), (p), (s))
 #endif
-
-#define UMM_POISON_MEMMOVE(t, p, s) memmove(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(s))
-#define UMM_POISON_MEMCPY(t, p, s) memcpy(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(s))
 
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 /*

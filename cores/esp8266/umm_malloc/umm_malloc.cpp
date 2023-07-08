@@ -928,7 +928,7 @@ void *umm_realloc(void *ptr, size_t size) {
 
     uint16_t c;
 
-    size_t curSize;
+    [[maybe_unused]] size_t curSize;
 
     UMM_CHECK_INITIALIZED();
 
@@ -1089,7 +1089,7 @@ void *umm_realloc(void *ptr, size_t size) {
         STATS__FREE_BLOCKS_UPDATE(-prevBlockSize);
         STATS__FREE_BLOCKS_ISR_MIN();
         blockSize += prevBlockSize;
-        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);  // Fix allocation so ISR poison check is good
+        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);  // Fix new allocation so poison check from an ISR passes.
         UMM_CRITICAL_SUSPEND(id_realloc);
         UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
@@ -1123,7 +1123,7 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks);
-            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
+            (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);
             UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
@@ -1204,7 +1204,7 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
-            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
+            (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);
             UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
@@ -1230,7 +1230,7 @@ void *umm_realloc(void *ptr, size_t size) {
         void *oldptr = ptr;
         if ((ptr = umm_malloc_core(_context, size))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
-            POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), size);
+            (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);
             UMM_POISON_MEMCPY(ptr, oldptr, curSize);
             UMM_CRITICAL_RESUME(id_realloc);
