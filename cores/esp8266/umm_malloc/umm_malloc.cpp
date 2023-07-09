@@ -1090,8 +1090,7 @@ void *umm_realloc(void *ptr, size_t size) {
         STATS__FREE_BLOCKS_ISR_MIN();
         blockSize += prevBlockSize;
         // Fix new allocation such that poison checks from an ISR pass.
-        size_t super_size = (blockSize * sizeof(umm_block)) - (sizeof(((umm_block *)0)->header));
-        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), super_size);
+        POISON_CHECK_SET_POISON_BLOCKS((void *)&UMM_DATA(c), blockSize);
         UMM_CRITICAL_SUSPEND(id_realloc);
         UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
@@ -1113,8 +1112,7 @@ void *umm_realloc(void *ptr, size_t size) {
         #else
         blockSize += (prevBlockSize + nextBlockSize);
         #endif
-        size_t super_size = (blockSize * sizeof(umm_block)) - (sizeof(((umm_block *)0)->header));
-        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), super_size);
+        POISON_CHECK_SET_POISON_BLOCKS((void *)&UMM_DATA(c), blockSize);
         UMM_CRITICAL_SUSPEND(id_realloc);
         UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
@@ -1190,8 +1188,7 @@ void *umm_realloc(void *ptr, size_t size) {
             #endif
         }
         // Fix new allocation such that poison checks from an ISR pass.
-        size_t super_size = (blockSize * sizeof(umm_block)) - (sizeof(((umm_block *)0)->header));
-        POISON_CHECK_SET_POISON((void *)&UMM_DATA(c), super_size);
+        POISON_CHECK_SET_POISON_BLOCKS((void *)&UMM_DATA(c), blockSize);
         UMM_CRITICAL_SUSPEND(id_realloc);
         UMM_POISON_MEMMOVE((void *)&UMM_DATA(c), ptr, curSize);
         ptr = (void *)&UMM_DATA(c);
