@@ -1682,6 +1682,17 @@ def sdk ():
 
 ################################################################
 
+def float_in_iram ():
+    return { 'iramfloat': collections.OrderedDict([
+                        ('.menu.iramfloat.no', 'in rom (default)'),
+                        ('.menu.iramfloat.no.build.iramfloat', '-DFP_IN_IROM'),
+                        ('.menu.iramfloat.yes', 'in iram (for ISRs)'),
+                        ('.menu.iramfloat.yes.build.iramfloat', '-DFP_IN_IRAM'),
+                    ])
+           }
+
+################################################################
+
 def all_boards ():
 
     if boardsgen or boardslocalgen:
@@ -1709,6 +1720,7 @@ def all_boards ():
     macros.update(led('led',    led_default, range(0,led_max+1)))
     macros.update(led('led216', 2,           { 16 }))
     macros.update(sdk())
+    macros.update(float_in_iram())
 
     if boardfilteropt or excludeboards:
         print('#')
@@ -1754,6 +1766,7 @@ def all_boards ():
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=NONOS SDK Version')
+    print('menu.iramfloat=Soft-float location')
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
@@ -1791,6 +1804,7 @@ def all_boards ():
             macrolist += speeds[default_speed]
 
         macrolist += [ 'autoflash' ]
+        macrolist += [ 'iramfloat' ]
 
         for block in macrolist:
             for optname in macros[block]:
