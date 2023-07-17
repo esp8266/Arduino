@@ -127,7 +127,31 @@ There are a number of options.
 - The last (``NoAssert - NDEBUG``) is even quieter than the first (some
   internal guards are skipped to save more flash).
 - The other ones may be used when asked by a maintainer or if you are a
-  developper trying to debug some issues.
+  developer trying to debug some issues.
+
+Debug Optimization
+~~~~~~~~~~~~~~~~~~
+
+Due to the limited resources on the device, our default compiler optimizations
+focus on creating the smallest code size (``.bin`` file). That is fine for
+release but not ideal for debugging.
+
+``Debug Optimization`` use to improve Exception Decoder results.
+
+- ``Lite`` impact on code size uses ``-fno-optimize-sibling-calls`` to alter
+  the ``-Os`` compiler option to place more caller addresses on the Stack.
+- ``Optimum`` offers better quality stack content for the Exception Decoder at
+  the expense of a larger code size. It uses the ``-Og`` compiler option, which
+  turns off optimizations that can make debugging difficult while keeping
+  others.
+- ``None`` no changes for debugging continue using ``-Os``.
+
+Take note some sketches may start working after changing the optimization. Or
+fail less often. And it is also possible (not likely) that source code that
+was working with ``-Os`` may break with ``-Og``.
+
+For more topic depth, read `Improving Exception Decoder Results <faq/a02-my-esp-crashes.rst#improving-exception-decoder-results>`__
+
 
 lwIP variant
 ~~~~~~~~~~~~

@@ -281,14 +281,13 @@ void ESP8266WebServerTemplate<ServerType>::serveStatic(const char* uri, FS& fs, 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::handleClient() {
   if (_currentStatus == HC_NONE) {
-    ClientType client = _server.accept();
-    if (!client) {
+    _currentClient = _server.accept();
+    if (!_currentClient) {
       return;
     }
 
     DBGWS("New client\n");
 
-    _currentClient = client;
     _currentStatus = HC_WAIT_READ;
     _statusChange = millis();
   }

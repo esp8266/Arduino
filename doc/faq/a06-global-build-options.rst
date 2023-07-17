@@ -181,10 +181,10 @@ their builds.
 
 There are two solutions to this issue:
 
-1. Turn off the “Aggressively Cache Compiled core” feature, by setting
+1. Do nothing, and rely on aggressive cache workaround built into the
+   script.
+2. Turn off the “Aggressively Cache Compiled core” feature, by setting
    ``compiler.cache_core=false``.
-2. Rely on the not ideal fail-safe, aggressive cache workaround built
-   into the script.
 
 Using “compiler.cache_core=false”
 ---------------------------------
@@ -253,14 +253,10 @@ problem would be cleared after a reboot. Or you can manually cleanup the
 
 **Arduino command-line option overrides**
 
-The script needs to know the working value of ``compiler.cache_core``
-that the Arduino IDE uses when building. This script can learn the state
-through documented locations; however, the Arduino IDE has two
-command-line options that can alter the results the Arduino IDE uses
-internally. And, the Arduino IDE does not provide a means for a script
-to learn the override value.
+If you are building with ``compiler.cache_core=true`` no action is
+needed. If ``false`` the script would benefit by knowing that.
 
-These two command-line options are the problem:
+When using either of these two command-line options:
 
 ::
 

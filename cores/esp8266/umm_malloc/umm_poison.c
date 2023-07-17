@@ -163,8 +163,11 @@ void *umm_poison_malloc(size_t size) {
     add_poison_size(&size);
 
     ret = umm_malloc(size);
-
-    ret = get_poisoned(ret, size);
+    /*
+      "get_poisoned" is now called from umm_malloc while still in a critical
+      section. Before umm_malloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
@@ -177,16 +180,15 @@ void *umm_poison_calloc(size_t num, size_t item_size) {
     // Use saturated multiply.
     // Rely on umm_malloc to supply the fail response as needed.
     size_t size = umm_umul_sat(num, item_size);
+    size_t request_sz = size;
 
     add_poison_size(&size);
 
     ret = umm_malloc(size);
 
     if (NULL != ret) {
-        memset(ret, 0x00, size);
+        memset(ret, 0x00, request_sz);
     }
-
-    ret = get_poisoned(ret, size);
 
     return ret;
 }
@@ -200,8 +202,11 @@ void *umm_poison_realloc(void *ptr, size_t size) {
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
-
-    ret = get_poisoned(ret, size);
+    /*
+      "get_poisoned" is now called from umm_realloc while still in a critical
+      section. Before umm_realloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
 
     return ret;
 }
