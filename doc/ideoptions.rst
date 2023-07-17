@@ -263,6 +263,12 @@ See our issue tracker in regards to default version selection.
 
 Notice that 3.x.x is provided **as-is** and remains **experimental**.
 
+Soft-float location
+~~~~~~~~~~~~~~~~~~~
+
+- ``in rom``: This provides more space in IRAM but disallow using floating operations inside ISRs. This is the default for some years.
+- ``in iram``: Floats can be used in ISRs, cost is ~1KB IRAM.
+
 SSL Support
 ~~~~~~~~~~~
 
