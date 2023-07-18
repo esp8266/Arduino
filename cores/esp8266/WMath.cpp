@@ -81,10 +81,6 @@ long map(long x, long in_min, long in_max, long out_min, long out_max) {
 
     long delta = x - in_min;
 
-    if (out_length == in_length) {
-        return out_min + delta;
-    }
-
     if ((out_length < 0) && (in_length < 0)) {
         std::swap(in_min, in_max);
         std::swap(out_min, out_max);
@@ -100,6 +96,10 @@ long map(long x, long in_min, long in_max, long out_min, long out_max) {
     delta      = x - in_min;
     in_length  = in_max - in_min;
     out_length = out_max - out_min;
+
+    if (out_length == in_length) {
+        return out_min + delta;
+    }
 
     // We now know in_min < in_max and out_min < out_max
     // Make sure x is within range of in_min ... in_max
