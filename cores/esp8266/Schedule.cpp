@@ -47,7 +47,8 @@ struct recurrent_fn_t
 
 static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
-static uint32_t rTarget;
+// The target time for scheduling the next timed recurrent function 
+static decltype(micros()) rTarget;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -122,10 +123,12 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
     // prevent new item overwriting an already expired rTarget.
-    const int32_t remaining = rTarget - micros();
-    if (!rFirst || (remaining > 0 && static_cast<uint32_t>(remaining) > item->callNow.remaining()))
+    const auto now = micros();
+    const auto itemRemaining = item->callNow.remaining();
+    const int32_t remaining = rTarget - now;
+    if (!rFirst || (remaining > 0 && static_cast<uint32_t>(remaining) > itemRemaining))
     {
-        rTarget = micros() + item->callNow.remaining();
+        rTarget = now + itemRemaining;
     }
 
     if (rLast)
@@ -218,13 +221,9 @@ void run_scheduled_recurrent_functions()
     recurrent_fn_t* prev = nullptr;
     bool done;
 
-    {
-        esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-        // prevent scheduling of new functions during this run
-        stop = rLast;
-        rTarget = micros() + (~static_cast<decltype(micros())>(0) >> 1);
-    }
+    // prevent scheduling of new functions during this run
+    stop = rLast;
+    rTarget = micros() + (~static_cast<decltype(micros())>(0) >> 1);
 
     do
     {
@@ -260,11 +259,14 @@ void run_scheduled_recurrent_functions()
             esp8266::InterruptLock lockAllInterruptsInThisScope;
 
             // prevent current item overwriting an already expired rTarget.
-            const int32_t remaining = rTarget - micros();
-            if (remaining > 0 && static_cast<uint32_t>(remaining) > current->callNow.remaining())
+            const auto now = micros();
+            const auto currentRemaining = current->callNow.remaining();
+            const int32_t remaining = rTarget - now;
+            if (remaining > 0 && static_cast<uint32_t>(remaining) > currentRemaining)
             {
-                rTarget = micros() + current->callNow.remaining();
+                rTarget = now + currentRemaining;
             }
+
             prev = current;
             current = current->mNext;
         }
