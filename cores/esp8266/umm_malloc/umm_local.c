@@ -103,7 +103,6 @@ static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, 
             UMM_CRITICAL_ENTRY(id_poison);
             if (!check_poison_block(&UMM_BLOCK(c))) {
                 DBGLOG_ERROR("Allocation address %p\n", vptr);
-                size_t size = *(size_t *)ptr;
                 poison = false;
             } else
             if (!check_poison_neighbors(_context, c)) {
