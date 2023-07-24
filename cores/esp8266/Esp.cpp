@@ -533,9 +533,11 @@ bool EspClass::eraseConfig(void) {
 }
 
 bool EspClass::eraseConfigAndReset(void) {
+    // Before calling, ensure the WiFi state is equivalent to
+    // "WiFi.mode(WIFI_OFF)." This will reduce the likelihood of the SDK
+    // performing WiFi data writes to Flash between erasing and resetting.
     bool reset = eraseConfig();
     if (reset) {
-        // Must be called in WiFi.mode(WIFI_OFF) state.
         hardware_reset();
     }
     return reset;

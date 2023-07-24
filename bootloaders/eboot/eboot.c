@@ -32,8 +32,8 @@
   ets_wdt_* APIs, so our choices are not too critical.
   The SDK will set up the WDT as it wants it.
 
-  A rationale for keeping the ets_wdt_enable() line. If the system is not stable
-  during a "soft restart." The HWDT would provide a recovery reboot.
+  A rationale for keeping the "ets_wdt_enable()" line, if the system is not
+  stable during a "soft restart," the HWDT would provide a recovery reboot.
 */
 extern void ets_wdt_enable(uint32_t mode, uint32_t arg1, uint32_t arg2);
 /*
@@ -44,10 +44,10 @@ extern void ets_wdt_enable(uint32_t mode, uint32_t arg1, uint32_t arg2);
   For current mode 1, calls ets_timer_disarm, then return the current mode.
   For current mode 2, calls ets_isr_mask, then return the current mode.
 
-  I always see a value of 0xFFFFFFFF.
+  I always see a return value of 0xFFFFFFFF.
 
-  The value would normally be used with ets_wdt_restore; however, that is not an
-  option since a valid prior call to ets_wdt_enable() may not have been done.
+  The return value would normally be used with ets_wdt_restore; however, that is
+  not an option since a valid prior call to ets_wdt_enable() may not have been done.
 */
 extern uint32_t ets_wdt_disable(void);
 
