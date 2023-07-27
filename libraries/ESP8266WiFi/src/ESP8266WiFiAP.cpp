@@ -323,6 +323,17 @@ IPAddress ESP8266WiFiAPClass::softAPIP() {
     return IPAddress(ip.ip.addr);
 }
 
+/**
+ * Get the softAP broadcast ip address.
+ * @return IPAddress softAP broadcast IP
+ */
+IPAddress ESP8266WiFiAPClass::softAPbroadcastIP()
+{
+    struct ip_info ip;
+    wifi_get_ip_info(SOFTAP_IF, &ip);
+    return IPAddress(ip.ip.addr | ~(ip.netmask.addr));
+}
+
 
 /**
  * Get the softAP interface MAC address.
