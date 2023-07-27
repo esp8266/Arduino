@@ -21,7 +21,6 @@
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
-#include "coredecls.h"
 
 typedef std::function<void(void)> mSchedFuncT;
 struct scheduled_fn_t
@@ -49,6 +48,8 @@ static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
 // The target time for scheduling the next timed recurrent function 
 static decltype(micros()) rTarget;
+
+constexpr decltype(micros()) HALF_MAX_MICROS = ~static_cast<decltype(micros())>(0) >> 1;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -106,7 +107,7 @@ bool schedule_function(const std::function<void(void)>& fn)
 
 IRAM_ATTR // (not only) called from ISR
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm)
+    decltype(micros()) repeat_us, const std::function<bool(void)>& alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -126,7 +127,7 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     const auto now = micros();
     const auto itemRemaining = item->callNow.remaining();
     const int32_t remaining = rTarget - now;
-    if (!rFirst || (remaining > 0 && static_cast<uint32_t>(remaining) > itemRemaining))
+    if (!rFirst || (remaining > 0 && static_cast<decltype(micros())>(remaining) > itemRemaining))
     {
         rTarget = now + itemRemaining;
     }
@@ -144,17 +145,17 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     return true;
 }
 
-uint32_t get_scheduled_recurrent_delay_us()
+decltype(micros()) get_scheduled_recurrent_delay_us()
 {
-    if (!rFirst) return ~static_cast<decltype(micros())>(0) >> 1;
+    if (!rFirst) return HALF_MAX_MICROS;
     // handle already expired rTarget.
     const int32_t remaining = rTarget - micros();
-    return (remaining > 0) ? static_cast<uint32_t>(remaining) : 0;
+    return (remaining > 0) ? static_cast<decltype(micros())>(remaining) : 0;
 }
 
-uint32_t get_scheduled_delay_us()
+decltype(micros()) get_scheduled_delay_us()
 {
-    return sFirst ? 0 : ~static_cast<decltype(micros())>(0) >> 1;
+    return sFirst ? 0 : HALF_MAX_MICROS;
 }
 
 void run_scheduled_functions()
@@ -223,7 +224,7 @@ void run_scheduled_recurrent_functions()
 
     // prevent scheduling of new functions during this run
     stop = rLast;
-    rTarget = micros() + (~static_cast<decltype(micros())>(0) >> 1);
+    rTarget = micros() + HALF_MAX_MICROS;
 
     do
     {
@@ -262,7 +263,7 @@ void run_scheduled_recurrent_functions()
             const auto now = micros();
             const auto currentRemaining = current->callNow.remaining();
             const int32_t remaining = rTarget - now;
-            if (remaining > 0 && static_cast<uint32_t>(remaining) > currentRemaining)
+            if (remaining > 0 && static_cast<decltype(micros())>(remaining) > currentRemaining)
             {
                 rTarget = now + currentRemaining;
             }

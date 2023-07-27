@@ -22,6 +22,8 @@
 #include <functional>
 #include <stdint.h>
 
+#include "coredecls.h"
+
 #define SCHEDULED_FN_MAX_COUNT 32
 
 // The purpose of scheduled functions is to trigger, from SYS stack (like in
@@ -42,7 +44,7 @@
 // get_scheduled_recurrent_delay_us() is used by delay() to give a chance to
 // all recurrent functions to run per their timing requirement.
 
-uint32_t get_scheduled_recurrent_delay_us();
+decltype(micros()) get_scheduled_recurrent_delay_us();
 
 // scheduled functions called once:
 //
@@ -65,7 +67,7 @@ uint32_t get_scheduled_recurrent_delay_us();
 // values, viz. 0 in case of any pending scheduled functions, or a large delay time if
 // there is no function in the queue.
 
-uint32_t get_scheduled_delay_us();
+decltype(micros()) get_scheduled_delay_us();
 
 bool schedule_function (const std::function<void(void)>& fn);
 
@@ -93,7 +95,7 @@ void run_scheduled_functions();
 //   any remaining delay from repeat_us is disregarded, and fn is executed.
 
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
+    decltype(micros()) repeat_us, const std::function<bool(void)>& alarm = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
