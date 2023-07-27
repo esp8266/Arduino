@@ -1684,9 +1684,9 @@ def sdk ():
 
 def float_in_iram ():
     return { 'iramfloat': collections.OrderedDict([
-                        ('.menu.iramfloat.no', 'in rom (default)'),
+                        ('.menu.iramfloat.no', 'not allowed in ISR (more IRAM, default)'),
                         ('.menu.iramfloat.no.build.iramfloat', '-DFP_IN_IROM'),
-                        ('.menu.iramfloat.yes', 'in iram (for ISRs)'),
+                        ('.menu.iramfloat.yes', 'allowed in ISR (less IRAM)'),
                         ('.menu.iramfloat.yes.build.iramfloat', '-DFP_IN_IRAM'),
                     ])
            }
@@ -1766,7 +1766,7 @@ def all_boards ():
     print('menu.stacksmash=Stack Protection')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=NONOS SDK Version')
-    print('menu.iramfloat=Soft-float location')
+    print('menu.iramfloat=Floating Point operations')
     print('menu.ssl=SSL Support')
     print('menu.mmu=MMU')
     print('menu.non32xfer=Non-32-Bit Access')
