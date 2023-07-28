@@ -85,7 +85,7 @@
 // limitations under the License.
 
 extern "C" {
-  [[noreturn]] void hardware_reset(void) {
+  void hardware_reset(void) {
     volatile uint32_t* const rtc_mem = (volatile uint32_t *)0x60001100u;
 
     // Block NMI or Software WDT from disturbing out restart reason
