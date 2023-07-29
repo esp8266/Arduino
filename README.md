@@ -124,6 +124,7 @@ ESP8266 core files are licensed under LGPL.
 [uzlib](https://github.com/pfalcon/uzlib) library written and (c) 2014-2018 Paul Sokolovsky, licensed under the ZLib license (https://www.zlib.net/zlib_license.html). uzlib is based on: tinf library by Joergen Ibsen (Deflate decompression); Deflate Static Huffman tree routines by Simon Tatham; LZ77 compressor by Paul Sokolovsky; with library integrated and maintained by Paul Sokolovsky.
 
 ### Other useful links ###
+Hopefully you enjoy using this coding
 
 [Toolchain repo](https://github.com/earlephilhower/esp-quick-toolchain)
 
