@@ -49,6 +49,16 @@ static recurrent_fn_t* rLast = nullptr;
 // The target time for scheduling the next timed recurrent function 
 static decltype(micros()) rTarget;
 
+// As 32 bit unsigned integer, micros() rolls over every 71.6 minutes.
+// For unambiguous earlier/later order between two timestamps,
+// despite roll over, there is a limit on the maximum duration
+// that can be requested, if full expiration must be observable:
+// later - earlier >= 0 for both later >= earlier or (rolled over) later <= earlier
+// Also, expiration should remain observable for a useful duration of time:
+// now - (start + period) >= 0 for now - start >= 0 despite (start + period) >= now
+// A well-balanced solution, not breaking on two's compliment signed arithmetic,
+// is limiting durations to the maximum signed value of the same word size
+// as the original unsigned word.
 constexpr decltype(micros()) HALF_MAX_MICROS = ~static_cast<decltype(micros())>(0) >> 1;
 
 // Returns a pointer to an unused sched_fn_t,
