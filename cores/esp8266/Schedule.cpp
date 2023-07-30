@@ -126,8 +126,8 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     // prevent new item overwriting an already expired rTarget.
     const auto now = micros();
     const auto itemRemaining = item->callNow.remaining();
-    const int32_t remaining = rTarget - now;
-    if (!rFirst || (remaining > 0 && static_cast<decltype(micros())>(remaining) > itemRemaining))
+    const auto remaining = rTarget - now;
+    if (!rFirst || (remaining <= HALF_MAX_MICROS && remaining > itemRemaining))
     {
         rTarget = now + itemRemaining;
     }
@@ -149,8 +149,9 @@ decltype(micros()) get_scheduled_recurrent_delay_us()
 {
     if (!rFirst) return HALF_MAX_MICROS;
     // handle already expired rTarget.
-    const int32_t remaining = rTarget - micros();
-    return (remaining > 0) ? static_cast<decltype(micros())>(remaining) : 0;
+    const auto now = micros();
+    const auto remaining = rTarget - now;
+    return (remaining <= HALF_MAX_MICROS) ? remaining : 0;
 }
 
 decltype(micros()) get_scheduled_delay_us()
@@ -262,8 +263,8 @@ void run_scheduled_recurrent_functions()
             // prevent current item overwriting an already expired rTarget.
             const auto now = micros();
             const auto currentRemaining = current->callNow.remaining();
-            const int32_t remaining = rTarget - now;
-            if (remaining > 0 && static_cast<decltype(micros())>(remaining) > currentRemaining)
+            const auto remaining = rTarget - now;
+            if (remaining <= HALF_MAX_MICROS && remaining > currentRemaining)
             {
                 rTarget = now + currentRemaining;
             }
