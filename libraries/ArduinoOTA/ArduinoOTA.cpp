@@ -170,6 +170,7 @@ String ArduinoOTAClass::readStringUntil(char end){
 void ArduinoOTAClass::_onRx(){
   if(!_udp_ota->next()) return;
   IPAddress ota_ip;
+  IPAddress ota_ip2;
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
@@ -183,8 +184,33 @@ void ArduinoOTAClass::_onRx(){
     _udp_ota->read();
     _md5 = readStringUntil('\n');
     _md5.trim();
+#ifdef OTA_DEBUG
+    OTA_DEBUG.printf("Read md5 %s\n", _md5.c_str());
+#endif  
     if(_md5.length() != 32)
       return;
+
+    // Use provided IP address for TCP communication if provided and valid
+    if(_udp_ota->peek() > 0){
+      String ipstring = readStringUntil('\n');
+      ipstring.trim();
+      ota_ip2.fromString(ipstring);
+    }
+
+    if(ota_ip2.isSet())
+    {
+#ifdef OTA_DEBUG
+      OTA_DEBUG.printf("Using TCP IP from message: %s\n", _ota_ip.toString().c_str());
+#endif      
+      _ota_ip2 = ota_ip2;
+    }
+    else
+    {
+#ifdef OTA_DEBUG
+      OTA_DEBUG.printf("Using TCP IP from UDP socket: %s\n", _ota_ip.toString().c_str());
+#endif
+      _ota_ip2 = _ota_ip;
+    }
 
     ota_ip = _ota_ip;
 
@@ -274,9 +300,9 @@ void ArduinoOTAClass::_runUpdate() {
   }
 
   WiFiClient client;
-  if (!client.connect(_ota_ip, _ota_port)) {
+  if (!client.connect(_ota_ip2, _ota_port)) {
 #ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Connect Failed\n");
+    OTA_DEBUG.printf("Connect Failed to %s:%d\n", _ota_ip2.toString().c_str(), _ota_port);
 #endif
     _udp_ota->listen(IP_ADDR_ANY, _port);
     if (_error_callback) {
