@@ -44,16 +44,16 @@
 
 /// note we use HTTP client errors too so we start at 100
 enum HTTPUpdateError {
-    HTTP_UE_TOO_LESS_SPACE            = (-100),
-    HTTP_UE_SERVER_NOT_REPORT_SIZE    = (-101),
-    HTTP_UE_SERVER_FILE_NOT_FOUND     = (-102),
-    HTTP_UE_SERVER_FORBIDDEN          = (-103),
-    HTTP_UE_SERVER_WRONG_HTTP_CODE    = (-104),
-    HTTP_UE_SERVER_FAULTY_MD5         = (-105),
-    HTTP_UE_BIN_VERIFY_HEADER_FAILED  = (-106),
-    HTTP_UE_BIN_FOR_WRONG_FLASH       = (-107),
-    HTTP_UE_SERVER_UNAUTHORIZED       = (-108),
-    HTTP_UE_SERVER_NOT_REPORT_VERSION = (-109), // server did not respond with a firmware version
+    HTTP_UE_SERVER_NOT_REPORT_VERSION    = -109, // server did not respond with a firmware version
+    HTTP_UE_SERVER_UNAUTHORIZED,        // -108
+    HTTP_UE_BIN_FOR_WRONG_FLASH,        // -107
+    HTTP_UE_BIN_VERIFY_HEADER_FAILED,   // -106
+    HTTP_UE_SERVER_FAULTY_MD5,          // -105
+    HTTP_UE_SERVER_WRONG_HTTP_CODE,     // -104
+    HTTP_UE_SERVER_FORBIDDEN,           // -103
+    HTTP_UE_SERVER_FILE_NOT_FOUND,      // -102
+    HTTP_UE_SERVER_NOT_REPORT_SIZE,     // -101
+    HTTP_UE_TOO_LESS_SPACE              // -100
 };
 
 enum HTTPUpdateResult {
