@@ -511,40 +511,39 @@ HTTPUpdateResult ESP8266HTTPUpdate::getAvailableVersion(WiFiClient& client, cons
     }
 
     switch (code) {
-        case HTTP_CODE_OK:  ///< OK (check for version)
-            if (http.hasHeader("x-version")) {
-                available_version = http.header("x-version");
-                ret = HTTP_UPDATE_OK;
-                DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", current_version.c_str());
-                DEBUG_HTTP_UPDATE("[httpUpdate]  - server  version: %s\n", available_version.c_str());
-            } else {
-                _setLastError(HTTP_UE_SERVER_NOT_REPORT_VERSION);
-                ret = HTTP_UPDATE_FAILED;
-                DEBUG_HTTP_UPDATE("[httpUpdate] Server did not respond with a firmware version\n");
-            }
-
-            if (http.hasHeader("x-MD5")) {
-                DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
-                DEBUG_HTTP_UPDATE("[httpUpdate]  - server  Sketch MD5: %s\n", http.header("x-MD5").c_str());
-            }
-            break;
-        case HTTP_CODE_NOT_FOUND:
-            _setLastError(HTTP_UE_SERVER_FILE_NOT_FOUND);
+    case HTTP_CODE_OK:  ///< OK (check for version)
+        if (http.hasHeader("x-version")) {
+            available_version = http.header("x-version");
+            ret = HTTP_UPDATE_OK;
+            DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", current_version.c_str());
+            DEBUG_HTTP_UPDATE("[httpUpdate]  - server  version: %s\n", available_version.c_str());
+        } else {
+            _setLastError(HTTP_UE_SERVER_NOT_REPORT_VERSION);
             ret = HTTP_UPDATE_FAILED;
-            break;
-        case HTTP_CODE_FORBIDDEN:
-            _setLastError(HTTP_UE_SERVER_FORBIDDEN);
-            ret = HTTP_UPDATE_FAILED;
-            break;
-        case HTTP_CODE_UNAUTHORIZED:
-            _setLastError(HTTP_UE_SERVER_UNAUTHORIZED);
-            ret = HTTP_UPDATE_FAILED;
-            break;
-        default:
-            _setLastError(HTTP_UE_SERVER_WRONG_HTTP_CODE);
-            ret = HTTP_UPDATE_FAILED;
-            DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
-            break;
+            DEBUG_HTTP_UPDATE("[httpUpdate] Server did not respond with a firmware version\n");
+        }
+        if (http.hasHeader("x-MD5")) {
+            DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
+            DEBUG_HTTP_UPDATE("[httpUpdate]  - server  Sketch MD5: %s\n", http.header("x-MD5").c_str());
+        }
+        break;
+    case HTTP_CODE_NOT_FOUND:
+        _setLastError(HTTP_UE_SERVER_FILE_NOT_FOUND);
+        ret = HTTP_UPDATE_FAILED;
+        break;
+    case HTTP_CODE_FORBIDDEN:
+        _setLastError(HTTP_UE_SERVER_FORBIDDEN);
+        ret = HTTP_UPDATE_FAILED;
+        break;
+    case HTTP_CODE_UNAUTHORIZED:
+        _setLastError(HTTP_UE_SERVER_UNAUTHORIZED);
+        ret = HTTP_UPDATE_FAILED;
+        break;
+    default:
+        _setLastError(HTTP_UE_SERVER_WRONG_HTTP_CODE);
+        ret = HTTP_UPDATE_FAILED;
+        DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
+        break;
     }
 
     http.end();
