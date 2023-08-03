@@ -235,6 +235,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate] ESP8266 info:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - free Space: %d\n", ESP.getFreeSketchSpace());
     DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch Size: %d\n", ESP.getSketchSize());
+    DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
 
     if(currentVersion && currentVersion[0] != 0x00) {
         DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", currentVersion.c_str() );
@@ -438,6 +439,116 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, const String& md5, 
     }
 
     return true;
+}
+
+/**
+ * @brief  Get avialable firmware version from update server
+ * @author Holger Mueller
+ * @date   2023-08-03
+ * 
+ * @param  client WiFiClient to use (see HTTPClient::begin)
+ * @param  host Update host name or IP (see HTTPClient::begin)
+ * @param  port Port on host (see HTTPClient::begin)
+ * @param  uri Update URI on server (see HTTPClient::begin)
+ * @param  current_version Current firmware version
+ * @param  available_version Firmware version available on update server
+ * @return ESP8266HTTPUpdate::HTTPUpdateResult, HTTP_UPDATE_OK in case of success
+ */
+HTTPUpdateResult ESP8266HTTPUpdate::getAvailableVersion(WiFiClient& client, const String& host, uint16_t port, const String& uri, const String& current_version, String& available_version) {
+    HTTPUpdateResult ret = HTTP_UPDATE_FAILED;
+    HTTPClient http;
+    http.begin(client, host, port, uri);
+
+    // use HTTP/1.0 for update since the update handler not support any transfer Encoding
+    http.useHTTP10(true);
+    http.setTimeout(_httpClientTimeout);
+    http.setFollowRedirects(_followRedirects);
+    http.setUserAgent(F("ESP8266-http-Update"));
+    http.addHeader(F("x-ESP8266-Chip-ID"), String(ESP.getChipId()));
+    http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
+    http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
+    http.addHeader(F("x-ESP8266-free-space"), String(ESP.getFreeSketchSpace()));
+    http.addHeader(F("x-ESP8266-sketch-size"), String(ESP.getSketchSize()));
+    http.addHeader(F("x-ESP8266-sketch-md5"), String(ESP.getSketchMD5()));
+    http.addHeader(F("x-ESP8266-chip-size"), String(ESP.getFlashChipRealSize()));
+    http.addHeader(F("x-ESP8266-sdk-version"), ESP.getSdkVersion());
+
+    http.addHeader(F("x-ESP8266-mode"), F("version"));
+
+    if (current_version && current_version[0] != 0x00) {
+        http.addHeader(F("x-ESP8266-version"), current_version);
+    }
+
+    if (!_user.isEmpty() && !_password.isEmpty()) {
+        http.setAuthorization(_user.c_str(), _password.c_str());
+    }
+
+    if (!_auth.isEmpty()) {
+        http.setAuthorization(_auth.c_str());
+    }
+
+    const char* headerkeys[] = {"x-MD5", "x-version"};
+    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
+
+    // track these headers
+    http.collectHeaders(headerkeys, headerkeyssize);
+
+    int code = http.GET();
+
+    if (code <= 0) {
+        DEBUG_HTTP_UPDATE("[httpUpdate] HTTP error: %s\n", http.errorToString(code).c_str());
+        _setLastError(code);
+        http.end();
+        return HTTP_UPDATE_FAILED;
+    }
+
+    DEBUG_HTTP_UPDATE("[httpUpdate] Header read fin.\n");
+    DEBUG_HTTP_UPDATE("[httpUpdate] Server header:\n");
+    DEBUG_HTTP_UPDATE("[httpUpdate]  - code: %d\n", code);
+    DEBUG_HTTP_UPDATE("[httpUpdate]  - len: %d\n", http.getSize());
+    if (code != HTTP_CODE_OK) {
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - payload: %s\n", http.getString().c_str());
+    }
+
+    switch (code) {
+        case HTTP_CODE_OK:  ///< OK (check for version)
+            if (http.hasHeader("x-version")) {
+                available_version = http.header("x-version");
+                ret = HTTP_UPDATE_OK;
+                DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", current_version.c_str());
+                DEBUG_HTTP_UPDATE("[httpUpdate]  - server  version: %s\n", available_version.c_str());
+            } else {
+                _setLastError(HTTP_UE_SERVER_NOT_REPORT_VERSION);
+                ret = HTTP_UPDATE_FAILED;
+                DEBUG_HTTP_UPDATE("[httpUpdate] Server did not respond with a firmware version\n");
+            }
+
+            if (http.hasHeader("x-MD5")) {
+                DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
+                DEBUG_HTTP_UPDATE("[httpUpdate]  - server  Sketch MD5: %s\n", http.header("x-MD5").c_str());
+            }
+            break;
+        case HTTP_CODE_NOT_FOUND:
+            _setLastError(HTTP_UE_SERVER_FILE_NOT_FOUND);
+            ret = HTTP_UPDATE_FAILED;
+            break;
+        case HTTP_CODE_FORBIDDEN:
+            _setLastError(HTTP_UE_SERVER_FORBIDDEN);
+            ret = HTTP_UPDATE_FAILED;
+            break;
+        case HTTP_CODE_UNAUTHORIZED:
+            _setLastError(HTTP_UE_SERVER_UNAUTHORIZED);
+            ret = HTTP_UPDATE_FAILED;
+            break;
+        default:
+            _setLastError(HTTP_UE_SERVER_WRONG_HTTP_CODE);
+            ret = HTTP_UPDATE_FAILED;
+            DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
+            break;
+    }
+
+    http.end();
+    return ret;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)
