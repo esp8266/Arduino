@@ -166,6 +166,11 @@ extern "C" void __esp_delay(unsigned long ms) {
 extern "C" void esp_delay(unsigned long ms) __attribute__((weak, alias("__esp_delay")));
 
 bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uint32_t intvl_ms) {
+    if (!timeout_ms) {
+        esp_yield();
+        return true;
+    }
+
     uint32_t expired = millis() - start_ms;
     if (expired >= timeout_ms) {
         return true; // expired
