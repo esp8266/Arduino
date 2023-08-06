@@ -207,6 +207,16 @@ public:
     sendContent(emptyString);
   }
 
+  /**
+   * @brief  Redirect to another URL, e.g.
+   * webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * @param  url URL to redirect to
+   */
+   void redirect(const String& url) {
+    sendHeader(F("Location"), url, true);
+    send(302, F("text/html"), "");  // send 302: "Found"
+  }
+
   // Whether other requests should be accepted from the client on the
   // same socket after a response is sent.
   // This will automatically configure the "Connection" header of the response.
