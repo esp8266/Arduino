@@ -32,7 +32,6 @@ class UdpContext;
 class WiFiUDP : public UDP, public SList<WiFiUDP> {
 private:
   UdpContext* _ctx;
-  uint8_t _beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
 
 public:
   WiFiUDP();  // Constructor
@@ -49,7 +48,8 @@ public:
   void stop() override;
   // join a multicast group and listen on the given port
   virtual uint8_t beginMulticast(IPAddress interfaceAddr, uint16_t port);
-  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port) __attribute__((deprecated));
+  // join a multicast group and listen on the given port, using a specific interface address
+  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
 
   // Sending UDP packets
   
