@@ -408,10 +408,7 @@ extern "C" void __disableWiFiAtBootTime (void)
 {
     // Starting from arduino core v3: wifi is disabled at boot time
     // WiFi.begin() or WiFi.softAP() will wake WiFi up
-    wifi_set_opmode_current(0/*WIFI_OFF*/);
-    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-    wifi_fpm_open();
-    wifi_fpm_do_sleep(0xFFFFFFF);
+    ESP.forcedModemSleep();
 }
 
 #if FLASH_MAP_SUPPORT

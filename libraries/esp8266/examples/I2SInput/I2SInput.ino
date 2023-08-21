@@ -27,12 +27,10 @@
    course be sure to wire up VCC(3.3V) and GND.
 */
 
-#include <ESP8266WiFi.h>
 #include <I2S.h>
 
 void setup() {
   Serial.begin(115200);
-  WiFi.forceSleepBegin();
   delay(500);
 
   i2s_rxtx_begin(true, false);  // Enable I2S RX

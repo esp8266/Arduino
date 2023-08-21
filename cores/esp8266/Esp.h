@@ -57,7 +57,6 @@ enum RFMode {
     RF_DISABLED = 4 // disable RF after deep-sleep wake up, just like modem sleep, there will be the smallest current.
 };
 
-#define RF_MODE(mode) int __get_rf_mode() { return mode; }
 #define RF_PRE_INIT() void __run_user_rf_pre_init()
 
 // compatibility definitions
@@ -94,9 +93,34 @@ class EspClass {
         static void wdtDisable();
         static void wdtFeed();
 
-        static void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
-        static void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        static void deepSleep(uint64_t time_us);
+        static void deepSleepInstant(uint64_t time_us);
         static uint64_t deepSleepMax();
+
+        static bool forcedModemSleep(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before forcedModemSleep,
+        ///  it would have to be restored explicitly.
+        static void forcedModemSleepOff();
+
+        static bool forcedLightSleepBegin(uint32_t duration_us = 0, void (*wakeupCb)() = nullptr);
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before forcedLightSleepBegin,
+        ///  it would have to be restored explicitly.
+        static void forcedLightSleepEnd(bool cancel = false);
+
+        static void autoModemSleep();
+        static void autoLightSleep();
+        /// The prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before auto{Modem,Light}Sleep,
+        ///  it would have to be restored explicitly.
+        static void autoSleepOff();
+
+        static void neverSleep();
+        /// Any prior sleep type is restored, but only as automatic.
+        /// If any forced sleep mode was effective before neverSleep,
+        ///  it would have to be restored explicitly.
+        static void neverSleepOff();
 
         static bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         static bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
@@ -268,5 +292,35 @@ class EspClass {
 };
 
 extern EspClass ESP;
+
+/// RAII helper token class for forcedLightSleepBegin()/End().
+/// Cast to bool to check that forced light sleep can commence.
+/// The forced light sleep is entered when the token goes out of scope.
+/// Call cancel() to prevent sleeping.
+class ESPForcedLightSleepToken {
+private:
+    ESPForcedLightSleepToken() = delete;
+    ESPForcedLightSleepToken(const ESPForcedLightSleepToken&) = delete;
+    ESPForcedLightSleepToken& operator=(const ESPForcedLightSleepToken&) = delete;
+
+    bool isArmed = false;
+
+public:
+    ESPForcedLightSleepToken(uint32_t duration_us, void (*wakeupCb)()) {
+        isArmed = ESP.forcedLightSleepBegin(10 * 1000 * 1000, wakeupCb);
+    }
+    ~ESPForcedLightSleepToken() {
+        if (isArmed) ESP.forcedLightSleepEnd(false);
+    }
+    operator bool() {
+        return isArmed;
+    }
+    void cancel() {
+        if (isArmed) {
+            ESP.forcedLightSleepEnd(true);
+            isArmed = false;
+        }
+    }
+};
 
 #endif //ESP_H

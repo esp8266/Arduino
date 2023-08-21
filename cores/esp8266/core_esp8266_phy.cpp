@@ -27,6 +27,7 @@
 #include "ets_sys.h"
 #include "spi_flash.h"
 #include "user_interface.h"
+#include "coredecls.h"
 
 extern "C" {
 
@@ -288,20 +289,10 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     /*[114] =*/ 1
 };
 
-
-// These functions will be overridden from C++ code.
-// Unfortunately, we can't use extern "C" because Arduino preprocessor
-// doesn't generate forward declarations for extern "C" functions correctly,
-// so we use mangled names here.
-#define __get_adc_mode _Z14__get_adc_modev
-#define __get_rf_mode _Z13__get_rf_modev
-#define __run_user_rf_pre_init _Z22__run_user_rf_pre_initv
-
 static bool spoof_init_data = false;
 
 extern int __real_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
 extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
-extern int __get_adc_mode();
 
 /*
   Verified that the wide filtering of all 128 byte flash reads during
@@ -328,19 +319,43 @@ extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t 
     return 0;
 }
 
-extern int __get_rf_mode(void)  __attribute__((weak));
-extern int __get_rf_mode(void)
+extern int __get_rf_disable_mode(void) __attribute__((noinline, weak));
+extern int __get_rf_disable_mode(void)
 {
-    return -1;  // mode not set
+    // Starting from arduino core v3: wifi is disabled at boot time
+    //  mode == 4: Disable RF after deep-sleep wake up, just like modem sleep; this has the least current
+    //  consumption; the device is not able to transmit or receive data after wake up.
+    return 4;
 }
 
-extern int __get_adc_mode(void) __attribute__((weak));
+extern int __get_rf_powerup_disable_mode(void) __attribute__((noinline, weak));
+extern int __get_rf_powerup_disable_mode(void)
+{
+    // Starting from arduino core v3: wifi is disabled at boot time
+    // mode == 2: RF initialization only calibrates VDD33 which will take about 2 ms;
+    // this has the least current consumption.
+    return 2;
+}
+
+extern int __get_rf_mode(void)  __attribute__((noinline, weak));
+extern int __get_rf_mode(void)
+{
+    return __get_rf_disable_mode();
+}
+
+extern int __get_rf_powerup_mode(void)  __attribute__((noinline, weak));
+extern int __get_rf_powerup_mode(void)
+{
+    return __get_rf_powerup_disable_mode();
+}
+
+extern int __get_adc_mode(void) __attribute__((noinline, weak));
 extern int __get_adc_mode(void)
 {
     return 33; // default ADC mode
 }
 
-extern void __run_user_rf_pre_init(void) __attribute__((weak));
+extern void __run_user_rf_pre_init(void) __attribute__((noinline, weak));
 extern void __run_user_rf_pre_init(void)
 {
     return; // default do nothing
@@ -369,6 +384,10 @@ void user_rf_pre_init()
     int rf_mode = __get_rf_mode();
     if (rf_mode >= 0) {
         system_phy_set_rfoption(rf_mode);
+    }
+    rf_mode = __get_rf_powerup_mode();
+    if (rf_mode >= 0) {
+        system_phy_set_powerup_option(rf_mode);
     }
     __run_user_rf_pre_init();
 }

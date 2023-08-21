@@ -115,16 +115,16 @@ void EspClass::wdtFeed(void)
     system_soft_wdt_feed();
 }
 
-void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
+void EspClass::deepSleep(uint64_t time_us)
 {
-    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_set_option(__get_rf_mode());
     system_deep_sleep(time_us);
     esp_suspend();
 }
 
-void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
+void EspClass::deepSleepInstant(uint64_t time_us)
 {
-    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_set_option(__get_rf_mode());
     system_deep_sleep_instant(time_us);
     esp_suspend();
 }
@@ -136,6 +136,174 @@ uint64_t EspClass::deepSleepMax()
   //cali*(2^31-1)/(2^12)
   return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
 
+}
+
+extern os_timer_t* timer_list;
+namespace {
+    sleep_type_t saved_sleep_type = NONE_SLEEP_T;
+    os_timer_t* saved_timer_list = nullptr;
+    fpm_wakeup_cb saved_wakeupCb = nullptr;
+}
+
+bool EspClass::forcedModemSleep(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
+{
+    // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
+    if (!duration_us || duration_us > 0xFFFFFFF) {
+        duration_us = 0xFFFFFFF;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_set_opmode(NULL_MODE);
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    wifi_fpm_open();
+    saved_wakeupCb = nullptr;
+    if (wakeupCb) wifi_fpm_set_wakeup_cb(wakeupCb);
+    auto ret_do_sleep = wifi_fpm_do_sleep(duration_us);
+    if (ret_do_sleep != 0)
+    {
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.printf("core: error %d with wifi_fpm_do_sleep: (-1=sleep status error, -2=force sleep not enabled)\n", ret_do_sleep);
+#endif
+        return false;
+    }
+    // SDK turns on forced modem sleep in idle task
+    esp_delay(10);
+    return true;
+}
+
+void EspClass::forcedModemSleepOff()
+{
+    const sleep_type_t sleepType = wifi_fpm_get_sleep_type();
+    if (sleepType != NONE_SLEEP_T) {
+        if (sleepType == MODEM_SLEEP_T) wifi_fpm_do_wakeup();
+        wifi_fpm_close();
+    }
+    wifi_fpm_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
+}
+
+#ifdef DEBUG_SERIAL
+namespace {
+    void walk_timer_list() {
+        os_timer_t* timer_root;
+        {
+            esp8266::InterruptLock lock;
+            auto src = timer_list;
+            auto dest = src ? new os_timer_t : nullptr;
+            timer_root = dest;
+            while (dest) {
+                *dest = *src;
+                src = src->timer_next;
+                dest->timer_next = src ? new os_timer_t(*timer_list) : nullptr;
+                dest = dest->timer_next;
+            }
+        }
+        DEBUG_SERIAL.printf("=============\n");
+        for (os_timer_t* timer_node = timer_root; nullptr != timer_node; timer_node = timer_node->timer_next) {
+            DEBUG_SERIAL.printf("timer_address = %p\n", timer_node);
+            DEBUG_SERIAL.printf("timer_expire  = %u\n", timer_node->timer_expire);
+            DEBUG_SERIAL.printf("timer_period  = %u\n", timer_node->timer_period);
+            DEBUG_SERIAL.printf("timer_func    = %p\n", timer_node->timer_func);
+            DEBUG_SERIAL.printf("timer_next    = %p\n", timer_node->timer_next);
+            if (timer_node->timer_next) DEBUG_SERIAL.printf("=============\n");
+        }
+        DEBUG_SERIAL.printf("=============\n");
+        DEBUG_SERIAL.flush();
+        while (timer_root) {
+            auto next = timer_root->timer_next;
+            delete timer_root;
+            timer_root = next;
+        }
+    }
+}
+#endif
+
+bool EspClass::forcedLightSleepBegin(uint32_t duration_us, fpm_wakeup_cb wakeupCb)
+{
+    // Setting duration to 0xFFFFFFF, it disconnects the RTC timer
+    if (!duration_us || duration_us > 0xFFFFFFF) {
+        duration_us = 0xFFFFFFF;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = wifi_fpm_get_sleep_type();
+    wifi_set_opmode(NULL_MODE);
+    wifi_fpm_set_sleep_type(LIGHT_SLEEP_T);
+    wifi_fpm_open();
+    saved_wakeupCb = wakeupCb;
+    wifi_fpm_set_wakeup_cb([]() {
+        if (saved_wakeupCb) {
+            saved_wakeupCb();
+            saved_wakeupCb = nullptr;
+        }
+        esp_schedule();
+        });
+#ifdef DEBUG_SERIAL
+    walk_timer_list();
+#endif
+    {
+        esp8266::InterruptLock lock;
+        saved_timer_list = timer_list;
+        timer_list = nullptr;
+    }
+    return wifi_fpm_do_sleep(duration_us) == 0;
+}
+
+void EspClass::forcedLightSleepEnd(bool cancel)
+{
+    if (!cancel) {
+        // SDK turns on forced light sleep in idle task
+        esp_suspend();
+    }
+#ifdef DEBUG_SERIAL
+    walk_timer_list();
+#endif
+    {
+        esp8266::InterruptLock lock;
+        timer_list = saved_timer_list;
+    }
+    saved_wakeupCb = nullptr;
+    wifi_fpm_close();
+    wifi_fpm_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
+    if (cancel) {
+        // let the SDK catch up in idle task
+        esp_delay(10);
+    }
+}
+
+void EspClass::autoModemSleep() {
+    wifi_fpm_close();
+    saved_sleep_type = wifi_get_sleep_type();
+    wifi_set_sleep_type(MODEM_SLEEP_T);
+}
+
+void EspClass::autoLightSleep() {
+    wifi_fpm_close();
+    saved_sleep_type = wifi_get_sleep_type();
+    wifi_set_sleep_type(LIGHT_SLEEP_T);
+}
+
+void EspClass::autoSleepOff() {
+    wifi_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
+}
+
+void EspClass::neverSleep() {
+    const auto active_sleep_type = wifi_get_sleep_type();
+    if (NONE_SLEEP_T == active_sleep_type) {
+        return;
+    }
+    wifi_fpm_close();
+    saved_sleep_type = active_sleep_type;
+    wifi_set_sleep_type(NONE_SLEEP_T);
+}
+
+void EspClass::neverSleepOff() {
+    if (NONE_SLEEP_T == saved_sleep_type) {
+        return;
+    }
+    wifi_set_sleep_type(saved_sleep_type);
+    saved_sleep_type = NONE_SLEEP_T;
 }
 
 /*
@@ -531,7 +699,7 @@ bool EspClass::eraseConfig(void) {
     return true;
 }
 
-uint8_t *EspClass::random(uint8_t *resultArray, const size_t outputSizeBytes)
+uint8_t* EspClass::random(uint8_t* resultArray, const size_t outputSizeBytes)
 {
   /**
    * The ESP32 Technical Reference Manual v4.1 chapter 24 has the following to say about random number generation (no information found for ESP8266):
@@ -787,7 +955,7 @@ static bool isAlignedPointer(const uint8_t *ptr) {
 }
 
 
-size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data, size_t size) {
+size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t* data, size_t size) {
     auto flash_write = [](uint32_t address, uint8_t *data, size_t size) {
         return spi_flash_write(address, reinterpret_cast<uint32_t *>(data), size) == SPI_FLASH_RESULT_OK;
     };
@@ -857,7 +1025,7 @@ size_t EspClass::flashWriteUnalignedMemory(uint32_t address, const uint8_t *data
     return written;
 }
 
-bool EspClass::flashWrite(uint32_t address, const uint32_t *data, size_t size) {
+bool EspClass::flashWrite(uint32_t address, const uint32_t* data, size_t size) {
     SpiFlashOpResult result;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
@@ -871,7 +1039,7 @@ bool EspClass::flashWrite(uint32_t address, const uint32_t *data, size_t size) {
     return result == SPI_FLASH_RESULT_OK;
 }
 
-bool EspClass::flashWrite(uint32_t address, const uint8_t *data, size_t size) {
+bool EspClass::flashWrite(uint32_t address, const uint8_t* data, size_t size) {
     if (data && size) {
         if (!isAlignedAddress(address)
          || !isAlignedPointer(data)

@@ -289,10 +289,10 @@ void runTest7() {
   // WiFi.shutdown(nv->wss);  // Forced Modem Sleep for a more Instant Deep Sleep,
   //  and no extended RFCAL as it goes into Deep Sleep
   Serial.println(F("going into Deep Sleep now..."));
-  printMillis();                         // show time difference across sleep
-  testPoint_HIGH;                        // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-  ESP.deepSleep(10E6, WAKE_RF_DEFAULT);  // good night!  D0 fires a reset in 10 seconds...
-  // if you do ESP.deepSleep(0, mode); it needs a RESET to come out of sleep (RTC is disconnected)
+  printMillis();        // show time difference across sleep
+  testPoint_HIGH;       // testPoint set HIGH to track Deep Sleep period, cleared at startup()
+  ESP.deepSleep(10E6);  // good night!  D0 fires a reset in 10 seconds...
+  // if you do ESP.deepSleep(0); it needs a RESET to come out of sleep (RTC is disconnected)
   // maximum timed Deep Sleep interval ~ 3 to 4 hours depending on the RTC timer, see the README
   // the 2 uA GPIO amperage during Deep Sleep can't drive the LED so it's not lit now, although
   // depending on the LED used, you might see it very dimly lit in a dark room during this test
@@ -309,7 +309,7 @@ void runTest8() {
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();                                  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
   testPoint_HIGH;                                  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-  ESP.deepSleep(10E6, WAKE_RFCAL);                 // good night!  D0 fires a reset in 10 seconds...
+  ESP.deepSleep(10E6);                             // good night! D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 
@@ -322,7 +322,7 @@ void runTest9() {
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();                                  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
   testPoint_HIGH;                                  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-  ESP.deepSleepInstant(10E6, WAKE_NO_RFCAL);       // good night!  D0 fires a reset in 10 seconds...
+  ESP.deepSleepInstant(10E6);                      // good night! D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 
@@ -335,7 +335,7 @@ void runTest10() {
   Serial.println(F("going into Deep Sleep now..."));
   Serial.flush();                                  // needs a delay(10) or Serial.flush() else it doesn't print the whole message
   testPoint_HIGH;                                  // testPoint set HIGH to track Deep Sleep period, cleared at startup()
-  ESP.deepSleepInstant(10E6, WAKE_RF_DISABLED);    // good night!  D0 fires a reset in 10 seconds...
+  ESP.deepSleepInstant(10E6);                      // good night! D0 fires a reset in 10 seconds...
   Serial.println(F("What... I'm not asleep?!?"));  // it will never get here
 }
 

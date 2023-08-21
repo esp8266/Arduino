@@ -109,7 +109,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _md5 = MD5Builder();
 
 #ifndef HOST_MOCK
-  wifi_set_sleep_type(NONE_SLEEP_T);
+  ESP.neverSleep();
 #endif
 
   //address where we will start writing the update
