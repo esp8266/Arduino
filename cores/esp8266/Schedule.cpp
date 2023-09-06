@@ -21,6 +21,7 @@
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
+#include <atomic>
 
 typedef std::function<void(void)> mSchedFuncT;
 struct scheduled_fn_t
@@ -47,7 +48,7 @@ struct recurrent_fn_t
 static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
 // The target time for scheduling the next timed recurrent function 
-static decltype(micros()) rTarget;
+static std::atomic<decltype(micros())> rTarget;
 
 // As 32 bit unsigned integer, micros() rolls over every 71.6 minutes.
 // For unambiguous earlier/later order between two timestamps,
@@ -133,13 +134,17 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
-    // prevent new item overwriting an already expired rTarget.
     const auto now = micros();
     const auto itemRemaining = item->callNow.remaining();
-    const auto remaining = rTarget - now;
-    if (!rFirst || (remaining <= HALF_MAX_MICROS && remaining > itemRemaining))
+    for (auto _rTarget = rTarget.load(); ;)
     {
-        rTarget = now + itemRemaining;
+        const auto remaining = _rTarget - now;
+        if (!rFirst || (remaining <= HALF_MAX_MICROS && remaining > itemRemaining))
+        {
+            // if (!rTarget.compare_exchange_weak(_rTarget, now + itemRemaining)) continue;
+            rTarget = now + itemRemaining; // interrupt lock is active, no ABA issue
+        }
+        break;
     }
 
     if (rLast)
@@ -158,9 +163,8 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 decltype(micros()) get_scheduled_recurrent_delay_us()
 {
     if (!rFirst) return HALF_MAX_MICROS;
-    // handle already expired rTarget.
     const auto now = micros();
-    const auto remaining = rTarget - now;
+    const auto remaining = rTarget.load() - now;
     return (remaining <= HALF_MAX_MICROS) ? remaining : 0;
 }
 
@@ -233,9 +237,9 @@ void run_scheduled_recurrent_functions()
     recurrent_fn_t* prev = nullptr;
     bool done;
 
+    rTarget.store(micros() + HALF_MAX_MICROS);
     // prevent scheduling of new functions during this run
     stop = rLast;
-    rTarget = micros() + HALF_MAX_MICROS;
 
     do
     {
@@ -268,17 +272,20 @@ void run_scheduled_recurrent_functions()
         }
         else
         {
-            esp8266::InterruptLock lockAllInterruptsInThisScope;
-
-            // prevent current item overwriting an already expired rTarget.
             const auto now = micros();
             const auto currentRemaining = current->callNow.remaining();
-            const auto remaining = rTarget - now;
-            if (remaining <= HALF_MAX_MICROS && remaining > currentRemaining)
+            for (auto _rTarget = rTarget.load(); ;)
             {
-                rTarget = now + currentRemaining;
+                const auto remaining = _rTarget - now;
+                if (remaining <= HALF_MAX_MICROS && remaining > currentRemaining)
+                {
+                    // if (!rTarget.compare_exchange_weak(_rTarget, now + currentRemaining)) continue;
+                    esp8266::InterruptLock lockAllInterruptsInThisScope;
+                    if (rTarget != _rTarget) { _rTarget = rTarget; continue; }
+                    rTarget = now + currentRemaining;
+                }
+                break;
             }
-
             prev = current;
             current = current->mNext;
         }
