@@ -510,7 +510,10 @@ uart_tx_fifo_full(const int uart_nr)
 static void
 uart_do_write_char(const int uart_nr, char c)
 {
-    while(uart_tx_fifo_full(uart_nr));
+    while(uart_tx_fifo_full(uart_nr))
+    {
+        optimistic_yield(10000UL);
+    }
 
     USF(uart_nr) = c;
 }
@@ -544,7 +547,6 @@ uart_write(uart_t* uart, const char* buf, size_t size)
     const int uart_nr = uart->uart_nr;
     while (size--) {
         uart_do_write_char(uart_nr, pgm_read_byte(buf++));
-        optimistic_yield(10000UL);
     }
 
     return ret;
