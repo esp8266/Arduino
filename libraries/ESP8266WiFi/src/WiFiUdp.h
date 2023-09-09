@@ -47,6 +47,8 @@ public:
   // Finish with the UDP connection
   void stop() override;
   // join a multicast group and listen on the given port
+  virtual uint8_t beginMulticast(IPAddress interfaceAddr, uint16_t port);
+  // join a multicast group and listen on the given port, using a specific interface address
   uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
 
   // Sending UDP packets
