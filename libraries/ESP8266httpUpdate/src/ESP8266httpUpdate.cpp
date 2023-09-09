@@ -235,6 +235,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate] ESP8266 info:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - free Space: %d\n", ESP.getFreeSketchSpace());
     DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch Size: %d\n", ESP.getSketchSize());
+    DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
 
     if(currentVersion && currentVersion[0] != 0x00) {
         DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", currentVersion.c_str() );
