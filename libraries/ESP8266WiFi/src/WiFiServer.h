@@ -100,6 +100,8 @@ public:
   uint16_t port() const;
   void close();
   void stop();
+  void end();
+  explicit operator bool();
 
   using ClientType = WiFiClient;
 
