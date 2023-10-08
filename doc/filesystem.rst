@@ -228,9 +228,15 @@ use esptool.py.
 
 *ESP8266LittleFS* is the equivalent tool for LittleFS.
 
-- Download the 2.6.0 or later version of the tool: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
+For Arduino IDE 1.x:
+- Download the latest plugin from: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin/releases
 - Install as above
 - To upload a LittleFS filesystem use Tools > ESP8266 LittleFS Data Upload
+
+For Arduino IDE 2.x:
+- Download the latest plugin from: https://github.com/earlephilhower/arduino-littlefs-upload/releases
+- Follow the manual installation instructions in: https://github.com/earlephilhower/arduino-littlefs-upload/blob/main/README.md
+- To upload a LittleFS filesystem use `Ctrl`+`Shift`+`P` and then select the `Upload LittleFS to Pico/ESP8266` item
 
 
 File system object (SPIFFS/LittleFS/SD/SDFS)
