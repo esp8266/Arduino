@@ -514,6 +514,7 @@ String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
   char temp[] = "0x00";
   unsigned int len = text.length();
   unsigned int i = 0;
+  decoded.reserve(len - (std::count(text.begin(), text.end(), '%') * 2));
   while (i < len)
   {
     char decodedChar;
