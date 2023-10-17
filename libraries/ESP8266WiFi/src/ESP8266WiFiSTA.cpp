@@ -608,6 +608,18 @@ uint8_t* ESP8266WiFiSTAClass::BSSID(void) {
 }
 
 /**
+ * Fill the current bssid / mac associated with the network if configured
+ * @param bssid  pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+ * @return bssid uint8_t *
+ */
+uint8_t* ESP8266WiFiSTAClass::BSSID(uint8_t* bssid) {
+    struct station_config conf;
+    wifi_station_get_config(&conf);
+    memcpy(bssid, conf.bssid, WL_MAC_ADDR_LENGTH);
+    return bssid;
+}
+
+/**
  * Return the current bssid / mac associated with the network if configured
  * @return String bssid mac
  */

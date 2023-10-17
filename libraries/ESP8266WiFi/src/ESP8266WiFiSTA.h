@@ -79,6 +79,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         String psk() const;
 
         uint8_t * BSSID();
+        uint8_t * BSSID(uint8_t* bssid);
         String BSSIDstr();
 
         int8_t RSSI();
