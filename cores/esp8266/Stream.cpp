@@ -262,6 +262,32 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
+String Stream::readStringUntil(const char* terminator, uint32_t count) {
+    String ret;
+    int c;
+    uint32_t termCount = 0;
+    size_t termLen = strlen(terminator);
+    size_t termIndex = 0;
+    size_t index = 0;
+
+    while ((c = timedRead()) > 0) {
+        ret += (char) c;
+        index++;
+
+        if (terminator[termIndex] == c) {
+            if (++termIndex == termLen && ++termCount == count) {
+                // don't include terminator in returned string
+                ret.remove(index - termIndex, termLen);
+                break;
+            }
+        } else {
+            termIndex = 0;
+        }
+    }
+
+    return ret;
+}
+
 // read what can be read, immediate exit on unavailable data
 // prototype similar to Arduino's `int Client::read(buf, len)`
 int Stream::read (uint8_t* buffer, size_t maxLen)

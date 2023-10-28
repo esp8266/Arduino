@@ -115,6 +115,7 @@ class Stream: public Print {
         // Arduino String functions to be added here
         virtual String readString();
         String readStringUntil(char terminator);
+        String readStringUntil(const char* terminator, uint32_t count = 1);
 
         virtual int read (uint8_t* buffer, size_t len);
         int read (char* buffer, size_t len) { return read((uint8_t*)buffer, len); }
