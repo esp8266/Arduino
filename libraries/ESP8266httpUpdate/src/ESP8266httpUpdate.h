@@ -132,9 +132,8 @@ public:
     int getLastError(void);
     String getLastErrorString(void);
 
-    void setClientTimeout(int timeout) {
-        _httpClientTimeout = timeout;
-    }
+    [[deprecated("use setWallTime()")]] void setClientTimeout(int wallTime) { setWallTime(wallTime); }
+    void setWallTime(int wallTime) { _httpWallTime = wallTime; }
 protected:
     t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion, bool spiffs = false);
     bool runUpdate(Stream& in, uint32_t size, const String& md5, int command = U_FLASH);
@@ -154,7 +153,7 @@ protected:
     String _auth;
     String _md5Sum;
 private:
-    int _httpClientTimeout;
+    unsigned long _httpWallTime;
     followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
 
     // Callbacks

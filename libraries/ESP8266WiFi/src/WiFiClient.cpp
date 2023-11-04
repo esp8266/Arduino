@@ -216,7 +216,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
-    _client->setTimeout(_timeout);
+    _client->setTimeout(_timeout);  // context write uses timeout
     return _client->write((const char*)buf, size);
 }
 
@@ -238,7 +238,6 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
-    _client->setTimeout(_timeout);
     StreamConstPtr nopeek(buf, size);
     return nopeek.sendAll(this);
 }
@@ -462,4 +461,11 @@ void WiFiClient::peekConsume (size_t consume)
 {
     if (_client)
         _client->peekConsume(consume);
+}
+
+void WiFiClient::setTimeout (unsigned long timeout)
+{
+    Client::setTimeout(timeout);
+    if (_client)
+        _client->setTimeout(timeout);
 }

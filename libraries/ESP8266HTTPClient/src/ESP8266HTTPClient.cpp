@@ -216,7 +216,7 @@ void HTTPClient::disconnect(bool preserveClient)
         }
 
         if(_reuse && _canReuse) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp kept open for reuse\n");
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
             if(_client) {
@@ -303,15 +303,12 @@ void HTTPClient::setAuthorization(String auth)
 }
 
 /**
- * set the timeout for the TCP connection
+ * set the wall time for operations
  * @param timeout unsigned int
  */
-void HTTPClient::setTimeout(uint16_t timeout)
+void HTTPClient::setWallTime(unsigned long wallTime)
 {
-    _tcpTimeout = timeout;
-    if(connected()) {
-        _client->setTimeout(timeout);
-    }
+    _wallTime.reset(wallTime?: esp8266::polledTimeout::oneShotMs::neverExpires);
 }
 
 /**
@@ -794,8 +791,6 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-    _client->setTimeout(_tcpTimeout);
-
     if(!_client->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
@@ -879,7 +874,6 @@ bool HTTPClient::sendHeader(const char * type)
  */
 int HTTPClient::handleHeaderResponse()
 {
-
     if(!connected()) {
         return HTTPC_ERROR_NOT_CONNECTED;
     }
@@ -891,15 +885,13 @@ int HTTPClient::handleHeaderResponse()
     String transferEncoding;
 
     _transferEncoding = HTTPC_TE_IDENTITY;
-    unsigned long lastDataTime = millis();
+    _wallTime.reset();
 
     while(connected()) {
         size_t len = _client->available();
         if(len > 0) {
             int headerSeparator = -1;
             String headerLine = _client->readStringUntil('\n');
-
-            lastDataTime = millis();
 
             DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
@@ -978,7 +970,7 @@ int HTTPClient::handleHeaderResponse()
             }
 
         } else {
-            if((millis() - lastDataTime) > _tcpTimeout) {
+            if(_wallTime) {
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
             esp_yield();

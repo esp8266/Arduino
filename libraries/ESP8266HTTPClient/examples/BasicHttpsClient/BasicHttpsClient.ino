@@ -41,11 +41,33 @@ void loop() {
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
+#if 1  // 1=secure, 0=insecure
+
     client->setFingerprint(fingerprint_sni_cloudflaressl_com);
+
+    // date needs to be setup
+    configTime("UTC", "pool.ntp.org");
+    time_t now;
+    while (time(&now) < 24 * 3600) {
+      Serial.println("waiting for NTP time to be set...");
+      delay(1000);
+    }
+    Serial.printf("date: %s", ctime(&now));
+
+#else
     // Or, if you happy to ignore the SSL certificate, then use the following line instead:
-    // client->setInsecure();
+    client->setInsecure();
+#endif
 
     HTTPClient https;
+    https.setWallTime(10000);    // do not exceed 10s while getting data
+    client->setWallTime(20000);  // do not exceed 20s during handshake
+
+    // Try to reduce RAM footprint when SSL server allows it
+    constexpr int sslbufsize = 1024;
+    bool mfln = client->probeMaxFragmentLength(jigsaw_host, jigsaw_port, sslbufsize);
+    Serial.printf("Can reduce SSL footprint to %d bytes in RAM: %s\n", sslbufsize, mfln ? "yes" : "no");
+    if (mfln) { client->setBufferSizes(sslbufsize, sslbufsize); }
 
     Serial.print("[HTTPS] begin...\n");
     if (https.begin(*client, jigsaw_host, jigsaw_port)) {  // HTTPS

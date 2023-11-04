@@ -64,6 +64,7 @@ public:
   // - https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rh-copy
   virtual std::unique_ptr<WiFiClient> clone() const;
 
+  virtual void setTimeout (unsigned long timeout) override;
   virtual uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port) override;
   virtual int connect(const char *host, uint16_t port) override;

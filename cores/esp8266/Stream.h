@@ -65,7 +65,7 @@ class Stream: public Print {
 
 // parsing methods
 
-        void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
+        virtual void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
         unsigned long getTimeout () const { return _timeout; }
 
         bool find(const char *target);   // reads data from the stream until the target string is found

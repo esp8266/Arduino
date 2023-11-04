@@ -28,6 +28,7 @@
 #include <bearssl/bearssl.h>
 #include "BearSSLHelpers.h"
 #include "CertStoreBearSSL.h"
+#include "PolledTimeout.h"
 
 namespace BearSSL {
 
@@ -147,6 +148,9 @@ class WiFiClientSecureCtx : public WiFiClient {
     // consume bytes after use (see peekBuffer)
     virtual void peekConsume (size_t consume) override;
 
+    // install a wall-time used during handshake
+    void setWallTime (unsigned long wallTime) { _wallTime.reset(wallTime?: esp8266::polledTimeout::oneShotMs::neverExpires); }
+
   protected:
     bool _connectSSL(const char *hostName); // Do initial SSL handshake
 
@@ -235,6 +239,8 @@ class WiFiClientSecureCtx : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
+
+    esp8266::polledTimeout::oneShotMs _wallTime;
 }; // class WiFiClientSecureCtx
 
 
@@ -372,6 +378,12 @@ class WiFiClientSecure : public WiFiClient {
     uint8_t getKeepAliveCount() const override { return _ctx->getKeepAliveCount(); };
 
     void disableKeepAlive() override { _ctx->disableKeepAlive(); };
+
+    // override setTimeout and forward to context
+    virtual void setTimeout (unsigned long timeout) override;
+
+    // install a wall-time used during handshake
+    void setWallTime (unsigned long wallTime) { _ctx->setWallTime(wallTime); }
 
   private:
     std::shared_ptr<WiFiClientSecureCtx> _ctx;

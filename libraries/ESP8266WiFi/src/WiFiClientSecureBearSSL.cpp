@@ -31,7 +31,6 @@ extern "C" {
 }
 #include "debug.h"
 #include "ESP8266WiFi.h"
-#include "PolledTimeout.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
 #include "StackThunk.h"
@@ -68,10 +67,9 @@ extern "C" {
 
 namespace BearSSL {
 
-void WiFiClientSecureCtx::_clear() {
-  // TLS handshake may take more than the 5 second default timeout
-  _timeout = 15000;
+constexpr auto defaultWallTime = 10000UL;
 
+void WiFiClientSecureCtx::_clear() {
   _sc = nullptr;
   _sc_svr = nullptr;
   _eng = nullptr;
@@ -103,7 +101,7 @@ void WiFiClientSecureCtx::_clearAuthenticationSettings() {
 }
 
 
-WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient() {
+WiFiClientSecureCtx::WiFiClientSecureCtx() : WiFiClient(), _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -124,7 +122,7 @@ WiFiClientSecureCtx::~WiFiClientSecureCtx() {
 WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext* client,
                                      const X509List *chain, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max): _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -145,7 +143,7 @@ WiFiClientSecureCtx::WiFiClientSecureCtx(ClientContext *client,
                                      const X509List *chain,
                                      unsigned cert_issuer_key_type, const PrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, ServerSessions *cache,
-                                     const X509List *client_CA_ta, int tls_min, int tls_max) {
+                                     const X509List *client_CA_ta, int tls_min, int tls_max): _wallTime(defaultWallTime) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -204,7 +202,10 @@ bool WiFiClientSecureCtx::stop(unsigned int maxWaitMs) {
 }
 
 bool WiFiClientSecureCtx::flush(unsigned int maxWaitMs) {
+  auto savedTimeout = _timeout;
+  _timeout = std::max(1U, maxWaitMs);
   (void) _run_until(BR_SSL_SENDAPP);
+  _timeout = savedTimeout;
   return WiFiClient::flush(maxWaitMs);
 }
 
@@ -246,7 +247,6 @@ void WiFiClientSecureCtx::_freeSSL() {
   _recvapp_len = 0;
   // This connection is toast
   _handshake_done = false;
-  _timeout = 15000;
 }
 
 bool WiFiClientSecureCtx::_clientConnected() {
@@ -462,7 +462,7 @@ size_t WiFiClientSecureCtx::peekBytes(uint8_t *buffer, size_t length) {
   }
 
   _startMillis = millis();
-  while ((_pollRecvBuffer() < (int) length) && ((millis() - _startMillis) < 5000)) {
+  while ((_pollRecvBuffer() < (int)length) && ((millis() - _startMillis) < _timeout)) {
     yield();
   }
 
@@ -539,6 +539,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
         br_ssl_engine_sendrec_ack(_eng, wlen);
       }
       no_work = 0;
+      loopTimeout.reset();
       continue;
     }
 
@@ -582,6 +583,7 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
           br_ssl_engine_recvrec_ack(_eng, rlen);
         }
         no_work = 0;
+        loopTimeout.reset();
         continue;
       }
     }
@@ -602,6 +604,14 @@ int WiFiClientSecureCtx::_run_until(unsigned target, bool blocking) {
 }
 
 bool WiFiClientSecureCtx::_wait_for_handshake() {
+
+#if defined(DEBUG_ESP_PORT)
+  if constexpr (F_CPU != 160000000L) {
+    DEBUG_ESP_PORT.printf_P((PGM_P)PSTR("BSSL: Please enable 160MHz build\n"));
+  }
+#endif
+
+  _wallTime.reset();
   _handshake_done = false;
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
@@ -611,6 +621,10 @@ bool WiFiClientSecureCtx::_wait_for_handshake() {
     }
     if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
       _handshake_done = true;
+    }
+    if (_wallTime) {
+      DEBUG_BSSL("handshake too long\n");
+      break;
     }
     optimistic_yield(1000);
   }
@@ -1206,9 +1220,6 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
   _x509_insecure = nullptr;
   _x509_knownkey = nullptr;
 
-  // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
-  if (ret) _timeout = 5000;
-
   return ret;
 }
 
@@ -1673,4 +1684,11 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   return _SendAbort(probe, supportsLen);
 }
 
-};
+void WiFiClientSecure::setTimeout (unsigned long timeout)
+{
+  WiFiClient::setTimeout(timeout);
+  if (_ctx)
+    _ctx->setTimeout(timeout);
+}
+
+};  // namespace BearSSL
