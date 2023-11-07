@@ -262,10 +262,10 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
-String Stream::readStringUntil(const char* terminator, uint32_t count) {
+String Stream::readStringUntil(const char* terminator, uint32_t untilTotalNumberOfOccurrences) {
     String ret;
     int c;
-    uint32_t termCount = 0;
+    uint32_t occurrences = 0;
     size_t termLen = strlen(terminator);
     size_t termIndex = 0;
     size_t index = 0;
@@ -275,7 +275,7 @@ String Stream::readStringUntil(const char* terminator, uint32_t count) {
         index++;
 
         if (terminator[termIndex] == c) {
-            if (++termIndex == termLen && ++termCount == count) {
+            if (++termIndex == termLen && ++occurrences == untilTotalNumberOfOccurrences) {
                 // don't include terminator in returned string
                 ret.remove(index - termIndex, termLen);
                 break;
