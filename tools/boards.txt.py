@@ -1684,9 +1684,9 @@ def sdk ():
 
 def float_in_iram ():
     return { 'iramfloat': collections.OrderedDict([
-                        ('.menu.iramfloat.no', 'Not allowed in ISR (more IRAM)'),
+                        ('.menu.iramfloat.no', 'in IROM'),
                         ('.menu.iramfloat.no.build.iramfloat', '-DFP_IN_IROM'),
-                        ('.menu.iramfloat.yes', 'Allowed in ISR (less IRAM)'),
+                        ('.menu.iramfloat.yes', 'allowed in ISR'),
                         ('.menu.iramfloat.yes.build.iramfloat', '-DFP_IN_IRAM'),
                     ])
            }
