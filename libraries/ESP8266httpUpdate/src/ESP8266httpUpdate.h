@@ -43,16 +43,18 @@
 #endif
 
 /// note we use HTTP client errors too so we start at 100
-//TODO - in v3.0.0 make this an enum
-constexpr int HTTP_UE_TOO_LESS_SPACE            = (-100);
-constexpr int HTTP_UE_SERVER_NOT_REPORT_SIZE    = (-101);
-constexpr int HTTP_UE_SERVER_FILE_NOT_FOUND     = (-102);
-constexpr int HTTP_UE_SERVER_FORBIDDEN          = (-103);
-constexpr int HTTP_UE_SERVER_WRONG_HTTP_CODE    = (-104);
-constexpr int HTTP_UE_SERVER_FAULTY_MD5         = (-105);
-constexpr int HTTP_UE_BIN_VERIFY_HEADER_FAILED  = (-106);
-constexpr int HTTP_UE_BIN_FOR_WRONG_FLASH       = (-107);
-constexpr int HTTP_UE_SERVER_UNAUTHORIZED       = (-108);
+enum HTTPUpdateError {
+    HTTP_UE_SERVER_NOT_REPORT_VERSION    = -109, // server did not respond with a firmware version
+    HTTP_UE_SERVER_UNAUTHORIZED,        // -108
+    HTTP_UE_BIN_FOR_WRONG_FLASH,        // -107
+    HTTP_UE_BIN_VERIFY_HEADER_FAILED,   // -106
+    HTTP_UE_SERVER_FAULTY_MD5,          // -105
+    HTTP_UE_SERVER_WRONG_HTTP_CODE,     // -104
+    HTTP_UE_SERVER_FORBIDDEN,           // -103
+    HTTP_UE_SERVER_FILE_NOT_FOUND,      // -102
+    HTTP_UE_SERVER_NOT_REPORT_SIZE,     // -101
+    HTTP_UE_TOO_LESS_SPACE              // -100
+};
 
 enum HTTPUpdateResult {
     HTTP_UPDATE_FAILED,
@@ -122,7 +124,9 @@ public:
     t_httpUpdate_return updateFS(WiFiClient& client, const String& url, const String& currentVersion = "");
     t_httpUpdate_return update(HTTPClient& httpClient, const String& currentVersion = "");
     t_httpUpdate_return updateFS(HTTPClient& httpClient, const String& currentVersion = "");
-    
+
+    t_httpUpdate_return getAvailableVersion(WiFiClient& client, const String& host, uint16_t port, const String& uri, const String& current_version, String& available_version);
+
     // Notification callbacks
     void onStart(HTTPUpdateStartCB cbOnStart)          { _cbStart = cbOnStart; }
     void onEnd(HTTPUpdateEndCB cbOnEnd)                { _cbEnd = cbOnEnd; }
@@ -153,10 +157,9 @@ protected:
     String _password;
     String _auth;
     String _md5Sum;
-private:
     int _httpClientTimeout;
     followRedirects_t _followRedirects = HTTPC_DISABLE_FOLLOW_REDIRECTS;
-
+private:
     // Callbacks
     HTTPUpdateStartCB    _cbStart;
     HTTPUpdateEndCB      _cbEnd;
