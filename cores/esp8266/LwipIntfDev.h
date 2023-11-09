@@ -68,6 +68,7 @@ public:
 
     // default mac-address is inferred from esp8266's STA interface
     boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
+    void    end();
 
     const netif* getNetIf() const
     {
@@ -138,6 +139,7 @@ protected:
     int8_t   _intrPin;
     uint8_t  _macAddress[6];
     bool     _started;
+    bool     _scheduled;
     bool     _default;
 };
 
@@ -229,6 +231,7 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this,
                    netif_init_s, ethernet_input))
     {
+        RawDev::end();
         return false;
     }
 
@@ -242,10 +245,11 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
             break;
 
         case ERR_IF:
+            RawDev::end();
             return false;
 
         default:
-            netif_remove(&_netif);
+            end();
             return false;
         }
     }
@@ -272,20 +276,39 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
         }
     }
 
-    if (_intrPin < 0
-        && !schedule_recurrent_function_us(
+    if (_intrPin < 0 && !_scheduled)
+    {
+        _scheduled = schedule_recurrent_function_us(
             [&]()
             {
+                if (!_started)
+                {
+                    _scheduled = false;
+                    return false;
+                }
                 this->handlePackets();
                 return true;
             },
-            100))
-    {
-        netif_remove(&_netif);
-        return false;
+            100);
+        if (!_scheduled)
+        {
+            end();
+            return false;
+        }
     }
 
     return true;
+}
+
+template<class RawDev>
+void LwipIntfDev<RawDev>::end()
+{
+    netif_remove(&_netif);
+    ip_addr_copy(_netif.ip_addr, ip_addr_any);  // to allow DHCP at next begin
+    ip_addr_copy(_netif.netmask, ip_addr_any);
+    ip_addr_copy(_netif.gw, ip_addr_any);
+    _started = false;
+    RawDev::end();
 }
 
 template<class RawDev>
