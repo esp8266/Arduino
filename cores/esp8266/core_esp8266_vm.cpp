@@ -168,13 +168,13 @@ static void spi_init(spi_regs *spi1)
   pinMode(miso, SPECIAL);
   pinMode(mosi, SPECIAL);
   pinMode(cs, SPECIAL);
-  spi1->spi_cmd = 0;
+  spi1->spi_ctrl = 0;  // MSB first + plain SPI mode
   GPMUX &= ~(1 << 9);
   spi1->spi_clock = spi_clkval;
-  spi1->spi_ctrl = 0 ; // MSB first + plain SPI mode
   spi1->spi_ctrl1 = 0; // undocumented, clear for safety?
   spi1->spi_ctrl2 = 0; // No add'l delays on signals
   spi1->spi_user2 = 0; // No insn or insn_bits to set
+  spi1->spi_cmd = 0;
 }
 
 // Note: GCC optimization -O2 and -O3 tried and returned *slower* code than the default
