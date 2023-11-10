@@ -260,6 +260,21 @@ uint8_t * ESP8266WiFiScanClass::BSSID(uint8_t i) {
 }
 
 /**
+ * fill MAC / BSSID of scanned wifi
+ * @param i specify from which network item want to get the information
+ * @param bssid  pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+ * @return uint8_t * MAC / BSSID of scanned wifi
+ */
+uint8_t * ESP8266WiFiScanClass::BSSID(uint8_t i, uint8_t* bssid) {
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+    if(!it) {
+        return 0;
+    }
+    memcpy(bssid, it->bssid, WL_MAC_ADDR_LENGTH);
+    return bssid;
+}
+
+/**
  * return MAC / BSSID of scanned wifi
  * @param i specify from which network item want to get the information
  * @return String MAC / BSSID of scanned wifi
