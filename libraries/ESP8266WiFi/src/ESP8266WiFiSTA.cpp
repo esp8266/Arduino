@@ -423,6 +423,8 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
         WiFi.enableSTA(false);
     }
 
+    _useStaticIp = false;
+
     return ret;
 }
 
