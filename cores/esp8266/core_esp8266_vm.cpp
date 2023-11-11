@@ -161,14 +161,15 @@ static struct cache_line *__vm_cache; // Always points to MRU (hence the line be
 
 constexpr int addrmask = ~(sizeof(__vm_cache[0].w)-1); // Helper to mask off bits present in cache entry
 
-
 static void spi_init(spi_regs *spi1)
 {
   pinMode(sck, SPECIAL);
   pinMode(miso, SPECIAL);
   pinMode(mosi, SPECIAL);
   pinMode(cs, SPECIAL);
+  // spi_ctrl appears to need setting before other SPI registers
   spi1->spi_ctrl = 0;  // MSB first + plain SPI mode
+  asm("" ::: "memory");
   GPMUX &= ~(1 << 9);
   spi1->spi_clock = spi_clkval;
   spi1->spi_ctrl1 = 0; // undocumented, clear for safety?
