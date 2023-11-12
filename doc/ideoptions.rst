@@ -266,8 +266,8 @@ Notice that 3.x.x is provided **as-is** and remains **experimental**.
 Floating Point operations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- ``allowed in ISR``: Floats can be used in ISRs (default), cost is ~1KB IRAM when floats are used
 - ``in IROM``: This provides more free space in IRAM but it disallows using floating operations inside ISRs.
-- ``allowed in ISR``: Floats can be used in ISRs, cost is ~1KB IRAM.
 
 SSL Support
 ~~~~~~~~~~~
