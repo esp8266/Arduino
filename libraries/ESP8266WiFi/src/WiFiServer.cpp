@@ -173,6 +173,14 @@ void WiFiServer::stop() {
     close();
 }
 
+void WiFiServer::end() {
+    close();
+}
+
+WiFiServer::operator bool() {
+  return (status() != CLOSED);
+}
+
 err_t WiFiServer::_accept(tcp_pcb* apcb, err_t err) {
     (void) err;
     DEBUGV("WS:ac\r\n");

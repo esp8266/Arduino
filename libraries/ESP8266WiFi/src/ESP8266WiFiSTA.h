@@ -45,7 +45,8 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood
         //to detect Arduino arg order, and handle it correctly. Be aware that the Arduino default value handling doesn't
         //work here (see Arduino docs for gway/subnet defaults). In other words: at least 3 args must always be given.
-        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
+        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = INADDR_ANY, IPAddress dns2 = INADDR_ANY);
+        bool setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY);
 
         bool reconnect();
 
@@ -79,6 +80,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         String psk() const;
 
         uint8_t * BSSID();
+        uint8_t * BSSID(uint8_t* bssid);
         String BSSIDstr();
 
         int8_t RSSI();

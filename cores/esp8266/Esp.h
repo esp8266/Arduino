@@ -212,6 +212,22 @@ class EspClass {
 
         static bool eraseConfig();
 
+        /**
+         * @brief Erases 4 sectors at the end of flash, 1 - RF_CAL and 3 - SYSTEMPARM.
+         * These are the same additional sectors that are erase when you select
+         * Erase Flash: "Sketch + WiFi Settings" from the Arduino IDE Tools menu.
+         *
+         * This operation erases the running SDK's flash configuration space.
+         * As a precaution before calling, first call "WiFi.mode(WIFI_OFF)."
+         *
+         * If you need to erase "WiFi Settings" and reboot consider using
+         * "ArduinoOTA.eraseConfigAndReset()" it handles shutting down WiFi
+         * before the erase.
+         * @return bool result of operation. Always False on return.
+         * Function does not return on success.
+         */
+        static bool eraseConfigAndReset();
+
         static uint8_t *random(uint8_t *resultArray, const size_t outputSizeBytes);
         static uint32_t random();
 
