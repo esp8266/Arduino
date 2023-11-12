@@ -275,16 +275,22 @@ else:
 #
 
 current_vtables = None
-fp_in_irom = ""
+current_fp = None
 for d in flatten_cppdefines:
     if str(d).startswith("VTABLES_IN_"):
         current_vtables = d
-    if str(d) == "FP_IN_IROM":
-        fp_in_irom = "-DFP_IN_IROM"
+    if str(d).startswith("FP_IN_"):
+        current_fp = d
+
 if not current_vtables:
     current_vtables = "VTABLES_IN_FLASH"
     env.Append(CPPDEFINES=[current_vtables])
 assert current_vtables
+
+if not current_fp:
+    current_fp = "FP_IN_IROM"
+    env.Append(CPPDEFINES=[current_fp])
+assert current_fp
 
 #
 # MMU
@@ -363,9 +369,10 @@ app_ld = env.Command(
     join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
-        "$CC -CC -E -P -D%s %s %s $SOURCE -o $TARGET"
+        "$CC -CC -E -P -D%s -D%s %s $SOURCE -o $TARGET"
         % (
             current_vtables,
+            current_fp,
             # String representation of MMU flags
             " ".join(
                 [
@@ -373,7 +380,6 @@ app_ld = env.Command(
                     for f in mmu_flags
                 ]
             ),
-            fp_in_irom,
         ),
         "Generating LD script $TARGET",
     ),
