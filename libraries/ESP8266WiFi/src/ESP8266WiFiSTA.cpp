@@ -340,6 +340,29 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 }
 
 /**
+ * Change DNS for static IP configuration
+ * @param dns1       Static DNS server 1
+ * @param dns2       Static DNS server 2 (optional)
+ */
+bool ESP8266WiFiSTAClass::setDNS(IPAddress dns1, IPAddress dns2) {
+
+  if((WiFi.getMode() & WIFI_STA) == 0)
+    return false;
+
+  if(dns1.isSet()) {
+      // Set DNS1-Server
+      dns_setserver(0, dns1);
+  }
+
+  if(dns2.isSet()) {
+      // Set DNS2-Server
+      dns_setserver(1, dns2);
+  }
+
+  return true;
+}
+
+/**
  * will force a disconnect an then start reconnecting to AP
  * @return ok
  */
@@ -399,6 +422,8 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff, bool eraseCredentials) {
     if(wifioff) {
         WiFi.enableSTA(false);
     }
+
+    _useStaticIp = false;
 
     return ret;
 }
