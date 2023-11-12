@@ -497,10 +497,10 @@ generic.menu.eesz.autoflash.build.flash_size=16M
 generic.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 generic.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 generic.menu.eesz.autoflash.upload.maximum_size=1044464
-generic.menu.iramfloat.yes=allowed in ISR
-generic.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 generic.menu.iramfloat.no=in IROM
 generic.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+generic.menu.iramfloat.yes=allowed in ISR
+generic.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 esp8285.name=Generic ESP8285 Module
@@ -853,10 +853,10 @@ esp8285.menu.eesz.autoflash.build.flash_size=16M
 esp8285.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 esp8285.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp8285.menu.eesz.autoflash.upload.maximum_size=1044464
-esp8285.menu.iramfloat.yes=allowed in ISR
-esp8285.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 esp8285.menu.iramfloat.no=in IROM
 esp8285.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+esp8285.menu.iramfloat.yes=allowed in ISR
+esp8285.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 gen4iod.name=4D Systems gen4 IoD Range
@@ -1132,10 +1132,10 @@ gen4iod.menu.eesz.autoflash.build.flash_size=16M
 gen4iod.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 gen4iod.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 gen4iod.menu.eesz.autoflash.upload.maximum_size=1044464
-gen4iod.menu.iramfloat.yes=allowed in ISR
-gen4iod.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 gen4iod.menu.iramfloat.no=in IROM
 gen4iod.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+gen4iod.menu.iramfloat.yes=allowed in ISR
+gen4iod.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
@@ -1355,10 +1355,10 @@ huzzah.menu.eesz.autoflash.build.flash_size=16M
 huzzah.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 huzzah.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 huzzah.menu.eesz.autoflash.upload.maximum_size=1044464
-huzzah.menu.iramfloat.yes=allowed in ISR
-huzzah.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 huzzah.menu.iramfloat.no=in IROM
 huzzah.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+huzzah.menu.iramfloat.yes=allowed in ISR
+huzzah.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifi_slot.name=Amperka WiFi Slot
@@ -1672,10 +1672,10 @@ wifi_slot.menu.eesz.autoflash.build.flash_size=16M
 wifi_slot.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifi_slot.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_slot.menu.eesz.autoflash.upload.maximum_size=1044464
-wifi_slot.menu.iramfloat.yes=allowed in ISR
-wifi_slot.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 wifi_slot.menu.iramfloat.no=in IROM
 wifi_slot.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifi_slot.menu.iramfloat.yes=allowed in ISR
+wifi_slot.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 arduino-esp8266.name=Arduino
@@ -1907,10 +1907,10 @@ arduino-esp8266.menu.eesz.autoflash.build.flash_size=16M
 arduino-esp8266.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 arduino-esp8266.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 arduino-esp8266.menu.eesz.autoflash.upload.maximum_size=1044464
-arduino-esp8266.menu.iramfloat.yes=allowed in ISR
-arduino-esp8266.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 arduino-esp8266.menu.iramfloat.no=in IROM
 arduino-esp8266.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+arduino-esp8266.menu.iramfloat.yes=allowed in ISR
+arduino-esp8266.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espmxdevkit.name=DOIT ESP-Mx DevKit (ESP8285)
@@ -2163,10 +2163,10 @@ espmxdevkit.menu.eesz.autoflash.build.flash_size=16M
 espmxdevkit.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espmxdevkit.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espmxdevkit.menu.eesz.autoflash.upload.maximum_size=1044464
-espmxdevkit.menu.iramfloat.yes=allowed in ISR
-espmxdevkit.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espmxdevkit.menu.iramfloat.no=in IROM
 espmxdevkit.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espmxdevkit.menu.iramfloat.yes=allowed in ISR
+espmxdevkit.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 oak.name=Digistump Oak
@@ -2387,10 +2387,10 @@ oak.menu.eesz.autoflash.build.flash_size=16M
 oak.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 oak.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 oak.menu.eesz.autoflash.upload.maximum_size=1044464
-oak.menu.iramfloat.yes=allowed in ISR
-oak.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 oak.menu.iramfloat.no=in IROM
 oak.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+oak.menu.iramfloat.yes=allowed in ISR
+oak.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espduino.name=ESPDuino (ESP-13 Module)
@@ -2618,10 +2618,10 @@ espduino.menu.eesz.autoflash.build.flash_size=16M
 espduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espduino.menu.eesz.autoflash.upload.maximum_size=1044464
-espduino.menu.iramfloat.yes=allowed in ISR
-espduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espduino.menu.iramfloat.no=in IROM
 espduino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espduino.menu.iramfloat.yes=allowed in ISR
+espduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espectro.name=ESPectro Core
@@ -2841,10 +2841,10 @@ espectro.menu.eesz.autoflash.build.flash_size=16M
 espectro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espectro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espectro.menu.eesz.autoflash.upload.maximum_size=1044464
-espectro.menu.iramfloat.yes=allowed in ISR
-espectro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espectro.menu.iramfloat.no=in IROM
 espectro.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espectro.menu.iramfloat.yes=allowed in ISR
+espectro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espino.name=ESPino (ESP-12 Module)
@@ -3067,10 +3067,10 @@ espino.menu.eesz.autoflash.build.flash_size=16M
 espino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espino.menu.eesz.autoflash.upload.maximum_size=1044464
-espino.menu.iramfloat.yes=allowed in ISR
-espino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espino.menu.iramfloat.no=in IROM
 espino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espino.menu.iramfloat.yes=allowed in ISR
+espino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
@@ -3293,10 +3293,10 @@ espresso_lite_v1.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espresso_lite_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v1.menu.eesz.autoflash.upload.maximum_size=1044464
-espresso_lite_v1.menu.iramfloat.yes=allowed in ISR
-espresso_lite_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espresso_lite_v1.menu.iramfloat.no=in IROM
 espresso_lite_v1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espresso_lite_v1.menu.iramfloat.yes=allowed in ISR
+espresso_lite_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
@@ -3519,10 +3519,10 @@ espresso_lite_v2.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espresso_lite_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v2.menu.eesz.autoflash.upload.maximum_size=1044464
-espresso_lite_v2.menu.iramfloat.yes=allowed in ISR
-espresso_lite_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espresso_lite_v2.menu.iramfloat.no=in IROM
 espresso_lite_v2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espresso_lite_v2.menu.iramfloat.yes=allowed in ISR
+espresso_lite_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 sonoff.name=ITEAD Sonoff
@@ -3783,10 +3783,10 @@ sonoff.menu.eesz.autoflash.build.flash_size=16M
 sonoff.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 sonoff.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 sonoff.menu.eesz.autoflash.upload.maximum_size=1044464
-sonoff.menu.iramfloat.yes=allowed in ISR
-sonoff.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 sonoff.menu.iramfloat.no=in IROM
 sonoff.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+sonoff.menu.iramfloat.yes=allowed in ISR
+sonoff.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 inventone.name=Invent One
@@ -4006,10 +4006,10 @@ inventone.menu.eesz.autoflash.build.flash_size=16M
 inventone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 inventone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 inventone.menu.eesz.autoflash.upload.maximum_size=1044464
-inventone.menu.iramfloat.yes=allowed in ISR
-inventone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 inventone.menu.iramfloat.no=in IROM
 inventone.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+inventone.menu.iramfloat.yes=allowed in ISR
+inventone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_wroom_02.name=LOLIN(WEMOS) D1 ESP-WROOM-02
@@ -4245,10 +4245,10 @@ d1_wroom_02.menu.eesz.autoflash.build.flash_size=16M
 d1_wroom_02.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_wroom_02.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_wroom_02.menu.eesz.autoflash.upload.maximum_size=1044464
-d1_wroom_02.menu.iramfloat.yes=allowed in ISR
-d1_wroom_02.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1_wroom_02.menu.iramfloat.no=in IROM
 d1_wroom_02.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_wroom_02.menu.iramfloat.yes=allowed in ISR
+d1_wroom_02.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini.name=LOLIN(WEMOS) D1 R2 & mini
@@ -4468,10 +4468,10 @@ d1_mini.menu.eesz.autoflash.build.flash_size=16M
 d1_mini.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini.menu.eesz.autoflash.upload.maximum_size=1044464
-d1_mini.menu.iramfloat.yes=allowed in ISR
-d1_mini.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1_mini.menu.iramfloat.no=in IROM
 d1_mini.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini.menu.iramfloat.yes=allowed in ISR
+d1_mini.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_clone.name=LOLIN(WEMOS) D1 mini (clone)
@@ -4708,10 +4708,10 @@ d1_mini_clone.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_clone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_clone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_clone.menu.eesz.autoflash.upload.maximum_size=1044464
-d1_mini_clone.menu.iramfloat.yes=allowed in ISR
-d1_mini_clone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1_mini_clone.menu.iramfloat.no=in IROM
 d1_mini_clone.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_clone.menu.iramfloat.yes=allowed in ISR
+d1_mini_clone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_lite.name=LOLIN(WEMOS) D1 mini Lite
@@ -4963,10 +4963,10 @@ d1_mini_lite.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_lite.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_lite.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_lite.menu.eesz.autoflash.upload.maximum_size=1044464
-d1_mini_lite.menu.iramfloat.yes=allowed in ISR
-d1_mini_lite.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1_mini_lite.menu.iramfloat.no=in IROM
 d1_mini_lite.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_lite.menu.iramfloat.yes=allowed in ISR
+d1_mini_lite.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_pro.name=LOLIN(WEMOS) D1 mini Pro
@@ -5178,10 +5178,10 @@ d1_mini_pro.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_pro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_pro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_pro.menu.eesz.autoflash.upload.maximum_size=1044464
-d1_mini_pro.menu.iramfloat.yes=allowed in ISR
-d1_mini_pro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1_mini_pro.menu.iramfloat.no=in IROM
 d1_mini_pro.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_pro.menu.iramfloat.yes=allowed in ISR
+d1_mini_pro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1.name=LOLIN(WeMos) D1 R1
@@ -5401,10 +5401,10 @@ d1.menu.eesz.autoflash.build.flash_size=16M
 d1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1.menu.eesz.autoflash.upload.maximum_size=1044464
-d1.menu.iramfloat.yes=allowed in ISR
-d1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 d1.menu.iramfloat.no=in IROM
 d1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1.menu.iramfloat.yes=allowed in ISR
+d1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 agruminolemon.name=Lifely Agrumino Lemon v4
@@ -5640,10 +5640,10 @@ agruminolemon.menu.eesz.autoflash.build.flash_size=16M
 agruminolemon.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 agruminolemon.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 agruminolemon.menu.eesz.autoflash.upload.maximum_size=1044464
-agruminolemon.menu.iramfloat.yes=allowed in ISR
-agruminolemon.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 agruminolemon.menu.iramfloat.no=in IROM
 agruminolemon.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+agruminolemon.menu.iramfloat.yes=allowed in ISR
+agruminolemon.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -5863,10 +5863,10 @@ nodemcu.menu.eesz.autoflash.build.flash_size=16M
 nodemcu.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 nodemcu.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcu.menu.eesz.autoflash.upload.maximum_size=1044464
-nodemcu.menu.iramfloat.yes=allowed in ISR
-nodemcu.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 nodemcu.menu.iramfloat.no=in IROM
 nodemcu.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+nodemcu.menu.iramfloat.yes=allowed in ISR
+nodemcu.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
@@ -6090,10 +6090,10 @@ nodemcuv2.menu.eesz.autoflash.build.flash_size=16M
 nodemcuv2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 nodemcuv2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcuv2.menu.eesz.autoflash.upload.maximum_size=1044464
-nodemcuv2.menu.iramfloat.yes=allowed in ISR
-nodemcuv2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 nodemcuv2.menu.iramfloat.no=in IROM
 nodemcuv2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+nodemcuv2.menu.iramfloat.yes=allowed in ISR
+nodemcuv2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -6344,10 +6344,10 @@ modwifi.menu.eesz.autoflash.build.flash_size=16M
 modwifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 modwifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 modwifi.menu.eesz.autoflash.upload.maximum_size=1044464
-modwifi.menu.iramfloat.yes=allowed in ISR
-modwifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 modwifi.menu.iramfloat.no=in IROM
 modwifi.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+modwifi.menu.iramfloat.yes=allowed in ISR
+modwifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 phoenix_v1.name=Phoenix 1.0
@@ -6570,10 +6570,10 @@ phoenix_v1.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 phoenix_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v1.menu.eesz.autoflash.upload.maximum_size=1044464
-phoenix_v1.menu.iramfloat.yes=allowed in ISR
-phoenix_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 phoenix_v1.menu.iramfloat.no=in IROM
 phoenix_v1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+phoenix_v1.menu.iramfloat.yes=allowed in ISR
+phoenix_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 phoenix_v2.name=Phoenix 2.0
@@ -6796,10 +6796,10 @@ phoenix_v2.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 phoenix_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v2.menu.eesz.autoflash.upload.maximum_size=1044464
-phoenix_v2.menu.iramfloat.yes=allowed in ISR
-phoenix_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 phoenix_v2.menu.iramfloat.no=in IROM
 phoenix_v2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+phoenix_v2.menu.iramfloat.yes=allowed in ISR
+phoenix_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 eduinowifi.name=Schirmilabs Eduino WiFi
@@ -7019,10 +7019,10 @@ eduinowifi.menu.eesz.autoflash.build.flash_size=16M
 eduinowifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 eduinowifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 eduinowifi.menu.eesz.autoflash.upload.maximum_size=1044464
-eduinowifi.menu.iramfloat.yes=allowed in ISR
-eduinowifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 eduinowifi.menu.iramfloat.no=in IROM
 eduinowifi.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+eduinowifi.menu.iramfloat.yes=allowed in ISR
+eduinowifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wiolink.name=Seeed Wio Link
@@ -7242,10 +7242,10 @@ wiolink.menu.eesz.autoflash.build.flash_size=16M
 wiolink.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wiolink.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wiolink.menu.eesz.autoflash.upload.maximum_size=1044464
-wiolink.menu.iramfloat.yes=allowed in ISR
-wiolink.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 wiolink.menu.iramfloat.no=in IROM
 wiolink.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wiolink.menu.iramfloat.yes=allowed in ISR
+wiolink.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 blynk.name=SparkFun Blynk Board
@@ -7465,10 +7465,10 @@ blynk.menu.eesz.autoflash.build.flash_size=16M
 blynk.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 blynk.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 blynk.menu.eesz.autoflash.upload.maximum_size=1044464
-blynk.menu.iramfloat.yes=allowed in ISR
-blynk.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 blynk.menu.iramfloat.no=in IROM
 blynk.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+blynk.menu.iramfloat.yes=allowed in ISR
+blynk.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 thing.name=SparkFun ESP8266 Thing
@@ -7688,10 +7688,10 @@ thing.menu.eesz.autoflash.build.flash_size=16M
 thing.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 thing.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thing.menu.eesz.autoflash.upload.maximum_size=1044464
-thing.menu.iramfloat.yes=allowed in ISR
-thing.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 thing.menu.iramfloat.no=in IROM
 thing.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+thing.menu.iramfloat.yes=allowed in ISR
+thing.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
@@ -7911,10 +7911,10 @@ thingdev.menu.eesz.autoflash.build.flash_size=16M
 thingdev.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 thingdev.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thingdev.menu.eesz.autoflash.upload.maximum_size=1044464
-thingdev.menu.iramfloat.yes=allowed in ISR
-thingdev.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 thingdev.menu.iramfloat.no=in IROM
 thingdev.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+thingdev.menu.iramfloat.yes=allowed in ISR
+thingdev.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -8134,10 +8134,10 @@ esp210.menu.eesz.autoflash.build.flash_size=16M
 esp210.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 esp210.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp210.menu.eesz.autoflash.upload.maximum_size=1044464
-esp210.menu.iramfloat.yes=allowed in ISR
-esp210.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 esp210.menu.iramfloat.no=in IROM
 esp210.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+esp210.menu.iramfloat.yes=allowed in ISR
+esp210.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
@@ -8357,10 +8357,10 @@ espinotee.menu.eesz.autoflash.build.flash_size=16M
 espinotee.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espinotee.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espinotee.menu.eesz.autoflash.upload.maximum_size=1044464
-espinotee.menu.iramfloat.yes=allowed in ISR
-espinotee.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 espinotee.menu.iramfloat.no=in IROM
 espinotee.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espinotee.menu.iramfloat.yes=allowed in ISR
+espinotee.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifi_kit_8.name=WiFi Kit 8
@@ -8580,10 +8580,10 @@ wifi_kit_8.menu.eesz.autoflash.build.flash_size=16M
 wifi_kit_8.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifi_kit_8.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_kit_8.menu.eesz.autoflash.upload.maximum_size=1044464
-wifi_kit_8.menu.iramfloat.yes=allowed in ISR
-wifi_kit_8.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 wifi_kit_8.menu.iramfloat.no=in IROM
 wifi_kit_8.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifi_kit_8.menu.iramfloat.yes=allowed in ISR
+wifi_kit_8.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifiduino.name=WiFiduino
@@ -8803,10 +8803,10 @@ wifiduino.menu.eesz.autoflash.build.flash_size=16M
 wifiduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifiduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifiduino.menu.eesz.autoflash.upload.maximum_size=1044464
-wifiduino.menu.iramfloat.yes=allowed in ISR
-wifiduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 wifiduino.menu.iramfloat.no=in IROM
 wifiduino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifiduino.menu.iramfloat.yes=allowed in ISR
+wifiduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifinfo.name=WifInfo
@@ -9082,10 +9082,10 @@ wifinfo.menu.eesz.autoflash.build.flash_size=16M
 wifinfo.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifinfo.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifinfo.menu.eesz.autoflash.upload.maximum_size=1044464
-wifinfo.menu.iramfloat.yes=allowed in ISR
-wifinfo.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 wifinfo.menu.iramfloat.no=in IROM
 wifinfo.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifinfo.menu.iramfloat.yes=allowed in ISR
+wifinfo.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 cw01.name=XinaBox CW01
@@ -9308,8 +9308,8 @@ cw01.menu.eesz.autoflash.build.flash_size=16M
 cw01.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 cw01.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 cw01.menu.eesz.autoflash.upload.maximum_size=1044464
-cw01.menu.iramfloat.yes=allowed in ISR
-cw01.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 cw01.menu.iramfloat.no=in IROM
 cw01.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+cw01.menu.iramfloat.yes=allowed in ISR
+cw01.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
