@@ -142,6 +142,16 @@ SECTIONS
 
     /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
     *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
+
+#ifdef FP_IN_IRAM
+    *libgcc.a:*f2.o(.literal .text)
+    *libgcc.a:*f3.o(.literal .text)
+    *libgcc.a:*fsi.o(.literal .text)
+    *libgcc.a:*fdi.o(.literal .text)
+    *libgcc.a:*ifs.o(.literal .text)
+    *libgcc.a:*idf.o(.literal .text)
+#endif
+
   } >iram1_0_seg :iram1_0_phdr
 
   .irom0.text : ALIGN(4)
