@@ -79,7 +79,7 @@ protected:
 
 public:
   WiFiServer(const IPAddress& addr, uint16_t port);
-  WiFiServer(uint16_t port);
+  WiFiServer(uint16_t port = 23);
   virtual ~WiFiServer() {}
   WiFiClient accept(); // https://www.arduino.cc/en/Reference/EthernetServerAccept
   WiFiClient available(uint8_t* status = NULL) __attribute__((deprecated("Renamed to accept().")));

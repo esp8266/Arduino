@@ -18,6 +18,11 @@ For most use cases the basic WiFiServer class of the ESP8266WiFi library is suit
 
 Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
 
+begin(port)
+~~~~~~~~~~~
+
+Additionally to ``begin()`` without parameter and a constructor with parameter ``port``, ESP8266WiFi library has ``begin(uint16_t port)`` and a constructor without parameters. If port is not specified with constructor and ``begin`` without parameter is used, the server is started on port 23.
+
 accept
 ~~~~~~
 
