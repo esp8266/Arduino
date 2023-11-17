@@ -51,7 +51,7 @@ def get_elf_entry(elf, path):
     lines = io.StringIO(result.stdout)
     for line in lines.readlines():
         if 'Entry point address' in line:
-            words = re.split('\s+', line)
+            words = re.split(r'\s+', line)
             entry_point = words[-2]
             return int(entry_point, 16)
 
@@ -70,7 +70,7 @@ def get_segment_size_addr(elf, segment, path):
     lines = io.StringIO(result.stdout)
     for line in lines.readlines():
         if segment in line:
-            words = re.split('\s+', line)
+            words = re.split(r'\s+', line)
             size = int(words[3], 16)
             addr = int(words[4], 16)
             return [ size, addr ]
