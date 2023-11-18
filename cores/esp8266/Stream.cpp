@@ -22,6 +22,7 @@
 
 #include <Arduino.h>
 #include <Stream.h>
+#include <StreamString.h>
 
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
@@ -287,6 +288,59 @@ String Stream::readStringUntil(const char* terminator, uint32_t untilTotalNumber
 
     return ret;
 }
+
+String Stream::readStreamString(const ssize_t maxLen ,const oneShotMs::timeType timeoutMs) {
+    String ret;
+    S2Stream stream(ret);
+    sendGeneric(&stream, maxLen, -1, timeoutMs);
+    return ret;
+}
+
+String Stream::readStreamStringUntil(const int readUntilChar, const oneShotMs::timeType timeoutMs) {
+    String ret;
+    S2Stream stream(ret);
+    sendGeneric(&stream, -1, readUntilChar, timeoutMs);
+    return ret;
+}
+
+String Stream::readStreamStringUntil (const char* terminatorString, uint32_t untilTotalNumberOfOccurrences, const oneShotMs::timeType timeoutMs) {
+    String ret;
+    S2Stream stream(ret);
+    uint32_t occurrences = 0;
+    size_t termLen = strlen(terminatorString);
+    size_t termIndex = 0;
+    // Serial.printf("S %s\n",terminatorString);
+    while(1){
+        size_t read = sendGeneric(&stream, -1, terminatorString[termIndex], timeoutMs);
+        // Serial.printf("r %d, l %d, ti %d\n", read, termLen, termIndex);
+        if(getLastSendReport() != Report::Success) {
+            Serial.printf("Error %d\n", (int) getLastSendReport());
+            break;
+        }
+        if(termIndex == termLen - 1){
+            // Serial.printf("m %d\n", occurrences);
+            if(++occurrences == untilTotalNumberOfOccurrences){
+                break;
+            }else{
+                ret += terminatorString;
+                termIndex = 0;
+                continue;
+            }
+        }
+        int c = timedPeek();
+        // Serial.printf("c %c %02X\n", c, c);
+        if( c >= 0 && c != terminatorString[++termIndex]){
+            ret += String(terminatorString).substring(0, termIndex);
+            termIndex = 0;
+            continue;
+        };
+        if(c < 0 || (read == 0 && termIndex == 0)) break;
+    }
+    
+    return ret;
+}
+
+
 
 // read what can be read, immediate exit on unavailable data
 // prototype similar to Arduino's `int Client::read(buf, len)`
