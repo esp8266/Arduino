@@ -100,7 +100,7 @@ static void ets_printf_P(const char *str, ...) {
 
 static void cut_here() {
     // https://tinyurl.com/8266dcdr => https://arduino-esp8266.readthedocs.io/en/latest/faq/a02-my-esp-crashes.html#exception
-    ets_printf_P(PSTR("\nDO NOT POST THIS EXCEPTION - Decode it: https://tinyurl.com/8266dcdr\n"));
+    ets_printf_P(PSTR("\nTo make this dump useful, DECODE IT - https://tinyurl.com/8266dcdr\n"));
 
     for (auto i = 0; i < 15; i++ ) {
         ets_putc('-');
