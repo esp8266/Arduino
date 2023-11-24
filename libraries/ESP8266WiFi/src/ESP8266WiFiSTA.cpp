@@ -339,6 +339,22 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   return true;
 }
 
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress dns) {
+
+    if (!local_ip.isSet())
+        return config(INADDR_ANY, INADDR_ANY, INADDR_ANY);
+
+    if (!local_ip.isV4())
+        return false;
+
+    IPAddress gw(local_ip);
+    gw[3] = 1;
+    if (!dns.isSet()) {
+        dns = gw;
+    }
+    return config(local_ip, dns, gw);
+}
+
 /**
  * Change DNS for static IP configuration
  * @param dns1       Static DNS server 1
