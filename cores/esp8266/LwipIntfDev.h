@@ -96,7 +96,7 @@ public:
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
     }
-    IPAddress dnsIP(int n) const  // WiFi lib way
+    IPAddress dnsIP(int n = 0) const  // WiFi lib way
     {
         return IPAddress(dns_getserver(n));
     }
