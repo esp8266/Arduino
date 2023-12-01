@@ -86,6 +86,13 @@ public:
         return ret;
     }
 
+    void end()
+    {
+        ip_addr_copy(LwipIntfDev<RawDev>::_netif.ip_addr,
+                     ip_addr_any);  // to allow DHCP at next begin
+        LwipIntfDev<RawDev>::end();
+    }
+
     HardwareStatus hardwareStatus() const
     {
         return _hardwareStatus;
