@@ -30,6 +30,7 @@
 
 ///////////////////////////////////////////////////////////////
 // S2Stream points to a String and makes it a Stream
+// ("String to Stream")
 // (it is also the helper for StreamString)
 
 class S2Stream: public Stream
@@ -192,7 +193,7 @@ public:
     }
 
     // Reading this stream will mark the string as read without consuming
-    // (not enabled by default)
+    // (not enabled by default, see CS2Stream)
     // Calling resetPointer() resets the read state and allows rereading.
     void resetPointer(int pointer = 0)
     {
@@ -204,6 +205,21 @@ protected:
     int     peekPointer;  // -1:String is consumed / >=0:resettable pointer
 };
 
+///////////////////////////////////////////////////////////////
+// CS2Stream is a S2Stream using an unmodifiable string by default
+// ("Constant String to Stream")
+// for equivalent with char* see StreamConstPtr(StreamDev.h)
+
+class CS2Stream: public S2Stream
+{
+public:
+
+    CS2Stream(String& string) : S2Stream(string, 0) { }
+    CS2Stream(String* string) : S2Stream(string, 0) { }
+    void setConsume() = delete; // prevent from modifying the string
+};
+
+///////////////////////////////////////////////////////////////
 // StreamString is a S2Stream holding the String
 
 class StreamString: public String, public S2Stream
