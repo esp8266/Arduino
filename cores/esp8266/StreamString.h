@@ -213,10 +213,9 @@ protected:
 class CS2Stream: public S2Stream
 {
 public:
-
     CS2Stream(String& string) : S2Stream(string, 0) { }
     CS2Stream(String* string) : S2Stream(string, 0) { }
-    void setConsume() = delete; // prevent from modifying the string
+    void setConsume() = delete;  // prevent from modifying the string
 };
 
 ///////////////////////////////////////////////////////////////
