@@ -29,8 +29,7 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-// S2Stream points to a String and makes it a Stream
-// ("String to Stream")
+// S2Stream ("String to Stream") points to a String and makes it a Stream
 // (it is also the helper for StreamString)
 
 class S2Stream: public Stream
@@ -185,19 +184,19 @@ public:
         return peekPointer < 0 ? string->length() : string->length() - peekPointer;
     }
 
-    // calling setConsume() will consume bytes as the stream is read
-    // (enabled by default)
+    // calling setConsume() will make the string consumed as the stream is read.
+    // (default behaviour)
     void setConsume()
     {
         peekPointer = -1;
     }
 
-    // Reading this stream will mark the string as read without consuming
-    // (not enabled by default, see CS2Stream)
-    // Calling resetPointer() resets the read state and allows rereading.
-    void resetPointer(int pointer = 0)
+    // Calling resetPointer() resets the read cursor and allows rereading.
+    // (this is the opposite of default mode set by setConsume())
+    // (check also CS2Stream::)
+    void resetPointer(size_t pointer = 0)
     {
-        peekPointer = pointer;
+        peekPointer = std::min(std::max(0U, pointer), string->length());
     }
 
 protected:
@@ -206,9 +205,8 @@ protected:
 };
 
 ///////////////////////////////////////////////////////////////
-// CS2Stream is a S2Stream using an unmodifiable string by default
-// ("Constant String to Stream")
-// for equivalent with char* see StreamConstPtr(StreamDev.h)
+// CS2Stream ("Constant String to Stream") is a S2Stream using an unmodifiable String
+// (for an equivalent with char* see StreamConstPtr:: in StreamDev.h)
 
 class CS2Stream: public S2Stream
 {
