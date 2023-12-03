@@ -7,7 +7,7 @@ The number of features provided by ESP8266 in the station mode is far more exten
 
 Description of station class has been broken down into four parts. First discusses methods to establish connection to an access point. Second provides methods to manage connection like e.g. ``reconnect`` or ``isConnected``. Third covers properties to obtain information about connection like MAC or IP address. Finally the fourth section provides alternate methods to connect like e.g. Wi-Fi Protected Setup (WPS).
 
-An effort to unify such network device class accross several Arduino cores has been made. Recommandations are located at `NetApiHelpers <https://github.com/JAndrassy/NetApiHelpers>`__. Esp8266 Arduino core's station class is following these guidelines.
+An effort to unify such network device class accross several Arduino core implementations has been made.  Recommandations are located at `Arduino-Networking-API <https://github.com/JAndrassy/Arduino-Networking-API>`__ and tested with `NetApiHelpers <https://github.com/JAndrassy/NetApiHelpers>`__.  Esp8266 Arduino core's station class is also following these guidelines.
 
 Table of Contents
 -----------------
