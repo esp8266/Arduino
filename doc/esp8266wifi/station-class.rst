@@ -7,6 +7,8 @@ The number of features provided by ESP8266 in the station mode is far more exten
 
 Description of station class has been broken down into four parts. First discusses methods to establish connection to an access point. Second provides methods to manage connection like e.g. ``reconnect`` or ``isConnected``. Third covers properties to obtain information about connection like MAC or IP address. Finally the fourth section provides alternate methods to connect like e.g. Wi-Fi Protected Setup (WPS).
 
+An effort to unify such network device class accross several Arduino core implementations has been made.  Recommandations are located at `Arduino-Networking-API <https://github.com/JAndrassy/Arduino-Networking-API>`__ and tested with `NetApiHelpers <https://github.com/JAndrassy/NetApiHelpers>`__.  Esp8266 Arduino core's station class is also following these guidelines.
+
 Table of Contents
 -----------------
 
@@ -97,6 +99,8 @@ config
 
 Disable `DHCP <https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol>`__ client (Dynamic Host Configuration Protocol) and set the IP configuration of station interface to user defined arbitrary values. The interface will be a static IP configuration instead of values provided by DHCP.
 
+Note that to reenable DHCP, all three parameters as 0.0.0.0 (local_ip, gateway and subnet as ``INADDR_ANY``) must be passed back to config() and re-connecting is needed.
+
 .. code:: cpp
 
     WiFi.config(local_ip, gateway, subnet, dns1, dns2)
@@ -157,8 +161,7 @@ The following IP configuration may be provided:
     .
     Connected, IP address: 192.168.1.22
 
-Please note that station with static IP configuration usually connects to the network faster. In the above example it took about 500ms (one dot `.` displayed). This is because obtaining of IP configuration by DHCP client takes time and in this case this step is skipped. If you pass all three parameter as 0.0.0.0 (local_ip, gateway and subnet), it will re enable DHCP. You need to re-connect the device to get new IPs.
-
+Please note that station with static IP configuration usually connects to the network faster. In the above example it took about 500ms (one dot `.` displayed). This is because obtaining of IP configuration by DHCP client takes time and in this case this step is skipped. Reminder: If you pass all three parameters as 0.0.0.0 (local_ip, gateway and subnet), it will re enable DHCP. You need to re-connect the device to get new IPs.
 
 Manage Connection
 ~~~~~~~~~~~~~~~~~
