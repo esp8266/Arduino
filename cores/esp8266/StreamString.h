@@ -193,27 +193,14 @@ public:
 
     // Calling resetPointer() resets the read cursor and allows rereading.
     // (this is the opposite of default mode set by setConsume())
-    // (check also CS2Stream::)
     void resetPointer(size_t pointer = 0)
     {
-        peekPointer = std::min(std::max(0U, pointer), string->length());
+        peekPointer = std::min(std::max(0U, (unsigned int)pointer), string->length());
     }
 
 protected:
     String* string;
     int     peekPointer;  // -1:String is consumed / >=0:resettable pointer
-};
-
-///////////////////////////////////////////////////////////////
-// CS2Stream ("Constant String to Stream") is a S2Stream using an unmodifiable String
-// (for an equivalent with char* see StreamConstPtr:: in StreamDev.h)
-
-class CS2Stream: public S2Stream
-{
-public:
-    CS2Stream(String& string) : S2Stream(string, 0) { }
-    CS2Stream(String* string) : S2Stream(string, 0) { }
-    void setConsume() = delete;  // prevent from modifying the string
 };
 
 ///////////////////////////////////////////////////////////////
