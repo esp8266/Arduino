@@ -104,14 +104,14 @@ void testStreamString() {
   }
 
   {
-    // This can also be done with StreamConstPtr as source without intermediate variable
-    // and S2Stream as destination without intermediate variable
+    // Streaming to a regular String
 
-    String someRegularString { F("hello") };
+    String someSource{ F("hello") };
+    String someDestString;
 
-    StreamConstPtr(someRegularString).sendAll(S2Stream(someRegularString));
-    StreamConstPtr(someRegularString).sendAll(S2Stream(someRegularString));
-    check("StreamConstPtr(aString).sendAll(S2Stream(someString))", someRegularString.c_str(), "hellohello");
+    StreamConstPtr(someSource).sendAll(S2Stream(someDestString));
+    StreamConstPtr(someSource).sendAll(S2Stream(someDestString));
+    check("StreamConstPtr(someSource).sendAll(S2Stream(someDestString))", someDestString.c_str(), "hellohello");
   }
 
   {
@@ -193,7 +193,7 @@ void setup() {
   testStreamString();
 
   Serial.printf("sizeof: String:%zu Stream:%zu StreamString:%zu S2Stream:%zu StreamConstPtr:%zu\n",
-    sizeof(String), sizeof(Stream), sizeof(StreamString), sizeof(S2Stream), sizeof(StreamConstPtr));
+                sizeof(String), sizeof(Stream), sizeof(StreamString), sizeof(S2Stream), sizeof(StreamConstPtr));
 }
 
 #endif
