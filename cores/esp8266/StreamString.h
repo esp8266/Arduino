@@ -195,7 +195,7 @@ public:
     // (this is the opposite of default mode set by setConsume())
     void resetPointer(size_t pointer = 0)
     {
-        peekPointer = std::min(std::max(0U, (unsigned int)pointer), string->length());
+        peekPointer = std::min(pointer, (size_t)string->length());
     }
 
 protected:
