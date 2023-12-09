@@ -26,11 +26,11 @@ Multicast UDP
 
 .. code:: cpp
 
-    uint8_t  beginMulticast (IPAddress interfaceAddr, IPAddress multicast, uint16_t port) 
+    uint8_t  beginMulticast (IPAddress multicast, uint16_t port) 
     virtual int  beginPacketMulticast (IPAddress multicastAddress, uint16_t port, IPAddress interfaceAddress, int ttl=1) 
     IPAddress  destinationIP () 
     uint16_t  localPort ()
 
-The ``WiFiUDP`` class supports sending and receiving multicast packets on STA interface. When sending a multicast packet, replace ``udp.beginPacket(addr, port)`` with ``udp.beginPacketMulticast(addr, port, WiFi.localIP())``. When listening to multicast packets, replace ``udp.begin(port)`` with ``udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)``. You can use ``udp.destinationIP()`` to tell whether the packet received was sent to the multicast or unicast address.
+The ``WiFiUDP`` class supports sending and receiving multicast packets on STA interface. When sending a multicast packet, replace ``udp.beginPacket(addr, port)`` with ``udp.beginPacketMulticast(addr, port, WiFi.localIP())``. When listening to multicast packets, replace ``udp.begin(port)`` with ``udp.beginMulticast(multicast_ip_addr, port)``. You can use ``udp.destinationIP()`` to tell whether the packet received was sent to the multicast or unicast address.
 
 For code samples please refer to separate section with `examples <udp-examples.rst>`__ dedicated specifically to the UDP Class.

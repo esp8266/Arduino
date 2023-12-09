@@ -17,12 +17,14 @@ menu.FlashFreq=Flash Frequency
 menu.ResetMethod=Reset Method
 menu.dbg=Debug port
 menu.lvl=Debug Level
+menu.optim=Debug Optimization
 menu.ip=lwIP Variant
 menu.vt=VTables
 menu.exception=C++ Exceptions
 menu.stacksmash=Stack Protection
 menu.wipe=Erase Flash
 menu.sdk=NONOS SDK Version
+menu.iramfloat=Floating Point operations
 menu.ssl=SSL Support
 menu.mmu=MMU
 menu.non32xfer=Non-32-Bit Access
@@ -40,6 +42,7 @@ generic.build.mcu=esp8266
 generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.spiffs_pagesize=256
+generic.build.debug_optim=
 generic.build.debug_port=
 generic.build.debug_level=
 generic.menu.xtal.80=80 MHz
@@ -397,6 +400,12 @@ generic.menu.dbg.Serial1=Serial1
 generic.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 generic.menu.lvl.None____=None
 generic.menu.lvl.None____.build.debug_level=
+generic.menu.optim.Smallest=None
+generic.menu.optim.Smallest.build.debug_optim=-Os
+generic.menu.optim.Lite=Lite
+generic.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+generic.menu.optim.Full=Optimum
+generic.menu.optim.Full.build.debug_optim=-Og
 generic.menu.lvl.SSL=SSL
 generic.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 generic.menu.lvl.TLS_MEM=TLS_MEM
@@ -488,6 +497,10 @@ generic.menu.eesz.autoflash.build.flash_size=16M
 generic.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 generic.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 generic.menu.eesz.autoflash.upload.maximum_size=1044464
+generic.menu.iramfloat.no=in IROM
+generic.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+generic.menu.iramfloat.yes=allowed in ISR
+generic.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 esp8285.name=Generic ESP8285 Module
@@ -502,6 +515,7 @@ esp8285.serial.disableRTS=true
 esp8285.build.mcu=esp8266
 esp8285.build.core=esp8266
 esp8285.build.spiffs_pagesize=256
+esp8285.build.debug_optim=
 esp8285.build.debug_port=
 esp8285.build.debug_level=
 esp8285.menu.xtal.80=80 MHz
@@ -742,6 +756,12 @@ esp8285.menu.dbg.Serial1=Serial1
 esp8285.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 esp8285.menu.lvl.None____=None
 esp8285.menu.lvl.None____.build.debug_level=
+esp8285.menu.optim.Smallest=None
+esp8285.menu.optim.Smallest.build.debug_optim=-Os
+esp8285.menu.optim.Lite=Lite
+esp8285.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+esp8285.menu.optim.Full=Optimum
+esp8285.menu.optim.Full.build.debug_optim=-Og
 esp8285.menu.lvl.SSL=SSL
 esp8285.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 esp8285.menu.lvl.TLS_MEM=TLS_MEM
@@ -833,6 +853,10 @@ esp8285.menu.eesz.autoflash.build.flash_size=16M
 esp8285.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 esp8285.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp8285.menu.eesz.autoflash.upload.maximum_size=1044464
+esp8285.menu.iramfloat.no=in IROM
+esp8285.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+esp8285.menu.iramfloat.yes=allowed in ISR
+esp8285.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 gen4iod.name=4D Systems gen4 IoD Range
@@ -848,6 +872,7 @@ gen4iod.serial.disableRTS=true
 gen4iod.build.mcu=esp8266
 gen4iod.build.core=esp8266
 gen4iod.build.spiffs_pagesize=256
+gen4iod.build.debug_optim=
 gen4iod.build.debug_port=
 gen4iod.build.debug_level=
 gen4iod.menu.xtal.80=80 MHz
@@ -1010,6 +1035,12 @@ gen4iod.menu.dbg.Serial1=Serial1
 gen4iod.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 gen4iod.menu.lvl.None____=None
 gen4iod.menu.lvl.None____.build.debug_level=
+gen4iod.menu.optim.Smallest=None
+gen4iod.menu.optim.Smallest.build.debug_optim=-Os
+gen4iod.menu.optim.Lite=Lite
+gen4iod.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+gen4iod.menu.optim.Full=Optimum
+gen4iod.menu.optim.Full.build.debug_optim=-Og
 gen4iod.menu.lvl.SSL=SSL
 gen4iod.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 gen4iod.menu.lvl.TLS_MEM=TLS_MEM
@@ -1101,6 +1132,10 @@ gen4iod.menu.eesz.autoflash.build.flash_size=16M
 gen4iod.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 gen4iod.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 gen4iod.menu.eesz.autoflash.upload.maximum_size=1044464
+gen4iod.menu.iramfloat.no=in IROM
+gen4iod.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+gen4iod.menu.iramfloat.yes=allowed in ISR
+gen4iod.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
@@ -1115,6 +1150,7 @@ huzzah.serial.disableRTS=true
 huzzah.build.mcu=esp8266
 huzzah.build.core=esp8266
 huzzah.build.spiffs_pagesize=256
+huzzah.build.debug_optim=
 huzzah.build.debug_port=
 huzzah.build.debug_level=
 huzzah.menu.xtal.80=80 MHz
@@ -1222,6 +1258,12 @@ huzzah.menu.dbg.Serial1=Serial1
 huzzah.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 huzzah.menu.lvl.None____=None
 huzzah.menu.lvl.None____.build.debug_level=
+huzzah.menu.optim.Smallest=None
+huzzah.menu.optim.Smallest.build.debug_optim=-Os
+huzzah.menu.optim.Lite=Lite
+huzzah.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+huzzah.menu.optim.Full=Optimum
+huzzah.menu.optim.Full.build.debug_optim=-Og
 huzzah.menu.lvl.SSL=SSL
 huzzah.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 huzzah.menu.lvl.TLS_MEM=TLS_MEM
@@ -1313,6 +1355,10 @@ huzzah.menu.eesz.autoflash.build.flash_size=16M
 huzzah.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 huzzah.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 huzzah.menu.eesz.autoflash.upload.maximum_size=1044464
+huzzah.menu.iramfloat.no=in IROM
+huzzah.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+huzzah.menu.iramfloat.yes=allowed in ISR
+huzzah.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifi_slot.name=Amperka WiFi Slot
@@ -1327,6 +1373,7 @@ wifi_slot.serial.disableRTS=true
 wifi_slot.build.mcu=esp8266
 wifi_slot.build.core=esp8266
 wifi_slot.build.spiffs_pagesize=256
+wifi_slot.build.debug_optim=
 wifi_slot.build.debug_port=
 wifi_slot.build.debug_level=
 wifi_slot.menu.xtal.80=80 MHz
@@ -1528,6 +1575,12 @@ wifi_slot.menu.dbg.Serial1=Serial1
 wifi_slot.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifi_slot.menu.lvl.None____=None
 wifi_slot.menu.lvl.None____.build.debug_level=
+wifi_slot.menu.optim.Smallest=None
+wifi_slot.menu.optim.Smallest.build.debug_optim=-Os
+wifi_slot.menu.optim.Lite=Lite
+wifi_slot.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+wifi_slot.menu.optim.Full=Optimum
+wifi_slot.menu.optim.Full.build.debug_optim=-Og
 wifi_slot.menu.lvl.SSL=SSL
 wifi_slot.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifi_slot.menu.lvl.TLS_MEM=TLS_MEM
@@ -1619,6 +1672,10 @@ wifi_slot.menu.eesz.autoflash.build.flash_size=16M
 wifi_slot.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifi_slot.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_slot.menu.eesz.autoflash.upload.maximum_size=1044464
+wifi_slot.menu.iramfloat.no=in IROM
+wifi_slot.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifi_slot.menu.iramfloat.yes=allowed in ISR
+wifi_slot.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 arduino-esp8266.name=Arduino
@@ -1645,6 +1702,7 @@ arduino-esp8266.build.mcu=esp8266
 arduino-esp8266.build.core=esp8266
 arduino-esp8266.build.variant=generic
 arduino-esp8266.build.spiffs_pagesize=256
+arduino-esp8266.build.debug_optim=
 arduino-esp8266.build.debug_port=
 arduino-esp8266.build.debug_level=
 arduino-esp8266.menu.xtal.80=80 MHz
@@ -1752,6 +1810,12 @@ arduino-esp8266.menu.dbg.Serial1=Serial1
 arduino-esp8266.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 arduino-esp8266.menu.lvl.None____=None
 arduino-esp8266.menu.lvl.None____.build.debug_level=
+arduino-esp8266.menu.optim.Smallest=None
+arduino-esp8266.menu.optim.Smallest.build.debug_optim=-Os
+arduino-esp8266.menu.optim.Lite=Lite
+arduino-esp8266.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+arduino-esp8266.menu.optim.Full=Optimum
+arduino-esp8266.menu.optim.Full.build.debug_optim=-Og
 arduino-esp8266.menu.lvl.SSL=SSL
 arduino-esp8266.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 arduino-esp8266.menu.lvl.TLS_MEM=TLS_MEM
@@ -1843,6 +1907,10 @@ arduino-esp8266.menu.eesz.autoflash.build.flash_size=16M
 arduino-esp8266.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 arduino-esp8266.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 arduino-esp8266.menu.eesz.autoflash.upload.maximum_size=1044464
+arduino-esp8266.menu.iramfloat.no=in IROM
+arduino-esp8266.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+arduino-esp8266.menu.iramfloat.yes=allowed in ISR
+arduino-esp8266.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espmxdevkit.name=DOIT ESP-Mx DevKit (ESP8285)
@@ -1858,6 +1926,7 @@ espmxdevkit.serial.disableRTS=true
 espmxdevkit.build.mcu=esp8266
 espmxdevkit.build.core=esp8266
 espmxdevkit.build.spiffs_pagesize=256
+espmxdevkit.build.debug_optim=
 espmxdevkit.build.debug_port=
 espmxdevkit.build.debug_level=
 espmxdevkit.menu.xtal.80=80 MHz
@@ -1997,6 +2066,12 @@ espmxdevkit.menu.dbg.Serial1=Serial1
 espmxdevkit.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espmxdevkit.menu.lvl.None____=None
 espmxdevkit.menu.lvl.None____.build.debug_level=
+espmxdevkit.menu.optim.Smallest=None
+espmxdevkit.menu.optim.Smallest.build.debug_optim=-Os
+espmxdevkit.menu.optim.Lite=Lite
+espmxdevkit.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espmxdevkit.menu.optim.Full=Optimum
+espmxdevkit.menu.optim.Full.build.debug_optim=-Og
 espmxdevkit.menu.lvl.SSL=SSL
 espmxdevkit.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espmxdevkit.menu.lvl.TLS_MEM=TLS_MEM
@@ -2088,6 +2163,10 @@ espmxdevkit.menu.eesz.autoflash.build.flash_size=16M
 espmxdevkit.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espmxdevkit.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espmxdevkit.menu.eesz.autoflash.upload.maximum_size=1044464
+espmxdevkit.menu.iramfloat.no=in IROM
+espmxdevkit.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espmxdevkit.menu.iramfloat.yes=allowed in ISR
+espmxdevkit.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 oak.name=Digistump Oak
@@ -2103,6 +2182,7 @@ oak.serial.disableRTS=true
 oak.build.mcu=esp8266
 oak.build.core=esp8266
 oak.build.spiffs_pagesize=256
+oak.build.debug_optim=
 oak.build.debug_port=
 oak.build.debug_level=
 oak.menu.xtal.80=80 MHz
@@ -2210,6 +2290,12 @@ oak.menu.dbg.Serial1=Serial1
 oak.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 oak.menu.lvl.None____=None
 oak.menu.lvl.None____.build.debug_level=
+oak.menu.optim.Smallest=None
+oak.menu.optim.Smallest.build.debug_optim=-Os
+oak.menu.optim.Lite=Lite
+oak.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+oak.menu.optim.Full=Optimum
+oak.menu.optim.Full.build.debug_optim=-Og
 oak.menu.lvl.SSL=SSL
 oak.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 oak.menu.lvl.TLS_MEM=TLS_MEM
@@ -2301,6 +2387,10 @@ oak.menu.eesz.autoflash.build.flash_size=16M
 oak.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 oak.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 oak.menu.eesz.autoflash.upload.maximum_size=1044464
+oak.menu.iramfloat.no=in IROM
+oak.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+oak.menu.iramfloat.yes=allowed in ISR
+oak.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espduino.name=ESPDuino (ESP-13 Module)
@@ -2324,6 +2414,7 @@ espduino.serial.disableRTS=true
 espduino.build.mcu=esp8266
 espduino.build.core=esp8266
 espduino.build.spiffs_pagesize=256
+espduino.build.debug_optim=
 espduino.build.debug_port=
 espduino.build.debug_level=
 espduino.menu.xtal.80=80 MHz
@@ -2430,6 +2521,12 @@ espduino.menu.dbg.Serial1=Serial1
 espduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espduino.menu.lvl.None____=None
 espduino.menu.lvl.None____.build.debug_level=
+espduino.menu.optim.Smallest=None
+espduino.menu.optim.Smallest.build.debug_optim=-Os
+espduino.menu.optim.Lite=Lite
+espduino.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espduino.menu.optim.Full=Optimum
+espduino.menu.optim.Full.build.debug_optim=-Og
 espduino.menu.lvl.SSL=SSL
 espduino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espduino.menu.lvl.TLS_MEM=TLS_MEM
@@ -2521,6 +2618,10 @@ espduino.menu.eesz.autoflash.build.flash_size=16M
 espduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espduino.menu.eesz.autoflash.upload.maximum_size=1044464
+espduino.menu.iramfloat.no=in IROM
+espduino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espduino.menu.iramfloat.yes=allowed in ISR
+espduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espectro.name=ESPectro Core
@@ -2535,6 +2636,7 @@ espectro.serial.disableRTS=true
 espectro.build.mcu=esp8266
 espectro.build.core=esp8266
 espectro.build.spiffs_pagesize=256
+espectro.build.debug_optim=
 espectro.build.debug_port=
 espectro.build.debug_level=
 espectro.menu.xtal.80=80 MHz
@@ -2642,6 +2744,12 @@ espectro.menu.dbg.Serial1=Serial1
 espectro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espectro.menu.lvl.None____=None
 espectro.menu.lvl.None____.build.debug_level=
+espectro.menu.optim.Smallest=None
+espectro.menu.optim.Smallest.build.debug_optim=-Os
+espectro.menu.optim.Lite=Lite
+espectro.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espectro.menu.optim.Full=Optimum
+espectro.menu.optim.Full.build.debug_optim=-Og
 espectro.menu.lvl.SSL=SSL
 espectro.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espectro.menu.lvl.TLS_MEM=TLS_MEM
@@ -2733,6 +2841,10 @@ espectro.menu.eesz.autoflash.build.flash_size=16M
 espectro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espectro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espectro.menu.eesz.autoflash.upload.maximum_size=1044464
+espectro.menu.iramfloat.no=in IROM
+espectro.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espectro.menu.iramfloat.yes=allowed in ISR
+espectro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espino.name=ESPino (ESP-12 Module)
@@ -2747,6 +2859,7 @@ espino.serial.disableRTS=true
 espino.build.mcu=esp8266
 espino.build.core=esp8266
 espino.build.spiffs_pagesize=256
+espino.build.debug_optim=
 espino.build.debug_port=
 espino.build.debug_level=
 espino.menu.xtal.80=80 MHz
@@ -2857,6 +2970,12 @@ espino.menu.dbg.Serial1=Serial1
 espino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espino.menu.lvl.None____=None
 espino.menu.lvl.None____.build.debug_level=
+espino.menu.optim.Smallest=None
+espino.menu.optim.Smallest.build.debug_optim=-Os
+espino.menu.optim.Lite=Lite
+espino.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espino.menu.optim.Full=Optimum
+espino.menu.optim.Full.build.debug_optim=-Og
 espino.menu.lvl.SSL=SSL
 espino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espino.menu.lvl.TLS_MEM=TLS_MEM
@@ -2948,6 +3067,10 @@ espino.menu.eesz.autoflash.build.flash_size=16M
 espino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espino.menu.eesz.autoflash.upload.maximum_size=1044464
+espino.menu.iramfloat.no=in IROM
+espino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espino.menu.iramfloat.yes=allowed in ISR
+espino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
@@ -2962,6 +3085,7 @@ espresso_lite_v1.serial.disableRTS=true
 espresso_lite_v1.build.mcu=esp8266
 espresso_lite_v1.build.core=esp8266
 espresso_lite_v1.build.spiffs_pagesize=256
+espresso_lite_v1.build.debug_optim=
 espresso_lite_v1.build.debug_port=
 espresso_lite_v1.build.debug_level=
 espresso_lite_v1.menu.xtal.80=80 MHz
@@ -3072,6 +3196,12 @@ espresso_lite_v1.menu.dbg.Serial1=Serial1
 espresso_lite_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espresso_lite_v1.menu.lvl.None____=None
 espresso_lite_v1.menu.lvl.None____.build.debug_level=
+espresso_lite_v1.menu.optim.Smallest=None
+espresso_lite_v1.menu.optim.Smallest.build.debug_optim=-Os
+espresso_lite_v1.menu.optim.Lite=Lite
+espresso_lite_v1.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espresso_lite_v1.menu.optim.Full=Optimum
+espresso_lite_v1.menu.optim.Full.build.debug_optim=-Og
 espresso_lite_v1.menu.lvl.SSL=SSL
 espresso_lite_v1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espresso_lite_v1.menu.lvl.TLS_MEM=TLS_MEM
@@ -3163,6 +3293,10 @@ espresso_lite_v1.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espresso_lite_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v1.menu.eesz.autoflash.upload.maximum_size=1044464
+espresso_lite_v1.menu.iramfloat.no=in IROM
+espresso_lite_v1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espresso_lite_v1.menu.iramfloat.yes=allowed in ISR
+espresso_lite_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
@@ -3177,6 +3311,7 @@ espresso_lite_v2.serial.disableRTS=true
 espresso_lite_v2.build.mcu=esp8266
 espresso_lite_v2.build.core=esp8266
 espresso_lite_v2.build.spiffs_pagesize=256
+espresso_lite_v2.build.debug_optim=
 espresso_lite_v2.build.debug_port=
 espresso_lite_v2.build.debug_level=
 espresso_lite_v2.menu.xtal.80=80 MHz
@@ -3287,6 +3422,12 @@ espresso_lite_v2.menu.dbg.Serial1=Serial1
 espresso_lite_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espresso_lite_v2.menu.lvl.None____=None
 espresso_lite_v2.menu.lvl.None____.build.debug_level=
+espresso_lite_v2.menu.optim.Smallest=None
+espresso_lite_v2.menu.optim.Smallest.build.debug_optim=-Os
+espresso_lite_v2.menu.optim.Lite=Lite
+espresso_lite_v2.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espresso_lite_v2.menu.optim.Full=Optimum
+espresso_lite_v2.menu.optim.Full.build.debug_optim=-Og
 espresso_lite_v2.menu.lvl.SSL=SSL
 espresso_lite_v2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espresso_lite_v2.menu.lvl.TLS_MEM=TLS_MEM
@@ -3378,6 +3519,10 @@ espresso_lite_v2.menu.eesz.autoflash.build.flash_size=16M
 espresso_lite_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espresso_lite_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espresso_lite_v2.menu.eesz.autoflash.upload.maximum_size=1044464
+espresso_lite_v2.menu.iramfloat.no=in IROM
+espresso_lite_v2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espresso_lite_v2.menu.iramfloat.yes=allowed in ISR
+espresso_lite_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 sonoff.name=ITEAD Sonoff
@@ -3401,6 +3546,7 @@ sonoff.serial.disableRTS=true
 sonoff.build.mcu=esp8266
 sonoff.build.core=esp8266
 sonoff.build.spiffs_pagesize=256
+sonoff.build.debug_optim=
 sonoff.build.debug_port=
 sonoff.build.debug_level=
 sonoff.menu.xtal.80=80 MHz
@@ -3540,6 +3686,12 @@ sonoff.menu.dbg.Serial1=Serial1
 sonoff.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 sonoff.menu.lvl.None____=None
 sonoff.menu.lvl.None____.build.debug_level=
+sonoff.menu.optim.Smallest=None
+sonoff.menu.optim.Smallest.build.debug_optim=-Os
+sonoff.menu.optim.Lite=Lite
+sonoff.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+sonoff.menu.optim.Full=Optimum
+sonoff.menu.optim.Full.build.debug_optim=-Og
 sonoff.menu.lvl.SSL=SSL
 sonoff.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 sonoff.menu.lvl.TLS_MEM=TLS_MEM
@@ -3631,6 +3783,10 @@ sonoff.menu.eesz.autoflash.build.flash_size=16M
 sonoff.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 sonoff.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 sonoff.menu.eesz.autoflash.upload.maximum_size=1044464
+sonoff.menu.iramfloat.no=in IROM
+sonoff.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+sonoff.menu.iramfloat.yes=allowed in ISR
+sonoff.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 inventone.name=Invent One
@@ -3645,6 +3801,7 @@ inventone.serial.disableRTS=true
 inventone.build.mcu=esp8266
 inventone.build.core=esp8266
 inventone.build.spiffs_pagesize=256
+inventone.build.debug_optim=
 inventone.build.debug_port=
 inventone.build.debug_level=
 inventone.menu.xtal.80=80 MHz
@@ -3752,6 +3909,12 @@ inventone.menu.dbg.Serial1=Serial1
 inventone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 inventone.menu.lvl.None____=None
 inventone.menu.lvl.None____.build.debug_level=
+inventone.menu.optim.Smallest=None
+inventone.menu.optim.Smallest.build.debug_optim=-Os
+inventone.menu.optim.Lite=Lite
+inventone.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+inventone.menu.optim.Full=Optimum
+inventone.menu.optim.Full.build.debug_optim=-Og
 inventone.menu.lvl.SSL=SSL
 inventone.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 inventone.menu.lvl.TLS_MEM=TLS_MEM
@@ -3843,6 +4006,10 @@ inventone.menu.eesz.autoflash.build.flash_size=16M
 inventone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 inventone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 inventone.menu.eesz.autoflash.upload.maximum_size=1044464
+inventone.menu.iramfloat.no=in IROM
+inventone.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+inventone.menu.iramfloat.yes=allowed in ISR
+inventone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_wroom_02.name=LOLIN(WEMOS) D1 ESP-WROOM-02
@@ -3857,6 +4024,7 @@ d1_wroom_02.serial.disableRTS=true
 d1_wroom_02.build.mcu=esp8266
 d1_wroom_02.build.core=esp8266
 d1_wroom_02.build.spiffs_pagesize=256
+d1_wroom_02.build.debug_optim=
 d1_wroom_02.build.debug_port=
 d1_wroom_02.build.debug_level=
 d1_wroom_02.menu.xtal.80=80 MHz
@@ -3980,6 +4148,12 @@ d1_wroom_02.menu.dbg.Serial1=Serial1
 d1_wroom_02.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_wroom_02.menu.lvl.None____=None
 d1_wroom_02.menu.lvl.None____.build.debug_level=
+d1_wroom_02.menu.optim.Smallest=None
+d1_wroom_02.menu.optim.Smallest.build.debug_optim=-Os
+d1_wroom_02.menu.optim.Lite=Lite
+d1_wroom_02.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1_wroom_02.menu.optim.Full=Optimum
+d1_wroom_02.menu.optim.Full.build.debug_optim=-Og
 d1_wroom_02.menu.lvl.SSL=SSL
 d1_wroom_02.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_wroom_02.menu.lvl.TLS_MEM=TLS_MEM
@@ -4071,6 +4245,10 @@ d1_wroom_02.menu.eesz.autoflash.build.flash_size=16M
 d1_wroom_02.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_wroom_02.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_wroom_02.menu.eesz.autoflash.upload.maximum_size=1044464
+d1_wroom_02.menu.iramfloat.no=in IROM
+d1_wroom_02.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_wroom_02.menu.iramfloat.yes=allowed in ISR
+d1_wroom_02.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini.name=LOLIN(WEMOS) D1 R2 & mini
@@ -4085,6 +4263,7 @@ d1_mini.serial.disableRTS=true
 d1_mini.build.mcu=esp8266
 d1_mini.build.core=esp8266
 d1_mini.build.spiffs_pagesize=256
+d1_mini.build.debug_optim=
 d1_mini.build.debug_port=
 d1_mini.build.debug_level=
 d1_mini.menu.xtal.80=80 MHz
@@ -4192,6 +4371,12 @@ d1_mini.menu.dbg.Serial1=Serial1
 d1_mini.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini.menu.lvl.None____=None
 d1_mini.menu.lvl.None____.build.debug_level=
+d1_mini.menu.optim.Smallest=None
+d1_mini.menu.optim.Smallest.build.debug_optim=-Os
+d1_mini.menu.optim.Lite=Lite
+d1_mini.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1_mini.menu.optim.Full=Optimum
+d1_mini.menu.optim.Full.build.debug_optim=-Og
 d1_mini.menu.lvl.SSL=SSL
 d1_mini.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini.menu.lvl.TLS_MEM=TLS_MEM
@@ -4283,6 +4468,10 @@ d1_mini.menu.eesz.autoflash.build.flash_size=16M
 d1_mini.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini.menu.eesz.autoflash.upload.maximum_size=1044464
+d1_mini.menu.iramfloat.no=in IROM
+d1_mini.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini.menu.iramfloat.yes=allowed in ISR
+d1_mini.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_clone.name=LOLIN(WEMOS) D1 mini (clone)
@@ -4297,6 +4486,7 @@ d1_mini_clone.serial.disableRTS=true
 d1_mini_clone.build.mcu=esp8266
 d1_mini_clone.build.core=esp8266
 d1_mini_clone.build.spiffs_pagesize=256
+d1_mini_clone.build.debug_optim=
 d1_mini_clone.build.debug_port=
 d1_mini_clone.build.debug_level=
 d1_mini_clone.menu.xtal.80=80 MHz
@@ -4421,6 +4611,12 @@ d1_mini_clone.menu.dbg.Serial1=Serial1
 d1_mini_clone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_clone.menu.lvl.None____=None
 d1_mini_clone.menu.lvl.None____.build.debug_level=
+d1_mini_clone.menu.optim.Smallest=None
+d1_mini_clone.menu.optim.Smallest.build.debug_optim=-Os
+d1_mini_clone.menu.optim.Lite=Lite
+d1_mini_clone.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1_mini_clone.menu.optim.Full=Optimum
+d1_mini_clone.menu.optim.Full.build.debug_optim=-Og
 d1_mini_clone.menu.lvl.SSL=SSL
 d1_mini_clone.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_clone.menu.lvl.TLS_MEM=TLS_MEM
@@ -4512,6 +4708,10 @@ d1_mini_clone.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_clone.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_clone.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_clone.menu.eesz.autoflash.upload.maximum_size=1044464
+d1_mini_clone.menu.iramfloat.no=in IROM
+d1_mini_clone.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_clone.menu.iramfloat.yes=allowed in ISR
+d1_mini_clone.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_lite.name=LOLIN(WEMOS) D1 mini Lite
@@ -4526,6 +4726,7 @@ d1_mini_lite.serial.disableRTS=true
 d1_mini_lite.build.mcu=esp8266
 d1_mini_lite.build.core=esp8266
 d1_mini_lite.build.spiffs_pagesize=256
+d1_mini_lite.build.debug_optim=
 d1_mini_lite.build.debug_port=
 d1_mini_lite.build.debug_level=
 d1_mini_lite.menu.xtal.80=80 MHz
@@ -4665,6 +4866,12 @@ d1_mini_lite.menu.dbg.Serial1=Serial1
 d1_mini_lite.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_lite.menu.lvl.None____=None
 d1_mini_lite.menu.lvl.None____.build.debug_level=
+d1_mini_lite.menu.optim.Smallest=None
+d1_mini_lite.menu.optim.Smallest.build.debug_optim=-Os
+d1_mini_lite.menu.optim.Lite=Lite
+d1_mini_lite.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1_mini_lite.menu.optim.Full=Optimum
+d1_mini_lite.menu.optim.Full.build.debug_optim=-Og
 d1_mini_lite.menu.lvl.SSL=SSL
 d1_mini_lite.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_lite.menu.lvl.TLS_MEM=TLS_MEM
@@ -4756,6 +4963,10 @@ d1_mini_lite.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_lite.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_lite.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_lite.menu.eesz.autoflash.upload.maximum_size=1044464
+d1_mini_lite.menu.iramfloat.no=in IROM
+d1_mini_lite.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_lite.menu.iramfloat.yes=allowed in ISR
+d1_mini_lite.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1_mini_pro.name=LOLIN(WEMOS) D1 mini Pro
@@ -4770,6 +4981,7 @@ d1_mini_pro.serial.disableRTS=true
 d1_mini_pro.build.mcu=esp8266
 d1_mini_pro.build.core=esp8266
 d1_mini_pro.build.spiffs_pagesize=256
+d1_mini_pro.build.debug_optim=
 d1_mini_pro.build.debug_port=
 d1_mini_pro.build.debug_level=
 d1_mini_pro.menu.xtal.80=80 MHz
@@ -4869,6 +5081,12 @@ d1_mini_pro.menu.dbg.Serial1=Serial1
 d1_mini_pro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1_mini_pro.menu.lvl.None____=None
 d1_mini_pro.menu.lvl.None____.build.debug_level=
+d1_mini_pro.menu.optim.Smallest=None
+d1_mini_pro.menu.optim.Smallest.build.debug_optim=-Os
+d1_mini_pro.menu.optim.Lite=Lite
+d1_mini_pro.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1_mini_pro.menu.optim.Full=Optimum
+d1_mini_pro.menu.optim.Full.build.debug_optim=-Og
 d1_mini_pro.menu.lvl.SSL=SSL
 d1_mini_pro.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1_mini_pro.menu.lvl.TLS_MEM=TLS_MEM
@@ -4960,6 +5178,10 @@ d1_mini_pro.menu.eesz.autoflash.build.flash_size=16M
 d1_mini_pro.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1_mini_pro.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1_mini_pro.menu.eesz.autoflash.upload.maximum_size=1044464
+d1_mini_pro.menu.iramfloat.no=in IROM
+d1_mini_pro.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1_mini_pro.menu.iramfloat.yes=allowed in ISR
+d1_mini_pro.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 d1.name=LOLIN(WeMos) D1 R1
@@ -4974,6 +5196,7 @@ d1.serial.disableRTS=true
 d1.build.mcu=esp8266
 d1.build.core=esp8266
 d1.build.spiffs_pagesize=256
+d1.build.debug_optim=
 d1.build.debug_port=
 d1.build.debug_level=
 d1.menu.xtal.80=80 MHz
@@ -5081,6 +5304,12 @@ d1.menu.dbg.Serial1=Serial1
 d1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 d1.menu.lvl.None____=None
 d1.menu.lvl.None____.build.debug_level=
+d1.menu.optim.Smallest=None
+d1.menu.optim.Smallest.build.debug_optim=-Os
+d1.menu.optim.Lite=Lite
+d1.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+d1.menu.optim.Full=Optimum
+d1.menu.optim.Full.build.debug_optim=-Og
 d1.menu.lvl.SSL=SSL
 d1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 d1.menu.lvl.TLS_MEM=TLS_MEM
@@ -5172,6 +5401,10 @@ d1.menu.eesz.autoflash.build.flash_size=16M
 d1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 d1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 d1.menu.eesz.autoflash.upload.maximum_size=1044464
+d1.menu.iramfloat.no=in IROM
+d1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+d1.menu.iramfloat.yes=allowed in ISR
+d1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 agruminolemon.name=Lifely Agrumino Lemon v4
@@ -5186,6 +5419,7 @@ agruminolemon.serial.disableRTS=true
 agruminolemon.build.mcu=esp8266
 agruminolemon.build.core=esp8266
 agruminolemon.build.spiffs_pagesize=256
+agruminolemon.build.debug_optim=
 agruminolemon.build.debug_port=
 agruminolemon.build.debug_level=
 agruminolemon.menu.xtal.80=80 MHz
@@ -5309,6 +5543,12 @@ agruminolemon.menu.dbg.Serial1=Serial1
 agruminolemon.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 agruminolemon.menu.lvl.None____=None
 agruminolemon.menu.lvl.None____.build.debug_level=
+agruminolemon.menu.optim.Smallest=None
+agruminolemon.menu.optim.Smallest.build.debug_optim=-Os
+agruminolemon.menu.optim.Lite=Lite
+agruminolemon.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+agruminolemon.menu.optim.Full=Optimum
+agruminolemon.menu.optim.Full.build.debug_optim=-Og
 agruminolemon.menu.lvl.SSL=SSL
 agruminolemon.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 agruminolemon.menu.lvl.TLS_MEM=TLS_MEM
@@ -5400,6 +5640,10 @@ agruminolemon.menu.eesz.autoflash.build.flash_size=16M
 agruminolemon.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 agruminolemon.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 agruminolemon.menu.eesz.autoflash.upload.maximum_size=1044464
+agruminolemon.menu.iramfloat.no=in IROM
+agruminolemon.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+agruminolemon.menu.iramfloat.yes=allowed in ISR
+agruminolemon.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -5414,6 +5658,7 @@ nodemcu.serial.disableRTS=true
 nodemcu.build.mcu=esp8266
 nodemcu.build.core=esp8266
 nodemcu.build.spiffs_pagesize=256
+nodemcu.build.debug_optim=
 nodemcu.build.debug_port=
 nodemcu.build.debug_level=
 nodemcu.menu.xtal.80=80 MHz
@@ -5521,6 +5766,12 @@ nodemcu.menu.dbg.Serial1=Serial1
 nodemcu.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 nodemcu.menu.lvl.None____=None
 nodemcu.menu.lvl.None____.build.debug_level=
+nodemcu.menu.optim.Smallest=None
+nodemcu.menu.optim.Smallest.build.debug_optim=-Os
+nodemcu.menu.optim.Lite=Lite
+nodemcu.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+nodemcu.menu.optim.Full=Optimum
+nodemcu.menu.optim.Full.build.debug_optim=-Og
 nodemcu.menu.lvl.SSL=SSL
 nodemcu.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 nodemcu.menu.lvl.TLS_MEM=TLS_MEM
@@ -5612,6 +5863,10 @@ nodemcu.menu.eesz.autoflash.build.flash_size=16M
 nodemcu.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 nodemcu.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcu.menu.eesz.autoflash.upload.maximum_size=1044464
+nodemcu.menu.iramfloat.no=in IROM
+nodemcu.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+nodemcu.menu.iramfloat.yes=allowed in ISR
+nodemcu.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
@@ -5626,6 +5881,7 @@ nodemcuv2.serial.disableRTS=true
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.core=esp8266
 nodemcuv2.build.spiffs_pagesize=256
+nodemcuv2.build.debug_optim=
 nodemcuv2.build.debug_port=
 nodemcuv2.build.debug_level=
 nodemcuv2.menu.xtal.80=80 MHz
@@ -5737,6 +5993,12 @@ nodemcuv2.menu.dbg.Serial1=Serial1
 nodemcuv2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 nodemcuv2.menu.lvl.None____=None
 nodemcuv2.menu.lvl.None____.build.debug_level=
+nodemcuv2.menu.optim.Smallest=None
+nodemcuv2.menu.optim.Smallest.build.debug_optim=-Os
+nodemcuv2.menu.optim.Lite=Lite
+nodemcuv2.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+nodemcuv2.menu.optim.Full=Optimum
+nodemcuv2.menu.optim.Full.build.debug_optim=-Og
 nodemcuv2.menu.lvl.SSL=SSL
 nodemcuv2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 nodemcuv2.menu.lvl.TLS_MEM=TLS_MEM
@@ -5828,6 +6090,10 @@ nodemcuv2.menu.eesz.autoflash.build.flash_size=16M
 nodemcuv2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 nodemcuv2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 nodemcuv2.menu.eesz.autoflash.upload.maximum_size=1044464
+nodemcuv2.menu.iramfloat.no=in IROM
+nodemcuv2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+nodemcuv2.menu.iramfloat.yes=allowed in ISR
+nodemcuv2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -5842,6 +6108,7 @@ modwifi.serial.disableRTS=true
 modwifi.build.mcu=esp8266
 modwifi.build.core=esp8266
 modwifi.build.spiffs_pagesize=256
+modwifi.build.debug_optim=
 modwifi.build.debug_port=
 modwifi.build.debug_level=
 modwifi.menu.xtal.80=80 MHz
@@ -5980,6 +6247,12 @@ modwifi.menu.dbg.Serial1=Serial1
 modwifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 modwifi.menu.lvl.None____=None
 modwifi.menu.lvl.None____.build.debug_level=
+modwifi.menu.optim.Smallest=None
+modwifi.menu.optim.Smallest.build.debug_optim=-Os
+modwifi.menu.optim.Lite=Lite
+modwifi.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+modwifi.menu.optim.Full=Optimum
+modwifi.menu.optim.Full.build.debug_optim=-Og
 modwifi.menu.lvl.SSL=SSL
 modwifi.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 modwifi.menu.lvl.TLS_MEM=TLS_MEM
@@ -6071,6 +6344,10 @@ modwifi.menu.eesz.autoflash.build.flash_size=16M
 modwifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 modwifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 modwifi.menu.eesz.autoflash.upload.maximum_size=1044464
+modwifi.menu.iramfloat.no=in IROM
+modwifi.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+modwifi.menu.iramfloat.yes=allowed in ISR
+modwifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 phoenix_v1.name=Phoenix 1.0
@@ -6085,6 +6362,7 @@ phoenix_v1.serial.disableRTS=true
 phoenix_v1.build.mcu=esp8266
 phoenix_v1.build.core=esp8266
 phoenix_v1.build.spiffs_pagesize=256
+phoenix_v1.build.debug_optim=
 phoenix_v1.build.debug_port=
 phoenix_v1.build.debug_level=
 phoenix_v1.menu.xtal.80=80 MHz
@@ -6195,6 +6473,12 @@ phoenix_v1.menu.dbg.Serial1=Serial1
 phoenix_v1.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 phoenix_v1.menu.lvl.None____=None
 phoenix_v1.menu.lvl.None____.build.debug_level=
+phoenix_v1.menu.optim.Smallest=None
+phoenix_v1.menu.optim.Smallest.build.debug_optim=-Os
+phoenix_v1.menu.optim.Lite=Lite
+phoenix_v1.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+phoenix_v1.menu.optim.Full=Optimum
+phoenix_v1.menu.optim.Full.build.debug_optim=-Og
 phoenix_v1.menu.lvl.SSL=SSL
 phoenix_v1.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 phoenix_v1.menu.lvl.TLS_MEM=TLS_MEM
@@ -6286,6 +6570,10 @@ phoenix_v1.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v1.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 phoenix_v1.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v1.menu.eesz.autoflash.upload.maximum_size=1044464
+phoenix_v1.menu.iramfloat.no=in IROM
+phoenix_v1.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+phoenix_v1.menu.iramfloat.yes=allowed in ISR
+phoenix_v1.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 phoenix_v2.name=Phoenix 2.0
@@ -6300,6 +6588,7 @@ phoenix_v2.serial.disableRTS=true
 phoenix_v2.build.mcu=esp8266
 phoenix_v2.build.core=esp8266
 phoenix_v2.build.spiffs_pagesize=256
+phoenix_v2.build.debug_optim=
 phoenix_v2.build.debug_port=
 phoenix_v2.build.debug_level=
 phoenix_v2.menu.xtal.80=80 MHz
@@ -6410,6 +6699,12 @@ phoenix_v2.menu.dbg.Serial1=Serial1
 phoenix_v2.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 phoenix_v2.menu.lvl.None____=None
 phoenix_v2.menu.lvl.None____.build.debug_level=
+phoenix_v2.menu.optim.Smallest=None
+phoenix_v2.menu.optim.Smallest.build.debug_optim=-Os
+phoenix_v2.menu.optim.Lite=Lite
+phoenix_v2.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+phoenix_v2.menu.optim.Full=Optimum
+phoenix_v2.menu.optim.Full.build.debug_optim=-Og
 phoenix_v2.menu.lvl.SSL=SSL
 phoenix_v2.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 phoenix_v2.menu.lvl.TLS_MEM=TLS_MEM
@@ -6501,6 +6796,10 @@ phoenix_v2.menu.eesz.autoflash.build.flash_size=16M
 phoenix_v2.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 phoenix_v2.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 phoenix_v2.menu.eesz.autoflash.upload.maximum_size=1044464
+phoenix_v2.menu.iramfloat.no=in IROM
+phoenix_v2.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+phoenix_v2.menu.iramfloat.yes=allowed in ISR
+phoenix_v2.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 eduinowifi.name=Schirmilabs Eduino WiFi
@@ -6515,6 +6814,7 @@ eduinowifi.serial.disableRTS=true
 eduinowifi.build.mcu=esp8266
 eduinowifi.build.core=esp8266
 eduinowifi.build.spiffs_pagesize=256
+eduinowifi.build.debug_optim=
 eduinowifi.build.debug_port=
 eduinowifi.build.debug_level=
 eduinowifi.menu.xtal.80=80 MHz
@@ -6622,6 +6922,12 @@ eduinowifi.menu.dbg.Serial1=Serial1
 eduinowifi.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 eduinowifi.menu.lvl.None____=None
 eduinowifi.menu.lvl.None____.build.debug_level=
+eduinowifi.menu.optim.Smallest=None
+eduinowifi.menu.optim.Smallest.build.debug_optim=-Os
+eduinowifi.menu.optim.Lite=Lite
+eduinowifi.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+eduinowifi.menu.optim.Full=Optimum
+eduinowifi.menu.optim.Full.build.debug_optim=-Og
 eduinowifi.menu.lvl.SSL=SSL
 eduinowifi.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 eduinowifi.menu.lvl.TLS_MEM=TLS_MEM
@@ -6713,6 +7019,10 @@ eduinowifi.menu.eesz.autoflash.build.flash_size=16M
 eduinowifi.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 eduinowifi.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 eduinowifi.menu.eesz.autoflash.upload.maximum_size=1044464
+eduinowifi.menu.iramfloat.no=in IROM
+eduinowifi.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+eduinowifi.menu.iramfloat.yes=allowed in ISR
+eduinowifi.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wiolink.name=Seeed Wio Link
@@ -6727,6 +7037,7 @@ wiolink.serial.disableRTS=true
 wiolink.build.mcu=esp8266
 wiolink.build.core=esp8266
 wiolink.build.spiffs_pagesize=256
+wiolink.build.debug_optim=
 wiolink.build.debug_port=
 wiolink.build.debug_level=
 wiolink.menu.xtal.80=80 MHz
@@ -6834,6 +7145,12 @@ wiolink.menu.dbg.Serial1=Serial1
 wiolink.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wiolink.menu.lvl.None____=None
 wiolink.menu.lvl.None____.build.debug_level=
+wiolink.menu.optim.Smallest=None
+wiolink.menu.optim.Smallest.build.debug_optim=-Os
+wiolink.menu.optim.Lite=Lite
+wiolink.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+wiolink.menu.optim.Full=Optimum
+wiolink.menu.optim.Full.build.debug_optim=-Og
 wiolink.menu.lvl.SSL=SSL
 wiolink.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wiolink.menu.lvl.TLS_MEM=TLS_MEM
@@ -6925,6 +7242,10 @@ wiolink.menu.eesz.autoflash.build.flash_size=16M
 wiolink.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wiolink.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wiolink.menu.eesz.autoflash.upload.maximum_size=1044464
+wiolink.menu.iramfloat.no=in IROM
+wiolink.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wiolink.menu.iramfloat.yes=allowed in ISR
+wiolink.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 blynk.name=SparkFun Blynk Board
@@ -6939,6 +7260,7 @@ blynk.serial.disableRTS=true
 blynk.build.mcu=esp8266
 blynk.build.core=esp8266
 blynk.build.spiffs_pagesize=256
+blynk.build.debug_optim=
 blynk.build.debug_port=
 blynk.build.debug_level=
 blynk.menu.xtal.80=80 MHz
@@ -7046,6 +7368,12 @@ blynk.menu.dbg.Serial1=Serial1
 blynk.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 blynk.menu.lvl.None____=None
 blynk.menu.lvl.None____.build.debug_level=
+blynk.menu.optim.Smallest=None
+blynk.menu.optim.Smallest.build.debug_optim=-Os
+blynk.menu.optim.Lite=Lite
+blynk.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+blynk.menu.optim.Full=Optimum
+blynk.menu.optim.Full.build.debug_optim=-Og
 blynk.menu.lvl.SSL=SSL
 blynk.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 blynk.menu.lvl.TLS_MEM=TLS_MEM
@@ -7137,6 +7465,10 @@ blynk.menu.eesz.autoflash.build.flash_size=16M
 blynk.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 blynk.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 blynk.menu.eesz.autoflash.upload.maximum_size=1044464
+blynk.menu.iramfloat.no=in IROM
+blynk.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+blynk.menu.iramfloat.yes=allowed in ISR
+blynk.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 thing.name=SparkFun ESP8266 Thing
@@ -7151,6 +7483,7 @@ thing.serial.disableRTS=true
 thing.build.mcu=esp8266
 thing.build.core=esp8266
 thing.build.spiffs_pagesize=256
+thing.build.debug_optim=
 thing.build.debug_port=
 thing.build.debug_level=
 thing.menu.xtal.80=80 MHz
@@ -7258,6 +7591,12 @@ thing.menu.dbg.Serial1=Serial1
 thing.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 thing.menu.lvl.None____=None
 thing.menu.lvl.None____.build.debug_level=
+thing.menu.optim.Smallest=None
+thing.menu.optim.Smallest.build.debug_optim=-Os
+thing.menu.optim.Lite=Lite
+thing.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+thing.menu.optim.Full=Optimum
+thing.menu.optim.Full.build.debug_optim=-Og
 thing.menu.lvl.SSL=SSL
 thing.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 thing.menu.lvl.TLS_MEM=TLS_MEM
@@ -7349,6 +7688,10 @@ thing.menu.eesz.autoflash.build.flash_size=16M
 thing.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 thing.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thing.menu.eesz.autoflash.upload.maximum_size=1044464
+thing.menu.iramfloat.no=in IROM
+thing.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+thing.menu.iramfloat.yes=allowed in ISR
+thing.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
@@ -7363,6 +7706,7 @@ thingdev.serial.disableRTS=true
 thingdev.build.mcu=esp8266
 thingdev.build.core=esp8266
 thingdev.build.spiffs_pagesize=256
+thingdev.build.debug_optim=
 thingdev.build.debug_port=
 thingdev.build.debug_level=
 thingdev.menu.xtal.80=80 MHz
@@ -7470,6 +7814,12 @@ thingdev.menu.dbg.Serial1=Serial1
 thingdev.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 thingdev.menu.lvl.None____=None
 thingdev.menu.lvl.None____.build.debug_level=
+thingdev.menu.optim.Smallest=None
+thingdev.menu.optim.Smallest.build.debug_optim=-Os
+thingdev.menu.optim.Lite=Lite
+thingdev.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+thingdev.menu.optim.Full=Optimum
+thingdev.menu.optim.Full.build.debug_optim=-Og
 thingdev.menu.lvl.SSL=SSL
 thingdev.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 thingdev.menu.lvl.TLS_MEM=TLS_MEM
@@ -7561,6 +7911,10 @@ thingdev.menu.eesz.autoflash.build.flash_size=16M
 thingdev.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 thingdev.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 thingdev.menu.eesz.autoflash.upload.maximum_size=1044464
+thingdev.menu.iramfloat.no=in IROM
+thingdev.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+thingdev.menu.iramfloat.yes=allowed in ISR
+thingdev.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -7575,6 +7929,7 @@ esp210.build.mcu=esp8266
 esp210.build.core=esp8266
 esp210.build.variant=generic
 esp210.build.spiffs_pagesize=256
+esp210.build.debug_optim=
 esp210.build.debug_port=
 esp210.build.debug_level=
 esp210.menu.xtal.80=80 MHz
@@ -7682,6 +8037,12 @@ esp210.menu.dbg.Serial1=Serial1
 esp210.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 esp210.menu.lvl.None____=None
 esp210.menu.lvl.None____.build.debug_level=
+esp210.menu.optim.Smallest=None
+esp210.menu.optim.Smallest.build.debug_optim=-Os
+esp210.menu.optim.Lite=Lite
+esp210.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+esp210.menu.optim.Full=Optimum
+esp210.menu.optim.Full.build.debug_optim=-Og
 esp210.menu.lvl.SSL=SSL
 esp210.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 esp210.menu.lvl.TLS_MEM=TLS_MEM
@@ -7773,6 +8134,10 @@ esp210.menu.eesz.autoflash.build.flash_size=16M
 esp210.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 esp210.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 esp210.menu.eesz.autoflash.upload.maximum_size=1044464
+esp210.menu.iramfloat.no=in IROM
+esp210.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+esp210.menu.iramfloat.yes=allowed in ISR
+esp210.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
@@ -7787,6 +8152,7 @@ espinotee.serial.disableRTS=true
 espinotee.build.mcu=esp8266
 espinotee.build.core=esp8266
 espinotee.build.spiffs_pagesize=256
+espinotee.build.debug_optim=
 espinotee.build.debug_port=
 espinotee.build.debug_level=
 espinotee.menu.xtal.80=80 MHz
@@ -7894,6 +8260,12 @@ espinotee.menu.dbg.Serial1=Serial1
 espinotee.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 espinotee.menu.lvl.None____=None
 espinotee.menu.lvl.None____.build.debug_level=
+espinotee.menu.optim.Smallest=None
+espinotee.menu.optim.Smallest.build.debug_optim=-Os
+espinotee.menu.optim.Lite=Lite
+espinotee.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+espinotee.menu.optim.Full=Optimum
+espinotee.menu.optim.Full.build.debug_optim=-Og
 espinotee.menu.lvl.SSL=SSL
 espinotee.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 espinotee.menu.lvl.TLS_MEM=TLS_MEM
@@ -7985,6 +8357,10 @@ espinotee.menu.eesz.autoflash.build.flash_size=16M
 espinotee.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 espinotee.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 espinotee.menu.eesz.autoflash.upload.maximum_size=1044464
+espinotee.menu.iramfloat.no=in IROM
+espinotee.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+espinotee.menu.iramfloat.yes=allowed in ISR
+espinotee.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifi_kit_8.name=WiFi Kit 8
@@ -7999,6 +8375,7 @@ wifi_kit_8.serial.disableRTS=true
 wifi_kit_8.build.mcu=esp8266
 wifi_kit_8.build.core=esp8266
 wifi_kit_8.build.spiffs_pagesize=256
+wifi_kit_8.build.debug_optim=
 wifi_kit_8.build.debug_port=
 wifi_kit_8.build.debug_level=
 wifi_kit_8.menu.xtal.80=80 MHz
@@ -8106,6 +8483,12 @@ wifi_kit_8.menu.dbg.Serial1=Serial1
 wifi_kit_8.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifi_kit_8.menu.lvl.None____=None
 wifi_kit_8.menu.lvl.None____.build.debug_level=
+wifi_kit_8.menu.optim.Smallest=None
+wifi_kit_8.menu.optim.Smallest.build.debug_optim=-Os
+wifi_kit_8.menu.optim.Lite=Lite
+wifi_kit_8.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+wifi_kit_8.menu.optim.Full=Optimum
+wifi_kit_8.menu.optim.Full.build.debug_optim=-Og
 wifi_kit_8.menu.lvl.SSL=SSL
 wifi_kit_8.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifi_kit_8.menu.lvl.TLS_MEM=TLS_MEM
@@ -8197,6 +8580,10 @@ wifi_kit_8.menu.eesz.autoflash.build.flash_size=16M
 wifi_kit_8.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifi_kit_8.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifi_kit_8.menu.eesz.autoflash.upload.maximum_size=1044464
+wifi_kit_8.menu.iramfloat.no=in IROM
+wifi_kit_8.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifi_kit_8.menu.iramfloat.yes=allowed in ISR
+wifi_kit_8.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifiduino.name=WiFiduino
@@ -8211,6 +8598,7 @@ wifiduino.serial.disableRTS=true
 wifiduino.build.mcu=esp8266
 wifiduino.build.core=esp8266
 wifiduino.build.spiffs_pagesize=256
+wifiduino.build.debug_optim=
 wifiduino.build.debug_port=
 wifiduino.build.debug_level=
 wifiduino.menu.xtal.80=80 MHz
@@ -8318,6 +8706,12 @@ wifiduino.menu.dbg.Serial1=Serial1
 wifiduino.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifiduino.menu.lvl.None____=None
 wifiduino.menu.lvl.None____.build.debug_level=
+wifiduino.menu.optim.Smallest=None
+wifiduino.menu.optim.Smallest.build.debug_optim=-Os
+wifiduino.menu.optim.Lite=Lite
+wifiduino.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+wifiduino.menu.optim.Full=Optimum
+wifiduino.menu.optim.Full.build.debug_optim=-Og
 wifiduino.menu.lvl.SSL=SSL
 wifiduino.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifiduino.menu.lvl.TLS_MEM=TLS_MEM
@@ -8409,6 +8803,10 @@ wifiduino.menu.eesz.autoflash.build.flash_size=16M
 wifiduino.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifiduino.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifiduino.menu.eesz.autoflash.upload.maximum_size=1044464
+wifiduino.menu.iramfloat.no=in IROM
+wifiduino.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifiduino.menu.iramfloat.yes=allowed in ISR
+wifiduino.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 wifinfo.name=WifInfo
@@ -8440,6 +8838,7 @@ wifinfo.serial.disableRTS=true
 wifinfo.build.mcu=esp8266
 wifinfo.build.core=esp8266
 wifinfo.build.spiffs_pagesize=256
+wifinfo.build.debug_optim=
 wifinfo.build.debug_port=
 wifinfo.build.debug_level=
 wifinfo.menu.xtal.80=80 MHz
@@ -8586,6 +8985,12 @@ wifinfo.menu.dbg.Serial1=Serial1
 wifinfo.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 wifinfo.menu.lvl.None____=None
 wifinfo.menu.lvl.None____.build.debug_level=
+wifinfo.menu.optim.Smallest=None
+wifinfo.menu.optim.Smallest.build.debug_optim=-Os
+wifinfo.menu.optim.Lite=Lite
+wifinfo.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+wifinfo.menu.optim.Full=Optimum
+wifinfo.menu.optim.Full.build.debug_optim=-Og
 wifinfo.menu.lvl.SSL=SSL
 wifinfo.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 wifinfo.menu.lvl.TLS_MEM=TLS_MEM
@@ -8677,6 +9082,10 @@ wifinfo.menu.eesz.autoflash.build.flash_size=16M
 wifinfo.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 wifinfo.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 wifinfo.menu.eesz.autoflash.upload.maximum_size=1044464
+wifinfo.menu.iramfloat.no=in IROM
+wifinfo.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+wifinfo.menu.iramfloat.yes=allowed in ISR
+wifinfo.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 
 ##############################################################
 cw01.name=XinaBox CW01
@@ -8691,6 +9100,7 @@ cw01.serial.disableRTS=true
 cw01.build.mcu=esp8266
 cw01.build.core=esp8266
 cw01.build.spiffs_pagesize=256
+cw01.build.debug_optim=
 cw01.build.debug_port=
 cw01.build.debug_level=
 cw01.menu.xtal.80=80 MHz
@@ -8801,6 +9211,12 @@ cw01.menu.dbg.Serial1=Serial1
 cw01.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 cw01.menu.lvl.None____=None
 cw01.menu.lvl.None____.build.debug_level=
+cw01.menu.optim.Smallest=None
+cw01.menu.optim.Smallest.build.debug_optim=-Os
+cw01.menu.optim.Lite=Lite
+cw01.menu.optim.Lite.build.debug_optim=-Os -fno-optimize-sibling-calls
+cw01.menu.optim.Full=Optimum
+cw01.menu.optim.Full.build.debug_optim=-Og
 cw01.menu.lvl.SSL=SSL
 cw01.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
 cw01.menu.lvl.TLS_MEM=TLS_MEM
@@ -8892,4 +9308,8 @@ cw01.menu.eesz.autoflash.build.flash_size=16M
 cw01.menu.eesz.autoflash.build.flash_ld=eagle.flash.auto.ld
 cw01.menu.eesz.autoflash.build.extra_flags=-DFLASH_MAP_SUPPORT=1
 cw01.menu.eesz.autoflash.upload.maximum_size=1044464
+cw01.menu.iramfloat.no=in IROM
+cw01.menu.iramfloat.no.build.iramfloat=-DFP_IN_IROM
+cw01.menu.iramfloat.yes=allowed in ISR
+cw01.menu.iramfloat.yes.build.iramfloat=-DFP_IN_IRAM
 

@@ -32,7 +32,7 @@ class ArduinoCompatibleWiFiServerTemplate : public TServer, public Print {
 public:
 
   ArduinoCompatibleWiFiServerTemplate(const IPAddress& addr, uint16_t port) : TServer(addr, port) {}
-  ArduinoCompatibleWiFiServerTemplate(uint16_t port) : TServer(port) {}
+  ArduinoCompatibleWiFiServerTemplate(uint16_t port = 23) : TServer(port) {}
   virtual ~ArduinoCompatibleWiFiServerTemplate() {}
 
   // https://www.arduino.cc/en/Reference/WiFiServerAvailable

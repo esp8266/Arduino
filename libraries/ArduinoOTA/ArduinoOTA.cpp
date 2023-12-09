@@ -3,6 +3,7 @@
 #endif
 #include <functional>
 #include <WiFiUdp.h>
+#include <eboot_command.h>
 #include "ArduinoOTA.h"
 #include "MD5Builder.h"
 #include "StreamString.h"
@@ -24,10 +25,11 @@ extern "C" {
 #include <ESP8266mDNS.h>
 #endif
 
-#ifdef DEBUG_ESP_OTA
-#ifdef DEBUG_ESP_PORT
+#if defined(DEBUG_ESP_OTA) && defined(DEBUG_ESP_PORT)
 #define OTA_DEBUG DEBUG_ESP_PORT
-#endif
+#define OTA_DEBUG_PRINTF(fmt, ...) OTA_DEBUG.printf_P(PSTR(fmt),  ##__VA_ARGS__)
+#else
+#define OTA_DEBUG_PRINTF(...)
 #endif
 
 ArduinoOTAClass::ArduinoOTAClass()
@@ -93,6 +95,10 @@ void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
   _rebootOnSuccess = reboot;
 }
 
+void ArduinoOTAClass::setEraseConfig(ota_erase_cfg_t eraseConfig){
+  _eraseConfig = eraseConfig;
+}
+
 void ArduinoOTAClass::begin(bool useMDNS) {
   if (_initialized)
     return;
@@ -119,7 +125,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-  
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS) {
     MDNS.begin(_hostname.c_str());
@@ -133,9 +139,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
 #endif
   _initialized = true;
   _state = OTA_IDLE;
-#ifdef OTA_DEBUG
-  OTA_DEBUG.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
-#endif
+  OTA_DEBUG_PRINTF("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
 }
 
 int ArduinoOTAClass::parseInt(){
@@ -243,13 +247,11 @@ void ArduinoOTAClass::_runUpdate() {
   IPAddress ota_ip = _ota_ip;
 
   if (!Update.begin(_size, _cmd)) {
-#ifdef OTA_DEBUG
-    OTA_DEBUG.println("Update Begin Error");
-#endif
+    OTA_DEBUG_PRINTF("Update Begin Error\n");
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
-    
+
     StreamString ss;
     Update.printError(ss);
     _udp_ota->append("ERR: ", 5);
@@ -275,9 +277,7 @@ void ArduinoOTAClass::_runUpdate() {
 
   WiFiClient client;
   if (!client.connect(_ota_ip, _ota_port)) {
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Connect Failed\n");
-#endif
+    OTA_DEBUG_PRINTF("Connect Failed\n");
     _udp_ota->listen(IP_ADDR_ANY, _port);
     if (_error_callback) {
       _error_callback(OTA_CONNECT_ERROR);
@@ -293,9 +293,7 @@ void ArduinoOTAClass::_runUpdate() {
     while (!client.available() && waited--)
       delay(1);
     if (!waited){
-#ifdef OTA_DEBUG
-      OTA_DEBUG.printf("Receive Failed\n");
-#endif
+      OTA_DEBUG_PRINTF("Receive Failed\n");
       _udp_ota->listen(IP_ADDR_ANY, _port);
       if (_error_callback) {
         _error_callback(OTA_RECEIVE_ERROR);
@@ -320,18 +318,31 @@ void ArduinoOTAClass::_runUpdate() {
     client.flush();
     delay(1000);
     client.stop();
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Update Success\n");
-#endif
+    OTA_DEBUG_PRINTF("Update Success\n");
     if (_end_callback) {
       _end_callback();
     }
     if(_rebootOnSuccess){
-#ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Rebooting...\n");
-#endif
+      OTA_DEBUG_PRINTF("Rebooting...\n");
       //let serial/network finish tasks that might be given in _end_callback
       delay(100);
+      if (OTA_ERASE_CFG_NO != _eraseConfig) {
+        eraseConfigAndReset();  // returns on failure
+        if (_error_callback) {
+          _error_callback(OTA_ERASE_SETTINGS_ERROR);
+        }
+        if (OTA_ERASE_CFG_ABORT_ON_ERROR == _eraseConfig) {
+          eboot_command_clear();
+          return;
+        }
+#ifdef OTA_DEBUG
+        else if (OTA_ERASE_CFG_IGNORE_ERROR == _eraseConfig) {
+          // Fallthrough and restart
+        } else {
+          panic();
+        }
+#endif
+      }
       ESP.restart();
     }
   } else {
@@ -357,10 +368,19 @@ void ArduinoOTAClass::end() {
     }
 #endif
     _state = OTA_IDLE;
-    #ifdef OTA_DEBUG
-    OTA_DEBUG.printf("OTA server stopped.\n");
-    #endif    
+    OTA_DEBUG_PRINTF("OTA server stopped.\n");
 }
+
+void ArduinoOTAClass::eraseConfigAndReset() {
+  OTA_DEBUG_PRINTF("Erase Config and Hard Reset ...\n");
+  if (WiFi.mode(WIFI_OFF)) {
+    ESP.eraseConfigAndReset();  // No return testing - Only returns on failure
+    OTA_DEBUG_PRINTF("  ESP.eraseConfigAndReset() failed!\n");
+  } else {
+    OTA_DEBUG_PRINTF("  WiFi.mode(WIFI_OFF) Timeout!\n");
+  }
+}
+
 //this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {

@@ -38,10 +38,29 @@ public:
     // Arduino-Ethernet API compatibility, order can be either:
     // mac, ip, gateway, netmask, dns (esp8266 or natural order)
     // mac, ip, dns, gateway, netmask (Arduino legacy)
-    boolean begin(const uint8_t* macAddress, const IPAddress& local_ip = IPADDR_NONE,
-                  const IPAddress& arg1 = IPADDR_NONE, const IPAddress& arg2 = IPADDR_NONE,
-                  const IPAddress& arg3 = IPADDR_NONE)
+    boolean begin(const uint8_t* macAddress, IPAddress local_ip = IPADDR_NONE,
+                  IPAddress arg1 = IPADDR_NONE, IPAddress arg2 = IPADDR_NONE,
+                  IPAddress arg3 = IPADDR_NONE)
     {
+        if (local_ip.isSet() && local_ip.isV4())
+        {
+            // setting auto values using arduino ordering of parameters
+            if (arg1 == IPADDR_NONE)  // else dns or gw
+            {
+                arg1    = local_ip;
+                arg1[3] = 1;
+            }
+            if (arg2 == IPADDR_NONE)  // else gw or mask
+            {
+                arg2    = local_ip;
+                arg2[3] = 1;
+            }
+            // if arg2 is mask (esp ordering), let DNS IP unconfigured
+            if (arg3 == IPADDR_NONE && arg2[0] != 255)  // else mask or dns
+            {
+                arg3 = IPAddress(255, 255, 255, 0);
+            }
+        }
         SPI4EthInit();  // Arduino Ethernet self-initializes SPI
         bool ret = true;
         if (local_ip.isSet())
@@ -65,6 +84,13 @@ public:
         }
 
         return ret;
+    }
+
+    void end()
+    {
+        ip_addr_copy(LwipIntfDev<RawDev>::_netif.ip_addr,
+                     ip_addr_any);  // to allow DHCP at next begin
+        LwipIntfDev<RawDev>::end();
     }
 
     HardwareStatus hardwareStatus() const

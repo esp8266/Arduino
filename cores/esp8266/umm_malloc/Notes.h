@@ -341,5 +341,16 @@ Enhancement ideas:
       * For multiple Heaps builds, add a dedicated function that always reports
         DRAM results.
 
+
+  April 22, 2023
+
+  The umm_poison logic runs outside the UMM_CRITICAL_* umbrella. When interrupt
+  routines do alloc calls, it is possible to interrupt an in-progress allocation
+  just before the poison is set, with a new alloc request resulting in a false
+  "poison check fail" against the in-progress allocation. The SDK does mallocs
+  from ISRs. SmartConfig can illustrate this issue.
+
+  Move get_poisoned() within UMM_CRITICAL_* in umm_malloc() and umm_realloc().
+
 */
 #endif
