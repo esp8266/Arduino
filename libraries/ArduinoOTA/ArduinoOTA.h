@@ -18,8 +18,15 @@ typedef enum {
   OTA_BEGIN_ERROR,
   OTA_CONNECT_ERROR,
   OTA_RECEIVE_ERROR,
-  OTA_END_ERROR
+  OTA_END_ERROR,
+  OTA_ERASE_SETTINGS_ERROR
 } ota_error_t;
+
+typedef enum {
+  OTA_ERASE_CFG_NO = 0,
+  OTA_ERASE_CFG_IGNORE_ERROR,
+  OTA_ERASE_CFG_ABORT_ON_ERROR
+} ota_erase_cfg_t;
 
 class ArduinoOTAClass
 {
@@ -47,6 +54,10 @@ class ArduinoOTAClass
     //Sets if the device should be rebooted after successful update. Default true
     void setRebootOnSuccess(bool reboot);
 
+    //Sets flag to erase WiFi Settings at reboot/reset. "eraseConfig" selects to
+    //abort erase on failure or ignore error and erase.
+    void setEraseConfig(ota_erase_cfg_t eraseConfig = OTA_ERASE_CFG_ABORT_ON_ERROR);
+
     //This callback will be called when OTA connection has begun
     void onStart(THandlerFunction fn);
 
@@ -64,6 +75,11 @@ class ArduinoOTAClass
 
     //Ends the ArduinoOTA service
     void end();
+
+    //Has the effect of the "+ WiFi Settings" in the Arduino IDE Tools "Erase
+    //Flash" selection. Only returns on erase flash failure.
+    void eraseConfigAndReset();
+
     //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.
     void handle();
 
@@ -84,6 +100,7 @@ class ArduinoOTAClass
     bool _initialized = false;
     bool _rebootOnSuccess = true;
     bool _useMDNS = true;
+    ota_erase_cfg_t _eraseConfig = OTA_ERASE_CFG_NO;
     ota_state_t _state = OTA_IDLE;
     int _size = 0;
     int _cmd = 0;

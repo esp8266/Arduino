@@ -17,8 +17,39 @@
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
-extern void ets_wdt_enable(void);
-extern void ets_wdt_disable(void);
+/*
+  After Power Enable Pin, EXT_RST, or HWDT event, at "main()" in eboot, WDT is
+  disabled. Key WDT hardware registers are zero.
+
+  After "ESP.restart()" and other soft restarts, at "main()" in eboot, WDT is enabled.
+
+  References for the under-documented ets_wdt_* API
+    https://mongoose-os.com/blog/esp8266-watchdog-timer/
+    http://cholla.mmto.org/esp8266/bootrom/boot.txt
+
+  After looking at esp8266-watchdog-timer some more, `ets_wdt_enable(4, 12, 12)`
+  is good for eboot's needs. From a ".map" the NON-OS SDK does not use the
+  ets_wdt_* APIs, so our choices are not too critical.
+  The SDK will set up the WDT as it wants it.
+
+  A rationale for keeping the "ets_wdt_enable()" line, if the system is not
+  stable during a "soft restart," the HWDT would provide a recovery reboot.
+*/
+extern void ets_wdt_enable(uint32_t mode, uint32_t arg1, uint32_t arg2);
+/*
+  "ets_wdt_disable"
+
+  Diables WDT, then feeds the dog.
+  For current modes other than 1 or 2, returns the current mode.
+  For current mode 1, calls ets_timer_disarm, then return the current mode.
+  For current mode 2, calls ets_isr_mask, then return the current mode.
+
+  I always see a return value of 0xFFFFFFFF.
+
+  The return value would normally be used with ets_wdt_restore; however, that is
+  not an option since a valid prior call to ets_wdt_enable() may not have been done.
+*/
+extern uint32_t ets_wdt_disable(void);
 
 int print_version(const uint32_t flash_addr)
 {
@@ -241,12 +272,12 @@ int main()
 
         ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2], false);
-        ets_wdt_enable();
+        ets_wdt_enable(4, 12, 12);  // WDT about 13 secs.
 
         ets_printf("%d\n", res);
 #if 0
-	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the 
-	//beginning of the image in the empty area, see #7458. Disabling for now. 
+	//devyte: this verify step below (cmp:) only works when the end of copy operation above does not overwrite the
+	//beginning of the image in the empty area, see #7458. Disabling for now.
         //TODO: replace the below verify with hash type, crc, or similar.
         // Verify the copy
         ets_printf("cmp:");
@@ -257,7 +288,7 @@ int main()
             }
 
         ets_printf("%d\n", res);
-#endif	    
+#endif
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
