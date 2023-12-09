@@ -131,7 +131,9 @@ For Arduino networking API compatibility, the ESP8266WiFi library supports IPv4-
     WiFi.config(local_ip, dns, gateway)          (discouraged, insufficiently accurate, for Arduino API portability)
     WiFi.config(local_ip, dns, gateway, subnet)
 
-Versions where some of ``dns``, ``gateway`` and ``subnet`` parameters are not specified use a default value. Default ``subnet`` is 255.255.255.0. Default ``gateway`` and ``dns`` are derived from ``local_ip`` by changing the last number to 1 (discouraged). To return to DHCP you can use ``WiFi.config(INADDR_NONE);``.
+Versions where some of ``dns``, ``gateway`` and ``subnet`` parameters are not specified use a default value. Default ``subnet`` is 255.255.255.0. Default ``gateway`` and ``dns`` are derived from ``local_ip`` by changing the last number to 1 (It is discouraged to use these default values as they may not apply to every network configuration).
+
+To return to DHCP you can use ``WiFi.config(INADDR_NONE);``.
 
 **Warning: The default values for dns, gateway and subnet may not match your router's settings.** Also please note, that ``config(local_ip, gateway)`` is not supported and ``WiFi.config(local_ip, gateway, subnet)`` doesn't set the DNS server IP.
 

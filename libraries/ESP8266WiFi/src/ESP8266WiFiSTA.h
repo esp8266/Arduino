@@ -49,7 +49,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
 
         // two and one parameter version. 2nd parameter is DNS like in Arduino
         // IPv4 only
-        [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy function config(ip[,dns]) because it is insufficiently accurate")]]
+        [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy function config(ip[,dns]) as chosen defaults may not match the local network configuration")]]
         bool config(IPAddress local_ip, IPAddress dns = INADDR_ANY);
 
         bool setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY);
