@@ -103,7 +103,7 @@ Note that to reenable DHCP, all three parameters as 0.0.0.0 (local_ip, gateway a
 
 .. code:: cpp
 
-    WiFi.config(local_ip, gateway, subnet)             (discouraged, dns is not set but it is useful)
+    WiFi.config(local_ip, gateway, subnet)             (discouraged, insufficiently accurate, for Arduino API portability)
     WiFi.config(local_ip, gateway, subnet, dns1)
     WiFi.config(local_ip, gateway, subnet, dns1, dns2)
 
@@ -126,9 +126,9 @@ For Arduino networking API compatibility, the ESP8266WiFi library supports IPv4-
 
 .. code:: cpp
 
-    WiFi.config(local_ip)                        (discouraged, for retro compatibility: dns=gateway=···.1)
-    WiFi.config(local_ip, dns)                   (discouraged, for retro compatibility: gateway=···.1)
-    WiFi.config(local_ip, dns, gateway)          (discouraged, for retro compatibility: subnet/netmask quite unavoidable)
+    WiFi.config(local_ip)                        (discouraged, insufficiently accurate, for Arduino API portability)
+    WiFi.config(local_ip, dns)                   (discouraged, insufficiently accurate, for Arduino API portability)
+    WiFi.config(local_ip, dns, gateway)          (discouraged, insufficiently accurate, for Arduino API portability)
     WiFi.config(local_ip, dns, gateway, subnet)
 
 Versions where some of ``dns``, ``gateway`` and ``subnet`` parameters are not specified use a default value. Default ``subnet`` is 255.255.255.0. Default ``gateway`` and ``dns`` are derived from ``local_ip`` by changing the last number to 1 (discouraged). To return to DHCP you can use ``WiFi.config(INADDR_NONE);``.
