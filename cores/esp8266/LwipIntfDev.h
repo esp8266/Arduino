@@ -69,6 +69,7 @@ public:
                    const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
     // two and one parameter version. 2nd parameter is DNS like in Arduino. IPv4 only
+    [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy function config(ip[,dns]) as chosen defaults may not match the local network configuration")]]
     boolean config(IPAddress local_ip, IPAddress dns = INADDR_ANY);
 
     // default mac-address is inferred from esp8266's STA interface
