@@ -99,11 +99,11 @@ config
 
 Disable `DHCP <https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol>`__ client (Dynamic Host Configuration Protocol) and set the IP configuration of station interface to user defined arbitrary values. The interface will be a static IP configuration instead of values provided by DHCP.
 
-Note that to reenable DHCP, all three parameters as 0.0.0.0 (local_ip, gateway and subnet as ``INADDR_ANY``) must be passed back to config() and re-connecting is needed.
+Note that to reenable DHCP, all three parameters (local_ip, gateway and subnet) as IPv4 ``0U`` (= 0.0.0.0) must be passed back to config() and re-connecting is needed.
 
 .. code:: cpp
 
-    WiFi.config(local_ip, gateway, subnet)             (discouraged, insufficiently accurate, for Arduino API portability)
+    WiFi.config(local_ip, gateway, subnet)             (for Arduino API portability, discouraged as chosen defaults may not match the local network configuration)
     WiFi.config(local_ip, gateway, subnet, dns1)
     WiFi.config(local_ip, gateway, subnet, dns1, dns2)
 
@@ -126,14 +126,14 @@ For Arduino networking API compatibility, the ESP8266WiFi library supports IPv4-
 
 .. code:: cpp
 
-    WiFi.config(local_ip)                        (discouraged, insufficiently accurate, for Arduino API portability)
-    WiFi.config(local_ip, dns)                   (discouraged, insufficiently accurate, for Arduino API portability)
-    WiFi.config(local_ip, dns, gateway)          (discouraged, insufficiently accurate, for Arduino API portability)
+    WiFi.config(local_ip)                        (for Arduino API portability, discouraged as chosen defaults may not match the local network configuration)
+    WiFi.config(local_ip, dns)                   (for Arduino API portability, discouraged as chosen defaults may not match the local network configuration)
+    WiFi.config(local_ip, dns, gateway)          (for Arduino API portability, discouraged as chosen defaults may not match the local network configuration)
     WiFi.config(local_ip, dns, gateway, subnet)
 
-Versions where some of ``dns``, ``gateway`` and ``subnet`` parameters are not specified use a default value. Default ``subnet`` is 255.255.255.0. Default ``gateway`` and ``dns`` are derived from ``local_ip`` by changing the last number to 1 (It is discouraged to use these default values as they may not apply to every network configuration).
+Versions where some of ``dns``, ``gateway`` and ``subnet`` parameters are not specified use a default value. Default ``subnet`` is 255.255.255.0. Default ``gateway`` and ``dns`` are derived from ``local_ip`` by changing the last number to 1. It is discouraged to use these default values as they may not apply to every network configuration.
 
-To return to DHCP you can use ``WiFi.config(INADDR_NONE);``.
+Reminder : To reenable DHCP you can use ``WiFi.config(0U, 0U, 0U);``.
 
 **Warning: The default values for dns, gateway and subnet may not match your router's settings.** Also please note, that ``config(local_ip, gateway)`` is not supported and ``WiFi.config(local_ip, gateway, subnet)`` doesn't set the DNS server IP.
 
