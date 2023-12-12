@@ -1,4 +1,15 @@
-:orphan:
+Troubleshooting
+===============
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   Core Debugging <core_debugging>
+   Exception Causes <exception_causes>
+   Stack Dumps <stack_dump>
+   Improving Exception Decoder Results <improving_exception_decoder_results>
+
 
 My ESP crashes running some code. How to troubleshoot it?
 ---------------------------------------------------------
@@ -10,11 +21,9 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
--  `Exception Decoder <#exception-decoder>`__
--  `Improving Exception Decoder Results <#improving-exception-decoder-results>`__
 -  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
--  `If at the Wall, Enter an Issue
-   Report <#if-at-the-wall-enter-an-issue-report>`__
+-  `If nothing else helps, file an issue report
+   <#if-nothing-else-helps-file-an-issue-repot>`__
 -  `Conclusion <#conclusion>`__
 
 Introduction
@@ -34,7 +43,7 @@ What ESP has to Say
 Start off by opening a Serial Monitor (Ctrl+Shift+M) to observe the
 output. Typical crash log looks as follows:
 
-.. figure:: pictures/a02-typical-crash-log.png
+.. figure:: typical-crash-log.png
    :alt: Typical crash log
 
    Typical crash log
@@ -137,24 +146,36 @@ Exception
 
 Typical restart because of exception looks like follows:
 
-.. figure:: pictures/a02-exception-cause-decoding.png
+.. figure:: exception-cause-decoding.png
    :alt: Exception cause decoding
 
    Exception cause decoding
 
 Start with looking up exception code in the `Exception Causes
-(EXCCAUSE) <../exception_causes.rst>`__
-table to understand what kind of issue it is. If you have no clues what
-it's about and where it happens, then use `Arduino ESP8266/ESP32
-Exception Stack Trace
-Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ to find
-out in which line of application it is triggered. Please refer to `Check
-Where the Code Crashes <#check-where-the-code-crashes>`__ point below
-for a quick example how to do it.
+(EXCCAUSE) <../Troubleshooting/exception_causes.rst>`__
+table to understand what kind of issue it is.
 
-**NOTE:** When decoding exceptions be sure to include all lines between
-the ``---- CUT HERE ----`` marks in the output to allow the decoder to also
-provide the line of code that's actually causing the exception.
+Stack dump
+^^^^^^^^^^
+
+If the ESP crashes the Exception Cause will be shown and the current stack will be dumped.
+
+::
+
+    Exception (0): epc1=0x402103f4 epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+
+    ctx: sys
+    sp: 3ffffc10 end: 3fffffb0 offset: 01a0
+
+
+    >>>stack>>>
+
+    ...........
+
+    <<<stack<<<
+
+
+Please refer to `our troubleshooting guide <../Troubleshooting/stack_dump.rst>`__
 
 Watchdog
 ^^^^^^^^
@@ -176,7 +197,7 @@ serial monitor.
 An example of application crash triggered by software wdt is shown
 below.
 
-.. figure:: pictures/a02-sw-watchdog-example.png
+.. figure:: sw-watchdog-example.png
    :alt: Example of restart by s/w watchdog
 
    Example of restart by s/w watchdog
@@ -187,7 +208,7 @@ particular line in code where wdt has been triggered.
 
 Reset by hardware watchdog timer is shown on picture below.
 
-.. figure:: pictures/a02-hw-watchdog-example.png
+.. figure:: hw-watchdog-example.png
    :alt: Example of restart by h/w watchdog
 
    Example of restart by h/w watchdog
@@ -203,142 +224,6 @@ application. Then by observing what was the last debug message printed
 out before restart, you should be able to narrow down part of code
 firing the h/w wdt reset. If diagnosed application or library has debug
 option then switch it on to aid this troubleshooting.
-
-Exception Decoder
-~~~~~~~~~~~~~~~~~
-
-Decoding of ESP stack trace is now easy and available to everybody
-thanks to great `Arduino ESP8266/ESP32 Exception Stack Trace
-Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ developed
-by @me-no-dev.
-
-Installation for Arduino IDE is quick and easy following the
-`installation <https://github.com/me-no-dev/EspExceptionDecoder#installation>`__
-instructions.
-
-If you don't have any code for troubleshooting, use the example below:
-
-::
-
-    void setup()
-    {
-      Serial.begin(115200);
-      Serial.println();
-      Serial.println("Let's provoke the s/w wdt firing...");
-      //
-      // provoke an OOM, will be recorded as the last occurred one
-      char* out_of_memory_failure = (char*)malloc(1000000);
-      //
-      // wait for s/w wdt in infinite loop below
-      while(true);
-      //
-      Serial.println("This line will not ever print out");
-    }
-
-    void loop(){}
-
-
-Enable the Out-Of-Memory (*OOM*) debug option (in the *Tools > Debug Level*
-menu), compile/flash/upload this code to your ESP (Ctrl+U) and start Serial
-Monitor (Ctrl+Shift+M).  You should shortly see ESP restarting every couple
-of seconds and ``Soft WDT reset`` message together with stack trace showing
-up on each restart.  Click the Autoscroll check-box on Serial Monitor to
-stop the messages scrolling up.  Select and copy the stack trace, including
-the ``last failed alloc call: ...`` line, go to the *Tools* and open the
-*ESP Exception Decoder*.
-
-.. figure:: pictures/a02-decode-stack-tace-1-2.png
-   :alt: Decode the stack trace, steps 1 and 2
-
-   Decode the stack trace, steps 1 and 2
-
-Now paste the stack trace to Exception Decoder's window. At the bottom
-of this window you should see a list of decoded lines of sketch you have
-just uploaded to your ESP. On the top of the list, like on the top of
-the stack trace, there is a reference to the last line executed just
-before the software watchdog timer fired causing the ESP's restart.
-Check the number of this line and look it up on the sketch. It should be
-the line ``Serial.println("Let's provoke the s/w wdt firing...")``, that
-happens to be just before ``while(true)`` that made the watchdog fired
-(ignore the lines with comments, that are discarded by compiler).
-
-.. figure:: pictures/a02-decode-stack-tace-3-6.png
-   :alt: Decode the stack trace, steps 3 through 6
-
-   Decode the stack trace, steps 3 through 6
-
-Armed with `Arduino ESP8266/ESP32 Exception Stack Trace
-Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ you can
-track down where the module is crashing whenever you see the stack trace
-dropped. The same procedure applies to crashes caused by exceptions.
-
-    Note, to decode the exact line of code where the application
-    crashed, you need to use ESP Exception Decoder in context of sketch
-    you have just loaded to the module for diagnosis. Decoder is not
-    able to correctly decode the stack trace dropped by some other
-    application not compiled and loaded from your Arduino IDE.
-
-
-Improving Exception Decoder Results
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Due to the limited resources on the device, our default compiler optimizations
-focus on creating the smallest code size (``.bin`` file). The GCC compiler's
-option ``-Os`` contains the base set of optimizations used. This set is fine for
-release but not ideal for debugging.
-
-Our view of a crash is often the `Stack Dump <../Troubleshooting/stack_dump.rst>`__
-which gets copy/pasted into an Exception Decoder.
-For some situations, the optimizer doesn't write caller return addresses to the
-stack. When we crash, the list of functions called is missing. And when the
-crash occurs in a leaf function, there is seldom if ever any evidence of who
-called.
-
-With the ``-Os`` option, functions called once are inlined into the calling
-function. A chain of these functions can optimize down to the calling function.
-When the crash occurs in one of these chain functions, the actual location in
-the source code is no longer available.
-
-When you select ``Debug Optimization: Lite`` on the Arduino IDE Tools menu, it
-turns off ``optimize-sibling-calls``. Turning off this optimization allows more
-caller addresses to be written to the stack, improving the results from the
-Exception Decoder. Without this option, the callers involved in the crash may be
-missing from the Decoder results. Because of the limited stack space, there is
-the remote possibility that removing this optimization could lead to more
-frequent stack overflows. You only want to do this in a debug setting. This
-option does not help the chained function issue.
-
-When you select ``Debug Optimization: Optimum``, you get an even more complete
-stack trace. For example, chained function calls may show up. This selection
-uses the compiler option ``-Og``. GCC considers this the ideal optimization for
-the "edit-compile-debug cycle" ... "producing debuggable code." You can read the
-specifics at `GCC's Optimize Options <https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html>`__
-
-When global optimization creates build size issues or stack overflow issues,
-select ``Debug Optimization: None``, and use a targeted approach with
-``#pragma GCC optimize("Og")`` at the module level. Or, if you want to use a
-different set of optimizations, you can set optimizations through build options.
-Read more at `Global Build Options <a06-global-build-options.rst>`__.
-
-For non-Arduino IDE build platforms, you may need to research how to add build
-options. Some build platforms already use ``-Og`` for debug builds.
-
-A crash in a leaf function may not leave the caller's address on the stack.
-The return address can stay in a register for the duration of the call.
-Resulting in a crash report identifying the crashing function without a
-trace of who called. You can encourage the compiler to save the caller's
-return address by adding an inline assembly trick
-``__asm__ __volatile__("" ::: "a0", "memory");`` at the beginning of the
-function's body. Or instead, for a debug build conditional option, use the
-macro ``DEBUG_LEAF_FUNCTION()`` from ``#include <debug.h>``. For compiler
-toolchain 3.2.0 and above, the ``-Og`` option is an alternative solution.
-
-In some cases, adding ``#pragma GCC optimize("Og,no-ipa-pure-const")`` to a
-module as well as using ``DEBUG_LEAF_FUNCTION()`` in a leaf function were
-needed to display a complete call chain. Or use
-``#pragma GCC optimize("Os,no-inline,no-optimize-sibling-calls,no-ipa-pure-const")``
-if you require optimization ``-Os``.
-
 
 Other Causes for Crashes
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -400,8 +285,8 @@ Memory, memory, memory
    ``ESP.getFreeHeap()`` / ``ESP.getHeapFragmentation()`` /
    ``ESP.getMaxFreeBlockSize()`` will help the process of finding memory issues.
 
-   Now is time to re-read about the `exception decoder
-   <#exception-decoder>`__.
+   Now is time to re-read about the `stack dump and exception decoder
+   <../Troubleshootng/stack_dump.rst>`__.
 
 
 *Some techniques for reducing memory usage*
@@ -419,8 +304,8 @@ Stack
    * Objects that have large data members, such as large arrays, should also be avoided on the stack, and should be dynamically allocated (consider smart pointers).
 
 
-If at the Wall, Enter an Issue Report
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If nothing else helps, file an issue report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using the procedure above you should be able to troubleshoot all the
 code you write. It may happen that ESP is crashing inside some library
@@ -472,12 +357,15 @@ Conclusion
 Do not be afraid to troubleshoot ESP exception and watchdog restarts.
 `Esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core provides
 detailed diagnostics that will help you pin down the issue. Before
-checking the s/w, get your h/w right. Use `ESP Exception
-Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ to find
-out where the code fails. If you do you homework and are still unable to
-identify the root cause, submit an issue report. Provide enough details.
-Be specific and isolate the issue. Then ask community for support. There
-are plenty of people that like to work with ESP and willing to help with
-your problem.
+checking the s/w, get your h/w right. Use `our troubleshooting guide 
+<../Troubleshootng/stack_dump.rst>`__ to find out where the code fails.
+If you do you homework and are still unable to identify the root cause,
+submit an issue report. Provide enough details. Be specific and isolate the issue.
+Then ask community for support. There are plenty of people that like to work with
+ESP and willing to help with your problem.
+
+[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well-established community for questions and answers about Arduino for ESP8266. Stackoverflow is also an alternative. If you need help, have a "How do I..." type question, have a problem with a 3rd party library not hosted in this repo, or just want to discuss how to approach a problem, please ask there.
+
+Also check out our [ESP8266 Gitter channel](https://app.gitter.im/#/room/#esp8266_Arduino:gitter.im)
 
 `FAQ list :back: <readme.rst>`__

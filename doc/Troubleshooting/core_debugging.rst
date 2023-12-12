@@ -1,5 +1,6 @@
-Debugging
-=========
+Core Debugging
+==============
+
 
 Introduction
 ------------

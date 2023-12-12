@@ -1,5 +1,5 @@
-Stack Dumps
-===========
+Decoding Stack Dumps
+====================
 
 Introduction
 ------------
@@ -54,15 +54,180 @@ The first number after ``Exception`` gives the cause of the reset. a
 full list of all causes can be found `here <../exception_causes.rst>`__
 the hex after are the stack dump.
 
-Decode
-~~~~~~
+Due to the limited resources on the device, our default compiler optimizations
+can obfuscate the result. See `how to improve the decoder results <improving_exception_decoder_results.rst>`__.
 
-It's possible to decode the Stack to readable information.
-You can get a copy and read about the `Esp Exception Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ tool.
 
-For a troubleshooting example using the Exception Decoder Tool, read `FAQ: My ESP Crashes <../faq/a02-my-esp-crashes.rst#exception-decoder>`__.
+Decoding
+--------
+
+**NOTE:** When decoding exceptions be sure to include **all lines** between
+the ``---- CUT HERE ----`` marks in the output to allow the decoder to also
+provide the line of code that's actually causing the exception.
+
+
+ESP Excepton Decoder
+^^^^^^^^^^^^^^^^^^^^
+
+Using https://github.com/me-no-dev/EspExceptionDecoder by @me-no-dev
 
 .. figure:: ESP_Exception_Decoderp.png
    :alt: ESP Exception Decoder
 
    ESP Exception Decoder
+
+`Installation instructions for Arduino IDE 1.x <https://github.com/me-no-dev/EspExceptionDecoder#installation>`__
+
+If you don't have any code for troubleshooting, use the example below:
+
+.. code:: cpp
+
+    void setup()
+    {
+      Serial.begin(115200);
+      Serial.println();
+      Serial.println("Let's provoke the s/w wdt firing...");
+      //
+      // provoke an OOM, will be recorded as the last occurred one
+      char* out_of_memory_failure = (char*)malloc(1000000);
+      //
+      // wait for s/w wdt in infinite loop below
+      while(true);
+      //
+      Serial.println("This line will not ever print out");
+    }
+
+    void loop(){}
+
+
+Enable the Out-Of-Memory (*OOM*) debug option (in the *Tools > Debug Level*
+menu), compile/flash/upload this code to your ESP (Ctrl+U) and start Serial
+Monitor (Ctrl+Shift+M).  You should shortly see ESP restarting every couple
+of seconds and ``Soft WDT reset`` message together with stack trace showing
+up on each restart.  Click the Autoscroll check-box on Serial Monitor to
+stop the messages scrolling up.  Select and copy the stack trace, including
+the ``last failed alloc call: ...`` line, go to the *Tools* and open the
+*ESP Exception Decoder*.
+
+.. figure:: decode-stack-trace-1-2.png
+   :alt: Decode the stack trace, steps 1 and 2
+
+   Decode the stack trace, steps 1 and 2
+
+Now paste the stack trace to Exception Decoder's window. At the bottom
+of this window you should see a list of decoded lines of sketch you have
+just uploaded to your ESP. On the top of the list, like on the top of
+the stack trace, there is a reference to the last line executed just
+before the software watchdog timer fired causing the ESP's restart.
+Check the number of this line and look it up on the sketch. It should be
+the line ``Serial.println("Let's provoke the s/w wdt firing...")``, that
+happens to be just before ``while(true)`` that made the watchdog fired
+(ignore the lines with comments, that are discarded by compiler).
+
+.. figure:: decode-stack-trace-3-6.png
+   :alt: Decode the stack trace, steps 3 through 6
+
+   Decode the stack trace, steps 3 through 6
+
+Armed with `Arduino ESP8266/ESP32 Exception Stack Trace
+Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ you can
+track down where the module is crashing whenever you see the stack trace
+dropped. The same procedure applies to crashes caused by exceptions.
+
+Note, to decode the exact line of code where the application
+crashed, you need to use ESP Exception Decoder in context of sketch
+you have just loaded to the module for diagnosis. Decoder is not
+able to correctly decode the stack trace dropped by some other
+application not compiled and loaded from your Arduino IDE.
+
+decoder.py script
+^^^^^^^^^^^^^^^^^
+
+Core also includes a standalone script that is able to decode
+
+.. code:: console
+
+   $ python3 tools/decoder.py --help
+   usage: decoder.py [-h] [--tool {gdb,addr2line}] [--toolchain-path TOOLCHAIN_PATH] firmware_elf [postmortem]
+
+   positional arguments:
+     firmware_elf
+     postmortem
+
+   options:
+     -h, --help            show this help message and exit
+     --tool {gdb,addr2line}
+     --toolchain-path TOOLCHAIN_PATH
+                           Sets path to Xtensa tools, when they are not in PATH
+
+Where 'postmortem' is either path to the file or ``-`` to capture input of some other tool output.
+
+For example
+
+.. code:: cpp
+
+  #include <Arduino.h>
+
+  int* somewhere { nullptr };
+  
+  void setup() {
+      delay(5000);
+      Serial.begin(115200);
+      Serial.printf("%d\n", *somewhere);
+  }
+  
+  void loop() {
+  }
+
+Right after booting, device would print the following to the default serial port
+
+.. code:: console
+
+   --------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+   Exception (28):
+   epc1=0x4020105f epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+   
+   >>>stack>>>
+   
+   ctx: cont
+   sp: 3ffffe00 end: 3fffffd0 offset: 0190
+   3fffff90:  0001c200 0000001c 00000000 402018d9
+   3fffffa0:  3fffdad0 00000000 3ffee4bc 40201055
+   3fffffb0:  feefeffe feefeffe 3ffee510 40201954
+   3fffffc0:  feefeffe feefeffe 3ffe85d8 40100c39
+   <<<stack<<<
+   
+   --------------- CUT HERE FOR EXCEPTION DECODER ---------------
+
+Using default git installation paths and Arduino IDE 2.x
+
+.. code:: console
+
+   $ python3 /home/runner/.arduino15/packages/esp8266com/esp8266/tools/decoder.py \
+       --toolchain-path /home/runner/.arduino15/packages/esp8266com/esp8266/tools/xtensa-lx106-elf/ \
+       --elf-path /tmp/arduino/sketches/2D54B6F2B852F5DEF454A04EC8FA3CF5/arduino8869.ino.elf \
+       stack.txt
+
+   Exception (28) - LoadProhibited: A load referenced a page mapped with an attribute that does not permit loads
+   epc1=0x4020105f: setup at /home/runner/dev/arduino8661/src/main.cpp:8
+   
+   
+   0x402018d9: esp_delay at /home/runner/.arduino15/packages/esp8266com/esp8266/cores/esp8266/core_esp8266_main.cpp:158
+   0x40201055: setup at /home/runner/dev/arduino8661/src/main.cpp:8
+   0x40201954: loop_wrapper() at /home/runner/.arduino15/packages/esp8266com/esp8266/cores/esp8266/core_esp8266_main.cpp:244
+   0x40100c39: cont_wrapper at ??:?
+
+Temporary directory location can be found in verbose build log output, see *Preferences > Show verbose output during [✓] compile*
+
+For example
+
+.. code::
+
+   C:\Users\USERNAME\AppData\Local\Temp\arduino\sketches\2D54B6F2B852F5DEF454A04EC8FA3CF5
+
+
+PlatformIO
+^^^^^^^^^^
+
+Use the built-in `'pio device monitor' exception filter <https://docs.platformio.org/en/stable/core/userguide/device/cmd_monitor.html#built-in-filters>` or decoder.py script
