@@ -341,7 +341,7 @@ uint8_t WiFiClient::status()
 
 WiFiClient::operator bool()
 {
-    return available() || connected();
+    return (_client != nullptr);
 }
 
 IPAddress WiFiClient::remoteIP()
