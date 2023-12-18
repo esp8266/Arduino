@@ -208,7 +208,14 @@ public:
   }
 
   /**
-   * @brief  Redirect to another URL, e.g. webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * @brief  Redirect to another URL, e.g.
+   *   webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * There are 3 points of redirection here:
+   *   1) "Location" element in the header
+   *   2) Disable client caching
+   *   3) HTML "content" element to redirect
+   * If the "Location" header element works the HTML content is never seen.
+   * https://tools.ietf.org/html/rfc7231#section-6.4.3
    * @param  url URL to redirect to
    * @param  content Optional redirect content
    */
