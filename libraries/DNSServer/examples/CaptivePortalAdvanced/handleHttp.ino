@@ -90,8 +90,6 @@ void handleWifiSave() {
   server.arg("n").toCharArray(ssid, sizeof(ssid) - 1);
   server.arg("p").toCharArray(password, sizeof(password) - 1);
   server.redirect("wifi");
-  // Empty content inhibits Content-length header so we have to close the socket ourselves.
-  server.client().stop();              // Stop is needed because we sent no content length
   saveCredentials();
   connect = strlen(ssid) > 0;  // Request WLAN connect with new credentials if there is a SSID
 }
