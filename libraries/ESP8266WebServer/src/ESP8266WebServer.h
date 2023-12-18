@@ -208,13 +208,20 @@ public:
   }
 
   /**
-   * @brief  Redirect to another URL, e.g.
-   * webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * @brief  Redirect to another URL, e.g. webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
    * @param  url URL to redirect to
+   * @param  content Optional redirect content
    */
-   void redirect(const String& url) {
+  void redirect(const String& url, const String& content = emptyString) {
     sendHeader(F("Location"), url, true);
-    send(302, F("text/html"), "");  // send 302: "Found"
+    sendHeader(F("Cache-Control"), F("no-cache, no-store, must-revalidate"));
+    sendHeader(F("Pragma"), F("no-cache"));
+    sendHeader(F("Expires"), F("-1"));
+    send(302, F("text/html"), content);  // send 302: "Found"
+    if (content.isEmpty()) {
+      // Empty content inhibits Content-length header so we have to close the socket ourselves.
+      client().stop();  // Stop is needed because we sent no content length
+    }
   }
 
   // Whether other requests should be accepted from the client on the
