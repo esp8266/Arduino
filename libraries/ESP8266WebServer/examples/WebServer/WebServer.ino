@@ -43,8 +43,7 @@ void handleRedirect() {
 
   if (!LittleFS.exists(url)) { url = "/$update.htm"; }
 
-  server.sendHeader("Location", url, true);
-  server.send(302);
+  server.redirect(url);
 }  // handleRedirect()
 
 
