@@ -161,20 +161,21 @@ static struct cache_line *__vm_cache; // Always points to MRU (hence the line be
 
 constexpr int addrmask = ~(sizeof(__vm_cache[0].w)-1); // Helper to mask off bits present in cache entry
 
-
 static void spi_init(spi_regs *spi1)
 {
   pinMode(sck, SPECIAL);
   pinMode(miso, SPECIAL);
   pinMode(mosi, SPECIAL);
   pinMode(cs, SPECIAL);
-  spi1->spi_cmd = 0;
+  // spi_ctrl appears to need setting before other SPI registers
+  spi1->spi_ctrl = 0;  // MSB first + plain SPI mode
+  asm("" ::: "memory");
   GPMUX &= ~(1 << 9);
   spi1->spi_clock = spi_clkval;
-  spi1->spi_ctrl = 0 ; // MSB first + plain SPI mode
   spi1->spi_ctrl1 = 0; // undocumented, clear for safety?
   spi1->spi_ctrl2 = 0; // No add'l delays on signals
   spi1->spi_user2 = 0; // No insn or insn_bits to set
+  spi1->spi_cmd = 0;
 }
 
 // Note: GCC optimization -O2 and -O3 tried and returned *slower* code than the default

@@ -16,7 +16,7 @@ const char *ssid = STASSID;
 const char *pass = STAPSK;
 
 void fetch(BearSSL::WiFiClientSecure *client) {
-  client->write("GET / HTTP/1.0\r\nHost: tls.mbed.org\r\nUser-Agent: ESP8266\r\n\r\n");
+  client->write("GET /ip HTTP/1.0\r\nHost: api.my-ip.io\r\nUser-Agent: ESP8266\r\n\r\n");
   client->flush();
   using oneShot = esp8266::polledTimeout::oneShot;
   oneShot timeout(5000);
@@ -39,12 +39,12 @@ void fetch(BearSSL::WiFiClientSecure *client) {
 int fetchNoMaxFragmentLength() {
   int ret = ESP.getFreeHeap();
 
-  Serial.printf("\nConnecting to https://tls.mbed.org\n");
+  Serial.printf("\nConnecting to https://api.my-ip.io\n");
   Serial.printf("No MFLN attempted\n");
 
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
-  if (client.connect("tls.mbed.org", 443)) {
+  if (client.connect("api.my-ip.io", 443)) {
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
     fetch(&client);
@@ -76,11 +76,11 @@ int fetchMaxFragmentLength() {
 
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
-  bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 512);
-  Serial.printf("\nConnecting to https://tls.mbed.org\n");
+  bool mfln = client.probeMaxFragmentLength("api.my-ip.io", 443, 512);
+  Serial.printf("\nConnecting to https://api.my-ip.io\n");
   Serial.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
   if (mfln) { client.setBufferSizes(512, 512); }
-  if (client.connect("tls.mbed.org", 443)) {
+  if (client.connect("api.my-ip.io", 443)) {
     Serial.printf("MFLN status: %s\n", client.getMFLNStatus() ? "true" : "false");
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
