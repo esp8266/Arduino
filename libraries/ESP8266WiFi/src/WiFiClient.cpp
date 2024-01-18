@@ -387,6 +387,16 @@ void WiFiClient::abort()
 	_client->abort(); // Wich in turn calls tcp_abort which calls tcp_abandon().
 }
 
+// In case you need to increase/decrease timeout current value
+bool WiFiClient::setTimeout( int timeout_ms )
+{
+   if ( timeout_ms <= 0 || timeout_ms > 3600000 ) return(false); // More than 0 and less than 1 hour
+   _timeout = timeout_ms;
+   if (!_client) return(true);
+   else _client->setTimeout(_timeout);
+   return(true);
+}
+
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
