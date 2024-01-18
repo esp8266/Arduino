@@ -151,6 +151,12 @@ public:
   // Immediately stops this client instance.
   // Unlike stop(), does not wait to gracefuly shutdown the connection.
   void abort();
+ 
+  // Default timeout is set to 5000 ms. 
+  // setTimeout gives the possibility to adjust this value.
+  // getTimeout return the timeout current value.  
+  bool setTimeout( int );
+  int getTimeout();
 
 protected:
 
