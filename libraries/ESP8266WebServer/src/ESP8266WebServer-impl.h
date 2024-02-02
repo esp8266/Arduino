@@ -734,8 +734,10 @@ void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
     _finalizeResponse();
   }
   _currentUri = "";
+  delete[] _currentArgs;
+  _currentArgs = nullptr;
+  _currentArgCount = 0;
 }
-
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_finalizeResponse() {
