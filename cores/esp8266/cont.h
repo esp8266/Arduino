@@ -22,9 +22,14 @@
 #define CONT_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifndef CONT_STACKSIZE
 #define CONT_STACKSIZE 4096
+#endif
+
+#ifndef CONT_STACKGUARD
+#define CONT_STACKGUARD 0xfeefeffe
 #endif
 
 #ifdef __cplusplus
@@ -62,8 +67,11 @@ void cont_run(cont_t*, void (*pfn)(void));
 // execution state (registers and stack)
 void cont_suspend(cont_t*);
 
+// Check that cont resume state is valid
+void cont_check_overflow(cont_t*);
+
 // Check guard bytes around the stack. Immediately panics on failure.
-void cont_check(cont_t*);
+void cont_check_guard(cont_t*);
 
 // Go through stack and check how many bytes are most probably still unchanged
 // and thus weren't used by the user code. i.e. that stack space is free. (high water mark)
@@ -77,7 +85,6 @@ bool cont_can_suspend(cont_t* cont);
 // routines' stack usages to be calculated by re-painting, checking current
 // free, running the routine, then checking the max free
 void cont_repaint_stack(cont_t *cont);
-
 
 #ifdef __cplusplus
 }
