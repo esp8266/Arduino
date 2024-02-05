@@ -111,8 +111,8 @@ The following points assume work in a direct clone of the repository, and not in
 
    * [platform.txt](https://github.com/esp8266/Arduino/blob/master/platform.txt) and [package.json](https://github.com/esp8266/Arduino/blob/master/package.json): update `version` to the release E.g. `3.0.0`,
 
-   * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h): import the latest database with the following shell command:\
-     `$ cd tools; sh TZupdate.sh`
+   * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h): import the latest database:\
+     `$ pip install -U tzdata; python format_tzdata.py --output ../cores/esp8266/TZ.h`
 
    * Update SSL/TLS certificates and public keys in examples:\
      `$ cd tools; sh certsUpdate.sh`
