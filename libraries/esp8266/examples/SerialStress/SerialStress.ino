@@ -60,7 +60,7 @@ void setup() {
   Serial.swap();  // RX=GPIO13 TX=GPIO15
   Serial.setRxBufferSize(SERIAL_SIZE_RX);
 
-  Serial1.begin(LOGBAUD); // RX=NONE TX=GPIO2
+  Serial1.begin(LOGBAUD);  // RX=NONE TX=GPIO2
   logger = &Serial1;
 
   logger->println();

@@ -73,7 +73,7 @@ void setup() {
   logger.printf("\nSTA: %s (dns: %s / %s)\n", WiFi.localIP().toString().c_str(), WiFi.dnsIP(0).toString().c_str(), WiFi.dnsIP(1).toString().c_str());
 
   ppplink.begin(PPPLINKBAUD);
-  ppplink.swap(); // RX=GPIO13 TX=GPIO15
+  ppplink.swap();  // RX=GPIO13 TX=GPIO15
 
   logger.println();
   logger.printf("\n\nhey, trying to be a PPP server here\n\n");
