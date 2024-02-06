@@ -592,34 +592,42 @@ With this information the script now can check if an update is needed. It is als
 
     <?PHP
 
-    header('Content-type: text/plain; charset=utf8', true);
-
     function check_header($name, $value = false) {
-        if(!isset($_SERVER[$name])) {
+        global $headers;
+        if (!isset($headers[$name])) {
             return false;
         }
-        if($value && $_SERVER[$name] != $value) {
+        if ($value && $headers[$name] != $value) {
             return false;
         }
         return true;
     }
-
-    function sendFile($path) {
+    
+    function sendFile($path, $version) {
         header($_SERVER["SERVER_PROTOCOL"].' 200 OK', true, 200);
         header('Content-Type: application/octet-stream', true);
         header('Content-Disposition: attachment; filename='.basename($path));
         header('Content-Length: '.filesize($path), true);
         header('x-MD5: '.md5_file($path), true);
+        header('x-version: '.$version, true);
         readfile($path);
     }
-
-    if(!check_header('User-Agent', 'ESP8266-http-Update')) {
+    
+    
+    $headers = getallheaders();
+    
+    header('Content-type: text/plain; charset=utf8', true);
+    
+    //if (!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
+    if (!check_header('User-Agent', 'ESP8266-http-Update')) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
-        echo "only for ESP8266 updater!\n";
+        echo "Only for ESP8266 updater!\n";
+        echo "User-Agent: ".$headers['User-Agent']." != ESP8266-http-Update\n";
         exit();
     }
-
-    if(
+    
+    if (
+        !check_header('x-ESP8266-mode') ||
         !check_header('x-ESP8266-STA-MAC') ||
         !check_header('x-ESP8266-AP-MAC') ||
         !check_header('x-ESP8266-free-space') ||
@@ -629,32 +637,54 @@ With this information the script now can check if an update is needed. It is als
         !check_header('x-ESP8266-sdk-version')
     ) {
         header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
-        echo "only for ESP8266 updater! (header)\n";
+        echo "Only for ESP8266 updater! (header missing)\n";
         exit();
     }
-
-    $db = array(
-        "18:FE:AA:AA:AA:AA" => "DOOR-7-g14f53a19",
-        "18:FE:AA:AA:AA:BB" => "TEMP-1.0.0"
-    );
-
-    if(!isset($db[$_SERVER['x-ESP8266-STA-MAC']])) {
-        header($_SERVER["SERVER_PROTOCOL"].' 500 ESP MAC not configured for updates', true, 500);
+    
+    $db_string = '{
+        "18:FE:AA:AA:AA:AA": {"file": "DOOR-7-g14f53a19.bin", "version": 1},
+        "18:FE:AA:AA:AA:BB": {"file": "TEMP-1.0.0".bin", "version": 1}}';
+    // $db_string = file_get_contents("arduino-db.json");
+    $db = json_decode($db_string, true);
+    $mode = $headers['x-ESP8266-mode'];
+    $mac = $headers['x-ESP8266-STA-MAC'];
+    
+    if (!isset($db[$mac])) {
+        header($_SERVER["SERVER_PROTOCOL"].' 404 ESP MAC not configured for updates', true, 404);
+        echo "MAC ".$mac." not configured for updates\n";
+        exit();
     }
-
-    $localBinary = "./bin/".$db[$_SERVER['x-ESP8266-STA-MAC']].".bin";
-
-    // Check if version has been set and does not match, if not, check if
-    // MD5 hash between local binary and ESP8266 binary do not match if not.
-    // then no update has been found.
-    if((!check_header('x-ESP8266-sdk-version') && $db[$_SERVER['x-ESP8266-STA-MAC']] != $_SERVER['x-ESP8266-version'])
-        || $_SERVER["x-ESP8266-sketch-md5"] != md5_file($localBinary)) {
-        sendFile($localBinary);
+    
+    $localBinary = $db[$mac]['file'];
+    $localVersion = $db[$mac]['version'];
+    
+    if (!is_readable($localBinary)) {
+        header($_SERVER["SERVER_PROTOCOL"].' 404 File not found', true, 404);
+        echo "File ".$localBinary." not found\n";
+        exit();
+    }
+    
+    if ($mode == 'sketch') {
+        // Check if version has been set and does not match, if not, check if
+        // MD5 hash between local binary and ESP8266 binary do not match if not.
+        // then no update has been found.
+        if ((check_header('x-ESP8266-version') && $headers['x-ESP8266-version'] != $localVersion)) {
+            // || $headers["x-ESP8266-sketch-md5"] != md5_file($localBinary)) {
+            sendFile($localBinary, $localVersion);
+        } else {
+            header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
+            echo "File ".$localBinary." not modified\n";
+        }
+    } else if ($mode == 'version') {
+        header($_SERVER["SERVER_PROTOCOL"].' 200 OK', true, 200);
+        header('x-MD5: '.md5_file($localBinary), true);
+        header('x-version: '.$localVersion, true);
     } else {
-        header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
+        header($_SERVER["SERVER_PROTOCOL"].' 404 Mode not supported', true, 404);
+        echo "mode: ".$mode." not supported\n";
+        exit();
     }
-
-    header($_SERVER["SERVER_PROTOCOL"].' 500 no version for ESP MAC', true, 500);
+    ?>
 
 Stream Interface
 ----------------

@@ -339,6 +339,45 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   return true;
 }
 
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress dns) {
+
+    if (!local_ip.isSet())
+        return config(INADDR_ANY, INADDR_ANY, INADDR_ANY);
+
+    if (!local_ip.isV4())
+        return false;
+
+    IPAddress gw(local_ip);
+    gw[3] = 1;
+    if (!dns.isSet()) {
+        dns = gw;
+    }
+    return config(local_ip, dns, gw);
+}
+
+/**
+ * Change DNS for static IP configuration
+ * @param dns1       Static DNS server 1
+ * @param dns2       Static DNS server 2 (optional)
+ */
+bool ESP8266WiFiSTAClass::setDNS(IPAddress dns1, IPAddress dns2) {
+
+  if((WiFi.getMode() & WIFI_STA) == 0)
+    return false;
+
+  if(dns1.isSet()) {
+      // Set DNS1-Server
+      dns_setserver(0, dns1);
+  }
+
+  if(dns2.isSet()) {
+      // Set DNS2-Server
+      dns_setserver(1, dns2);
+  }
+
+  return true;
+}
+
 /**
  * will force a disconnect an then start reconnecting to AP
  * @return ok
@@ -605,6 +644,18 @@ uint8_t* ESP8266WiFiSTAClass::BSSID(void) {
     static struct station_config conf;
     wifi_station_get_config(&conf);
     return reinterpret_cast<uint8_t*>(conf.bssid);
+}
+
+/**
+ * Fill the current bssid / mac associated with the network if configured
+ * @param bssid  pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+ * @return bssid uint8_t *
+ */
+uint8_t* ESP8266WiFiSTAClass::BSSID(uint8_t* bssid) {
+    struct station_config conf;
+    wifi_station_get_config(&conf);
+    memcpy(bssid, conf.bssid, WL_MAC_ADDR_LENGTH);
+    return bssid;
 }
 
 /**
