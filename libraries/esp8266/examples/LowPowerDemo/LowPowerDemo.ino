@@ -42,7 +42,7 @@
 #include <PolledTimeout.h>
 #include <include/WiFiState.h>  // WiFiState structure details
 
-//#define DEBUG  // prints WiFi connection info to serial, uncomment if you want WiFi messages
+// #define DEBUG  // prints WiFi connection info to serial, uncomment if you want WiFi messages
 #ifdef DEBUG
 #define DEBUG_PRINTLN(x) Serial.println(x)
 #define DEBUG_PRINT(x) Serial.print(x)
@@ -56,8 +56,8 @@
 
 // uncomment one of the two lines below for your LED connection (optional)
 #define LED 5  // D1/GPIO5 external LED for modules with built-in LEDs so it doesn't add amperage
-//#define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
-// you can use LED_BUILTIN, but it adds to the measured amperage by 0.3mA to 6mA.
+// #define LED 2  // D4/GPIO2 LED for ESP-01,07 modules; D4 is LED_BUILTIN on most other modules
+//  you can use LED_BUILTIN, but it adds to the measured amperage by 0.3mA to 6mA.
 
 ADC_MODE(ADC_VCC);  // allows you to monitor the internal VCC level; it varies with WiFi load
 // don't connect anything to the analog input pin(s)!
@@ -72,7 +72,7 @@ IPAddress dns1(0, 0, 0, 0);
 IPAddress dns2(0, 0, 0, 0);
 uint32_t timeout = 30E3;  // 30 second timeout on the WiFi connection
 
-//#define TESTPOINT  //  used to track the timing of several test cycles (optional)
+// #define TESTPOINT  //  used to track the timing of several test cycles (optional)
 #ifdef TESTPOINT
 #define testPointPin 4  // D2/GPIO4, you can use any pin that supports interrupts
 #define testPoint_HIGH digitalWrite(testPointPin, HIGH)

@@ -47,7 +47,7 @@ const char *ap_default_psk = APPSK;    ///< Default PSK.
 /// @}
 
 /// Uncomment the next line for verbose output over UART.
-//#define SERIAL_VERBOSE
+// #define SERIAL_VERBOSE
 
 /**
    @brief Read WiFi connection information from file system.
