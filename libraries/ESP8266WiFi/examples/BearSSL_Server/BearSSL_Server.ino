@@ -48,7 +48,7 @@ const char *pass = STAPSK;
 // The HTTPS server
 BearSSL::WiFiServerSecure server(443);
 
-//#define USE_EC // Enable Elliptic Curve signed cert
+// #define USE_EC // Enable Elliptic Curve signed cert
 
 #define USING_INSECURE_CERTS_AND_KEYS_AND_CAS 1
 #include <ssl-tls-ca-key-cert-example.h>
@@ -58,7 +58,7 @@ BearSSL::WiFiServerSecure server(443);
                       // Caching SSL sessions shortens the length of the SSL handshake.
                       // You can see the performance improvement by looking at the
                       // Network tab of the developer tools of your browser.
-//#define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
+// #define DYNAMIC_CACHE // Whether to dynamically allocate the cache.
 
 #if defined(USE_CACHE) && defined(DYNAMIC_CACHE)
 // Dynamically allocated cache.
