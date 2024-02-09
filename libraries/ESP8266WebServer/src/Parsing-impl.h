@@ -358,9 +358,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
   client.readStringUntil('\n');
   //start reading the form
   if (line == ("--"+boundary)){
-    if(_postArgs) delete[] _postArgs;
-    _postArgs = new RequestArgument[WEBSERVER_MAX_POST_ARGS];
-    _postArgsLen = 0;
+    std::unique_ptr<RequestArgument[]> postArgs(new RequestArgument[WEBSERVER_MAX_POST_ARGS]);
+    int postArgsLen = 0;
     while(1){
       String argName;
       String argValue;
@@ -408,7 +407,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             }
             DBGWS("PostArg Value: %s\n\n", argValue.c_str());
 
-            RequestArgument& arg = _postArgs[_postArgsLen++];
+            RequestArgument& arg = postArgs[postArgsLen++];
             arg.key = argName;
             arg.value = argValue;
 
@@ -488,25 +487,20 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
     }
 
     int iarg;
-    int totalArgs = ((WEBSERVER_MAX_POST_ARGS - _postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - _postArgsLen):_currentArgCount;
+    int totalArgs = ((WEBSERVER_MAX_POST_ARGS - postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - postArgsLen):_currentArgCount;
     for (iarg = 0; iarg < totalArgs; iarg++){
-      RequestArgument& arg = _postArgs[_postArgsLen++];
+      RequestArgument& arg = postArgs[postArgsLen++];
       arg.key = _currentArgs[iarg].key;
       arg.value = _currentArgs[iarg].value;
     }
-    if (_currentArgs) delete[] _currentArgs;
-    _currentArgs = new RequestArgument[_postArgsLen];
-    for (iarg = 0; iarg < _postArgsLen; iarg++){
+    delete[] _currentArgs;
+    _currentArgs = new RequestArgument[postArgsLen];
+    for (iarg = 0; iarg < postArgsLen; iarg++){
       RequestArgument& arg = _currentArgs[iarg];
-      arg.key = _postArgs[iarg].key;
-      arg.value = _postArgs[iarg].value;
+      arg.key = postArgs[iarg].key;
+      arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    if (_postArgs) {
-      delete[] _postArgs;
-      _postArgs = nullptr;
-      _postArgsLen = 0;
-    }
     return true;
   }
   DBGWS("Error: line: %s\n", line.c_str());
