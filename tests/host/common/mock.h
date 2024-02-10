@@ -182,6 +182,16 @@ void mock_stop_littlefs();
 
 #include <common/esp8266_peri.h>
 
-//
+// host serial port
+
+extern int hostBaudrate;
+void       hostsp_open(const char* port, int baud = 9600, int bit = 8, int parity = 0, int stop = 1,
+                       int control = 0);
+size_t     hostsp_write(char c);
+size_t     hostsp_write(const void* data, size_t len);
+size_t     hostsp_read();
+size_t     hostsp_read(void* data, size_t len);
+size_t     hostsp_availableForWrite();
+size_t     hostsp_available();  // for read
 
 #endif  // __cplusplus

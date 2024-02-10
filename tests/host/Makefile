@@ -126,6 +126,7 @@ MOCK_CPP_FILES_COMMON := \
 		littlefs_mock.cpp \
 		sdfs_mock.cpp \
 		WMath.cpp \
+		HostUART.cpp \
 		MockUART.cpp \
 		MockTools.cpp \
 		MocklwIP.cpp \
@@ -202,6 +203,7 @@ FLAGS += $(USERCFLAGS)
 CXXFLAGS += -fno-rtti $(FLAGS) -funsigned-char
 CFLAGS += $(FLAGS) -funsigned-char
 LDFLAGS += $(OPTZ) -g $(M32)
+ENDLDFLAGS += -lserialport
 LDFLAGS += $(USERLDFLAGS)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
@@ -295,7 +297,7 @@ $(BINDIR)/core.a: $(C_OBJECTS:%=$(BINDIR)/%) $(CPP_OBJECTS_CORE:%=$(BINDIR)/%)
 	$(RANLIB) $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS:%=$(BINDIR)/%) $(BINDIR)/core.a
-	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@
+	$(VERBLD) $(CXX) $(DEFSYM_FS) $(LDFLAGS) $^ -o $@ $(ENDLDFLAGS)
 
 #################################################
 # building ino sources
