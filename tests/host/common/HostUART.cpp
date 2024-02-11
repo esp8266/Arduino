@@ -83,7 +83,7 @@ size_t hostsp_write(const void* data, size_t len)
     return len;
 }
 
-size_t hostsp_read()
+char hostsp_read()
 {
     char c;
     spcheck("read(1)", sp_blocking_read(hostPort, &c, 1, timeout_ms));

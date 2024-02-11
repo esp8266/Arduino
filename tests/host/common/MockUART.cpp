@@ -192,7 +192,12 @@ extern "C"
     size_t uart_read(uart_t* uart, char* userbuffer, size_t usersize)
     {
         if (hostBaudrate)
-            return hostsp_read();
+        {
+            if (!hostsp_available())
+                return 0;
+            *userbuffer = hostsp_read();
+            return 1;
+        }
 
         if (uart == NULL || !uart->rx_enabled)
             return 0;

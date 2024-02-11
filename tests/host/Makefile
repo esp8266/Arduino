@@ -400,7 +400,7 @@ ifeq ($(INO),)
 else
 
 %: %.ino.cpp.o $(BINDIR)/fullcore.a FORCE
-	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@
+	$(VERBLD) $(CXX) $(LDFLAGS) $< $(BINDIR)/fullcore.a $(LIBSSL) -o $@ $(ENDLDFLAGS)
 	mkdir -p $(BINDIR)/$(lastword $(subst /, ,$@))
 	ln -sf $@ $(BINDIR)/$(lastword $(subst /, ,$@))
 	@echo "----> $(BINDIR)/$(lastword $(subst /, ,$@))/$(lastword $(subst /, ,$@)) <----"

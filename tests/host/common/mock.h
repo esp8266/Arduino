@@ -189,7 +189,7 @@ void       hostsp_open(const char* port, int baud = 9600, int bit = 8, int parit
                        int control = 0);
 size_t     hostsp_write(char c);
 size_t     hostsp_write(const void* data, size_t len);
-size_t     hostsp_read();
+char       hostsp_read();
 size_t     hostsp_read(void* data, size_t len);
 size_t     hostsp_availableForWrite();
 size_t     hostsp_available();  // for read
