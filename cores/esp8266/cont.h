@@ -67,7 +67,7 @@ void cont_run(cont_t*, void (*pfn)(void));
 // execution state (registers and stack)
 void cont_suspend(cont_t*);
 
-// Check that cont resume state is valid
+// Check that cont resume state is valid. Immediately panics on failure.
 void cont_check_overflow(cont_t*);
 
 // Check guard bytes around the stack. Immediately panics on failure.
