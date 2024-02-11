@@ -22,6 +22,8 @@
 #include <functional>
 #include <stdint.h>
 
+#include "coredecls.h"
+
 #define SCHEDULED_FN_MAX_COUNT 32
 
 // The purpose of scheduled functions is to trigger, from SYS stack (like in
@@ -39,10 +41,10 @@
 // scheduled function happen more often: every yield() (vs every loop()),
 // and time resolution is microsecond (vs millisecond). Details are below.
 
-// compute_scheduled_recurrent_grain() is used by delay() to give a chance to
+// get_scheduled_recurrent_delay_us() is used by delay() to give a chance to
 // all recurrent functions to run per their timing requirement.
 
-uint32_t compute_scheduled_recurrent_grain ();
+decltype(micros()) get_scheduled_recurrent_delay_us();
 
 // scheduled functions called once:
 //
@@ -59,6 +61,13 @@ uint32_t compute_scheduled_recurrent_grain ();
 //   SCHEDULED_FN_MAX_COUNT (or memory shortage).
 // * Run the lambda only once next time.
 // * A scheduled function can schedule a function.
+
+// get_scheduled_delay_us() is named for symmetry to get_scheduled_recurrent_delay_us,
+// despite the lack of specific delay times. Therefore it can return only one of two
+// values, viz. 0 in case of any pending scheduled functions, or a large delay time if
+// there is no function in the queue.
+
+decltype(micros()) get_scheduled_delay_us();
 
 bool schedule_function (const std::function<void(void)>& fn);
 
@@ -86,7 +95,7 @@ void run_scheduled_functions();
 //   any remaining delay from repeat_us is disregarded, and fn is executed.
 
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm = nullptr);
+    decltype(micros()) repeat_us, const std::function<bool(void)>& alarm = nullptr);
 
 // Test recurrence and run recurrent scheduled functions.
 // (internally called at every `yield()` and `loop()`)
