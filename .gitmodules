@@ -25,3 +25,6 @@
 [submodule "tools/sdk/uzlib"]
 	path = tools/sdk/uzlib
 	url = https://github.com/pfalcon/uzlib.git
+[submodule "libraries/ghostl"]
+	path = libraries/ghostl
+	url = https://github.com/dok-net/ghostl.git

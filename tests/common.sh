@@ -45,7 +45,9 @@ function skip_ino()
     *"/TeensySdioDemo/"* | \
     *"/TeensySdioLogger/"* | \
     *"/UserChipSelectFunction/"* | \
-    *"/UserSPIDriver/"*)
+    *"/UserSPIDriver/"* | \
+    *"/ghostl/examples/coro/"* | \
+    *"/ghostl/examples/taskqueue/"*)
         return 0
         ;;
     *"Teensy"*)
