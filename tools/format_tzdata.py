@@ -11,6 +11,7 @@ import os
 import pathlib
 import re
 import sys
+import pathlib
 
 from importlib import resources
 
@@ -57,19 +58,20 @@ def tzdata_resource_from_name(name):
     return resources.files(f'tzdata.zoneinfo.{pair[0].replace("/", ".")}') / pair[1]
 
 
-def make_zones_list(zones):
-    with open(zones, "r") as f:
-        zones = [zone.strip() for zone in f.readlines()]
-
-    return zones
+def make_zones_list(f):
+    return [zone.strip() for zone in f.readlines()]
 
 
 def make_zones(args):
     out = []
 
     for zone in make_zones_list(args.zones):
-        target = tzdata_resource_from_name(zone)
-        with tzdata_resource_from_name(zone).open("rb") as f:
+        if args.root:
+            target = args.root / zone
+        else:
+            target = tzdata_resource_from_name(zone)
+
+        with target.open("rb") as f:
             magic = f.read(4)
             if magic != b"TZif":
                 continue
@@ -138,7 +140,7 @@ if __name__ == "__main__":
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         "--output",
-        type=argparse.FileType("w"),
+        type=argparse.FileType("w", encoding="utf-8"),
         default=sys.stdout,
     )
     parser.add_argument(
@@ -148,13 +150,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--zones",
-        help="Zone names, one per line",
+        type=argparse.FileType("r", encoding="utf-8"),
+        help="Zone names file, one per line",
         default=os.path.join(os.path.dirname(tzdata.__file__), "zones"),
     )
     parser.add_argument(
         "--root",
         help="Where do we get raw zoneinfo files from",
-        default=os.path.join(os.path.dirname(tzdata.__file__), "zoneinfo"),
+        type=pathlib.Path,
     )
 
     args = parser.parse_args()
