@@ -52,6 +52,7 @@ EXCEPTION_CODES = (
     "permit stores",
 )
 
+
 # similar to java version, which used `list` and re-formatted it
 # instead, simply use an already short-format `info line`
 # TODO `info symbol`? revert to `list`?
@@ -135,8 +136,7 @@ def decode_lines(format_addresses, elf, lines):
             _, addrs = line.split(":")
             addrs = ANY_ADDR_RE.findall(addrs)
             stack_addresses.setdefault(last_stack, [])
-            for addr in addrs:
-                stack_addresses[last_stack].append(addr)
+            stack_addresses[last_stack].extend(addrs)
         # epc1=0xfffefefe epc2=0xfefefefe epc3=0xefefefef excvaddr=0xfefefefe depc=0xfefefefe
         elif EPC_STRING in line:
             pairs = line.split()
