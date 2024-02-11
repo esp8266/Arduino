@@ -139,7 +139,8 @@ def header(zones):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument(
         "--output",
         type=argparse.FileType("w", encoding="utf-8"),
