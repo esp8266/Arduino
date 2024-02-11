@@ -40,7 +40,8 @@ To get events to work we need to complete just two steps:
 
 1. Declare the event handler:
 
-``cpp   WiFiEventHandler disconnectedEventHandler;``
+.. code:: cpp
+    WiFiEventHandler disconnectedEventHandler;
 
 2. Select particular event (in this case ``onStationModeDisconnected``)
    and add the code to be executed when event is fired.
