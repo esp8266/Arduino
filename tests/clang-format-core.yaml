@@ -6,7 +6,6 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 SpaceAfterTemplateKeyword: false
 SpaceBeforeInheritanceColon: false
 SpacesBeforeTrailingComments: 2
-AlignTrailingComments: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: false

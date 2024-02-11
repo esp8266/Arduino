@@ -29,7 +29,7 @@
 
 /*
     SWAP_PINS:
-   0: use Serial1 for logging (legacy example)
+   0: use Serial1 for logging
    1: configure Hardware Serial port on RX:GPIO13 TX:GPIO15
       and use EspSoftwareSerial for logging on
       standard Serial pins RX:GPIO3 and TX:GPIO1
@@ -90,6 +90,8 @@ void setup() {
   logger->enableIntTx(false);
   logger->println("\n\nUsing EspSoftwareSerial for logging");
 #else
+  // Hardware serial0 is on RX(3)/TX(1)
+  // Hardware serial1 is on (no RX)/TX(2)
   logger->begin(BAUD_LOGGER);
   logger->println("\n\nUsing Serial1 for logging");
 #endif
