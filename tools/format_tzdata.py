@@ -126,8 +126,8 @@ def markdown(zones):
 
 
 def header(zones):
-    print(f"// ! ! ! DO NOT EDIT, AUTOMATICALLY GENERATED ! ! !")
-    print(f"// File created {datetime.datetime.now(tz=datetime.UTC)}")
+    print("// ! ! ! DO NOT EDIT, AUTOMATICALLY GENERATED ! ! !")
+    print(f"// File created {datetime.datetime.now(tz=datetime.timezone.utc)}")
     print(f"// Based on IANA database {tzdata.IANA_VERSION}")
     print(f"// Re-run <esp8266 arduino core>/tools/{sys.argv[0]} to update")
     print()
