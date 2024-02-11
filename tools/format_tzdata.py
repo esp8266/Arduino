@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # this script refreshes world timezone definitions in
 #   cores/esp8266/TZ.h
 #
