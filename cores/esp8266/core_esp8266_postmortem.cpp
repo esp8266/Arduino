@@ -259,11 +259,9 @@ static void postmortem_report(uint32_t sp_dump) {
     uint32_t stack_end;
 
     // above and inside of cont, dump from the sp to the bottom of the stack
-    if (rst_info.reason == REASON_USER_STACK_OVERFLOW) {
-        ets_printf_P(PSTR("\nctx: cont\n"));
-        stack_end = cont_stack_end;
-    }
-    else if (sp_dump > cont_stack_start && sp_dump < cont_stack_end) {
+    if ((rst_info.reason == REASON_USER_STACK_OVERFLOW)
+     || ((sp_dump > cont_stack_start) && (sp_dump < cont_stack_end)))
+    {
         ets_printf_P(PSTR("\nctx: cont\n"));
         stack_end = cont_stack_end;
     }
