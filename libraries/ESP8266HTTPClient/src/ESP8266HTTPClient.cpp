@@ -119,6 +119,9 @@ bool HTTPClient::begin(WiFiClient &client, const String& host, uint16_t port, co
     return true;
 }
 
+void HTTPClient::setHostHeader(const String& host) {
+    _hostHeader = host;
+}
 
 bool HTTPClient::beginInternal(const String& __url, const char* expectedProtocol)
 {
@@ -840,7 +843,7 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     header += F("\r\nHost: ");
-    header += _host;
+    header += _hostHeader.isEmpty() ? _host : _hostHeader;
     if (_port != 80 && _port != 443)
     {
         header += ':';
