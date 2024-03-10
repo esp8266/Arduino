@@ -58,11 +58,11 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #define HTTP_UPLOAD_BUFLEN 2048
 #endif
 
-#define HTTP_MAX_DATA_WAIT 5000 //ms to wait for the client to send the request
-#define HTTP_MAX_DATA_AVAILABLE_WAIT 30 //ms to wait for the client to send the request when there is another client with data available
-#define HTTP_MAX_POST_WAIT 5000 //ms to wait for POST data to arrive
-#define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
-#define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
+#define HTTP_MAX_DATA_WAIT 5000         // ms to wait for the client to send the request
+#define HTTP_MAX_DATA_AVAILABLE_WAIT 30 // ms to wait for the client to send the request when there is another client with data available
+#define HTTP_MAX_POST_WAIT 5000         // ms to wait for POST data to arrive
+#define HTTP_MAX_SEND_WAIT 5000         // ms to wait for data chunk to be ACKed
+#define HTTP_MAX_CLOSE_WAIT 2000        // ms to wait for the client to close the connection
 
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
@@ -72,9 +72,9 @@ typedef struct {
   String  filename;
   String  name;
   String  type;
-  size_t  totalSize;    // total size of uploaded file so far
-  size_t  currentSize;  // size of data currently in buf
-  size_t  contentLength; // size of entire post request, file size + headers and other request data.
+  size_t  totalSize;      // total size of uploaded file so far
+  size_t  currentSize;    // size of data currently in buf
+  size_t  contentLength;  // size of entire post request, file size + headers and other request data.
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
@@ -122,8 +122,8 @@ public:
   void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
-  void onNotFound(THandlerFunction fn);  //called when handler is not assigned
-  void onFileUpload(THandlerFunction fn); //handle file uploads
+  void onNotFound(THandlerFunction fn);   // called when handler is not assigned
+  void onFileUpload(THandlerFunction fn); // handle file uploads
   void enableCORS(bool enable);
   void enableETag(bool enable, ETagFunction fn = nullptr);
 
@@ -135,21 +135,21 @@ public:
   // Allows setting server options (i.e. SSL keys) by the instantiator
   ServerType &getServer() { return _server; }
 
-  const String& pathArg(unsigned int i) const; // get request path argument by number
+  const String& pathArg(unsigned int i) const;    // get request path argument by number
   const String& arg(const String& name) const;    // get request argument value by name
-  const String& arg(int i) const;          // get request argument value by number
-  const String& argName(int i) const;      // get request argument name by number
-  int args() const;                        // get arguments count
-  bool hasArg(const String& name) const;   // check if argument exists
+  const String& arg(int i) const;                 // get request argument value by number
+  const String& argName(int i) const;             // get request argument name by number
+  int args() const;                               // get arguments count
+  bool hasArg(const String& name) const;          // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
   template<typename... Args>
-  void collectHeaders(const Args&... args); // set the request headers to collect (variadic template version)
+  void collectHeaders(const Args&... args);       // set the request headers to collect (variadic template version)
   const String& header(const String& name) const; // get request header value by name
-  const String& header(int i) const;       // get request header value by number
-  const String& headerName(int i) const;   // get request header name by number
-  int headers() const;                     // get header count
+  const String& header(int i) const;              // get request header value by number
+  const String& headerName(int i) const;          // get request header name by number
+  int headers() const;                            // get header count
   bool hasHeader(const String& name) const;       // check if header exists
-  const String& hostHeader() const;        // get request host header if available or empty String if not
+  const String& hostHeader() const;               // get request host header if available or empty String if not
 
   // send response to the client
   // code - HTTP response code, can be 200 or 404
@@ -350,4 +350,4 @@ protected:
 using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 using RequestHandler = esp8266webserver::RequestHandler<WiFiServer>;
 
-#endif //ESP8266WEBSERVER_H
+#endif // ESP8266WEBSERVER_H
