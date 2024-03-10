@@ -49,7 +49,7 @@ public:
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        return _uri->canHandle(requestUri, RequestHandler<ServerType>::pathArgs);
+        return _uri->canHandle(requestUri, RequestHandler<ServerType>::currentPathArgs);
     }
 
     bool canUpload(const String& requestUri) override  {

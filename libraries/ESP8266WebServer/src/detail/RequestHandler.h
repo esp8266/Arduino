@@ -24,12 +24,15 @@ private:
     RequestHandler<ServerType>* _next = nullptr;
 	
 protected:
-    std::vector<String> pathArgs;
+    std::vector<String> currentPathArgs;
 
 public:
     const String& pathArg(unsigned int i) { 
-        assert(i < pathArgs.size());
-        return pathArgs[i];
+        assert(i < currentPathArgs.size());
+        return currentPathArgs[i];
+    }
+    const int pathArgs() {
+        return currentPathArgs.size();
     }
 };
 

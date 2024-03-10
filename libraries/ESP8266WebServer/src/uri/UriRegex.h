@@ -28,21 +28,21 @@ class UriRegex : public Uri {
             return new UriRegex(_uri);
         };
 
-        bool canHandle(const String &requestUri, std::vector<String> &pathArgs) override final {
-            if (Uri::canHandle(requestUri, pathArgs))
+        bool canHandle(const String &requestUri, std::vector<String> &currentPathArgs) override final {
+            if (Uri::canHandle(requestUri, currentPathArgs))
                 return true;
 
             regmatch_t groupArray[REGEX_MAX_GROUPS];
             if (regexec(&_regexCompiled, requestUri.c_str(), REGEX_MAX_GROUPS, groupArray, 0) == 0) {
                 // matches
-                pathArgs.clear();
+                currentPathArgs.clear();
 
                 unsigned int g = 1; 
                 for (; g < REGEX_MAX_GROUPS; g++) {
                     if (groupArray[g].rm_so == (long int)-1)
                         break;  // No more groups
 
-                    pathArgs.push_back(requestUri.substring(groupArray[g].rm_so, groupArray[g].rm_eo));
+                    currentPathArgs.push_back(requestUri.substring(groupArray[g].rm_so, groupArray[g].rm_eo));
                 }
 
                 return true;

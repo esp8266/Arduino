@@ -13,11 +13,11 @@ class UriBraces : public Uri {
             return new UriBraces(_uri);
         };
 
-        bool canHandle(const String &requestUri, std::vector<String> &pathArgs) override final {
-            if (Uri::canHandle(requestUri, pathArgs))
+        bool canHandle(const String &requestUri, std::vector<String> &currentPathArgs) override final {
+            if (Uri::canHandle(requestUri, currentPathArgs))
                 return true;
 
-            pathArgs.clear();
+            currentPathArgs.clear();
 
             size_t uriLength = _uri.length();
             unsigned int requestUriIndex = 0;
@@ -33,8 +33,8 @@ class UriBraces : public Uri {
                 i += 2; // index of char after '}'
                 if (i >= uriLength) {
                     // there is no char after '}'
-                    pathArgs.push_back(requestUri.substring(requestUriIndex));
-                    return pathArgs.back().indexOf("/") == -1; // path argument may not contain a '/'
+                    currentPathArgs.push_back(requestUri.substring(requestUriIndex));
+                    return currentPathArgs.back().indexOf("/") == -1; // path argument may not contain a '/'
                 }
                 else
                 {
@@ -42,7 +42,7 @@ class UriBraces : public Uri {
                     int uriIndex = requestUri.indexOf(charEnd, requestUriIndex);
                     if (uriIndex < 0)
                         return false;
-                    pathArgs.push_back(requestUri.substring(requestUriIndex, uriIndex));
+                    currentPathArgs.push_back(requestUri.substring(requestUriIndex, uriIndex));
                     requestUriIndex = (unsigned int) uriIndex;
                 }
             }
