@@ -347,8 +347,6 @@ protected:
   RequestArgument* _currentArgs = nullptr;
   int              _currentArgsHavePlain = 0;
   std::unique_ptr<HTTPUpload> _currentUpload;
-  int              _postArgsLen = 0;
-  RequestArgument* _postArgs = nullptr;
 
   int              _headerKeysCount = 0;
   RequestArgument* _currentHeaders = nullptr;

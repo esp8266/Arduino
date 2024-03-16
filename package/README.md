@@ -111,8 +111,8 @@ The following points assume work in a direct clone of the repository, and not in
 
    * [platform.txt](https://github.com/esp8266/Arduino/blob/master/platform.txt) and [package.json](https://github.com/esp8266/Arduino/blob/master/package.json): update `version` to the release E.g. `3.0.0`,
 
-   * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h): import the latest database with the following shell command:\
-     `$ cd tools; sh TZupdate.sh`
+   * [cores/esp8266/TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h): import the latest database:\
+     `$ pip install -U tzdata; python tools/format_tzdata.py --output cores/esp8266/TZ.h`
 
    * Update SSL/TLS certificates and public keys in examples:\
      `$ cd tools; sh certsUpdate.sh`
@@ -173,7 +173,7 @@ The following points assume work in a direct clone of the repository, and not in
 
    * [platform.txt](https://github.com/esp8266/Arduino/blob/master/platform.txt)
    * [package.json](https://github.com/esp8266/Arduino/blob/master/package.json)
-   * [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) (<= `cd tools; sh ./TZupdate.sh`)
+   * [TZ.h](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TZ.h) (<= `pip install -U tzdata; python tools/format_tzdata.py --output cores/esp8266/TZ.h`)
    * Certificates (<= `cd tools; sh certsUpdate.sh`)
 
 - [ ] 5. Wait until the release notes have been checked by other maintainers (can be changed afterwards anyway)

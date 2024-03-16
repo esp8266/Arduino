@@ -590,10 +590,6 @@ const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) cons
 
 template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
-  for (int j = 0; j < _postArgsLen; ++j) {
-    if ( _postArgs[j].key == name )
-      return _postArgs[j].value;
-  }
   for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
@@ -622,10 +618,6 @@ int ESP8266WebServerTemplate<ServerType>::args() const {
 
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::hasArg(const String& name) const {
-  for (int j = 0; j < _postArgsLen; ++j) {
-    if (_postArgs[j].key == name)
-      return true;
-  }
   for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if (_currentArgs[i].key == name)
       return true;
@@ -734,8 +726,10 @@ void ESP8266WebServerTemplate<ServerType>::_handleRequest() {
     _finalizeResponse();
   }
   _currentUri = "";
+  delete[] _currentArgs;
+  _currentArgs = nullptr;
+  _currentArgCount = 0;
 }
-
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_finalizeResponse() {
