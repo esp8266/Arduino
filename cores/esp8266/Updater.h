@@ -57,7 +57,7 @@ class UpdaterClass {
     using THandlerFunction_Progress = std::function<void(size_t, size_t)>;
     using THandlerFunction_Error = std::function<void(uint8_t)>;
     using THandlerFunction = std::function<void()>;
-  
+
     UpdaterClass();
     ~UpdaterClass();
 
@@ -71,7 +71,7 @@ class UpdaterClass {
     bool begin(size_t size, int command = U_FLASH, int ledPin = -1, uint8_t ledOn = LOW);
 
     /*
-      Run Updater from asynchronous callbacs
+      Run Updater from asynchronous callbacks
     */
     void runAsync(bool async){ _async = async; }
 
@@ -218,7 +218,7 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
-    void _setError(int error);    
+    void _setError(int error);
 
     bool _async = false;
     uint8_t _error = 0;

@@ -651,6 +651,12 @@ String UpdaterClass::getErrorString() const {
   case UPDATE_ERROR_OOM:
     out = F("Out of memory");
     break;
+  case UPDATE_ERROR_RUNNING_ALREADY:
+    out = F("Update already running");
+    break;
+  case UPDATE_ERROR_UNKNOWN_COMMAND:
+    out = F("Unknown update command");
+    break;
   default:
     out = F("UNKNOWN");
     break;
