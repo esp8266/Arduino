@@ -24,57 +24,67 @@
 using __cxxabiv1::__guard;
 
 // Debugging helper, last allocation which returned NULL
-extern void *umm_last_fail_alloc_addr;
-extern int umm_last_fail_alloc_size;
+extern "C" void *_heap_abi_malloc(size_t size, bool unhandled, const void* const caller);
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
+#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR))
+/*
+  When built with C++ Exceptions: "enabled", track caller address of Last OOM.
+  * For debug build, force enable Last OOM tracking.
+  * With the option "DEBUG_ESP_OOM," always do Last OOM tracking.
+  * Otherwise, disable Last OOM tracking. The build relies on the weak link to
+    the default C++ exception handler.
+*/
 
-#if !defined(__cpp_exceptions)
+// Debug replacement adaptation from ".../new_op.cc".
+using std::new_handler;
+using std::bad_alloc;
+
+void * operator new (std::size_t size)
+{
+    void *p;
+
+    /* malloc (0) is unpredictable; avoid it.  */
+    if (__builtin_expect(size == 0, false)) {
+        size = 1;
+    }
+
+    while (0 == (p = _heap_abi_malloc(size, false, __builtin_return_address(0)))) {
+        new_handler handler = std::get_new_handler();
+        if (!handler) {
+            throw(bad_alloc());
+        }
+        handler();
+    }
+
+    return p;
+}
+#elif !defined(__cpp_exceptions)
+// When doing builds with C++ Exceptions "disabled", always save details of
+// the last OOM event.
 
 // overwrite weak operators new/new[] definitions
 
 void* operator new(size_t size)
 {
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-        __unhandled_exception(PSTR("OOM"));
-    }
-    return ret;
+    return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }
 
 void* operator new[](size_t size)
 {
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-        __unhandled_exception(PSTR("OOM"));
-    }
-    return ret;
+    return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }
 
 void* operator new (size_t size, const std::nothrow_t&)
 {
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-    }
-    return ret;
+    return _heap_abi_malloc(size, false, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size, const std::nothrow_t&)
 {
-    void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
-        umm_last_fail_alloc_addr = __builtin_return_address(0);
-        umm_last_fail_alloc_size = size;
-    }
-    return ret;
+    return _heap_abi_malloc(size, false, __builtin_return_address(0));
 }
 
 #endif // !defined(__cpp_exceptions)
