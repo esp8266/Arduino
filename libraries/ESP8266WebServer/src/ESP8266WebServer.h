@@ -207,6 +207,30 @@ public:
     sendContent(emptyString);
   }
 
+  /**
+   * @brief  Redirect to another URL, e.g.
+   *   webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * There are 3 points of redirection here:
+   *   1) "Location" element in the header
+   *   2) Disable client caching
+   *   3) HTML "content" element to redirect
+   * If the "Location" header element works the HTML content is never seen.
+   * https://tools.ietf.org/html/rfc7231#section-6.4.3
+   * @param  url URL to redirect to
+   * @param  content Optional redirect content
+   */
+  void redirect(const String& url, const String& content = emptyString) {
+    sendHeader(F("Location"), url, true);
+    sendHeader(F("Cache-Control"), F("no-cache, no-store, must-revalidate"));
+    sendHeader(F("Pragma"), F("no-cache"));
+    sendHeader(F("Expires"), F("-1"));
+    send(302, F("text/html"), content);  // send 302: "Found"
+    if (content.isEmpty()) {
+      // Empty content inhibits Content-length header so we have to close the socket ourselves.
+      client().stop();  // Stop is needed because we sent no content length
+    }
+  }
+
   // Whether other requests should be accepted from the client on the
   // same socket after a response is sent.
   // This will automatically configure the "Connection" header of the response.
