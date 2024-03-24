@@ -43,7 +43,7 @@ extern "C"
 //   can return nullptr when STA is down
 // - Because WiFi is started in off mode at boot time,
 //   wifi_station_set/get_hostname() is now no more used
-//   because setting hostname firt does not work anymore
+//   because setting hostname first does not work anymore
 // - wifi_station_hostname is overwritten by SDK when wifi is
 //   woken up in WiFi::mode()
 //
