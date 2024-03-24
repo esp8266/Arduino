@@ -60,7 +60,7 @@ Alternatively, it can be declared as ``static`` in both function and global scop
 .. code:: cpp
     disconnectedEventHandler = nullptr;
 
-Take note that lifetime of the callback handler is up to the app. e.g. if ``onStationModeDisconnected`` is declared in the function scope, it would be discarded immediately after the function exists.
+Take note that lifetime of the callback handler is up to the app. e.g. if ``onStationModeDisconnected`` is declared in the function scope, it would be discarded immediately after the function exits.
 
 The Code
 ~~~~~~~~
