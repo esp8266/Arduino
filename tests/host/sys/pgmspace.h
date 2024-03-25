@@ -82,5 +82,6 @@ inline int vsnprintf_P(char* str, size_t size, const char* format, va_list ap)
 #define strncmp_P strncmp
 #define strncasecmp_P strncasecmp
 #define strcat_P strcat
+#define memcmp_P memcmp
 
 #endif
