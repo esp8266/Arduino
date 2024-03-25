@@ -24,6 +24,7 @@
 //#define CONT_STACKSIZE 4096
 
 #include <numeric>
+#include <exception>
 
 #include <Arduino.h>
 #include "Schedule.h"
