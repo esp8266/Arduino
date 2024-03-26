@@ -284,24 +284,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _hash->begin();
     for (uint32_t offset = 0; offset < binSize; offset += sizeof(buff)) {
       auto len = std::min(sizeof(buff), binSize - offset);
-
-      if (len % 4 == 0) {
-            ESP.flashRead(_startAddress + offset, reinterpret_cast<uint32_t *>(&buff[0]), len);
-            _hash->add(buff, len);
-        }
-        else {
-            // Calculate padding needed to make len 4-byte aligned
-            uint32_t padLen = (len + 3) & ~3; // Rounds up to nearest multiple of 4
-            
-            // Temporary buffer to satisfy 4-byte alignment requirement
-            uint8_t tempBuff[padLen] = {0};
-            
-            // Read into the temporary buffer
-            ESP.flashRead(_startAddress + offset, reinterpret_cast<uint32_t *>(&tempBuff[0]), padLen); // Note: ESP.flashRead size parameter might be in 4-byte words, not bytes
-            
-            // Process only the relevant portion of the temp buffer
-            _hash->add(tempBuff, len); // Ensure only len bytes are processed, not including the padded bytes
-        }
+      ESP.flashRead(_startAddress + offset, buff, len);
+      _hash->add(buff, len);
     }
     _hash->end();
 
