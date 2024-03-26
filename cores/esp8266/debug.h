@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "cont.h"
+
 #define _DEBUG_LEAF_FUNCTION(...) __asm__ __volatile__("" ::: "a0", "memory")
 
 #ifdef DEBUG_ESP_CORE
@@ -32,6 +34,7 @@ extern "C"
 {
 #endif
     void __stack_chk_fail(void) __attribute__((noreturn));
+    void __stack_overflow(cont_t*, uint32_t*) __attribute__((noreturn));
     void __unhandled_exception(const char* str) __attribute__((noreturn));
     void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
 #define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
