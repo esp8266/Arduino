@@ -52,6 +52,7 @@ EXCEPTION_CODES = (
     "permit stores",
 )
 
+
 # similar to java version, which used `list` and re-formatted it
 # instead, simply use an already short-format `info line`
 # TODO `info symbol`? revert to `list`?
@@ -96,12 +97,12 @@ def addresses_addr2line(addr2line, elf, addresses):
 
 
 def decode_lines(format_addresses, elf, lines):
-    STACK_RE = re.compile(r"^[0-9a-f]{8}:\s+([0-9a-f]{8} ?)+ *$")
+    ANY_ADDR_RE = re.compile(r"0x[0-9a-fA-F]{8}|[0-9a-fA-F]{8}")
+    HEX_ADDR_RE = re.compile(r"0x[0-9a-f]{8}")
 
-    LAST_ALLOC_RE = re.compile(
-        r"last failed alloc call: ([0-9a-fA-F]{8})\(([0-9]+)\).*"
-    )
-    LAST_ALLOC = "last failed alloc"
+    MEM_ERR_LINE_RE = re.compile(r"^(Stack|last failed alloc call)")
+
+    STACK_LINE_RE = re.compile(r"^[0-9a-f]{8}:\s\s+")
 
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
     EXCEPTION_STRING = "Exception ("
@@ -131,13 +132,11 @@ def decode_lines(format_addresses, elf, lines):
             stack_addresses = print_all_addresses(stack_addresses)
             last_stack = line.strip()
         # 3fffffb0:  feefeffe feefeffe 3ffe85d8 401004ed
-        elif in_stack and STACK_RE.match(line):
-            stack, addrs = line.split(":")
-            addrs = addrs.strip()
-            addrs = addrs.split(" ")
+        elif in_stack and STACK_LINE_RE.match(line):
+            _, addrs = line.split(":")
+            addrs = ANY_ADDR_RE.findall(addrs)
             stack_addresses.setdefault(last_stack, [])
-            for addr in addrs:
-                stack_addresses[last_stack].append(addr)
+            stack_addresses[last_stack].extend(addrs)
         # epc1=0xfffefefe epc2=0xfefefefe epc3=0xefefefef excvaddr=0xfefefefe depc=0xfefefefe
         elif EPC_STRING in line:
             pairs = line.split()
@@ -152,13 +151,13 @@ def decode_lines(format_addresses, elf, lines):
         elif EXCEPTION_STRING in line:
             number = line.strip()[len(EXCEPTION_STRING) : -2]
             print(f"Exception ({number}) - {EXCEPTION_CODES[int(number)]}")
+        # stack smashing detected at <ADDR>
         # last failed alloc call: <ADDR>(<NUMBER>)[@<maybe file loc>]
-        elif LAST_ALLOC in line:
-            values = LAST_ALLOC_RE.match(line)
-            if values:
-                addr, size = values.groups()
-                print()
-                print(f"Allocation of {size} bytes failed: {format_address(addr)}")
+        elif MEM_ERR_LINE_RE.match(line):
+            for addr in ANY_ADDR_RE.findall(line):
+                line = line.replace(addr, format_address(addr))
+            print()
+            print(line.strip())
         # postmortem guards our actual stack dump values with these
         elif ">>>stack>>>" in line:
             in_stack = True
