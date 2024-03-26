@@ -105,6 +105,7 @@ def decode_lines(format_addresses, elf, lines):
     STACK_LINE_RE = re.compile(r"^[0-9a-f]{8}:\s\s+")
 
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
+    DECODE_IT = "DECODE IT"
     EXCEPTION_STRING = "Exception ("
     EPC_STRING = "epc1="
 
@@ -125,6 +126,7 @@ def decode_lines(format_addresses, elf, lines):
     def format_address(address):
         return "\n".join(format_addresses(elf, [address]))
 
+    lastepc = 0
     for line in lines:
         # ctx could happen multiple times. for the 2nd one, reset list
         # ctx: bearssl *or* ctx: cont *or* ctx: sys *or* ctx: whatever
@@ -143,9 +145,13 @@ def decode_lines(format_addresses, elf, lines):
             for pair in pairs:
                 name, addr = pair.split("=")
                 if name in ["epc1", "excvaddr"]:
-                    output = format_address(addr)
-                    if output:
-                        print(f"{name}={output}")
+                    addr = addr.rstrip(',')
+                    if lastepc != addr:
+                        if addr != '0x00000000':
+                            lastepc = addr
+                        output = format_address(addr)
+                        if output:
+                            print(f"{name}={output}")
         # Exception (123):
         # Other reasons coming before the guard shown as-is
         elif EXCEPTION_STRING in line:
@@ -163,8 +169,10 @@ def decode_lines(format_addresses, elf, lines):
             in_stack = True
         # ignore
         elif "<<<stack<<<" in line:
+            in_stack = False
+            stack_addresses = print_all_addresses(stack_addresses)
             continue
-        elif CUT_HERE_STRING in line:
+        elif CUT_HERE_STRING in line or DECODE_IT in line:
             continue
         else:
             line = line.strip()
@@ -181,6 +189,9 @@ def select_tool(toolchain_path, tool, func):
     path = f"xtensa-lx106-elf-{tool}"
     if toolchain_path:
         path = os.path.join(toolchain_path, path)
+        if not os.path.isfile(path):
+            print(f"error: not existing tool (path -- tool): '{path}'", file=sys.stderr)
+            sys.exit(1)
 
     def formatter(func, path):
         def wrapper(elf, addresses):
