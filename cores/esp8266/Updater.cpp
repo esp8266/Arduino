@@ -279,7 +279,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     }
 
     // Calculate hash of the payload, 128 bytes at a time
-    alignas(alignof(uint32_t)) uint8_t buff[128];
+    uint8_t buff[128];
 
     _hash->begin();
     for (uint32_t offset = 0; offset < binSize; offset += sizeof(buff)) {
