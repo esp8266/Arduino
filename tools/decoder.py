@@ -126,7 +126,7 @@ def decode_lines(format_addresses, elf, lines):
     def format_address(address):
         return "\n".join(format_addresses(elf, [address]))
 
-    lastepc = 0
+    lastaddr = {}
     for line in lines:
         # ctx could happen multiple times. for the 2nd one, reset list
         # ctx: bearssl *or* ctx: cont *or* ctx: sys *or* ctx: whatever
@@ -146,9 +146,9 @@ def decode_lines(format_addresses, elf, lines):
                 name, addr = pair.split("=")
                 if name in ["epc1", "excvaddr"]:
                     addr = addr.rstrip(',')
-                    if lastepc != addr:
+                    if not name in lastaddr or lastaddr[name] != addr:
                         if addr != '0x00000000':
-                            lastepc = addr
+                            lastaddr[name] = addr
                         output = format_address(addr)
                         if output:
                             print(f"{name}={output}")
