@@ -105,7 +105,7 @@ def decode_lines(format_addresses, elf, lines):
 
     STACK_LINE_RE = re.compile(r"^[0-9a-f]{8}:\s\s+")
 
-    IGNORE_DUP = re.compile(r"^(epc1=0x........,|Fatal exception )")
+    IGNORE_FIRMWARE_RE = re.compile(r"^(epc1=0x........, |Fatal exception )")
 
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
     DECODE_IT = "DECODE IT"
@@ -136,7 +136,7 @@ def decode_lines(format_addresses, elf, lines):
             stack_addresses = print_all_addresses(stack_addresses)
             last_stack = line.strip()
         # 3fffffb0:  feefeffe feefeffe 3ffe85d8 401004ed
-        elif IGNORE_DUP.match(line):
+        elif IGNORE_FIRMWARE_RE.match(line):
             continue
         elif in_stack and STACK_LINE_RE.match(line):
             _, addrs = line.split(":")
