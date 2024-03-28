@@ -10,6 +10,7 @@ import argparse
 import sys
 import re
 import subprocess
+import shutil
 
 # https://github.com/me-no-dev/EspExceptionDecoder/blob/349d17e4c9896306e2c00b4932be3ba510cad208/src/EspExceptionDecoder.java#L59-L90
 EXCEPTION_CODES = (
@@ -189,9 +190,8 @@ def select_tool(toolchain_path, tool, func):
     path = f"xtensa-lx106-elf-{tool}"
     if toolchain_path:
         path = os.path.join(toolchain_path, path)
-        if not os.path.isfile(path):
-            print(f"error: not existing tool (path -- tool): '{path}'", file=sys.stderr)
-            sys.exit(1)
+        if not shutil.which(path):
+            raise FileNotFoundError(path)
 
     def formatter(func, path):
         def wrapper(elf, addresses):
