@@ -84,6 +84,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         wl_status_t status();
         String SSID() const;
         String psk() const;
+        uint8_t encryptionType();
 
         uint8_t * BSSID();
         uint8_t * BSSID(uint8_t* bssid);
@@ -94,6 +95,9 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
 
     protected:
+        friend class ESP8266WiFiGenericClass;
+
+        uint8_t authMode;
 
         static bool _useStaticIp;
         static bool _useInsecureWEP;
