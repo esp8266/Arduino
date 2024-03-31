@@ -10,6 +10,7 @@ import argparse
 import sys
 import re
 import subprocess
+import shutil
 
 # https://github.com/me-no-dev/EspExceptionDecoder/blob/349d17e4c9896306e2c00b4932be3ba510cad208/src/EspExceptionDecoder.java#L59-L90
 EXCEPTION_CODES = (
@@ -104,7 +105,10 @@ def decode_lines(format_addresses, elf, lines):
 
     STACK_LINE_RE = re.compile(r"^[0-9a-f]{8}:\s\s+")
 
+    IGNORE_FIRMWARE_RE = re.compile(r"^(epc1=0x........, |Fatal exception )")
+
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
+    DECODE_IT = "DECODE IT"
     EXCEPTION_STRING = "Exception ("
     EPC_STRING = "epc1="
 
@@ -132,6 +136,8 @@ def decode_lines(format_addresses, elf, lines):
             stack_addresses = print_all_addresses(stack_addresses)
             last_stack = line.strip()
         # 3fffffb0:  feefeffe feefeffe 3ffe85d8 401004ed
+        elif IGNORE_FIRMWARE_RE.match(line):
+            continue
         elif in_stack and STACK_LINE_RE.match(line):
             _, addrs = line.split(":")
             addrs = ANY_ADDR_RE.findall(addrs)
@@ -163,8 +169,10 @@ def decode_lines(format_addresses, elf, lines):
             in_stack = True
         # ignore
         elif "<<<stack<<<" in line:
+            in_stack = False
+            stack_addresses = print_all_addresses(stack_addresses)
             continue
-        elif CUT_HERE_STRING in line:
+        elif CUT_HERE_STRING in line or DECODE_IT in line:
             continue
         else:
             line = line.strip()
@@ -181,6 +189,9 @@ def select_tool(toolchain_path, tool, func):
     path = f"xtensa-lx106-elf-{tool}"
     if toolchain_path:
         path = os.path.join(toolchain_path, path)
+        
+    if not shutil.which(path):
+        raise FileNotFoundError(path)
 
     def formatter(func, path):
         def wrapper(elf, addresses):
