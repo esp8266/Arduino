@@ -189,8 +189,9 @@ def select_tool(toolchain_path, tool, func):
     path = f"xtensa-lx106-elf-{tool}"
     if toolchain_path:
         path = os.path.join(toolchain_path, path)
-        if not shutil.which(path):
-            raise FileNotFoundError(path)
+        
+    if not shutil.which(path):
+        raise FileNotFoundError(path)
 
     def formatter(func, path):
         def wrapper(elf, addresses):
