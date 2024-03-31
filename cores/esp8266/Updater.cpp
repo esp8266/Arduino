@@ -284,7 +284,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _hash->begin();
     for (uint32_t offset = 0; offset < binSize; offset += sizeof(buff)) {
       auto len = std::min(sizeof(buff), binSize - offset);
-      ESP.flashRead(_startAddress + offset, reinterpret_cast<uint32_t *>(&buff[0]), len);
+      ESP.flashRead(_startAddress + offset, buff, len);
       _hash->add(buff, len);
     }
     _hash->end();
