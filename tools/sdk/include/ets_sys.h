@@ -208,7 +208,6 @@ void *ets_memset(void *s, int c, size_t n);
 void ets_timer_arm_new(ETSTimer *a, int b, int c, int isMstimer);
 void ets_timer_setfn(ETSTimer *t, ETSTimerFunc *fn, void *parg);
 void ets_timer_disarm(ETSTimer *a);
-int atoi(const char *nptr);
 int ets_strncmp(const char *s1, const char *s2, int len);
 int ets_strcmp(const char *s1, const char *s2);
 int ets_strlen(const char *s);
