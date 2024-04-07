@@ -74,7 +74,7 @@ void Ticker::_attach(Ticker::Milliseconds milliseconds, bool repeat)
 
     // whenever duration excedes this limit, make timer repeatable N times
     // in case it is really repeatable, it will reset itself and continue as usual
-    size_t total = 0;
+    uint32_t total = 0;
     if (milliseconds > DurationMax) {
         total = 1;
         while (milliseconds > DurationMax) {

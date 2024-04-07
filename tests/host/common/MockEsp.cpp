@@ -34,7 +34,8 @@
 
 #include <sys/time.h>
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <chrono>
 
 #include <user_interface.h>
 struct rst_info resetInfo;

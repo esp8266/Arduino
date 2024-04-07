@@ -270,11 +270,9 @@ void run_scheduled_recurrent_functions()
 
         if (yieldNow)
         {
-            // because scheduled functions might last too long for watchdog etc,
-            // this is yield() in cont stack, but need to call cont_suspend directly
-            // to prevent recursion into run_scheduled_recurrent_functions()
+            // because scheduled functions might last too long for watchdog etc.
             esp_schedule();
-            cont_suspend(g_pcont);
+            esp_suspend();
         }
     } while (current && !done);
 

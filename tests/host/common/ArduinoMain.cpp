@@ -39,6 +39,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <thread>
+
 #define MOCK_PORT_SHIFTER 9000
 
 bool        user_exit         = false;
@@ -63,6 +65,18 @@ int mockverbose(const char* fmt, ...)
     if (mockdebug)
         return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
     return 0;
+}
+
+static uint8_t mock_read_uart()
+{
+    uint8_t ch  = 0;
+    int     ret = read(STDIN_FILENO, &ch, 1);
+    if (ret == -1)
+    {
+        perror("read(STDIN,1)");
+        return 0;
+    }
+    return (ret == 1) ? ch : 0;
 }
 
 static int mock_start_uart(void)
@@ -98,31 +112,39 @@ static int mock_start_uart(void)
 static int mock_stop_uart(void)
 {
     if (!restore_tty)
+    {
         return 0;
+    }
+
     if (!isatty(STDIN))
     {
         perror("restoring tty: isatty(STDIN)");
         return -1;
     }
+
     if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
     {
         perror("restoring tty: tcsetattr(STDIN)");
         return -1;
     }
-    printf("\e[?25h");  // show cursor
-    return (0);
+
+    const char show_cursor[] = "\e[?25h";
+    write(STDOUT_FILENO, &show_cursor[0], sizeof(show_cursor));
+
+    return 0;
 }
 
-static uint8_t mock_read_uart(void)
+static void mock_system_loop()
 {
-    uint8_t ch  = 0;
-    int     ret = read(STDIN, &ch, 1);
-    if (ret == -1)
+    uint8_t data = mock_read_uart();
+    if (data)
     {
-        perror("read(STDIN,1)");
-        return 0;
+        uart_new_data(UART0, data);
     }
-    return (ret == 1) ? ch : 0;
+
+    check_incoming_udp();
+
+    mock::timer::loop();
 }
 
 void help(const char* argv0, int exitcode)
@@ -144,7 +166,8 @@ void help(const char* argv0, int exitcode)
            "\t                 (spiffs, littlefs: negative value will force mismatched size)\n"
            "\tgeneral:\n"
            "\t-c             - ignore CTRL-C (send it via Serial)\n"
-           "\t-f             - no throttle (possibly 100%%CPU)\n"
+           "\t-I             - main thread forced sleep interval in milliseconds\n"
+           "                   (default 1ms, very likely to cause 100%%CPU when set to 0ms)\n"
            "\t-1             - run loop once then exit (for host testing)\n"
            "\t-v             - verbose\n",
            argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
@@ -153,7 +176,7 @@ void help(const char* argv0, int exitcode)
 
 static struct option options[] = {
     { "help", no_argument, NULL, 'h' },
-    { "fast", no_argument, NULL, 'f' },
+    { "interval", required_argument, NULL, 'I' },
     { "local", no_argument, NULL, 'l' },
     { "sigint", no_argument, NULL, 'c' },
     { "blockinguart", no_argument, NULL, 'b' },
@@ -167,12 +190,13 @@ static struct option options[] = {
     { "once", no_argument, NULL, '1' },
 };
 
-void cleanup()
+void mock_stop_all()
 {
     mock_stop_udp();
     mock_stop_spiffs();
     mock_stop_littlefs();
     mock_stop_uart();
+    mock_stop_task();
 }
 
 void make_fs_filename(String& name, const char* fspath, const char* argv0)
@@ -192,22 +216,37 @@ void make_fs_filename(String& name, const char* fspath, const char* argv0)
         name = argv0;
 }
 
+void loop_impl()
+{
+    static bool setup_done { false };
+    if (!setup_done)
+    {
+        setup();
+        setup_done = true;
+    }
+
+    loop();
+    loop_end();
+}
+
 void control_c(int sig)
 {
     (void)sig;
 
     if (user_exit)
     {
-        fprintf(stderr, MOCK "stuck, killing\n");
-        cleanup();
-        exit(1);
+        const char stuck[] = MOCK "stuck, killing\n";
+        write(STDERR_FILENO, &stuck[0], sizeof(stuck));
+        mock_stop_all();
+        _exit(1);
     }
+
     user_exit = true;
 }
 
 int main(int argc, char* const argv[])
 {
-    bool fast     = false;
+    auto interval = std::chrono::milliseconds { 1 };
     blocking_uart = false;  // global
 
     signal(SIGINT, control_c);
@@ -219,7 +258,7 @@ int main(int argc, char* const argv[])
 
     for (;;)
     {
-        int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
+        int n = getopt_long(argc, argv, "hlcbvTi:I:S:s:L:P:1", options, NULL);
         if (n < 0)
             break;
         switch (n)
@@ -239,8 +278,8 @@ int main(int argc, char* const argv[])
         case 'c':
             ignore_sigint = true;
             break;
-        case 'f':
-            fast = true;
+        case 'I':
+            interval = std::chrono::milliseconds { atoll(optarg) };
             break;
         case 'S':
             spiffs_kb = atoi(optarg);
@@ -300,28 +339,13 @@ int main(int argc, char* const argv[])
     }
 
     // install exit handler in case Esp.restart() is called
-    atexit(cleanup);
+    atexit(mock_stop_all);
 
     // first call to millis(): now is millis() and micros() beginning
     millis();
 
-    setup();
-    while (!user_exit)
-    {
-        uint8_t data = mock_read_uart();
-
-        if (data)
-            uart_new_data(UART0, data);
-        if (!fast)
-            usleep(1000);  // not 100% cpu, ~1000 loops per second
-        loop();
-        loop_end();
-        check_incoming_udp();
-
-        if (run_once)
-            user_exit = true;
-    }
-    cleanup();
+    // loops until exit, switching between sys and user tasks
+    mock_loop_task(mock_system_loop, interval, user_exit);
 
     return 0;
 }

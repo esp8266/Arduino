@@ -16,6 +16,9 @@
 #define CATCH_CONFIG_MAIN
 #include "ArduinoCatch.hpp"
 
+#include <chrono>
+#include <thread>
+
 std::ostream& operator<<(std::ostream& out, const String& str)
 {
     out.write(str.c_str(), str.length());
@@ -36,3 +39,23 @@ std::string StringMaker<String>::convert(String const& str)
 }
 
 }  // namespace Catch
+
+extern "C"
+{
+    bool can_yield()
+    {
+        return true;
+    }
+
+    void esp_yield() { }
+
+    void esp_suspend() { }
+
+    void esp_schedule() { }
+
+    void esp_delay(unsigned long ms)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    }
+
+}  // extern "C"
