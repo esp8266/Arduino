@@ -40,6 +40,7 @@
 #include <mutex>
 #include <thread>
 #include <functional>
+#include <exception>
 
 namespace
 {
@@ -54,15 +55,21 @@ namespace
 // - when loop() is ready to yield via esp_suspend() (either at the end of the func, or via yield()),
 //   notify the second thread token cv to repeat the conditions above
 
-std::thread user_task;
-
-std::atomic<bool> user_task_is_done { false };
+std::thread       user_task;
 std::atomic<bool> scheduled { false };
+
+struct StopException: public std::exception
+{
+    const char* what() const noexcept(true) override
+    {
+        return "Stopped";
+    }
+};
 
 enum class Token
 {
     Default,
-    Exit,
+    Stop,
     User,
     Sys,
 };
@@ -82,37 +89,61 @@ void arrive(Barrier& b, Token token)
     b.cv.notify_all();
 }
 
-void wait(Barrier& b, Token token)
+Token wait(Barrier& b, Token token)
 {
     std::unique_lock lock { b.m };
-    b.cv.wait(lock,
-              [&]()
-              {
-                  return b.token == Token::Exit || b.token == token;
-              });
+
+    Token current;
+    for (;;)
+    {
+        current = b.token;
+        if ((current == token) || (current == Token::Stop))
+        {
+            break;
+        }
+
+        b.cv.wait(lock);
+    }
+
+    return current;
+}
+
+bool wait_or_stop(Barrier& b, Token token)
+{
+    return Token::Stop == wait(b, token);
 }
 
 ETSTimer delay_timer;
 
-void mock_task_wrapper()
+void mock_task_wrapper(bool once)
 {
     std::once_flag setup_done;
 
-    for (;;)
+    try
     {
-        wait(barrier, Token::User);
-
-        std::call_once(setup_done, setup);
-        loop();
-        loop_end();
-
-        esp_schedule();
-        arrive(barrier, Token::Sys);
-
-        if (user_task_is_done)
+        for (;;)
         {
-            break;
+            if (wait_or_stop(barrier, Token::User))
+            {
+                break;
+            }
+
+            std::call_once(setup_done, setup);
+            loop();
+            loop_end();
+
+            if (once)
+            {
+                arrive(barrier, Token::Stop);
+                break;
+            }
+
+            esp_schedule();
+            arrive(barrier, Token::Sys);
         }
+    }
+    catch (const StopException&)
+    {
     }
 }
 
@@ -126,7 +157,10 @@ extern "C" bool can_yield()
 extern "C" void esp_suspend()
 {
     arrive(barrier, Token::Sys);
-    wait(barrier, Token::User);
+    if (wait_or_stop(barrier, Token::User))
+    {
+        throw StopException {};
+    }
 }
 
 extern "C" void esp_schedule()
@@ -167,14 +201,13 @@ extern "C" void esp_delay(unsigned long ms)
 
 void mock_stop_task()
 {
-    user_task_is_done = true;
-    arrive(barrier, Token::Exit);
+    arrive(barrier, Token::Stop);
 }
 
-void mock_loop_task(void (*system_task)(), std::chrono::milliseconds interval,
+void mock_loop_task(void (*system_task)(), std::chrono::milliseconds interval, bool once,
                     const bool& user_exit)
 {
-    user_task = std::thread(mock_task_wrapper);
+    user_task = std::thread(mock_task_wrapper, once);
 
     esp_schedule();
     for (;;)
@@ -189,7 +222,10 @@ void mock_loop_task(void (*system_task)(), std::chrono::milliseconds interval,
         {
             scheduled = false;
             arrive(barrier, Token::User);
-            wait(barrier, Token::Sys);
+            if (wait_or_stop(barrier, Token::Sys))
+            {
+                break;
+            }
         }
 
         if (user_exit)

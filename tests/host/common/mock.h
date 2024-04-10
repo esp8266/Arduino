@@ -191,7 +191,8 @@ void mock_stop_littlefs();
 #ifdef __cplusplus
 #include <chrono>
 void mock_stop_task();
-void mock_loop_task(void (*)(), std::chrono::milliseconds interval, const bool& user_exit);
+void mock_loop_task(void (*)(), std::chrono::milliseconds interval, bool once,
+                    const bool& user_exit);
 #endif
 
 void mock_stop_all();

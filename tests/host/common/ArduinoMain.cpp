@@ -44,7 +44,6 @@
 #define MOCK_PORT_SHIFTER 9000
 
 bool        user_exit         = false;
-bool        run_once          = false;
 const char* host_interface    = nullptr;
 size_t      spiffs_kb         = 1024;
 size_t      littlefs_kb       = 1024;
@@ -247,6 +246,8 @@ void control_c(int sig)
 int main(int argc, char* const argv[])
 {
     auto interval = std::chrono::milliseconds { 1 };
+    auto run_once = false;
+
     blocking_uart = false;  // global
 
     signal(SIGINT, control_c);
@@ -345,7 +346,7 @@ int main(int argc, char* const argv[])
     millis();
 
     // loops until exit, switching between sys and user tasks
-    mock_loop_task(mock_system_loop, interval, user_exit);
+    mock_loop_task(mock_system_loop, interval, run_once, user_exit);
 
     return 0;
 }
