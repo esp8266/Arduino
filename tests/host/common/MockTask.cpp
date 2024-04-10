@@ -59,29 +59,37 @@ std::thread user_task;
 std::atomic<bool> user_task_is_done { false };
 std::atomic<bool> scheduled { false };
 
-struct Barrier {
-    std::atomic<int> token { -1 };
-    std::condition_variable cv;
-    std::mutex m;
+enum class Token
+{
+    Default,
+    Exit,
+    User,
+    Sys,
 };
 
-constexpr int BARRIER_EXIT = -1;
-
-constexpr int BARRIER_USER = 1;
-constexpr int BARRIER_SYS = 2;
+struct Barrier
+{
+    std::atomic<Token>      token { Token::Default };
+    std::condition_variable cv;
+    std::mutex              m;
+};
 
 Barrier barrier {};
 
-void arrive(Barrier& b, int value)
+void arrive(Barrier& b, Token token)
 {
-    b.token = value;
+    b.token = token;
     b.cv.notify_all();
 }
 
-void wait(Barrier& b, int value)
+void wait(Barrier& b, Token token)
 {
     std::unique_lock lock { b.m };
-    b.cv.wait(lock, [&]() { return b.token == BARRIER_EXIT || b.token == value; });
+    b.cv.wait(lock,
+              [&]()
+              {
+                  return b.token == Token::Exit || b.token == token;
+              });
 }
 
 ETSTimer delay_timer;
@@ -92,14 +100,14 @@ void mock_task_wrapper()
 
     for (;;)
     {
-        wait(barrier, BARRIER_USER);
+        wait(barrier, Token::User);
 
         std::call_once(setup_done, setup);
         loop();
         loop_end();
 
         esp_schedule();
-        arrive(barrier, BARRIER_SYS);
+        arrive(barrier, Token::Sys);
 
         if (user_task_is_done)
         {
@@ -117,8 +125,8 @@ extern "C" bool can_yield()
 
 extern "C" void esp_suspend()
 {
-    arrive(barrier, BARRIER_SYS);
-    wait(barrier, BARRIER_USER);
+    arrive(barrier, Token::Sys);
+    wait(barrier, Token::User);
 }
 
 extern "C" void esp_schedule()
@@ -160,7 +168,7 @@ extern "C" void esp_delay(unsigned long ms)
 void mock_stop_task()
 {
     user_task_is_done = true;
-    arrive(barrier, BARRIER_EXIT);
+    arrive(barrier, Token::Exit);
 }
 
 void mock_loop_task(void (*system_task)(), std::chrono::milliseconds interval,
@@ -180,8 +188,8 @@ void mock_loop_task(void (*system_task)(), std::chrono::milliseconds interval,
         if (scheduled)
         {
             scheduled = false;
-            arrive(barrier, BARRIER_USER);
-            wait(barrier, BARRIER_SYS);
+            arrive(barrier, Token::User);
+            wait(barrier, Token::Sys);
         }
 
         if (user_exit)
