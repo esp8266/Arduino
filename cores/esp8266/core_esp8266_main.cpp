@@ -22,9 +22,6 @@
 
 //This may be used to change user task stack size:
 //#define CONT_STACKSIZE 4096
-
-#include <numeric>
-
 #include <Arduino.h>
 #include "Schedule.h"
 extern "C" {
@@ -176,13 +173,12 @@ bool esp_try_delay(const uint32_t start_ms, const uint32_t timeout_ms, const uin
         return true; // expired
     }
 
-    // compute greatest chunked delay with respect to scheduled recurrent functions
-    uint32_t grain_ms = std::gcd(intvl_ms, compute_scheduled_recurrent_grain());
+    // compute greatest delay interval with respect to scheduled recurrent functions
+    const uint32_t scheduled_recurrent_delay_ms = get_scheduled_recurrent_delay_us() / 1000UL;
+    const uint32_t max_delay_ms = std::min(intvl_ms, scheduled_recurrent_delay_ms);
 
     // recurrent scheduled functions will be called from esp_delay()->esp_suspend()
-    esp_delay(grain_ms > 0 ?
-        std::min((timeout_ms - expired), grain_ms):
-        (timeout_ms - expired));
+    esp_delay(std::min((timeout_ms - expired), max_delay_ms));
 
     return false; // expiration must be checked again
 }

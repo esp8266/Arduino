@@ -158,10 +158,10 @@ public:
   IRAM_ATTR // fast
   bool expired()
   {
-    YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
-    if(PeriodicT)           //in case of false: gets optimized away
-      return expiredRetrigger();
-    return expiredOneShot();
+    bool hasExpired = PeriodicT ? expiredRetrigger() : expiredOneShot();
+    if (!hasExpired) //in case of DoNothing: gets optimized away
+      YieldPolicyT::execute();
+    return hasExpired;
   }
 
   IRAM_ATTR // fast
@@ -186,7 +186,7 @@ public:
   {
     reset();
     _timeout = TimePolicyT::toTimeTypeUnit(newUserTimeout);
-    _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
+    _neverExpires = newUserTimeout > timeMax();
   }
 
   // Resets, will trigger after the timeout previously set.
@@ -219,11 +219,27 @@ public:
     _neverExpires = true;
   }
 
+  void stop()
+  {
+    resetToNeverExpires();
+  }
+
   timeType getTimeout() const
   {
     return TimePolicyT::toUserUnit(_timeout);
   }
 
+  IRAM_ATTR // fast
+  timeType remaining() const
+  {
+    if (_neverExpires)
+      return timeMax();
+    timeType current = TimePolicyT::time();
+    if (checkExpired(current))
+      return TimePolicyT::toUserUnit(0);
+    return TimePolicyT::toUserUnit(_timeout - (current - _start));
+  }
+  
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax;
@@ -235,7 +251,7 @@ private:
   bool checkExpired(const timeType internalUnit) const
   {
     // canWait() is not checked here
-    // returns "can expire" and "time expired"
+    // returns "can expire" and "time has expired"
     return (!_neverExpires) && ((internalUnit - _start) >= _timeout);
   }
 
@@ -250,7 +266,7 @@ protected:
     timeType current = TimePolicyT::time();
     if(checkExpired(current))
     {
-      unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
+      timeType n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
       _start += n  * _timeout;
       return true;
     }

@@ -17,12 +17,11 @@
 */
 
 #include <assert.h>
-#include <numeric>
 
 #include "Schedule.h"
 #include "PolledTimeout.h"
 #include "interrupts.h"
-#include "coredecls.h"
+#include <atomic>
 
 typedef std::function<void(void)> mSchedFuncT;
 struct scheduled_fn_t
@@ -35,7 +34,6 @@ static scheduled_fn_t* sFirst = nullptr;
 static scheduled_fn_t* sLast = nullptr;
 static scheduled_fn_t* sUnused = nullptr;
 static int sCount = 0;
-static uint32_t recurrent_max_grain_mS = 0;
 
 typedef std::function<bool(void)> mRecFuncT;
 struct recurrent_fn_t
@@ -49,6 +47,20 @@ struct recurrent_fn_t
 
 static recurrent_fn_t* rFirst = nullptr;
 static recurrent_fn_t* rLast = nullptr;
+// The target time for scheduling the next timed recurrent function 
+static std::atomic<decltype(micros())> rTarget;
+
+// As 32 bit unsigned integer, micros() rolls over every 71.6 minutes.
+// For unambiguous earlier/later order between two timestamps,
+// despite roll over, there is a limit on the maximum duration
+// that can be requested, if full expiration must be observable:
+// later - earlier >= 0 for both later >= earlier or (rolled over) later <= earlier
+// Also, expiration should remain observable for a useful duration of time:
+// now - (start + period) >= 0 for now - start >= 0 despite (start + period) >= now
+// A well-balanced solution, not breaking on two's compliment signed arithmetic,
+// is limiting durations to the maximum signed value of the same word size
+// as the original unsigned word.
+constexpr decltype(micros()) HALF_MAX_MICROS = ~static_cast<decltype(micros())>(0) >> 1;
 
 // Returns a pointer to an unused sched_fn_t,
 // or if none are available allocates a new one,
@@ -106,7 +118,7 @@ bool schedule_function(const std::function<void(void)>& fn)
 
 IRAM_ATTR // (not only) called from ISR
 bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
-    uint32_t repeat_us, const std::function<bool(void)>& alarm)
+    decltype(micros()) repeat_us, const std::function<bool(void)>& alarm)
 {
     assert(repeat_us < decltype(recurrent_fn_t::callNow)::neverExpires); //~26800000us (26.8s)
 
@@ -122,6 +134,19 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
 
     esp8266::InterruptLock lockAllInterruptsInThisScope;
 
+    const auto now = micros();
+    const auto itemRemaining = item->callNow.remaining();
+    for (auto _rTarget = rTarget.load(); ;)
+    {
+        const auto remaining = _rTarget - now;
+        if (!rFirst || (remaining <= HALF_MAX_MICROS && remaining > itemRemaining))
+        {
+            // if (!rTarget.compare_exchange_weak(_rTarget, now + itemRemaining)) continue;
+            rTarget = now + itemRemaining; // interrupt lock is active, no ABA issue
+        }
+        break;
+    }
+
     if (rLast)
     {
         rLast->mNext = item;
@@ -132,37 +157,20 @@ bool schedule_recurrent_function_us(const std::function<bool(void)>& fn,
     }
     rLast = item;
 
-    // grain needs to be recomputed
-    recurrent_max_grain_mS = 0;
-
     return true;
 }
 
-uint32_t compute_scheduled_recurrent_grain ()
+decltype(micros()) get_scheduled_recurrent_delay_us()
 {
-    if (recurrent_max_grain_mS == 0)
-    {
-        if (rFirst)
-        {
-            uint32_t recurrent_max_grain_uS = rFirst->callNow.getTimeout();
-            for (auto it = rFirst->mNext; it; it = it->mNext)
-                recurrent_max_grain_uS = std::gcd(recurrent_max_grain_uS, it->callNow.getTimeout());
-            if (recurrent_max_grain_uS)
-                // round to the upper millis
-                recurrent_max_grain_mS = recurrent_max_grain_uS <= 1000? 1: (recurrent_max_grain_uS + 999) / 1000;
-        }
+    if (!rFirst) return HALF_MAX_MICROS;
+    const auto now = micros();
+    const auto remaining = rTarget.load() - now;
+    return (remaining <= HALF_MAX_MICROS) ? remaining : 0;
+}
 
-#ifdef DEBUG_ESP_CORE
-        static uint32_t last_grain = 0;
-        if (recurrent_max_grain_mS != last_grain)
-        {
-            ::printf(":rsf %u->%u\n", last_grain, recurrent_max_grain_mS);
-            last_grain = recurrent_max_grain_mS;
-        }
-#endif
-    }
-
-    return recurrent_max_grain_mS;
+decltype(micros()) get_scheduled_delay_us()
+{
+    return sFirst ? 0 : HALF_MAX_MICROS;
 }
 
 void run_scheduled_functions()
@@ -225,11 +233,14 @@ void run_scheduled_recurrent_functions()
         fence = true;
     }
 
+    decltype(rLast) stop;
     recurrent_fn_t* prev = nullptr;
-    // prevent scheduling of new functions during this run
-    auto stop = rLast;
-
     bool done;
+
+    rTarget.store(micros() + HALF_MAX_MICROS);
+    // prevent scheduling of new functions during this run
+    stop = rLast;
+
     do
     {
         done = current == stop;
@@ -258,12 +269,23 @@ void run_scheduled_recurrent_functions()
             }
 
             delete(to_ditch);
-
-            // grain needs to be recomputed
-            recurrent_max_grain_mS = 0;
         }
         else
         {
+            const auto now = micros();
+            const auto currentRemaining = current->callNow.remaining();
+            for (auto _rTarget = rTarget.load(); ;)
+            {
+                const auto remaining = _rTarget - now;
+                if (remaining <= HALF_MAX_MICROS && remaining > currentRemaining)
+                {
+                    // if (!rTarget.compare_exchange_weak(_rTarget, now + currentRemaining)) continue;
+                    esp8266::InterruptLock lockAllInterruptsInThisScope;
+                    if (rTarget != _rTarget) { _rTarget = rTarget; continue; }
+                    rTarget = now + currentRemaining;
+                }
+                break;
+            }
             prev = current;
             current = current->mNext;
         }
