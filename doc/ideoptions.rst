@@ -150,7 +150,7 @@ Take note some sketches may start working after changing the optimization. Or
 fail less often. And it is also possible (not likely) that source code that
 was working with ``-Os`` may break with ``-Og``.
 
-For more topic depth, read `Improving Exception Decoder Results <faq/a02-my-esp-crashes.rst#improving-exception-decoder-results>`__
+For more topic depth, read `Improving Exception Decoder Results <Troubleshooting/improving_exception_decoder_results.rst>`__
 
 
 lwIP variant
