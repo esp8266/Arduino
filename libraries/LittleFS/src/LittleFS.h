@@ -172,7 +172,7 @@ public:
             // Add metadata with creation time to the directory marker
             int rc = lfs_setattr(&_lfs, path, 'c', (const void *)&now, sizeof(now));
             if (rc < 0) {
-                DEBUGV("Unable to set last write time on '%s' to %ld\n", path, (long)now);
+                DEBUGV("Unable to set creation time on '%s' to %ld\n", path, (long)now);
             }
         }
         return (rc==0);
