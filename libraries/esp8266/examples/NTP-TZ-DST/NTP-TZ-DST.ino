@@ -31,11 +31,11 @@
 // check for your nearest city in TZ.h
 
 // espressif headquarter TZ
-//#define MYTZ TZ_Asia_Shanghai
+// #define MYTZ TZ_Asia_Shanghai
 
 // example for "Not Only Whole Hours" timezones:
 // Kolkata/Calcutta is shifted by 30mn
-//#define MYTZ TZ_Asia_Kolkata
+// #define MYTZ TZ_Asia_Kolkata
 
 // example of a timezone with a variable Daylight-Saving-Time:
 // demo: watch automatic time adjustment on Summer/Winter change (DST)

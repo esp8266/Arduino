@@ -10,6 +10,7 @@ import argparse
 import sys
 import re
 import subprocess
+import shutil
 
 # https://github.com/me-no-dev/EspExceptionDecoder/blob/349d17e4c9896306e2c00b4932be3ba510cad208/src/EspExceptionDecoder.java#L59-L90
 EXCEPTION_CODES = (
@@ -51,6 +52,7 @@ EXCEPTION_CODES = (
     "StoreProhibited: A store referenced a page mapped with an attribute that does not "
     "permit stores",
 )
+
 
 # similar to java version, which used `list` and re-formatted it
 # instead, simply use an already short-format `info line`
@@ -96,14 +98,17 @@ def addresses_addr2line(addr2line, elf, addresses):
 
 
 def decode_lines(format_addresses, elf, lines):
-    STACK_RE = re.compile(r"^[0-9a-f]{8}:\s+([0-9a-f]{8} ?)+ *$")
+    ANY_ADDR_RE = re.compile(r"0x[0-9a-fA-F]{8}|[0-9a-fA-F]{8}")
+    HEX_ADDR_RE = re.compile(r"0x[0-9a-f]{8}")
 
-    LAST_ALLOC_RE = re.compile(
-        r"last failed alloc call: ([0-9a-fA-F]{8})\(([0-9]+)\).*"
-    )
-    LAST_ALLOC = "last failed alloc"
+    MEM_ERR_LINE_RE = re.compile(r"^(Stack|last failed alloc call)")
+
+    STACK_LINE_RE = re.compile(r"^[0-9a-f]{8}:\s\s+")
+
+    IGNORE_FIRMWARE_RE = re.compile(r"^(epc1=0x........, |Fatal exception )")
 
     CUT_HERE_STRING = "CUT HERE FOR EXCEPTION DECODER"
+    DECODE_IT = "DECODE IT"
     EXCEPTION_STRING = "Exception ("
     EPC_STRING = "epc1="
 
@@ -131,13 +136,13 @@ def decode_lines(format_addresses, elf, lines):
             stack_addresses = print_all_addresses(stack_addresses)
             last_stack = line.strip()
         # 3fffffb0:  feefeffe feefeffe 3ffe85d8 401004ed
-        elif in_stack and STACK_RE.match(line):
-            stack, addrs = line.split(":")
-            addrs = addrs.strip()
-            addrs = addrs.split(" ")
+        elif IGNORE_FIRMWARE_RE.match(line):
+            continue
+        elif in_stack and STACK_LINE_RE.match(line):
+            _, addrs = line.split(":")
+            addrs = ANY_ADDR_RE.findall(addrs)
             stack_addresses.setdefault(last_stack, [])
-            for addr in addrs:
-                stack_addresses[last_stack].append(addr)
+            stack_addresses[last_stack].extend(addrs)
         # epc1=0xfffefefe epc2=0xfefefefe epc3=0xefefefef excvaddr=0xfefefefe depc=0xfefefefe
         elif EPC_STRING in line:
             pairs = line.split()
@@ -152,20 +157,22 @@ def decode_lines(format_addresses, elf, lines):
         elif EXCEPTION_STRING in line:
             number = line.strip()[len(EXCEPTION_STRING) : -2]
             print(f"Exception ({number}) - {EXCEPTION_CODES[int(number)]}")
+        # stack smashing detected at <ADDR>
         # last failed alloc call: <ADDR>(<NUMBER>)[@<maybe file loc>]
-        elif LAST_ALLOC in line:
-            values = LAST_ALLOC_RE.match(line)
-            if values:
-                addr, size = values.groups()
-                print()
-                print(f"Allocation of {size} bytes failed: {format_address(addr)}")
+        elif MEM_ERR_LINE_RE.match(line):
+            for addr in ANY_ADDR_RE.findall(line):
+                line = line.replace(addr, format_address(addr))
+            print()
+            print(line.strip())
         # postmortem guards our actual stack dump values with these
         elif ">>>stack>>>" in line:
             in_stack = True
         # ignore
         elif "<<<stack<<<" in line:
+            in_stack = False
+            stack_addresses = print_all_addresses(stack_addresses)
             continue
-        elif CUT_HERE_STRING in line:
+        elif CUT_HERE_STRING in line or DECODE_IT in line:
             continue
         else:
             line = line.strip()
@@ -182,6 +189,9 @@ def select_tool(toolchain_path, tool, func):
     path = f"xtensa-lx106-elf-{tool}"
     if toolchain_path:
         path = os.path.join(toolchain_path, path)
+        
+    if not shutil.which(path):
+        raise FileNotFoundError(path)
 
     def formatter(func, path):
         def wrapper(elf, addresses):

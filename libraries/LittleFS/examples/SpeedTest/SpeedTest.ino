@@ -8,8 +8,8 @@
 // WARNING:  The filesystem will be formatted at the start of the test!
 
 #define TESTFS LittleFS
-//#define TESTFS SPIFFS
-//#define TESTFS SDFS
+// #define TESTFS SPIFFS
+// #define TESTFS SDFS
 
 // How large of a file to test
 #define TESTSIZEKB 512

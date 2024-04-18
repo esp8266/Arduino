@@ -33,7 +33,7 @@
 #include <utility>
 #include <type_traits>
 
-// an abstract class used as a means to proide a unique pointer type
+// an abstract class used as a means to provide a unique pointer type
 // but really has no body
 class __FlashStringHelper;
 #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
@@ -204,7 +204,7 @@ class String {
         bool concat(double num);
 
         // if there's not enough memory for the concatenated value, the string
-        // will be left unchanged (but this isn't signalled in any way)
+        // will be left unchanged (but this isn't signaled in any way)
         template <typename T>
         String &operator +=(const T &rhs) {
             concat(rhs);
@@ -343,7 +343,7 @@ class String {
         char *wbuffer() { return const_cast<char *>(buffer()); } // Writable version of buffer
 
         // concatenation is done via non-member functions
-        // make sure we still have access to internal methods, since we optimize based on capacity of both sides and want to manipulate internal buffers directly
+        // make sure we still have access to internal methods, since we optimize based on the capacity of both sides and want to manipulate internal buffers directly
         friend String operator +(const String &lhs, String &&rhs);
         friend String operator +(String &&lhs, String &&rhs);
         friend String operator +(char lhs, String &&rhs);
