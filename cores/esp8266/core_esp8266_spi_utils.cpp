@@ -56,7 +56,7 @@ _SPICommand(volatile uint32_t spiIfNum,
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
 
-  // force SPI register access via base+offset. 
+  // force SPI register access via base+offset.
   // Prevents loading individual address constants from flash.
   uint32_t *spibase = (uint32_t*)(spiIfNum ? &(SPI1CMD) : &(SPI0CMD));
   #define SPIREG(reg) (*((volatile uint32_t *)(spibase+(&(reg) - &(SPI0CMD)))))
@@ -77,7 +77,7 @@ _SPICommand(volatile uint32_t spiIfNum,
      PRECACHE_START();
      Wait_SPI_Idlep((SpiFlashChip *)fchip);
   }
-  
+
   // preserve essential controller state such as incoming/outgoing
   // data lengths and IO mode.
   uint32_t oldSPI0U = SPIREG(SPI0U);
@@ -117,11 +117,22 @@ _SPICommand(volatile uint32_t spiIfNum,
   SPIREG(SPI0U) = oldSPI0U;
   SPIREG(SPI0U2)= oldSPI0U2;
   SPIREG(SPI0C) = oldSPI0C;
-  
-  PRECACHE_END();
+
   if (!spiIfNum) {
+      // w/o a call to Wait_SPI_Idlep, 'Exception 0' or other exceptions (saw
+      // 28) may occur later after returning to iCache code. This issue was
+      // observed with non-volatile status register writes.
+      //
+      // My guess is: Returning too soon to uncached iCache executable space. An
+      // iCache read may not complete properly because the Flash or SPI
+      // interface is still busy with the last write operation. In such a case,
+      // I expect new reads from iROM to result in zeros. This would explain
+      // the Exception 0 for code, and Exception 20, 28, and 29 where a literal
+      // was misread as 0 and then used as a pointer.
+      Wait_SPI_Idlep((SpiFlashChip *)fchip);
       xt_wsr_ps(saved_ps);
   }
+  PRECACHE_END();
   return (timeout>0 ? SPI_RESULT_OK : SPI_RESULT_TIMEOUT);
 }
 
@@ -159,8 +170,16 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   if (miso_bits % 32 != 0)
      miso_words++;
 
+  // Use SPI_CS_SETUP to add time for #CS to settle (ringing) before SPI CLK
+  // begins. The BootROM does not do this; however, RTOS SDK and NONOS SDK do
+  // as part of flash init/configuration.
+  //
+  // One SPI bus clock cycle time inserted between #CS active and the 1st SPI
+  // bus clock cycle. The number of clock cycles is in SPI_CNTRL2
+  // SPI_SETUP_TIME, which defaults to 1.
+  //
   // Select user defined command mode in the controller
-  uint32_t spiu=SPIUCOMMAND; //SPI_USR_COMMAND
+  uint32_t spiu=SPIUCOMMAND | SPIUCSSETUP; //SPI_USR_COMMAND | SPI_CS_SETUP
 
   // Set the command byte to send
   uint32_t spiu2 = ((7 & SPIMCOMMAND)<<SPILCOMMAND) | cmd;
