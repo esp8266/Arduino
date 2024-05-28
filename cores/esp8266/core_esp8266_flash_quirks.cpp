@@ -66,12 +66,13 @@ void initFlashQuirks() {
             newSR3=SR3;
             if (get_flash_mhz()>26) { // >26Mhz?
                // Set the output drive to 100%
+               // These definitions are for the XM25QH32B part. On a XM25QH32C
+               // part, the XM25QH32B's 100% is C's 25% driver strength.
                newSR3 &= ~(SPI_FLASH_SR3_XMC_DRV_MASK << SPI_FLASH_SR3_XMC_DRV_S);
                newSR3 |= (SPI_FLASH_SR3_XMC_DRV_100 << SPI_FLASH_SR3_XMC_DRV_S);
             }
             if (newSR3 != SR3) { // only write if changed
-               if (SPI0Command(SPI_FLASH_CMD_WEVSR,NULL,0,0)==SPI_RESULT_OK)  // write enable volatile SR
-                  SPI0Command(SPI_FLASH_CMD_WSR3,&newSR3,8,0);  // write to SR3
+               SPI0Command(SPI_FLASH_CMD_WSR3,&newSR3,8,0,SPI_FLASH_CMD_WEVSR);  // write to SR3, use write enable volatile prefix
                SPI0Command(SPI_FLASH_CMD_WRDI,NULL,0,0);        // write disable - probably not needed
             }
          }

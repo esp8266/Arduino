@@ -51,7 +51,7 @@ namespace experimental {
 static SpiOpResult PRECACHE_ATTR
 _SPICommand(volatile uint32_t spiIfNum,
             uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
-            uint32_t *data,uint32_t writeWords,uint32_t readWords)
+            uint32_t *data,uint32_t writeWords,uint32_t readWords, uint32_t pre_cmd)
 {
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
@@ -84,8 +84,18 @@ _SPICommand(volatile uint32_t spiIfNum,
   uint32_t oldSPI0U2= SPIREG(SPI0U2);
   uint32_t oldSPI0C = SPIREG(SPI0C);
 
-  //SPI0S &= ~(SPISE|SPISBE|SPISSE|SPISCD);
   SPIREG(SPI0C) = spic;
+  if (pre_cmd) {
+     // Send prefix cmd w/o data - sends 8 bits - usually a Write Enable cmd
+     SPIREG(SPI0U)  = (spiu & ~(SPIUMOSI|SPIUMISO));
+     SPIREG(SPI0U1) = 0;
+     SPIREG(SPI0U2) = (spiu2 & ~0xFFFFu) | pre_cmd;
+
+     SPIREG(SPI0CMD) = spicmdusr;   //Send cmd
+     while ((SPIREG(SPI0CMD) & spicmdusr));
+  }
+
+  //SPI0S &= ~(SPISE|SPISBE|SPISSE|SPISCD);
   SPIREG(SPI0U) = spiu;
   SPIREG(SPI0U1)= spiu1;
   SPIREG(SPI0U2)= spiu2;
@@ -150,12 +160,33 @@ _SPICommand(volatile uint32_t spiIfNum,
  *	miso_bits
  *		Number of bits to read from the SPI bus after the outgoing
  *		data has been sent.
+ *  pre_cmd
+ *    A few SPI Flash commands require enable commands to immediately preceed
+ *    them. Since two calls to SPI0Command from ICACHE memory most likely would
+ *    be separated by SPI Flash read request for iCache, use this option to
+ *    supply a prefix command, 8-bits w/o read or write data.
  *
  *  Note: This code has only been tested with SPI bus 0, but should work
  *        equally well with other buses. The ESP8266 has bus 0 and 1,
  *        newer chips may have more one day.
+ *
+ *  Supplemental Notes:
+ *
+ *  SPI Bus view: For *data as an array of bytes, byte[0] goes out first wit
+ *  the most significant bit shifted out first and so on. When thinking of th
+ *  data as an array of 32bit-words, the least significant byte of the first
+ *  32bit-word goes out first on the SPI bus with the most significant bit of
+ *  that byte shifted out first onto the wire.
+ *
+ *  When presenting a 3 or 4-byte address, the byte order will need to be
+ *  reversed. Don't overthink it. For a 3-byte address, view *data as a byte
+ *  array and set the first 3-bytes to the address. eg. byteData[0] MSB,
+ *  byteData[1] middle, and byteData[2] LSB.
+ *
+ *  When sending a fractional byte, fill in the most significant bit positions
+ *  first.
  */
-SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits) {
+SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits, uint32_t pre_cmd) {
   if (mosi_bits>(64*8))
      return SPI_RESULT_ERR;
   if (miso_bits>(64*8))
@@ -202,7 +233,7 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   spic &= ~(SPICQIO | SPICDIO | SPICQOUT | SPICDOUT | SPICAHB | SPICFASTRD);
   spic |= (SPICRESANDRES | SPICSHARE | SPICWPR | SPIC2BSE);
 
-  SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words);
+  SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words,pre_cmd);
 
   if (rc==SPI_RESULT_OK) {
      // clear any bits we did not read in the last word.

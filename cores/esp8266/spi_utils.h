@@ -35,7 +35,7 @@ typedef enum {
     SPI_RESULT_TIMEOUT
 } SpiOpResult;
 
-SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits);
+SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits, uint32_t prefix=0);
 }
 
 #ifdef __cplusplus
