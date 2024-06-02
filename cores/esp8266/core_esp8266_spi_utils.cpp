@@ -32,6 +32,7 @@
 #include "core_esp8266_features.h"
 
 #include "spi_utils.h"
+#include "spi_flash_defs.h"
 
 extern "C" uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
 
@@ -65,6 +66,7 @@ _SPICommand(volatile uint32_t spiIfNum,
   // Everything defined here must be volatile or the optimizer can
   // treat them as constants, resulting in the flash reads we're
   // trying to avoid
+  SpiFlashOpResult (* volatile SPI_write_enablep)(SpiFlashChip *) = SPI_write_enable;
   uint32_t (* volatile Wait_SPI_Idlep)(SpiFlashChip *) = Wait_SPI_Idle;
   volatile SpiFlashChip *fchip=flashchip;
   volatile uint32_t spicmdusr=SPICMDUSR;
@@ -85,8 +87,13 @@ _SPICommand(volatile uint32_t spiIfNum,
   uint32_t oldSPI0C = SPIREG(SPI0C);
 
   SPIREG(SPI0C) = spic;
+
+  if (SPI_FLASH_CMD_WREN == pre_cmd) {
+     // See SPI_write_enable comments in esp8266_undocumented.h
+     SPI_write_enablep((SpiFlashChip *)fchip);
+  } else
   if (pre_cmd) {
-     // Send prefix cmd w/o data - sends 8 bits - usually a Write Enable cmd
+     // Send prefix cmd w/o data - sends 8 bits. eg. Volatile SR Write Enable, 0x50
      SPIREG(SPI0U)  = (spiu & ~(SPIUMOSI|SPIUMISO));
      SPIREG(SPI0U1) = 0;
      SPIREG(SPI0U2) = (spiu2 & ~0xFFFFu) | pre_cmd;
@@ -166,17 +173,21 @@ _SPICommand(volatile uint32_t spiIfNum,
  *    be separated by SPI Flash read request for iCache, use this option to
  *    supply a prefix command, 8-bits w/o read or write data.
  *
+ *    Case in point from the GD25Q32E datasheet: "The Write Enable for Volatile
+ *    Status Register command must be issued prior to a Write Status Register
+ *    command and any other commands can’t be inserted between them."
+ *
  *  Note: This code has only been tested with SPI bus 0, but should work
  *        equally well with other buses. The ESP8266 has bus 0 and 1,
  *        newer chips may have more one day.
  *
  *  Supplemental Notes:
  *
- *  SPI Bus view: For *data as an array of bytes, byte[0] goes out first wit
- *  the most significant bit shifted out first and so on. When thinking of th
- *  data as an array of 32bit-words, the least significant byte of the first
- *  32bit-word goes out first on the SPI bus with the most significant bit of
- *  that byte shifted out first onto the wire.
+ *  SPI Bus wire view: Think of *data as an array of bytes, byte[0] goes out
+ *  first with the most significant bit shifted out first and so on. When
+ *  thinking of the data as an array of 32bit-words, the least significant byte
+ *  of the first 32bit-word goes out first on the SPI bus with the most
+ *  significant bit of that byte shifted out first onto the wire.
  *
  *  When presenting a 3 or 4-byte address, the byte order will need to be
  *  reversed. Don't overthink it. For a 3-byte address, view *data as a byte
@@ -184,7 +195,7 @@ _SPICommand(volatile uint32_t spiIfNum,
  *  byteData[1] middle, and byteData[2] LSB.
  *
  *  When sending a fractional byte, fill in the most significant bit positions
- *  first.
+ *  of the byte first.
  */
 SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits, uint32_t pre_cmd) {
   if (mosi_bits>(64*8))
@@ -236,9 +247,16 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words,pre_cmd);
 
   if (rc==SPI_RESULT_OK) {
-     // clear any bits we did not read in the last word.
-     if (miso_bits % 32) {
-        data[miso_bits/32] &= ~(0xFFFFFFFF << (miso_bits % 32));
+     // Clear any bits we did not read in the last word. Bits in a fractional
+     // bytes will be stored in the most significant part of the byte first.
+     if (miso_bits % 32u) {
+        uint32_t whole_byte_bits = (miso_bits % 32u) & ~7u;
+        uint32_t mask = ~(0xFFFFFFFFu << whole_byte_bits);
+        if (miso_bits % 8u) {
+           // Select fractional byte bits.
+           mask |= (~(0xFFu >> (miso_bits % 8u)) & 0xFFu) << whole_byte_bits;
+        }
+        data[miso_bits/32u] &= mask;
      }
   }
   return rc;

@@ -241,6 +241,17 @@ extern fn_c_exception_handler_t _xtos_c_handler_table[XCHAL_EXCCAUSE_NUM];
 extern fn_c_exception_handler_t _xtos_set_exception_handler(int cause, fn_c_exception_handler_t fn);
 #endif
 
+/*
+  BootROM function that sends the SPI Flash "Write Enable" command, 0x06.
+  The function internally calls Wait_SPI_Idle before enabling.
+  Polls status register forever waiting for WEL bit to set.
+  This function always returns 0; however, most examples test for 0.
+
+  Every function I find that needs WEL set, call this function. I suspect the
+  waiting for the WEL bit to set is a Flash chip anomaly workaround.
+*/
+extern SpiFlashOpResult SPI_write_enable(SpiFlashChip *fc);
+
 extern uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
 extern void Cache_Read_Disable();
 extern int32_t system_func1(uint32_t);
