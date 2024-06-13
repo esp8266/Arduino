@@ -13,18 +13,18 @@ const char *password = "...";
 const char *ap_ssid = "ESP8266_Demo";
 const char *ap_password = "";
 
-WebServer server(80);
+ESP8266WebServer server(80);
 
 const int led = 13;
 
 // ON_STA_FILTER - Only accept requests coming from STA interface
-bool ON_STA_FILTER(WebServer &server) {
-  return WiFi.STA.hasIP() && WiFi.STA.localIP() == server.client().localIP();
+bool ON_STA_FILTER(ESP8266WebServer &server) {
+  return WiFi.localIP() == server.client().localIP();
 }
 
 // ON_AP_FILTER - Only accept requests coming from AP interface
-bool ON_AP_FILTER(WebServer &server) {
-  return WiFi.AP.hasIP() && WiFi.AP.localIP() == server.client().localIP();
+bool ON_AP_FILTER(ESP8266WebServer &server) {
+  return WiFi.softAPIP() == server.client().localIP();
 }
 
 void handleNotFound() {
