@@ -84,7 +84,7 @@ More details about this in `Filters.ino` example.
 
 .. code:: cpp
 
-  server.on("/", handlerFunction).setFilter(ON_AP_STA)
+  server.on("/", handlerFunction).setFilter(ON_AP_FILTER)
 
 Sending responses to the client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
