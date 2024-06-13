@@ -10,7 +10,7 @@ const char *password = "...";
 
 // Your AP WiFi Credentials
 // ( This is the AP your ESP will broadcast )
-const char *ap_ssid = "ESP32_Demo";
+const char *ap_ssid = "ESP8266_Demo";
 const char *ap_password = "";
 
 WebServer server(80);
@@ -66,7 +66,7 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp32")) {
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
@@ -96,5 +96,4 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
-  delay(2);  //allow the cpu to switch to other tasks
 }
