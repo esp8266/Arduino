@@ -74,8 +74,7 @@ public:
     }
 
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
-        (void) server;
-        if (!canHandle(requestMethod, requestUri))
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         _fn();
@@ -83,9 +82,8 @@ public:
     }
 
     void upload(WebServerType& server, const String& requestUri, HTTPUpload& upload) override {
-        (void) server;
         (void) upload;
-        if (canUpload(requestUri))
+        if (canUpload(server, requestUri))
             _ufn();
     }
 
@@ -156,8 +154,7 @@ public:
     }
 
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
-
-        if (!canHandle(requestMethod, requestUri))
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         DEBUGV("DirectoryRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), SRH::_uri.c_str());
@@ -264,7 +261,7 @@ public:
     }
 
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String & requestUri) override {
-        if (!canHandle(requestMethod, requestUri))
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         if (server._eTagEnabled) {
