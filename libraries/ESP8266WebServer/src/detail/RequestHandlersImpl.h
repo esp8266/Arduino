@@ -59,9 +59,22 @@ public:
         return true;
     }
 
+    bool canHandle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
+        if (_method != HTTP_ANY && _method != requestMethod)
+            return false;
+
+        return _uri->canHandle(requestUri, RequestHandler<ServerType>::pathArgs) && (_filter != NULL ? _filter(server) : true);
+    }
+
+    bool canUpload(WebServerType& server, const String& requestUri) override {
+        if (!_ufn || !canHandle(server, HTTP_POST, requestUri))
+            return false;
+
+        return true;
+    }
+
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
-        (void) server;
-        if (!canHandle(requestMethod, requestUri))
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         _fn();
@@ -69,15 +82,22 @@ public:
     }
 
     void upload(WebServerType& server, const String& requestUri, HTTPUpload& upload) override {
-        (void) server;
         (void) upload;
-        if (canUpload(requestUri))
+        if (canUpload(server, requestUri))
             _ufn();
+    }
+
+    FunctionRequestHandler& setFilter(typename WebServerType::FilterFunction filter) {
+        _filter = filter;
+        return *this;
     }
 
 protected:
     typename WebServerType::THandlerFunction _fn;
     typename WebServerType::THandlerFunction _ufn;
+    // _filter should return 'true' when the request should be handled
+    // and 'false' when the request should be ignored
+    typename WebServerType::FilterFunction _filter;
     Uri *_uri;
     HTTPMethod _method;
 };
@@ -115,7 +135,6 @@ protected:
 // serve all files within a given directory
 template<typename ServerType>
 class StaticDirectoryRequestHandler : public StaticRequestHandler<ServerType> {
-
     using SRH = StaticRequestHandler<ServerType>;
     using WebServerType = ESP8266WebServerTemplate<ServerType>;
 
@@ -130,9 +149,12 @@ public:
         return SRH::validMethod(requestMethod) && requestUri.startsWith(SRH::_uri);
     }
 
-    bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
+    bool canHandle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
+        return SRH::validMethod(requestMethod) && requestUri.startsWith(SRH::_uri) && (_filter != NULL ? _filter(server) : true);
+    }
 
-        if (!canHandle(requestMethod, requestUri))
+    bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         DEBUGV("DirectoryRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), SRH::_uri.c_str());
@@ -203,8 +225,14 @@ public:
         return true;
     }
 
+    StaticDirectoryRequestHandler& setFilter(typename WebServerType::FilterFunction filter) {
+        _filter = filter;
+        return *this;
+    }
+
 protected:
     size_t _baseUriLength;
+    typename WebServerType::FilterFunction _filter;
 };
 
 
@@ -228,8 +256,12 @@ public:
         return SRH::validMethod(requestMethod) && requestUri == SRH::_uri;
     }
 
+    bool canHandle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) override {
+        return SRH::validMethod(requestMethod) && requestUri == SRH::_uri && (_filter != NULL ? _filter(server) : true);
+    }
+
     bool handle(WebServerType& server, HTTPMethod requestMethod, const String & requestUri) override {
-        if (!canHandle(requestMethod, requestUri))
+        if (!canHandle(server, requestMethod, requestUri))
             return false;
 
         if (server._eTagEnabled) {
@@ -266,8 +298,14 @@ public:
         return true;
     }
 
+    StaticFileRequestHandler& setFilter(typename WebServerType::FilterFunction filter) {
+        _filter = filter;
+        return *this;
+    }
+
 protected:
     String _eTagCode; // ETag code calculated for this file as used in http header include quotes.
+    typename WebServerType::FilterFunction _filter;
 };
 
 } // namespace
