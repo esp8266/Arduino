@@ -41,7 +41,7 @@ void handleRedirect() {
   TRACE("Redirect...");
   String url = "/index.htm";
 
-  if (!LittleFS.exists(url)) { url = "/$update.htm"; }
+  if (!LittleFS.exists(url)) { url = "/$upload.htm"; }
 
   server.redirect(url);
 }  // handleRedirect()
