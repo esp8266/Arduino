@@ -230,23 +230,71 @@ void ESP8266WebServerTemplate<ServerType>::requestAuthentication(HTTPAuthMethod 
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, ESP8266WebServerTemplate<ServerType>::THandlerFunction handler) {
-  on(uri, HTTP_ANY, handler);
+RequestHandler<ServerType>& ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, ESP8266WebServerTemplate<ServerType>::THandlerFunction handler) {
+  return on(uri, HTTP_ANY, handler);
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn) {
-  on(uri, method, fn, _fileUploadHandler);
+RequestHandler<ServerType>& ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn) {
+  return on(uri, method, fn, _fileUploadHandler);
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn) {
-  _addRequestHandler(new FunctionRequestHandler<ServerType>(fn, ufn, uri, method));
+RequestHandler<ServerType>& ESP8266WebServerTemplate<ServerType>::on(const Uri &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn) {
+  RequestHandler<ServerType> *handler = new FunctionRequestHandler<ServerType>(fn, ufn, uri, method);
+  _addRequestHandler(handler);
+  return *handler;
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::removeRoute(const char *uri) {
+  return removeRoute(String(uri), HTTP_ANY);
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::removeRoute(const char *uri, HTTPMethod method) {
+  return removeRoute(String(uri), method);
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::removeRoute(const String &uri) {
+  return removeRoute(uri, HTTP_ANY);
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::removeRoute(const String &uri, HTTPMethod method) {
+  bool anyHandlerRemoved = false;
+  RequestHandlerType *handler = _firstHandler;
+  RequestHandlerType *previousHandler = nullptr;
+
+  while (handler) {
+    if (handler->canHandle(method, uri)) {
+      if (_removeRequestHandler(handler)) {
+        anyHandlerRemoved = true;
+        // Move to the next handler
+        if (previousHandler) {
+          handler = previousHandler->next();
+        } else {
+          handler = _firstHandler;
+        }
+        continue;
+      }
+    }
+    previousHandler = handler;
+    handler = handler->next();
+  }
+
+  return anyHandlerRemoved;
 }
 
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::addHandler(RequestHandlerType* handler) {
     _addRequestHandler(handler);
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::removeHandler(RequestHandlerType *handler) {
+  return _removeRequestHandler(handler);
 }
 
 template <typename ServerType>
@@ -259,6 +307,33 @@ void ESP8266WebServerTemplate<ServerType>::_addRequestHandler(RequestHandlerType
       _lastHandler->next(handler);
       _lastHandler = handler;
     }
+}
+
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_removeRequestHandler(RequestHandlerType *handler) {
+  RequestHandlerType *current = _firstHandler;
+  RequestHandlerType *previous = nullptr;
+
+  while (current != nullptr) {
+    if (current == handler) {
+      if (previous == nullptr) {
+        _firstHandler = current->next();
+      } else {
+        previous->next(current->next());
+      }
+
+      if (current == _lastHandler) {
+        _lastHandler = previous;
+      }
+
+      // Delete 'matching' handler
+      delete current;
+      return true;
+    }
+    previous = current;
+    current = current->next();
+  }
+  return false;
 }
 
 template <typename ServerType>

@@ -103,6 +103,21 @@ public:
         return DHCP_CHECK_NONE;
     }
 
+    void MACAddress(uint8_t* mac)
+    {
+        LwipIntfDev<RawDev>::macAddress(mac);
+    }
+
+    IPAddress dnsServerIP() const
+    {
+        return LwipIntfDev<RawDev>::dnsIP(0);
+    }
+
+    void setDnsServerIP(const IPAddress dnsIP)
+    {
+        LwipIntfDev<RawDev>::setDNS(dnsIP);
+    }
+
 protected:
     HardwareStatus _hardwareStatus;
 };
