@@ -116,11 +116,17 @@ public:
 
   typedef std::function<void(void)> THandlerFunction;
   typedef std::function<String(FS &fs, const String &fName)> ETagFunction;
+  typedef std::function<bool(ESP8266WebServerTemplate<ServerType> &server)> FilterFunction;
 
-  void on(const Uri &uri, THandlerFunction handler);
-  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  RequestHandler<ServerType>& on(const Uri &uri, THandlerFunction handler);
+  RequestHandler<ServerType>& on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
+  RequestHandler<ServerType>& on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  bool removeRoute(const char *uri);
+  bool removeRoute(const char *uri, HTTPMethod method);
+  bool removeRoute(const String &uri);
+  bool removeRoute(const String &uri, HTTPMethod method);
   void addHandler(RequestHandlerType* handler);
+  bool removeHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
@@ -306,6 +312,7 @@ public:
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
+  bool _removeRequestHandler(RequestHandlerType *handler);
   void _handleRequest();
   void _finalizeResponse();
   ClientFuture _parseRequest(ClientType& client);
