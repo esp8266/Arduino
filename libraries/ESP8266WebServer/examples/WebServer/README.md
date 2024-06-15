@@ -120,7 +120,7 @@ The **serveStatic** plug in is part of the library and handles delivering files 
 > ```
 
 
-### Cross-Origin Ressource Sharing (CORS)
+### Cross-Origin Resource Sharing (CORS)
 
 The `enableCORS(true)` function adds a `Access-Control-Allow-Origin: *` http-header to all responses to the client
 to inform that it is allowed to call URLs and services on this server from other web sites.
