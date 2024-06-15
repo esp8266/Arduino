@@ -153,7 +153,7 @@ public:
       // Close the file
       if (_fsUploadFile) { _fsUploadFile.close(); }
     }  // if
-  }  // upload()
+  }    // upload()
 
 protected:
   File _fsUploadFile;
