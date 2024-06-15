@@ -106,7 +106,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
   //attach handler
   RequestHandlerType* handler;
   for (handler = _firstHandler; handler; handler = handler->next()) {
-    if (handler->canHandle(_currentMethod, _currentUri))
+    if (handler->canHandle(*this, _currentMethod, _currentUri))
       break;
   }
   _currentHandler = handler;
@@ -324,7 +324,7 @@ int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& d
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
-    if(_currentHandler && _currentHandler->canUpload(_currentUri))
+    if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
     _currentUpload->totalSize += _currentUpload->currentSize;
     _currentUpload->currentSize = 0;
@@ -425,7 +425,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             _currentUpload->currentSize = 0;
             _currentUpload->contentLength = len;
             DBGWS("Start File: %s Type: %s\n", _currentUpload->filename.c_str(), _currentUpload->type.c_str());
-            if(_currentHandler && _currentHandler->canUpload(_currentUri))
+            if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
 
@@ -463,11 +463,11 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                 }
             }
             // Found the boundary string, finish processing this file upload
-            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+            if (_currentHandler && _currentHandler->canUpload(*this, _currentUri))
                 _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->totalSize += _currentUpload->currentSize;
             _currentUpload->status = UPLOAD_FILE_END;
-            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+            if (_currentHandler && _currentHandler->canUpload(*this, _currentUri))
                 _currentHandler->upload(*this, _currentUri, *_currentUpload);
             DBGWS("End File: %s Type: %s Size: %d\n",
                 _currentUpload->filename.c_str(),
@@ -542,7 +542,7 @@ String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
-  if(_currentHandler && _currentHandler->canUpload(_currentUri))
+  if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }
