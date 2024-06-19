@@ -45,7 +45,9 @@ function skip_ino()
     *"/TeensySdioDemo/"* | \
     *"/TeensySdioLogger/"* | \
     *"/UserChipSelectFunction/"* | \
-    *"/UserSPIDriver/"*)
+    *"/UserSPIDriver/"* | \
+    *"/onewiretest/"* | \
+    *"/debug/"*)
         return 0
         ;;
     *"Teensy"*)

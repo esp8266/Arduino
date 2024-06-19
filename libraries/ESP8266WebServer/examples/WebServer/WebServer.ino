@@ -41,7 +41,7 @@ void handleRedirect() {
   TRACE("Redirect...");
   String url = "/index.htm";
 
-  if (!LittleFS.exists(url)) { url = "/$update.htm"; }
+  if (!LittleFS.exists(url)) { url = "/$upload.htm"; }
 
   server.redirect(url);
 }  // handleRedirect()
@@ -104,7 +104,7 @@ public:
 
   // @brief check incoming request. Can handle POST for uploads and DELETE.
   // @param requestMethod method of the http request line.
-  // @param requestUri request ressource from the http request line.
+  // @param requestUri request resource from the http request line.
   // @return true when method can be handled.
   bool canHandle(HTTPMethod requestMethod, const String UNUSED &_uri) override {
     return ((requestMethod == HTTP_POST) || (requestMethod == HTTP_DELETE));
