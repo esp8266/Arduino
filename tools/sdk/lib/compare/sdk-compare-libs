@@ -32,10 +32,10 @@ verbose=false
 sdk="$1"
 me="$0"
 core=$(cd ${me%/*}/../../../..; pwd)
-
+tool="$core/tools/xtensa-lx106-elf-gcc/bin"
 
 [ -r "$sdk/lib/libnet80211.a" ] || help "$0"
-[ -r "$core/tools/xtensa-lx106-elf/bin" ] || help "$0"
+[ -r "$tool" ] || help "$0"
 
 tmp=$(pwd)/NONOSDK.deleteme
 
@@ -53,7 +53,7 @@ md5()
 {
 	mkdir temp
 	cd temp
-	PATH="$core/tools/xtensa-lx106-elf/bin:$PATH" xtensa-lx106-elf-ar x "$1"
+	PATH="$tool:$PATH" xtensa-lx106-elf-ar x "$1"
 	rm -f mem_manager.o time.o user_interface.o eagle_lwip_if.o
 	cat *.o | md5sum
 	cd ..

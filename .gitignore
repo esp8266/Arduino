@@ -1,6 +1,7 @@
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
+tools/xtensa-lx106-elf-gcc/
 tools/mkspiffs/
 tools/mklittlefs/
 tools/python3/

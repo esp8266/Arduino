@@ -9,7 +9,7 @@ name=ESP8266 Boards (3.2.0-dev)
 version=3.2.0-dev
 
 # These will be removed by the packager script when doing a JSON release
-runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
+runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf-gcc
 runtime.tools.python3.path={runtime.platform.path}/tools/python3
 
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool

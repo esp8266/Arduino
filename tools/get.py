@@ -14,7 +14,6 @@ import platform
 import sys
 import tarfile
 import zipfile
-import re
 
 verbose = True
 
@@ -48,29 +47,37 @@ def report_progress(count, blockSize, totalSize):
         sys.stdout.write("\r%d%%" % percent)
         sys.stdout.flush()
 
-def unpack(filename, destination):
+def unpack_impl(filename, destination):
+    file = None
     dirname = ''
-    print('Extracting {0}'.format(filename))
+
     if filename.endswith('tar.gz'):
-        tfile = tarfile.open(filename, 'r:gz')
-        tfile.extractall(destination)
-        dirname= tfile.getnames()[0]
+        file = tarfile.open(filename, 'r:gz')
+        file.extractall(destination)
+        dirname = tfile.getnames()[0]
     elif filename.endswith('zip'):
-        zfile = zipfile.ZipFile(filename)
-        zfile.extractall(destination)
+        file = zipfile.ZipFile(filename)
+        file.extractall(destination)
         dirname = zfile.namelist()[0]
     else:
         raise NotImplementedError('Unsupported archive type')
 
-    # a little trick to rename tool directories so they don't contain version number
-    rename_to = re.match(r'^([a-zA-Z_][^\-]*\-*)+', dirname).group(0).strip('-')
-    if rename_to != dirname:
-        print('Renaming {0} to {1}'.format(dirname, rename_to))
-        if os.path.isdir(rename_to):
-            shutil.rmtree(rename_to)
-        shutil.move(dirname, rename_to)
+    if file:
+        file.close()
 
-def get_tool(tool):
+    return dirname
+
+def unpack(name, filename, destination):
+    print(f'Extracting {filename}')
+    dirname = unpack_impl(filename, destination)
+
+    if dirname != name:
+        print(f'Renaming {dirname} to {name}')
+        if os.path.isdir(name):
+            shutil.rmtree(name)
+        shutil.move(dirname, name)
+
+def get_tool(name, tool):
     archive_name = tool['archiveFileName']
     local_path = dist_dir + archive_name
     url = tool['url']
@@ -81,21 +88,20 @@ def get_tool(tool):
         sys.stdout.write("\rDone\n")
         sys.stdout.flush()
     else:
-        print('Tool {0} already downloaded'.format(archive_name))
+        print(f'Tool "{name}" already downloaded as "{archive_name}"')
     local_hash = sha256sum(local_path)
     if local_hash != real_hash:
-        print('Hash mismatch for {0}, delete the file and try again'.format(local_path))
-        raise RuntimeError()
-    unpack(local_path, '.')
+        raise RuntimeError(f'Hash mismatch for tool {name} "{local_path}", delete the file and try again')
+    unpack(name, local_path, '.')
 
-def load_tools_list(filename, platform):
+def load_tools(filename, platform):
     tools_info = json.load(open(filename))['packages'][0]['tools']
-    tools_to_download = []
+    tools_to_download = {}
     for t in tools_info:
         tool_platform = [p for p in t['systems'] if p['host'] == platform]
-        if len(tool_platform) == 0:
+        if not tool_platform:
             continue
-        tools_to_download.append(tool_platform[0])
+        tools_to_download[t['name']] = tool_platform[0]
     return tools_to_download
 
 def identify_platform():
@@ -127,10 +133,12 @@ def main():
     if (os.path.exists('python3/python3')):
         os.unlink('python3/python3')
     print('Platform: {0}'.format(identify_platform()))
-    tools_to_download = load_tools_list('../package/package_esp8266com_index.template.json', identify_platform())
+    tools_to_download = load_tools(
+        '../package/package_esp8266com_index.template.json',
+        identify_platform())
     mkdir_p(dist_dir)
-    for tool in tools_to_download:
-        get_tool(tool)
+    for name, tool in tools_to_download.items():
+        get_tool(name, tool)
 
 if __name__ == '__main__':
     main()
