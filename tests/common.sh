@@ -225,7 +225,7 @@ function build_sketches()
                 && step_summary "$sketch warnings" "$cache_dir/build.log"
         fi
 
-        print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
+        print_size_info "$core_path"/tools/xtensa-lx106-elf-gcc/bin/xtensa-lx106-elf-size \
             $build_dir/*.elf >>$cache_dir/size.log
 
         echo ::endgroup::
@@ -443,7 +443,7 @@ function install_platformio()
     pio pkg install --global --skip-dependencies --platform "https://github.com/platformio/platform-espressif8266.git"
 
     local framework_symlink="framework-arduinoespressif8266 @ symlink://${ESP8266_ARDUINO_BUILD_DIR}"
-    local toolchain_symlink="toolchain-xtensa @ symlink://${ESP8266_ARDUINO_BUILD_DIR}/tools/xtensa-lx106-elf/"
+    local toolchain_symlink="toolchain-xtensa @ symlink://${ESP8266_ARDUINO_BUILD_DIR}/tools/xtensa-lx106-elf-gcc/"
 
     # pre-generate config; pio-ci with multiple '-O' replace each other instead of appending to the same named list
     # (and, it is much nicer to write this instead of a multi-line cmdline with several large strings)

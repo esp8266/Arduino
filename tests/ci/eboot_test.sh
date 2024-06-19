@@ -3,7 +3,7 @@
 set -ev
 
 root=$(git rev-parse --show-toplevel)
-READELF="$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-readelf"
+READELF="$root/tools/xtensa-lx106-elf-gcc/bin/xtensa-lx106-elf-readelf"
 
 cd $root/tools
 python3 get.py -q

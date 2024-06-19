@@ -1,6 +1,8 @@
 #!/bin/bash
 # set -e
 
+root=$(git rev-parse --show-toplevel)
+
 single_sdk="${2}"
 if [[ -n "$single_sdk" ]]; then
   if [[ "NONOSDK" != "${single_sdk:0:7}" ]]; then
@@ -16,8 +18,8 @@ add_path_ifexist() {
   return 1
 }
 
-if ! which xtensa-lx106-elf-ar | grep "tools/xtensa-lx106-elf/bin" >>/dev/null; then
-  add_path_ifexist "../../../xtensa-lx106-elf/bin" || add_path_ifexist "../../xtensa-lx106-elf/bin"
+if ! which xtensa-lx106-elf-ar >>/dev/null; then
+  add_path_ifexist "$root/tools/xtensa-lx106-elf-gcc/bin"
 fi
 
 help_msg() {
