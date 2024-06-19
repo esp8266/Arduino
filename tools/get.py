@@ -54,11 +54,11 @@ def unpack_impl(filename, destination):
     if filename.endswith('tar.gz'):
         file = tarfile.open(filename, 'r:gz')
         file.extractall(destination)
-        dirname = tfile.getnames()[0]
+        dirname = file.getnames()[0]
     elif filename.endswith('zip'):
         file = zipfile.ZipFile(filename)
         file.extractall(destination)
-        dirname = zfile.namelist()[0]
+        dirname = file.namelist()[0]
     else:
         raise NotImplementedError('Unsupported archive type')
 
