@@ -8,6 +8,7 @@ import os
 import shutil
 import errno
 import os.path
+import pathlib
 import hashlib
 import json
 import platform
@@ -65,17 +66,19 @@ def unpack_impl(filename, destination):
     if file:
         file.close()
 
-    return dirname
+    return pathlib.Path(destination) / dirname
 
 def unpack(name, filename, destination):
-    print(f'Extracting {filename}')
-    dirname = unpack_impl(filename, destination)
+    expected = pathlib.Path(destination) / name
 
-    if dirname != name:
-        print(f'Renaming {dirname} to {name}')
-        if os.path.isdir(name):
-            shutil.rmtree(name)
-        shutil.move(dirname, name)
+    print(f'Extracting {filename}')
+    output = unpack_impl(filename, destination)
+
+    if expected != output:
+        print(f'Renaming {output} to {expected}')
+        if expected.is_dir():
+            shutil.rmtree(expected)
+        output.rename(expected)
 
 def get_tool(name, tool):
     archive_name = tool['archiveFileName']
