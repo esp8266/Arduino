@@ -49,7 +49,7 @@ done
 # TODO should not be matched, these are formatted externally
 # exclude=$(git submodule --quiet foreach git rev-parse --show-toplevel | grep libraries)
 
-if [ -z $1 ] ; then
+if [ -z "$1" ] ; then
     style=${root}/tests/clang-format-arduino.yaml
     find libraries \
         -path libraries/ESP8266SdFat -prune -o \

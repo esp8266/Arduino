@@ -145,6 +145,16 @@ extern "C"
 }
 #endif
 
+namespace mock
+{
+namespace timer
+{
+
+    void loop();
+
+}  // namespace timer
+}  // namespace mock
+
 // tcp
 int     mockSockSetup(int sock);
 int     mockConnect(uint32_t addr, int& sock, int port);
@@ -177,6 +187,15 @@ void mock_stop_spiffs();
 void mock_start_littlefs(const String& fname, size_t size_kb, size_t block_kb = 8,
                          size_t page_b = 512);
 void mock_stop_littlefs();
+
+#ifdef __cplusplus
+#include <chrono>
+void mock_stop_task();
+void mock_loop_task(void (*)(), std::chrono::milliseconds interval, bool once,
+                    const bool& user_exit);
+#endif
+
+void mock_stop_all();
 
 //
 

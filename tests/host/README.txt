@@ -2,7 +2,7 @@
 Host Tests for Continuous Integration
 -------------------------------------
 
-	make FORCE32=0 OPTZ=-O0 CI
+	make FORCE32=0 OPTZ=-Og CI
 
 	(FORCE32=0: https://bugs.launchpad.net/ubuntu/+source/valgrind/+bug/948004)
 
@@ -43,7 +43,7 @@ run it:
 
 Optional 'V=1' enables makefile verbosity
 Optional 'D=1' enables core debug messages (same as Arduino IDE's tools/debug menu)
-Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, -D=1 implies -O0)
+Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, -D=1 implies -Og)
 Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gcc-multilib is not detected)
 Optional 'R="<options>"' (ex: R="-b -v") runs the executable with given options after build
 
