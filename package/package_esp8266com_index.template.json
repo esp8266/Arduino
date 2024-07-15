@@ -130,6 +130,9 @@
                   },
                   {
                      "name": "DOIT ESP-Mx DevKit (ESP8285)"
+                  },
+                  {
+                     "name": "MERCURY 1.0"
                   }
                ],
                "toolsDependencies": [
