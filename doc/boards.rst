@@ -262,6 +262,13 @@ ESPresso Lite 2.0
 
 ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
 
+Mercury 1.0
+-----------
+
+Based on ESP8266, Mercury is board developed by Ralio Technologies. Board supports on motor drivers and direct-connect feature for various endpoints.
+
+Product page: https://www.raliotech.com
+
 Phoenix 1.0
 -----------
 
