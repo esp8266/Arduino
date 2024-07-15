@@ -1027,7 +1027,24 @@ boards = collections.OrderedDict([
             'is a multi-chip package which contains ESP8266 and 1MB flash. '
         ],
 
-    })
+    }),
+    ( 'mercury1', {
+            'name': 'MERCURY 1.0',
+            'opts': {
+                '.build.board': 'mercury',
+                '.build.variant': 'mercury_v1',
+                },
+            'macro': [
+                'resetmethod_nodemcu',
+                'flashmode_dio',
+                'flashfreq_40',
+                '4M',
+                ],
+            'desc': [ 'ESP8266 based board that support onboard 2x brushed motor driver. Designed for beginners with age 10+ who aspire to become robotics engineers.',
+                      '',
+                      'Product page: https://www.raliotech.com/'
+                      ],
+        })
 	])
 
 
