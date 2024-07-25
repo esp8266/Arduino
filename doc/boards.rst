@@ -39,25 +39,30 @@ Minimal Hardware Setup for Bootloading and Usage
 +-----------------+------------+------------------+
 | GND             |            | GND              |
 +-----------------+------------+------------------+
-| TX or GPIO2\*   |            | RX               |
+| TX or GPIO2     |            |                  |
+| [#tx_or_gpio2]_ | RX         |                  |
 +-----------------+------------+------------------+
 | RX              |            | TX               |
 +-----------------+------------+------------------+
 | GPIO0           | PullUp     | DTR              |
 +-----------------+------------+------------------+
-| Reset\*         | PullUp     | RTS              |
+| Reset           |            |                  |
+| [#reset]_       | PullUp     | RTS              |
 +-----------------+------------+------------------+
-| GPIO15\*        | PullDown   |                  |
+| GPIO15          |            |                  |
+| [#gpio15]_      | PullDown   |                  |
 +-----------------+------------+------------------+
-| CH\_PD          | PullUp     |                  |
+| CH\_PD          |            |                  |
+| [#ch_pd]_       | PullUp     |                  |
 +-----------------+------------+------------------+
 
--  Note
--  GPIO15 is also named MTDO
--  Reset is also named RSBT or REST (adding PullUp improves the
+.. rubric:: Notes
+
+.. [#tx_or_gpio2] GPIO15 is also named MTDO
+.. [#reset] Reset is also named RSBT or REST (adding PullUp improves the
    stability of the module)
--  GPIO2 is alternative TX for the boot loader mode
--  **Directly connecting a pin to VCC or GND is not a substitute for a
+.. [#gpio15] GPIO2 is alternative TX for the boot loader mode
+.. [#ch_pd] **Directly connecting a pin to VCC or GND is not a substitute for a
    PullUp or PullDown resistor, doing this can break upload management
    and the serial console, instability has also been noted in some
    cases.**
@@ -88,15 +93,16 @@ ESPxx Hardware
 +---------------+------------+------------------+
 | GPIO0         |            | GND              |
 +---------------+------------+------------------+
-| Reset         |            | RTS\*            |
+| Reset         |            | RTS [#rts]_      |
 +---------------+------------+------------------+
 | GPIO15        | PullDown   |                  |
 +---------------+------------+------------------+
 | CH\_PD        | PullUp     |                  |
 +---------------+------------+------------------+
 
--  Note
--  if no RTS is used a manual power toggle is needed
+.. rubric:: Notes
+
+.. [#rts] if no RTS is used a manual power toggle is needed
 
 Minimal Hardware Setup for Running only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +182,11 @@ rst cause
 boot mode
 ~~~~~~~~~
 
-the first value respects the pin setup of the Pins 0, 2 and 15.
+the first value respects the pin setup of the Pins 0, 2 and 15
+
+.. code-block::
+
+    Number = (GPIO15 << 2) | (GPIO0 << 1) | GPIO2
 
 +----------+----------+---------+---------+-------------+
 | Number   | GPIO15   | GPIO0   | GPIO2   | Mode        |
@@ -198,7 +208,6 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 | 7        | 3.3V     | 3.3V    | 3.3V    | SDIO        |
 +----------+----------+---------+---------+-------------+
 
-note: - number = ((GPIO15 << 2) \| (GPIO0 << 1) \| GPIO2);
 
 Generic ESP8285 Module
 ----------------------
@@ -413,14 +422,10 @@ ThaiEasyElec's ESPino
 
 ESPino by ThaiEasyElec using WROOM-02 module from Espressif Systems with 4 MB Flash.
 
-We will update an English description soon. - Product page:
-http://thaieasyelec.com/products/wireless-modules/wifi-modules/espino-wifi-development-board-detail.html
-- Schematics:
-www.thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_Schematic.pdf -
-Dimensions:
-http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_Dimension.pdf
-- Pinouts:
-http://thaieasyelec.com/downloads/ETEE052/ETEE052\_ESPino\_User\_Manual\_TH\_v1\_0\_20160204.pdf (Please see pg. 8)
+* Product page (retired product): https://www.thaieasyelec.com/product/%E0%B8%A2%E0%B8%81%E0%B9%80%E0%B8%A5%E0%B8%B4%E0%B8%81%E0%B8%88%E0%B8%B3%E0%B8%AB%E0%B8%99%E0%B9%88%E0%B8%B2%E0%B8%A2-retired-espino-wifi-development-board/11000833173001086
+* Schematics: https://downloads.thaieasyelec.com/ETEE052/ETEE052\_ESPino\_Schematic.pdf
+* Dimensions: https://downloads.thaieasyelec.com/ETEE052/ETEE052\_ESPino\_Dimension.pdf
+* Pinouts (Please see pg.8): https://downloads.thaieasyelec.com/ETEE052/ETEE052\_ESPino\_User\_Manual\_TH\_v1\_0\_20160204.pdf
 
 WifInfo
 -------

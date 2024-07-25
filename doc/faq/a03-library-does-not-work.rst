@@ -7,7 +7,7 @@ This Arduino library doesn't work on ESP. How do I make it working?
 -  `Identify the Issues <#identify-the-issues>`__
 -  `Fix it Yourself <#fix-it-yourself>`__
 -  `Compilation Errors <#compilation-errors>`__
--  `Exceptions / Watchdog Resets <#exceptions--watchdog-resets>`__
+-  `Exceptions / Watchdog Resets <#exceptions-watchdog-resets>`__
 -  `Functionality Issues <#functionality-issues>`__
 -  `Conclusion <#conclusion>`__
 
