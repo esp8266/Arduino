@@ -3,7 +3,6 @@
 
 #include <ESP8266WebServer.h>
 #include <vector>
-#include <assert.h>
 
 namespace esp8266webserver {
 
@@ -16,7 +15,7 @@ public:
     /*
         note: old handler API for backward compatibility
     */
-    
+
     virtual bool canHandle(HTTPMethod method, const String& uri) {
         (void) method;
         (void) uri;
@@ -43,7 +42,7 @@ public:
         return false;
     }
     virtual bool handle(WebServerType& server, HTTPMethod requestMethod, const String& requestUri) {
-        (void) server; 
+        (void) server;
         (void) requestMethod;
         (void) requestUri;
         return false;
@@ -74,8 +73,11 @@ protected:
     std::vector<String> pathArgs;
 
 public:
-    const String& pathArg(unsigned int i) { 
-        assert(i < pathArgs.size());
+    size_t pathArgsSize() const {
+        return pathArgs.size();
+    }
+
+    const String& pathArg(unsigned int i) const {
         return pathArgs[i];
     }
 };
