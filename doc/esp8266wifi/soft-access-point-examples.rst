@@ -79,7 +79,9 @@ Sketch is small so analysis shouldn't be difficult. In first line we are includi
 
 Setting up of the access point ``ESPsoftAP_01`` is done by executing:
 
-``cpp  boolean result = WiFi.softAP("ESPsoftAP_01", "pass-to-soft-AP");``
+.. code:: cpp
+
+    boolean result = WiFi.softAP("ESPsoftAP_01", "pass-to-soft-AP");
 
 If this operation is successful then ``result`` will be ``true`` or ``false`` if otherwise. Basing on that either ``Ready`` or ``Failed!`` will be printed out by the following ``if - else`` conditional statement.
 

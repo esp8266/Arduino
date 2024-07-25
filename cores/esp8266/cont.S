@@ -26,8 +26,14 @@
 cont_suspend:
     /* a1: sp */
     /* a2: void* cont_ctx */
-    /* adjust stack and save registers */
+    /* adjust stack */
     addi    a1,  a1, -24
+
+    /* make sure that a1 points after cont_ctx.stack[] */
+    addi    a4,  a2, 32
+    bltu    a1,  a4, cont_overflow
+
+    /* save registers */
     s32i    a12, a1, 0
     s32i    a13, a1, 4
     s32i    a14, a1, 8
@@ -46,6 +52,11 @@ cont_suspend:
     /* sp <- cont_ctx.sp_ret */
     l32i    a1, a2, 4
     jx      a0
+
+cont_overflow:
+    mov.n   a3,  a1
+    movi    a4, __stack_overflow
+    jx      a4
 
 cont_continue:
     l32i    a12, a1, 0
@@ -113,7 +124,7 @@ cont_run:
     bnez    a4, cont_resume
     /* else */
     /* set new stack*/
-    l32i    a1, a2, 16;
+    l32i    a1, a2, 16
     /* goto pfn */
     movi    a2, cont_wrapper
     jx      a2
@@ -121,12 +132,15 @@ cont_run:
 cont_resume:
     /* a1 <- cont_ctx.sp_suspend */
     l32i    a1, a2, 12
+    /* make sure that a1 points after cont_ctx.stack[] */
+    addi    a5,  a2, 32
+    bltu    a1,  a5, cont_overflow
     /* reset yield flag, 0 -> cont_ctx.pc_suspend */
     movi    a3, 0
     s32i    a3, a2, 8
     /* jump to saved cont_ctx.pc_suspend */
     movi    a0, cont_ret
-    jx       a4
+    jx      a4
 
 cont_norm:
     /* calculate pointer to cont_ctx.struct_start from sp */

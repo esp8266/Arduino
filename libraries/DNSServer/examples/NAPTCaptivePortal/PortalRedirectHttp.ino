@@ -36,13 +36,11 @@ void sendPortalRedirect(String path, String targetName) {
     If the "Location" header element works the HTML stuff is never seen.
   */
   // https://tools.ietf.org/html/rfc7231#section-6.4.3
-  server.sendHeader("Location", path, true);
-  addNoCacheHeader();
   String reply = FPSTR(portalRedirectHTML);
   reply.reserve(reply.length() + 2 * path.length() + 80);
   reply.replace("{t}", targetName);
   reply.replace("{1}", path);
-  server.send(302, "text/html", reply);
+  server.redirect(path, reply);
 }
 
 #endif  // LWIP_FEATURES && !LWIP_IPV6

@@ -17,10 +17,10 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: false
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
@@ -39,13 +39,13 @@ jobs:
         lwip: ["default", "IPv6"]
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
@@ -63,13 +63,13 @@ jobs:
     name: Windows
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: false
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
@@ -88,13 +88,13 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: false
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ./tools/dist
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}

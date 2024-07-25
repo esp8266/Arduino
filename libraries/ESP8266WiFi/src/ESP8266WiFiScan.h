@@ -48,6 +48,7 @@ class ESP8266WiFiScanClass {
         uint8_t encryptionType(uint8_t networkItem);
         int32_t RSSI(uint8_t networkItem);
         uint8_t * BSSID(uint8_t networkItem);
+        uint8_t * BSSID(uint8_t networkItem, uint8_t* bssid);
         String BSSIDstr(uint8_t networkItem);
         int32_t channel(uint8_t networkItem);
         bool isHidden(uint8_t networkItem);

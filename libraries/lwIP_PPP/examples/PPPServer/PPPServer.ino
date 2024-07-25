@@ -20,7 +20,6 @@
 #include <lwip/dns.h>
 #include <PPPServer.h>
 #include <ESP8266WiFi.h>
-#include <SoftwareSerial.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -36,8 +35,8 @@
 #define RX 13  // d1mini D7
 #define TX 15  // d1mini D8
 
-SoftwareSerial ppplink(RX, TX);
-HardwareSerial& logger = Serial;
+HardwareSerial& ppplink = Serial;
+HardwareSerial& logger = Serial1;
 PPPServer ppp(&ppplink);
 
 void PPPConnectedCallback(netif* nif) {
@@ -74,7 +73,8 @@ void setup() {
   logger.printf("\nSTA: %s (dns: %s / %s)\n", WiFi.localIP().toString().c_str(), WiFi.dnsIP(0).toString().c_str(), WiFi.dnsIP(1).toString().c_str());
 
   ppplink.begin(PPPLINKBAUD);
-  ppplink.enableIntTx(true);
+  ppplink.swap();  // RX=GPIO13 TX=GPIO15
+
   logger.println();
   logger.printf("\n\nhey, trying to be a PPP server here\n\n");
   logger.printf("Now try this on your linux host:\n\n");

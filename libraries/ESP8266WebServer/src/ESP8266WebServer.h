@@ -116,11 +116,17 @@ public:
 
   typedef std::function<void(void)> THandlerFunction;
   typedef std::function<String(FS &fs, const String &fName)> ETagFunction;
+  typedef std::function<bool(ESP8266WebServerTemplate<ServerType> &server)> FilterFunction;
 
-  void on(const Uri &uri, THandlerFunction handler);
-  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  RequestHandler<ServerType>& on(const Uri &uri, THandlerFunction handler);
+  RequestHandler<ServerType>& on(const Uri &uri, HTTPMethod method, THandlerFunction fn);
+  RequestHandler<ServerType>& on(const Uri &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  bool removeRoute(const char *uri);
+  bool removeRoute(const char *uri, HTTPMethod method);
+  bool removeRoute(const String &uri);
+  bool removeRoute(const String &uri, HTTPMethod method);
   void addHandler(RequestHandlerType* handler);
+  bool removeHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
@@ -207,6 +213,30 @@ public:
     sendContent(emptyString);
   }
 
+  /**
+   * @brief  Redirect to another URL, e.g.
+   *   webserver.on("/index.html", HTTP_GET, []() { webserver.redirect("/"); });
+   * There are 3 points of redirection here:
+   *   1) "Location" element in the header
+   *   2) Disable client caching
+   *   3) HTML "content" element to redirect
+   * If the "Location" header element works the HTML content is never seen.
+   * https://tools.ietf.org/html/rfc7231#section-6.4.3
+   * @param  url URL to redirect to
+   * @param  content Optional redirect content
+   */
+  void redirect(const String& url, const String& content = emptyString) {
+    sendHeader(F("Location"), url, true);
+    sendHeader(F("Cache-Control"), F("no-cache, no-store, must-revalidate"));
+    sendHeader(F("Pragma"), F("no-cache"));
+    sendHeader(F("Expires"), F("-1"));
+    send(302, F("text/html"), content);  // send 302: "Found"
+    if (content.isEmpty()) {
+      // Empty content inhibits Content-length header so we have to close the socket ourselves.
+      client().stop();  // Stop is needed because we sent no content length
+    }
+  }
+
   // Whether other requests should be accepted from the client on the
   // same socket after a response is sent.
   // This will automatically configure the "Connection" header of the response.
@@ -282,6 +312,7 @@ public:
 
 protected:
   void _addRequestHandler(RequestHandlerType* handler);
+  bool _removeRequestHandler(RequestHandlerType *handler);
   void _handleRequest();
   void _finalizeResponse();
   ClientFuture _parseRequest(ClientType& client);
@@ -323,8 +354,6 @@ protected:
   RequestArgument* _currentArgs = nullptr;
   int              _currentArgsHavePlain = 0;
   std::unique_ptr<HTTPUpload> _currentUpload;
-  int              _postArgsLen = 0;
-  RequestArgument* _postArgs = nullptr;
 
   int              _headerKeysCount = 0;
   RequestArgument* _currentHeaders = nullptr;

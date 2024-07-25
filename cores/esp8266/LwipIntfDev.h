@@ -63,17 +63,31 @@ public:
         memset(&_netif, 0, sizeof(_netif));
     }
 
+    //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood
+    //to detect Arduino arg order, and handle it correctly.
     boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2,
                    const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
 
+    // two and one parameter version. 2nd parameter is DNS like in Arduino. IPv4 only
+    [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy "
+                 "function config(ip[,dns]) as chosen defaults may not match the local network "
+                 "configuration")]] boolean
+    config(IPAddress local_ip, IPAddress dns = INADDR_ANY);
+
     // default mac-address is inferred from esp8266's STA interface
     boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
+    void    end();
 
     const netif* getNetIf() const
     {
         return &_netif;
     }
 
+    uint8_t* macAddress(uint8_t* mac)
+    {
+        memcpy(mac, &_netif.hwaddr, 6);
+        return mac;
+    }
     IPAddress localIP() const
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.ip_addr)));
@@ -85,6 +99,21 @@ public:
     IPAddress gatewayIP() const
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
+    }
+    IPAddress dnsIP(int n = 0) const
+    {
+        return IPAddress(dns_getserver(n));
+    }
+    void setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY)
+    {
+        if (dns1.isSet())
+        {
+            dns_setserver(0, dns1);
+        }
+        if (dns2.isSet())
+        {
+            dns_setserver(1, dns2);
+        }
     }
 
     // 1. Currently when no default is set, esp8266-Arduino uses the first
@@ -138,6 +167,7 @@ protected:
     int8_t   _intrPin;
     uint8_t  _macAddress[6];
     bool     _started;
+    bool     _scheduled;
     bool     _default;
 };
 
@@ -173,6 +203,24 @@ boolean LwipIntfDev<RawDev>::config(const IPAddress& localIP, const IPAddress& g
         dns_setserver(1, dns2);
     }
     return true;
+}
+
+template<class RawDev>
+boolean LwipIntfDev<RawDev>::config(IPAddress local_ip, IPAddress dns)
+{
+    if (!local_ip.isSet())
+        return config(INADDR_ANY, INADDR_ANY, INADDR_ANY);
+
+    if (!local_ip.isV4())
+        return false;
+
+    IPAddress gw(local_ip);
+    gw[3] = 1;
+    if (!dns.isSet())
+    {
+        dns = gw;
+    }
+    return config(local_ip, gw, IPAddress(255, 255, 255, 0), dns);
 }
 
 template<class RawDev>
@@ -229,6 +277,7 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
     if (!netif_add(&_netif, ip_2_ip4(&ip_addr), ip_2_ip4(&netmask), ip_2_ip4(&gw), this,
                    netif_init_s, ethernet_input))
     {
+        RawDev::end();
         return false;
     }
 
@@ -242,10 +291,11 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
             break;
 
         case ERR_IF:
+            RawDev::end();
             return false;
 
         default:
-            netif_remove(&_netif);
+            end();
             return false;
         }
     }
@@ -272,20 +322,36 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
         }
     }
 
-    if (_intrPin < 0
-        && !schedule_recurrent_function_us(
+    if (_intrPin < 0 && !_scheduled)
+    {
+        _scheduled = schedule_recurrent_function_us(
             [&]()
             {
+                if (!_started)
+                {
+                    _scheduled = false;
+                    return false;
+                }
                 this->handlePackets();
                 return true;
             },
-            100))
-    {
-        netif_remove(&_netif);
-        return false;
+            100);
+        if (!_scheduled)
+        {
+            end();
+            return false;
+        }
     }
 
     return true;
+}
+
+template<class RawDev>
+void LwipIntfDev<RawDev>::end()
+{
+    netif_remove(&_netif);
+    _started = false;
+    RawDev::end();
 }
 
 template<class RawDev>

@@ -115,6 +115,7 @@ class Stream: public Print {
         // Arduino String functions to be added here
         virtual String readString();
         String readStringUntil(char terminator);
+        String readStringUntil(const char* terminator, uint32_t untilTotalNumberOfOccurrences = 1);
 
         virtual int read (uint8_t* buffer, size_t len);
         int read (char* buffer, size_t len) { return read((uint8_t*)buffer, len); }
@@ -195,21 +196,25 @@ class Stream: public Print {
         // returns number of transferred bytes
         size_t sendAvailable (Stream* to) { return sendGeneric(to, -1, -1, oneShotMs::alwaysExpired); }
         size_t sendAvailable (Stream& to) { return sendAvailable(&to); }
+        size_t sendAvailable (Stream&& to) { return sendAvailable(&to); }
 
         // transfers data until timeout
         // returns number of transferred bytes
         size_t sendAll (Stream* to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, -1, timeoutMs); }
         size_t sendAll (Stream& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
+        size_t sendAll (Stream&& to, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendAll(&to, timeoutMs); }
 
         // transfers data until a char is encountered (the char is swallowed but not transferred) with timeout
         // returns number of transferred bytes
         size_t sendUntil (Stream* to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, -1, readUntilChar, timeoutMs); }
         size_t sendUntil (Stream& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
+        size_t sendUntil (Stream&& to, const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendUntil(&to, readUntilChar, timeoutMs); }
 
         // transfers data until requested size or timeout
         // returns number of transferred bytes
         size_t sendSize (Stream* to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendGeneric(to, maxLen, -1, timeoutMs); }
         size_t sendSize (Stream& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
+        size_t sendSize (Stream&& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamRemaining () { return -1; }

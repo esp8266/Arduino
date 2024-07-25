@@ -4,6 +4,7 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
+#include <uri/UriGlob.h>
 
 /*
    This example serves a "hello world" on a WLAN and a SoftAP at the same time.
@@ -74,8 +75,8 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
-  server.on("/generate_204", handleRoot);  // Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);        // Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on(UriGlob("/generate_204*"), handleRoot);  // Android captive portal. Handle "/generate_204_<uuid>"-like requests. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot);                  // Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
   server.onNotFound(handleNotFound);
   server.begin();  // Web server start
   Serial.println("HTTP server started");

@@ -23,38 +23,45 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "cont.h"
+#include "core_esp8266_features.h"
 #include "debug.h"
+
+#include "cont.h"
 
 extern "C"
 {
 
-static constexpr unsigned int CONT_STACKGUARD { 0xfeefeffe };
+static constexpr uint32_t CONT_STACKSIZE_U32 { sizeof(cont_t::stack) / sizeof(*cont_t::stack) };
 
 void cont_init(cont_t* cont) {
     memset(cont, 0, sizeof(cont_t));
     
     cont->stack_guard1 = CONT_STACKGUARD;
     cont->stack_guard2 = CONT_STACKGUARD;
-    cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
+    cont->stack_end = &cont->stack[0] + CONT_STACKSIZE_U32;
     cont->struct_start = (unsigned*) cont;
     
     // fill stack with magic values to check high water mark
-    for(int pos = 0; pos < (int)(sizeof(cont->stack) / 4); pos++)
+    for(int pos = 0; pos < (int)(CONT_STACKSIZE_U32); pos++)
     {
         cont->stack[pos] = CONT_STACKGUARD;
     }
 }
 
-void IRAM_ATTR cont_check(cont_t* cont) {
-    if ((cont->stack_guard1 == CONT_STACKGUARD)
-     && (cont->stack_guard2 == CONT_STACKGUARD))
+void IRAM_ATTR cont_check_guard(cont_t* cont) {
+    if ((cont->stack_guard1 != CONT_STACKGUARD)
+     || (cont->stack_guard2 != CONT_STACKGUARD))
     {
-        return;
+        __stack_chk_fail();
+        __builtin_unreachable();
     }
+}
 
-    __stack_chk_fail();
-    __builtin_unreachable();
+void IRAM_ATTR cont_check_overflow(cont_t* cont) {
+    if (cont->sp_suspend && (cont->sp_suspend < &cont->stack[0])) {
+        __stack_overflow(cont, cont->sp_suspend);
+        __builtin_unreachable();
+    }
 }
 
 // No need for this to be in IRAM, not expected to be IRQ called

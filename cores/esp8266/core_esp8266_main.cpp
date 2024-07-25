@@ -262,7 +262,7 @@ static void loop_wrapper() {
     }
     loop();
     loop_end();
-    cont_check(g_pcont);
+    cont_check_guard(g_pcont);
     if (serialEventRun) {
         serialEventRun();
     }
