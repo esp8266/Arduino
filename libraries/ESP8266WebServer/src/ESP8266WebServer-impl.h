@@ -664,6 +664,13 @@ const String& ESP8266WebServerTemplate<ServerType>::pathArg(unsigned int i) cons
 }
 
 template <typename ServerType>
+const int ESP8266WebServerTemplate<ServerType>::pathArgs() const {
+  if (_currentHandler != nullptr)
+    return _currentHandler->pathArgs();
+  return 0;
+}
+
+template <typename ServerType>
 const String& ESP8266WebServerTemplate<ServerType>::arg(const String& name) const {
   for (int i = 0; i < _currentArgCount + _currentArgsHavePlain; ++i) {
     if ( _currentArgs[i].key == name )
