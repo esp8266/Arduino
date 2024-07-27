@@ -349,9 +349,12 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
 template<class RawDev>
 void LwipIntfDev<RawDev>::end()
 {
-    netif_remove(&_netif);
-    _started = false;
-    RawDev::end();
+    if (_started)
+    {
+        netif_remove(&_netif);
+        _started = false;
+        RawDev::end();
+    }
 }
 
 template<class RawDev>
