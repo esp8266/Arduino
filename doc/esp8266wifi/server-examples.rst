@@ -16,7 +16,6 @@ Table of Contents
 -  `The Page is Served <#the-page-is-served>`__
 -  `Get it Together <#put-it-together>`__
 -  `Get it Run <#get-it-run>`__
--  `What Else? <#what-else>`__
 -  `Conclusion <#conclusion>`__
 
 The Object

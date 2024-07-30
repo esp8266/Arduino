@@ -9,7 +9,7 @@ I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to r
 -  `Reset Methods <#reset-methods>`__
 -  `Ck <#ck>`__
 -  `Nodemcu <#nodemcu>`__
--  `I'm Stuck <#im-stuck>`__
+-  `I'm Stuck <#i-m-stuck>`__
 -  `Conclusion <#conclusion>`__
 
 Introduction
