@@ -71,8 +71,8 @@ $(shell mkdir -p $(BINDIR))
 # Core files sometimes override libc functions, check when necessary to hide them
 # TODO proper configure script / other build system?
 ifeq (,$(wildcard $(BINDIR)/.have_strlcpy))
-$(shell echo -e '#include <cstring>\nint main(){char a[4]{}; char b[4]{}; strlcpy(&a[0], &b[0], sizeof(a)); return 0;}' | \
-	$(CXX) -x c++ - -o $(BINDIR)/.have_strlcpy 2>/dev/null || ( echo -e '#!/bin/sh\nexit 1' > $(BINDIR)/.have_strlcpy ; chmod +x $(BINDIR)/.have_strlcpy; ))
+$(shell printf '#include <cstring>\nint main(){char a[4]{}; char b[4]{}; strlcpy(&a[0], &b[0], sizeof(a)); return 0;}\n' | \
+	$(CXX) -x c++ - -o $(BINDIR)/.have_strlcpy 2>/dev/null || ( printf '#!/bin/sh\nexit 1\n' > $(BINDIR)/.have_strlcpy ; chmod +x $(BINDIR)/.have_strlcpy; ))
 endif
 
 $(shell $(BINDIR)/.have_strlcpy)
@@ -81,8 +81,8 @@ FLAGS += -DSTRLCPY_MISSING
 endif
 
 ifeq (,$(wildcard $(BINDIR)/.have_strlcat))
-$(shell echo -e '#include <cstring>\nint main(){char a[4]{}; strlcat(&a[0], "test", sizeof(a)); return 0;}' | \
-	$(CXX) -x c++ - -o $(BINDIR)/.have_strlcat 2>/dev/null || ( echo -e '#!/bin/sh\nexit 1' > $(BINDIR)/.have_strlcat ; chmod +x $(BINDIR)/.have_strlcat; ))
+$(shell printf '#include <cstring>\nint main(){char a[4]{}; strlcat(&a[0], "test", sizeof(a)); return 0;}\n' | \
+	$(CXX) -x c++ - -o $(BINDIR)/.have_strlcat 2>/dev/null || ( printf '#!/bin/sh\nexit 1\n' > $(BINDIR)/.have_strlcat ; chmod +x $(BINDIR)/.have_strlcat; ))
 endif
 
 $(shell $(BINDIR)/.have_strlcat)
