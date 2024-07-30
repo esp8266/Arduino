@@ -13,8 +13,8 @@ const char* jigsaw_host = "jigsaw.w3.org";
 const uint16_t jigsaw_port = 443;
 
 // CN: w3.org => name: w3_org
-// not valid before: 2024-01-26 00:00:00
-// not valid after:  2024-12-31 23:59:59
+// not valid before: 2024-01-26 00:00:00+00:00
+// not valid after:  2024-12-31 23:59:59+00:00
 const char fingerprint_w3_org [] PROGMEM = "07:f2:bd:4c:d0:ce:58:da:13:03:9d:a9:0d:df:e9:5b:60:5f:7f:a5";
 const char pubkey_w3_org [] PROGMEM = R"PUBKEY(
 -----BEGIN PUBLIC KEY-----
@@ -25,8 +25,8 @@ EZ9D7g5JfO7TUZH+nxWxCT7njoKgD9yvJZYTy/oijTdhB7o7knUsBLRj8A==
 
 // http://cacerts.digicert.com/CloudflareIncECCCA-3.crt
 // CN: Cloudflare Inc ECC CA-3 => name: Cloudflare_Inc_ECC_CA_3
-// not valid before: 2020-01-27 12:48:08
-// not valid after:  2024-12-31 23:59:59
+// not valid before: 2020-01-27 12:48:08+00:00
+// not valid after:  2024-12-31 23:59:59+00:00
 const char cert_Cloudflare_Inc_ECC_CA_3 [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIQCjeHZF5ftIwiTv0b7RQMPDANBgkqhkiG9w0BAQsFADBa
