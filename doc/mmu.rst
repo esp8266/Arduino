@@ -250,5 +250,3 @@ address range of IRAM or DRAM.
    uint8_t mmu_set_uint8(void *p8, const uint8_t val);
    uint16_t mmu_set_uint16(uint16_t *p16, const uint16_t val);
    int16_t mmu_set_int16(int16_t *p16, const int16_t val);
-
-::
