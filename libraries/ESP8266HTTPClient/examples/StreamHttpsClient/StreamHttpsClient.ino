@@ -1,7 +1,5 @@
 /**
-   StreamHTTPClient.ino
-
-    Created on: 24.05.2015
+   Based on StreamHTTPClient.ino
 
 */
 
@@ -9,8 +7,9 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-
 #include <ESP8266HTTPClient.h>
+
+#include "certs.h"
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -37,23 +36,27 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    auto certs = std::make_unique<BearSSL::X509List>(cert_Amazon_RSA_2048_M02);
+    auto client = std::make_unique<BearSSL::WiFiClientSecure>();
 
-    bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
-    Serial.printf("\nConnecting to https://tls.mbed.org\n");
+    client->setTrustAnchors(certs.get());
+    // Or, if you prefer to use fingerprinting:
+    // client->setFingerprint(fingerprint___mbed_com);
+    // This is *not* a recommended option, as fingerprint changes with the host certificate
+
+    // Or, if you are *absolutely* sure it is ok to ignore the SSL certificate:
+    // client->setInsecure();
+
+    bool mfln = client->probeMaxFragmentLength(mbed_host, mbed_port, 1024);
+    Serial.printf("\nConnecting to %s:%hu...\n", mbed_host, mbed_port);
     Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
     if (mfln) { client->setBufferSizes(1024, 1024); }
 
     Serial.print("[HTTPS] begin...\n");
 
-    // configure server and url
-    const uint8_t fingerprint[20] = { 0x15, 0x77, 0xdc, 0x04, 0x7c, 0x00, 0xf8, 0x70, 0x09, 0x34, 0x24, 0xf4, 0xd3, 0xa1, 0x7a, 0x6c, 0x1e, 0xa3, 0xe0, 0x2a };
-
-    client->setFingerprint(fingerprint);
-
     HTTPClient https;
 
-    if (https.begin(*client, "https://tls.mbed.org/")) {
+    if (https.begin(*client, mbed_host, mbed_port)) {
 
       Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
