@@ -76,8 +76,8 @@ $(shell echo -e '#include <cstring>\nint main(){char a[4]{}; char b[4]{}; strlcp
 endif
 
 $(shell $(BINDIR)/.have_strlcpy)
-ifeq ($(.SHELLSTATUS), 0)
-FLAGS += -DHAVE_STRLCPY
+ifneq ($(.SHELLSTATUS), 0)
+FLAGS += -DSTRLCPY_MISSING
 endif
 
 ifeq (,$(wildcard $(BINDIR)/.have_strlcat))
@@ -86,8 +86,8 @@ $(shell echo -e '#include <cstring>\nint main(){char a[4]{}; strlcat(&a[0], "tes
 endif
 
 $(shell $(BINDIR)/.have_strlcat)
-ifeq ($(.SHELLSTATUS), 0)
-FLAGS += -DHAVE_STRLCAT
+ifneq ($(.SHELLSTATUS), 0)
+FLAGS += -DSTRLCAT_MISSING
 endif
 
 # Actual build recipes

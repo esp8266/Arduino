@@ -6,7 +6,7 @@
 
 extern "C"
 {
-#ifndef HAVE_STRLCAT
+#ifdef STRLCAT_MISSING
     // '_cups_strlcat()' - Safely concatenate two strings.
 
     size_t                   /* O - Length of string */
@@ -43,9 +43,9 @@ extern "C"
 
         return (dstlen + srclen);
     }
-#endif /* !HAVE_STRLCAT */
+#endif /* STRLCAT_MISSING */
 
-#ifndef HAVE_STRLCPY
+#ifdef STRLCPY_MISSING
     // '_cups_strlcpy()' - Safely copy two strings.
 
     size_t                   /* O - Length of string */
@@ -73,6 +73,6 @@ extern "C"
 
         return (srclen);
     }
-#endif /* !HAVE_STRLCPY */
+#endif /* STRLCPY_MISSING */
 
 }  // extern "C"

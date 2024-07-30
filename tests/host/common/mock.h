@@ -67,10 +67,10 @@ extern "C"
 #endif
     char* utoa(unsigned value, char* result, int base);
     char* itoa(int value, char* result, int base);
-#ifndef HAVE_STRLCAT
+#ifdef STRLCAT_MISSING
     size_t strlcat(char* dst, const char* src, size_t size);
 #endif
-#ifndef HAVE_STRLCPY
+#ifdef STRLCPY_MISSING
     size_t strlcpy(char* dst, const char* src, size_t size);
 #endif
 #ifdef __cplusplus
