@@ -45,6 +45,17 @@ def ls_files(patterns):
     return out
 
 
+def diff_lines():
+    proc = subprocess.run(
+        ["git", "--no-pager", "diff", "--ignore-submodules"],
+        capture_output=True,
+        check=True,
+        universal_newlines=True,
+    )
+
+    return proc.stdout.split("\n")
+
+
 def find_files(patterns):
     """Filesystem search, matches both git and non-git files"""
     return [
@@ -98,7 +109,7 @@ FILES_PRESETS = {
 @dataclass
 class Changed:
     file: str
-    hunk: list[str]
+    hunk: str
     lines: list[int]
 
 
@@ -126,16 +137,17 @@ class Context:
         self.reset_with_line(line)
 
 
-def changed_files():
+def changed_files_for_diff(lines: list[str] | str) -> list[Changed]:
     """
-    Naive git-diff output parser. Generates list[Changed] for every file changed after clang-format.
+    Naive git-diff output parser. Generates list of objects for every file changed after clang-format.
     """
-    proc = subprocess.run(
-        ["git", "--no-pager", "diff"],
-        capture_output=True,
-        check=True,
-        universal_newlines=True,
-    )
+    match lines:
+        case str():
+            lines = lines.split("\n")
+        case list():
+            pass
+        case _:
+            raise ValueError("Unknown 'lines' type, can be either list[str] or str")
 
     ctx = Context()
     out = []
@@ -143,11 +155,13 @@ def changed_files():
     # TODO: pygit2?
     # ref. https://github.com/cpp-linter/cpp-linter/blob/main/cpp_linter/git/__init__.py ::parse_diff
     # ref. https://github.com/libgit2/pygit2/blob/master/src/diff.c ::parse_diff
-    for line in proc.stdout.split("\n"):
+    for line in lines:
         # '--- a/path/to/changed/file' most likely
-        # '--- a/dev/null' aka created file. should be ignored, same as removed ones
+        # '--- /dev/null' aka created file. should be ignored, same as removed ones
         if line.startswith("---"):
             ctx.pop(out, line)
+
+            _, file = line.split(" ")
             ctx.deleted = "/dev/null" in file
 
         # '+++ b/path/to/changed/file' most likely
@@ -183,6 +197,10 @@ def changed_files():
     return out
 
 
+def changed_files() -> list[Changed]:
+    return changed_files_for_diff(diff_lines())
+
+
 def errors_changed(changed: Changed):
     all_lines = ", ".join(str(x) for x in changed.lines)
     for line in changed.lines:
@@ -204,12 +222,14 @@ def summary_diff(changed: Changed):
 
 
 def stdout_diff():
-    subprocess.run(["git", "--no-pager", "diff"])
+    subprocess.run(["git", "--no-pager", "diff", "--ignore-submodules"])
 
 
 def assert_unchanged():
     subprocess.run(
-        ["git", "diff", "--exit-code"], check=True, stdout=subprocess.DEVNULL
+        ["git", "diff", "--ignore-submodules", "--exit-code"],
+        check=True,
+        stdout=subprocess.DEVNULL,
     )
 
 
