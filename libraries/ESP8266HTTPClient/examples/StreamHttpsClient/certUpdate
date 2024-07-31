@@ -1,0 +1,2 @@
+cd ${0%/*} 2>/dev/null
+python3 ../../../../tools/cert.py -s tls.mbed.org -n mbed > certs.h
