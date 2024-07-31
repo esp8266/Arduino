@@ -1,5 +1,5 @@
 #!/bin/sh
-# requires clang-format, git, python3 with pyyaml
+# requires python3, git, and runnable clang-format (specified below)
 
 set -e -x
 
@@ -11,51 +11,13 @@ test -d ${root}/libraries
 # default to v15, latest stable version from ubuntu-latest Github Actions image
 CLANG_FORMAT=${CLANG_FORMAT:-clang-format-15}
 
-#########################################
-# 'all' variable should be "cores/esp8266 libraries"
-
-all=${1:-"
-cores/esp8266/Lwip*
-libraries/ESP8266mDNS
-libraries/Wire
-libraries/lwIP*
-cores/esp8266/debug*
-cores/esp8266/core_esp8266_si2c.cpp
-cores/esp8266/StreamString.*
-cores/esp8266/StreamSend.*
-libraries/Netdump
-tests
-"}
-
-#########################################
-# restyling core & libraries
-
 cd $root
+python $root/tests/restyle.py format --clang-format=$CLANG_FORMAT preset --include core --include arduino
 
-style=${root}/tests/clang-format-core.yaml
-for target in $all; do
-    if [ -d "$target" ]; then
-        find $target \
-            '(' -name "*.cpp" -o -name "*.c" -o -name "*.h" ')' \
-            -exec $CLANG_FORMAT --verbose --style="file:$style" -i {} \;
-    else
-        $CLANG_FORMAT --verbose --style="file:$style" -i $target
-    fi
-done
-
-#########################################
-# restyling arduino examples
-
-# TODO should not be matched, these are formatted externally
-# exclude=$(git submodule --quiet foreach git rev-parse --show-toplevel | grep libraries)
-
-if [ -z $1 ] ; then
-    style=${root}/tests/clang-format-arduino.yaml
-    find libraries \
-        -path libraries/ESP8266SdFat -prune -o \
-        -path libraries/Ethernet -prune -o \
-        -path libraries/SoftwareSerial -prune -o \
-        -name '*.ino' -exec $CLANG_FORMAT --verbose --style="file:$style" -i {} \;
+if [ $CI = "true" ] ; then
+    echo foo
+    python $root/tests/restyle.py assert --with-summary --with-errors
+else
+    echo bar
+    python $root/tests/restyle.py assert --with-diff
 fi
-
-#########################################
