@@ -23,7 +23,7 @@ TZIF_MAGIC = b"TZif"
 UTC_VALUE  = "UTC0"
 ENCODING   = "utf-8"
 
-def known_alias(entry: str) -> Optional[str]
+def known_alias(entry: str) -> Optional[str]:
     swaps = {
         "Europe/Zaporozhye": "Europe/Zaporizhzhia",
         "Europe/Uzhgorod": "Europe/Uzhhorod",
