@@ -174,5 +174,3 @@ if __name__ == "__main__":
         elif args.format == "header":
             header(zones)
 
-if __name__ == "__main__":
-    main()
