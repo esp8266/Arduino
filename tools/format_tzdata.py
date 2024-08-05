@@ -9,18 +9,21 @@ import argparse
 import contextlib
 import datetime
 import mmap
-import os
-import pathlib
-import re
 import sys
-import pathlib
 
 from importlib import resources
+from pathlib   import Path
+from typing    import List, Tuple, Optional
 
 import tzdata  # https://tzdata.readthedocs.io/en/latest/
 
+# Let us use constants for defaults:
 
-def known_alias(entry):
+TZIF_MAGIC = b"TZif"
+UTC_VALUE  = "UTC0"
+ENCODING   = "utf-8"
+
+def known_alias(entry: str) -> Optional[str]
     swaps = {
         "Europe/Zaporozhye": "Europe/Zaporizhzhia",
         "Europe/Uzhgorod": "Europe/Uzhhorod",
@@ -29,7 +32,7 @@ def known_alias(entry):
     return swaps.get(entry)
 
 
-def fix_name(name):
+def fix_name(name: str) -> str:
     swaps = [["-", "m"], ["+", "p"], ["/", "_"]]
 
     for lhs, rhs in swaps:
@@ -38,7 +41,7 @@ def fix_name(name):
     return name
 
 
-def utc_alias(zone):
+def utc_alias(zone: str) -> bool:
     return zone in (
         "Universal",
         "UTC",
@@ -52,7 +55,7 @@ def utc_alias(zone):
     )
 
 
-def tzdata_resource_from_name(name):
+def tzdata_resource_from_name(name: str) -> Path:
     pair = name.rsplit("/", 1)
     if len(pair) == 1:
         return resources.files("tzdata.zoneinfo") / pair[0]
@@ -60,11 +63,11 @@ def tzdata_resource_from_name(name):
     return resources.files(f'tzdata.zoneinfo.{pair[0].replace("/", ".")}') / pair[1]
 
 
-def make_zones_list(f):
+def make_zones_list(f) -> List[str]:
     return [zone.strip() for zone in f.readlines()]
 
 
-def make_zones(args):
+def make_zones(args: argparse.Namespace) -> List[Tuple[str, str]]:
     out = []
 
     for zone in make_zones_list(args.zones):
@@ -75,7 +78,7 @@ def make_zones(args):
 
         with target.open("rb") as f:
             magic = f.read(4)
-            if magic != b"TZif":
+            if magic != TZIF_MAGIC:
                 continue
 
             m = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
@@ -84,8 +87,7 @@ def make_zones(args):
                 continue
 
             m.seek(newline + 1)
-            tz = m.readline().strip()
-            tz = tz.decode("ascii")
+            tz = m.readline().strip().decode(ENCODING)
 
             if alias := known_alias(zone):
                 out.append([alias, tz])
@@ -96,7 +98,7 @@ def make_zones(args):
     return out
 
 
-def markdown(zones):
+def markdown(zones: List[Tuple[str, str]]) -> None:
     utcs = []
     rows = []
 
@@ -105,7 +107,7 @@ def markdown(zones):
             utcs.append(name)
             continue
 
-        rows.append(f"|{name}|`{value}`|")
+        rows.append(f"|{name}|`{UTC_VALUE}`|")
 
     print("|Name|Value|")
     print("|---|---|")
@@ -125,11 +127,11 @@ def markdown(zones):
     print(f"*Generated with *{tzdata.IANA_VERSION=} {tzdata.__version__=}*")
 
 
-def header(zones):
+def header(zones: List[Tuple[str, str]]) -> None:
     print("// ! ! ! DO NOT EDIT, AUTOMATICALLY GENERATED ! ! !")
     print(f"// File created {datetime.datetime.now(tz=datetime.timezone.utc)}")
     print(f"// Based on IANA database {tzdata.IANA_VERSION}")
-    print(f"// Re-run <esp8266 arduino core>/tools/{sys.argv[0]} to update")
+    print(f"// Re-run <esp8266 arduino core>/tools/{Path(sys.argv[0]).name} to update")
     print()
     print("#pragma once")
     print()
@@ -143,7 +145,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output",
-        type=argparse.FileType("w", encoding="utf-8"),
+        type=argparse.FileType("w", encoding=ENCODING),
         default=sys.stdout,
     )
     parser.add_argument(
@@ -153,14 +155,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--zones",
-        type=argparse.FileType("r", encoding="utf-8"),
+        type=argparse.FileType("r", encoding=ENCODING),
         help="Zone names file, one per line",
-        default=os.path.join(os.path.dirname(tzdata.__file__), "zones"),
+        default=Path(tzdata.__file__).parent / "zones",
     )
     parser.add_argument(
         "--root",
         help="Where do we get raw zoneinfo files from",
-        type=pathlib.Path,
+        type=Path,
     )
 
     args = parser.parse_args()
@@ -171,3 +173,6 @@ if __name__ == "__main__":
             markdown(zones)
         elif args.format == "header":
             header(zones)
+
+if __name__ == "__main__":
+    main()
