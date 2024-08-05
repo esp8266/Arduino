@@ -52,32 +52,48 @@ def process_baud_rate(baud_rate: str) -> str:
 
 def create_erase_file(erase_len: str) -> Path:
 
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+    try:
 
-        temp_file.write(bytearray([0xff] * int(erase_len, 0)))
+        erase_length = int(erase_len, 0)
 
-    return Path(temp_file.name)
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(bytearray([0xff] * erase_length))
+            
+        return Path(temp_file.name)
+    
+    except ValueError:
+
+        sys.stderr.write(f"Invalid erase length: {erase_len}\n")
+
+        sys.exit(1)
+
+
+def validate_write_flash_args(addr: str, file_path: str) -> None:
+    try:
+        int(addr, 0)  
+    except ValueError:
+        sys.stderr.write(f"Invalid flash address: {addr}\n")
+        sys.exit(1)
+    
+    if not Path(file_path).is_file():
+        sys.stderr.write(f"Flash file not found: {file_path}\n")
+        sys.exit(1)
 
 def build_command_line(args: argparse.Namespace) -> Tuple[List[str], Optional[Path]]:
-
     cmdline = args.additional_args + ["write_flash"]
     
     if args.erase_flash:
-
         cmdline.append("--erase-all")
     
     cmdline.extend(["--flash_size", "detect"])
     
     if args.write_flash:
-
-        cmdline.extend([args.write_flash[0], args.write_flash[1]])
+        validate_write_flash_args(args.write_flash[0], args.write_flash[1])
+        cmdline.extend(args.write_flash)
     
     erase_file = None
-
     if args.erase_region:
-
         erase_file = create_erase_file(args.erase_region[1])
-        
         cmdline.extend([args.erase_region[0], str(erase_file)])
     
     return cmdline, erase_file
@@ -95,13 +111,14 @@ def main():
     
     try:
         esptool.main(cmdline)
+
     except Exception as e:
-        sys.stderr.write(f'\nA fatal esptool.py error occurred: {e}')
+        sys.stderr.write(f'\nA fatal esptool.py error occurred: {e}\n')
+        sys.exit(2)
+
     finally:
         if erase_file:
-            erase_file.unlink()
-        if any(sys.exc_info()):
-            sys.exit(2)
+            erase_file.unlink(missing_ok=True)
 
 if __name__ == "__main__":
     main()
