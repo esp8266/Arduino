@@ -26,25 +26,17 @@
 extern "C" {
 #include "libb64/cencode.h"
 }
-#include "base64.h"
+#include "Base64.h"
+#include <algorithm>
 
-/**
- * convert input data to base64
- * @param data const uint8_t *
- * @param length size_t
- * @return String
- */
-String base64::encode(const uint8_t * data, size_t length, bool doNewLines)
+String Base64::encode(const uint8_t* data, size_t length, bool doNewLines)
 {
     String base64;
-
-    // base64 needs more size then the source data, use cencode.h macros
-    size_t size = ((doNewLines ? base64_encode_expected_len( length )
-                    : base64_encode_expected_len_nonewlines( length )) + 1);
-
+    // base64 needs more size than the source data, use cencode.h macros
+    size_t size = ((doNewLines ? base64_encode_expected_len(length)
+                    : base64_encode_expected_len_nonewlines(length)) + 1);
     if (base64.reserve(size))
     {
-
         base64_encodestate _state;
         if (doNewLines)
         {
@@ -54,13 +46,16 @@ String base64::encode(const uint8_t * data, size_t length, bool doNewLines)
         {
             base64_init_encodestate_nonewlines(&_state);
         }
-
         constexpr size_t BUFSIZE = 48;
         char buf[BUFSIZE + 1 /* newline */ + 1 /* NUL */];
         for (size_t len = 0; len < length; len += BUFSIZE * 3 / 4)
         {
-            size_t blocklen = base64_encode_block((const char*) data + len,
-                                                  std::min( BUFSIZE * 3 / 4, length - len ), buf, &_state);
+            size_t blocklen = base64_encode_block(
+                reinterpret_cast<const char*>(data + len),
+                std::min(BUFSIZE * 3 / 4, length - len),
+                buf,
+                &_state
+            );
             buf[blocklen] = '\0';
             base64 += buf;
         }
@@ -71,6 +66,10 @@ String base64::encode(const uint8_t * data, size_t length, bool doNewLines)
     {
         base64 = F("-FAIL-");
     }
-
     return base64;
+}
+
+String Base64::encode(const String& text, bool doNewLines)
+{
+    return encode(reinterpret_cast<const uint8_t*>(text.c_str()), text.length(), doNewLines);
 }
