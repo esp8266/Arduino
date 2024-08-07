@@ -32,6 +32,7 @@
 #include "core_esp8266_features.h"
 
 #include "spi_utils.h"
+#include "spi_flash_defs.h"
 
 extern "C" uint32_t Wait_SPI_Idle(SpiFlashChip *fc);
 
@@ -51,12 +52,12 @@ namespace experimental {
 static SpiOpResult PRECACHE_ATTR
 _SPICommand(volatile uint32_t spiIfNum,
             uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
-            uint32_t *data,uint32_t writeWords,uint32_t readWords)
+            uint32_t *data,uint32_t writeWords,uint32_t readWords, uint32_t pre_cmd)
 {
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
 
-  // force SPI register access via base+offset. 
+  // force SPI register access via base+offset.
   // Prevents loading individual address constants from flash.
   uint32_t *spibase = (uint32_t*)(spiIfNum ? &(SPI1CMD) : &(SPI0CMD));
   #define SPIREG(reg) (*((volatile uint32_t *)(spibase+(&(reg) - &(SPI0CMD)))))
@@ -65,6 +66,7 @@ _SPICommand(volatile uint32_t spiIfNum,
   // Everything defined here must be volatile or the optimizer can
   // treat them as constants, resulting in the flash reads we're
   // trying to avoid
+  SpiFlashOpResult (* volatile SPI_write_enablep)(SpiFlashChip *) = SPI_write_enable;
   uint32_t (* volatile Wait_SPI_Idlep)(SpiFlashChip *) = Wait_SPI_Idle;
   volatile SpiFlashChip *fchip=flashchip;
   volatile uint32_t spicmdusr=SPICMDUSR;
@@ -77,15 +79,30 @@ _SPICommand(volatile uint32_t spiIfNum,
      PRECACHE_START();
      Wait_SPI_Idlep((SpiFlashChip *)fchip);
   }
-  
+
   // preserve essential controller state such as incoming/outgoing
   // data lengths and IO mode.
   uint32_t oldSPI0U = SPIREG(SPI0U);
   uint32_t oldSPI0U2= SPIREG(SPI0U2);
   uint32_t oldSPI0C = SPIREG(SPI0C);
 
-  //SPI0S &= ~(SPISE|SPISBE|SPISSE|SPISCD);
   SPIREG(SPI0C) = spic;
+
+  if (SPI_FLASH_CMD_WREN == pre_cmd) {
+     // See SPI_write_enable comments in esp8266_undocumented.h
+     SPI_write_enablep((SpiFlashChip *)fchip);
+  } else
+  if (pre_cmd) {
+     // Send prefix cmd w/o data - sends 8 bits. eg. Volatile SR Write Enable, 0x50
+     SPIREG(SPI0U)  = (spiu & ~(SPIUMOSI|SPIUMISO));
+     SPIREG(SPI0U1) = 0;
+     SPIREG(SPI0U2) = (spiu2 & ~0xFFFFu) | pre_cmd;
+
+     SPIREG(SPI0CMD) = spicmdusr;   //Send cmd
+     while ((SPIREG(SPI0CMD) & spicmdusr));
+  }
+
+  //SPI0S &= ~(SPISE|SPISBE|SPISSE|SPISCD);
   SPIREG(SPI0U) = spiu;
   SPIREG(SPI0U1)= spiu1;
   SPIREG(SPI0U2)= spiu2;
@@ -117,11 +134,22 @@ _SPICommand(volatile uint32_t spiIfNum,
   SPIREG(SPI0U) = oldSPI0U;
   SPIREG(SPI0U2)= oldSPI0U2;
   SPIREG(SPI0C) = oldSPI0C;
-  
-  PRECACHE_END();
+
   if (!spiIfNum) {
+      // w/o a call to Wait_SPI_Idlep, 'Exception 0' or other exceptions (saw
+      // 28) may occur later after returning to iCache code. This issue was
+      // observed with non-volatile status register writes.
+      //
+      // My guess is: Returning too soon to uncached iCache executable space. An
+      // iCache read may not complete properly because the Flash or SPI
+      // interface is still busy with the last write operation. In such a case,
+      // I expect new reads from iROM to result in zeros. This would explain
+      // the Exception 0 for code, and Exception 20, 28, and 29 where a literal
+      // was misread as 0 and then used as a pointer.
+      Wait_SPI_Idlep((SpiFlashChip *)fchip);
       xt_wsr_ps(saved_ps);
   }
+  PRECACHE_END();
   return (timeout>0 ? SPI_RESULT_OK : SPI_RESULT_TIMEOUT);
 }
 
@@ -139,12 +167,37 @@ _SPICommand(volatile uint32_t spiIfNum,
  *	miso_bits
  *		Number of bits to read from the SPI bus after the outgoing
  *		data has been sent.
+ *  pre_cmd
+ *    A few SPI Flash commands require enable commands to immediately preceed
+ *    them. Since two calls to SPI0Command from ICACHE memory most likely would
+ *    be separated by SPI Flash read request for iCache, use this option to
+ *    supply a prefix command, 8-bits w/o read or write data.
+ *
+ *    Case in point from the GD25Q32E datasheet: "The Write Enable for Volatile
+ *    Status Register command must be issued prior to a Write Status Register
+ *    command and any other commands can’t be inserted between them."
  *
  *  Note: This code has only been tested with SPI bus 0, but should work
  *        equally well with other buses. The ESP8266 has bus 0 and 1,
  *        newer chips may have more one day.
+ *
+ *  Supplemental Notes:
+ *
+ *  SPI Bus wire view: Think of *data as an array of bytes, byte[0] goes out
+ *  first with the most significant bit shifted out first and so on. When
+ *  thinking of the data as an array of 32bit-words, the least significant byte
+ *  of the first 32bit-word goes out first on the SPI bus with the most
+ *  significant bit of that byte shifted out first onto the wire.
+ *
+ *  When presenting a 3 or 4-byte address, the byte order will need to be
+ *  reversed. Don't overthink it. For a 3-byte address, view *data as a byte
+ *  array and set the first 3-bytes to the address. eg. byteData[0] MSB,
+ *  byteData[1] middle, and byteData[2] LSB.
+ *
+ *  When sending a fractional byte, fill in the most significant bit positions
+ *  of the byte first.
  */
-SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits) {
+SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_t miso_bits, uint32_t pre_cmd) {
   if (mosi_bits>(64*8))
      return SPI_RESULT_ERR;
   if (miso_bits>(64*8))
@@ -159,8 +212,16 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   if (miso_bits % 32 != 0)
      miso_words++;
 
+  // Use SPI_CS_SETUP to add time for #CS to settle (ringing) before SPI CLK
+  // begins. The BootROM does not do this; however, RTOS SDK and NONOS SDK do
+  // as part of flash init/configuration.
+  //
+  // One SPI bus clock cycle time inserted between #CS active and the 1st SPI
+  // bus clock cycle. The number of clock cycles is in SPI_CNTRL2
+  // SPI_SETUP_TIME, which defaults to 1.
+  //
   // Select user defined command mode in the controller
-  uint32_t spiu=SPIUCOMMAND; //SPI_USR_COMMAND
+  uint32_t spiu=SPIUCOMMAND | SPIUCSSETUP; //SPI_USR_COMMAND | SPI_CS_SETUP
 
   // Set the command byte to send
   uint32_t spiu2 = ((7 & SPIMCOMMAND)<<SPILCOMMAND) | cmd;
@@ -183,12 +244,19 @@ SpiOpResult SPI0Command(uint8_t cmd, uint32_t *data, uint32_t mosi_bits, uint32_
   spic &= ~(SPICQIO | SPICDIO | SPICQOUT | SPICDOUT | SPICAHB | SPICFASTRD);
   spic |= (SPICRESANDRES | SPICSHARE | SPICWPR | SPIC2BSE);
 
-  SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words);
+  SpiOpResult rc =_SPICommand(0,spic,spiu,spiu1,spiu2,data,mosi_words,miso_words,pre_cmd);
 
   if (rc==SPI_RESULT_OK) {
-     // clear any bits we did not read in the last word.
-     if (miso_bits % 32) {
-        data[miso_bits/32] &= ~(0xFFFFFFFF << (miso_bits % 32));
+     // Clear any bits we did not read in the last word. Bits in a fractional
+     // bytes will be stored in the most significant part of the byte first.
+     if (miso_bits % 32u) {
+        uint32_t whole_byte_bits = (miso_bits % 32u) & ~7u;
+        uint32_t mask = ~(0xFFFFFFFFu << whole_byte_bits);
+        if (miso_bits % 8u) {
+           // Select fractional byte bits.
+           mask |= (~(0xFFu >> (miso_bits % 8u)) & 0xFFu) << whole_byte_bits;
+        }
+        data[miso_bits/32u] &= mask;
      }
   }
   return rc;

@@ -63,8 +63,16 @@ public:
         memset(&_netif, 0, sizeof(_netif));
     }
 
+    //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood
+    //to detect Arduino arg order, and handle it correctly.
     boolean config(const IPAddress& local_ip, const IPAddress& arg1, const IPAddress& arg2,
                    const IPAddress& arg3 = IPADDR_NONE, const IPAddress& dns2 = IPADDR_NONE);
+
+    // two and one parameter version. 2nd parameter is DNS like in Arduino. IPv4 only
+    [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy "
+                 "function config(ip[,dns]) as chosen defaults may not match the local network "
+                 "configuration")]] boolean
+    config(IPAddress local_ip, IPAddress dns = INADDR_ANY);
 
     // default mac-address is inferred from esp8266's STA interface
     boolean begin(const uint8_t* macAddress = nullptr, const uint16_t mtu = DEFAULT_MTU);
@@ -75,14 +83,10 @@ public:
         return &_netif;
     }
 
-    uint8_t* macAddress(uint8_t* mac)  // WiFi lib way
+    uint8_t* macAddress(uint8_t* mac)
     {
         memcpy(mac, &_netif.hwaddr, 6);
         return mac;
-    }
-    void MACAddress(uint8_t* mac)  // Ethernet lib way
-    {
-        macAddress(mac);
     }
     IPAddress localIP() const
     {
@@ -96,15 +100,11 @@ public:
     {
         return IPAddress(ip4_addr_get_u32(ip_2_ip4(&_netif.gw)));
     }
-    IPAddress dnsIP(int n) const  // WiFi lib way
+    IPAddress dnsIP(int n = 0) const
     {
         return IPAddress(dns_getserver(n));
     }
-    IPAddress dnsServerIP() const  // Ethernet lib way
-    {
-        return dnsIP(0);
-    }
-    void setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY)  // WiFi lib way
+    void setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY)
     {
         if (dns1.isSet())
         {
@@ -114,10 +114,6 @@ public:
         {
             dns_setserver(1, dns2);
         }
-    }
-    void setDnsServerIP(const IPAddress dnsIP)  // Ethernet lib way
-    {
-        setDNS(dnsIP);
     }
 
     // 1. Currently when no default is set, esp8266-Arduino uses the first
@@ -207,6 +203,24 @@ boolean LwipIntfDev<RawDev>::config(const IPAddress& localIP, const IPAddress& g
         dns_setserver(1, dns2);
     }
     return true;
+}
+
+template<class RawDev>
+boolean LwipIntfDev<RawDev>::config(IPAddress local_ip, IPAddress dns)
+{
+    if (!local_ip.isSet())
+        return config(INADDR_ANY, INADDR_ANY, INADDR_ANY);
+
+    if (!local_ip.isV4())
+        return false;
+
+    IPAddress gw(local_ip);
+    gw[3] = 1;
+    if (!dns.isSet())
+    {
+        dns = gw;
+    }
+    return config(local_ip, gw, IPAddress(255, 255, 255, 0), dns);
 }
 
 template<class RawDev>
@@ -335,12 +349,12 @@ boolean LwipIntfDev<RawDev>::begin(const uint8_t* macAddress, const uint16_t mtu
 template<class RawDev>
 void LwipIntfDev<RawDev>::end()
 {
-    netif_remove(&_netif);
-    ip_addr_copy(_netif.ip_addr, ip_addr_any);  // to allow DHCP at next begin
-    ip_addr_copy(_netif.netmask, ip_addr_any);
-    ip_addr_copy(_netif.gw, ip_addr_any);
-    _started = false;
-    RawDev::end();
+    if (_started)
+    {
+        netif_remove(&_netif);
+        _started = false;
+        RawDev::end();
+    }
 }
 
 template<class RawDev>

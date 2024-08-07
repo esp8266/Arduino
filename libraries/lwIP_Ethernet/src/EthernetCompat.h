@@ -86,6 +86,13 @@ public:
         return ret;
     }
 
+    void end()
+    {
+        ip_addr_copy(LwipIntfDev<RawDev>::_netif.ip_addr,
+                     ip_addr_any);  // to allow DHCP at next begin
+        LwipIntfDev<RawDev>::end();
+    }
+
     HardwareStatus hardwareStatus() const
     {
         return _hardwareStatus;
@@ -94,6 +101,21 @@ public:
     int maintain() const
     {
         return DHCP_CHECK_NONE;
+    }
+
+    void MACAddress(uint8_t* mac)
+    {
+        LwipIntfDev<RawDev>::macAddress(mac);
+    }
+
+    IPAddress dnsServerIP() const
+    {
+        return LwipIntfDev<RawDev>::dnsIP(0);
+    }
+
+    void setDnsServerIP(const IPAddress dnsIP)
+    {
+        LwipIntfDev<RawDev>::setDNS(dnsIP);
     }
 
 protected:

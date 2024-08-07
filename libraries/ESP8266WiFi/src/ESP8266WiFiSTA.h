@@ -46,6 +46,12 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         //to detect Arduino arg order, and handle it correctly. Be aware that the Arduino default value handling doesn't
         //work here (see Arduino docs for gway/subnet defaults). In other words: at least 3 args must always be given.
         bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = INADDR_ANY, IPAddress dns2 = INADDR_ANY);
+
+        // two and one parameter version. 2nd parameter is DNS like in Arduino
+        // IPv4 only
+        [[deprecated("It is discouraged to use this 1 or 2 parameters network configuration legacy function config(ip[,dns]) as chosen defaults may not match the local network configuration")]]
+        bool config(IPAddress local_ip, IPAddress dns = INADDR_ANY);
+
         bool setDNS(IPAddress dns1, IPAddress dns2 = INADDR_ANY);
 
         bool reconnect();

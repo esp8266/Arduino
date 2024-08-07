@@ -39,10 +39,15 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    auto certs = std::make_unique<BearSSL::X509List>(cert_Cloudflare_Inc_ECC_CA_3);
+    auto client = std::make_unique<BearSSL::WiFiClientSecure>();
 
-    client->setFingerprint(fingerprint_sni_cloudflaressl_com);
-    // Or, if you happy to ignore the SSL certificate, then use the following line instead:
+    client->setTrustAnchors(certs.get());
+    // Or, if you prefer to use fingerprinting:
+    // client->setFingerprint(fingerprint_w3_org);
+    // This is *not* a recommended option, as fingerprint changes with the host certificate
+
+    // Or, if you are *absolutely* sure it is ok to ignore the SSL certificate:
     // client->setInsecure();
 
     HTTPClient https;

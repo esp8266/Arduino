@@ -359,9 +359,14 @@ void ArduinoOTAClass::_runUpdate() {
 }
 
 void ArduinoOTAClass::end() {
+    if (!_initialized)
+      return;
+
     _initialized = false;
-    _udp_ota->unref();
-    _udp_ota = 0;
+    if(_udp_ota){
+        _udp_ota->unref();
+        _udp_ota = 0;
+    }
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
     if(_useMDNS){
         MDNS.end();
