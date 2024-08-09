@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+extern void stack_thunk_yield(void);
+
 extern void stack_thunk_add_ref();
 extern void stack_thunk_del_ref();
 extern void stack_thunk_repaint();
