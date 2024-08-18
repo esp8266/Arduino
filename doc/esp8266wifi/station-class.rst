@@ -473,7 +473,7 @@ Function returns one of the following connection statuses:
 - ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses
 - ``WL_DISCONNECTED`` if module is not configured in station mode
 
-Returned value is type of ``wl_status_t`` defined in `wl\_definitions.h <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/include/wl_definitions.h>`__
+Returned value is type of ``wl_status_t`` defined in `wl\_definitions.h <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/wl_definitions.h>`__
 
 *Example code:*
 
@@ -511,7 +511,7 @@ Returned value is type of ``wl_status_t`` defined in `wl\_definitions.h <https:/
     Connection status: 3
     Connected, IP address: 192.168.1.10
 
-Particular connection statuses 6 and 3 may be looked up in `wl\_definitions.h <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/include/wl_definitions.h>`__ as follows:
+Particular connection statuses 6 and 3 may be looked up in `wl\_definitions.h <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/wl_definitions.h>`__ as follows:
 
 ::
 
