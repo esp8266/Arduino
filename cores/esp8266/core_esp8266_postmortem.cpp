@@ -118,7 +118,7 @@ static inline void ets_println() { ets_printf_P(PSTR("\n")); }
 
 static void cut_here() {
 #ifdef NO_CUT_HERE
-	return;
+    return;
 #endif
 
     // https://tinyurl.com/8266dcdr => https://arduino-esp8266.readthedocs.io/en/latest/faq/a02-my-esp-crashes.html#exception
