@@ -125,11 +125,11 @@ static void cut_here() {
     ets_printf_P(PSTR("\nTo make this dump useful, DECODE IT - https://tinyurl.com/8266dcdr\n"));
 
     for (auto i = 0; i < 15; i++ ) {
-        ets_uart_putc1('-');
+        crash_ets_uart_putc1('-');
     }
     ets_printf_P(PSTR(" CUT HERE FOR EXCEPTION DECODER "));
     for (auto i = 0; i < 15; i++ ) {
-        ets_uart_putc1('-');
+        crash_ets_uart_putc1('-');
     }
     ets_println();
 }
