@@ -216,7 +216,7 @@ Requirements
 Application Example
 ~~~~~~~~~~~~~~~~~~~
 
-Instructions below show configuration of OTA on a NodeMCU 1.0 (ESP-12E Module) board. You can use any other board that meets the `requirements <#basic-requirements>`__ described above. This instruction is valid for all operating systems supported by the Arduino IDE. Screen captures have been made on Windows 7 and you may see small differences (like name of the serial port), if you are using Linux or MacOS.
+Instructions below show configuration of OTA on a NodeMCU 1.0 (ESP-12E Module) board. You can use any other board that meets the `requirements <#ota-basic-requirements>`__ described above. This instruction is valid for all operating systems supported by the Arduino IDE. Screen captures have been made on Windows 7 and you may see small differences (like name of the serial port), if you are using Linux or MacOS.
 
 1. Before you begin, please make sure that you have the following software
    installed:
@@ -336,7 +336,7 @@ Select COM port and baud rate on external terminal program as if you were using 
    :alt: Termite settings
 
 
-Then run OTA from IDE and look what is displayed on terminal. Successful `ArduinoOTA <#arduinoota>`__ process using BasicOTA.ino sketch looks like below (IP address depends on your network configuration):
+Then run OTA from IDE and look what is displayed on terminal. Successful `ArduinoOTA <#arduino-ide>`__ process using BasicOTA.ino sketch looks like below (IP address depends on your network configuration):
 
 .. figure:: a-ota-external-serial-terminal-output.png
    :alt: OTA upload successful - output on an external serial terminal
@@ -407,7 +407,7 @@ The sample implementation provided below has been done using:
    ``ESP8266HTTPUpdateServer`` library,
 -  NodeMCU 1.0 (ESP-12E Module).
 
-You can use another module if it meets previously described `requirements <#basic-requirements>`__.
+You can use another module if it meets previously described `requirements <#ota-basic-requirements>`__.
 
 1. Before you begin, please make sure that you have the following
    software installed:

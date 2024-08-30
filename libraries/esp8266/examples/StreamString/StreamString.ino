@@ -54,7 +54,7 @@ void testStreamString() {
   {
     // We use a a lighter StreamConstPtr(input) to make a read-only Stream out of
     // a String that obviously should not be modified during the time the
-    // StreamConstPtr instance is used.  It is used as a source to be sent to
+    // StreamConstPtr instance is used.  It is used as a read-only source to be sent to
     // 'result'.
 
     result.clear();
@@ -77,7 +77,7 @@ void testStreamString() {
     // Now inputString is made into a Stream using S2Stream,
     // and set in non-consume mode (using ::resetPointer()).
 
-    // Then, after that input is read once, it won't be anymore readable
+    // Then, after input is read once, it won't be anymore readable
     // until the pointer is reset.
 
     S2Stream input(inputString);
@@ -87,7 +87,7 @@ void testStreamString() {
     input.sendAll(result);
     input.sendAll(result);
     check("S2Stream.sendAll(StreamString)", result.c_str(), "hello");
-    check("unmodified String given to S2Stream", inputString.c_str(), "hello");
+    check("String given to S2Stream is unmodified", inputString.c_str(), "hello");
   }
 
   {
@@ -101,6 +101,17 @@ void testStreamString() {
     input.sendAll(result);
     input.sendAll(result);
     check("S2Stream.resetPointer(2):", result.c_str(), "llo");
+  }
+
+  {
+    // Streaming to a regular String
+
+    String someSource{ F("hello") };
+    String someDestString;
+
+    StreamConstPtr(someSource).sendAll(S2Stream(someDestString));
+    StreamConstPtr(someSource).sendAll(S2Stream(someDestString));
+    check("StreamConstPtr(someSource).sendAll(S2Stream(someDestString))", someDestString.c_str(), "hellohello");
   }
 
   {
@@ -181,7 +192,8 @@ void setup() {
 
   testStreamString();
 
-  Serial.printf("sizeof: String:%d Stream:%d StreamString:%d SStream:%d\n", (int)sizeof(String), (int)sizeof(Stream), (int)sizeof(StreamString), (int)sizeof(S2Stream));
+  Serial.printf("sizeof: String:%zu Stream:%zu StreamString:%zu S2Stream:%zu StreamConstPtr:%zu\n",
+                sizeof(String), sizeof(Stream), sizeof(StreamString), sizeof(S2Stream), sizeof(StreamConstPtr));
 }
 
 #endif

@@ -21,8 +21,6 @@ It features
 * Only files in the root folder are supported for simplicity - no directories.
 
 
-
-
 ## Implementing a web server
 
 The ESP8266WebServer library offers a simple path to implement a web server on a ESP8266 board.
@@ -90,7 +88,7 @@ that actually has only one line of functionality by sending a string as result t
 > });
 > ```
 
-Here the text from a static String with html code is returned instead of a file from the filesystem. 
+Here the text from a static string with html code is returned instead of a file from the filesystem. 
 The content of this string can be found in the file `builtinfiles.h`. It contains a small html+javascript implementation
 that allows uploading new files into the empty filesystem.
 
@@ -100,14 +98,14 @@ Just open <http://webserver/$upload.htm> and drag some files from the data folde
 ## Registering a function to handle requests to the server without a path
 
 Often servers are addressed by using the base URL like <http://webserver/> where no further path details is given.
-Of course we like the user to be redirected to something usable. Therefore the `handleRoot()` function is registered:
+Of course we like the user to be redirected to something usable. Therefore the `handleRedirect()` function is registered:
 
 > ```CPP
-> server.on("/$upload.htm", handleRoot);
+> server.on("/", HTTP_GET, handleRedirect);
 > ```
 
-The `handleRoot()` function checks the filesystem for the file named **/index.htm** and creates a redirect to this file when the file exists.
-Otherwise the redirection goes to the built-in **/$upload.htm** web page.
+The `handleRedirect()` function checks the filesystem for the file named **/index.htm** and creates a redirect
+response to this file when the file exists. Otherwise the redirection goes to the built-in **/$upload.htm** web page.
 
 
 
@@ -122,7 +120,7 @@ The **serveStatic** plug in is part of the library and handles delivering files 
 > ```
 
 
-### Cross-Origin Ressource Sharing (CORS)
+### Cross-Origin Resource Sharing (CORS)
 
 The `enableCORS(true)` function adds a `Access-Control-Allow-Origin: *` http-header to all responses to the client
 to inform that it is allowed to call URLs and services on this server from other web sites.

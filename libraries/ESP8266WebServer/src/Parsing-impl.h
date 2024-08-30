@@ -106,7 +106,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
   //attach handler
   RequestHandlerType* handler;
   for (handler = _firstHandler; handler; handler = handler->next()) {
-    if (handler->canHandle(_currentMethod, _currentUri))
+    if (handler->canHandle(*this, _currentMethod, _currentUri))
       break;
   }
   _currentHandler = handler;
@@ -324,7 +324,7 @@ int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& d
 template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
-    if(_currentHandler && _currentHandler->canUpload(_currentUri))
+    if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
     _currentUpload->totalSize += _currentUpload->currentSize;
     _currentUpload->currentSize = 0;
@@ -358,9 +358,8 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
   client.readStringUntil('\n');
   //start reading the form
   if (line == ("--"+boundary)){
-    if(_postArgs) delete[] _postArgs;
-    _postArgs = new RequestArgument[WEBSERVER_MAX_POST_ARGS];
-    _postArgsLen = 0;
+    std::unique_ptr<RequestArgument[]> postArgs(new RequestArgument[WEBSERVER_MAX_POST_ARGS]);
+    int postArgsLen = 0;
     while(1){
       String argName;
       String argValue;
@@ -408,7 +407,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             }
             DBGWS("PostArg Value: %s\n\n", argValue.c_str());
 
-            RequestArgument& arg = _postArgs[_postArgsLen++];
+            RequestArgument& arg = postArgs[postArgsLen++];
             arg.key = argName;
             arg.value = argValue;
 
@@ -426,7 +425,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
             _currentUpload->currentSize = 0;
             _currentUpload->contentLength = len;
             DBGWS("Start File: %s Type: %s\n", _currentUpload->filename.c_str(), _currentUpload->type.c_str());
-            if(_currentHandler && _currentHandler->canUpload(_currentUri))
+            if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
               _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->status = UPLOAD_FILE_WRITE;
 
@@ -464,11 +463,11 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                 }
             }
             // Found the boundary string, finish processing this file upload
-            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+            if (_currentHandler && _currentHandler->canUpload(*this, _currentUri))
                 _currentHandler->upload(*this, _currentUri, *_currentUpload);
             _currentUpload->totalSize += _currentUpload->currentSize;
             _currentUpload->status = UPLOAD_FILE_END;
-            if (_currentHandler && _currentHandler->canUpload(_currentUri))
+            if (_currentHandler && _currentHandler->canUpload(*this, _currentUri))
                 _currentHandler->upload(*this, _currentUri, *_currentUpload);
             DBGWS("End File: %s Type: %s Size: %d\n",
                 _currentUpload->filename.c_str(),
@@ -488,25 +487,20 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
     }
 
     int iarg;
-    int totalArgs = ((WEBSERVER_MAX_POST_ARGS - _postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - _postArgsLen):_currentArgCount;
+    int totalArgs = ((WEBSERVER_MAX_POST_ARGS - postArgsLen) < _currentArgCount)?(WEBSERVER_MAX_POST_ARGS - postArgsLen):_currentArgCount;
     for (iarg = 0; iarg < totalArgs; iarg++){
-      RequestArgument& arg = _postArgs[_postArgsLen++];
+      RequestArgument& arg = postArgs[postArgsLen++];
       arg.key = _currentArgs[iarg].key;
       arg.value = _currentArgs[iarg].value;
     }
-    if (_currentArgs) delete[] _currentArgs;
-    _currentArgs = new RequestArgument[_postArgsLen];
-    for (iarg = 0; iarg < _postArgsLen; iarg++){
+    delete[] _currentArgs;
+    _currentArgs = new RequestArgument[postArgsLen];
+    for (iarg = 0; iarg < postArgsLen; iarg++){
       RequestArgument& arg = _currentArgs[iarg];
-      arg.key = _postArgs[iarg].key;
-      arg.value = _postArgs[iarg].value;
+      arg.key = postArgs[iarg].key;
+      arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    if (_postArgs) {
-      delete[] _postArgs;
-      _postArgs = nullptr;
-      _postArgsLen = 0;
-    }
     return true;
   }
   DBGWS("Error: line: %s\n", line.c_str());
@@ -548,7 +542,7 @@ String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
 template <typename ServerType>
 bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
-  if(_currentHandler && _currentHandler->canUpload(_currentUri))
+  if(_currentHandler && _currentHandler->canUpload(*this, _currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }

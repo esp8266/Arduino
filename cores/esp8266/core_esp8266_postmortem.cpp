@@ -40,6 +40,7 @@ extern "C" {
 // using numbers different from "REASON_" in user_interface.h (=0..6)
 enum rst_reason_sw
 {
+    REASON_USER_STACK_OVERFLOW = 252,
     REASON_USER_STACK_SMASH = 253,
     REASON_USER_SWEXCEPTION_RST = 254
 };
@@ -62,7 +63,7 @@ static struct PostmortemInfo {
 
     // Common way to notify about where the stack smashing happened
     // (but, **only** if caller uses our handler function)
-    uint32_t stacksmash_addr = 0;
+    uint32_t stack_chk_addr = 0;
 } s_pm;
 
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
@@ -198,7 +199,7 @@ static void postmortem_report(uint32_t sp_dump) {
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset"));
-        const char infinite_loop[] = { 0x06, 0xff, 0xff };  // loop: j loop
+        const uint8_t infinite_loop[] = { 0x06, 0xff, 0xff };  // loop: j loop
         if (is_pc_valid(rst_info.epc1) && 0 == memcmp_P(infinite_loop, (PGM_VOID_P)rst_info.epc1, 3u)) {
             // The SDK is riddled with these. They are usually preceded by an ets_printf.
             ets_printf_P(PSTR(" - deliberate infinite loop detected"));
@@ -208,17 +209,23 @@ static void postmortem_report(uint32_t sp_dump) {
             rst_info.exccause, /* Address executing at time of Soft WDT level-1 interrupt */ rst_info.epc1, 0, 0, 0, 0);
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
-        ets_printf_P(PSTR("\nStack smashing detected.\n"));
-        ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            5 /* Alloca exception, closest thing to stack fault*/, s_pm.stacksmash_addr, 0, 0, 0, 0);
+        ets_printf_P(PSTR("\nStack smashing detected at 0x%08x\n"), s_pm.stack_chk_addr);
+    }
+    else if (rst_info.reason == REASON_USER_STACK_OVERFLOW) {
+        ets_printf_P(PSTR("\nStack overflow detected\n"));
     }
     else {
         ets_printf_P(PSTR("\nGeneric Reset\n"));
     }
 
-    uint32_t cont_stack_start = (uint32_t) &(g_pcont->stack);
-    uint32_t cont_stack_end = (uint32_t) g_pcont->stack_end;
-    uint32_t stack_end;
+    uint32_t cont_stack_start;
+    if (rst_info.reason == REASON_USER_STACK_SMASH) {
+        cont_stack_start = s_pm.stack_chk_addr;
+    } else {
+        cont_stack_start = (uint32_t) (&g_pcont->stack[0]);
+    }
+
+    uint32_t cont_stack_end = cont_stack_start + CONT_STACKSIZE;
 
     // amount of stack taken by interrupt or exception handler
     // and everything up to __wrap_system_restart_local
@@ -232,7 +239,7 @@ static void postmortem_report(uint32_t sp_dump) {
         //  16 ?unnamed? - index into a table, pull out pointer, and call if non-zero
         //     appears near near wDev_ProcessFiq
         //  32 pp_soft_wdt_feed_local - gather the specifics and call __wrap_system_restart_local
-        offset =  32 + 16 + 48 + 256;
+        offset = 32 + 16 + 48 + 256;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
         // Stack Tally
@@ -259,15 +266,21 @@ static void postmortem_report(uint32_t sp_dump) {
         sp_dump = stack_thunk_get_cont_sp();
     }
 
-    if (sp_dump > cont_stack_start && sp_dump < cont_stack_end) {
+    uint32_t stack_end;
+
+    // above and inside of cont, dump from the sp to the bottom of the stack
+    if ((rst_info.reason == REASON_USER_STACK_OVERFLOW)
+     || ((sp_dump > cont_stack_start) && (sp_dump < cont_stack_end)))
+    {
         ets_printf_P(PSTR("\nctx: cont\n"));
         stack_end = cont_stack_end;
     }
+    // in system, reposition to a known address
+    // it's actually 0x3ffffff0, but the stuff below ets_run
+    // is likely not really relevant to the crash
     else {
         ets_printf_P(PSTR("\nctx: sys\n"));
         stack_end = 0x3fffffb0;
-        // it's actually 0x3ffffff0, but the stuff below ets_run
-        // is likely not really relevant to the crash
     }
 
     ets_printf_P(PSTR("sp: %08x end: %08x offset: %04x\n"), sp_dump, stack_end, offset);
@@ -313,11 +326,20 @@ static void print_stack(uint32_t start, uint32_t end) {
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
+        // avoid printing irrelevant data
+        if ((values[0] == CONT_STACKGUARD)
+         && (values[0] == values[1])
+         && (values[1] == values[2])
+         && (values[2] == values[3]))
+        {
+            continue;
+        }
+
         // rough indicator: stack frames usually have SP saved as the second word
-        bool looksLikeStackFrame = (values[2] == pos + 0x10);
+        const bool looksLikeStackFrame = (values[2] == pos + 0x10);
 
         ets_printf_P(PSTR("%08x:  %08x %08x %08x %08x %c\n"),
-            pos, values[0], values[1], values[2], values[3], (looksLikeStackFrame)?'<':' ');
+            pos, values[0], values[1], values[2], values[3], (looksLikeStackFrame) ? '<' : ' ');
     }
 }
 
@@ -387,7 +409,7 @@ void __panic_func(const char* file, int line, const char* func) {
 uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
 void __stack_chk_fail(void) {
     s_pm.user_reset_reason = REASON_USER_STACK_SMASH;
-    s_pm.stacksmash_addr = (uint32_t)__builtin_return_address(0);
+    s_pm.stack_chk_addr = (uint32_t)__builtin_return_address(0);
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
@@ -395,6 +417,18 @@ void __stack_chk_fail(void) {
     uint32_t sp;
     __asm__ __volatile__ ("mov %0, a1\n\t" : "=r"(sp) :: "memory");
     postmortem_report(sp);
+
+    __builtin_unreachable(); // never reached, needed to satisfy "noreturn" attribute
+}
+
+void __stack_overflow(cont_t* cont, uint32_t* sp) {
+    s_pm.user_reset_reason = REASON_USER_STACK_OVERFLOW;
+    s_pm.stack_chk_addr = (uint32_t)&cont->stack[0];
+
+    if (gdb_present())
+        __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
+
+    postmortem_report((uint32_t)sp);
 
     __builtin_unreachable(); // never reached, needed to satisfy "noreturn" attribute
 }

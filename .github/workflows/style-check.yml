@@ -24,20 +24,9 @@ jobs:
       with:
         python-version: '3.x'
     - name: Style check
-      env:
-        LLVM_SNAPSHOT_KEY: "6084F3CF814B57C1CF12EFD515CF4D18AF4F7421"
       run: |
-          export GNUPGHOME=$(mktemp -d)
-          gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$LLVM_SNAPSHOT_KEY"
-          gpg --batch --armor --export "$LLVM_SNAPSHOT_KEY" | \
-            sudo tee /etc/apt/trusted.gpg.d/llvm-snapshot.gpg.asc
-          gpgconf --kill all
-          rm -r $GNUPGHOME
-          echo "deb http://apt.llvm.org/focal/     llvm-toolchain-focal-13   main" | \
-            sudo tee /etc/apt/sources.list.d/llvm.list
           sudo apt update
-          sudo apt install clang-format-13
-          pip3 install pyyaml
+          python ./tests/test_restyle.py --quiet
           bash ./tests/ci/style_check.sh
 
   # Validate orthography

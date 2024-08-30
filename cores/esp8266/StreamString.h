@@ -29,7 +29,7 @@
 #include "WString.h"
 
 ///////////////////////////////////////////////////////////////
-// S2Stream points to a String and makes it a Stream
+// S2Stream ("String to Stream") points to a String and makes it a Stream
 // (it is also the helper for StreamString)
 
 class S2Stream: public Stream
@@ -184,19 +184,18 @@ public:
         return peekPointer < 0 ? string->length() : string->length() - peekPointer;
     }
 
-    // calling setConsume() will consume bytes as the stream is read
-    // (enabled by default)
+    // calling setConsume() will make the string consumed as the stream is read.
+    // (default behaviour)
     void setConsume()
     {
         peekPointer = -1;
     }
 
-    // Reading this stream will mark the string as read without consuming
-    // (not enabled by default)
-    // Calling resetPointer() resets the read state and allows rereading.
-    void resetPointer(int pointer = 0)
+    // Calling resetPointer() resets the read cursor and allows rereading.
+    // (this is the opposite of default mode set by setConsume())
+    void resetPointer(size_t pointer = 0)
     {
-        peekPointer = pointer;
+        peekPointer = std::min(pointer, (size_t)string->length());
     }
 
 protected:
@@ -204,6 +203,7 @@ protected:
     int     peekPointer;  // -1:String is consumed / >=0:resettable pointer
 };
 
+///////////////////////////////////////////////////////////////
 // StreamString is a S2Stream holding the String
 
 class StreamString: public String, public S2Stream

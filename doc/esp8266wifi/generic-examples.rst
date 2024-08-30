@@ -38,23 +38,39 @@ Register the Events
 
 To get events to work we need to complete just two steps:
 
-1. Declare the event handler:
+1. Declare the event handler in global scope.
 
-``cpp   WiFiEventHandler disconnectedEventHandler;``
+.. code-block:: cpp
 
-2. Select particular event (in this case ``onStationModeDisconnected``)
-   and add the code to be executed when event is fired.
+    WiFiEventHandler disconnectedEventHandler;
 
-``cpp   disconnectedEventHandler = WiFi.onStationModeDisconnected([](const WiFiEventStationModeDisconnected& event)   {     Serial.println("Station disconnected");   });`` If this event is fired the code will print out information that station has been disconnected.
+Alternatively, it can be declared as ``static`` in both function and global scopes.
 
-That's it. It is all we need to do.
+
+2. Select particular event (in this case ``onStationModeDisconnected``).
+   When this event is fired the code will print out information that station has been disconnected:
+
+.. code-block:: cpp
+
+    disconnectedEventHandler = WiFi.onStationModeDisconnected(
+        [](auto&& event) {
+            Serial.println("Station disconnected");
+        });
+
+3. Disable ``disconnectedEventHandler``, so the event is no longer handled by our callback:
+
+.. code-block:: cpp
+
+    disconnectedEventHandler = nullptr;
+
+Take note that lifetime of the callback handler is up to the app. e.g. if ``onStationModeDisconnected`` is declared in the function scope, it would be discarded immediately after the function exits.
 
 The Code
 ~~~~~~~~
 
 The complete code, including both methods discussed at the beginning, is provided below.
 
-.. code:: cpp
+.. code-block:: cpp
 
     #include <ESP8266WiFi.h>
 

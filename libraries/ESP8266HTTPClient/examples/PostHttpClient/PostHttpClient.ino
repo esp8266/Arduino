@@ -15,7 +15,7 @@
         bin/PostServer/PostServer
    then put your PC's IP address in SERVER_IP below, port 9080 (instead of default 80):
 */
-//#define SERVER_IP "10.0.1.7:9080" // PC address with emulation on host
+// #define SERVER_IP "10.0.1.7:9080" // PC address with emulation on host
 #define SERVER_IP "192.168.1.42"
 
 #ifndef STASSID

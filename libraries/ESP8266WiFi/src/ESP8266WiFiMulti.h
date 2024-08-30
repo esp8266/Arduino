@@ -69,7 +69,7 @@ public:
     wl_status_t run(uint32_t connectTimeoutMs=WIFI_CONNECT_TIMEOUT_MS);
 
     void cleanAPlist();
-
+    int count() { return _APlist.size(); }
 private:
     WifiAPlist _APlist;
     bool _firstRun;

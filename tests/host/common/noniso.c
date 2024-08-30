@@ -18,9 +18,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
-#include "stdlib_noniso.h"
 
-void reverse(char* begin, char* end)
+#include <stdlib_noniso.h>
+
+static void reverse(char* begin, char* end)
 {
     char* is = begin;
     char* ie = end - 1;
@@ -83,21 +84,4 @@ char* itoa(int value, char* result, int base)
 
     utoa(uvalue, result, base);
     return out;
-}
-
-int atoi(const char* s)
-{
-    return (int)atol(s);
-}
-
-long atol(const char* s)
-{
-    char* tmp;
-    return strtol(s, &tmp, 10);
-}
-
-double atof(const char* s)
-{
-    char* tmp;
-    return strtod(s, &tmp);
 }

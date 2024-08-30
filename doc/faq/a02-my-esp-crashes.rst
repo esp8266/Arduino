@@ -5,7 +5,7 @@ My ESP crashes running some code. How to troubleshoot it?
 
 -  `Introduction <#introduction>`__
 -  `What ESP has to Say <#what-esp-has-to-say>`__
--  `Get Your H/W Right <#get-your-hw-right>`__
+-  `Get Your H/W Right <#get-your-h-w-right>`__
 -  `Enable compilation warnings <#enable-compilation-warnings>`__
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
@@ -148,8 +148,8 @@ table to understand what kind of issue it is. If you have no clues what
 it's about and where it happens, then use `Arduino ESP8266/ESP32
 Exception Stack Trace
 Decoder <https://github.com/me-no-dev/EspExceptionDecoder>`__ to find
-out in which line of application it is triggered. Please refer to `Check
-Where the Code Crashes <#check-where-the-code-crashes>`__ point below
+out in which line of application it is triggered. Please refer to
+`Exception decoder <#exception-decoder>`__ point below
 for a quick example how to do it.
 
 **NOTE:** When decoding exceptions be sure to include all lines between
