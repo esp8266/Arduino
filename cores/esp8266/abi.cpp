@@ -24,7 +24,7 @@
 using __cxxabiv1::__guard;
 
 // Debugging helper, last allocation which returned NULL
-extern "C" void *_heap_abi_malloc(size_t size, bool unhandled, const void* const caller);
+extern "C" void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller);
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
@@ -36,15 +36,16 @@ extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
   * With the option "DEBUG_ESP_OOM," always do Last OOM tracking.
   * Otherwise, disable Last OOM tracking. The build relies on the weak link to
     the default C++ exception handler.
+    This saves about 136 bytes of IROM, code in flash.
 */
 
 // Debug replacement adaptation from ".../new_op.cc".
 using std::new_handler;
 using std::bad_alloc;
 
-void * operator new (std::size_t size)
+void* operator new (std::size_t size)
 {
-    void *p;
+    void* p;
 
     /* malloc (0) is unpredictable; avoid it.  */
     if (__builtin_expect(size == 0, false)) {
@@ -61,6 +62,7 @@ void * operator new (std::size_t size)
 
     return p;
 }
+
 #elif !defined(__cpp_exceptions)
 // When doing builds with C++ Exceptions "disabled", always save details of
 // the last OOM event.

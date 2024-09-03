@@ -146,8 +146,8 @@ extern "C" {
  *
  * Support debug wrappers that need to include handling poison
  */
-#define UMM_MALLOC_FL(s,f,l,c)    umm_poison_malloc(s)
-#define UMM_CALLOC_FL(n,s,f,l,c)  umm_poison_calloc(n,s)
+#define UMM_MALLOC(s)             umm_poison_malloc(s)
+#define UMM_CALLOC(n,s)           umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc_flc(p,s,f,l,c)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free_flc(p,f,l,c)
 #define ENABLE_THICK_DEBUG_WRAPPERS
@@ -161,8 +161,8 @@ extern "C" {
  *
  * Support debug wrappers that need to include handling poison
  */
-#define UMM_MALLOC_FL(s,f,l,c)    umm_poison_malloc(s)
-#define UMM_CALLOC_FL(n,s,f,l,c)  umm_poison_calloc(n,s)
+#define UMM_MALLOC(s)             umm_poison_malloc(s)
+#define UMM_CALLOC(n,s)           umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
@@ -170,10 +170,10 @@ extern "C" {
 #undef realloc
 #undef free
 
-#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(DEBUG_ESP_WITHINISR) || defined(HEAP_DEBUG_PROBE_PSFLC_CB)
+#elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(DEBUG_ESP_WITHINISR)
 // All other debug wrappers that do not require handling poison
-#define UMM_MALLOC_FL(s,f,l,c)    umm_malloc(s)
-#define UMM_CALLOC_FL(n,s,f,l,c)  umm_calloc(n,s)
+#define UMM_MALLOC(s)             umm_malloc(s)
+#define UMM_CALLOC(n,s)           umm_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
@@ -241,19 +241,19 @@ extern "C" {
 // always track last failed caller and size requested
 #if defined(DEBUG_ESP_OOM)
 struct umm_last_fail_alloc {
-    const void *addr;
-    size_t size;
-    const char *file;
-    int line;
-} _umm_last_fail_alloc = {NULL, 0, NULL, 0};
+    const void *addr = { nullptr };
+    size_t size = { 0 };
+    const char *file = { nullptr };
+    int line = { 0 };
+} _umm_last_fail_alloc;
 
 #else
 // Note for the least used case "(defined(__cpp_exceptions) &&
 // !defined(DEBUG_ESP_OOM))", we only capture details for LIBC calls.
 struct umm_last_fail_alloc {
-    const void *addr;
-    size_t size;
-} _umm_last_fail_alloc = {NULL, 0};
+    const void *addr = { nullptr };
+    size_t size = { 0 };
+} _umm_last_fail_alloc;
 #endif
 
 
@@ -314,7 +314,7 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psflc(void *ptr, size_t si
     return true;
 }
 #define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, f, l, c) oom_check__log_last_fail_atomic_psflc(p, s, f, l, c)
-#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, f, l, c) ({ (void)p, (void)s, (void)f; (void)l; (void)c; true; })
+#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, c) ({ (void)p; (void)s; (void)c; true; })
 
 #elif defined(ENABLE_THICK_DEBUG_WRAPPERS)
 static bool IRAM_ATTR oom_check__log_last_fail_atomic_psc(void *ptr, size_t size, const void* caller) {
@@ -329,7 +329,7 @@ static bool IRAM_ATTR oom_check__log_last_fail_atomic_psc(void *ptr, size_t size
     return true;
 }
 #define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, f, l, c) oom_check__log_last_fail_atomic_psc(p, s, c)
-#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, f, l, c) ({ (void)p, (void)s, (void)f; (void)l; (void)c; true; })
+#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, c) ({ (void)p; (void)s; (void)c; true; })
 
 #else
 // At this location, the macro is only used by Heap API families "new" and
@@ -344,8 +344,8 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
     return true;
 }
 // Used to capture minumum OOM info for "new" and LIBC
-#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, f, l, c) oom_check__log_last_fail_psc(p, s, c)
-#define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, f, l, c) ({ (void)p, (void)s, (void)f; (void)l; (void)c; true; })
+#define OOM_CHECK__LOG_LAST_FAIL_LITE_FL(p, s, c) oom_check__log_last_fail_psc(p, s, c)
+#define OOM_CHECK__LOG_LAST_FAIL_FL(p, s, c) ({ (void)p; (void)s; (void)c; true; })
 #endif
 
 
@@ -398,26 +398,26 @@ static void isr_check__flash_not_safe(const void *caller) {
 //   * "fancy macros" that call heap_pvPortMalloc, ...
 //   * Fallback for uncapture malloc API calls, malloc, ...
 //
-void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, const void* caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
-    void* ret = UMM_MALLOC_FL(size, file, line, caller);
+    void* ret = UMM_MALLOC(size);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
     return ret;
 }
 
-void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, int line, const void* caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
     size_t total_size = umm_umul_sat(count, size);
-    void* ret = UMM_CALLOC_FL(1, total_size, file, line, caller);
+    void* ret = UMM_CALLOC(1, total_size);
     OOM_CHECK__LOG_LAST_FAIL_FL(ret, total_size, file, line, caller);
     return ret;
 }
 
-void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortRealloc(void* ptr, size_t size, const char* file, int line, const void* caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
@@ -426,7 +426,7 @@ void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, in
     return ret;
 }
 
-void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, [[maybe_unused]] const void *caller)
+void IRAM_ATTR _heap_vPortFree(void* ptr, const char* file, int line, [[maybe_unused]] const void* caller)
 {
     INTEGRITY_CHECK__PANIC_FL(file, line, caller);
     POISON_CHECK__PANIC_FL(file, line, caller);
@@ -448,12 +448,12 @@ void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, i
     return _heap_pvPortCalloc(count, size,  file, line, __builtin_return_address(0));
 }
 
-void* IRAM_ATTR heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+void* IRAM_ATTR heap_pvPortRealloc(void* ptr, size_t size, const char* file, int line)
 {
     return _heap_pvPortRealloc(ptr, size,  file, line, __builtin_return_address(0));
 }
 
-void IRAM_ATTR heap_vPortFree(void *ptr, const char* file, int line)
+void IRAM_ATTR heap_vPortFree(void* ptr, const char* file, int line)
 {
     return _heap_vPortFree(ptr, file, line, __builtin_return_address(0));
 }
@@ -489,7 +489,7 @@ void IRAM_ATTR free(void* ptr)
 #define STATIC_ALWAYS_INLINE static ALWAYS_INLINE
 
 STATIC_ALWAYS_INLINE
-void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, const void* caller)
 {
     (void)file;
     (void)line;
@@ -498,7 +498,7 @@ void* IRAM_ATTR _heap_pvPortMalloc(size_t size, const char* file, int line, cons
 }
 
 STATIC_ALWAYS_INLINE
-void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, int line, const void* caller)
 {
     (void)file;
     (void)line;
@@ -507,7 +507,7 @@ void* IRAM_ATTR _heap_pvPortCalloc(size_t count, size_t size, const char* file, 
 }
 
 STATIC_ALWAYS_INLINE
-void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, int line, const void *caller)
+void* IRAM_ATTR _heap_pvPortRealloc(void* ptr, size_t size, const char* file, int line, const void* caller)
 {
     (void)file;
     (void)line;
@@ -516,7 +516,7 @@ void* IRAM_ATTR _heap_pvPortRealloc(void *ptr, size_t size, const char* file, in
 }
 
 STATIC_ALWAYS_INLINE
-void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, const void *caller)
+void IRAM_ATTR _heap_vPortFree(void* ptr, const char* file, int line, const void* caller)
 {
     (void)file;
     (void)line;
@@ -532,37 +532,37 @@ void IRAM_ATTR _heap_vPortFree(void *ptr, const char* file, int line, const void
 void* _malloc_r(struct _reent* unused, size_t size)
 {
     (void) unused;
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     void* ret = _heap_pvPortMalloc(size, NULL, 0, caller);
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
     return ret;
 }
 
 void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     void* ret = _heap_pvPortCalloc(count, size, NULL, 0, caller);
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
     return ret;
 }
 
 void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
 {
     (void) unused;
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     void* ret = _heap_pvPortRealloc(ptr, size, NULL, 0, caller);
-    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
     return ret;
 }
 
 void _free_r(struct _reent* unused, void* ptr)
 {
     (void) unused;
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }
@@ -590,7 +590,7 @@ void* IRAM_ATTR pvPortCalloc(size_t count, size_t size, const char* file, int li
     return _heap_pvPortCalloc(count, size,  file, line, __builtin_return_address(0));
 }
 
-void* IRAM_ATTR pvPortRealloc(void *ptr, size_t size, const char* file, int line)
+void* IRAM_ATTR pvPortRealloc(void* ptr, size_t size, const char* file, int line)
 {
     HeapSelectDram ephemeral;
     return _heap_pvPortRealloc(ptr, size,  file, line, __builtin_return_address(0));
@@ -602,7 +602,7 @@ void* IRAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
     return _heap_pvPortCalloc(1, size, file, line, __builtin_return_address(0));
 }
 
-void IRAM_ATTR vPortFree(void *ptr, const char* file, int line)
+void IRAM_ATTR vPortFree(void* ptr, const char* file, int line)
 {
 #if defined(UMM_POISON_CHECK) || defined(UMM_INTEGRITY_CHECK)
     // While umm_free internally determines the correct heap, UMM_POISON_CHECK
@@ -639,19 +639,16 @@ void system_show_malloc(void)
 // heap allocator for "new" (ABI) - To support collecting OOM info, always defined
 void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
 {
-    [[maybe_unused]] const char *file = NULL;
-    [[maybe_unused]] const int line = 0;
-
     #ifdef ENABLE_THICK_DEBUG_WRAPPERS
     ISR_CHECK__LOG_NOT_SAFE(caller);
-    INTEGRITY_CHECK__PANIC_FL(file, line, caller);
-    POISON_CHECK__PANIC_FL(file, line, caller);
-    void* ret = UMM_MALLOC_FL(size, file, line, caller);
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
+    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
+    POISON_CHECK__PANIC_FL(NULL, 0, caller);
+    void* ret = UMM_MALLOC(size);
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
     #else
     void* ret = UMM_MALLOC(size);
     // minimum OOM check
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, file, line, caller);
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
     #endif
     if (!ok && unhandled) {
         __unhandled_exception(PSTR("OOM"));
@@ -767,7 +764,7 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
 //
 #include <bits/c++config.h>
 #include <cstdlib>
-#include "new"
+#include <new>
 
 // The sized deletes are defined in other files.
 #pragma GCC diagnostic ignored "-Wsized-deallocation"
@@ -775,14 +772,14 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
 // These function replace their weak counterparts tagged with _GLIBCXX_WEAK_DEFINITION
 void operator delete(void* ptr) noexcept
 {
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }
 
 void operator delete(void* ptr, std::size_t) noexcept
 {
-    void *caller = __builtin_return_address(0);
+    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }

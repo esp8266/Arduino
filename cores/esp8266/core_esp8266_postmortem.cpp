@@ -295,7 +295,7 @@ static void postmortem_report(uint32_t sp_dump) {
         ets_printf_P(PSTR("\nlast failed alloc call: 0x%08X(%d), File: %S:%d\n"),
             (uint32_t)_umm_last_fail_alloc.addr,
             _umm_last_fail_alloc.size,
-            (_umm_last_fail_alloc.file) ? _umm_last_fail_alloc.file : "??",
+            (_umm_last_fail_alloc.file) ? _umm_last_fail_alloc.file : PSTR("??"),
             _umm_last_fail_alloc.line);
 #else
         ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)_umm_last_fail_alloc.addr, _umm_last_fail_alloc.size);

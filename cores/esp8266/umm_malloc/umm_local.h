@@ -35,8 +35,7 @@ static size_t umm_uadd_sat(const size_t a, const size_t b);
 
 
 #if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) \
-|| defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK) \
-|| defined(HEAP_DEBUG_PROBE_PSFLC_CB) || defined(_HEAP_DEBUG_PROBE_PSFLC_CB)
+|| defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
 #else
 #define umm_malloc(s)    malloc(s)
 #define umm_calloc(n,s)  calloc(n,s)
