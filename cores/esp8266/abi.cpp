@@ -20,6 +20,8 @@
 #include <assert.h>
 #include <Arduino.h>
 #include <cxxabi.h>
+#include <bits/c++config.h>
+#include <bit>
 
 using __cxxabiv1::__guard;
 
@@ -29,21 +31,29 @@ extern "C" void* _heap_abi_malloc(size_t size, bool unhandled, const void* const
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR))
+#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) \
+|| defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
 /*
   When built with C++ Exceptions: "enabled", track caller address of Last OOM.
   * For debug build, force enable Last OOM tracking.
   * With the option "DEBUG_ESP_OOM," always do Last OOM tracking.
   * Otherwise, disable Last OOM tracking. The build relies on the weak link to
-    the default C++ exception handler.
-    This saves about 136 bytes of IROM, code in flash.
+    the default C++ exception handler. This saves about 232 bytes of IROM, when
+    using C++ exceptions.
+
+//C C++ Exception "enabled" already adds 28,868 bytes to the build does another
+//C 232 matter that much? Added define MIN_ESP_OOM for experimention.
+
+    If desired, define MIN_ESP_OOM to continue with a minimum OOM tracking for
+    C++ exception builds.
 */
+
 
 // Debug replacement adaptation from ".../new_op.cc".
 using std::new_handler;
 using std::bad_alloc;
 
-void* operator new (std::size_t size)
+static void* _heap_new(std::size_t size, const void* caller)
 {
     void* p;
 
@@ -52,7 +62,7 @@ void* operator new (std::size_t size)
         size = 1;
     }
 
-    while (0 == (p = _heap_abi_malloc(size, false, __builtin_return_address(0)))) {
+    while (0 == (p = _heap_abi_malloc(size, false, caller))) {
         new_handler handler = std::get_new_handler();
         if (!handler) {
             throw(bad_alloc());
@@ -63,18 +73,54 @@ void* operator new (std::size_t size)
     return p;
 }
 
+void* operator new (std::size_t size)
+{
+    return _heap_new(size, __builtin_return_address(0));
+}
+
+void* operator new[] (std::size_t size)
+{
+    return _heap_new(size, __builtin_return_address(0));
+}
+
+void* operator new (size_t size, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new(size, __builtin_return_address(0));
+    }
+    __catch (...) {
+        return nullptr;
+    }
+}
+
+void* operator new[] (size_t size, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new(size, __builtin_return_address(0));
+    }
+    __catch (...) {
+        return nullptr;
+    }
+}
+/*
+  TODO:
+  Current master does not support "new" align operations. Compiler reports:
+    "/workdir/repo/gcc-gnu/libstdc++-v3/libsupc++/new_opa.cc:86: undefined reference to `memalign'"
+  Look at enhancement to umm_malloc for an alignment option.
+*/
+
 #elif !defined(__cpp_exceptions)
 // When doing builds with C++ Exceptions "disabled", always save details of
 // the last OOM event.
 
 // overwrite weak operators new/new[] definitions
 
-void* operator new(size_t size)
+void* operator new (size_t size)
 {
     return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }
 
-void* operator new[](size_t size)
+void* operator new[] (size_t size)
 {
     return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }

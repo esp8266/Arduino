@@ -310,10 +310,12 @@ static void postmortem_report(uint32_t sp_dump) {
         ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)_umm_last_fail_alloc.addr);
     }
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
     size_t oom_count = umm_get_oom_count();
     if (oom_count) {
         ets_printf_P(PSTR("\nOOM Count: %u\n"), oom_count);
     }
+#endif
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 

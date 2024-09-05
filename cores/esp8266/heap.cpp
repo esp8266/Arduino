@@ -35,7 +35,7 @@
  *    occurred.
  *
  *    When DEBUG_ESP_OOM is not selected, use a minimized Last OOM wrapper to
- *    track LIBC and the C++ operator "new".  These wrappers only save the
+ *    track LIBC and the C++ operator "new". These wrappers only save the
  *    caller address and size of the Last OOM - and report details at
  *    Postmortem. No Last OOM tracking for the "new" operator with the non-debug
  *    build and option C++ Exceptions: "enabled".
@@ -51,6 +51,8 @@
  *      _malloc_r APIs are called with interrupts disabled.
  *    * If called from within an ISR, we could have crash before reaching
  *      this code.
+ *    * Build define, DEBUG_ESP_WITHINISR, may help bring attention to allocs
+ *      made from within ISRs.
  *
  *    Enable via a build option define.
  *
@@ -634,7 +636,8 @@ void system_show_malloc(void)
 #endif
 }
 
-#if defined(DEBUG_ESP_OOM) || !defined(__cpp_exceptions) || defined(DEBUG_ESP_PORT)
+#if defined(DEBUG_ESP_OOM) || !defined(__cpp_exceptions) \
+|| defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM)
 ///////////////////////////////////////////////////////////////////////////////
 // heap allocator for "new" (ABI) - To support collecting OOM info, always defined
 void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
