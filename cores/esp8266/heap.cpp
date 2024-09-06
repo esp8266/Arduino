@@ -769,21 +769,30 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
 #include <cstdlib>
 #include <new>
 
-// The sized deletes are defined in other files.
-#pragma GCC diagnostic ignored "-Wsized-deallocation"
-
 // These function replace their weak counterparts tagged with _GLIBCXX_WEAK_DEFINITION
-void operator delete(void* ptr) noexcept
+void _heap_delete(void* ptr, const void* caller) noexcept
 {
-    void* caller = __builtin_return_address(0);
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }
 
+void operator delete(void* ptr) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+void operator delete[] (void *ptr) noexcept
+{
+  _heap_delete(ptr, __builtin_return_address(0));
+}
+
 void operator delete(void* ptr, std::size_t) noexcept
 {
-    void* caller = __builtin_return_address(0);
-    ISR_CHECK__LOG_NOT_SAFE(caller);
-    _heap_vPortFree(ptr, NULL, 0, caller);
+  _heap_delete(ptr, __builtin_return_address(0));
+}
+
+void operator delete[] (void* ptr, std::size_t) noexcept
+{
+  _heap_delete(ptr, __builtin_return_address(0));
 }
 #endif
