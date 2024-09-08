@@ -38,10 +38,11 @@ static size_t umm_uadd_sat(const size_t a, const size_t b);
 || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK) \
 || defined(DEBUG_ESP_WITHINISR)
 #else
-#define umm_malloc(s)    malloc(s)
-#define umm_calloc(n,s)  calloc(n,s)
-#define umm_realloc(p,s) realloc(p,s)
-#define umm_free(p)      free(p)
+#define umm_malloc(s)           malloc(s)
+#define umm_memalign(a,s)       memalign(a,s)
+#define umm_calloc(n,s)         calloc(n,s)
+#define umm_realloc(p,s)        realloc(p,s)
+#define umm_free(p)             free(p)
 #endif
 
 

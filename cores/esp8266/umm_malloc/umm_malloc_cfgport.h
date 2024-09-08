@@ -297,6 +297,9 @@ extern char _heap_start[];
 
 extern void *umm_poison_malloc(size_t size);
 extern void *umm_poison_calloc(size_t num, size_t size);
+#if UMM_ENABLE_MEMALIGN
+extern void *umm_posion_memalign(size_t alignment, size_t size);
+#endif
 #endif
 
 #if defined(UMM_POISON_CHECK_LITE)
@@ -375,5 +378,69 @@ extern bool  umm_poison_check(void);
 #else
 #define UMM_OVERHEAD_ADJUST  (umm_block_size() / 2)
 #endif
+
+
+/*
+ * -DUMM_ENABLE_MEMALIGN=1
+ *
+ * Include function memalign(size_t alignment, size_t size) in the build.
+ * Provides lowlevel memalign function to support C++17 addition of aligned
+ * "new" operators.
+ *
+ * Requires default 8-byte aligned data addresses.
+ * Build options "-DUMM_LEGACY_ALIGN_4BYTE=1" and "-DUMM_LEGACY_ALIGN_4BYTE=1"
+ * are mutually exclusive.
+ *
+ * Allocations from memalign() internally appear and are handled like any other
+ * UMM_MALLOC memory allocation.
+ *
+ * The existing free() function handles releasing memalign() memory allocations.
+ *
+ * Function realloc() should not be called for aligned memory allocations.
+ * It can break the alignment. At worst, the alignment falls back to
+ * sizeof(umm_block), 8 bytes.
+ *
+ * The UMM_POISON build option supports memalign().
+ *
+ */
+
+#if ((1 - UMM_ENABLE_MEMALIGN - 1) == 2)
+#undef UMM_ENABLE_MEMALIGN
+#define UMM_ENABLE_MEMALIGN 1
+#elif ((1 - UMM_ENABLE_MEMALIGN - 1) == 0)
+#undef UMM_ENABLE_MEMALIGN
+#endif
+
+
+
+/*
+ * -DUMM_LEGACY_ALIGN_4BYTE=1
+ *
+ * To accommodate any libraries or Sketches that may have workarounds for the
+ * old 4-byte alignment, this deprecated build option is available.
+ * This option cannot be combined with -DUMM_ENABLE_MEMALIGN=1
+ *
+//C I am not sure we need to do this; however, the old behavior goes back to the
+//C beginning of time. And, would never return a data allocation address that was
+//C 8-byte aligned. If this was an issue and a workaround was created, we may
+//C have broken it.
+ */
+
+#if ((1 - UMM_LEGACY_ALIGN_4BYTE - 1) == 2)
+#undef UMM_LEGACY_ALIGN_4BYTE
+#define UMM_LEGACY_ALIGN_4BYTE 1
+#elif ((1 - UMM_LEGACY_ALIGN_4BYTE - 1) == 0)
+#undef UMM_LEGACY_ALIGN_4BYTE
+#endif
+
+
+#if UMM_LEGACY_ALIGN_4BYTE
+#pragma message("Support for legacy 4-byte alignment is deprecated")
+#endif
+
+// //C Should we default to legacy?
+// #if ! UMM_ENABLE_MEMALIGN && ! UMM_LEGACY_ALIGN_4BYTE
+// #define UMM_LEGACY_ALIGN_4BYTE 1
+// #endif
 
 #endif

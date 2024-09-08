@@ -4,7 +4,7 @@
  */
 /*
  * On the Arduino ESP8266 platform, there are four heap API families in use:
- *   * The C++ `new`/`delete` operators
+ *   * The C++ `new`/`delete` operators - libstdc/libsupc
  *   * The legacy `malloc`, ... often used by "C" programs
  *   * An internal LIBC library `_malloc_r`, ...
  *   * The portable heap APIs, `pvPortMalloc`, ... for embedded platforms.
@@ -39,6 +39,8 @@
  *    caller address and size of the Last OOM - and report details at
  *    Postmortem. No Last OOM tracking for the "new" operator with the non-debug
  *    build and option C++ Exceptions: "enabled".
+ *    Update: Use MIN_ESP_OOM to always track OOM on "new" operators. With this
+ *    option C++ "Replaceable allocation functions" are always in use.
  *
  *    You may select DEBUG_ESP_OOM through the Arduino IDE, Tools->Debug level:
  *    "OOM". Or, enable via a build option define.
@@ -142,6 +144,13 @@ extern "C" {
 #undef STATIC_ALWAYS_INLINE
 #undef ENABLE_THICK_DEBUG_WRAPPERS
 
+// We want none of these redefined, possition these after all includes have finished.
+#undef malloc
+#undef calloc
+#undef realloc
+#undef free
+#undef memalign
+
 #if defined(UMM_POISON_CHECK_LITE)
 /*
  * umm_malloc will build with umm_poison_* wrappers for each Heap API.
@@ -149,13 +158,14 @@ extern "C" {
  * Support debug wrappers that need to include handling poison
  */
 #define UMM_MALLOC(s)             umm_poison_malloc(s)
+#define UMM_MEMALIGN(a,s)         umm_posion_memalign(a,s)
 #define UMM_CALLOC(n,s)           umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc_flc(p,s,f,l,c)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free_flc(p,f,l,c)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-
-#undef realloc
-#undef free
+//D
+//D #undef realloc
+//D #undef free
 
 #elif defined(UMM_POISON_CHECK)
 /*
@@ -164,28 +174,32 @@ extern "C" {
  * Support debug wrappers that need to include handling poison
  */
 #define UMM_MALLOC(s)             umm_poison_malloc(s)
+#define UMM_MEMALIGN(a,s)         umm_posion_memalign(a,s)
 #define UMM_CALLOC(n,s)           umm_poison_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-
-#undef realloc
-#undef free
+//D
+//D #undef realloc
+//D #undef free
 
 #elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(DEBUG_ESP_WITHINISR)
 // All other debug wrappers that do not require handling poison
 #define UMM_MALLOC(s)             umm_malloc(s)
+#define UMM_MEMALIGN(a,s)         umm_memalign(a,s)
 #define UMM_CALLOC(n,s)           umm_calloc(n,s)
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-
-#undef realloc
-#undef free
+//D
+//D #undef realloc
+//D #undef free
 
 #else  // ! UMM_POISON_CHECK && ! DEBUG_ESP_OOM
+extern "C" void* memalign(size_t alignment, size_t size);
 // Used to create thin heap wrappers not for debugging.
 #define UMM_MALLOC(s)             malloc(s)
+#define UMM_MEMALIGN(a,s)         memalign(a,s)
 #define UMM_CALLOC(n,s)           calloc(n,s)
 #define UMM_REALLOC(p,s)          realloc(p,s)
 #define UMM_FREE(p)               free(p)
@@ -385,11 +399,12 @@ static void isr_check__flash_not_safe(const void *caller) {
 // When selected, do Integrity Check first. Verifies the heap management
 // information is not corrupt. Followed by Full Poison Check before *alloc
 // operation.
-//
-#undef malloc
-#undef calloc
-#undef realloc
-#undef free
+//D
+//D #undef malloc
+//D #undef calloc
+//D #undef realloc
+//D #undef free
+//D #undef memalign
 
 ///////////////////////////////////////////////////////////////////////////////
 // Common Heap debug helper functions for each alloc operation
@@ -435,6 +450,19 @@ void IRAM_ATTR _heap_vPortFree(void* ptr, const char* file, int line, [[maybe_un
     UMM_FREE_FL(ptr, file, line, caller);
 }
 
+#if UMM_ENABLE_MEMALIGN
+// The base name pvPortMemalign is a fabrication. I am not aware of an alignment
+// option for the portable malloc library; however, I need one for the way these
+// debug wrappers are set up.
+void* IRAM_ATTR _heap_pvPortMemalign(size_t alignment, size_t size, const char* file, int line, const void* caller)
+{
+    INTEGRITY_CHECK__PANIC_FL(file, line, caller);
+    POISON_CHECK__PANIC_FL(file, line, caller);
+    void* ret = UMM_MEMALIGN(alignment, size);
+    OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, file, line, caller);
+    return ret;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Heap debug wrappers used by "fancy debug macros" to capture caller's context:
@@ -442,17 +470,17 @@ void IRAM_ATTR _heap_vPortFree(void* ptr, const char* file, int line, [[maybe_un
 // The "fancy debug macros" are defined in `heap_api_debug.h`
 void* IRAM_ATTR heap_pvPortMalloc(size_t size, const char* file, int line)
 {
-    return _heap_pvPortMalloc(size,  file, line, __builtin_return_address(0));
+    return _heap_pvPortMalloc(size, file, line, __builtin_return_address(0));
 }
 
 void* IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char* file, int line)
 {
-    return _heap_pvPortCalloc(count, size,  file, line, __builtin_return_address(0));
+    return _heap_pvPortCalloc(count, size, file, line, __builtin_return_address(0));
 }
 
 void* IRAM_ATTR heap_pvPortRealloc(void* ptr, size_t size, const char* file, int line)
 {
-    return _heap_pvPortRealloc(ptr, size,  file, line, __builtin_return_address(0));
+    return _heap_pvPortRealloc(ptr, size, file, line, __builtin_return_address(0));
 }
 
 void IRAM_ATTR heap_vPortFree(void* ptr, const char* file, int line)
@@ -460,6 +488,12 @@ void IRAM_ATTR heap_vPortFree(void* ptr, const char* file, int line)
     return _heap_vPortFree(ptr, file, line, __builtin_return_address(0));
 }
 
+#if UMM_ENABLE_MEMALIGN
+void* IRAM_ATTR heap_pvPortMemalign(size_t alignment, size_t size, const char* file, int line)
+{
+    return _heap_pvPortMemalign(alignment, size, file, line, __builtin_return_address(0));
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Heap debug wrappers used to captured any remaining standard heap api calls
@@ -482,6 +516,13 @@ void IRAM_ATTR free(void* ptr)
 {
     _heap_vPortFree(ptr, NULL, 0, __builtin_return_address(0));
 }
+
+#if UMM_ENABLE_MEMALIGN
+void* IRAM_ATTR memalign(size_t alignment, size_t size)
+{
+    return _heap_pvPortMemalign(alignment, size, NULL, 0, __builtin_return_address(0));
+}
+#endif
 
 #else
 ///////////////////////////////////////////////////////////////////////////////
@@ -525,6 +566,18 @@ void IRAM_ATTR _heap_vPortFree(void* ptr, const char* file, int line, const void
     (void)caller;
     UMM_FREE(ptr);
 }
+
+#if UMM_ENABLE_MEMALIGN
+STATIC_ALWAYS_INLINE
+void* IRAM_ATTR _heap_pvPortMemalign(size_t alignment, size_t size, const char* file, int line, const void* caller)
+{
+    (void)file;
+    (void)line;
+    (void)caller;
+    return UMM_MEMALIGN(alignment, size);
+}
+#endif
+
 #endif
 
 
@@ -568,6 +621,20 @@ void _free_r(struct _reent* unused, void* ptr)
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }
+
+#if UMM_ENABLE_MEMALIGN
+// Calls to aligned_alloc(a,s) will passthrough LIBC _memalign_r; however,
+// "new" operators with alignment pass through memalign.
+void* _memalign_r(struct _reent* unused, size_t alignment, size_t size)
+{
+    (void) unused;
+    void* caller = __builtin_return_address(0);
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    void* ret = _heap_pvPortMemalign(alignment, size, NULL, 0, caller);
+    OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
+    return ret;
+}
+#endif
 
 
 /*
@@ -620,6 +687,11 @@ void IRAM_ATTR vPortFree(void* ptr, const char* file, int line)
     return _heap_vPortFree(ptr, file, line, __builtin_return_address(0));
 }
 
+#if UMM_ENABLE_MEMALIGN
+// Just a reminder, function pvPortMemalign() is made up. SDK does not use it.
+//C maybe rename later?
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // NONOS SDK - Replacement functions
 //
@@ -636,12 +708,65 @@ void system_show_malloc(void)
 #endif
 }
 
-#if defined(DEBUG_ESP_OOM) || !defined(__cpp_exceptions) \
-|| defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM)
 ///////////////////////////////////////////////////////////////////////////////
 // heap allocator for "new" (ABI) - To support collecting OOM info, always defined
+#undef USE_HEAP_ABI_MEMALIGN
+#undef USE_HEAP_ABI_MALLOC
+
+#if defined(__cpp_exceptions) && \
+(defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
+#if defined(UMM_ENABLE_MEMALIGN)
+#define USE_HEAP_ABI_MEMALIGN 1
+#else
+#define USE_HEAP_ABI_MALLOC 1
+#endif
+
+#elif !defined(__cpp_exceptions)
+#if defined(UMM_ENABLE_MEMALIGN)
+#define USE_HEAP_ABI_MEMALIGN 1
+#else
+#define USE_HEAP_ABI_MALLOC 1
+#endif
+#endif
+
+#if USE_HEAP_ABI_MEMALIGN
+// To maintain my sanity, I intend that all functions containing the string
+// "memalign" in the name will have the "alignment" argument before the "size".
+void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const void* const caller)
+{
+    // A comment from libstdc new_op.cc says: "malloc (0) is unpredictable;
+    // avoid it." This behavoir is only done for the new operator. Our malloc is
+    // happy to return a null pointer for a zero size allocation; however, the
+    // comment implies to me that other behavior might probe an under tested
+    // logic path. We take the road more traveled.
+    if (__builtin_expect(0 == size, false)) {
+        size = 1;
+    }
+
+    #ifdef ENABLE_THICK_DEBUG_WRAPPERS
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
+    POISON_CHECK__PANIC_FL(NULL, 0, caller);
+    void* ret = UMM_MEMALIGN(alignment, size);
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
+    #else
+    void* ret = UMM_MEMALIGN(alignment, size);
+    // minimum OOM check
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
+    #endif
+    if (!ok && unhandled) {
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+#elif USE_HEAP_ABI_MALLOC
 void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
 {
+    /* malloc (0) is unpredictable; avoid it.  */
+    if (__builtin_expect(0 == size, false)) {
+        size = 1;
+    }
+
     #ifdef ENABLE_THICK_DEBUG_WRAPPERS
     ISR_CHECK__LOG_NOT_SAFE(caller);
     INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
@@ -769,30 +894,88 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
 #include <cstdlib>
 #include <new>
 
-// These function replace their weak counterparts tagged with _GLIBCXX_WEAK_DEFINITION
 void _heap_delete(void* ptr, const void* caller) noexcept
 {
     ISR_CHECK__LOG_NOT_SAFE(caller);
     _heap_vPortFree(ptr, NULL, 0, caller);
 }
 
-void operator delete(void* ptr) noexcept
+// These function replace their weak counterparts tagged with _GLIBCXX_WEAK_DEFINITION
+
+// del_op
+void operator delete (void* ptr) noexcept
 {
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
-void operator delete[] (void *ptr) noexcept
+// del_opnt
+void operator delete (void *ptr, const std::nothrow_t&) noexcept
 {
   _heap_delete(ptr, __builtin_return_address(0));
 }
 
+// del_ops
 void operator delete(void* ptr, std::size_t) noexcept
 {
   _heap_delete(ptr, __builtin_return_address(0));
 }
 
-void operator delete[] (void* ptr, std::size_t) noexcept
+// del_opv
+void operator delete[] (void *ptr) noexcept
 {
   _heap_delete(ptr, __builtin_return_address(0));
 }
+
+// del_opvnt
+void operator delete[] (void *ptr, const std::nothrow_t&) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opvs
+void operator delete[] (void *ptr, std::size_t) noexcept
+{
+  _heap_delete(ptr, __builtin_return_address(0));
+}
+
+#if defined(__cpp_exceptions)
+#if defined(UMM_ENABLE_MEMALIGN)
+// del_opa
+void operator delete (void* ptr, std::align_val_t) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opant
+void operator delete (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opsa
+void operator delete(void* ptr, std::size_t, std::align_val_t) noexcept
+{
+  _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opva
+void operator delete[] (void *ptr, std::align_val_t) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opvant
+void operator delete[] (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
+{
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opvsa
+void operator delete[] (void *ptr, std::size_t, std::align_val_t) noexcept
+{
+  _heap_delete(ptr, __builtin_return_address(0));
+}
+#endif  // #if defined(UMM_ENABLE_MEMALIGN)
+#endif // #if defined(__cpp_exceptions)
+
 #endif

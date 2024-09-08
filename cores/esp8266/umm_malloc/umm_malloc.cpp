@@ -529,11 +529,22 @@ void ICACHE_MAYBE umm_init_heap(size_t id, void *start_addr, size_t size, bool f
     }
 
     /* init heap pointer and size, and memset it to 0 */
-
     _context->id = id;
-    _context->heap = (umm_block *)start_addr;
-    _context->heap_end = (void *)((uintptr_t)start_addr + size);
+    // start_addr is 8-byte aligned. However, we want the allocated data address
+    // we return to be 8-byte aligned. By padding the start address, we adjust
+    // the data allocated address to land on an 8-byte aligned value.
+    // Our default target alignment is __STDCPP_DEFAULT_NEW_ALIGNMENT__ == 8
+    // To return malloc memory 8-byte aligned, we have to sacrifice 4-bytes at
+    // beginning and end of the heap address space.
+#if defined(UMM_LEGACY_ALIGN_4BYTE) && defined(UMM_ENABLE_MEMALIGN)
+    #error "Build option conflict - cannot support both UMM_LEGACY_ALIGN_4BYTE and UMM_ENABLE_MEMALIGN"
+#elif defined(UMM_LEGACY_ALIGN_4BYTE)
+    _context->heap = (umm_block *)((uintptr_t)start_addr);
+#else
+    _context->heap = (umm_block *)((uintptr_t)start_addr + 4u);
+#endif
     _context->numblocks = (size / sizeof(umm_block));
+    _context->heap_end = (void *)((uintptr_t)start_addr + _context->numblocks * sizeof(umm_block));
 
     // An option for blocking the zeroing of extra heaps. This allows for
     // post-crash debugging after reboot.
@@ -574,7 +585,7 @@ void ICACHE_MAYBE umm_init(void) {
  * inited and ICACHE has been enabled.
  */
 #ifdef UMM_HEAP_IRAM
-void ICACHE_FLASH_ATTR umm_init_iram_ex(void *addr, unsigned int size, bool full_init) {
+void IRAM_ATTR umm_init_iram_ex(void *addr, unsigned int size, bool full_init) {
     /* We need the main, internal heap set up first */
     UMM_CHECK_INITIALIZED();
 
@@ -582,20 +593,20 @@ void ICACHE_FLASH_ATTR umm_init_iram_ex(void *addr, unsigned int size, bool full
 }
 
 void _text_end(void);
-void ICACHE_FLASH_ATTR umm_init_iram(void) __attribute__((weak));
+void IRAM_ATTR umm_init_iram(void) __attribute__((weak));
 
 /*
   By using a weak link, it is possible to reduce the IRAM heap size with a
   user-supplied init function. This would allow the creation of a block of IRAM
   dedicated to a sketch and possibly used/preserved across reboots.
  */
-void ICACHE_FLASH_ATTR umm_init_iram(void) {
+void IRAM_ATTR umm_init_iram(void) {
     umm_init_iram_ex(mmu_sec_heap(), mmu_sec_heap_size(), true);
 }
 #endif  // #ifdef UMM_HEAP_IRAM
 
 #ifdef UMM_HEAP_EXTERNAL
-void ICACHE_FLASH_ATTR umm_init_vm(void *vmaddr, unsigned int vmsize) {
+void IRAM_ATTR umm_init_vm(void *vmaddr, unsigned int vmsize) {
     /* We need the main, internal (DRAM) heap set up first */
     UMM_CHECK_INITIALIZED();
 
@@ -693,7 +704,14 @@ void umm_free(void *ptr) {
  * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
  */
 
-static void *umm_malloc_core(umm_heap_context_t *_context, size_t size) {
+#if UMM_ENABLE_MEMALIGN
+#define UMM_MALLOC_CORE(a, b, c) umm_malloc_core(a, b, c)
+static void *umm_malloc_core(umm_heap_context_t *_context, size_t size, size_t alignment)
+#else
+#define UMM_MALLOC_CORE(a, b, c) umm_malloc_core(a, b)
+static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
+#endif
+{
     uint16_t blocks;
     uint16_t blockSize = 0;
 
@@ -705,6 +723,13 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size) {
     NON_NULL_CONTEXT_ASSERT();
 
     STATS__ALLOC_REQUEST(id_malloc, size);
+
+#if UMM_ENABLE_MEMALIGN
+    if (alignment) {
+        // Pad size to cover alignment adjustments
+        size += alignment;
+    }
+#endif
 
     blocks = umm_blocks(size);
 
@@ -753,6 +778,63 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size) {
     if (UMM_NBLOCK(cf) & UMM_BLOCKNO_MASK && blockSize >= blocks) {
 
         UMM_FRAGMENTATION_METRIC_REMOVE(cf);
+
+#if UMM_ENABLE_MEMALIGN
+        if (__builtin_expect(alignment, 0u)) {
+
+            size_t alignMask = (alignment - 1u);
+            uintptr_t aptr = (uintptr_t)&UMM_DATA(cf);
+
+            #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+            /* Data address must be properly aligned after poison space is inserted */
+            aptr += sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
+            aptr = (aptr + alignMask) & ~alignMask;
+            aptr -= sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
+            #else
+            aptr = (aptr + alignMask) & ~alignMask;
+            #endif
+
+            /* Figure out which block we're in. Note the use of truncated division... */
+            uint16_t c = ((aptr) - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
+
+            // Release space before our aligned space, adjusting for overhead
+            // From cf up to c can be free-ed
+            uint16_t frag = c - cf;
+            if (frag) {
+                umm_split_block(_context, cf, frag, UMM_FREELIST_MASK);
+                UMM_NBLOCK(cf) = (UMM_NBLOCK(cf) & UMM_BLOCKNO_MASK) | UMM_FREELIST_MASK;
+
+                // Splice in the new free block, let the later logic trim away
+                // unneeded spaces
+                UMM_PFREE(UMM_NFREE(cf)) = c;
+                UMM_NFREE(c) = UMM_NFREE(cf);
+
+                UMM_NFREE(cf) = c;
+                UMM_PFREE(c) = cf;
+
+                cf = c;
+                blocks -= frag;
+            }
+
+            #if DEV_DEBUG
+            #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
+            #if defined(UMM_INTEGRITY_CHECK)
+            umm_integrity_check();
+            #endif
+            // extra verify computations
+            uintptr_t ptr = (uintptr_t)&UMM_DATA(cf);
+            #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+            ptr += sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
+            ptr = (ptr + alignMask) & ~alignMask;
+            ptr -= sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
+            #else
+            ptr = (ptr + alignMask) & ~alignMask;
+            #endif
+            if (aptr != ptr) panic();
+            #endif
+            #endif // #if DEV_DEBUG
+        }
+#endif
 
         /*
          * This is an existing block in the memory heap, we just need to split off
@@ -813,8 +895,12 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size) {
 }
 
 /* ------------------------------------------------------------------------ */
-
-void *umm_malloc(size_t size) {
+#if UMM_ENABLE_MEMALIGN
+void *umm_memalign(size_t alignment, size_t size)
+#else
+void *umm_malloc(size_t size)
+#endif
+{
     UMM_CRITICAL_DECL(id_malloc);
 
     void *ptr = NULL;
@@ -889,6 +975,29 @@ void *umm_malloc(size_t size) {
         return ptr;
     }
 
+#if UMM_ENABLE_MEMALIGN
+
+    /*
+     * Ensure alignment is power of 2; however, we allow zero.
+     */
+
+    if (0u != (alignment & (alignment - 1u))) {
+      STATS__ALIGNMENT_ERROR(id_malloc, alignment);
+      return ptr;
+    }
+
+    /*
+     * Allocations default to 8-byte alignment same as __STDCPP_DEFAULT_NEW_ALIGNMENT__
+     * No need to execute extra alignment logic for small alignments.
+     */
+
+    static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ == 8u);
+    static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ == sizeof(umm_block));
+    if (alignment <= sizeof(umm_block)) {
+        alignment = 0u;   // Use implementation default, 8.
+    }
+#endif
+
     /* Allocate the memory within a protected critical section */
 
     UMM_CRITICAL_ENTRY(id_malloc);
@@ -903,11 +1012,12 @@ void *umm_malloc(size_t size) {
      * use DRAM for an ISR. Each 16-bit access to IRAM that umm_malloc has to make
      * requires a pass through the exception handling logic.
      */
+
     if (UMM_CRITICAL_WITHINISR(id_malloc)) {
         _context = umm_get_heap_by_id(UMM_HEAP_DRAM);
     }
 
-    ptr = umm_malloc_core(_context, size);
+    ptr = UMM_MALLOC_CORE(_context, size, alignment);
 
     ptr = POISON_CHECK_SET_POISON(ptr, size);
 
@@ -915,6 +1025,12 @@ void *umm_malloc(size_t size) {
 
     return ptr;
 }
+
+#if UMM_ENABLE_MEMALIGN
+void *umm_malloc(size_t size) {
+    return umm_memalign(0, size);
+}
+#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -1122,7 +1238,7 @@ void *umm_realloc(void *ptr, size_t size) {
     } else {
         DBGLOG_DEBUG("realloc a completely new block %i\n", blocks);
         void *oldptr = ptr;
-        if ((ptr = umm_malloc_core(_context, size))) {
+        if ((ptr = UMM_MALLOC_CORE(_context, size, 0))) {
             DBGLOG_DEBUG("realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks);
             (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);
@@ -1204,7 +1320,7 @@ void *umm_realloc(void *ptr, size_t size) {
     } else { // 4
         DBGLOG_DEBUG("realloc a completely new block %d\n", blocks);
         void *oldptr = ptr;
-        if ((ptr = umm_malloc_core(_context, size))) {
+        if ((ptr = UMM_MALLOC_CORE(_context, size, 0))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
             (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);
@@ -1230,7 +1346,7 @@ void *umm_realloc(void *ptr, size_t size) {
     } else {
         DBGLOG_DEBUG("realloc a completely new block %d\n", blocks);
         void *oldptr = ptr;
-        if ((ptr = umm_malloc_core(_context, size))) {
+        if ((ptr = UMM_MALLOC_CORE(_context, size, 0))) {
             DBGLOG_DEBUG("realloc %d to a bigger block %d, copy, and free the old\n", blockSize, blocks);
             (void)POISON_CHECK_SET_POISON(ptr, size);
             UMM_CRITICAL_SUSPEND(id_realloc);

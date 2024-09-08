@@ -51,9 +51,16 @@ void IRAM_ATTR heap_vPortFree(void *ptr, const char *file, int line);
 // Specifically the debug version (heap_...) that does not force DRAM heap.
 void *IRAM_ATTR heap_pvPortMalloc(size_t size, const char *file, int line);
 void *IRAM_ATTR heap_pvPortCalloc(size_t count, size_t size, const char *file, int line);
+#ifdef UMM_ENABLE_MEMALIGN
+// fake pvPort... name for memalign
+void* IRAM_ATTR heap_pvPortMemalign(size_t alignment, size_t size, const char* file, int line);
+#endif
 
 #define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMalloc(s, mem_debug_file, __LINE__); })
 #define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortCalloc(n, s, mem_debug_file, __LINE__); })
+#ifdef UMM_ENABLE_MEMALIGN
+#define memalign(a,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; heap_pvPortMemalign(a, s, mem_debug_file, __LINE__); })
+#endif
 #endif
 
 #ifdef __cplusplus

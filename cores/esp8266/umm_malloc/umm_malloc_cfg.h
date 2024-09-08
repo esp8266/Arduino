@@ -269,6 +269,9 @@ typedef struct UMM_STATISTICS_t {
     size_t id_realloc_zero_count;
     size_t id_free_count;
     size_t id_free_null_count;
+    #if UMM_ENABLE_MEMALIGN
+    size_t id_malloc_align_error_count;
+    #endif
     #endif
 }
 UMM_STATISTICS;
@@ -321,6 +324,13 @@ size_t ICACHE_FLASH_ATTR umm_block_size(void);
         _context->stats.tag##_zero_count += 1; \
     } while (false)
 
+#if UMM_ENABLE_MEMALIGN
+#define STATS__ALIGNMENT_ERROR(tag, s)  \
+    do { \
+        _context->stats.tag##_align_error_count += 1; \
+    } while (false)
+#endif
+
 #define STATS__NULL_FREE_REQUEST(tag)  \
     do { \
         umm_heap_context_t *_context = umm_get_current_heap(); \
@@ -345,6 +355,9 @@ size_t umm_get_realloc_count(void);
 size_t umm_get_realloc_zero_count(void);
 size_t umm_get_free_count(void);
 size_t umm_get_free_null_count(void);
+#if UMM_ENABLE_MEMALIGN
+size_t umm_get_malloc_align_error_count(void);
+#endif
 
 #else // Not UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN()          (void)0
@@ -353,6 +366,9 @@ size_t umm_get_free_null_count(void);
 #define STATS__ZERO_ALLOC_REQUEST(tag, s) (void)(s)
 #define STATS__NULL_FREE_REQUEST(tag)     (void)0
 #define STATS__FREE_REQUEST(tag)          (void)0
+#if UMM_ENABLE_MEMALIGN
+#define STATS__ALIGNMENT_ERROR(tag, a)    (void)(a)
+#endif
 #endif
 
 /*

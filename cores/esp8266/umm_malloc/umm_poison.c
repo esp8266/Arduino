@@ -157,6 +157,29 @@ static void *get_unpoisoned(void *vptr) {
 /* }}} */
 #endif
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
+
+#if UMM_ENABLE_MEMALIGN
+/* ------------------------------------------------------------------------ */
+
+void *umm_posion_memalign(size_t alignment, size_t size) {
+    void *ret;
+
+    add_poison_size(&size);
+
+    ret = umm_memalign(alignment, size);
+    /*
+      "get_poisoned" is now called from umm_malloc while still in a critical
+      section. Before umm_malloc returned, the pointer offset was adjusted to
+      the start of the requested buffer.
+    */
+
+    return ret;
+}
+
+void *umm_poison_malloc(size_t size) {
+    return umm_posion_memalign(0u, size);
+}
+#else
 /* ------------------------------------------------------------------------ */
 
 void *umm_poison_malloc(size_t size) {
@@ -173,6 +196,7 @@ void *umm_poison_malloc(size_t size) {
 
     return ret;
 }
+#endif
 
 /* ------------------------------------------------------------------------ */
 

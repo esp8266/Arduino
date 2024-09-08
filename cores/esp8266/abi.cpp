@@ -27,42 +27,155 @@ using __cxxabiv1::__guard;
 
 // Debugging helper, last allocation which returned NULL
 extern "C" void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller);
+#if UMM_ENABLE_MEMALIGN
+extern "C" void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const void* const caller);
+#endif
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-#if defined(__cpp_exceptions) && (defined(DEBUG_ESP_OOM) \
-|| defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
+
 /*
-  When built with C++ Exceptions: "enabled", track caller address of Last OOM.
-  * For debug build, force enable Last OOM tracking.
-  * With the option "DEBUG_ESP_OOM," always do Last OOM tracking.
-  * Otherwise, disable Last OOM tracking. The build relies on the weak link to
-    the default C++ exception handler. This saves about 232 bytes of IROM, when
-    using C++ exceptions.
+  This is what I perceived to be the intent of the original code.
 
-//C C++ Exception "enabled" already adds 28,868 bytes to the build does another
-//C 232 matter that much? Added define MIN_ESP_OOM for experimention.
+  Use C++ "Replaceable allocation functions" to install debug wrappers to catch
+  additional information for debugging. The default C++ exception handlers use
+  weak links.
 
-    If desired, define MIN_ESP_OOM to continue with a minimum OOM tracking for
-    C++ exception builds.
+  C++ Exceptions: "enabled" -
+    * With debug (eg. "Debug port: Serial"), do full caller info capture and
+      Heap debug checks. "Replaceable allocation functions" are in use by the
+      debugging code. "Replaceable allocation functions" are not available to
+      the Sketch.
+    * Without debug, no OOM details captured. The C++ "Replaceable allocation
+      functions" are available to the Sketch.
+
+  C++ Exceptions: "disabled" -
+    * C++ "Replaceable allocation functions" are always in use.
+    * With debug, do full caller info capture and Heap debug checks.
+    * Without debug, capture minimum OOM information. Calling address and size
+      of last alloc failure.
 */
 
+#if defined(__cpp_exceptions) && \
+(defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
 
 // Debug replacement adaptation from ".../new_op.cc".
 using std::new_handler;
 using std::bad_alloc;
 
+#if defined(UMM_ENABLE_MEMALIGN)
+
+// Includes C++ exceptions
+// Includes C++17 operator new align variants
+
+static void* _heap_new_align(std::size_t size, std::size_t alignment, const void* caller)
+{
+    /*
+       "Alignment must be a power of two."
+       The C++ sample code did this: if (__builtin_expect(!std::__has_single_bit(alignment), false)) throw(bad_alloc());
+
+       From https://en.cppreference.com/w/cpp/memory/c/aligned_alloc
+         "alignment - specifies the alignment. Must be a valid alignment
+         supported by the implementation."
+
+       I leave the validation to the umm_malloc library. See umm_memalign() for
+       details. Generally speaking, zero is handled as default and the default
+       is sizeof(umm_block), 8-bytes.
+     */
+
+    void* p;
+
+    while (nullptr == (p = _heap_abi_memalign(alignment, size, false, caller))) {
+        new_handler handler = std::get_new_handler();
+        if (!handler) {
+            throw(bad_alloc());
+        }
+        handler();
+    }
+
+    return p;
+}
+
+
+// new_opa
+void* operator new (std::size_t size, std::align_val_t alignment)
+{
+    return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
+}
+
+// new_opva
+void* operator new[] (std::size_t size, std::align_val_t alignment)
+{
+    return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
+}
+
+// new_opant
+void* operator new (std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
+    }
+    __catch(...) {
+        return nullptr;
+    }
+}
+
+// new_opvant
+void* operator new[] (std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
+    }
+    __catch(...) {
+        return nullptr;
+    }
+}
+
+// new_op
+void* operator new (std::size_t size)
+{
+    return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
+}
+
+// new_opv
+void* operator new[] (std::size_t size)
+{
+    return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
+}
+
+// new_opnt
+void* operator new (size_t size, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
+    }
+    __catch (...) {
+        return nullptr;
+    }
+}
+
+// new_opvnt
+void* operator new[] (size_t size, const std::nothrow_t&) noexcept
+{
+    __try {
+        return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
+    }
+    __catch (...) {
+        return nullptr;
+    }
+}
+
+#else // ! UMM_ENABLE_MEMALIGN
+
+// Includes C++ exceptions
+// Without C++17 operator new align variants
+
 static void* _heap_new(std::size_t size, const void* caller)
 {
     void* p;
 
-    /* malloc (0) is unpredictable; avoid it.  */
-    if (__builtin_expect(size == 0, false)) {
-        size = 1;
-    }
-
-    while (0 == (p = _heap_abi_malloc(size, false, caller))) {
+    while (nullptr == (p = _heap_abi_malloc(size, false, caller))) {
         new_handler handler = std::get_new_handler();
         if (!handler) {
             throw(bad_alloc());
@@ -102,18 +215,63 @@ void* operator new[] (size_t size, const std::nothrow_t&) noexcept
         return nullptr;
     }
 }
-/*
-  TODO:
-  Current master does not support "new" align operations. Compiler reports:
-    "/workdir/repo/gcc-gnu/libstdc++-v3/libsupc++/new_opa.cc:86: undefined reference to `memalign'"
-  Look at enhancement to umm_malloc for an alignment option.
-*/
+#endif // #if UMM_ENABLE_MEMALIGN
 
 #elif !defined(__cpp_exceptions)
 // When doing builds with C++ Exceptions "disabled", always save details of
 // the last OOM event.
 
 // overwrite weak operators new/new[] definitions
+
+#if defined(UMM_ENABLE_MEMALIGN)
+
+// Without C++ exceptions
+// Includes C++17 operator new align variants
+
+void* operator new (size_t size, std::align_val_t alignment)
+{
+    return _heap_abi_memalign(std::size_t(alignment), size, true, __builtin_return_address(0));
+}
+
+void* operator new[] (size_t size, std::align_val_t alignment)
+{
+    return _heap_abi_memalign(std::size_t(alignment), size, true, __builtin_return_address(0));
+}
+
+void* operator new (size_t size, std::align_val_t alignment, const std::nothrow_t&)
+{
+    return _heap_abi_memalign(std::size_t(alignment), size, false, __builtin_return_address(0));
+}
+
+void* operator new[] (size_t size, std::align_val_t alignment, const std::nothrow_t&)
+{
+    return _heap_abi_memalign(std::size_t(alignment), size, false, __builtin_return_address(0));
+}
+
+void* operator new (size_t size)
+{
+    return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, true, __builtin_return_address(0));
+}
+
+void* operator new[] (size_t size)
+{
+    return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, true, __builtin_return_address(0));
+}
+
+void* operator new (size_t size, const std::nothrow_t&)
+{
+    return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, false, __builtin_return_address(0));
+}
+
+void* operator new[] (size_t size, const std::nothrow_t&)
+{
+    return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, false, __builtin_return_address(0));
+}
+
+#else
+
+// Without C++ exceptions
+// Without C++17 operator new align variants
 
 void* operator new (size_t size)
 {
@@ -134,8 +292,27 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 {
     return _heap_abi_malloc(size, false, __builtin_return_address(0));
 }
+#endif // #elif !defined(__cpp_exceptions)  #if defined(UMM_ENABLE_MEMALIGN)
+#else
+/*
+   Using weaklink C++ Exception handlers in libstdc
+   The "new" operators that express alignment should work through libstdc via
+   memalign() in the umm_malloc library.
 
-#endif // !defined(__cpp_exceptions)
+   This saves 20 bytes in the UMM_ENABLE_MEMALIGN=1 case and 32 bytes when
+   UMM_ENABLE_MEMALIGN=0.
+
+*/
+//D <<
+//C temporary pragmas remove before merge
+#pragma message("Using weaklink C++ Exception handlers in libstdc")
+#if UMM_ENABLE_MEMALIGN
+#pragma message("The \"new\" operators that express alignment should work through libstdc via memalign() in the umm_malloc library.")
+//D >>
+#endif
+
+#endif // #if defined(__cpp_exceptions)
+
 
 void __cxa_pure_virtual(void)
 {
