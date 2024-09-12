@@ -105,6 +105,11 @@
  *    UMM_POISON_CHECK_LITE should reveal most heap corruptions with lower
  *    overhead.
  *
+ *    DEV_DEBUG_ABI_CPP - Not normally needed. Its intended use is for module
+ *    code maintenance. Use DEV_DEBUG_ABI_CPP when debugging the new/delete
+ *    overload wrappers in abi.cpp and heap.cpp. In the test Sketch, add "extern
+ *    bool abi_new_print;" and set abi_new_print=true/false around test function
+ *    calls. Also, set '-DDEV_DEBUG_ABI_CPP=1' in Sketch.ino.globals.h.
  */
 
 #include <stdlib.h>
@@ -129,6 +134,12 @@ extern "C" void z2EapFree(void *ptr, const char* file, int line) __attribute__((
 #include <user_interface.h>
 
 extern "C" {
+
+#define DEBUG_HEAP_PRINTF ets_uart_printf
+
+inline bool withinISR(uint32_t ps) {
+     return ((ps & 0x0f) != 0);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Select from various heap function renames that facilitate inserting debug
@@ -272,7 +283,6 @@ struct umm_last_fail_alloc {
 } _umm_last_fail_alloc;
 #endif
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // OOM - DEBUG_ESP_OOM extends monitoring for OOM to capture caller information
 // across various Heap entry points and their aliases.
@@ -288,11 +298,6 @@ struct umm_last_fail_alloc {
 // of system_get_os_print(). Also, being in an IRQ may prevent the printing of
 // file names stored in PROGMEM. The PROGMEM address to the string is printed in
 // its place.
-#define DEBUG_HEAP_PRINTF ets_uart_printf
-inline bool withinISR(uint32_t ps) {
-     return ((ps & 0x0f) != 0);
-}
-
 static void IRAM_ATTR print_loc(bool inISR, size_t size, const char* file, int line, const void* caller) {
     if (system_get_os_print()) {
         DEBUG_HEAP_PRINTF(":oom %p(%d), File: ", caller, (int)size);
@@ -369,7 +374,6 @@ static bool oom_check__log_last_fail_psc(void *ptr, size_t size, const void* cal
 // Monitor Heap APIs in flash for calls from ISRs
 //
 #if DEBUG_ESP_WITHINISR
-#define DEBUG_HEAP_PRINTF ets_uart_printf
 static void isr_check__flash_not_safe(const void *caller) {
     if (ETS_INTR_WITHINISR()) { // Assumes, non-zero INTLEVEL means in ISR
         DEBUG_HEAP_PRINTF("\nIn-flash, Heap API call from %p with Interrupts Disabled.\n", caller);
@@ -710,6 +714,35 @@ void system_show_malloc(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 // heap allocator for "new" (ABI) - To support collecting OOM info, always defined
+#if DEV_DEBUG_ABI_CPP
+// In test Sketch, set abi_new_print=true/false around test function calls.
+bool abi_new_print = false;
+
+// _dbg_abi_print_pstr is shared (private) between abi.cpp and heap.cpp
+extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name, const void* caller) {
+    if (abi_new_print) {
+        uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
+        DEBUG_HEAP_PRINTF("\nTrace %s: ", op);
+        if (caller) DEBUG_HEAP_PRINTF("caller(%p), ", caller);
+        if (withinISR(saved_ps)) {
+            DEBUG_HEAP_PRINTF("FN(%p)", function_name);
+        } else {
+            size_t sz = strlen_P(function_name);
+            char buf[sz + 1];
+            strcpy_P(buf, function_name);
+            DEBUG_HEAP_PRINTF("'%s'", buf);
+        }
+        if (caller) DEBUG_HEAP_PRINTF("\n");
+        xt_wsr_ps(saved_ps);
+    }
+}
+#define DEBUG_DELETE_OP_PRINTF() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__, __builtin_return_address(0)); } while (false)
+
+#else
+#define DEBUG_DELETE_OP_PRINTF(...) do { } while (false)
+#endif
+
+
 #undef USE_HEAP_ABI_MEMALIGN
 #undef USE_HEAP_ABI_MALLOC
 
@@ -734,6 +767,7 @@ void system_show_malloc(void)
 // "memalign" in the name will have the "alignment" argument before the "size".
 void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const void* const caller)
 {
+    DEBUG_HEAP_PRINTF("  _heap_abi_memalign(alignment(%u), size(%u), unhandled(%s), caller(%p))\n", alignment, size, (unhandled) ? "true" : "false", caller);
     // A comment from libstdc new_op.cc says: "malloc (0) is unpredictable;
     // avoid it." This behavoir is only done for the new operator. Our malloc is
     // happy to return a null pointer for a zero size allocation; however, the
@@ -760,8 +794,10 @@ void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const vo
     return ret;
 }
 #elif USE_HEAP_ABI_MALLOC
-void* _heap_abi_malloc(size_t size, bool unhandled, const void* caller)
+void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller)
 {
+    DEBUG_HEAP_PRINTF("  _heap_abi_malloc(size(%u), unhandled(%s), caller(%p))\n", size, (unhandled) ? "true" : "false", caller);
+
     /* malloc (0) is unpredictable; avoid it.  */
     if (__builtin_expect(0 == size, false)) {
         size = 1;
@@ -879,14 +915,9 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
     return  CONFIG_IRAM_MEMORY;
 }
 #endif // #if (NONOSDK >= (0x30000))
-};
+}; // extern "C" {
 
 #if defined(ENABLE_THICK_DEBUG_WRAPPERS)
-///////////////////////////////////////////////////////////////////////////////
-//C Note I just threw this together from files from the Internet
-//C Is this the proper way to supply replacement "delete" operator?
-//
-
 ///////////////////////////////////////////////////////////////////////////////
 // Replacement C++ delete operator to capture callers address
 //
@@ -905,37 +936,49 @@ void _heap_delete(void* ptr, const void* caller) noexcept
 // del_op
 void operator delete (void* ptr) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opnt
 void operator delete (void *ptr, const std::nothrow_t&) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_ops
-void operator delete(void* ptr, std::size_t) noexcept
+void operator delete (void* ptr, std::size_t) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opv
 void operator delete[] (void *ptr) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvnt
 void operator delete[] (void *ptr, const std::nothrow_t&) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvs
 void operator delete[] (void *ptr, std::size_t) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 
 #if defined(__cpp_exceptions)
@@ -943,37 +986,49 @@ void operator delete[] (void *ptr, std::size_t) noexcept
 // del_opa
 void operator delete (void* ptr, std::align_val_t) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opant
 void operator delete (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opsa
-void operator delete(void* ptr, std::size_t, std::align_val_t) noexcept
+void operator delete (void* ptr, std::size_t, std::align_val_t) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opva
 void operator delete[] (void *ptr, std::align_val_t) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvant
 void operator delete[] (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
 {
+    DEBUG_DELETE_OP_PRINTF();
+
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvsa
 void operator delete[] (void *ptr, std::size_t, std::align_val_t) noexcept
 {
-  _heap_delete(ptr, __builtin_return_address(0));
+    DEBUG_DELETE_OP_PRINTF();
+
+    _heap_delete(ptr, __builtin_return_address(0));
 }
 #endif  // #if defined(UMM_ENABLE_MEMALIGN)
 #endif // #if defined(__cpp_exceptions)

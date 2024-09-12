@@ -352,5 +352,30 @@ Enhancement ideas:
 
   Move get_poisoned() within UMM_CRITICAL_* in umm_malloc() and umm_realloc().
 
+
+  September 14, 2024
+
+  Added conditional build support (UMM_ENABLE_MEMALIGN) for memalign() needed
+  for support of C++17. Expand umm_malloc_core() to support an alignment value.
+  I updated  umm_malloc/umm_memalign to handle minimum alignment parameter
+  testing. For the umm_malloc library, ignore all the C++ noise on lower
+  alignment limits, etc. Language-restrictive requirements are left to the upper
+  levels.
+
+  Referenced info:
+
+    New new() - The C++17's Alignment Parameter for Operator new()
+     https://www.cppstories.com/2019/08/newnew-align/
+
+    Alignment
+      https://en.cppreference.com/w/cpp/language/object#Alignment
+
+      std::max_align_t (in stddef.h) is a typedef struct with a collection of
+      types that would be used. "alignof(std::max_align_t)" yields the largest
+      alignment for the largest type. In some locations, I have seen references
+      to "sizeof(std::max_align_t)" I think those were typos.
+
+    From https://github.com/m-labs/uclibc-lm32/blob/defb191aab7711218035a506ec5cd8bb87c05c55/libc/stdlib/malloc-standard/malloc.h#L39
+
 */
 #endif

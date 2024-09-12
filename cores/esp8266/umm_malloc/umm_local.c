@@ -393,30 +393,4 @@ size_t umm_umul_sat(const size_t a, const size_t b) {
     return r;
 }
 
-
-#if 0
-// UMM_ENABLE_MEMALIGN
-/*
- *  Places for helpful info
- *
- *  New new() - The C++17's Alignment Parameter for Operator new()
- *    https://www.cppstories.com/2019/08/newnew-align/
- *
- *  Alignment
- *    https://en.cppreference.com/w/cpp/language/object#Alignment
- *
- *    std::max_align_t (in stddef.h) is a typedef struct with a collection of
- *    types that would be used. "alignof(std::max_align_t)" yields the largest
- *    alignment for the largest type. Note, "sizeof(std::max_align_t)" does not
- *    make sense, it would  be the size of the struct with all the elements used
- *    to find the prefered alignment.
- *
- *  From https://github.com/m-labs/uclibc-lm32/blob/defb191aab7711218035a506ec5cd8bb87c05c55/libc/stdlib/malloc-standard/malloc.h#L39
- *
- *  Expand umm_malloc_core() to handle an alignment value. Ignore all the C++
- *  noise as to lower alignment limits, etc. Just make it work. The caller of
- *  umm_malloc_core() will deal with the applying the language requirements.
- */
-#endif
-
 #endif // BUILD_UMM_MALLOC_C

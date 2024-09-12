@@ -35,6 +35,12 @@ extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
+#if DEV_DEBUG_ABI_CPP
+extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name, const void* caller);
+#define DEBUG_NEW_OP_PRINTF() _dbg_abi_print_pstr("new_op", __PRETTY_FUNCTION__, NULL)
+#else
+#define DEBUG_NEW_OP_PRINTF() do { } while (false)
+#endif
 /*
   This is what I perceived to be the intent of the original code.
 
@@ -79,10 +85,12 @@ static void* _heap_new_align(std::size_t size, std::size_t alignment, const void
          "alignment - specifies the alignment. Must be a valid alignment
          supported by the implementation."
 
-       I leave the validation to the umm_malloc library. See umm_memalign() for
-       details. Generally speaking, zero is handled as default and the default
-       is sizeof(umm_block), 8-bytes.
-     */
+       I left the validation to the umm_malloc library. See umm_memalign() for
+       details. Generally speaking, zero is handled as default, and the default
+       is sizeof(umm_block), 8 bytes. Since the default is 8 bytes, the
+       umm_malloc library is less strict about checking alignments less than 8
+       bytes.
+    */
 
     void* p;
 
@@ -101,18 +109,24 @@ static void* _heap_new_align(std::size_t size, std::size_t alignment, const void
 // new_opa
 void* operator new (std::size_t size, std::align_val_t alignment)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
 }
 
 // new_opva
 void* operator new[] (std::size_t size, std::align_val_t alignment)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
 }
 
 // new_opant
 void* operator new (std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
     }
@@ -124,6 +138,8 @@ void* operator new (std::size_t size, std::align_val_t alignment, const std::not
 // new_opvant
 void* operator new[] (std::size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new_align(size, std::size_t(alignment), __builtin_return_address(0));
     }
@@ -135,18 +151,24 @@ void* operator new[] (std::size_t size, std::align_val_t alignment, const std::n
 // new_op
 void* operator new (std::size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
 }
 
 // new_opv
 void* operator new[] (std::size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
 }
 
 // new_opnt
 void* operator new (size_t size, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
     }
@@ -158,6 +180,8 @@ void* operator new (size_t size, const std::nothrow_t&) noexcept
 // new_opvnt
 void* operator new[] (size_t size, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new_align(size, __STDCPP_DEFAULT_NEW_ALIGNMENT__, __builtin_return_address(0));
     }
@@ -188,16 +212,22 @@ static void* _heap_new(std::size_t size, const void* caller)
 
 void* operator new (std::size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new(size, __builtin_return_address(0));
 }
 
 void* operator new[] (std::size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_new(size, __builtin_return_address(0));
 }
 
 void* operator new (size_t size, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new(size, __builtin_return_address(0));
     }
@@ -208,6 +238,8 @@ void* operator new (size_t size, const std::nothrow_t&) noexcept
 
 void* operator new[] (size_t size, const std::nothrow_t&) noexcept
 {
+    DEBUG_NEW_OP_PRINTF();
+
     __try {
         return _heap_new(size, __builtin_return_address(0));
     }
@@ -230,41 +262,57 @@ void* operator new[] (size_t size, const std::nothrow_t&) noexcept
 
 void* operator new (size_t size, std::align_val_t alignment)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(std::size_t(alignment), size, true, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size, std::align_val_t alignment)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(std::size_t(alignment), size, true, __builtin_return_address(0));
 }
 
 void* operator new (size_t size, std::align_val_t alignment, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(std::size_t(alignment), size, false, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size, std::align_val_t alignment, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(std::size_t(alignment), size, false, __builtin_return_address(0));
 }
 
 void* operator new (size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, true, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, true, __builtin_return_address(0));
 }
 
 void* operator new (size_t size, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, false, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_memalign(__STDCPP_DEFAULT_NEW_ALIGNMENT__, size, false, __builtin_return_address(0));
 }
 
@@ -275,32 +323,43 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 
 void* operator new (size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_malloc(size, true, __builtin_return_address(0));
 }
 
 void* operator new (size_t size, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_malloc(size, false, __builtin_return_address(0));
 }
 
 void* operator new[] (size_t size, const std::nothrow_t&)
 {
+    DEBUG_NEW_OP_PRINTF();
+
     return _heap_abi_malloc(size, false, __builtin_return_address(0));
 }
 #endif // #elif !defined(__cpp_exceptions)  #if defined(UMM_ENABLE_MEMALIGN)
 #else
 /*
-   Using weaklink C++ Exception handlers in libstdc
-   The "new" operators that express alignment should work through libstdc via
-   memalign() in the umm_malloc library.
+  Using weaklink C++ Exception handlers in libstdc. The "new" operators that
+  express alignment should work through libstdc via memalign() in the umm_malloc
+  library.
 
-   This saves 20 bytes in the UMM_ENABLE_MEMALIGN=1 case and 32 bytes when
-   UMM_ENABLE_MEMALIGN=0.
+  Note that libstdc will fail errors in alignment value early. Thus, the
+  UMM_STATS_FULL alignment error count will be zero.
+
+  This saves about 20 bytes in the UMM_ENABLE_MEMALIGN=1 case and 32 bytes when
+  UMM_ENABLE_MEMALIGN=0.
 
 */
 //D <<

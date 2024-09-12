@@ -101,6 +101,52 @@ extern char _heap_start[];
 #endif
 
 /*
+ * -DUMM_ENABLE_MEMALIGN=1
+ *
+ * Include function memalign(size_t alignment, size_t size) in the build.
+ * Provides lowlevel memalign function to support C++17 addition of aligned
+ * "new" operators.
+ *
+ * Requires default 8-byte aligned data addresses.
+ * Build options "-DUMM_LEGACY_ALIGN_4BYTE=1" and "-DUMM_LEGACY_ALIGN_4BYTE=1"
+ * are mutually exclusive.
+ *
+ * Allocations from memalign() internally appear and are handled like any other
+ * UMM_MALLOC memory allocation.
+ *
+ * The existing free() function handles releasing memalign() memory allocations.
+ *
+ * Function realloc() should not be called for aligned memory allocations.
+ * It can break the alignment. At worst, the alignment falls back to
+ * sizeof(umm_block), 8 bytes.
+ *
+ * The UMM_POISON build option supports memalign().
+ *
+ #define UMM_ENABLE_MEMALIGN 1
+ */
+
+// #define UMM_ENABLE_MEMALIGN 1
+
+#if ((1 - UMM_ENABLE_MEMALIGN - 1) == 2)
+#undef UMM_ENABLE_MEMALIGN
+#define UMM_ENABLE_MEMALIGN 1
+#elif ((1 - UMM_ENABLE_MEMALIGN - 1) == 0)
+#undef UMM_ENABLE_MEMALIGN
+#endif
+
+//D
+//D #ifndef __STRINGIFY
+//D #define __STRINGIFY(a) #a
+//D #endif
+//D #define QUOTE(a) __STRINGIFY(a)
+//D #pragma message("UMM_ENABLE_MEMALIGN: \"" QUOTE(UMM_ENABLE_MEMALIGN) "\"")
+//D #ifdef UMM_ENABLE_MEMALIGN
+//D #pragma message("UMM_ENABLE_MEMALIGN defined")
+//D #else
+//D #pragma message("UMM_ENABLE_MEMALIGN not defined")
+//D #endif
+
+/*
  * The NONOS SDK API requires function `umm_info()` for implementing
  * `system_show_malloc()`. Build option `-DUMM_INFO` enables this support.
  *
@@ -378,39 +424,6 @@ extern bool  umm_poison_check(void);
 #else
 #define UMM_OVERHEAD_ADJUST  (umm_block_size() / 2)
 #endif
-
-
-/*
- * -DUMM_ENABLE_MEMALIGN=1
- *
- * Include function memalign(size_t alignment, size_t size) in the build.
- * Provides lowlevel memalign function to support C++17 addition of aligned
- * "new" operators.
- *
- * Requires default 8-byte aligned data addresses.
- * Build options "-DUMM_LEGACY_ALIGN_4BYTE=1" and "-DUMM_LEGACY_ALIGN_4BYTE=1"
- * are mutually exclusive.
- *
- * Allocations from memalign() internally appear and are handled like any other
- * UMM_MALLOC memory allocation.
- *
- * The existing free() function handles releasing memalign() memory allocations.
- *
- * Function realloc() should not be called for aligned memory allocations.
- * It can break the alignment. At worst, the alignment falls back to
- * sizeof(umm_block), 8 bytes.
- *
- * The UMM_POISON build option supports memalign().
- *
- */
-
-#if ((1 - UMM_ENABLE_MEMALIGN - 1) == 2)
-#undef UMM_ENABLE_MEMALIGN
-#define UMM_ENABLE_MEMALIGN 1
-#elif ((1 - UMM_ENABLE_MEMALIGN - 1) == 0)
-#undef UMM_ENABLE_MEMALIGN
-#endif
-
 
 
 /*

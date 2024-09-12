@@ -524,7 +524,7 @@ static void ICACHE_MAYBE _umm_init_heap(umm_heap_context_t *_context) {
 void ICACHE_MAYBE umm_init_heap(size_t id, void *start_addr, size_t size, bool full_init) {
     /* Check for bad values and block duplicate init attempts. */
     umm_heap_context_t *_context = umm_get_heap_by_id(id);
-    if (NULL == start_addr || NULL == _context || _context->heap) {
+    if (NULL == start_addr || NULL == _context || _context->heap || size < 20u) {
         return;
     }
 
@@ -542,9 +542,10 @@ void ICACHE_MAYBE umm_init_heap(size_t id, void *start_addr, size_t size, bool f
     _context->heap = (umm_block *)((uintptr_t)start_addr);
 #else
     _context->heap = (umm_block *)((uintptr_t)start_addr + 4u);
+    size -= 4u;
 #endif
     _context->numblocks = (size / sizeof(umm_block));
-    _context->heap_end = (void *)((uintptr_t)start_addr + _context->numblocks * sizeof(umm_block));
+    _context->heap_end = (void *)((uintptr_t)_context->heap + _context->numblocks * sizeof(umm_block));
 
     // An option for blocking the zeroing of extra heaps. This allows for
     // post-crash debugging after reboot.
@@ -781,7 +782,6 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
 
 #if UMM_ENABLE_MEMALIGN
         if (__builtin_expect(alignment, 0u)) {
-
             size_t alignMask = (alignment - 1u);
             uintptr_t aptr = (uintptr_t)&UMM_DATA(cf);
 
@@ -815,24 +815,6 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
                 cf = c;
                 blocks -= frag;
             }
-
-            #if DEV_DEBUG
-            #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK)
-            #if defined(UMM_INTEGRITY_CHECK)
-            umm_integrity_check();
-            #endif
-            // extra verify computations
-            uintptr_t ptr = (uintptr_t)&UMM_DATA(cf);
-            #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-            ptr += sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
-            ptr = (ptr + alignMask) & ~alignMask;
-            ptr -= sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
-            #else
-            ptr = (ptr + alignMask) & ~alignMask;
-            #endif
-            if (aptr != ptr) panic();
-            #endif
-            #endif // #if DEV_DEBUG
         }
 #endif
 
