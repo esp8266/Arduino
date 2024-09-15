@@ -107,9 +107,12 @@
  *
  *    DEV_DEBUG_ABI_CPP - Not normally needed. Its intended use is for module
  *    code maintenance. Use DEV_DEBUG_ABI_CPP when debugging the new/delete
- *    overload wrappers in abi.cpp and heap.cpp. In the test Sketch, add "extern
- *    bool abi_new_print;" and set abi_new_print=true/false around test function
- *    calls. Also, set '-DDEV_DEBUG_ABI_CPP=1' in Sketch.ino.globals.h.
+ *    overload wrappers in abi.cpp and heap.cpp. To use in a test Sketch, add
+ *    "extern bool abi_new_print;" and set abi_new_print=true/false around test
+ *    function calls. Also, set '-DDEV_DEBUG_ABI_CPP=1' in Sketch.ino.globals.h.
+ *    With this option, using print functions in the test Sketch that performs
+ *    allocs can create a confusing array of debug prints. For this reason, I
+ *    often use ets_uart_printf in alloc test Sketches.
  */
 
 #include <stdlib.h>
@@ -155,7 +158,8 @@ inline bool withinISR(uint32_t ps) {
 #undef STATIC_ALWAYS_INLINE
 #undef ENABLE_THICK_DEBUG_WRAPPERS
 
-// We want none of these redefined, possition these after all includes have finished.
+// Whether using thick or thin wrappers, we want none of these redefined.
+// Position these "#undefs" after all includes.
 #undef malloc
 #undef calloc
 #undef realloc
@@ -174,9 +178,6 @@ inline bool withinISR(uint32_t ps) {
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc_flc(p,s,f,l,c)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free_flc(p,f,l,c)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-//D
-//D #undef realloc
-//D #undef free
 
 #elif defined(UMM_POISON_CHECK)
 /*
@@ -190,9 +191,6 @@ inline bool withinISR(uint32_t ps) {
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_poison_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_poison_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-//D
-//D #undef realloc
-//D #undef free
 
 #elif defined(DEBUG_ESP_OOM) || defined(UMM_INTEGRITY_CHECK) || defined(DEBUG_ESP_WITHINISR)
 // All other debug wrappers that do not require handling poison
@@ -202,9 +200,6 @@ inline bool withinISR(uint32_t ps) {
 #define UMM_REALLOC_FL(p,s,f,l,c) umm_realloc(p,s)
 #define UMM_FREE_FL(p,f,l,c)      umm_free(p)
 #define ENABLE_THICK_DEBUG_WRAPPERS
-//D
-//D #undef realloc
-//D #undef free
 
 #else  // ! UMM_POISON_CHECK && ! DEBUG_ESP_OOM
 extern "C" void* memalign(size_t alignment, size_t size);
@@ -403,12 +398,6 @@ static void isr_check__flash_not_safe(const void *caller) {
 // When selected, do Integrity Check first. Verifies the heap management
 // information is not corrupt. Followed by Full Poison Check before *alloc
 // operation.
-//D
-//D #undef malloc
-//D #undef calloc
-//D #undef realloc
-//D #undef free
-//D #undef memalign
 
 ///////////////////////////////////////////////////////////////////////////////
 // Common Heap debug helper functions for each alloc operation
@@ -712,115 +701,6 @@ void system_show_malloc(void)
 #endif
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// heap allocator for "new" (ABI) - To support collecting OOM info, always defined
-#if DEV_DEBUG_ABI_CPP
-// In test Sketch, set abi_new_print=true/false around test function calls.
-bool abi_new_print = false;
-
-// _dbg_abi_print_pstr is shared (private) between abi.cpp and heap.cpp
-extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name, const void* caller) {
-    if (abi_new_print) {
-        uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
-        DEBUG_HEAP_PRINTF("\nTrace %s: ", op);
-        if (caller) DEBUG_HEAP_PRINTF("caller(%p), ", caller);
-        if (withinISR(saved_ps)) {
-            DEBUG_HEAP_PRINTF("FN(%p)", function_name);
-        } else {
-            size_t sz = strlen_P(function_name);
-            char buf[sz + 1];
-            strcpy_P(buf, function_name);
-            DEBUG_HEAP_PRINTF("'%s'", buf);
-        }
-        if (caller) DEBUG_HEAP_PRINTF("\n");
-        xt_wsr_ps(saved_ps);
-    }
-}
-#define DEBUG_DELETE_OP_PRINTF() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__, __builtin_return_address(0)); } while (false)
-
-#else
-#define DEBUG_DELETE_OP_PRINTF(...) do { } while (false)
-#endif
-
-
-#undef USE_HEAP_ABI_MEMALIGN
-#undef USE_HEAP_ABI_MALLOC
-
-#if defined(__cpp_exceptions) && \
-(defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
-#if defined(UMM_ENABLE_MEMALIGN)
-#define USE_HEAP_ABI_MEMALIGN 1
-#else
-#define USE_HEAP_ABI_MALLOC 1
-#endif
-
-#elif !defined(__cpp_exceptions)
-#if defined(UMM_ENABLE_MEMALIGN)
-#define USE_HEAP_ABI_MEMALIGN 1
-#else
-#define USE_HEAP_ABI_MALLOC 1
-#endif
-#endif
-
-#if USE_HEAP_ABI_MEMALIGN
-// To maintain my sanity, I intend that all functions containing the string
-// "memalign" in the name will have the "alignment" argument before the "size".
-void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const void* const caller)
-{
-    DEBUG_HEAP_PRINTF("  _heap_abi_memalign(alignment(%u), size(%u), unhandled(%s), caller(%p))\n", alignment, size, (unhandled) ? "true" : "false", caller);
-    // A comment from libstdc new_op.cc says: "malloc (0) is unpredictable;
-    // avoid it." This behavoir is only done for the new operator. Our malloc is
-    // happy to return a null pointer for a zero size allocation; however, the
-    // comment implies to me that other behavior might probe an under tested
-    // logic path. We take the road more traveled.
-    if (__builtin_expect(0 == size, false)) {
-        size = 1;
-    }
-
-    #ifdef ENABLE_THICK_DEBUG_WRAPPERS
-    ISR_CHECK__LOG_NOT_SAFE(caller);
-    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
-    POISON_CHECK__PANIC_FL(NULL, 0, caller);
-    void* ret = UMM_MEMALIGN(alignment, size);
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
-    #else
-    void* ret = UMM_MEMALIGN(alignment, size);
-    // minimum OOM check
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
-    #endif
-    if (!ok && unhandled) {
-        __unhandled_exception(PSTR("OOM"));
-    }
-    return ret;
-}
-#elif USE_HEAP_ABI_MALLOC
-void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller)
-{
-    DEBUG_HEAP_PRINTF("  _heap_abi_malloc(size(%u), unhandled(%s), caller(%p))\n", size, (unhandled) ? "true" : "false", caller);
-
-    /* malloc (0) is unpredictable; avoid it.  */
-    if (__builtin_expect(0 == size, false)) {
-        size = 1;
-    }
-
-    #ifdef ENABLE_THICK_DEBUG_WRAPPERS
-    ISR_CHECK__LOG_NOT_SAFE(caller);
-    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
-    POISON_CHECK__PANIC_FL(NULL, 0, caller);
-    void* ret = UMM_MALLOC(size);
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
-    #else
-    void* ret = UMM_MALLOC(size);
-    // minimum OOM check
-    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
-    #endif
-    if (!ok && unhandled) {
-        __unhandled_exception(PSTR("OOM"));
-    }
-    return ret;
-}
-#endif
-
 #if (NONOSDK >= (0x30000))
 ////////////////////////////////////////////////////////////////////////////////
 /*
@@ -915,7 +795,120 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
     return  CONFIG_IRAM_MEMORY;
 }
 #endif // #if (NONOSDK >= (0x30000))
+
+
+///////////////////////////////////////////////////////////////////////////////
+// heap allocator for "new" (ABI) - To support collecting OOM info, always defined
+#if DEV_DEBUG_ABI_CPP
+// In test Sketch, set abi_new_print=true/false around test function calls.
+bool abi_new_print = false;
+#define DEBUG_ABI_CPP_PRINTF ets_uart_printf
+
+// _dbg_abi_print_pstr is shared (private) between abi.cpp and heap.cpp
+extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name) {
+    if (abi_new_print) {
+        uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
+        DEBUG_HEAP_PRINTF("\nTrace %s: ", op);
+        if (withinISR(saved_ps)) {
+            DEBUG_HEAP_PRINTF("FN(%p)", function_name);
+        } else {
+            size_t sz = strlen_P(function_name);
+            char buf[sz + 1];
+            strcpy_P(buf, function_name);
+            DEBUG_HEAP_PRINTF("'%s'", buf);
+        }
+        xt_wsr_ps(saved_ps);
+    }
+}
+// #define DEBUG_DELETE_OP_PRINT_FN() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__, __builtin_return_address(0)); } while (false)
+#define DEBUG_DELETE_OP_PRINT_FN() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__); } while (false)
+
+#else
+#define DEBUG_DELETE_OP_PRINT_FN(...) do { } while (false)
+#define DEBUG_ABI_CPP_PRINTF(...)
+#endif
+
+
+#undef USE_HEAP_ABI_MEMALIGN
+#undef USE_HEAP_ABI_MALLOC
+
+#if defined(__cpp_exceptions) && \
+(defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
+#if defined(UMM_ENABLE_MEMALIGN)
+#define USE_HEAP_ABI_MEMALIGN 1
+#else
+#define USE_HEAP_ABI_MALLOC 1
+#endif
+
+#elif !defined(__cpp_exceptions)
+#if defined(UMM_ENABLE_MEMALIGN)
+#define USE_HEAP_ABI_MEMALIGN 1
+#else
+#define USE_HEAP_ABI_MALLOC 1
+#endif
+#endif
+
+#if USE_HEAP_ABI_MEMALIGN
+// To maintain my sanity, I intend that all functions containing the string
+// "memalign" in the name will have the "alignment" argument before the "size".
+void* _heap_abi_memalign(size_t alignment, size_t size, bool unhandled, const void* const caller)
+{
+    DEBUG_ABI_CPP_PRINTF("  _heap_abi_memalign(alignment(%u), size(%u), unhandled(%s), caller(%p))\n", alignment, size, (unhandled) ? "true" : "false", caller);
+    // A comment from libstdc new_op.cc says: "malloc (0) is unpredictable;
+    // avoid it." This behavoir is only done for the new operator. Our malloc is
+    // happy to return a null pointer for a zero size allocation; however, the
+    // comment implies to me that other behavior might probe an under tested
+    // logic path. We take the road more traveled.
+    if (__builtin_expect(0 == size, false)) {
+        size = 1;
+    }
+
+    #ifdef ENABLE_THICK_DEBUG_WRAPPERS
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
+    POISON_CHECK__PANIC_FL(NULL, 0, caller);
+    void* ret = UMM_MEMALIGN(alignment, size);
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
+    #else
+    void* ret = UMM_MEMALIGN(alignment, size);
+    // minimum OOM check
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
+    #endif
+    if (!ok && unhandled) {
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+#elif USE_HEAP_ABI_MALLOC
+void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller)
+{
+    DEBUG_ABI_CPP_PRINTF("  _heap_abi_malloc(size(%u), unhandled(%s), caller(%p))\n", size, (unhandled) ? "true" : "false", caller);
+
+    /* malloc (0) is unpredictable; avoid it.  */
+    if (__builtin_expect(0 == size, false)) {
+        size = 1;
+    }
+
+    #ifdef ENABLE_THICK_DEBUG_WRAPPERS
+    ISR_CHECK__LOG_NOT_SAFE(caller);
+    INTEGRITY_CHECK__PANIC_FL(NULL, 0, caller);
+    POISON_CHECK__PANIC_FL(NULL, 0, caller);
+    void* ret = UMM_MALLOC(size);
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_FL(ret, size, NULL, 0, caller);
+    #else
+    void* ret = UMM_MALLOC(size);
+    // minimum OOM check
+    bool ok = OOM_CHECK__LOG_LAST_FAIL_LITE_FL(ret, size, caller);
+    #endif
+    if (!ok && unhandled) {
+        __unhandled_exception(PSTR("OOM"));
+    }
+    return ret;
+}
+#endif
+
 }; // extern "C" {
+
 
 #if defined(ENABLE_THICK_DEBUG_WRAPPERS)
 ///////////////////////////////////////////////////////////////////////////////
@@ -936,7 +929,8 @@ void _heap_delete(void* ptr, const void* caller) noexcept
 // del_op
 void operator delete (void* ptr) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), caller(%p)\n", ptr, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
@@ -944,15 +938,17 @@ void operator delete (void* ptr) noexcept
 // del_opnt
 void operator delete (void *ptr, const std::nothrow_t&) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), std::nothrow_t&, caller(%p)\n", ptr, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_ops
-void operator delete (void* ptr, std::size_t) noexcept
+void operator delete (void* ptr, [[maybe_unused]]std::size_t size) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), size(%u), caller(%p)\n", ptr, size, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
@@ -960,7 +956,8 @@ void operator delete (void* ptr, std::size_t) noexcept
 // del_opv
 void operator delete[] (void *ptr) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), caller(%p)\n", ptr, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
@@ -968,15 +965,17 @@ void operator delete[] (void *ptr) noexcept
 // del_opvnt
 void operator delete[] (void *ptr, const std::nothrow_t&) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), std::nothrow_t, caller(%p)\n", ptr, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvs
-void operator delete[] (void *ptr, std::size_t) noexcept
+void operator delete[] (void *ptr,[[maybe_unused]]std::size_t size) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), size(%u), caller(%p)\n", ptr, size, __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
@@ -984,49 +983,55 @@ void operator delete[] (void *ptr, std::size_t) noexcept
 #if defined(__cpp_exceptions)
 #if defined(UMM_ENABLE_MEMALIGN)
 // del_opa
-void operator delete (void* ptr, std::align_val_t) noexcept
+void operator delete (void* ptr, [[maybe_unused]]std::align_val_t alignment) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opant
-void operator delete (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
+void operator delete (void *ptr, [[maybe_unused]]std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), std::nothrow_t, caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opsa
-void operator delete (void* ptr, std::size_t, std::align_val_t) noexcept
+void operator delete (void* ptr, [[maybe_unused]]std::size_t size, [[maybe_unused]]std::align_val_t alignment) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), size(%u), alignment(%u), caller(%p)\n", ptr, size, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opva
-void operator delete[] (void *ptr, std::align_val_t) noexcept
+void operator delete[] (void *ptr, [[maybe_unused]]std::align_val_t alignment) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvant
-void operator delete[] (void *ptr, std::align_val_t, const std::nothrow_t&) noexcept
+void operator delete[] (void *ptr, [[maybe_unused]]std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), std::nothrow_t, caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
 // del_opvsa
-void operator delete[] (void *ptr, std::size_t, std::align_val_t) noexcept
+void operator delete[] (void *ptr, [[maybe_unused]]std::size_t size, [[maybe_unused]]std::align_val_t alignment) noexcept
 {
-    DEBUG_DELETE_OP_PRINTF();
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), size(%u), alignment(%u), caller(%p)\n", ptr, size, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }

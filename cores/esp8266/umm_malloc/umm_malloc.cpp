@@ -969,14 +969,15 @@ void *umm_malloc(size_t size)
     }
 
     /*
-     * Allocations default to 8-byte alignment same as __STDCPP_DEFAULT_NEW_ALIGNMENT__
-     * No need to execute extra alignment logic for small alignments.
+     * Allocations default to 8-byte alignment, same as __STDCPP_DEFAULT_NEW_ALIGNMENT__.
+     * There is no need to execute extra alignment logic for small alignments.
+     *
+     * Side note when you add '-faligned-new=4' or other non-8 values to the
+     * build the GCC compiler complains with: "cc1: warning: command-line option
+     * '-faligned-new=4' is valid for C++/ObjC++ but not for C."
      */
-
-    static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ == 8u);
-    static_assert(__STDCPP_DEFAULT_NEW_ALIGNMENT__ == sizeof(umm_block));
     if (alignment <= sizeof(umm_block)) {
-        alignment = 0u;   // Use implementation default, 8.
+        alignment = 0u;   // Use implementation default/minimum, 8.
     }
 #endif
 

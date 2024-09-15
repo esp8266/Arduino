@@ -36,8 +36,8 @@ extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
 #if DEV_DEBUG_ABI_CPP
-extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name, const void* caller);
-#define DEBUG_NEW_OP_PRINTF() _dbg_abi_print_pstr("new_op", __PRETTY_FUNCTION__, NULL)
+extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name);
+#define DEBUG_NEW_OP_PRINTF() _dbg_abi_print_pstr("new_op", __PRETTY_FUNCTION__)
 #else
 #define DEBUG_NEW_OP_PRINTF() do { } while (false)
 #endif
@@ -351,9 +351,10 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 #endif // #elif !defined(__cpp_exceptions)  #if defined(UMM_ENABLE_MEMALIGN)
 #else
 /*
-  Using weaklink C++ Exception handlers in libstdc. The "new" operators that
-  express alignment should work through libstdc via memalign() in the umm_malloc
-  library.
+  The C++ Exception handlers in libstdc are using weaklinks. The "new" operators
+  that express alignment should work through libstdc via memalign() in the
+  umm_malloc library. While not likely to ever be needed, the Sketch can replace
+  the C++ "Replaceable allocation functions."
 
   Note that libstdc will fail errors in alignment value early. Thus, the
   UMM_STATS_FULL alignment error count will be zero.
@@ -367,8 +368,8 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 #pragma message("Using weaklink C++ Exception handlers in libstdc")
 #if UMM_ENABLE_MEMALIGN
 #pragma message("The \"new\" operators that express alignment should work through libstdc via memalign() in the umm_malloc library.")
-//D >>
 #endif
+//D >>
 
 #endif // #if defined(__cpp_exceptions)
 
