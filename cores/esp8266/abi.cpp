@@ -36,8 +36,8 @@ extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 
 #if DEV_DEBUG_ABI_CPP
-extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name);
-#define DEBUG_NEW_OP_PRINTF() _dbg_abi_print_pstr("new_op", __PRETTY_FUNCTION__)
+extern "C" void _dbg_abi_print_pstr(const char *function_name);
+#define DEBUG_NEW_OP_PRINTF() _dbg_abi_print_pstr(__PRETTY_FUNCTION__)
 #else
 #define DEBUG_NEW_OP_PRINTF() do { } while (false)
 #endif
@@ -147,6 +147,8 @@ void* operator new[] (std::size_t size, std::align_val_t alignment, const std::n
         return nullptr;
     }
 }
+
+// default alignment
 
 // new_op
 void* operator new (std::size_t size)
@@ -288,6 +290,8 @@ void* operator new[] (size_t size, std::align_val_t alignment, const std::nothro
     return _heap_abi_memalign(std::size_t(alignment), size, false, __builtin_return_address(0));
 }
 
+// default alignment
+
 void* operator new (size_t size)
 {
     DEBUG_NEW_OP_PRINTF();
@@ -361,16 +365,7 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 
   This saves about 20 bytes in the UMM_ENABLE_MEMALIGN=1 case and 32 bytes when
   UMM_ENABLE_MEMALIGN=0.
-
 */
-//D <<
-//C temporary pragmas remove before merge
-#pragma message("Using weaklink C++ Exception handlers in libstdc")
-#if UMM_ENABLE_MEMALIGN
-#pragma message("The \"new\" operators that express alignment should work through libstdc via memalign() in the umm_malloc library.")
-#endif
-//D >>
-
 #endif // #if defined(__cpp_exceptions)
 
 

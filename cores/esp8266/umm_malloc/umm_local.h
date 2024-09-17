@@ -35,8 +35,8 @@ static size_t umm_uadd_sat(const size_t a, const size_t b);
 
 
 #if defined(DEBUG_ESP_OOM) || defined(UMM_POISON_CHECK) \
-|| defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK) \
-|| defined(DEBUG_ESP_WITHINISR)
+    || defined(UMM_POISON_CHECK_LITE) || defined(UMM_INTEGRITY_CHECK) \
+    || defined(DEBUG_ESP_WITHINISR)
 #else
 #define umm_malloc(s)           malloc(s)
 #define umm_memalign(a,s)       memalign(a,s)

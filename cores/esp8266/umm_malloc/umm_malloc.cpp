@@ -536,14 +536,14 @@ void ICACHE_MAYBE umm_init_heap(size_t id, void *start_addr, size_t size, bool f
     // Our default target alignment is __STDCPP_DEFAULT_NEW_ALIGNMENT__ == 8
     // To return malloc memory 8-byte aligned, we have to sacrifice 4-bytes at
     // beginning and end of the heap address space.
-#if defined(UMM_LEGACY_ALIGN_4BYTE) && defined(UMM_ENABLE_MEMALIGN)
+    #if defined(UMM_LEGACY_ALIGN_4BYTE) && defined(UMM_ENABLE_MEMALIGN)
     #error "Build option conflict - cannot support both UMM_LEGACY_ALIGN_4BYTE and UMM_ENABLE_MEMALIGN"
-#elif defined(UMM_LEGACY_ALIGN_4BYTE)
+    #elif defined(UMM_LEGACY_ALIGN_4BYTE)
     _context->heap = (umm_block *)((uintptr_t)start_addr);
-#else
+    #else
     _context->heap = (umm_block *)((uintptr_t)start_addr + 4u);
     size -= 4u;
-#endif
+    #endif
     _context->numblocks = (size / sizeof(umm_block));
     _context->heap_end = (void *)((uintptr_t)_context->heap + _context->numblocks * sizeof(umm_block));
 
@@ -725,12 +725,12 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
 
     STATS__ALLOC_REQUEST(id_malloc, size);
 
-#if UMM_ENABLE_MEMALIGN
+    #if UMM_ENABLE_MEMALIGN
     if (alignment) {
         // Pad size to cover alignment adjustments
         size += alignment;
     }
-#endif
+    #endif
 
     blocks = umm_blocks(size);
 
@@ -780,7 +780,7 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
 
         UMM_FRAGMENTATION_METRIC_REMOVE(cf);
 
-#if UMM_ENABLE_MEMALIGN
+        #if UMM_ENABLE_MEMALIGN
         if (__builtin_expect(alignment, 0u)) {
             size_t alignMask = (alignment - 1u);
             uintptr_t aptr = (uintptr_t)&UMM_DATA(cf);
@@ -816,7 +816,7 @@ static void *umm_malloc_core(umm_heap_context_t *_context, size_t size)
                 blocks -= frag;
             }
         }
-#endif
+        #endif
 
         /*
          * This is an existing block in the memory heap, we just need to split off
@@ -957,15 +957,15 @@ void *umm_malloc(size_t size)
         return ptr;
     }
 
-#if UMM_ENABLE_MEMALIGN
+    #if UMM_ENABLE_MEMALIGN
 
     /*
      * Ensure alignment is power of 2; however, we allow zero.
      */
 
     if (0u != (alignment & (alignment - 1u))) {
-      STATS__ALIGNMENT_ERROR(id_malloc, alignment);
-      return ptr;
+        STATS__ALIGNMENT_ERROR(id_malloc, alignment);
+        return ptr;
     }
 
     /*
@@ -979,7 +979,7 @@ void *umm_malloc(size_t size)
     if (alignment <= sizeof(umm_block)) {
         alignment = 0u;   // Use implementation default/minimum, 8.
     }
-#endif
+    #endif
 
     /* Allocate the memory within a protected critical section */
 

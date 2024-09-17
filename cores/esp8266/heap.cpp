@@ -805,10 +805,10 @@ bool abi_new_print = false;
 #define DEBUG_ABI_CPP_PRINTF ets_uart_printf
 
 // _dbg_abi_print_pstr is shared (private) between abi.cpp and heap.cpp
-extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name) {
+extern "C" void _dbg_abi_print_pstr(const char *function_name) {
     if (abi_new_print) {
         uint32_t saved_ps = xt_rsil(DEFAULT_CRITICAL_SECTION_INTLEVEL);
-        DEBUG_HEAP_PRINTF("\nTrace %s: ", op);
+        DEBUG_HEAP_PRINTF("\nTrace: ");
         if (withinISR(saved_ps)) {
             DEBUG_HEAP_PRINTF("FN(%p)", function_name);
         } else {
@@ -821,7 +821,7 @@ extern "C" void _dbg_abi_print_pstr(const char* op, const char *function_name) {
     }
 }
 // #define DEBUG_DELETE_OP_PRINT_FN() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__, __builtin_return_address(0)); } while (false)
-#define DEBUG_DELETE_OP_PRINT_FN() do { _dbg_abi_print_pstr("delete_op", __PRETTY_FUNCTION__); } while (false)
+#define DEBUG_DELETE_OP_PRINT_FN() do { _dbg_abi_print_pstr(__PRETTY_FUNCTION__); } while (false)
 
 #else
 #define DEBUG_DELETE_OP_PRINT_FN(...) do { } while (false)
@@ -972,7 +972,7 @@ void operator delete[] (void *ptr, const std::nothrow_t&) noexcept
 }
 
 // del_opvs
-void operator delete[] (void *ptr,[[maybe_unused]]std::size_t size) noexcept
+void operator delete[] (void *ptr, [[maybe_unused]]std::size_t size) noexcept
 {
     DEBUG_DELETE_OP_PRINT_FN();
     DEBUG_ABI_CPP_PRINTF(", ptr(%p), size(%u), caller(%p)\n", ptr, size, __builtin_return_address(0));
@@ -980,22 +980,32 @@ void operator delete[] (void *ptr,[[maybe_unused]]std::size_t size) noexcept
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
-#if defined(__cpp_exceptions)
 #if defined(UMM_ENABLE_MEMALIGN)
-// del_opa
-void operator delete (void* ptr, [[maybe_unused]]std::align_val_t alignment) noexcept
-{
-    DEBUG_DELETE_OP_PRINT_FN();
-    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
-
-    _heap_delete(ptr, __builtin_return_address(0));
-}
 
 // del_opant
 void operator delete (void *ptr, [[maybe_unused]]std::align_val_t alignment, const std::nothrow_t&) noexcept
 {
     DEBUG_DELETE_OP_PRINT_FN();
     DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), std::nothrow_t, caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
+
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+
+// del_opvant
+void operator delete[] (void *ptr, [[maybe_unused]]std::align_val_t alignment, const std::nothrow_t&) noexcept
+{
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), std::nothrow_t, caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
+
+    _heap_delete(ptr, __builtin_return_address(0));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+// del_opa
+void operator delete (void* ptr, [[maybe_unused]]std::align_val_t alignment) noexcept
+{
+    DEBUG_DELETE_OP_PRINT_FN();
+    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
@@ -1018,15 +1028,6 @@ void operator delete[] (void *ptr, [[maybe_unused]]std::align_val_t alignment) n
     _heap_delete(ptr, __builtin_return_address(0));
 }
 
-// del_opvant
-void operator delete[] (void *ptr, [[maybe_unused]]std::align_val_t alignment, const std::nothrow_t&) noexcept
-{
-    DEBUG_DELETE_OP_PRINT_FN();
-    DEBUG_ABI_CPP_PRINTF(", ptr(%p), alignment(%u), std::nothrow_t, caller(%p)\n", ptr, std::size_t(alignment), __builtin_return_address(0));
-
-    _heap_delete(ptr, __builtin_return_address(0));
-}
-
 // del_opvsa
 void operator delete[] (void *ptr, [[maybe_unused]]std::size_t size, [[maybe_unused]]std::align_val_t alignment) noexcept
 {
@@ -1035,7 +1036,6 @@ void operator delete[] (void *ptr, [[maybe_unused]]std::size_t size, [[maybe_unu
 
     _heap_delete(ptr, __builtin_return_address(0));
 }
-#endif  // #if defined(UMM_ENABLE_MEMALIGN)
-#endif // #if defined(__cpp_exceptions)
 
-#endif
+#endif  // #if defined(UMM_ENABLE_MEMALIGN)
+#endif  // #if defined(ENABLE_THICK_DEBUG_WRAPPERS)

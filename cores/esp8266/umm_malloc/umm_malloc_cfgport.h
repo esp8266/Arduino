@@ -134,18 +134,6 @@ extern char _heap_start[];
 #undef UMM_ENABLE_MEMALIGN
 #endif
 
-//D
-//D #ifndef __STRINGIFY
-//D #define __STRINGIFY(a) #a
-//D #endif
-//D #define QUOTE(a) __STRINGIFY(a)
-//D #pragma message("UMM_ENABLE_MEMALIGN: \"" QUOTE(UMM_ENABLE_MEMALIGN) "\"")
-//D #ifdef UMM_ENABLE_MEMALIGN
-//D #pragma message("UMM_ENABLE_MEMALIGN defined")
-//D #else
-//D #pragma message("UMM_ENABLE_MEMALIGN not defined")
-//D #endif
-
 /*
  * The NONOS SDK API requires function `umm_info()` for implementing
  * `system_show_malloc()`. Build option `-DUMM_INFO` enables this support.
