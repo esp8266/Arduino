@@ -798,9 +798,15 @@ uint32 IRAM_ATTR user_iram_memory_is_enabled(void)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// heap allocator for "new" (ABI) - To support collecting OOM info, always defined
+// Not normally needed, DEV_DEBUG_ABI_CPP is for module maintenance.
 #if DEV_DEBUG_ABI_CPP
 // In test Sketch, set abi_new_print=true/false around test function calls.
+//
+// Note that this code path is skipped when built with "C++ Exception: enabled"
+// and the non-debug build option. For this build case, there is no need to
+// collect OOM information. To use DEV_DEBUG_ABI_CPP, you must also define one
+// of the following: MIN_ESP_OOM, DEBUG_ESP_OOM, DEBUG_ESP_PORT, or
+// DEBUG_ESP_WITHINISR.
 bool abi_new_print = false;
 #define DEBUG_ABI_CPP_PRINTF ets_uart_printf
 
@@ -828,7 +834,9 @@ extern "C" void _dbg_abi_print_pstr(const char *function_name) {
 #define DEBUG_ABI_CPP_PRINTF(...)
 #endif
 
-
+///////////////////////////////////////////////////////////////////////////////
+// heap allocator for "new" (ABI) - To support collecting OOM info, always defined
+//
 #undef USE_HEAP_ABI_MEMALIGN
 #undef USE_HEAP_ABI_MALLOC
 
