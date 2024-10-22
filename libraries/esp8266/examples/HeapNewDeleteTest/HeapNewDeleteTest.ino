@@ -47,8 +47,6 @@ You need to add line'-DUMM_ENABLE_MEMALIGN=1' to the build options.
 
 #include <umm_malloc/umm_malloc_cfg.h>
 #include <umm_malloc/umm_heap_select.h>
-#include <BacktraceLog.h>
-
 #include <stdlib.h>  // aligned_alloc
 
 #define PRINTF(fmt, ...) ets_uart_printf(pstrcpy(PSTR(fmt)), ##__VA_ARGS__)
