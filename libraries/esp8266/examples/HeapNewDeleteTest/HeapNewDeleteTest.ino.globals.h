@@ -18,7 +18,7 @@
 // These build options are required for this test program.
 -DUMM_ENABLE_MEMALIGN=1
 -DDEV_DEBUG_ABI_CPP=1
-// -DMIN_ESP_OOM=1
+-DMIN_ESP_OOM=1
 // Use Arduino IDE "Tools->C++ Exceptions" to enable disable C++ exceptions.
 
 

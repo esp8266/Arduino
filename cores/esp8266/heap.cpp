@@ -918,7 +918,7 @@ void* _heap_abi_malloc(size_t size, bool unhandled, const void* const caller)
 }; // extern "C" {
 
 
-#if defined(ENABLE_THICK_DEBUG_WRAPPERS)
+#if defined(ENABLE_THICK_DEBUG_WRAPPERS) || defined(USE_HEAP_ABI_MEMALIGN) || defined(USE_HEAP_ABI_MALLOC)
 ///////////////////////////////////////////////////////////////////////////////
 // Replacement C++ delete operator to capture callers address
 //

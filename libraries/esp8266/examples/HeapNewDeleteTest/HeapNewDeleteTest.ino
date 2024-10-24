@@ -326,6 +326,11 @@ void _NOINLINE test_new_try_catch(int& err_count, size_t sz, size_t alignment, i
 void print_build_options() {
 #if DEV_DEBUG_ABI_CPP
   PRINTF_LN("  Built with DEV_DEBUG_ABI_CPP");
+#if defined(__cpp_exceptions) && !(defined(DEBUG_ESP_OOM) || defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_WITHINISR) || defined(MIN_ESP_OOM))
+  PRINTF_LN("*   This build used the LIBC's default operator \"new\"(/\"delete\") handler for C++ Exceptions, which bypassed");
+  PRINTF_LN("*   our monitoring logic. The goal is to confirm the coverage of our added Heap debugging logic.");
+  PRINTF_LN("*   To use the \"new\"/\"delete\" monitoring logic, define a debug option like MIN_ESP_OOM, DEBUG_ESP_PORT, etc.");
+#endif
 #else
   PRINTF_LN("* For complete operation, the test build requires option -DDEV_DEBUG_ABI_CPP=1");
 #endif
@@ -402,8 +407,6 @@ void setup() {
 
   print_build_options();
 #if UMM_ENABLE_MEMALIGN
-  PRINTF_LN("  Built with UMM_ENABLE_MEMALIGN, i.e. memalign present");
-
   void* new_ptr = aligned_alloc(128, 32);
   if (new_ptr) {
     PRINTF_LN("  %p, function \"aligned_alloc()\" worked", new_ptr);
