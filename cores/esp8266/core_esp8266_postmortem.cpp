@@ -167,17 +167,17 @@ static void postmortem_report(uint32_t sp_dump) {
     cut_here();
 
     if (s_pm.panic_line) {
-        ets_printf_P(PSTR("\nPanic %S:%d %S"), s_pm.panic_file, s_pm.panic_line, s_pm.panic_func);
+        ets_printf_P(PSTR("\nPanic %s:%d %s"), s_pm.panic_file, s_pm.panic_line, s_pm.panic_func);
         if (s_pm.panic_what) {
-            ets_printf_P(PSTR(": Assertion '%S' failed."), s_pm.panic_what);
+            ets_printf_P(PSTR(": Assertion '%s' failed."), s_pm.panic_what);
         }
         ets_putc('\n');
     }
     else if (s_pm.panic_file) {
-        ets_printf_P(PSTR("\nPanic %S\n"), s_pm.panic_file);
+        ets_printf_P(PSTR("\nPanic %s\n"), s_pm.panic_file);
     }
     else if (s_pm.unhandled_exception) {
-        ets_printf_P(PSTR("\nUnhandled C++ exception: %S\n"), s_pm.unhandled_exception);
+        ets_printf_P(PSTR("\nUnhandled C++ exception: %s\n"), s_pm.unhandled_exception);
     }
     else if (s_pm.abort_called) {
         ets_printf_P(PSTR("\nAbort called\n"));
@@ -292,7 +292,7 @@ static void postmortem_report(uint32_t sp_dump) {
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (_umm_last_fail_alloc.addr) {
 #if defined(DEBUG_ESP_OOM)
-        ets_printf_P(PSTR("\nlast failed alloc call: 0x%08X(%d), File: %S:%d\n"),
+        ets_printf_P(PSTR("\nlast failed alloc call: 0x%08X(%d), File: %s:%d\n"),
             (uint32_t)_umm_last_fail_alloc.addr,
             _umm_last_fail_alloc.size,
             (_umm_last_fail_alloc.file) ? _umm_last_fail_alloc.file : PSTR("??"),
