@@ -25,7 +25,7 @@
 #include <SD.h>
 #include <vector>
 
-#define SD_CS_PIN 2
+#define SD_CS_PIN 4
 
 
 void dir(String path) {
