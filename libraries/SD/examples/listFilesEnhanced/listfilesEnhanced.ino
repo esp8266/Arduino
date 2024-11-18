@@ -64,7 +64,7 @@ void listDirectory() {
 }
 
 
-void printDirectoryName(const char* name, uint8_t level) {
+void printDirectoryName(const char *name, uint8_t level) {
   for (uint8_t i = 0; i < level; ++i) {
     Serial.print("  ");
   }
@@ -75,30 +75,30 @@ void printDirectoryName(const char* name, uint8_t level) {
 
 // helper function: combine path
 String joinPath(const String &base, const String &name) {
-   if (base.endsWith("/")) {
-      return base + name;
-   }
-   return base + "/" + name;
+  if (base.endsWith("/")) {
+    return base + name;
+  }
+  return base + "/" + name;
 }
 
 // recusive function to collect directory names
 void collectDirectories(const String &dirname, std::vector<String> &directories) {
-   File root = SD.open(dirname);
-   if (!root || !root.isDirectory()) {
-      Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
-      return;
-   }
-   directories.push_back(dirname);   // Verzeichnis speichern
+  File root = SD.open(dirname);
+  if (!root || !root.isDirectory()) {
+    Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
+    return;
+  }
+  directories.push_back(dirname);   // Verzeichnis speichern
 
-   File file = root.openNextFile();
-   while (file) {
-      if (file.isDirectory()) {
-         String fullPath = joinPath(dirname, file.name());   // Vollständigen Pfad erstellen
-         collectDirectories(fullPath, directories);   // Rekursiver Aufruf
-      }
-      file = root.openNextFile();
-   }
-   root.close();
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      String fullPath = joinPath(dirname, file.name());   // Vollständigen Pfad erstellen
+      collectDirectories(fullPath, directories);   // Rekursiver Aufruf
+    }
+    file = root.openNextFile();
+  }
+  root.close();
 }
 
 // print filenames
