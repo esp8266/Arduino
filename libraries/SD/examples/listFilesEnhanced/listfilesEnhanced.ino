@@ -88,13 +88,13 @@ void collectDirectories(const String &dirname, std::vector<String> &directories)
     Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
     return;
   }
-  directories.push_back(dirname);   // Verzeichnis speichern
+  directories.push_back(dirname);  // Verzeichnis speichern
 
   File file = root.openNextFile();
   while (file) {
     if (file.isDirectory()) {
-      String fullPath = joinPath(dirname, file.name());   // Vollständigen Pfad erstellen
-      collectDirectories(fullPath, directories);   // Rekursiver Aufruf
+      String fullPath = joinPath(dirname, file.name());  // Vollständigen Pfad erstellen
+      collectDirectories(fullPath, directories);         // Rekursiver Aufruf
     }
     file = root.openNextFile();
   }
