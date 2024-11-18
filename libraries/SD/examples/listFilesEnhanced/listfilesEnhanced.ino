@@ -29,7 +29,7 @@
 void dir(String path) {
   std::vector<String> directories;
   collectDirectories(path, directories);
-  for (auto directory:directories) {
+  for (auto directory : directories) {
     printDirectoryName(directory.c_str(), 1);
     File fs = SD.open(directory);
     printFilesInDirectory(fs);
@@ -75,30 +75,30 @@ void printDirectoryName(const char* name, uint8_t level) {
 
 // helper function: combine path
 String joinPath(const String &base, const String &name) {
-    if (base.endsWith("/")) {
-        return base + name;
-    }
-    return base + "/" + name;
+   if (base.endsWith("/")) {
+      return base + name;
+   }
+   return base + "/" + name;
 }
 
 // recusive function to collect directory names
 void collectDirectories(const String &dirname, std::vector<String> &directories) {
-    File root = SD.open(dirname);
-    if (!root || !root.isDirectory()) {
-        Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
-        return;
-    }
-    directories.push_back(dirname); // Verzeichnis speichern
+   File root = SD.open(dirname);
+   if (!root || !root.isDirectory()) {
+      Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
+      return;
+   }
+   directories.push_back(dirname);   // Verzeichnis speichern
 
-    File file = root.openNextFile();
-    while (file) {
-        if (file.isDirectory()) {
-            String fullPath = joinPath(dirname, file.name()); // Vollständigen Pfad erstellen
-            collectDirectories(fullPath, directories);   // Rekursiver Aufruf
-        }
-        file = root.openNextFile();
-    }
-    root.close();
+   File file = root.openNextFile();
+   while (file) {
+      if (file.isDirectory()) {
+         String fullPath = joinPath(dirname, file.name());   // Vollständigen Pfad erstellen
+         collectDirectories(fullPath, directories);   // Rekursiver Aufruf
+      }
+      file = root.openNextFile();
+   }
+   root.close();
 }
 
 // print filenames
@@ -110,7 +110,7 @@ void printFileName(File file) {
   Serial.print(file.size(), DEC);
   time_t cr = file.getCreationTime();
   time_t lw = file.getLastWrite();
-  struct tm* tmstruct = localtime(&cr);
+  struct tm *tmstruct = localtime(&cr);
   Serial.printf("\tCREATION: %d-%02d-%02d %02d:%02d:%02d", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
   tmstruct = localtime(&lw);
   Serial.printf("\tLAST WRITE: %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
@@ -127,8 +127,7 @@ void printFilesInDirectory(File dir) {
     }
     if (file.isDirectory()) {
       continue;
-    }
-    else {
+    } else {
       printFileName(file);
     }
   }
