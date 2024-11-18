@@ -1,22 +1,20 @@
 /*
   Listfiles Enhanced
 
-  This example shows how to list files in SDcard in the following way:
+  This example demonstrates how to list files on an SDcard in the following way:
    1) collect all directories
    2) build full path of directories and keep in mind
    3) then print all files with the help of the directorie pathes
 
-  The circuit:
-   SD card attached to SPI bus as follows:
- ** MOSI - pin 11
- ** MISO - pin 12
- ** CLK  - pin 13
- ** CS   - pin 4
+  Wiring:
+   SDcard attached to SPI bus as follows:
+   - MOSI: pin 11
+   - MISO: pin 12
+   - CLK : pin 13
+   - CS  : pin 4
 
-  created:
-  
-  18. Nov 2024
-  by Frank Häfele
+  Created:
+   18. Nov 2024 by Frank Häfele
 
   This example code is in the public domain.
 
