@@ -88,7 +88,7 @@ void collectDirectories(const String &dirname, std::vector<String> &directories)
     Serial.printf("Error: Cannot open %s\n", dirname.c_str());
     return;
   }
-  directories.push_back(dirname);  // Verzeichnis speichern
+  directories.push_back(dirname);
 
   File file = root.openNextFile();
   while (file) {
