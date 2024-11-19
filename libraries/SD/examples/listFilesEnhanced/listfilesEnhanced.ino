@@ -85,7 +85,7 @@ String joinPath(const String &base, const String &name) {
 void collectDirectories(const String &dirname, std::vector<String> &directories) {
   File root = SD.open(dirname);
   if (!root || !root.isDirectory()) {
-    Serial.printf("Error: Verzeichnis %s konnte nicht geöffnet werden\n", dirname.c_str());
+    Serial.printf("Error: Cannot open %s\n", dirname.c_str());
     return;
   }
   directories.push_back(dirname);  // Verzeichnis speichern
