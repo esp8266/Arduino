@@ -94,7 +94,7 @@ void collectDirectories(const String &dirname, std::vector<String> &directories)
   while (file) {
     if (file.isDirectory()) {
       String fullPath = joinPath(dirname, file.name());
-      collectDirectories(fullPath, directories);         // Rekursiver Aufruf
+      collectDirectories(fullPath, directories);
     }
     file = root.openNextFile();
   }
