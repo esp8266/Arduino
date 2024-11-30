@@ -1,4 +1,4 @@
-XTENSA_TOOLCHAIN ?= ../../tools/xtensa-lx106-elf/bin/
+XTENSA_TOOLCHAIN ?= ../../tools/xtensa-lx106-elf-gcc/bin/
 ESPTOOL ?= ../../tools/esptool/esptool
 
 BIN_DIR := ./

@@ -25,7 +25,7 @@ except Exception:
 
 # check if ar and openssl are available
 if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
-    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
+    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf-gcc/xtensa-lx106-elf/bin/ar")
 if which('openssl') is None and not os.path.isfile('./openssl') and not os.path.isfile('./openssl.exe'):
     raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
     
