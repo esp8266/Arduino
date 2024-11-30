@@ -1208,6 +1208,7 @@ bool WiFiClientSecureCtx::_connectSSL(const char* hostName) {
 
   // reduce timeout after successful handshake to fail fast if server stop accepting our data for whathever reason
   if (ret) _timeout = 5000;
+  else _freeSSL();
 
   return ret;
 }
