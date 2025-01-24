@@ -39,9 +39,11 @@ while sys.argv:
     # https://github.com/esp8266/Arduino/issues/6755#issuecomment-553208688
     if thisarg == "erase_flash":
         write_option = '--erase-all'
+    # 'erase_region' is using a temporary file filled with 0xff
     elif thisarg == 'erase_region':
         erase_addr = sys.argv.pop(0)
         erase_len = sys.argv.pop(0)
+    # 'write_flash' and everything else is used as-is
     elif thisarg == 'write_flash':
         write_addr = sys.argv.pop(0)
         binary = sys.argv.pop(0)
@@ -56,19 +58,23 @@ cmdline = cmdline + [write_addr, binary]
 
 erase_file = ''
 if erase_addr:
-    # Generate temporary empty (0xff) file
-    eraser = tempfile.mkstemp()
-    erase_file = eraser[1]
-    os.write(eraser[0], bytearray([0xff] * int(erase_len, 0)))
-    os.close(eraser[0])
+    erase_fd, erase_file = tempfile.mkstemp()
+    os.write(erase_fd, b"\xff" * int(erase_len, 0))
+    os.close(erase_fd)
     cmdline = cmdline + [erase_addr, erase_file]
+
+exit_code = 0
 
 try:
     esptool.main(cmdline)
 except Exception as e:
-    sys.stderr.write('\nA fatal esptool.py error occurred: %s' % e)
-finally:
-    if erase_file:
+    sys.stderr.write(f"\nA fatal upload.py error occurred: {repr(e)}\n")
+    exit_code = 2
+
+if erase_file:
+    try:
         os.remove(erase_file)
-    if any(sys.exc_info()):
-        sys.exit(2)
+    except:
+        pass
+
+sys.exit(exit_code)
