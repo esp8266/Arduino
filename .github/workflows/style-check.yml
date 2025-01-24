@@ -27,7 +27,7 @@ jobs:
       run: |
           sudo apt update
           python ./tests/test_restyle.py --quiet
-          bash ./tests/ci/style_check.sh
+          env CLANG_FORMAT="clang-format-18" bash ./tests/ci/style_check.sh
 
   # Validate orthography
 
