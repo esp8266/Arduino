@@ -14,10 +14,8 @@ CLANG_FORMAT=${CLANG_FORMAT:-clang-format-15}
 cd $root
 python $root/tests/restyle.py format --clang-format=$CLANG_FORMAT preset --include core --include arduino
 
-if [ $CI = "true" ] ; then
-    echo foo
+if [ "$CI" = "true" ] ; then
     python $root/tests/restyle.py assert --with-summary --with-errors
 else
-    echo bar
     python $root/tests/restyle.py assert --with-diff
 fi
