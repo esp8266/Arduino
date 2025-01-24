@@ -184,7 +184,7 @@
     struct name                                                                                    \
     {                                                                                              \
         struct type*  stqh_first; /* first element */                                              \
-        struct type** stqh_last;  /* addr of last next element */                                  \
+        struct type** stqh_last; /* addr of last next element */                                   \
     }
 
 #define STAILQ_HEAD_INITIALIZER(head)                                                              \
@@ -371,7 +371,7 @@
     struct name                                                                                    \
     {                                                                                              \
         struct type*  tqh_first; /* first element */                                               \
-        struct type** tqh_last;  /* addr of last next element */                                   \
+        struct type** tqh_last; /* addr of last next element */                                    \
     }
 
 #define TAILQ_HEAD_INITIALIZER(head)                                                               \

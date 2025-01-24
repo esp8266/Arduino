@@ -27,8 +27,7 @@ class TestCase
 public:
     TestCase(TestCase* prev, test_case_func_t func, const char* file, size_t line, const char* name,
              const char* desc) :
-        m_func(func),
-        m_file(file), m_line(line), m_name(name), m_desc(desc)
+        m_func(func), m_file(file), m_line(line), m_name(name), m_desc(desc)
     {
         if (prev)
         {

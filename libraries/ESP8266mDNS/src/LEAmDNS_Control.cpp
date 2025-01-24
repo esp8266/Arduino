@@ -631,8 +631,8 @@ namespace MDNSImplementation
                                 }
                             }
                         }  // service tiebreak possibility
-                    }      // for services
-                }          // ANY answers
+                    }  // for services
+                }  // ANY answers
             }
             else
             {
@@ -955,7 +955,7 @@ namespace MDNSImplementation
                     }
 
                     pRRAnswer = pRRAnswer->m_pNext;  // Next collected answer
-                }                                    // while (answers)
+                }  // while (answers)
             } while ((bFoundNewKeyAnswer) && (bResult));
         }  // else: No answers provided
         DEBUG_EX_ERR(if (!bResult) {
@@ -1110,7 +1110,7 @@ namespace MDNSImplementation
                 }
                 pServiceQuery = pServiceQuery->m_pNext;
             }  // while(service query)
-        }      // else: No p_pSRVAnswer
+        }  // else: No p_pSRVAnswer
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processSRVAnswer: FAILED!\n"));
         });
@@ -1173,7 +1173,7 @@ namespace MDNSImplementation
                 }
                 pServiceQuery = pServiceQuery->m_pNext;
             }  // while(service query)
-        }      // else: No p_pTXTAnswer
+        }  // else: No p_pTXTAnswer
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processTXTAnswer: FAILED!\n"));
         });
@@ -1261,7 +1261,7 @@ namespace MDNSImplementation
                 }
                 pServiceQuery = pServiceQuery->m_pNext;
             }  // while(service query)
-        }      // else: No p_pAAnswer
+        }  // else: No p_pAAnswer
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _processAAnswer: FAILED!\n"));
         });
@@ -1349,7 +1349,7 @@ namespace MDNSImplementation
                 }
                 pServiceQuery = pServiceQuery->m_pNext;
             }  // while(service query)
-        }      // else: No p_pAAAAAnswer
+        }  // else: No p_pAAAAAnswer
 
         return bResult;
     }
@@ -2121,7 +2121,7 @@ namespace MDNSImplementation
                         }  // IP4 flagged
 
                         pIP4Address = pNextIP4Address;  // Next
-                    }                                   // while
+                    }  // while
 #endif
 #ifdef MDNS_IP6_SUPPORT
                     // IP6Address (from AAAA)
@@ -2185,7 +2185,7 @@ namespace MDNSImplementation
                         }  // IP6 flagged
 
                         pIP6Address = pNextIP6Address;  // Next
-                    }                                   // while
+                    }  // while
 #endif
                     pSQAnswer = pNextSQAnswer;
                 }

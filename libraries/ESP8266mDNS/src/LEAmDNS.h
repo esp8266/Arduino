@@ -492,8 +492,7 @@ namespace MDNSImplementation
         {
             MDNSServiceInfo(MDNSResponder& p_pM, MDNSResponder::hMDNSServiceQuery p_hS,
                             uint32_t p_u32A) :
-                p_pMDNSResponder(p_pM),
-                p_hServiceQuery(p_hS), p_u32AnswerIndex(p_u32A) {};
+                p_pMDNSResponder(p_pM), p_hServiceQuery(p_hS), p_u32AnswerIndex(p_u32A) {};
             struct CompareKey
             {
                 bool operator()(char const* a, char const* b) const

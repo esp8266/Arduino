@@ -27,3 +27,4 @@ BreakBeforeBraces: Allman
 IndentWidth: 4
 IndentCaseLabels: false
 ReflowComments: false
+SkipMacroDefinitionBody: true

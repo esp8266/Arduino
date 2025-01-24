@@ -81,8 +81,7 @@ void setup() {
   // bind RX and TX
   USC0(0) |= (1 << UCLBE);
 
-  while (Serial.read() == -1)
-    ;
+  while (Serial.read() == -1);
   if (Serial.hasOverrun()) { logger->print("overrun?\n"); }
 
   timeout = (start_ms = last_ms = millis()) + TIMEOUT;
