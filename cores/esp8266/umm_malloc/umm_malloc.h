@@ -34,6 +34,9 @@ extern void *umm_malloc(size_t size);
 extern void *umm_calloc(size_t num, size_t size);
 extern void *umm_realloc(void *ptr, size_t size);
 extern void  umm_free(void *ptr);
+#if UMM_ENABLE_MEMALIGN
+extern void *umm_memalign(size_t alignment, size_t size);
+#endif
 
 /* ------------------------------------------------------------------------ */
 
