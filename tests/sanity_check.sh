@@ -9,7 +9,7 @@ python3 get.py -q
 popd
 pushd "$cache_dir"
 
-gcc="$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc"\
+gcc="$root/tools/xtensa-lx106-elf-gcc/bin/xtensa-lx106-elf-gcc"\
 " -I$root/cores/esp8266"\
 " -I$root/tools/sdk/include"\
 " -I$root/variants/generic"\
