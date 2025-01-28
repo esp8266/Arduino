@@ -22,9 +22,6 @@ void base64_init_encodestate_nonewlines(base64_encodestate* state_in){
   state_in->stepsnewline = -1;
 }
 
-char base64_encode_value(const char n) {
-  unsigned char r;
-
 char base64_encode_value(const unsigned char n) {
   static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   if (n > 63) return '=';
