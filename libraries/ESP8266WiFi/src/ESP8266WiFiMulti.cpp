@@ -329,9 +329,10 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
             if (ssid == entry.ssid) {
                 DEBUG_WIFI_MULTI("[WIFIM] Connecting %s\n", ssid.c_str());
 
+                if(SSID_selected_callback) SSID_selected_callback(ssid.c_str());
                 // Connect to WiFi
                 WiFi.begin(ssid, entry.passphrase, channel, bssid);
-
+                
                 // Wait for status change
                 if (waitWiFiConnect(connectTimeoutMs) == WL_CONNECTED) {
                     return WL_CONNECTED;
@@ -350,6 +351,7 @@ wl_status_t ESP8266WiFiMulti::connectWiFiMulti(uint32_t connectTimeoutMs)
         if (!connectSkipIndex[i]) {
             DEBUG_WIFI_MULTI("[WIFIM] Try hidden connect %s\n", entry.ssid);
 
+            if(SSID_selected_callback) SSID_selected_callback(entry.ssid);
             // Connect to WiFi
             WiFi.begin(entry.ssid, entry.passphrase);
 
