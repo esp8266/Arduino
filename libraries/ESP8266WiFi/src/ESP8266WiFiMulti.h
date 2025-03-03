@@ -66,7 +66,7 @@ public:
 
     bool addAP(const char *ssid, const char *passphrase = NULL);
     bool existsAP(const char *ssid, const char *passphrase = NULL);
-    void on_SSID_Selected(SSID_selected_callback_t cb) {  SSID_selected_callback = cb;};
+    void onSsidSelected(SSID_selected_callback_t cb) {  _onSsidSelected = cb;};
 
     wl_status_t run(uint32_t connectTimeoutMs=WIFI_CONNECT_TIMEOUT_MS);
 
@@ -75,7 +75,7 @@ public:
 private:
     WifiAPlist _APlist;
     bool _firstRun;
-    SSID_selected_callback_t SSID_selected_callback = NULL;
+    SSID_selected_callback_t _onSsidSelected = NULL;
 
     bool APlistAdd(const char *ssid, const char *passphrase = NULL);
     bool APlistExists(const char *ssid, const char *passphrase = NULL);

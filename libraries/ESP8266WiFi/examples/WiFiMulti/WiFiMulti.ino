@@ -8,6 +8,7 @@
     - Connect to WiFi with strongest signal (RSSI)
     - Fall back to connect to next WiFi when a connection failed or lost
     - Fall back to connect to hidden SSID's which are not reported by WiFi scan
+    - Static IP assigned depending on which SSID is connected   
 
     To enable debugging output, select in the Arduino iDE:
     - Tools | Debug Port: Serial
@@ -20,6 +21,8 @@ ESP8266WiFiMulti wifiMulti;
 
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 5000;
+
+SSID_selected_callback_t connectedToSSID(char *ssid);
 
 void setup() {
   // Don't save WiFi configuration in flash - optional
@@ -35,7 +38,22 @@ void setup() {
   wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
   wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
   wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+
+  wifiMulti.onSsidSelected(connectedToSSID);
+
   // More is possible
+}
+
+SSID_selected_callback_t connectedToSSID(char *ssid)
+{
+  // On connecting the second WiFi, assign static IP using config(...).
+  // For other SSID (if config has not already been called) DHCP will be used.
+  if(strcmp(ssid, "ssid_from_AP_2") == 0) {
+    IPAddress ip2(192,168,1,123);
+    IPAddress gw2(192,168,1,1);
+    IPAddress subnet2(255,255,255,0);
+    WiFi.config(ip2, gw2, subnet2);
+  }
 }
 
 void loop() {
