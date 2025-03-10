@@ -50,32 +50,31 @@
 #define WIFI_SCAN_TIMEOUT_MS        5000
 #endif
 
-struct WifiAPEntry {
-    char *ssid;
-    char *passphrase;
-};
-
-typedef std::vector<WifiAPEntry> WifiAPlist;
-typedef void (*SSID_selected_callback_t)(const char * ssid);
-
 class ESP8266WiFiMulti
 {
 public:
+    using SSIDSelectedCallback = void (*)(const char *ssid);
+
     ESP8266WiFiMulti();
     ~ESP8266WiFiMulti();
 
     bool addAP(const char *ssid, const char *passphrase = NULL);
     bool existsAP(const char *ssid, const char *passphrase = NULL);
-    void onSsidSelected(SSID_selected_callback_t cb) {  _onSsidSelected = cb;};
+    void onSSIDSelected(SSIDSelectedCallback callback) { _onSSIDSelected = callback; }
 
     wl_status_t run(uint32_t connectTimeoutMs=WIFI_CONNECT_TIMEOUT_MS);
 
     void cleanAPlist();
     int count() { return _APlist.size(); }
 private:
-    WifiAPlist _APlist;
+    struct WifiAPEntry {
+        char *ssid;
+        char *passphrase;
+    };
+
+    std::vector<WifiAPEntry> _APlist;
     bool _firstRun;
-    SSID_selected_callback_t _onSsidSelected = NULL;
+    SSIDSelectedCallback _onSSIDSelected = NULL;
 
     bool APlistAdd(const char *ssid, const char *passphrase = NULL);
     bool APlistExists(const char *ssid, const char *passphrase = NULL);
