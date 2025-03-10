@@ -53,7 +53,7 @@ void connectedToSSID(const char *ssid) {
   }
 
   // For other SSID DHCP will be used.
-  Wifi.config(0U, 0U, 0U);
+  WiFi.config(0U, 0U, 0U);
 }
 
 void loop() {
