@@ -24,5 +24,8 @@ jobs:
         python-version: '3.x'
     - name: Build documentation
       run: |
-        pip install --user -r doc/requirements.txt
-        bash ./tests/ci/build_docs.sh
+        pushd doc/
+        python3 -mvenv _venv
+        ./_venv/bin/pip install -r requirements.txt
+        env SPHINXBUILD=$(pwd)/_venv/bin/sphinx-build ../tests/ci/build_docs.sh
+        popd

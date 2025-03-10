@@ -71,7 +71,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_venv', '_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -162,11 +162,7 @@ linkcheck_anchors_ignore = ["/#!"]
 #
 # on_rtd is whether we are on readthedocs.org
 env_readthedocs = os.environ.get('READTHEDOCS', None)
-print(env_readthedocs)
 
 if not env_readthedocs:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-
