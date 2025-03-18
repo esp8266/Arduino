@@ -23,7 +23,7 @@ extern "C" {
 extern void (*user_start_fptr)();
 
 #ifndef XCHAL_EXCCAUSE_NUM
-// from tools/xtensa-lx106-elf/include/xtensa/config/core.h:629:#define XCHAL_EXCCAUSE_NUM  		64
+// from xtensa hal header: xtensa/config/core.h:629:#define XCHAL_EXCCAUSE_NUM  		64
 #define XCHAL_EXCCAUSE_NUM  		64
 #endif
 

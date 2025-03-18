@@ -8,5 +8,5 @@ to delete every warning but "-Wreturn-type"
 
 Generate the "none-g++" file with the following command:
 ````
-./tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc --help=warnings -Q | grep '\[enabled\]' | grep -v 'return-type' | awk '{print $1}' | sed 's/-W/-Wno-/' | grep -v = | grep -v -- -f | egrep -v '(c11-c2x-compat|c90-c99-compat|c99-c11-compat|declaration-after-statement|designated-init|discarded-array-qualifiers|discarded-qualifiers|implicit-int|incompatible-pointer-types|int-conversion|old-style-definition|override-init-side-effects|pointer-to-int-cast)' > tools/warnings/none-g++
+./tools/xtensa-lx106-elf-gcc/bin/xtensa-lx106-elf-gcc --help=warnings -Q | grep '\[enabled\]' | grep -v 'return-type' | awk '{print $1}' | sed 's/-W/-Wno-/' | grep -v = | grep -v -- -f | egrep -v '(c11-c2x-compat|c90-c99-compat|c99-c11-compat|declaration-after-statement|designated-init|discarded-array-qualifiers|discarded-qualifiers|implicit-int|incompatible-pointer-types|int-conversion|old-style-definition|override-init-side-effects|pointer-to-int-cast)' > tools/warnings/none-g++
 ````

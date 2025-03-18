@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+root=$(git rev-parse --show-toplevel)
+
 add_path_ifexist() {
 	if [[ -d $1 ]]; then
 		export PATH=$( realpath $1 ):$PATH
@@ -9,8 +11,8 @@ add_path_ifexist() {
 	return 1
 }
 
-if ! which xtensa-lx106-elf-ar | grep "tools/xtensa-lx106-elf/bin" >>/dev/null; then
-	add_path_ifexist "../../../xtensa-lx106-elf/bin" || add_path_ifexist "../../xtensa-lx106-elf/bin"
+if ! which xtensa-lx106-elf-ar >>/dev/null; then
+  add_path_ifexist "$root/tools/xtensa-lx106-elf-gcc/bin"
 fi
 WORK_SPACE=${PWD}
 
