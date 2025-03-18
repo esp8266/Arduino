@@ -68,6 +68,12 @@ extern "C"
     // write one byte to the emulated UART
     static void uart_do_write_char(const int uart_nr, char c)
     {
+        if (uart_nr == 0 && hostBaudrate)
+        {
+            hostsp_write(c);
+            return;
+        }
+
         static bool w = false;
 
         if (uart_nr >= UART0 && uart_nr <= UART1)
@@ -117,7 +123,7 @@ extern "C"
         rx_buffer->wpos                    = nextPos;
     }
 
-    // insert a new byte into the RX FIFO nuffer
+    // insert a new byte into the RX FIFO buffer
     void uart_new_data(const int uart_nr, uint8_t data)
     {
         uart_t* uart = UART[uart_nr];
@@ -185,6 +191,14 @@ extern "C"
 
     size_t uart_read(uart_t* uart, char* userbuffer, size_t usersize)
     {
+        if (hostBaudrate)
+        {
+            if (!hostsp_available())
+                return 0;
+            *userbuffer = hostsp_read();
+            return 1;
+        }
+
         if (uart == NULL || !uart->rx_enabled)
             return 0;
 
@@ -344,7 +358,7 @@ extern "C"
                     free(uart);
                     return NULL;
                 }
-                rx_buffer->size   = rx_size;  // var this
+                rx_buffer->size   = rx_size;  //var this
                 rx_buffer->rpos   = 0;
                 rx_buffer->wpos   = 0;
                 rx_buffer->buffer = (uint8_t*)malloc(rx_buffer->size);
