@@ -28,7 +28,7 @@
 
 #include "../generic/common.h"
 
-#define LED_BUILTIN 0
+#define LED_BUILTIN 2
 #define BUILTIN_LED LED_BUILTIN
 
 #define A0 (17)
@@ -49,14 +49,10 @@ static const uint8_t D10  = 10;
 #define PIN_WIRE_SCL (14)
 
 // Brushed DC Motors
-#define MOTOR_1_DIR (16)
-#define MOTOR_1_PWM (12)
-#define MOTOR_2_DIR (5)
-#define MOTOR_2_PWM (4)
-
-//Ultrasonic Sensor
-static const uint8_t USST = D7;
-static const uint8_t USSE = D8;
+static const uint8_t MOTOR_1_DIR = D3;
+static const uint8_t MOTOR_1_PWM = D1;
+static const uint8_t MOTOR_2_DIR = D4;
+static const uint8_t MOTOR_2_PWM = D2;
 
 //Servo
 static const uint8_t SERVO1 = D4;
@@ -64,8 +60,15 @@ static const uint8_t SERVO2 = D6;
 static const uint8_t SERVO3 = D3;
 static const uint8_t SERVO4 = D5;
 
+//Ultrasonic Sensor
+static const uint8_t USST = D7;
+static const uint8_t USSE = D8;
+
 //IR
 static const uint8_t IR1 = D9;
 static const uint8_t IR2 = D10;
+
+//RGB LED
+static const uint8_t RGB = D0;
 
 #endif /* Pins_Arduino_h */
