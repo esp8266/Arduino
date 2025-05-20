@@ -16,6 +16,16 @@ function trap_exit()
     exit $exit_code
 }
 
+if [ "${CI-}" = "true" ] ; then
+    ci_group="::group::"
+    ci_end_group="::endgroup::"
+    ci_error="::error::"
+else
+    ci_group="==> "
+    ci_end_group=""
+    ci_error=">>> "
+fi
+
 function step_summary()
 {
     local header=$1
@@ -31,50 +41,6 @@ function step_summary()
     fi
 }
 
-# return 0 if this sketch should not be built in CI (for other archs, not needed, etc.)
-function skip_ino()
-{
-    case $1 in
-    *"/#attic/"* | \
-    *"/AvrAdcLogger/"* | \
-    *"/examplesV1/"* | \
-    *"/RtcTimestampTest/"* | \
-    *"/SoftwareSpi/"* | \
-    *"/TeensyDmaAdcLogger/"* | \
-    *"/TeensyRtcTimestamp/"* | \
-    *"/TeensySdioDemo/"* | \
-    *"/TeensySdioLogger/"* | \
-    *"/UserChipSelectFunction/"* | \
-    *"/UserSPIDriver/"* | \
-    *"/onewiretest/"* | \
-    *"/debug/"*)
-        return 0
-        ;;
-    *"Teensy"*)
-        return 0
-        ;;
-    *)
-        ;;
-    esac
-
-    return 1
-}
-
-# return reason if this sketch is not the main one or it is explicitly disabled with .test.skip in its directory
-function skip_sketch()
-{
-    local sketch=$1
-    local sketchname=$2
-    local sketchdir=$3
-    local sketchdirname=$4
-
-    if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
-        echo "Skipping $sketch (not the main sketch file)"
-    fi
-    if skip_ino "$sketch" || [[ -f "$sketchdir/.test.skip" ]]; then
-        echo "Skipping $sketch"
-    fi
-}
 
 function print_size_info_header()
 {
@@ -107,37 +73,74 @@ END {
         awk -v sketch_name="${elf_name%.*}" "$awk_script" -
 }
 
+function print_sketch_info()
+{
+    local build_mod=$1
+    local build_rem=$2
+
+    local testcnt=0
+    local cnt=0
+
+    for sketch in $ESP8266_ARDUINO_SKETCHES; do
+        testcnt=$(( ($testcnt + 1) % $build_mod ))
+        if [ $testcnt -ne $build_rem ]; then
+            continue  # Not ours to do
+        fi
+
+        local skip
+        skip=$(skip_sketch "$sketch")
+        if [ -n "$skip" ]; then
+            continue # Should be skipped / cannot be built
+        fi
+
+        cnt=$(( $cnt + 1 ))
+        printf '%2d\t%s\n' "$cnt" "$sketch"
+    done
+}
+
+function format_fqbn()
+{
+    local board_name=$1
+    local flash_size=$2
+    local lwip=$3
+
+    echo "esp8266com:esp8266:${board_name}:"\
+"eesz=${flash_size},"\
+"ip=${lwip}"
+}
+
 function build_sketches()
 {
     local core_path=$1
-    local ide_path=$2
-    local hardware_path=$3
-    local library_path=$4
+    local cli_path=$2
+    local library_path=$3
+    local lwip=$4
     local build_mod=$5
     local build_rem=$6
-    local lwip=$7
+    local build_cnt=$7
 
     local build_dir="$cache_dir"/build
     mkdir -p "$build_dir"
 
-    local build_cache="$cache_dir"/cache
-    mkdir -p "$build_cache"
+    local build_out="$cache_dir"/out
+    mkdir -p "$build_out"
+
+    local fqbn=$(format_fqbn "generic" "4M1M" "$lwip")
+    echo "FQBN: $fqbn"
 
     local build_cmd
-    build_cmd="python3 tools/build.py"\
-" --build_cache $build_cache"\
-" --build_path $build_dir"\
-" --hardware_path $hardware_path"\
-" --ide_path $ide_path"\
-" --library_path $library_path"\
-" --lwIP $lwip"\
-" --board_name generic --verbose --warnings all"\
-" --flash_size 4M1M --keep"
+    build_cmd+=${cli_path}
+    build_cmd+=" compile"\
+" --build-path $build_dir"\
+" --fqbn $fqbn"\
+" --libraries $library_path"\
+" --output-dir $build_out"
 
     print_size_info_header >"$cache_dir"/size.log
 
-    local mk_clean_core=1
+    local clean_core=1
     local testcnt=0
+    local cnt=0
 
     for sketch in $ESP8266_ARDUINO_SKETCHES; do
         testcnt=$(( ($testcnt + 1) % $build_mod ))
@@ -145,44 +148,24 @@ function build_sketches()
             continue  # Not ours to do
         fi
 
-        # mkbuildoptglobals.py is optimized around the Arduino IDE 1.x
-        # behaviour. One way the CI differs from the Arduino IDE is in the
-        # handling of core and caching core. With the Arduino IDE, each sketch
-        # has a private copy of core and contributes to a core cache. With the
-        # CI, there is one shared copy of core for all sketches. When global
-        # options are used, the shared copy of core and cache are removed before
-        # and after the build.
-        #
+        local skip
+        skip=$(skip_sketch "$sketch")
+        if [ -n "$skip" ]; then
+            echo "$skip"
+            continue # Should be skipped / cannot be built
+        fi
+
+        cnt=$(( $cnt + 1 ))
+        if [ $build_cnt != 0 ] ; then
+            if [ $build_cnt != $cnt ] ; then
+                continue # Haven't reached the $cnt yet
+            fi
+            build_cnt=0
+        fi
+
         # Do we need a clean core build? $build_dir/core/* cannot be shared
         # between sketches when global options are present.
-        if [ -s ${sketch}.globals.h ]; then
-            mk_clean_core=1
-        fi
-        if [ $mk_clean_core -ne 0 ]; then
-            rm -rf "$build_dir"/core/*
-        else
-            # Remove sketch specific files from ./core/ between builds.
-            rm -rf "$build_dir/core/build.opt" "$build_dir"/core/*.ino.globals.h
-        fi
-
-        if [ -e $cache_dir/core/*.a ]; then
-            # We need to preserve the build.options.json file and replace the last .ino
-            # with this sketch's ino file, or builder will throw everything away.
-            jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json \
-                > "$build_dir"/build.options.json.tmp
-            mv "$build_dir"/build.options.json.tmp "$build_dir"/build.options.json
-            if [ $mk_clean_core -ne 0 ]; then
-                # Hack workaround for CI not handling core rebuild for global options
-                rm $cache_dir/core/*.a
-            fi
-        fi
-
-        if [ -s ${sketch}.globals.h ]; then
-            # Set to cleanup core at the start of the next build.
-            mk_clean_core=1
-        else
-            mk_clean_core=0
-        fi
+        clean_core=$(arduino_mkbuildoptglobals_cleanup "$clean_core" "$build_dir" "$sketch")
 
         # Clear out the last built sketch, map, elf, bin files, but leave the compiled
         # objects in the core and libraries available for use so we don't need to rebuild
@@ -192,23 +175,7 @@ function build_sketches()
             "$build_dir"/*.map \
             "$build_dir"/*.elf
 
-        local sketchdir
-        sketchdir=$(dirname $sketch)
-
-        local sketchdirname
-        sketchdirname=$(basename $sketchdir)
-
-        local sketchname
-        sketchname=$(basename $sketch)
-
-        local skip
-        skip=$(skip_sketch "$sketch" "$sketchname" "$sketchdir" "$sketchdirname")
-        if [ -n "$skip" ]; then
-            echo "$skip"
-            continue
-        fi
-
-        echo ::group::Building $sketch
+        echo ${ci_group}Building $cnt $sketch
         echo "$build_cmd $sketch"
 
         local result
@@ -216,9 +183,9 @@ function build_sketches()
             && result=0 || result=1
 
         if [ $result -ne 0 ]; then
-            echo ::error::Build failed for $sketch
+            echo ${ci_error}Build failed for $cnt $sketch
             cat "$cache_dir/build.log"
-            echo ::endgroup::
+            echo $ci_end_group
             return $result
         else
             grep -s -c warning: "$cache_dir"/build.log \
@@ -228,7 +195,7 @@ function build_sketches()
         print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
             $build_dir/*.elf >>$cache_dir/size.log
 
-        echo ::endgroup::
+        echo $ci_end_group
     done
 }
 
@@ -278,14 +245,15 @@ function install_library()
 {
     local lib_path=$1
     local name=$2
-    local archive=$3
-    local hash=$4
-    local url=$5
+    local extract=$3
+    local archive=$4
+    local hash=$5
+    local url=$6
 
     fetch_and_unpack "$archive" "$hash" "$url"
     mkdir -p "$lib_path"
     rm -rf "$lib_path/$name"
-    mv "$name" "$lib_path/$name"
+    mv "$extract" "$lib_path/$name"
 }
 
 function install_libraries()
@@ -296,49 +264,30 @@ function install_libraries()
     mkdir -p "$core_path"/tools/dist
     pushd "$core_path"/tools/dist
 
-    install_library "$lib_path" \
-        "ArduinoJson" \
-        "ArduinoJson-v6.11.5.zip" \
-        "8b836c862e69e60c4357a5ed7cbcf1310a3bb1c6bd284fe028faaa3d9d7eed319d10febc8a6a3e06040d1c73aaba5ca487aeffe87ae9388dc4ae1677a64d602c" \
-        "https://github.com/bblanchon/ArduinoJson/releases/download/v6.11.5/ArduinoJson-v6.11.5.zip"
+    source "$root/tests/dep-libraries.sh"
 
     popd
 }
 
-function install_ide()
+function install_arduino_cli()
 {
-    # TODO replace ide distribution + arduino-builder with arduino-cli
-    local idever='1.8.19'
-    local ideurl="https://downloads.arduino.cc/arduino-$idever"
+    local path=$1
+    local core_path=$2
 
-    echo "Arduino IDE ${idever}"
+    local ver='1.2.2'
+    local urlbase="https://github.com/arduino/arduino-cli/releases/download/v${ver}/arduino-cli_${ver}_"
 
-    local core_path=$1
-    local ide_path=$2
+    echo "Arduino CLI ${ver}"
 
-    mkdir -p ${core_path}/tools/dist
-    pushd ${core_path}/tools/dist
+    mkdir -p ${core_path}/dist
+    pushd ${core_path}/dist
 
-    if [ "${RUNNER_OS-}" = "Windows" ]; then
-        fetch_and_unpack "arduino-windows.zip" \
-            "c4072d808aea3848bceff5772f9d1e56a0fde02366b5aa523d10975c54eee2ca8def25ee466abbc88995aa323d475065ad8eb30bf35a2aaf07f9473f9168e2da" \
-            "${ideurl}-windows.zip"
-        mv arduino-$idever arduino-distrib
-    elif [ "${RUNNER_OS-}" = "macOS" ]; then
-        fetch_and_unpack "arduino-macos.zip" \
-            "053b0c1e70da9176680264e40fcb9502f45ca5a879aeb8b6f71282b38bfdb87c63ebc6b88e35ea70a73720ad439d828cc8cb110e4c6ab07357126a36ee396325" \
-            "${ideurl}-macosx.zip"
-        # Hack to place arduino-builder in the same spot as sane OSes
-        mv Arduino.app arduino-distrib
-        mv arduino-distrib/Contents/Java/* arduino-distrib/.
-    else
-        fetch_and_unpack "arduino-linux.tar.xz" \
-            "9328abf8778200019ed40d4fc0e6afb03a4cee8baaffbcea7dd3626477e14243f779eaa946c809fb153a542bf2ed60cf11a5f135c91ecccb1243c1387be95328" \
-            "${ideurl}-linux64.tar.xz"
-        mv arduino-$idever arduino-distrib
-    fi
+    source "$root/tests/dep-arduino-cli.sh"
 
-    mv arduino-distrib "$ide_path"
+    mkdir -p $(dirname $path)
+    cp -v arduino-cli $path
+    chmod +x $path
+
     popd
 }
 
@@ -385,19 +334,19 @@ function install_core()
 
 function install_arduino()
 {
-    echo ::group::Install arduino
+    echo ${ci_group}Install arduino
     local debug=$1
-
-    test -d "$ESP8266_ARDUINO_IDE" \
-        || install_ide "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_IDE"
 
     local hardware_core_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
     test -d "$hardware_core_path" \
         || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path" "$debug"
 
+    command -v "${ESP8266_ARDUINO_CLI}" \
+        || install_arduino_cli "${ESP8266_ARDUINO_CLI}" "$hardware_core_path"
+
     install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
 
-    echo ::endgroup::
+    echo $ci_end_group
 }
 
 function arduino_lwip_menu_option()
@@ -412,25 +361,71 @@ function arduino_lwip_menu_option()
     esac
 }
 
+# mkbuildoptglobals.py is optimized around the Arduino IDE 1.x
+# behaviour. One way the CI differs from the Arduino IDE is in the
+# handling of core and caching core. With the Arduino IDE, each sketch
+# has a private copy of core and contributes to a core cache. With the
+# CI, there is one shared copy of core for all sketches. When global
+# options are used, the shared copy of core and cache are removed before
+# and after the build.
+function arduino_mkbuildoptglobals_cleanup()
+{
+    local clean_core=$1
+    local build_dir=$2
+    local sketch=$3
+
+    if [ -s ${sketch}.globals.h ]; then
+        clean_core=1
+    fi
+
+    # Remove sketch specific files from ./core/ between builds.
+    if [ $clean_core -ne 0 ]; then
+        rm -rf "$build_dir"/core/*
+    else
+        rm -rf "$build_dir/core/build.opt" "$build_dir"/core/*.ino.globals.h
+    fi
+
+    if [ -e ${build_dir}/core/*.a ]; then
+        # We need to preserve the build.options.json file and replace the last .ino
+        # with this sketch's ino file, or builder will throw everything away.
+        jq '."sketchLocation" = "'$sketch'"' $build_dir/build.options.json \
+            > "$build_dir"/build.options.json.tmp
+        mv "$build_dir"/build.options.json.tmp "$build_dir"/build.options.json
+        if [ $clean_core -ne 0 ]; then
+            # Hack workaround for CI not handling core rebuild for global options
+            rm ${build_dir}/core/*.a
+        fi
+    fi
+
+    if [ -s ${sketch}.globals.h ]; then
+        # Set to cleanup core at the start of the next build.
+        clean_core=1
+    else
+        clean_core=0
+    fi
+
+    echo $clean_core
+}
+
 function build_sketches_with_arduino()
 {
-    local build_mod=$1
-    local build_rem=$2
-
     local lwip
-    lwip=$(arduino_lwip_menu_option $3)
+    lwip=$(arduino_lwip_menu_option $1)
+
+    local build_mod=$2
+    local build_rem=$3
+    local build_cnt=$4
 
     build_sketches "$ESP8266_ARDUINO_BUILD_DIR" \
-        "$ESP8266_ARDUINO_IDE" \
-        "$ESP8266_ARDUINO_HARDWARE" \
+        "$ESP8266_ARDUINO_CLI" \
         "$ESP8266_ARDUINO_LIBRARIES" \
-        "$build_mod" "$build_rem" "$lwip"
+        "$lwip" "$build_mod" "$build_rem" "$build_cnt"
     step_summary "Size report" "$cache_dir/size.log"
 }
 
 function install_platformio()
 {
-    echo ::group::Install PlatformIO
+    echo ${ci_group}Install PlatformIO
 
     local board=$1
 
@@ -461,13 +456,14 @@ EOF
     # - esp8266/examples/ConfigFile
     pio pkg install --global --library "ArduinoJson@^6.11.0"
 
-    echo ::endgroup::
+    echo $ci_end_group
 }
 
 function build_sketches_with_platformio()
 {
     local build_mod=$1
     local build_rem=$2
+    local build_cnt=$3
     local testcnt=0
 
     for sketch in $ESP8266_ARDUINO_SKETCHES; do
@@ -476,23 +472,25 @@ function build_sketches_with_platformio()
             continue  # Not ours to do
         fi
 
-        local sketchdir
-        sketchdir=$(dirname $sketch)
-
-        local sketchdirname
-        sketchdirname=$(basename $sketchdir)
-
-        local sketchname
-        sketchname=$(basename $sketch)
-
         local skip
-        skip=$(skip_sketch "$sketch" "$sketchname" "$sketchdir" "$sketchdirname")
+        skip=$(skip_sketch "$sketch")
         if [ -n "$skip" ]; then
             echo "$skip"
-            continue
+            continue # Should be skipped / cannot be built
         fi
 
-        echo ::group::Building $sketch
+        cnt=$(( $cnt + 1 ))
+        if [ $build_cnt != 0 ] ; then
+            if [ $build_cnt != $cnt ] ; then
+                continue # Haven't reached the $cnt yet
+            fi
+            build_cnt=0
+        fi
+
+        echo ${ci_group}Building $sketch
+
+        local sketchdir
+        sketchdir=$(dirname $sketch)
 
         local result
         time pio ci \
@@ -502,13 +500,13 @@ function build_sketches_with_platformio()
             && result=0 || result=1
 
         if [ $result -ne 0 ]; then
-            echo ::error::Build failed for $sketch
+            echo ${ci_error}Build failed for $sketch
             cat "$cache_dir/build.log"
-            echo ::endgroup::
+            echo $ci_end_group
             return $result
         fi
 
-        echo ::endgroup::
+        echo $ci_end_group
     done
 }
 
