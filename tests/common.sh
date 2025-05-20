@@ -433,6 +433,8 @@ function install_platformio()
     python3 get.py -q
     popd
 
+    install_libraries "$ESP8266_ARDUINO_BUILD_DIR" "$ESP8266_ARDUINO_LIBRARIES"
+
     # we should reference our up-to-date build tools
     # ref. https://docs.platformio.org/en/latest/core/userguide/pkg/cmd_install.html
     pio pkg install --global --skip-dependencies --platform "https://github.com/platformio/platform-espressif8266.git"
@@ -440,9 +442,11 @@ function install_platformio()
     local framework_symlink="framework-arduinoespressif8266 @ symlink://${ESP8266_ARDUINO_BUILD_DIR}"
     local toolchain_symlink="toolchain-xtensa @ symlink://${ESP8266_ARDUINO_BUILD_DIR}/tools/xtensa-lx106-elf/"
 
-    # pre-generate config; pio-ci with multiple '-O' replace each other instead of appending to the same named list
-    # (and, it is much nicer to write this instead of a multi-line cmdline with several large strings)
+    # pre-generate config; pio-ci with multiple '-O' options replace each other instead of appending to the same named list
     cat <<EOF > $cache_dir/platformio.ini
+[platformio]
+lib_dir =
+    ${ESP8266_ARDUINO_LIBRARIES}
 [env:$board]
 platform = espressif8266
 board = $board
@@ -451,10 +455,6 @@ platform_packages =
     ${framework_symlink}
     ${toolchain_symlink}
 EOF
-
-    # Install dependencies:
-    # - esp8266/examples/ConfigFile
-    pio pkg install --global --library "ArduinoJson@^6.11.0"
 
     echo $ci_end_group
 }
