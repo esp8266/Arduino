@@ -14,24 +14,19 @@
  * Plus, test framework cannot pass -fno-builtin-... per-file, only globally
  */
 
-/* TODO remove when libc supports pointers to flash */
-#undef PSTR
-#define PSTR(X) X
-
-#if 1
-
 #define xDST_SRC_N(T, NAME)\
-T* __attribute__((noinline)) x ## NAME (T* dst, const T* src, size_t n)\
+static T* __attribute__((used, noinline)) x ## NAME (T* dst, const T* src, size_t n)\
 {\
     return NAME (dst, src, n);\
 }
 
 xDST_SRC_N (void, memcpy)
+xDST_SRC_N (void, memmove)
 xDST_SRC_N (char, strncat)
 xDST_SRC_N (char, strncpy)
 
 #define xDST_SRC(T, NAME)\
-T* __attribute__((noinline)) x ## NAME (T* dst, const T* src)\
+static T* __attribute__((used, noinline)) x ## NAME (T* dst, const T* src)\
 {\
     return NAME (dst, src);\
 }
@@ -40,7 +35,7 @@ xDST_SRC (char, strcat)
 xDST_SRC (char, strcpy)
 
 #define xS1_S2_N(RET, T, NAME)\
-RET __attribute__((noinline)) x ## NAME (const T *s1, const T *s2, size_t n)\
+static RET __attribute__((used, noinline)) x ## NAME (const T *s1, const T *s2, size_t n)\
 {\
     return NAME (s1, s2, n);\
 }
@@ -48,23 +43,30 @@ RET __attribute__((noinline)) x ## NAME (const T *s1, const T *s2, size_t n)\
 xS1_S2_N(int, void, memcmp)
 xS1_S2_N(int, char, strncmp)
 
-int __attribute__((noinline)) xstrcmp (const char *s1, const char *s2)
+static int __attribute__((used, noinline)) xstrcmp (const char *s1, const char *s2)
 {
     return strcmp (s1, s2);
 }
 
-void* __attribute__((noinline)) xmemchr (const void* s, int c, size_t n)
+static void* __attribute__((used, noinline)) xmemchr (const void* s, int c, size_t n)
 {
     return memchr (s, c, n);
 }
 
-size_t __attribute__((noinline)) xstrlen (const char* s)
+static size_t __attribute__((used, noinline)) xstrlen (const char* s)
 {
     return strlen (s);
 }
 
+#if 0
+
+/* TODO remove when libc supports pointers to flash */
+#undef PSTR
+#define PSTR(X) X
+
 #define memcmp(s1,s2,n) xmemcmp(s1,PSTR(s2),n)
 #define memcpy(dest,src,n) xmemcpy(dest,PSTR(src),n)
+#define memmove(dest,src,n) xmemmove(dest,PSTR(src),n)
 #define memchr(s,c,n) xmemchr(PSTR(s),c,n)
 #define strcat(dst,src) xstrcat(dst,PSTR(src))
 #define strncat(dst,src,ssize) xstrncat(dst,PSTR(src),ssize)
@@ -78,20 +80,23 @@ size_t __attribute__((noinline)) xstrlen (const char* s)
 
 /* in case wrapped calls are not required */
 
-#define memcmp(s1,s2,n) memcmp(s1,PSTR(s2),n)
-#define memcpy(dest,src,n) memcpy(dest,PSTR(src),n)
-#define memchr(s,c,n) memchr(PSTR(s),c,n)
-#define strcat(dst,src) strcat(dst,PSTR(src))
-#define strncat(dst,src,ssize) strncat(dst,PSTR(src),ssize)
-#define strcpy(dst,src) strcpy(dst,PSTR(src))
-#define strncpy(dst,src,dsize) strncpy(dst,PSTR(src),dsize)
-#define strlen(s) strlen(PSTR(s))
-#define strcmp(s1,s2) strcmp(s1,PSTR(s2))
-#define strncmp(s1,s2,n) strncmp(s1,PSTR(s2),n)
+#define memcmp(s1,s2,n) memcmp_P(s1,PSTR(s2),n)
+#define memcpy(dest,src,n) memcpy_P(dest,PSTR(src),n)
+#define memmove(dest,src,n) memmove_P(dest,PSTR(src),n)
+#define memchr(s,c,n) memchr_P(PSTR(s),c,n)
+#define strcat(dst,src) strcat_P(dst,PSTR(src))
+#define strncat(dst,src,ssize) strncat_P(dst,PSTR(src),ssize)
+#define strcpy(dst,src) strcpy_P(dst,PSTR(src))
+#define strncpy(dst,src,dsize) strncpy_P(dst,PSTR(src),dsize)
+#define strlen(s) strlen_P(PSTR(s))
+#define strcmp(s1,s2) strcmp_P(s1,PSTR(s2))
+#define strncmp(s1,s2,n) strncmp_P(s1,PSTR(s2),n)
 
 #endif
 
-const char* it     = "<UNSET>"; /* Routine name for message routines. */
+static const char Unset[] PROGMEM = "<UNSET>";
+
+const char* it      = Unset; /* Routine name for message routines. */
 static int   errors = 0;
 
 /* Complain if condition is not true.  */
@@ -104,7 +109,7 @@ static void checkit(int ok, int l)
 
     if (!ok)
     {
-        printf("string.c:%d %s\n", l, it);
+        printf(PSTR("string.c:%d %s\n"), l, it);
         ++errors;
     }
 }
@@ -119,9 +124,9 @@ static void funcqual(const char *a, const char *b, int l)
     //  line(l);
     if (a == NULL && b == NULL)
         return;
-    if (xstrcmp(a, b))
+    if (strcmp_P(a, b))
     {
-        printf("string.c:%d (%s)\n", l, it);
+        printf(PSTR("string.c:%d (%s)\n"), l, it);
     }
 }
 
@@ -131,7 +136,7 @@ static char two[50];
 void libm_test_string()
 {
     /* Test strcmp first because we use it to test other things.  */
-    it = "strcmp";
+    it = PSTR("strcmp");
     check(strcmp("", "") == 0);       /* Trivial case. */
     check(strcmp("a", "a") == 0);     /* Identity. */
     check(strcmp("abc", "abc") == 0); /* Multicharacter. */
@@ -143,8 +148,8 @@ void libm_test_string()
     check(strcmp("a\103", "a\003") > 0);
 
     /* Test strcpy next because we need it to set up other tests.  */
-    it = "strcpy";
-    check(strcpy_P(one, "abcd") == one); /* Returned value. */
+    it = PSTR("strcpy");
+    check(strcpy(one, "abcd") == one); /* Returned value. */
     equal(one, "abcd");                /* Basic test. */
 
     (void)strcpy(one, "x");
@@ -160,9 +165,9 @@ void libm_test_string()
     equal(one, ""); /* Boundary condition. */
 
     /* strcat.  */
-    it = "strcat";
+    it = PSTR("strcat");
     (void)strcpy(one, "ijk");
-    check(strcat_P(one, "lmn") == one); /* Returned value. */
+    check(strcat(one, "lmn") == one); /* Returned value. */
     equal(one, "ijklmn");             /* Basic test. */
 
     (void)strcpy(one, "x");
@@ -188,11 +193,11 @@ void libm_test_string()
 
     /* strncat - first test it as strcat, with big counts,
        then test the count mechanism.  */
-    it = "strncat";
+    it = PSTR("strncat");
     (void)strcpy(one, "ijk");
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
-    check(strncat_P(one, "lmn", 99) == one); /* Returned value. */
+    check(strncat(one, "lmn", 99) == one); /* Returned value. */
 #pragma GCC diagnostic pop
     equal(one, "ijklmn");                  /* Basic test. */
 
@@ -248,7 +253,7 @@ void libm_test_string()
     (void)strncat(one, "gh", 2);
 #pragma GCC diagnostic pop
     equal(one, "abcdgh"); /* Count _AND length equal. */
-    it = "strncmp";
+    it = PSTR("strncmp");
     /* strncmp - first test as strcmp with big counts";*/
     check(strncmp("", "", 99) == 0);       /* Trivial case. */
     check(strncmp("a", "a", 99) == 0);     /* Identity. */
@@ -263,8 +268,8 @@ void libm_test_string()
     check(strncmp("abc", "def", 0) == 0);   /* Zero count. */
 
     /* strncpy - testing is a bit different because of odd semantics.  */
-    it = "strncpy";
-    check(strncpy_P(one, "abc", 4) == one); /* Returned value. */
+    it = PSTR("strncpy");
+    check(strncpy(one, "abc", 4) == one); /* Returned value. */
     equal(one, "abc");                    /* Did the copy go right? */
 
     (void)strcpy(one, "abcdefgh");
@@ -310,13 +315,13 @@ void libm_test_string()
     equal(one, "hi there"); /* Stomped on source? */
 
     /* strlen.  */
-    it = "strlen";
+    it = PSTR("strlen");
     check(strlen("") == 0);     /* Empty. */
     check(strlen("a") == 1);    /* Single char. */
     check(strlen("abcd") == 4); /* Multiple chars. */
 
     /* strchr.  */
-    it = "strchr";
+    it = PSTR("strchr");
     check(strchr("abcd", 'z') == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(strchr(one, 'c') == one + 2);  /* Basic test. */
@@ -330,7 +335,7 @@ void libm_test_string()
     check(strchr(one, '\0') == one); /* NUL in empty string. */
 
     /* index - just like strchr.  */
-    it = "index";
+    it = PSTR("index");
     check(index("abcd", 'z') == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(index(one, 'c') == one + 2);  /* Basic test. */
@@ -344,7 +349,7 @@ void libm_test_string()
     check(index(one, '\0') == one); /* NUL in empty string. */
 
     /* strrchr.  */
-    it = "strrchr";
+    it = PSTR("strrchr");
     check(strrchr("abcd", 'z') == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(strrchr(one, 'c') == one + 2);  /* Basic test. */
@@ -358,7 +363,7 @@ void libm_test_string()
     check(strrchr(one, '\0') == one); /* NUL in empty string. */
 
     /* rindex - just like strrchr.  */
-    it = "rindex";
+    it = PSTR("rindex");
     check(rindex("abcd", 'z') == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(rindex(one, 'c') == one + 2);  /* Basic test. */
@@ -372,7 +377,7 @@ void libm_test_string()
     check(rindex(one, '\0') == one); /* NUL in empty string. */
 
     /* strpbrk - somewhat like strchr.  */
-    it = "strpbrk";
+    it = PSTR("strpbrk");
     check(strpbrk("abcd", "z") == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(strpbrk(one, "c") == one + 2);  /* Basic test. */
@@ -389,7 +394,7 @@ void libm_test_string()
     check(strpbrk(one, "") == NULL);   /* Both strings empty. */
 
     /* strstr - somewhat like strchr.  */
-    it = "strstr";
+    it = PSTR("strstr");
     check(strstr("z", "abcd") == NULL);   /* Not found. */
     check(strstr("abx", "abcd") == NULL); /* Dead end. */
     (void)strcpy(one, "abcd");
@@ -412,7 +417,7 @@ void libm_test_string()
     check(strstr(one, "bbca") == one + 1); /* With overlap. */
 
     /* strspn.  */
-    it = "strspn";
+    it = PSTR("strspn");
     check(strspn("abcba", "abc") == 5); /* Whole string. */
     check(strspn("abcba", "ab") == 2);  /* Partial. */
     check(strspn("abc", "qx") == 0);    /* None. */
@@ -420,7 +425,7 @@ void libm_test_string()
     check(strspn("abc", "") == 0);      /* Null search list. */
 
     /* strcspn.  */
-    it = "strcspn";
+    it = PSTR("strcspn");
     check(strcspn("abcba", "qx") == 5); /* Whole string. */
     check(strcspn("abcba", "cx") == 2); /* Partial. */
     check(strcspn("abc", "abc") == 0);  /* None. */
@@ -428,7 +433,7 @@ void libm_test_string()
     check(strcspn("abc", "") == 3);     /* Null search list. */
 
     /* strtok - the hard one.  */
-    it = "strtok";
+    it = PSTR("strtok");
     (void)strcpy(one, "first, second, third");
     equal(strtok(one, ", "), "first"); /* Basic test. */
     equal(one, "first");
@@ -475,7 +480,7 @@ void libm_test_string()
     equal(one + 4, "c");
 
     /* memcmp.  */
-    it = "memcmp";
+    it = PSTR("memcmp");
     check(memcmp("a", "a", 1) == 0);      /* Identity. */
     check(memcmp("abc", "abc", 3) == 0);  /* Multicharacter. */
     check(memcmp("abcd", "abce", 4) < 0); /* Honestly unequal. */
@@ -490,7 +495,7 @@ void libm_test_string()
     check(xmemcmp(one, two, 1) > 0);
 
     /* memchr.  */
-    it = "memchr";
+    it = PSTR("memchr");
     check(memchr("abcd", 'z', 4) == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
     check(xmemchr(one, 'c', 4) == one + 2);  /* Basic test. */
@@ -505,8 +510,8 @@ void libm_test_string()
     check(xmemchr(one, 0203, 3) == one + 1); /* Unsignedness. */
 
     /* memcpy - need not work for overlap.  */
-    it = "memcpy";
-    check(memcpy_P(one, "abc", 4) == one); /* Returned value. */
+    it = PSTR("memcpy");
+    check(memcpy(one, "abc", 4) == one); /* Returned value. */
     equal(one, "abc");                   /* Did the copy go right? */
 
     (void)strcpy(one, "abcdefgh");
@@ -522,10 +527,10 @@ void libm_test_string()
     (void)xmemcpy(two, one, 9);
     equal(two, "hi there"); /* Just paranoia. */
     equal(one, "hi there"); /* Stomped on source? */
-#if 0
+#if 1
   /* memmove - must work on overlap.  */
-  it = "memmove";
-  check(memmove(one, "abc", 4) == one); /* Returned value. */
+  it = PSTR("memmove");
+  check(xmemmove(one, "abc", 4) == one); /* Returned value. */
   equal(one, "abc");		/* Did the copy go right? */
 
   (void) strcpy(one, "abcdefgh");
@@ -538,20 +543,20 @@ void libm_test_string()
 
   (void) strcpy(one, "hi there");
   (void) strcpy(two, "foo");
-  (void) memmove(two, one, 9);
+  (void) xmemmove(two, one, 9);
   equal(two, "hi there");	/* Just paranoia. */
   equal(one, "hi there");	/* Stomped on source? */
 
   (void) strcpy(one, "abcdefgh");
-  (void) memmove(one+1, one, 9);
+  (void) xmemmove(one+1, one, 9);
   equal(one, "aabcdefgh");	/* Overlap, right-to-left. */
 
   (void) strcpy(one, "abcdefgh");
-  (void) memmove(one+1, one+2, 7);
+  (void) xmemmove(one+1, one+2, 7);
   equal(one, "acdefgh");	/* Overlap, left-to-right. */
 
   (void) strcpy(one, "abcdefgh");
-  (void) memmove(one, one, 9);
+  (void) xmemmove(one, one, 9);
   equal(one, "abcdefgh");	/* 100% overlap. */
 #endif
 #if 0
@@ -559,7 +564,7 @@ void libm_test_string()
      The SVID, the only place where memccpy is mentioned, says
      overlap might fail, so we don't try it.  Besides, it's hard
      to see the rationale for a non-left-to-right memccpy.  */
-  it = "memccpy";
+  it = PSTR("memccpy");
   check(memccpy(one, "abc", 'q', 4) == NULL); /* Returned value. */
   equal(one, "abc");		/* Did the copy go right? */
 
@@ -594,7 +599,7 @@ void libm_test_string()
   equal(two, "xbcdlebee");
 #endif
     /* memset.  */
-    it = "memset";
+    it = PSTR("memset");
     (void)strcpy(one, "abcdefgh");
     check(memset(one + 1, 'x', 3) == one + 1); /* Return value. */
     equal(one, "axxxefgh");                    /* Basic test. */
@@ -614,7 +619,7 @@ void libm_test_string()
 
     /* bcopy - much like memcpy.
        Berklix manual is silent about overlap, so don't test it.  */
-    it = "bcopy";
+    it = PSTR("bcopy");
     (void)bcopy("abc", one, 4);
     equal(one, "abc"); /* Simple copy. */
 
@@ -633,7 +638,7 @@ void libm_test_string()
     equal(one, "hi there"); /* Stomped on source? */
 
     /* bzero.  */
-    it = "bzero";
+    it = PSTR("bzero");
     (void)strcpy(one, "abcdef");
     bzero(one + 2, 2);
     equal(one, "ab"); /* Basic test. */
@@ -645,7 +650,7 @@ void libm_test_string()
     equal(one, "abcdef"); /* Zero-length copy. */
 
     /* bcmp - somewhat like memcmp.  */
-    it = "bcmp";
+    it = PSTR("bcmp");
     check(bcmp("a", "a", 1) == 0);       /* Identity. */
     check(bcmp("abc", "abc", 3) == 0);   /* Multicharacter. */
     check(bcmp("abcd", "abce", 4) != 0); /* Honestly unequal. */
