@@ -52,7 +52,6 @@ jobs:
     - name: Build Sketches
       env:
         ESP8266_ARDUINO_BUILDER: "arduino"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_LWIP: ${{ matrix.lwip }}
       run: |
         bash ./tests/build.sh 8 ${{ matrix.chunk }}
@@ -75,8 +74,6 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
     - name: Build Sketch
       env:
-        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
       run: |
         bash ./tests/build.sh
@@ -100,8 +97,6 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
     - name: Build Sketch
       env:
-        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
       run: |
         bash ./tests/build.sh
