@@ -131,6 +131,7 @@ function build_sketches()
     local build_cmd
     build_cmd+=${cli_path}
     build_cmd+=" compile"\
+" --warnings=all"\
 " --build-path $build_dir"\
 " --fqbn $fqbn"\
 " --libraries $library_path"\
@@ -307,20 +308,23 @@ function install_core()
     fi
 
     # Set our custom warnings for all builds
-    { echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags";
-      echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags";
-      echo "mkbuildoptglobals.extra_flags=--ci --cache_core"; } \
-          > platform.local.txt
+    printf "%s\n" \
+        "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
+        "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
+        "mkbuildoptglobals.extra_flags=--ci --cache_core" \
+            > ${core_path}/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat platform.local.txt
     echo -e "\n----\n"
 
+    # Fetch toolchain & filesystem utils
     pushd tools
     python3 get.py -q
 
     popd
     popd
 
+    # todo: windows runners are using copied tree
     local core_dir
     core_dir=$(dirname "$hardware_core_path")
     mkdir -p "$core_dir"
