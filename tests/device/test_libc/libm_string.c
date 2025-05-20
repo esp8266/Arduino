@@ -3,27 +3,101 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define memcmp memcmp_P
-#define memcpy memcpy_P
-#define memmem memmem_P
-#define memchr memchr_P
-#define strcat strcat_P
-#define strncat strncat_P
-#define strcpy strcpy_P
-#define strncpy strncpy_P
-#define strlen strlen_P
-#define strnlen strnlen_P
-#define strcmp strcmp_P
-#define strncmp strncmp_P
+#include <sys/pgmspace.h>
 
-_CONST char* it     = "<UNSET>"; /* Routine name for message routines. */
+/* esp8266/Arduino note
+ *
+ * Prevent the compiler from
+ * - solving test cases below at compile time, effectively removing any checks
+ * - optimizing out libc func calls, replacing them with bytewise memory access
+ *
+ * Plus, test framework cannot pass -fno-builtin-... per-file, only globally
+ */
+
+/* TODO remove when libc supports pointers to flash */
+#undef PSTR
+#define PSTR(X) X
+
+#if 1
+
+#define xDST_SRC_N(T, NAME)\
+T* __attribute__((noinline)) x ## NAME (T* dst, const T* src, size_t n)\
+{\
+    return NAME (dst, src, n);\
+}
+
+xDST_SRC_N (void, memcpy)
+xDST_SRC_N (char, strncat)
+xDST_SRC_N (char, strncpy)
+
+#define xDST_SRC(T, NAME)\
+T* __attribute__((noinline)) x ## NAME (T* dst, const T* src)\
+{\
+    return NAME (dst, src);\
+}
+
+xDST_SRC (char, strcat)
+xDST_SRC (char, strcpy)
+
+#define xS1_S2_N(RET, T, NAME)\
+RET __attribute__((noinline)) x ## NAME (const T *s1, const T *s2, size_t n)\
+{\
+    return NAME (s1, s2, n);\
+}
+
+xS1_S2_N(int, void, memcmp)
+xS1_S2_N(int, char, strncmp)
+
+int __attribute__((noinline)) xstrcmp (const char *s1, const char *s2)
+{
+    return strcmp (s1, s2);
+}
+
+void* __attribute__((noinline)) xmemchr (const void* s, int c, size_t n)
+{
+    return memchr (s, c, n);
+}
+
+size_t __attribute__((noinline)) xstrlen (const char* s)
+{
+    return strlen (s);
+}
+
+#define memcmp(s1,s2,n) xmemcmp(s1,PSTR(s2),n)
+#define memcpy(dest,src,n) xmemcpy(dest,PSTR(src),n)
+#define memchr(s,c,n) xmemchr(PSTR(s),c,n)
+#define strcat(dst,src) xstrcat(dst,PSTR(src))
+#define strncat(dst,src,ssize) xstrncat(dst,PSTR(src),ssize)
+#define strcpy(dst,src) xstrcpy(dst,PSTR(src))
+#define strncpy(dst,src,dsize) xstrncpy(dst,PSTR(src),dsize)
+#define strlen(s) xstrlen(PSTR(s))
+#define strcmp(s1,s2) xstrcmp(s1,PSTR(s2))
+#define strncmp(s1,s2,n) xstrncmp(s1,PSTR(s2),n)
+
+#else
+
+/* in case wrapped calls are not required */
+
+#define memcmp(s1,s2,n) memcmp(s1,PSTR(s2),n)
+#define memcpy(dest,src,n) memcpy(dest,PSTR(src),n)
+#define memchr(s,c,n) memchr(PSTR(s),c,n)
+#define strcat(dst,src) strcat(dst,PSTR(src))
+#define strncat(dst,src,ssize) strncat(dst,PSTR(src),ssize)
+#define strcpy(dst,src) strcpy(dst,PSTR(src))
+#define strncpy(dst,src,dsize) strncpy(dst,PSTR(src),dsize)
+#define strlen(s) strlen(PSTR(s))
+#define strcmp(s1,s2) strcmp(s1,PSTR(s2))
+#define strncmp(s1,s2,n) strncmp(s1,PSTR(s2),n)
+
+#endif
+
+const char* it     = "<UNSET>"; /* Routine name for message routines. */
 static int   errors = 0;
 
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)
 
-static void _DEFUN(checkit, (ok, l), int ok _AND int l)
-
+static void checkit(int ok, int l)
 {
     //  newfunc(it);
     //  line(l);
@@ -36,16 +110,16 @@ static void _DEFUN(checkit, (ok, l), int ok _AND int l)
 }
 
 /* Complain if first two args don't strcmp as equal.  */
-#define equal(a, b) funcqual(a, b, __LINE__);
+#define equal(a, b) funcqual(a, PSTR(b), __LINE__);
 
-static void _DEFUN(funcqual, (a, b, l), char* a _AND char* b _AND int l)
+static void funcqual(const char *a, const char *b, int l)
 {
     //  newfunc(it);
 
     //  line(l);
     if (a == NULL && b == NULL)
         return;
-    if (strcmp(a, b))
+    if (xstrcmp(a, b))
     {
         printf("string.c:%d (%s)\n", l, it);
     }
@@ -70,7 +144,7 @@ void libm_test_string()
 
     /* Test strcpy next because we need it to set up other tests.  */
     it = "strcpy";
-    check(strcpy(one, "abcd") == one); /* Returned value. */
+    check(strcpy_P(one, "abcd") == one); /* Returned value. */
     equal(one, "abcd");                /* Basic test. */
 
     (void)strcpy(one, "x");
@@ -78,7 +152,7 @@ void libm_test_string()
     equal(one + 2, "cd"); /* Wrote too much? */
 
     (void)strcpy(two, "hi there");
-    (void)strcpy(one, two);
+    (void)xstrcpy(one, two);
     equal(one, "hi there"); /* Basic test encore. */
     equal(two, "hi there"); /* Stomped on source? */
 
@@ -88,7 +162,7 @@ void libm_test_string()
     /* strcat.  */
     it = "strcat";
     (void)strcpy(one, "ijk");
-    check(strcat(one, "lmn") == one); /* Returned value. */
+    check(strcat_P(one, "lmn") == one); /* Returned value. */
     equal(one, "ijklmn");             /* Basic test. */
 
     (void)strcpy(one, "x");
@@ -98,7 +172,7 @@ void libm_test_string()
 
     (void)strcpy(one, "gh");
     (void)strcpy(two, "ef");
-    (void)strcat(one, two);
+    (void)xstrcpy(one, two);
     equal(one, "ghef"); /* Basic test encore. */
     equal(two, "ef");   /* Stomped on source? */
 
@@ -116,38 +190,63 @@ void libm_test_string()
        then test the count mechanism.  */
     it = "strncat";
     (void)strcpy(one, "ijk");
-    check(strncat(one, "lmn", 99) == one); /* Returned value. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+    check(strncat_P(one, "lmn", 99) == one); /* Returned value. */
+#pragma GCC diagnostic pop
     equal(one, "ijklmn");                  /* Basic test. */
 
     (void)strcpy(one, "x");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)strncat(one, "yz", 99);
+#pragma GCC diagnostic pop
     equal(one, "xyz");    /* Writeover. */
     equal(one + 4, "mn"); /* Wrote too much? */
 
     (void)strcpy(one, "gh");
     (void)strcpy(two, "ef");
-    (void)strncat(one, two, 99);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds="
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+    (void)xstrncat(one, two, 99);
+#pragma GCC diagnostic pop
     equal(one, "ghef"); /* Basic test encore. */
     equal(two, "ef");   /* Stomped on source? */
 
     (void)strcpy(one, "");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)strncat(one, "", 99);
+#pragma GCC diagnostic pop
     equal(one, ""); /* Boundary conditions. */
     (void)strcpy(one, "ab");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)strncat(one, "", 99);
+#pragma GCC diagnostic pop
     equal(one, "ab");
     (void)strcpy(one, "");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
     (void)strncat(one, "cd", 99);
+#pragma GCC diagnostic pop
     equal(one, "cd");
 
     (void)strcpy(one, "ab");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     (void)strncat(one, "cdef", 2);
+#pragma GCC diagnostic pop
     equal(one, "abcd"); /* Count-limited. */
 
     (void)strncat(one, "gh", 0);
     equal(one, "abcd"); /* Zero count. */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
     (void)strncat(one, "gh", 2);
+#pragma GCC diagnostic pop
     equal(one, "abcdgh"); /* Count _AND length equal. */
     it = "strncmp";
     /* strncmp - first test as strcmp with big counts";*/
@@ -165,15 +264,21 @@ void libm_test_string()
 
     /* strncpy - testing is a bit different because of odd semantics.  */
     it = "strncpy";
-    check(strncpy(one, "abc", 4) == one); /* Returned value. */
+    check(strncpy_P(one, "abc", 4) == one); /* Returned value. */
     equal(one, "abc");                    /* Did the copy go right? */
 
     (void)strcpy(one, "abcdefgh");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     (void)strncpy(one, "xyz", 2);
+#pragma GCC diagnostic pop
     equal(one, "xycdefgh"); /* Copy cut by count. */
 
     (void)strcpy(one, "abcdefgh");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     (void)strncpy(one, "xyz", 3); /* Copy cut just before NUL. */
+#pragma GCC diagnostic pop
     equal(one, "xyzdefgh");
 
     (void)strcpy(one, "abcdefgh");
@@ -188,7 +293,10 @@ void libm_test_string()
     equal(one + 5, "fgh");
 
     (void)strcpy(one, "abc");
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
     (void)strncpy(one, "xyz", 0); /* Zero-length copy. */
+#pragma GCC diagnostic pop
     equal(one, "abc");
 
     (void)strncpy(one, "", 2); /* Zero-length source. */
@@ -197,7 +305,7 @@ void libm_test_string()
     equal(one + 2, "c");
 
     (void)strcpy(one, "hi there");
-    (void)strncpy(two, one, 9);
+    (void)xstrncpy(two, one, 9);
     equal(two, "hi there"); /* Just paranoia. */
     equal(one, "hi there"); /* Stomped on source? */
 
@@ -379,26 +487,26 @@ void libm_test_string()
     /* memcmp should test strings as unsigned */
     one[0] = 0xfe;
     two[0] = 0x03;
-    check(memcmp(one, two, 1) > 0);
+    check(xmemcmp(one, two, 1) > 0);
 
     /* memchr.  */
     it = "memchr";
     check(memchr("abcd", 'z', 4) == NULL); /* Not found. */
     (void)strcpy(one, "abcd");
-    check(memchr(one, 'c', 4) == one + 2);  /* Basic test. */
-    check(memchr(one, 'd', 4) == one + 3);  /* End of string. */
-    check(memchr(one, 'a', 4) == one);      /* Beginning. */
-    check(memchr(one, '\0', 5) == one + 4); /* Finding NUL. */
+    check(xmemchr(one, 'c', 4) == one + 2);  /* Basic test. */
+    check(xmemchr(one, 'd', 4) == one + 3);  /* End of string. */
+    check(xmemchr(one, 'a', 4) == one);      /* Beginning. */
+    check(xmemchr(one, '\0', 5) == one + 4); /* Finding NUL. */
     (void)strcpy(one, "ababa");
-    check(memchr(one, 'b', 5) == one + 1); /* Finding first. */
-    check(memchr(one, 'b', 0) == NULL);    /* Zero count. */
-    check(memchr(one, 'a', 1) == one);     /* Singleton case. */
+    check(xmemchr(one, 'b', 5) == one + 1); /* Finding first. */
+    check(xmemchr(one, 'b', 0) == NULL);    /* Zero count. */
+    check(xmemchr(one, 'a', 1) == one);     /* Singleton case. */
     (void)strcpy(one, "a\203b");
-    check(memchr(one, 0203, 3) == one + 1); /* Unsignedness. */
+    check(xmemchr(one, 0203, 3) == one + 1); /* Unsignedness. */
 
     /* memcpy - need not work for overlap.  */
     it = "memcpy";
-    check(memcpy(one, "abc", 4) == one); /* Returned value. */
+    check(memcpy_P(one, "abc", 4) == one); /* Returned value. */
     equal(one, "abc");                   /* Did the copy go right? */
 
     (void)strcpy(one, "abcdefgh");
@@ -411,7 +519,7 @@ void libm_test_string()
 
     (void)strcpy(one, "hi there");
     (void)strcpy(two, "foo");
-    (void)memcpy(two, one, 9);
+    (void)xmemcpy(two, one, 9);
     equal(two, "hi there"); /* Just paranoia. */
     equal(one, "hi there"); /* Stomped on source? */
 #if 0
@@ -491,7 +599,10 @@ void libm_test_string()
     check(memset(one + 1, 'x', 3) == one + 1); /* Return value. */
     equal(one, "axxxefgh");                    /* Basic test. */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
     (void)memset(one + 2, 'y', 0);
+#pragma GCC diagnostic pop
     equal(one, "axxxefgh"); /* Zero-length set. */
 
     (void)memset(one + 5, 0, 1);
