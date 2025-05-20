@@ -18,11 +18,12 @@ import re
 
 verbose = True
 
-if sys.version_info[0] == 3:
-    from urllib.request import urlretrieve
+from urllib.request import urlretrieve
+
+if sys.version_info >= (3,12):
+    TARFILE_EXTRACT_ARGS = {'filter': 'data'}
 else:
-    # Not Python 3 - today, it is most likely to be Python 2
-    from urllib import urlretrieve
+    TARFILE_EXTRACT_ARGS = {}
 
 dist_dir = 'dist/'
 
@@ -51,9 +52,10 @@ def report_progress(count, blockSize, totalSize):
 def unpack(filename, destination):
     dirname = ''
     print('Extracting {0}'.format(filename))
-    if filename.endswith('tar.gz'):
-        tfile = tarfile.open(filename, 'r:gz')
-        tfile.extractall(destination)
+    extension = filename.split('.')[-1]
+    if filename.endswith((f'.tar.{extension}', f'.t{extension}')):
+        tfile = tarfile.open(filename, f'r:{extension}')
+        tfile.extractall(destination, **TARFILE_EXTRACT_ARGS)
         dirname= tfile.getnames()[0]
     elif filename.endswith('zip'):
         zfile = zipfile.ZipFile(filename)
