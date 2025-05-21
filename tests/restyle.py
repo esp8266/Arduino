@@ -85,6 +85,7 @@ def find_core_files():
         )
         if file.is_file()
         and file.suffix in (".c", ".cpp", ".h", ".hpp")
+        and not GIT_ROOT / "tests/device/test_libc" in file.parents
         and not GIT_ROOT / "tests/host/bin" in file.parents
         and not GIT_ROOT / "tests/host/common/catch.hpp" == file
     ]
