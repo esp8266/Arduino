@@ -62,6 +62,7 @@ int errors = 0;
     printf
 
 /* A safe target-independent memmove.  */
+void mymemmove(unsigned char* dest, unsigned char* src, size_t n) __attribute__((__noinline__));
 
 void mymemmove(unsigned char* dest, unsigned char* src, size_t n)
 {

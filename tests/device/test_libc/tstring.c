@@ -13,6 +13,7 @@
 #define MAX_1 50
 #define memcmp memcmp_P
 #define memcpy memcpy_P
+#define memmove memmove_P
 #define memmem memmem_P
 #define memchr memchr_P
 #define strcat strcat_P
