@@ -86,6 +86,9 @@ def unpack(p: pathlib.Path, destination: pathlib.Path):
 
 # ref. https://docs.arduino.cc/arduino-cli/package_index_json-specification/
 def get_tool(tool: dict, *, dist_dir: pathlib.Path, quiet: bool, dry_run: bool):
+    if not dist_dir.exists():
+        dist_dir.mkdir(parents=True, exist_ok=True)
+
     archive_name = tool["archiveFileName"]
     local_path = dist_dir / archive_name
 
