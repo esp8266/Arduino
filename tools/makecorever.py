@@ -41,14 +41,20 @@ def check_git(*args: str, cwd: Optional[str]):
         cmd.extend(["-C", cwd])
     cmd.extend(args)
 
-    with subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        universal_newlines=True,
-        stderr=subprocess.DEVNULL,
-    ) as proc:
-        if proc.stdout:
-            return proc.stdout.readlines()[0].strip()
+    try:
+        with subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+            stderr=subprocess.DEVNULL,
+        ) as proc:
+            if proc.stdout:
+                lines = proc.stdout.readlines()
+                return lines[0].strip()
+    except IndexError:
+        pass
+    except FileNotFoundError:
+        pass
 
     return ""
 
@@ -68,10 +74,7 @@ def generate(
         return check_git(*args, cwd=git_cwd)
 
     git_ver = "0" * hash_length
-    try:
-        git_ver = git("rev-parse", f"--short={hash_length}", "HEAD")
-    except Exception:
-        raise
+    git_ver = git("rev-parse", f"--short={hash_length}", "HEAD") or git_ver
 
     # version is
     # - using Arduino-CLI:
@@ -80,22 +83,20 @@ def generate(
     # - using git:
     #   - 5.6.7            (from release script, official release)
     #   - 5.6.7-42-g00d1e5 (from release script, test release)
-    git_desc = version
-    try:
-        # in any case, get a better version when git is around
-        git_desc = git("describe", "--tags")
-    except Exception:
-        raise
+
+    # in any case, get a better version when git is around
+    git_desc = git("describe", "--tags") or version
 
     if version == VERSION_UNSPECIFIED:
         version = git_desc
 
     version_triple = list(VERSION_DEFAULT)
 
-    try:
-        version_triple = version.split(".", 2)
-    except ValueError:
-        pass
+    if version != VERSION_UNSPECIFIED:
+        try:
+            version_triple = version.split(".", 2)
+        except ValueError:
+            pass
 
     major, minor, patch = version_triple
 
