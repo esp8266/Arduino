@@ -173,7 +173,7 @@ if __name__ == "__main__":
         out = pathlib.Path(s)
         out.parent.mkdir(parents=True, exist_ok=True)
 
-        return out.open("r", encoding="utf-8")
+        return out.open("w", encoding="utf-8")
 
     with select_output(args.output) as out:
         generate(
