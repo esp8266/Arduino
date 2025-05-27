@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# This script manages the use of a file with a unique name, like
-# `Sketch.ino.globals.h`, in the Sketch source directory to provide compiler
-# command-line options (build options) and sketch global macros. The build
-# option data is encapsulated in a unique "C" comment block and extracted into
-# the build tree during prebuild.
-#
 # Copyright (C) 2022 - M Hightower
+#
+# Updates & fixes for arduino-cli environment by Maxim Prokhorov
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,809 +15,925 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# This script manages the use of a file with a unique name, like
+# `SKETCH.ino.globals.h`, in the SKETCH source directory to provide compiler
+# command-line options (build options), sketch global macros, or inject code.
+# The buildo ption data is encapsulated in an unique "C" comment block /* ... */
+# and extracted into the build directory during prebuild.
 #
 # A Tip of the hat to:
 #
 # This PR continues the effort to get some form of global build support
-# presented by brainelectronics' PR https://github.com/esp8266/Arduino/pull/8095
+# presented by brainelectronics' PR
+# - https://github.com/esp8266/Arduino/pull/8095
 #
 # Used d-a-v's global name suggestion from arduino PR
-# https://github.com/arduino/arduino-cli/pull/1524
-#
+# - https://github.com/arduino/arduino-cli/pull/1524
+
 """
-Operation
+Sketch header aka SKETCH.ino.globals.h:
 
-"Sketch.ino.globals.h" - A global h file in the Source Sketch directory. The
-string Sketch.ino is the actual name of the sketch program. A matching copy is
-kept in the build path/core directory. The file is empty when it does not exist
-in the source directory.
+    SKETCH.ino.globals.h is expected to be created by the user.
 
-Using Sketch.ino.globals.h as a container to hold build.opt, gives implicit
-dependency tracking for build.opt by way of Sketch.ino.globals.h's
-dependencies.
+    It is always located in the root of the SKETCH directory, and must use the
+    the actual name of the sketch program (SKETCH.ino) in the its name.
+
+    Header file format is used because IDE only manages source files it actually
+    recognizes as valid C / C++ file formats. When building and re-building the
+    sketch, only valid file formats are taken into an account when building source
+    code dependencies tree.
+
+Command-line options file:
+
+    This file is created by the script.
+
+    Contents of the file are then used as gcc options (@file)
+
+    In the prebuild stage, options file is generated based on the contents of the
+    sketch header, and then placed into the build directory.
+
+    Quoting gcc manual
+    > If file does not exist, or cannot be read, then the option will be treated literally, and not removed.
+    >
+    > Options in file are separated by whitespace. A whitespace character may be included
+    > in an option by surrounding the entire option in either single or double quotes.
+    > Any character (including a backslash) may be included by prefixing the character
+    > to be included with a backslash.
+    > The file may itself contain additional @file options; any such options will be processed recursively.
+
+    Arduino build system uses timestamps as a method of determining which files should be rebuilt.
+    Options file is *always* created with at least two of the following lines
+    > -include "<build-directory>/core/<sketch-header>"
+    > -include "<esp8266-core-directory>/<common-header>"
+
+Common header:
+
+    This file is also created by the script.
+
+    It is used as a means of triggering core rebuild, because modern Arduino build systems
+    are agressively caching it and attempt to re-use existing core.a whenever possible.
+    core.a is also shared between different sketch compilations which use the same board.
+
+    This file would contain path to the currently used command-line options file extracted
+    from the sketch header. It remains empty otherwise.
+
+Build directory:
+
+    Arduino build process copies every valid source file from the source (sketch)
+    directory into the build directory. This script is expected to be launched in
+    the "prebuild" stage. At that point, build directory should already exist, but
+    it may not yet contain any of the sketch source files.
+
+    Script would always attempt to copy sketch header from the source (sketch)
+    directory to the build one. If it does not exist, a placeholder would be created.
+
+    Script would always synchronize atime & mtime of every file. When sketch header
+    exists, stats are taken from it. When it doesn't, stats for the generated common
+    header are used instead.
+
+Configuration:
+
+    "platform.txt" is expected to have this script listed as a tool
+    > runtime.tools.mkbuildoptglobals={runtime.platform.path}/tools/mkbuildoptglobals.py
+
+    Paths are always provided as Fully Qualified File Names (FQFNs).
+
+    For example
+    > globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
+    > globals.h.common.fqfn={build.core.path}/__common_globals.h
+    > build.opt.fqfn={build.path}/core/build.opt
+    > mkbuildoptglobals.extra_flags=
+
+    Both Arduino IDE 1.x and modern 2.x generate prerequisite makefiles (.d files)
+    at some point in "discovery phase".
+    ref. https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html
+
+    "prebuild" hook must be used, allowing this script to run *before* IDE creates them
+    ref. https://docs.arduino.cc/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165
+
+    > recipe.hooks.prebuild.#.pattern="{runtime.tools.python3.path}/python3" -I \\
+            "{runtime.tools.mkbuildoptglobals}" {mkbuildoptglobals.extra_flags} build \\
+            --build-path "{build.path}" \\
+            --build-opt "{build.opt.fqfn}" \\
+            --sketch-header "{globals.h.source.fqfn}" \\
+            --common-header "{commonhfile.fqfn}" \\
+
+    Command-line options file is then shared between other recipes by including it in
+    the "cpreprocessor" flags.
+    > compiler.cpreprocessor.flags=... @{build.opt.path} ...
+
+    After that point, prerequisite makefiles should contain either only the common header,
+    or both the common header and the build sketch header. When any of included headers is
+    modified, every file in the dependency chain would be rebuilt. This allows us to keep
+    existing core.a cache when command-line options file is not used by the sketch.
+
 Example:
-  gcc ... @{build.path}/core/build.opt -include "{build.path}/core/{build.project_name}.globals.h" ...
 
-In this implementation the '-include "{build.path}/core/{build.project_name}.globals.h"'
-component is added to the build.opt file.
-  gcc ... @{build.path}/core/build.opt ...
+    Sketch header file with embedded command-line options file might look like this
 
-At each build cycle, "{build.project_name}.globals.h" is conditoinally copied to
-"{build.path}/core/" at prebuild, and build.opt is extraction as needed. The
-Sketch.ino.globals.h's dependencies will trigger "rebuild all" as needed.
+    .. code-block:: c++
 
-If Sketch.ino.globals.h is not in the source sketch folder, an empty
-versions is created in the build tree. The file build.opt always contains a
-"-include ..." entry so that file dependencies are generated for
-Sketch.ino.globals.h. This allows for change detection when the file is
-added.
-"""
+    /*@create-file:build.opt@
+    // An embedded "build.opt" file using a "C" block comment. The starting signature
+    // must be on a line by itself. The closing block comment pattern should be on a
+    // line by itself. Each line within the block comment will be space trimmed and
+    // written to build.opt, skipping blank lines and lines starting with '//', '*'
+    // or '#'.
+    -DMYDEFINE="\"Chimichangas do not exist\""
+    -O3
+    -fanalyzer
+    -DUMM_STATS=2
+    */
 
-"""
-Arduino `preferences.txt` changes
+    #ifndef SKETCH_INO_GLOBALS_H
+    #define SKETCH_INO_GLOBALS_H
 
-"Aggressively cache compiled core" ideally should be turned off; however,
-a workaround has been implimented.
-In ~/.arduino15/preferences.txt, to disable the feature:
-  compiler.cache_core=false
+    #if defined(__cplusplus)
+    // Defines kept private to .cpp modules
+    //#pragma message("__cplusplus has been seen")
+    #endif
 
-Reference:
-https://forum.arduino.cc/t/no-aggressively-cache-compiled-core-in-ide-1-8-15/878954/2
-"""
+    #if !defined(__cplusplus) && !defined(__ASSEMBLER__)
+    // Defines kept private to .c modules
+    #endif
 
-"""
-# Updates or Additions for platform.txt or platform.local.txt
+    #if defined(__ASSEMBLER__)
+    // Defines kept private to assembler modules
+    #endif
 
-runtime.tools.mkbuildoptglobals={runtime.platform.path}/tools/mkbuildoptglobals.py
+    #endif
 
-# Fully qualified file names for processing sketch global options
-globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
-commonhfile.fqfn={build.core.path}/CommonHFile.h
-build.opt.fqfn={build.path}/core/build.opt
-mkbuildoptglobals.extra_flags=
+Caveats, Observations, and Ramblings:
 
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
+    1) Edits to "platform.txt" or "platform.local.txt" force a complete rebuild that
+    removes the core folder. Not a problem, just something to be aware of when
+    debugging this script. Similarly, changes on the IDE Tools selection cause a
+    complete rebuild.
 
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 @{build.opt.path} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
-"""
+    In contrast, the core directory is not deleted when the rebuild occurs from
+    changing a file with an established dependency.
 
-"""
-A Sketch.ino.globals.h file with embedded build.opt might look like this
+    2) Renaming files does not change the last modified timestamp, possibly causing
+    issues when replacing files by renaming and rebuilding.
 
-/*@create-file:build.opt@
-// An embedded build.opt file using a "C" block comment. The starting signature
-// must be on a line by itself. The closing block comment pattern should be on a
-// line by itself. Each line within the block comment will be space trimmed and
-// written to build.opt, skipping blank lines and lines starting with '//', '*'
-// or '#'.
+    A good example of this problem is when you correct the spelling of sketch
+    header file. You need to touch (update time stampt) the file so a
+    rebuild all is performed.
 
--DMYDEFINE="\"Chimichangas do not exist\""
--O3
--fanalyzer
--DUMM_STATS=2
-*/
+    3) During the build two identical copies of sketch header will exist.
+    #ifndef fencing will be needed for non comment blocks in SKETCH.ino.globals.h.
 
-#ifndef SKETCH_INO_GLOBALS_H
-#define SKETCH_INO_GLOBALS_H
+    4) By using a .h file to encapsulate "build.opt" options, the information is not
+    lost after a save-as. Before with an individual "build.opt" file, the file was
+    missing in the saved copy.
 
-#if defined(__cplusplus)
-// Defines kept private to .cpp modules
-//#pragma message("__cplusplus has been seen")
-#endif
+    5) Previously, when a .h file is renamed, a copy of the old file remains in the build
+    sketch folder. This created confusion if you missed an edit in updating an
+    include in one or more of your modules. Module will continue to use the
+    stale version of the .h, until you restart the IDE or other major changes that
+    would cause the IDE to delete and recopy the contents from the source sketch.
 
-#if !defined(__cplusplus) && !defined(__ASSEMBLER__)
-// Defines kept private to .c modules
-#endif
+    This may be the culprit for "What! It built fine last night!"
 
-#if defined(__ASSEMBLER__)
-// Defines kept private to assembler modules
-#endif
+    6a) In The case of two Arduino IDE screens up with different programs, they can
+    share the same core archive file. Defines on one screen will change the core
+    archive, and a build on the 2nd screen will build with those changes.
+    The 2nd build will have the core built for the 1st screen. It gets uglier. With
+    the 2nd program, the newly built modules used headers processed with different
+    defines than the core.
 
-#endif
-"""
+    6b) Problem: Once core has been build, changes to build.opt or globals.h will
+    not cause the core archive to be rebuild. You either have to change tool
+    settings or close and reopen the Arduino IDE. This is a variation on 6a) above.
+    I thought this was working for the single sketch case, but it does not! :(
+    That is because sometimes it does build properly. What is unknown are the
+    causes that will make it work and fail?
 
-"""
-Added 2) and 5) to docs
+    7) Previous IDE versions allowed to disable core.a caching
+    https://forum.arduino.cc/t/no-aggressively-cache-compiled-core-in-ide-1-8-15/878954/2
 
-Caveats, Observations, and Ramblings
+    This is not the case for 2.x, where the only way to control it is by calling arduino-cli
+    directly, or modifying its configuration file / using environment variable.
+    https://arduino.github.io/arduino-cli/1.2/configuration/
+    > "build_cache" configuration options related to the compilation cache
 
-1) Edits to platform.txt or platform.local.txt force a complete rebuild that
-removes the core folder. Not a problem, just something to be aware of when
-debugging this script. Similarly, changes on the IDE Tools selection cause a
-complete rebuild.
+    "--clean" option would start with a fresh build.
 
-In contrast, the core directory is not deleted when the rebuild occurs from
-changing a file with an established dependency.
+    8) Suspected but not confirmed. A quick edit and rebuild don't always work well.
+    Build does not work as expected. This does not fail often. Maybe PIC NIC.
 
-2) Renaming files does not change the last modified timestamp, possibly causing
-issues when replacing files by renaming and rebuilding.
-
-A good example of this problem is when you correct the spelling of file
-Sketch.ino.globals.h. You need to touch (update time stampt) the file so a
-rebuild all is performed.
-
-3) During the build two identical copies of Sketch.ino.globals.h will exist.
-#ifndef fencing will be needed for non comment blocks in Sketch.ino.globals.h.
-
-4) By using a .h file to encapsulate "build.opt" options, the information is not
-lost after a save-as. Before with an individual "build.opt" file, the file was
-missing in the saved copy.
-
-5) When a .h file is renamed, a copy of the old file remains in the build
-sketch folder. This can create confusion if you missed an edit in updating an
-include in one or more of your modules. That module will continue to use the
-stale version of the .h, until you restart the IDE or other major changes that
-would cause the IDE to delete and recopy the contents from the source sketch.
-
-This may be the culprit for "What! It built fine last night!"
-
-6a) In The case of two Arduino IDE screens up with different programs, they can
-share the same core archive file. Defines on one screen will change the core
-archive, and a build on the 2nd screen will build with those changes.
-The 2nd build will have the core built for the 1st screen. It gets uglier. With
-the 2nd program, the newly built modules used headers processed with different
-defines than the core.
-
-6b) Problem: Once core has been build, changes to build.opt or globals.h will
-not cause the core archive to be rebuild. You either have to change tool
-settings or close and reopen the Arduino IDE. This is a variation on 6a) above.
-I thought this was working for the single sketch case, but it does not! :(
-That is because sometimes it does build properly. What is unknown are the
-causes that will make it work and fail?
-  * Fresh single Arduino IDE Window, open with file to build - works
-
-I think these, 6a and 6b, are resolved by setting `compiler.cache_core=false`
-in ~/.arduino15/preferences.txt, to disable the aggressive caching feature:
-  https://forum.arduino.cc/t/no-aggressively-cache-compiled-core-in-ide-1-8-15/878954/2
-
-Added workaround for `compiler.cache_core=true` case.
-See `if use_aggressive_caching_workaround:` in main().
-
-7) Suspected but not confirmed. A quick edit and rebuild don't always work well.
-Build does not work as expected. This does not fail often. Maybe PIC NIC.
 """
 
 import argparse
-import glob
 import locale
+import logging
+import io
+import re
 import os
-import platform
+import dataclasses
+import pathlib
 import sys
 import textwrap
 import time
-import traceback
 
-from shutil import copyfile
+from typing import Optional, TextIO, Union, List, Tuple
+
+from shutil import copystat
 
 
 # Stay in sync with our bundled version
-PYTHON_REQUIRES = (3, 7)
+VERSION_MIN = (3, 7)
 
-if sys.version_info < PYTHON_REQUIRES:
-    raise SystemExit(f"{__file__}\nMinimal supported version of Python is {PYTHON_REQUIRES[0]}.{PYTHON_REQUIRES[1]}")
-
-
-# Need to work on signature line used for match to avoid conflicts with
-# existing embedded documentation methods.
-build_opt_signature = "/*@create-file:build.opt@"
-
-docs_url = "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html"
+if sys.version_info < VERSION_MIN:
+    raise SystemExit(
+        f"{__file__}\nMinimal supported version of Python is {VERSION_MIN[0]}.{VERSION_MIN[1]}"
+    )
 
 
-err_print_flag = False
-msg_print_buf = ""
-debug_enabled = False
-default_encoding = None
+# Like existing documentation methods, signature is embedded in the comment block
+# Unlike existing documentation methods, only the first line contains any metadata
 
-# Issues trying to address through buffered printing
-# 1. Arduino IDE 2.0 RC5 does not show stderr text in color. Text printed does
-#    not stand out from stdout messages.
-# 2. Separate pipes, buffering, and multiple threads with output can create
-#    mixed-up messages. "flush" helped but did not resolve. The Arduino IDE 2.0
-#    somehow makes the problem worse.
-# 3. With Arduino IDE preferences set for "no verbose output", you only see
-#    stderr messages. Prior related prints are missing.
+# Command-line options file, to be sourced by the compiler
+BUILD_OPT_SIGNATURE_RE = re.compile(r"/[\*]@\s*?create-file:(?P<name>\S*?)\s*?@$")
+
+# Script documentation & examples
+DOCS_URL = (
+    "https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html"
+)
+DOCS_EPILOG = f"""
+Use platform.local.txt 'mkbuildoptglobals.extra_flags=...' to supply extra command line flags.
+See {DOCS_URL} for more information.
+"""
+
+
+# Notify that custom build options exist for the other core, but not this one
+OTHER_BUILD_OPTIONS = [
+    "build_opt.h",
+    "file_opt",
+]
+
+
+def other_build_options(p: pathlib.Path, sketch_header: pathlib.Path):
+    return f"""Build options file '{p.name}' is not supported.")
+Embed build options and code in '{sketch_header.name}' instead.
+Create an empty '{sketch_header.name}' to silence this warning.
+
+  See {DOCS_URL} for more information.
+"""
+
+
+def check_other_build_options(sketch_header: pathlib.Path) -> Optional[str]:
+    if sketch_header.exists():
+        return None
+
+    for name in OTHER_BUILD_OPTIONS:
+        p = sketch_header.parent / name
+        if p.exists():
+            return other_build_options(p, sketch_header)
+
+    return None
+
+
+# Retrieve *system* encoding, not the one used by python internally
 #
-# Locally buffer and merge both stdout and stderr prints. This allows us to
-# print a complete context when there is an error. When any buffered prints
-# are targeted to stderr, print the whole buffer to stderr.
-
-def print_msg(*args, **kwargs):
-    global msg_print_buf
-    if 'sep' in kwargs:
-        sep = kwargs['sep']
-    else:
-        sep = ' '
-
-    msg_print_buf += args[0]
-    for arg in args[1:]:
-        msg_print_buf += sep
-        msg_print_buf += arg
-
-    if 'end' in kwargs:
-        msg_print_buf += kwargs['end']
-    else:
-        msg_print_buf += '\n'
-
-
-# Bring attention to errors with a blank line and lines starting with "*** ".
-def print_err(*args, **kwargs):
-    global err_print_flag
-    if (args[0])[0] != ' ':
-        print_msg("")
-    print_msg("***", *args, **kwargs)
-    err_print_flag = True
-
-def print_dbg(*args, **kwargs):
-    global debug_enabled
-    global err_print_flag
-    if debug_enabled:
-        print_msg("DEBUG:", *args, **kwargs)
-        err_print_flag = True
-
-
-def handle_error(err_no):
-    # on err_no 0, commit print buffer to stderr or stdout
-    # on err_no != 0, commit print buffer to stderr and sys exist with err_no
-    global msg_print_buf
-    global err_print_flag
-    if len(msg_print_buf):
-        if err_no or err_print_flag:
-            fd = sys.stderr
-        else:
-            fd = sys.stdout
-        print(msg_print_buf, file=fd, end='', flush=True)
-        msg_print_buf = ""
-        err_print_flag = False
-    if err_no:
-        sys.exit(err_no)
-
-
-def copy_create_build_file(source_fqfn, build_target_fqfn):
-    """
-    Conditionally copy a newer file between the source directory and the build
-    directory. When source file is missing, create an empty file in the build
-    directory.
-    return     True when file change detected.
-    """
-    if os.path.exists(source_fqfn):
-        if os.path.exists(build_target_fqfn) and \
-        os.path.getmtime(build_target_fqfn) >= os.path.getmtime(source_fqfn):
-            # only copy newer files - do nothing, all is good
-            print_dbg(f"up to date os.path.exists({source_fqfn}) ")
-            return False
-        else:
-            # The new copy gets stamped with the current time, just as other
-            # files copied by `arduino-builder`.
-            copyfile(source_fqfn, build_target_fqfn)
-            print_dbg(f"copyfile({source_fqfn}, {build_target_fqfn})")
-    else:
-        if os.path.exists(build_target_fqfn) and \
-        os.path.getsize(build_target_fqfn) == 0:
-            return False
-        else:
-            # Place holder - Must have an empty file to satisfy parameter list
-            # specifications in platform.txt.
-            with open(build_target_fqfn, 'w', encoding="utf-8"):
-                pass
-    return True     # file changed
-
-def add_include_line(build_opt_fqfn, include_fqfn):
-    global default_encoding
-    if not os.path.exists(include_fqfn):
-        # If file is missing, we need an place holder
-        with open(include_fqfn, 'w', encoding=default_encoding):
-            pass
-        print_msg("add_include_line: Created " + include_fqfn)
-
-    with open(build_opt_fqfn, 'a', encoding=default_encoding) as build_opt:
-        build_opt.write('-include "' + include_fqfn.replace('\\', '\\\\') + '"\n')
-
-def extract_create_build_opt_file(globals_h_fqfn, file_name, build_opt_fqfn):
-    """
-    Extract the embedded build.opt from Sketch.ino.globals.h into build
-    path/core/build.opt. The subdirectory path must already exist as well as the
-    copy of Sketch.ino.globals.h.
-    """
-    global build_opt_signature
-    global default_encoding
-
-    build_opt = open(build_opt_fqfn, 'w', encoding=default_encoding)
-    if not os.path.exists(globals_h_fqfn) or (0 == os.path.getsize(globals_h_fqfn)):
-        build_opt.close()
-        return False
-
-    complete_comment = False
-    build_opt_error = False
-    line_no = 0
-    # If the source sketch did not have the file Sketch.ino.globals.h, an empty
-    # file was created in the ./core/ folder.
-    # By using the copy, open will always succeed.
-    with open(globals_h_fqfn, 'r', encoding="utf-8") as src:
-        for line in src:
-            line = line.strip()
-            line_no += 1
-            if line == build_opt_signature:
-                if complete_comment:
-                    build_opt_error = True
-                    print_err("  Multiple embedded build.opt blocks in", f'{file_name}:{line_no}')
-                    continue
-                print_msg("Extracting embedded compiler command-line options from", f'{file_name}:{line_no}')
-                for line in src:
-                    line = line.strip()
-                    line_no += 1
-                    if 0 == len(line):
-                        continue
-                    if line.startswith("*/"):
-                        complete_comment = True
-                        break
-                    elif line.startswith("*"):      # these are so common - skip these should they occur
-                        continue
-                    elif line.startswith("#"):      # allow some embedded comments
-                        continue
-                    elif line.startswith("//"):
-                        continue
-                    # some consistency checking before writing - give some hints about what is wrong
-                    elif line == build_opt_signature:
-                        print_err("  Double begin before end for embedded build.opt block in", f'{file_name}:{line_no}')
-                        build_opt_error = True
-                    elif line.startswith(build_opt_signature):
-                        print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in", f'{file_name}:{line_no}')
-                        build_opt_error = True
-                    elif "/*" in line or "*/" in line :
-                        print_err("  Nesting issue for embedded build.opt block in", f'{file_name}:{line_no}')
-                        build_opt_error = True
-                    else:
-                        print_msg("  ", f'{line_no:2}, Add command-line option: {line}', sep='')
-                        build_opt.write(line + "\n")
-            elif line.startswith(build_opt_signature):
-                print_err("  build.opt signature block ignored, trailing character for embedded build.opt block in", f'{file_name}:{line_no}')
-                build_opt_error = True
-    if not complete_comment or build_opt_error:
-        build_opt.truncate(0)
-        build_opt.close()
-        if build_opt_error:
-            # this will help the script start over when the issue is fixed
-            os.remove(globals_h_fqfn)
-            print_err("  Extraction failed")
-            # Don't let the failure get hidden by a spew of nonsensical error
-            # messages that will follow. Bring things to a halt.
-            handle_error(1)
-            return False    # not reached
-    elif complete_comment:
-        print_msg("  Created compiler command-line options file " + build_opt_fqfn)
-    build_opt.close()
-    return complete_comment
-
-
-def enable_override(enable, commonhfile_fqfn):
-    # Reduce disk IO writes
-    if os.path.exists(commonhfile_fqfn):
-        if os.path.getsize(commonhfile_fqfn): # workaround active
-            if enable:
-                return
-        elif not enable:
-            return
-    with open(commonhfile_fqfn, 'w', encoding="utf-8") as file:
-        if enable:
-            file.write("//Override aggressive caching\n")
-    # enable workaround when getsize(commonhfile_fqfn) is non-zero, disabled when zero
-
-
-def discover_1st_time_run(build_path):
-    # Need to know if this is the 1ST compile of the Arduino IDE starting.
-    # Use empty cache directory as an indicator for 1ST compile.
-    # Arduino IDE 2.0 RC5 does not cleanup on exist like 1.6.19. Probably for
-    # debugging like the irregular version number 10607. For RC5 this indicator
-    # will be true after a reboot instead of a 1ST compile of the IDE starting.
-    # Another issue for this technique, Windows does not clear the Temp directory. :(
-    tmp_path, build = os.path.split(build_path)
-    ide_2_0 = 'arduino-sketch-'
-    if ide_2_0 == build[:len(ide_2_0)]:
-        search_path =  os.path.join(tmp_path, 'arduino-core-cache/*') # Arduino IDE 2.0
-    else:
-        search_path = os.path.join(tmp_path, 'arduino_cache_*/*') # Arduino IDE 1.6.x and up
-
-    count = 0
-    for dirname in glob.glob(search_path):
-        count += 1
-    return 0 == count
-
-
-def get_preferences_txt(file_fqfn, key):
-    # Get Key Value, key is allowed to be missing.
-    # We assume file file_fqfn exists
-    basename = os.path.basename(file_fqfn)
-    with open(file_fqfn, encoding="utf-8") as file:
-        for line in file:
-            name, value = line.partition("=")[::2]
-            if name.strip().lower() == key:
-                val = value.strip().lower()
-                if val != 'true':
-                    val = False
-                print_msg(f"  {basename}: {key}={val}")
-                return val
-    print_err(f"  Key '{key}' not found in file {basename}. Default to true.")
-    return True     # If we don't find it just assume it is set True
-
-
-def check_preferences_txt(runtime_ide_path, preferences_file):
-    key = "compiler.cache_core"
-    # return the state of "compiler.cache_core" found in preferences.txt
-    if preferences_file != None:
-        if os.path.exists(preferences_file):
-            print_msg(f"Using preferences from '{preferences_file}'")
-            return get_preferences_txt(preferences_file, key)
-        else:
-            print_err(f"Override preferences file '{preferences_file}' not found.")
-
-    # Referencing the preferences.txt for an indication of shared "core.a"
-    # caching is unreliable. There are too many places reference.txt can be
-    # stored and no hints of which the Arduino build might be using. Unless
-    # directed otherwise, assume "core.a" caching true.
-    print_msg(f"Assume aggressive 'core.a' caching enabled.")
-    return True
-
-def touch(fname, times=None):
-    with open(fname, "ab") as file:
-        file.close();
-    os.utime(fname, times)
-
-def synchronous_touch(globals_h_fqfn, commonhfile_fqfn):
-    global debug_enabled
-    # touch both files with the same timestamp
-    touch(globals_h_fqfn)
-    with open(globals_h_fqfn, "rb") as file:
-        file.close()
-    with open(commonhfile_fqfn, "ab") as file2:
-        file2.close()
-    ts = os.stat(globals_h_fqfn)
-    os.utime(commonhfile_fqfn, ns=(ts.st_atime_ns, ts.st_mtime_ns))
-
-    if debug_enabled:
-        print_dbg("After synchronous_touch")
-        ts = os.stat(globals_h_fqfn)
-        print_dbg(f"  globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
-        print_dbg(f"  getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
-        ts = os.stat(commonhfile_fqfn)
-        print_dbg(f"  commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
-        print_dbg(f"  getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
-
-def determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn):
-    global docs_url
-    print_dbg(f"runtime_ide_version: {args.runtime_ide_version}")
-
-    if args.cache_core != None:
-        print_msg(f"Preferences override, this prebuild script assumes the 'compiler.cache_core' parameter is set to {args.cache_core}")
-        print_msg(f"To change, modify 'mkbuildoptglobals.extra_flags=(--cache_core | --no_cache_core)' in 'platform.local.txt'")
-        return args.cache_core
-    else:
-        ide_path = None
-        preferences_fqfn = None
-        if args.preferences_sketch != None:
-            preferences_fqfn = os.path.join(
-                os.path.dirname(source_globals_h_fqfn),
-                os.path.normpath(args.preferences_sketch))
-        else:
-            if args.preferences_file != None:
-                preferences_fqfn = args.preferences_file
-            elif args.preferences_env != None:
-                preferences_fqfn = args.preferences_env
-            else:
-                ide_path = runtime_ide_path
-
-            if preferences_fqfn != None:
-                preferences_fqfn = os.path.normpath(preferences_fqfn)
-                root = False
-                if 'Windows' == platform.system():
-                    if preferences_fqfn[1:2] == ':\\':
-                        root = True
-                else:
-                    if preferences_fqfn[0] == '/':
-                        root = True
-                if not root:
-                    if preferences_fqfn[0] != '~':
-                        preferences_fqfn = os.path.join("~", preferences_fqfn)
-                    preferences_fqfn = os.path.expanduser(preferences_fqfn)
-                print_dbg(f"determine_cache_state: preferences_fqfn: {preferences_fqfn}")
-
-    return check_preferences_txt(ide_path, preferences_fqfn)
-
-
-"""
-TODO
-
-aggressive caching workaround
-========== ======= ==========
-The question needs to be asked, is it a good idea?
-With all this effort to aid in determining the cache state, it is rendered
-usless when arduino command line switches are used that contradict our
-settings.
-
-Sort out which of these are imperfect solutions should stay in
-
-Possible options for handling problems caused by:
-    ./arduino --preferences-file other-preferences.txt
-    ./arduino --pref compiler.cache_core=false
-
---cache_core
---no_cache_core
---preferences_file (relative to IDE or full path)
---preferences_sketch (default looks for preferences.txt or specify path relative to sketch folder)
---preferences_env, python docs say "Availability: most flavors of Unix, Windows."
-
- export ARDUINO15_PREFERENCES_FILE=$(realpath other-name-than-default-preferences.txt )
- ./arduino --preferences-file other-name-than-default-preferences.txt
-
- platform.local.txt: mkbuildoptglobals.extra_flags=--preferences_env
-
- Tested with:
- export ARDUINO15_PREFERENCES_FILE=$(realpath ~/projects/arduino/arduino-1.8.19/portable/preferences.txt)
- ~/projects/arduino/arduino-1.8.18/arduino
-
-
- Future Issues
- * "--preferences-file" does not work for Arduino IDE 2.0, they plan to address at a future release
- * Arduino IDE 2.0 does not support portable, they plan to address at a future release
-
-"""
-
-
-def check_env(env):
-    system = platform.system()
-    # From the docs:
-    #   Availability: most flavors of Unix, Windows.
-    #   “Availability: Unix” are supported on macOS
-    # Because of the soft commitment, I used "help=argparse.SUPPRESS" to keep
-    # the claim out of the help. The unavailable case is untested.
-    val = os.getenv(env)
-    if val == None:
-        if "Linux" == system or "Windows" == system:
-            raise argparse.ArgumentTypeError(f'Missing environment variable: {env}')
-        else:
-            # OS/Library limitation
-            raise argparse.ArgumentTypeError('Not supported')
-    return val
-
-
-def parse_args():
-    extra_txt = '''\
-       Use platform.local.txt 'mkbuildoptglobals.extra_flags=...' to supply override options:
-         --cache_core | --no_cache_core | --preferences_file PREFERENCES_FILE | ...
-
-       more help at {}
-       '''.format(docs_url)
-    parser = argparse.ArgumentParser(
-        description='Prebuild processing for globals.h and build.opt file',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-              epilog=textwrap.dedent(extra_txt))
-    parser.add_argument('runtime_ide_path', help='Runtime IDE path, {runtime.ide.path}')
-    parser.add_argument('runtime_ide_version', type=int, help='Runtime IDE Version, {runtime.ide.version}')
-    parser.add_argument('build_path', help='Build path, {build.path}')
-    parser.add_argument('build_opt_fqfn', help="Build FQFN to build.opt")
-    parser.add_argument('source_globals_h_fqfn', help="Source FQFN Sketch.ino.globals.h")
-    parser.add_argument('commonhfile_fqfn', help="Core Source FQFN CommonHFile.h")
-    parser.add_argument('--debug', action='store_true', required=False, default=False)
-    parser.add_argument('-DDEBUG_ESP_PORT', nargs='?', action='store', const="", default="", help='Add mkbuildoptglobals.extra_flags={build.debug_port} to platform.local.txt')
-    parser.add_argument('--ci', action='store_true', required=False, default=False)
-    group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('--cache_core', action='store_true', default=None, help='Assume a "compiler.cache_core" value of true')
-    group.add_argument('--no_cache_core', dest='cache_core', action='store_false', help='Assume a "compiler.cache_core" value of false')
-    group.add_argument('--preferences_file', help='Full path to preferences file')
-    group.add_argument('--preferences_sketch', nargs='?', action='store', const="preferences.txt", help='Sketch relative path to preferences file')
-    # Since the docs say most versions of Windows and Linux support the os.getenv method, suppress the help message.
-    group.add_argument('--preferences_env', nargs='?', action='store', type=check_env, const="ARDUINO15_PREFERENCES_FILE", help=argparse.SUPPRESS)
-    # ..., help='Use environment variable for path to preferences file')
-    return parser.parse_args()
-    # ref epilog, https://stackoverflow.com/a/50021771
-    # ref nargs='*'', https://stackoverflow.com/a/4480202
-    # ref no '--n' parameter, https://stackoverflow.com/a/21998252
-
-
-# retrieve *system* encoding, not the one used by python internally
+# Given that GCC will handle lines from an @file as if they were on
+# the command line. I assume that the contents of @file need to be encoded
+# to match that of the shell running GCC runs. I am not 100% sure this API
+# gives me that, but it appears to work.
+#
+# However, elsewhere when dealing with source code we continue to use 'utf-8',
+# ref. https://gcc.gnu.org/onlinedocs/cpp/Character-sets.html
 if sys.version_info >= (3, 11):
-    def get_encoding():
-        return locale.getencoding()
+    DEFAULT_ENCODING = locale.getencoding()
 else:
-    def get_encoding():
-        return locale.getdefaultlocale()[1]
+    DEFAULT_ENCODING = locale.getdefaultlocale()[1]
+
+FILE_ENCODING = "utf-8"
 
 
-def show_value(desc, value):
-    print_dbg(f'{desc:<40} {value}')
-    return
+# Issues trying to address through logging module & buffered printing
+# 1. Arduino IDE 1.x / 2.0 print stderr with color red, allowing any
+#    messages to stand out in an otherwise white on black console output.
+# 2. With Arduino IDE preferences set for "no verbose output", you only see
+#    stderr messages. Prior related prints are missing.
+# 3. logging ensures that stdout & stderr buffers are flushed before exiting.
+#    While it may not provide consistent output, no messages should be lost.
+class LoggingFilter(logging.Filter):
+    def __init__(self, *filter_only):
+        self._filter_only = filter_only
 
-def locale_dbg():
-    show_value("get_encoding()", get_encoding())
-    show_value("locale.getdefaultlocale()", locale.getdefaultlocale())
-    show_value('sys.getfilesystemencoding()', sys.getfilesystemencoding())
-    show_value("sys.getdefaultencoding()", sys.getdefaultencoding())
-    show_value("locale.getpreferredencoding(False)", locale.getpreferredencoding(False))
-    try:
-        show_value("locale.getpreferredencoding()", locale.getpreferredencoding())
-    except:
-        pass
-    show_value("sys.stdout.encoding", sys.stdout.encoding)
-
-    # use current setting
-    show_value("locale.setlocale(locale.LC_ALL, None)", locale.setlocale(locale.LC_ALL, None))
-    try:
-        show_value("locale.getencoding()", locale.getencoding())
-    except:
-        pass
-    show_value("locale.getlocale()", locale.getlocale())
-
-    # use user setting
-    show_value("locale.setlocale(locale.LC_ALL, '')", locale.setlocale(locale.LC_ALL, ''))
-    # show_value("locale.getencoding()", locale.getencoding())
-    show_value("locale.getlocale()", locale.getlocale())
-    return
+    def filter(self, rec):
+        return rec.levelno in self._filter_only
 
 
-def main():
-    global build_opt_signature
-    global docs_url
-    global debug_enabled
-    global default_encoding
-    num_include_lines = 1
+# Since default handler is not created, make sure only specific levels go through to stderr
+TO_STDERR = logging.StreamHandler(sys.stderr)
+TO_STDERR.setFormatter(logging.Formatter("*** %(levelname)s - %(message)s ***"))
+TO_STDERR.setLevel(logging.NOTSET)
+TO_STDERR.addFilter(
+    LoggingFilter(
+        logging.CRITICAL,
+        logging.DEBUG,
+        logging.ERROR,
+        logging.FATAL,
+        logging.WARNING,
+    )
+)
 
-    # Given that GCC will handle lines from an @file as if they were on
-    # the command line. I assume that the contents of @file need to be encoded
-    # to match that of the shell running GCC runs. I am not 100% sure this API
-    # gives me that, but it appears to work.
-    #
-    # However, elsewhere when dealing with source code we continue to use 'utf-8',
-    # ref. https://gcc.gnu.org/onlinedocs/cpp/Character-sets.html
-    default_encoding = get_encoding()
+# Generic info messages should be on stdout (but, note the above, these are hidden by IDE defaults)
+TO_STDOUT = logging.StreamHandler(sys.stdout)
+TO_STDOUT.setFormatter(logging.Formatter("%(message)s"))
+TO_STDOUT.setLevel(logging.INFO)
+TO_STDOUT.addFilter(
+    LoggingFilter(
+        logging.INFO,
+        logging.NOTSET,
+    )
+)
 
-    args = parse_args()
-    debug_enabled = args.debug
-    runtime_ide_path = os.path.normpath(args.runtime_ide_path)
-    build_path = os.path.normpath(args.build_path)
-    build_opt_fqfn = os.path.normpath(args.build_opt_fqfn)
-    source_globals_h_fqfn = os.path.normpath(args.source_globals_h_fqfn)
-    commonhfile_fqfn = os.path.normpath(args.commonhfile_fqfn)
+logging.basicConfig(level=logging.INFO, handlers=(TO_STDOUT, TO_STDERR))
 
-    globals_name = os.path.basename(source_globals_h_fqfn)
-    build_path_core, build_opt_name = os.path.split(build_opt_fqfn)
-    globals_h_fqfn = os.path.join(build_path_core, globals_name)
 
-    if debug_enabled:
-        locale_dbg()
+class ParsingException(Exception):
+    def __init__(self, file: Optional[str], lineno: int, line: str):
+        self.file = file
+        self.lineno = lineno
+        self.line = line
 
-    print_msg(f'default_encoding:       {default_encoding}')
+    def __str__(self):
+        out = ""
 
-    print_dbg(f"runtime_ide_path:       {runtime_ide_path}")
-    print_dbg(f"runtime_ide_version:    {args.runtime_ide_version}")
-    print_dbg(f"build_path:             {build_path}")
-    print_dbg(f"build_opt_fqfn:         {build_opt_fqfn}")
-    print_dbg(f"source_globals_h_fqfn:  {source_globals_h_fqfn}")
-    print_dbg(f"commonhfile_fqfn:       {commonhfile_fqfn}")
-    print_dbg(f"globals_name:           {globals_name}")
-    print_dbg(f"build_path_core:        {build_path_core}")
-    print_dbg(f"globals_h_fqfn:         {globals_h_fqfn}")
-    print_dbg(f"DDEBUG_ESP_PORT:        {args.DDEBUG_ESP_PORT}")
+        if self.file:
+            out += f"in {self.file}"
 
-    if len(args.DDEBUG_ESP_PORT):
-        build_opt_signature = build_opt_signature[:-1] + ":debug@"
+        lineno = f" {self.lineno}"
+        out += f"\n\n{lineno} {self.line}"
 
-    print_dbg(f"build_opt_signature:    {build_opt_signature}")
+        out += f'\n{" " * len(lineno)} '
+        out += "^" * len(self.line.strip())
 
-    if args.ci:
-        # Requires CommonHFile.h to never be checked in.
-        if os.path.exists(commonhfile_fqfn):
-            first_time = False
-        else:
-            first_time = True
-    else:
-        first_time = discover_1st_time_run(build_path)
-        if first_time:
-            print_dbg("First run since Arduino IDE started.")
+        return out
 
-    use_aggressive_caching_workaround = determine_cache_state(args, runtime_ide_path, source_globals_h_fqfn)
 
-    print_dbg(f"first_time:             {first_time}")
-    print_dbg(f"use_aggressive_caching_workaround: {use_aggressive_caching_workaround}")
+class InvalidSignature(ParsingException):
+    pass
 
-    if not os.path.exists(build_path_core):
-        os.makedirs(build_path_core)
-        print_msg("Clean build, created dir " + build_path_core)
 
-    if first_time or \
-    not use_aggressive_caching_workaround or \
-    not os.path.exists(commonhfile_fqfn):
-        enable_override(False, commonhfile_fqfn)
+class InvalidSyntax(ParsingException):
+    pass
 
-    # A future timestamp on commonhfile_fqfn will cause everything to
-    # rebuild. This occurred during development and may happen after
-    # changing the system time.
-    if time.time_ns() < os.stat(commonhfile_fqfn).st_mtime_ns:
-        touch(commonhfile_fqfn)
-        print_err(f"Neutralized future timestamp on build file: {commonhfile_fqfn}")
 
-    if os.path.exists(source_globals_h_fqfn):
-        print_msg("Using global include from " + source_globals_h_fqfn)
+def extract_build_opt(name: str, dst: TextIO, src: TextIO):
+    """
+    Read src line by line and extract matching 'create-file' directives.
+    'name' can match multiple times
 
-    copy_create_build_file(source_globals_h_fqfn, globals_h_fqfn)
+    Empty 'src' is always valid.
+    Never matching anything for 'name' is also valid.
 
-    # globals_h_fqfn timestamp was only updated if the source changed. This
-    # controls the rebuild on change. We can always extract a new build.opt
-    # w/o triggering a needless rebuild.
-    embedded_options = extract_create_build_opt_file(globals_h_fqfn, globals_name, build_opt_fqfn)
+    Incorrectly written signatures always fail with an exception.
 
-    if use_aggressive_caching_workaround:
-        # commonhfile_fqfn encodes the following information
-        # 1. When touched, it causes a rebuild of core.a
-        # 2. When file size is non-zero, it indicates we are using the
-        #    aggressive cache workaround. The workaround is set to true
-        #    (active) when we discover a non-zero length global .h file in
-        #    any sketch. The aggressive workaround is cleared on the 1ST
-        #    compile by the Arduino IDE after starting.
-        # 3. When the timestamp matches the build copy of globals.h
-        #    (globals_h_fqfn), we know one two things:
-        #    * The cached core.a matches up to the current build.opt and
-        #      globals.h. The current sketch owns the cached copy of core.a.
-        #    * globals.h has not changed, and no need to rebuild core.a
-        # 4. When core.a's timestamp does not match the build copy of
-        #    the global .h file, we only know we need to rebuild core.a, and
-        #    that is enough.
-        #
-        # When the sketch build has a "Sketch.ino.globals.h" file in the
-        # build tree that exactly matches the timestamp of "CommonHFile.h"
-        # in the platform source tree, it owns the core.a cache copy. If
-        # not, or "Sketch.ino.globals.h" has changed, rebuild core.
-        # A non-zero file size for commonhfile_fqfn, means we have seen a
-        # globals.h file before and workaround is active.
-        if debug_enabled:
-            print_dbg("Timestamps at start of check aggressive caching workaround")
-            ts = os.stat(globals_h_fqfn)
-            print_dbg(f"  globals_h_fqfn ns_stamp   = {ts.st_mtime_ns}")
-            print_dbg(f"  getmtime(globals_h_fqfn)    {os.path.getmtime(globals_h_fqfn)}")
-            ts = os.stat(commonhfile_fqfn)
-            print_dbg(f"  commonhfile_fqfn ns_stamp = {ts.st_mtime_ns}")
-            print_dbg(f"  getmtime(commonhfile_fqfn)  {os.path.getmtime(commonhfile_fqfn)}")
+    C/C++ syntax validity isn't checked, that's up to the user
+    """
+    IN_RAW = 1
+    IN_BUILD_OPT = 2
+    IN_SKIP_OPT = 3
 
-        if os.path.getsize(commonhfile_fqfn):
-            if (os.path.getmtime(globals_h_fqfn) != os.path.getmtime(commonhfile_fqfn)):
-                # Need to rebuild core.a
-                # touching commonhfile_fqfn in the source core tree will cause rebuild.
-                # Looks like touching or writing unrelated files in the source core tree will cause rebuild.
-                synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
-                print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
+    state = IN_RAW
+
+    for n, raw_line in enumerate(src, start=1):
+        line = raw_line.strip().rstrip()
+
+        if state == IN_SKIP_OPT:
+            if line.startswith("*/"):
+                state = IN_RAW
+            continue
+
+        if line.startswith("/*@"):
+            if not line.endswith("@"):
+                raise InvalidSyntax(None, n, raw_line)
+
+            result = BUILD_OPT_SIGNATURE_RE.search(line)
+            if not result or state in (IN_BUILD_OPT, IN_SKIP_OPT):
+                raise InvalidSignature(None, n, raw_line)
+
+            if name == result.group("name"):
+                state = IN_BUILD_OPT
             else:
-                print_dbg(f"Using old cached 'core.a'")
-        elif os.path.getsize(globals_h_fqfn):
-            enable_override(True, commonhfile_fqfn)
-            synchronous_touch(globals_h_fqfn, commonhfile_fqfn)
-            print_msg("Using 'aggressive caching' workaround, rebuild shared 'core.a' for current globals.")
-        else:
-            print_dbg(f"Workaround not active/needed")
+                state = IN_SKIP_OPT
 
-    add_include_line(build_opt_fqfn, commonhfile_fqfn)
-    add_include_line(build_opt_fqfn, globals_h_fqfn)
+            continue
 
-    # Provide context help for build option support.
-    source_build_opt_h_fqfn = os.path.join(os.path.dirname(source_globals_h_fqfn), "build_opt.h")
-    if os.path.exists(source_build_opt_h_fqfn) and not embedded_options:
-        print_err("Build options file '" + source_build_opt_h_fqfn + "' not supported.")
-        print_err("  Add build option content to '" + source_globals_h_fqfn + "'.")
-        print_err("  Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
-        print_err("  Read more at " + docs_url)
-    elif os.path.exists(source_globals_h_fqfn):
-        if not embedded_options:
-            print_msg("Tip: Embedd compiler command-line options in a block comment starting with '" + build_opt_signature + "'.")
-            print_msg("  Read more at " + docs_url)
-    else:
-        print_msg("Note: optional global include file '" + source_globals_h_fqfn + "' does not exist.")
-        print_msg("  Read more at " + docs_url)
+        if state == IN_BUILD_OPT:
+            if line.startswith("*/"):
+                state = IN_RAW
+                continue
 
-    handle_error(0)   # commit print buffer
+            if line.startswith(("#", "//", "*")):
+                continue
 
-if __name__ == '__main__':
-    rc = 1
+            if not line:
+                continue
+
+            dst.write(f"{line}\n")
+
+
+def extract_build_opt_from_path(dst: TextIO, name: str, p: pathlib.Path):
+    """
+    Same as 'extract_build_opt', but use a file path
+    """
     try:
-        rc = main()
-    except:
-        print_err(traceback.format_exc())
-        handle_error(0)
-    sys.exit(rc)
+        with p.open("r", encoding=FILE_ENCODING) as src:
+            extract_build_opt(name, dst, src)
+    except ParsingException as e:
+        e.file = p.name
+        raise e
+
+
+def is_future_utime(p: pathlib.Path):
+    return time.time_ns() < p.stat().st_mtime_ns
+
+
+def as_stat_result(p: Union[os.stat_result, pathlib.Path]) -> Optional[os.stat_result]:
+    if not isinstance(p, os.stat_result):
+        if not p.exists():
+            return None
+        return p.stat()
+
+    return p
+
+
+def is_different_utime(
+    p1: Union[os.stat_result, pathlib.Path],
+    p2: Union[os.stat_result, pathlib.Path],
+) -> bool:
+    s1 = as_stat_result(p1)
+    if not s1:
+        return True
+
+    s2 = as_stat_result(p2)
+    if not s2:
+        return True
+
+    for attr in ("st_atime_ns", "st_mtime_ns"):
+        if getattr(s1, attr) != getattr(s2, attr):
+            return True
+
+    return False
+
+
+# Arduino IDE uses timestamps to determine whether the .o file should be rebuilt
+def synchronize_utime(stat: Union[os.stat_result, pathlib.Path], *rest: pathlib.Path):
+    """
+    Retrieve stats from the first 'file' and apply to the 'rest'
+    """
+    if not isinstance(stat, os.stat_result):
+        logging.debug("using stats from %s", stat.name)
+        stat = stat.stat()
+    for p in rest:
+        if is_different_utime(stat, p.stat()):
+            os.utime(p, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+            logging.debug("synchronized %s", p.name)
+
+
+def as_include_line(p: pathlib.Path) -> str:
+    out = p.absolute().as_posix()
+    out = out.replace('"', '\\"')
+    out = f'-include "{out}"'
+    return out
+
+
+def as_path_field(help: str):
+    return dataclasses.field(
+        default_factory=pathlib.Path,
+        metadata={
+            "help": help,
+        },
+    )
+
+
+@dataclasses.dataclass
+class Context:
+    build_opt: pathlib.Path = as_path_field(
+        "resulting options file, used in the gcc command line options"
+    )
+
+    source_sketch_header: pathlib.Path = as_path_field(
+        ".globals.h located in the sketch directory"
+    )
+    build_sketch_header: pathlib.Path = as_path_field(
+        ".globals.h located in the build directory"
+    )
+
+    common_header: pathlib.Path = as_path_field(
+        "dependency file, copied into the core directory to trigger rebuilds"
+    )
+
+
+# build process requires some file to always exist, even when they are empty and thus unused
+def ensure_exists_and_empty(*paths: pathlib.Path):
+    """
+    Create empty or replace existing files with an empty ones at 'paths'
+    """
+    for p in paths:
+        if not p.parent.exists():
+            p.parent.mkdir(parents=True, exist_ok=True)
+
+        if not p.exists() or (p.exists() and p.stat().st_size):
+            p.write_bytes(b"")
+            logging.debug("placeholder for %s", p.name)
+        else:
+            logging.debug("up-to-date %s", p.name)
+
+
+def ensure_normal_time(*paths: pathlib.Path):
+    for p in paths:
+        if p.exists() and is_future_utime(p):
+            logging.debug("fixing timestamp of %s", p.name)
+            p.touch()
+
+
+# ref. https://gcc.gnu.org/onlinedocs/cpp/Line-Control.html
+# arduino builder not just copies sketch files to the build directory,
+# but also injects this line at the top to remember the source
+def as_arduino_sketch_quoted_header(p: pathlib.Path):
+    out = str(p.absolute())
+    out = out.replace("\\", "\\\\")
+    out = out.replace('"', '\\"')
+    return f'#line 1 "{out}"\n'
+
+
+def write_or_replace(p: pathlib.Path, contents: str, encoding=FILE_ENCODING) -> bool:
+    actual = ""
+
+    try:
+        if p.exists():
+            actual = p.read_text(encoding=encoding)
+    except UnicodeDecodeError:
+        logging.warning("cannot decode %s", p.name)
+
+    if contents != actual:
+        p.write_text(contents, encoding=encoding)
+        return True
+
+    return False
+
+
+# arduino builder would copy the file regardless
+# prebuild stage has it missing though
+def ensure_build_sketch_header_written(ctx: Context):
+    """
+    Sketch header copy or placeholder must always exist in the build directory (even when unused)
+    """
+    if not ctx.source_sketch_header.exists():
+        ensure_exists_and_empty(ctx.build_sketch_header)
+        return
+
+    p = ctx.build_sketch_header
+    if not p.parent.exists():
+        p.parent.mkdir(parents=True, exist_ok=True)
+
+    contents = ctx.source_sketch_header.read_text(encoding=FILE_ENCODING)
+    contents = "".join(
+        (
+            as_arduino_sketch_quoted_header(ctx.source_sketch_header),
+            contents,
+            "\n",
+        )
+    )
+
+    if write_or_replace(p, contents):
+        copystat(ctx.source_sketch_header, p)
+
+
+def ensure_common_header_bound(ctx: Context):
+    """
+    Record currently used command-line options file
+    """
+    if write_or_replace(
+        ctx.common_header, as_arduino_sketch_quoted_header(ctx.build_opt)
+    ):
+        logging.debug("wrote to %s", ctx.common_header.name)
+    else:
+        logging.debug("up-to-date %s", ctx.build_opt.name)
+
+
+def make_build_opt_name(ctx: Context, debug: bool) -> str:
+    name = ctx.build_opt.name
+    if debug:
+        name = f"{name}:debug"
+
+    return name
+
+
+def ensure_build_opt_written(ctx: Context, buffer: io.StringIO):
+    """
+    Make sure that 'build_opt' is written to the filesystem.
+
+    '-include ...' lines are always appended at the end of the buffer.
+    'build_opt' is not written when its contents remain unchanged.
+    """
+    includes = [
+        ctx.common_header,
+    ]
+
+    if len(buffer.getvalue()):
+        includes.append(ctx.build_sketch_header)
+
+    for p in includes:
+        buffer.write(f"{as_include_line(p)}\n")
+
+    value = buffer.getvalue()
+
+    if (
+        not ctx.build_opt.exists()
+        or is_different_utime(ctx.build_sketch_header, ctx.build_opt)
+        or ctx.build_opt.read_text(encoding=DEFAULT_ENCODING) != value
+    ):
+        ctx.build_opt.parent.mkdir(parents=True, exist_ok=True)
+        ctx.build_opt.write_text(value, encoding=DEFAULT_ENCODING)
+        logging.debug("wrote to %s", ctx.build_opt.name)
+    else:
+        logging.debug("up-to-date %s", ctx.build_opt.name)
+
+
+def maybe_empty_or_missing(p: pathlib.Path):
+    return not p.exists() or not p.stat().st_size
+
+
+def build_with_minimal_build_opt(ctx: Context):
+    """
+    When sketch header is empty or there were no opt files created
+    """
+    logging.debug("building with a minimal %s", ctx.build_opt.name)
+
+    ensure_build_opt_written(ctx, buffer=io.StringIO())
+
+    ensure_exists_and_empty(ctx.common_header)
+    ensure_build_sketch_header_written(ctx)
+
+    # sketch directory time ignored, stats are from the only persistent file
+    synchronize_utime(
+        ctx.common_header,
+        ctx.build_opt,
+        ctx.build_sketch_header,
+    )
+
+
+# Before synchronizing targets, find out which file was modified last
+# by default, check 'st_mtime_ns' attribute of os.stat_result
+def most_recent(
+    *paths: pathlib.Path, attr="st_mtime_ns"
+) -> Tuple[pathlib.Path, os.stat_result]:
+    def make_pair(p: pathlib.Path):
+        return (p, p.stat())
+
+    def key(pair: Tuple[pathlib.Path, os.stat_result]) -> int:
+        return getattr(pair[1], attr)
+
+    if not paths:
+        raise ValueError('"paths" cannot be empty')
+    elif len(paths) == 1:
+        return make_pair(paths[0])
+
+    return max((make_pair(p) for p in paths), key=key)
+
+
+def main_build(args: argparse.Namespace):
+    ctx = Context(
+        build_opt=args.build_opt,
+        source_sketch_header=args.source_sketch_header,
+        build_sketch_header=args.build_sketch_header,
+        common_header=args.common_header,
+    )
+
+    if args.debug:
+        logging.debug("using the following build context")
+        for field in dataclasses.fields(ctx):
+            logging.debug(
+                " %s %s %s",
+                field.name,
+                getattr(ctx, field.name),
+                field.metadata["help"],
+            )
+
+    # notify when other files similar to .globals.h are in the sketch directory
+    other_build_options = check_other_build_options(ctx.source_sketch_header)
+    if other_build_options:
+        logging.warning(other_build_options)
+
+    # future timestamps generally break build order.
+    # before comparing or synchronizing time, make sure it is current
+    ensure_normal_time(*dataclasses.astuple(ctx))
+
+    # when .globals.h is missing, provide placeholder files for the build and exit
+    if maybe_empty_or_missing(ctx.source_sketch_header):
+        build_with_minimal_build_opt(ctx)
+        return
+
+    # when debug port is used, allow for a different set of command line options
+    build_debug = args.build_debug or "DEBUG_SERIAL_PORT" in (
+        args.D or []
+    )  # type: bool
+    name = make_build_opt_name(ctx, build_debug)
+
+    # options file is not written immediately, buffer its contents before commiting
+    build_opt_buffer = io.StringIO()
+
+    try:
+        logging.debug("searching for %s", name)
+        extract_build_opt_from_path(build_opt_buffer, name, ctx.source_sketch_header)
+    except ParsingException as e:
+        raise e from None
+
+    # when command-line options were not created / found, it means the same thing as empty or missing .globals.h
+    if not len(build_opt_buffer.getvalue()):
+        build_with_minimal_build_opt(ctx)
+        return
+
+    logging.debug("preparing %s", ctx.build_opt.name)
+    for line in build_opt_buffer:
+        logging.debug(" %s", line)
+
+    # at this point, it is necessary to synchronize timestamps of every file
+    ensure_build_opt_written(ctx, build_opt_buffer)
+    ensure_build_sketch_header_written(ctx)
+    ensure_common_header_bound(ctx)
+
+    # stats are now based on the either active sketch or common header
+    # (thus ensure core.a is rebuilt, even when sketch mtime is earlier)
+    synchronize_utime(
+        most_recent(ctx.common_header, ctx.source_sketch_header)[1],
+        ctx.build_opt,
+        ctx.build_sketch_header,
+        ctx.common_header,
+        ctx.source_sketch_header,
+    )
+
+
+def main_inspect(args: argparse.Namespace):
+    p = args.path  # type: pathlib.Path
+
+    buffer = io.StringIO()
+    try:
+        extract_build_opt_from_path(buffer, args.build_opt_name, p)
+    except ParsingException as e:
+        raise e from None
+
+    logging.info(buffer.getvalue())
+
+
+def main_placeholder(args: argparse.Namespace):
+    paths = args.path  # type: List[pathlib.Path]
+    ensure_exists_and_empty(*paths)
+
+
+def main_synchronize(args: argparse.Namespace):
+    first = args.first  # type: pathlib.Path
+    rest = args.rest  # type: List[pathlib.Path]
+    synchronize_utime(first, *rest)
+
+
+def as_path(p: str) -> pathlib.Path:
+    if p.startswith("{") or p.endswith("}"):
+        raise ValueError(f'"{p}" was not resolved') from None
+
+    return pathlib.Path(p)
+
+
+def parse_args(args=None, namespace=None):
+    parser = argparse.ArgumentParser(
+        description="Handles sketch header containing command-line options, resulting build.opt and the shared core common header",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent(DOCS_EPILOG),
+    )
+
+    def main_help(args: argparse.Namespace):
+        parser.print_help()
+
+    parser.set_defaults(func=main_help)
+
+    parser.add_argument(
+        "--debug", action="store_true", help=argparse.SUPPRESS
+    )  # normal debug
+    parser.add_argument(
+        "--audit", action="store_true", help=argparse.SUPPRESS
+    )  # extra noisy debug
+
+    parser.add_argument(
+        "--build-debug",
+        action="store_true",
+        help="Instead of build.opt, use build.opt:debug when searching for the comment signature match",
+    )
+
+    parser.add_argument(
+        "-D",
+        help="Intended to be used with mkbuildoptglobals.extra_flags={build.debug_port} in platform.local.txt)."
+        " Only enable --build-debug when debug port is also enabled in the menu / fqbn options.",
+    )
+
+    subparsers = parser.add_subparsers()
+
+    # "prebuild" hook recipe command, preparing all of the necessary build files
+
+    build = subparsers.add_parser("build")
+
+    build.add_argument(
+        "--build-opt",
+        type=as_path,
+        required=True,
+        help="Command-line options file FQFN aka Fully Qualified File Name "
+        "(%build-path%/core/%build-opt%)",
+    )
+    build.add_argument(
+        "--source-sketch-header",
+        type=as_path,
+        required=True,
+        help="FQFN of the globals.h header, located in the sketch directory "
+        "(%sketchname%/%sketchname%.ino.globals.h)",
+    )
+    build.add_argument(
+        "--build-sketch-header",
+        type=as_path,
+        required=True,
+        help="FQFN of the globals.h header, located in the build directory "
+        "(%build-path%/sketch/%sketchname%.ino.globals.h)",
+    )
+    build.add_argument(
+        "--common-header",
+        type=as_path,
+        required=True,
+        help="FQFN of shared dependency header (%core-path%/%common-header%)",
+    )
+
+    build.set_defaults(func=main_build)
+
+    # "postbuild" hook recipe command, in case some files have to be cleared
+
+    placeholder = subparsers.add_parser(
+        "placeholder",
+        help=ensure_exists_and_empty.__doc__,
+    )
+    placeholder.add_argument(
+        "path",
+        action="append",
+        type=as_path,
+    )
+    placeholder.set_defaults(func=main_placeholder)
+
+    # Parse file path and discover any 'name' options inside
+
+    inspect = subparsers.add_parser(
+        "inspect",
+        help=extract_build_opt.__doc__,
+    )
+    inspect.add_argument("--build-opt-name", type=str, default="build.opt")
+    inspect.add_argument(
+        "path",
+        type=as_path,
+    )
+    inspect.set_defaults(func=main_inspect)
+
+    # Retrieve stats from the first file and apply to the rest
+
+    synchronize = subparsers.add_parser(
+        "synchronize",
+        help=synchronize_utime.__doc__,
+    )
+    synchronize.add_argument(
+        "first",
+        type=as_path,
+        help="Any file",
+    )
+    synchronize.add_argument(
+        "rest",
+        type=as_path,
+        nargs="+",
+        help="Any file",
+    )
+    synchronize.set_defaults(func=main_synchronize)
+
+    return parser.parse_args(args, namespace)
+
+
+def main(args: argparse.Namespace):
+    # mildly verbose logging, intended to notify about the steps taken
+    if args.debug:
+        logging.root.setLevel(logging.DEBUG)
+
+    # very verbose logging from the python internals
+    if args.audit and sys.version_info >= (3, 8):
+
+        def hook(event, args):
+            # note that logging module itself has audit calls,
+            # logging.debug(...) here would deadlock output
+            print(f"{event}:{args}", file=sys.stderr)
+
+        sys.addaudithook(hook)
+
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    main(parse_args())
