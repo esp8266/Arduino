@@ -132,7 +132,6 @@ function build_sketches()
     build_cmd+=${cli_path}
     build_cmd+=" compile"\
 " --warnings=all"\
-" --output-path $build_dir"\
 " --fqbn $fqbn"\
 " --libraries $library_path"\
 " --output-dir $build_out"
