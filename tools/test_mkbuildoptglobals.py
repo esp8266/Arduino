@@ -8,16 +8,102 @@ from typing import TextIO
 from mkbuildoptglobals import extract_build_opt, InvalidSignature, InvalidSyntax
 import contextlib
 
+
 @contextlib.contextmanager
 def buffer(init: str):
     yield io.StringIO(init), io.StringIO()
 
+
 class TestExtractBuildOpt(unittest.TestCase):
+    def testNoSource(self):
+        src = io.StringIO()
+        dst = io.StringIO()
+
+        extract_build_opt("anything.opt", dst, src)
+        self.assertFalse(dst.getvalue())
+
+    def testSomeSource(self):
+        src = io.StringIO("12345")
+        dst = io.StringIO()
+
+        extract_build_opt("numbers.opt", dst, src)
+        self.assertFalse(dst.getvalue())
+
+    def testNoOpt(self):
+        src = io.StringIO(
+            r"""
+#include <cstdio>
+int main() {
+    puts("hello world");
+    return 0;
+}
+        """
+        )
+
+        dst = io.StringIO()
+
+        extract_build_opt("something.opt", dst, src)
+        self.assertFalse(dst.getvalue())
+
+    def testAfterOpt(self):
+        src = io.StringIO(
+            r"""
+int main() {
+    puts("hello world");
+    return 0;
+}
+/*@create-file:after.opt@
+-fhello-world
+*/
+        """
+        )
+
+        dst = io.StringIO()
+
+        extract_build_opt("after.opt", dst, src)
+        self.assertEqual("-fhello-world\n", dst.getvalue())
+
+    def testEmptyBlock(self):
+        src = io.StringIO(
+            r"""
+
+
+/*@create-file:empty.opt@
+*/
+
+"""
+        )
+
+        dst = io.StringIO()
+
+        extract_build_opt("empty.opt", dst, src)
+        self.assertFalse(dst.getvalue())
+
     def testParseOnce(self):
         src = io.StringIO(
-            """
-/*@create-file:build.opt@
+            r"""
+/*@create-file:special.opt@
 -fspecial-option
+*/
+"""
+        )
+
+        dst = io.StringIO()
+
+        extract_build_opt("special.opt", dst, src)
+        self.assertEqual("-fspecial-option\n", dst.getvalue())
+
+    def testParseOnceLines(self):
+        src = io.StringIO(
+            r"""
+/*@create-file:build.opt@
+-DFOO="arbitrary definition 1"
+#comment
+
+//               comment      
+
+-DBAR="arbitrary definition 2"
+    //  finalize this
 */
         """
         )
@@ -25,7 +111,10 @@ class TestExtractBuildOpt(unittest.TestCase):
         dst = io.StringIO()
 
         extract_build_opt("build.opt", dst, src)
-        self.assertEqual("-fspecial-option\n", dst.getvalue())
+        self.assertEqual(
+            '-DFOO="arbitrary definition 1"\n' '-DBAR="arbitrary definition 2"\n',
+            dst.getvalue(),
+        )
 
     def testParseSecond(self):
         src = io.StringIO(
@@ -54,10 +143,13 @@ class TestExtractBuildOpt(unittest.TestCase):
     def testMultiple(self):
         src = io.StringIO(
             r"""
+#include <cstdio>
+int foo() { return 111; }
+
 /*@ create-file:foo.opt @
 -ffoo
 */
-
+#define INTERMIXED_DATA
 /*@create-file:foo.opt:debug@
 -fbaz
 */
@@ -65,7 +157,6 @@ class TestExtractBuildOpt(unittest.TestCase):
 /*@create-file:bar.opt:debug@
 -DUNUSED
 */
-
 /*@create-file:foo.opt@
 -mbar
 */
@@ -73,6 +164,7 @@ class TestExtractBuildOpt(unittest.TestCase):
 /*@create-file:bar.opt@
 -DALSO_UNUSED
 */
+
 
 """
         )
@@ -107,21 +199,21 @@ const char WriteMkbuildopts[] = /*@create-file:foo.opt@*/
         with self.assertRaises(InvalidSignature) as raises:
             extract_build_opt("bar.opt", dst, src)
 
-        self.assertEqual("", dst.getvalue())
+        self.assertFalse(dst.getvalue())
 
         e = raises.exception
         self.assertFalse(e.file)
         self.assertEqual(12, e.lineno)
         self.assertEqual("/*@make-file:bar.opt@\n", e.line)
 
-    def testPartialDest(self):
+    def testPartialInvalidSyntax(self):
         src = io.StringIO(
             r"""
-/*@create-file:foo.opt@
+/*@create-file:syntax.opt@
 -DIMPORTANT_FLAG
 -DANOTHER_FLAG=123
 */
-/*@ create-file:foo.opt @
+/*@ create-file:syntax.opt @
 /*@oops
 -mthis-fails
 */
@@ -130,29 +222,60 @@ const char WriteMkbuildopts[] = /*@create-file:foo.opt@*/
 
         dst = io.StringIO()
         with self.assertRaises(InvalidSyntax) as raises:
-            extract_build_opt("foo.opt", dst, src)
+            extract_build_opt("syntax.opt", dst, src)
+
+        self.assertFalse(dst.getvalue())
 
         e = raises.exception
         self.assertFalse(e.file)
         self.assertEqual(7, e.lineno)
         self.assertEqual("/*@oops\n", e.line)
-        self.assertEqual("-DIMPORTANT_FLAG\n-DANOTHER_FLAG=123\n", dst.getvalue())
+
+    def testPartialUnclosed(self):
+        src = io.StringIO(
+            r"""
+/*@create-file:unclosed.opt@
+line 1
+line 2
+"""
+        )
+        dst = io.StringIO()
+        with self.assertRaises(InvalidSyntax) as raises:
+            extract_build_opt("unclosed.opt", dst, src)
+
+        self.assertFalse(dst.getvalue())
 
     def testParseSignatureSpace(self):
-        with buffer(r"""
+        with buffer(
+            r"""
 /*@  create-file:test.opt    @
 -ftest-test-test
 */
-""") as (src, dst):
+"""
+        ) as (src, dst):
             extract_build_opt("test.opt", dst, src)
             self.assertEqual("-ftest-test-test\n", dst.getvalue())
 
-        with buffer(r"""
+        with buffer(
+            r"""
 /*@create-file:test.opt
 @
 -ftest-test-test
 */
-""") as (src, dst):
+"""
+        ) as (src, dst):
+            with self.assertRaises(InvalidSyntax) as raises:
+                extract_build_opt("test.opt", dst, src)
+
+            self.assertFalse(dst.getvalue())
+
+        with buffer(
+            r"""
+/*@create-file:test.opt
+-ftest-test-test
+*/
+"""
+        ) as (src, dst):
             with self.assertRaises(InvalidSyntax) as raises:
                 extract_build_opt("test.opt", dst, src)
 

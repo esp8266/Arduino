@@ -401,6 +401,7 @@ def extract_build_opt(name: str, dst: TextIO, src: TextIO):
     IN_SKIP_OPT = 3
 
     state = IN_RAW
+    block = []  # type: List[str]
 
     for n, raw_line in enumerate(src, start=1):
         line = raw_line.strip().rstrip()
@@ -408,6 +409,9 @@ def extract_build_opt(name: str, dst: TextIO, src: TextIO):
         if state == IN_SKIP_OPT:
             if line.startswith("*/"):
                 state = IN_RAW
+                for line in block:
+                    dst.write(line)
+                block = []
             continue
 
         if line.startswith("/*@"):
@@ -436,7 +440,13 @@ def extract_build_opt(name: str, dst: TextIO, src: TextIO):
             if not line:
                 continue
 
-            dst.write(f"{line}\n")
+            block.append(f"{line}\n")
+
+    if state != IN_RAW:
+        raise InvalidSyntax(None, n, raw_line)
+
+    for line in block:
+        dst.write(line)
 
 
 def extract_build_opt_from_path(dst: TextIO, name: str, p: pathlib.Path):
