@@ -138,7 +138,6 @@ function build_sketches()
 
     print_size_info_header >"$cache_dir"/size.log
 
-    local clean_core=1
     local testcnt=0
     local cnt=0
 
@@ -163,17 +162,11 @@ function build_sketches()
             build_cnt=0
         fi
 
-        # Do we need a clean core build? $build_dir/core/* cannot be shared
-        # between sketches when global options are present.
-        clean_core=$(arduino_mkbuildoptglobals_cleanup "$clean_core" "$build_dir" "$sketch")
-
-        # Clear out the last built sketch, map, elf, bin files, but leave the compiled
-        # objects in the core and libraries available for use so we don't need to rebuild
-        # them each sketch.
-        rm -rf "$build_dir"/sketch \
-            "$build_dir"/*.bin \
-            "$build_dir"/*.map \
-            "$build_dir"/*.elf
+        # Clear out the latest map, elf, bin files
+        rm -rf \
+            "$build_out"/*.bin \
+            "$build_out"/*.map \
+            "$build_out"/*.elf
 
         echo ${ci_group}Building $cnt $sketch
         echo "$build_cmd $sketch"
@@ -193,7 +186,7 @@ function build_sketches()
         fi
 
         print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
-            $build_dir/*.elf >>$cache_dir/size.log
+            $build_out/*.elf >>$cache_dir/size.log
 
         echo $ci_end_group
     done
