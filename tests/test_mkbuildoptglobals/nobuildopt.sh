@@ -3,7 +3,7 @@ function nobuildopt()
     build_esp8266_example "Blink"
 
     local last_sketch=$(most_recent_dir "$sketches")
-    assert_build "Blink.ino" "$last_sketch" 0
+    assert_build "Blink" "$last_sketch" 0
     assert_core 0
 
     local blink_commonh_stat=$(make_commonh_stat)
