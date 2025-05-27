@@ -31,10 +31,6 @@ VERSION_UNSPECIFIED = "unspecified"
 VERSION_DEFAULT = ("0", "0", "0")
 
 
-def escape_version(v: str) -> str:
-    return v.replace("-", "_").replace(".", "_")
-
-
 def check_git(*args: str, cwd: Optional[str]):
     cmd = ["git"]
     if cwd:
@@ -120,7 +116,7 @@ def generate(
 
         text += rf"""
 #define ARDUINO_ESP8266_RELEASE   \"{release_version}\"
-#define ARDUINO_ESP8266_RELEASE_{escape_version(release_version)}
+#define ARDUINO_ESP8266_RELEASE_{major}_{minor}_{revision}
 """
     else:
         text += """
