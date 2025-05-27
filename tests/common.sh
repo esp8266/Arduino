@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -u -e -E -o pipefail
+set -u -e -E -o pipefail -o errtrace
 
 cache_dir=$(mktemp -d)
 trap 'trap_exit' EXIT
@@ -9,8 +9,14 @@ function trap_exit()
 {
     # workaround for macOS shipping with broken bash
     local exit_code=$?
+
+    # ^ $cache_dir is temporary, prune when exiting
     if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
+    fi
+
+    if [ "$exit_code" != 0 ] ; then
+        echo "*** exit_code=$exit_code ***"
     fi
 
     exit $exit_code

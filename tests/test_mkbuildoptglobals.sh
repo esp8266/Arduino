@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+trap 'echo " ${BASH_SOURCE[1]}:$LINENO $BASH_COMMAND"' ERR
+
 root=$(git rev-parse --show-toplevel)
 source "$root/tests/env.sh"
 
