@@ -109,13 +109,8 @@ def generate(
 #define ARDUINO_ESP8266_REVISION  {revision}
 """
     if release:
-        if version != VERSION_UNSPECIFIED:
-            release_version = version
-        else:
-            release_version = git_desc
-
         text += rf"""
-#define ARDUINO_ESP8266_RELEASE   \"{release_version}\"
+#define ARDUINO_ESP8266_RELEASE   \"{major}.{minor}.{revision}\"
 #define ARDUINO_ESP8266_RELEASE_{major}_{minor}_{revision}
 """
     else:
