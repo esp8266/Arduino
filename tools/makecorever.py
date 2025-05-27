@@ -56,7 +56,6 @@ def check_git(*args: str, cwd: Optional[str]):
 
 
 def generate(
-    out: TextIO,
     *,
     git_root: pathlib.Path,
     hash_length: int = 8,
@@ -118,7 +117,7 @@ def generate(
 #define ARDUINO_ESP8266_DEV       1 // development version
 """
 
-    out.write(text)
+    return text
 
 
 if __name__ == "__main__":
@@ -158,20 +157,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    def select_output(s: str) -> TextIO:
-        if not s:
-            return sys.stdout
+    contents = generate(
+        git_root=args.git_root,
+        hash_length=args.hash_length,
+        release=args.release,
+        version=args.version,
+    )
 
-        out = pathlib.Path(s)
+    if args.output:
+        out = pathlib.Path(args.output)
         out.parent.mkdir(parents=True, exist_ok=True)
 
-        return out.open("w", encoding="utf-8")
-
-    with select_output(args.output) as out:
-        generate(
-            out,
-            git_root=args.git_root,
-            hash_length=args.hash_length,
-            release=args.release,
-            version=args.version,
-        )
+        if not out.exists() or contents != out.read_text(encoding="utf-8"):
+            out.write_text(contents, encoding="utf-8")
+    else:
+        print(contents, file=sys.stdout)

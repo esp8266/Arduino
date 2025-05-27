@@ -312,6 +312,7 @@ function install_core()
         "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
         "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
         "mkbuildoptglobals.extra_flags=--ci --cache_core" \
+        "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
             > ${core_path}/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat platform.local.txt
