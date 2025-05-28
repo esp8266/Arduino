@@ -393,6 +393,7 @@ def write_or_replace(p: pathlib.Path, contents: str, encoding=FILE_ENCODING) -> 
         logging.warning("cannot decode %s", p.name)
 
     if contents != actual:
+        p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(contents, encoding=encoding)
         logging.debug("%s contents written", p.name)
         return True
