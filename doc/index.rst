@@ -15,6 +15,7 @@ Welcome to ESP8266 Arduino Core's documentation!
    PROGMEM <PROGMEM>
    Using GDB to debug <gdb>
    MMU <mmu>
+   Global build options <global_build_options>
 
    Boards <boards>
    FAQ <faq/readme>
