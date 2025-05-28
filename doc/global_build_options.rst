@@ -1,5 +1,8 @@
-How to specify global build defines and options
-===============================================
+Global build defines and options
+================================
+
+Basics
+------
 
 To create globally usable macro definitions for a Sketch, create a file
 with a name based on your Sketch’s file name followed by ``.globals.h``
@@ -28,6 +31,9 @@ Actions taken in processing comment block to create ``build.opt``
    allowed and would be merged in order they are written in the file
 -  ``build.opt`` is finished with a ``-include ...`` command, which
    references the global .h its contents were extracted from.
+
+Example
+-------
 
 Example Sketch: ``LowWatermark.ino``
 
@@ -93,7 +99,7 @@ Global ``.h`` file: ``LowWatermark.ino.globals.h``
    #endif
 
 Separate production and debug build options
-===========================================
+-------------------------------------------
 
 If your production and debug build option requirements are different,
 adding ``mkbuildoptglobals.extra_flags={build.debug_port}`` to
@@ -160,7 +166,7 @@ Updated Global ``.h`` file: ``LowWatermark.ino.globals.h``
 
 
 Custom build environments
-=========================
+-------------------------
 
 Some custom build environments may have already addressed this issue by
 other means. If you have a custom build environment that does not
@@ -173,16 +179,24 @@ environment:
    recipe.hooks.prebuild.2.pattern=
    build.opt.flags=
 
+Source Code
+-----------
 
-Other build confusion
-=====================
+https://github.com/esp8266/Arduino/blob/master/tools/mkbuildoptglobals.py
 
-1. Renaming a file does not change the last modified timestamp, possibly
-   causing issues when adding a file by renaming and rebuilding. A good
-   example of this problem would be to have then fixed a typo in file
-   name ``LowWatermark.ino.globals.h``. You need to touch (update
-   timestamp) the file so a “rebuild all” is performed.
 
-2. Original script relied on IDE 1.x core & sketch caching behaviour.
-   Since 3.2.x, we no longer assume aggressive caching can be disabled.
-   `Read more <a07-mkbuildoptglobals-aggressive-caching.rst>`__.
+Internals
+---------
+
+:doc:`/buildopt/internals`
+
+IDE 1.x aggressive caching
+--------------------------
+
+.. attention::
+
+    This article applies ONLY to IDE 1.x and original version
+    of the mkbuildoptglobals.py script shipped with Core 3.1.x
+
+:doc:`/buildopt/aggressive-caching`
+

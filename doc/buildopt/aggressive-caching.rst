@@ -1,12 +1,12 @@
 :orphan:
 
+Aggressively cache compiled core
+================================
+
 .. attention::
 
     This article applies ONLY to IDE 1.x and original version
     of the mkbuildoptglobals.py script shipped with Core 3.1.x
-
-Aggressively cache compiled core
-================================
 
 This feature appeared with the release of Arduino IDE 1.8.2. The feature
 “Aggressively Cache Compiled core” refers to sharing a single copy of
