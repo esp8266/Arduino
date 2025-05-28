@@ -2,7 +2,17 @@ SHELL := /bin/bash
 
 ESP8266_CORE_PATH ?= $(shell git rev-parse --show-toplevel)
 
+# arduino-cli core/ & sketch/ build and cache directories
+# by default, share build location with every other sketch
+CACHE_DIR ?= $(HOME)/.cache/arduino
+ifneq ("$(findstring $(ESP8266_CORE_PATH),$(CACHE_DIR))", "")
+$(warning "CACHE_DIR is located in ESP8266_CORE_PATH, core.a caching will be disabled")
+endif
+
+# binaries (compile --output-dir=...) & test output goes in here.
 BUILD_DIR ?= $(PWD)/build
+
+# where to look for BSTest scripts
 BS_DIR ?= $(PWD)/libraries/BSTest
 
 PYTHON ?= python3
@@ -67,7 +77,7 @@ list: showtestlist
 
 all: count tests test_report
 
-$(TEST_LIST): | virtualenv $(TEST_CONFIG) $(BUILD_DIR) $(HARDWARE_DIR)
+$(TEST_LIST): | virtualenv $(TEST_CONFIG) $(CACHE_DIR) $(BUILD_DIR) $(HARDWARE_DIR)
 
 .NOTPARALLEL: $(TEST_LIST)
 
@@ -78,18 +88,21 @@ showtestlist:
 	@printf '%s\n' $(TEST_LIST)
 	@echo "--------------------------------"
 
-$(TEST_LIST): LOCAL_BUILD_DIR=$(BUILD_DIR)/$(notdir $@)
-$(TEST_LIST): LOCAL_DATA_IMG=data.img
+$(TEST_LIST): LOCAL_BUILD_DIR=$(BUILD_DIR)/$(notdir $@)/
+$(TEST_LIST): LOCAL_TEST_RESULT_XML=$(LOCAL_BUILD_DIR)/$(TEST_RESULT_XML)
+$(TEST_LIST): LOCAL_DATA_DIR=$(LOCAL_BUILD_DIR)/data/
+$(TEST_LIST): LOCAL_DATA_IMG=$(LOCAL_BUILD_DIR)/data.img
 
 define build-arduino
-	rm -f $(LOCAL_BUILD_DIR)/build.options.json
-	$(BUILD_TOOL) compile \
-		$(BUILD_FLAGS) \
-		--libraries "$(PWD)/libraries" \
-		--warnings=all \
-		--build-path $(LOCAL_BUILD_DIR) \
-		--fqbn=$(FQBN) \
-		$@
+	export ARDUINO_BUILD_CACHE_PATH="$(CACHE_DIR)"; \
+		$(BUILD_TOOL) config dump; \
+		$(BUILD_TOOL) compile \
+			$(BUILD_FLAGS) \
+			--libraries "$(PWD)/libraries" \
+			--output-dir "$(LOCAL_BUILD_DIR)" \
+			--warnings=all \
+			--fqbn=$(FQBN) \
+			$@
 endef
 
 define build-mock
@@ -98,7 +111,7 @@ define build-mock
 	$(VENV_PYTHON) $(BS_DIR)/runner.py \
 		$(BS_FLAGS) \
 		--name $(basename $(notdir $@)) \
-		--output $(LOCAL_BUILD_DIR)/$(TEST_RESULT_XML) \
+		--output $(LOCAL_TEST_RESULT_XML) \
 		--env-file $(TEST_CONFIG) \
 		$(call mock_script,$@) \
 		executable "$(ESP8266_CORE_PATH)/tests/host/bin/$(@:%.ino=%)" || echo ""`
@@ -111,17 +124,17 @@ define upload-data
 		(cd $(dir $@) && ./make_data.py ) || echo "Filesystem creation skipped"
 	@test -d $(dir $@)/data/ && ( \
 		$(MKFS) \
-			--create $(dir $@)/data/ \
+			--create $(LOCAL_DATA_DIR) \
 			--size 0xFB000 \
 			--block 8192 \
 			--page 256 \
-			$(LOCAL_BUILD_DIR)/$(LOCAL_DATA_IMG) && \
+			$(LOCAL_DATA_IMG) && \
 		$(ESPTOOL) \
 			--chip esp8266 \
 			--port $(UPLOAD_PORT) \
 			--baud $(UPLOAD_BAUD) \
 			--after no_reset \
-			write_flash 0x300000 $(LOCAL_BUILD_DIR)/$(LOCAL_DATA_IMG) ) \
+			write_flash 0x300000 $(LOCAL_DATA_IMG) ) \
 		&& (echo "Uploaded filesystem") \
 		|| (echo "Filesystem upload skipped")
 endef
@@ -149,7 +162,7 @@ define run-test
 	$(VENV_PYTHON) $(BS_DIR)/runner.py \
 		$(BS_FLAGS) \
 		--name $(basename $(notdir $@)) \
-		--output $(LOCAL_BUILD_DIR)/$(TEST_RESULT_XML) \
+		--output $(LOCAL_TEST_RESULT_XML) \
 		--env-file $(TEST_CONFIG) \
 		$(call mock_script,$@) \
 		port $(UPLOAD_PORT) \
@@ -160,6 +173,7 @@ $(TEST_LIST):
 	@echo "--------------------------------"
 	@echo "Running test '$@' of $(words $(TEST_LIST)) tests"
 	mkdir -p $(LOCAL_BUILD_DIR)
+	mkdir -p $(CACHE_DIR)
 ifneq ("$(NO_BUILD)","1")
 	@echo Building $(notdir $@)
 ifeq ("$(MOCK)", "1")
@@ -187,13 +201,17 @@ $(TEST_REPORT_HTML): $(TEST_REPORT_XML) | virtualenv
 test_report: $(TEST_REPORT_HTML)
 	@echo "Test report generated in $(TEST_REPORT_HTML)"
 
+$(CACHE_DIR):
+	@mkdir -p $@
+
 $(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $@
 
 virtualenv:
 	@make -C $(BS_DIR) PYTHON=$(PYTHON) virtualenv
 
 clean:
+	rm -rf $(CACHE_DIR)
 	rm -rf $(BUILD_DIR)
 	rm -rf $(BS_DIR)/virtualenv
 	rm -f $(TEST_REPORT_HTML) $(TEST_REPORT_XML)

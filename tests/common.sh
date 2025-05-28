@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -u -e -E -o pipefail
+set -u -e -E -o pipefail -o errtrace
 
 cache_dir=$(mktemp -d)
 trap 'trap_exit' EXIT
@@ -9,8 +9,14 @@ function trap_exit()
 {
     # workaround for macOS shipping with broken bash
     local exit_code=$?
+
+    # ^ $cache_dir is temporary, prune when exiting
     if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
+    fi
+
+    if [ "$exit_code" != 0 ] ; then
+        echo "*** exit_code=$exit_code ***"
     fi
 
     exit $exit_code
@@ -132,14 +138,12 @@ function build_sketches()
     build_cmd+=${cli_path}
     build_cmd+=" compile"\
 " --warnings=all"\
-" --build-path $build_dir"\
 " --fqbn $fqbn"\
 " --libraries $library_path"\
 " --output-dir $build_out"
 
     print_size_info_header >"$cache_dir"/size.log
 
-    local clean_core=1
     local testcnt=0
     local cnt=0
 
@@ -164,17 +168,11 @@ function build_sketches()
             build_cnt=0
         fi
 
-        # Do we need a clean core build? $build_dir/core/* cannot be shared
-        # between sketches when global options are present.
-        clean_core=$(arduino_mkbuildoptglobals_cleanup "$clean_core" "$build_dir" "$sketch")
-
-        # Clear out the last built sketch, map, elf, bin files, but leave the compiled
-        # objects in the core and libraries available for use so we don't need to rebuild
-        # them each sketch.
-        rm -rf "$build_dir"/sketch \
-            "$build_dir"/*.bin \
-            "$build_dir"/*.map \
-            "$build_dir"/*.elf
+        # Clear out the latest map, elf, bin files
+        rm -rf \
+            "$build_out"/*.bin \
+            "$build_out"/*.map \
+            "$build_out"/*.elf
 
         echo ${ci_group}Building $cnt $sketch
         echo "$build_cmd $sketch"
@@ -194,7 +192,7 @@ function build_sketches()
         fi
 
         print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
-            $build_dir/*.elf >>$cache_dir/size.log
+            $build_out/*.elf >>$cache_dir/size.log
 
         echo $ci_end_group
     done
@@ -311,7 +309,6 @@ function install_core()
     printf "%s\n" \
         "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
         "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
-        "mkbuildoptglobals.extra_flags=--ci --cache_core" \
         "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
             > ${core_path}/platform.local.txt
     echo -e "\n----platform.local.txt----"
