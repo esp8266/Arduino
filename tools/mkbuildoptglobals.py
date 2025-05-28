@@ -135,7 +135,9 @@ class LoggingFilter(logging.Filter):
 
 # Since default handler is not created, make sure only specific levels go through to stderr
 TO_STDERR = logging.StreamHandler(sys.stderr)
-TO_STDERR.setFormatter(logging.Formatter("*** %(levelname)s - %(message)s ***"))
+TO_STDERR.setFormatter(
+    logging.Formatter("*** %(filename)s %(funcName)s:%(lineno)d ***\n%(message)s\n")
+)
 TO_STDERR.setLevel(logging.NOTSET)
 TO_STDERR.addFilter(
     LoggingFilter(
@@ -305,12 +307,13 @@ def synchronize_utime(stat: Union[os.stat_result, pathlib.Path], *rest: pathlib.
     Retrieve stats from the first 'file' and apply to the 'rest'
     """
     if not isinstance(stat, os.stat_result):
-        logging.debug("using stats from %s", stat.name)
         stat = stat.stat()
+    logging.debug(
+        "setting mtime=%d for:\n%s", stat.st_mtime, "\n".join(f"  {p}" for p in rest)
+    )
     for p in rest:
         if is_different_utime(stat, p.stat()):
             os.utime(p, ns=(stat.st_atime_ns, stat.st_mtime_ns))
-            logging.debug("synchronized %s", p.name)
 
 
 def as_include_line(p: pathlib.Path) -> str:
@@ -358,15 +361,15 @@ def ensure_exists_and_empty(*paths: pathlib.Path):
 
         if not p.exists() or (p.exists() and p.stat().st_size):
             p.write_bytes(b"")
-            logging.debug("placeholder for %s", p.name)
+            logging.debug("%s is a placeholder", p.name)
         else:
-            logging.debug("up-to-date %s", p.name)
+            logging.debug("%s is up-to-date", p.name)
 
 
 def ensure_normal_time(*paths: pathlib.Path):
     for p in paths:
         if p.exists() and is_future_utime(p):
-            logging.debug("fixing timestamp of %s", p.name)
+            logging.debug("%s has timestamp in the future, fixing", p.name)
             p.touch()
 
 
@@ -391,8 +394,10 @@ def write_or_replace(p: pathlib.Path, contents: str, encoding=FILE_ENCODING) -> 
 
     if contents != actual:
         p.write_text(contents, encoding=encoding)
+        logging.debug("%s contents written", p.name)
         return True
 
+    logging.debug("%s is up-to-date", p.name)
     return False
 
 
@@ -427,12 +432,7 @@ def ensure_common_header_bound(ctx: Context):
     """
     Record currently used command-line options file
     """
-    if write_or_replace(
-        ctx.common_header, as_arduino_sketch_quoted_header(ctx.build_opt)
-    ):
-        logging.debug("wrote to %s", ctx.common_header.name)
-    else:
-        logging.debug("up-to-date %s", ctx.build_opt.name)
+    write_or_replace(ctx.common_header, as_arduino_sketch_quoted_header(ctx.build_opt))
 
 
 def make_build_opt_name(ctx: Context, debug: bool) -> str:
@@ -460,18 +460,7 @@ def ensure_build_opt_written(ctx: Context, buffer: io.StringIO):
     for p in includes:
         buffer.write(f"{as_include_line(p)}\n")
 
-    value = buffer.getvalue()
-
-    if (
-        not ctx.build_opt.exists()
-        or is_different_utime(ctx.build_sketch_header, ctx.build_opt)
-        or ctx.build_opt.read_text(encoding=DEFAULT_ENCODING) != value
-    ):
-        ctx.build_opt.parent.mkdir(parents=True, exist_ok=True)
-        ctx.build_opt.write_text(value, encoding=DEFAULT_ENCODING)
-        logging.debug("wrote to %s", ctx.build_opt.name)
-    else:
-        logging.debug("up-to-date %s", ctx.build_opt.name)
+    write_or_replace(ctx.build_opt, buffer.getvalue(), encoding=DEFAULT_ENCODING)
 
 
 def maybe_empty_or_missing(p: pathlib.Path):
@@ -525,14 +514,13 @@ def main_build(args: argparse.Namespace):
     )
 
     if args.debug:
-        logging.debug("using the following build context")
-        for field in dataclasses.fields(ctx):
-            logging.debug(
-                " %s %s %s",
-                field.name,
-                getattr(ctx, field.name),
-                field.metadata["help"],
-            )
+        logging.debug(
+            "Build Context:\n%s",
+            "".join(
+                f'  "{field.name}" at {getattr(ctx, field.name)} - {field.metadata["help"]}\n'
+                for field in dataclasses.fields(ctx)
+            ),
+        )
 
     # notify when other files similar to .globals.h are in the sketch directory
     other_build_options = check_other_build_options(ctx.source_sketch_header)
@@ -558,19 +546,19 @@ def main_build(args: argparse.Namespace):
     build_opt_buffer = io.StringIO()
 
     try:
-        logging.debug("searching for %s", name)
         extract_build_opt_from_path(build_opt_buffer, name, ctx.source_sketch_header)
     except ParsingException as e:
-        raise e from None
+        raise
 
     # when command-line options were not created / found, it means the same thing as empty or missing .globals.h
     if not len(build_opt_buffer.getvalue()):
         build_with_minimal_build_opt(ctx)
         return
 
-    logging.debug("preparing %s", ctx.build_opt.name)
-    for line in build_opt_buffer:
-        logging.debug(" %s", line)
+    logging.info(
+        "\nExtra command-line options:\n%s",
+        "\n".join(f"  {line}" for line in build_opt_buffer.getvalue().split("\n")),
+    )
 
     # at this point, it is necessary to synchronize timestamps of every file
     ensure_build_opt_written(ctx, build_opt_buffer)
