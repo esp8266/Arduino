@@ -40,7 +40,7 @@ function step_summary()
     # ref. https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
     if [ -n "${GITHUB_STEP_SUMMARY-}" ]; then
         { echo "# $header"; echo '```console'; cat "$contents"; echo '```'; } \
-            >> $GITHUB_STEP_SUMMARY
+            >> "$GITHUB_STEP_SUMMARY"
     else
         echo "# $header"
         cat "$contents"
@@ -55,7 +55,7 @@ function print_size_info_header()
 
 function print_size_info()
 {
-    local awk_script='
+    local awk_script=$'
 /^\.data/ || /^\.rodata/ || /^\.bss/ || /^\.text/ || /^\.irom0\.text/{
     size[$1] = $2
 }
@@ -64,7 +64,7 @@ END {
     total_ram = size[".data"] + size[".rodata"] + size[".bss"]
     total_flash = size[".data"] + size[".rodata"] + size[".text"] + size[".irom0.text"]
 
-    printf "%-28s %-8d %-8d %-8d %-8d %-10d %-8d %-8d\n",
+    printf "%-28s %-8d %-8d %-8d %-8d %-10d %-8d %-8d\\n",
             sketch_name,
             size[".data"], size[".rodata"], size[".bss"], size[".text"], size[".irom0.text"],
             total_ram, total_flash
@@ -110,9 +110,9 @@ function format_fqbn()
     local flash_size=$2
     local lwip=$3
 
-    echo "esp8266com:esp8266:${board_name}:"\
-"eesz=${flash_size},"\
-"ip=${lwip}"
+    echo $"esp8266com:esp8266:${board_name}:
+eesz=${flash_size},
+ip=${lwip}"
 }
 
 function build_sketches()
@@ -131,16 +131,17 @@ function build_sketches()
     local build_out="$cache_dir"/out
     mkdir -p "$build_out"
 
-    local fqbn=$(format_fqbn "generic" "4M1M" "$lwip")
+    local fqbn
+    fqbn=$(format_fqbn "generic" "4M1M" "$lwip")
     echo "FQBN: $fqbn"
 
     local build_cmd
-    build_cmd+=${cli_path}
-    build_cmd+=" compile"\
-" --warnings=all"\
-" --fqbn $fqbn"\
-" --libraries $library_path"\
-" --output-dir $build_out"
+    build_cmd=$''"${cli_path}"'
+ compile
+ --warnings=all
+ --fqbn '"$fqbn"'
+ --libraries '"$library_path"'
+ --output-dir '"$build_out"''
 
     print_size_info_header >"$cache_dir"/size.log
 
@@ -300,9 +301,9 @@ function install_core()
 
     local debug_flags=""
     if [ "$debug" = "debug" ]; then
-        debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM"\
-" -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI"\
-" -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
+        debug_flags=$'-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM
+ -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+ -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM'
     fi
 
     # Set our custom warnings for all builds

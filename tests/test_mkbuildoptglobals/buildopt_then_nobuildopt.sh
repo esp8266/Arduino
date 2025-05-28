@@ -2,7 +2,7 @@ function buildopt_then_nobuildopt()
 {
     build_esp8266_example "GlobalBuildOptions"
 
-    local last_sketch=$(most_recent_dir "$sketches")
+    local last_sketch=$(most_recent_dir "$sketches_dir")
     assert_build "GlobalBuildOptions" "$last_sketch" 1
     assert_core 1
 
@@ -11,7 +11,7 @@ function buildopt_then_nobuildopt()
 
     build_esp8266_example "Blink"
 
-    last_sketch=$(most_recent_dir "$sketches")
+    last_sketch=$(most_recent_dir "$sketches_dir")
     assert_build "Blink" "$last_sketch" 0
     assert_core 0
 

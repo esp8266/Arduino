@@ -13,14 +13,14 @@ function step_summary()
 
 export ARDUINO_BUILD_CACHE_PATH="$cache_dir"
 
-sketches="${cache_dir}/sketches/"
-cores="${cache_dir}/cores/"
-
 esp8266_dir="${ESP8266_ARDUINO_BUILD_DIR}"
 commonfileh="${esp8266_dir}/cores/esp8266/CommonHFile.h"
 
 tests_dir="$root/tests/test_mkbuildoptglobals"
 tests=$(ls -1 "$tests_dir" | sed 's/.sh$//g')
+
+cores_dir="${cache_dir}/cores/"
+sketches_dir="${cache_dir}/sketches/"
 
 function name_size_mtime()
 {
@@ -31,13 +31,21 @@ function most_recent_file()
 {
     local name="$1"
     local location="$2"
-    echo $(readlink -f "${location}/"$(ls -t1 "${location}" | grep "$name" | head -1))
+
+    local file
+    file=$(ls -t1 "${location}" | grep "$name" | head -1)
+
+    readlink -f "${location}/${file}"
 }
 
 function most_recent_dir()
 {
     local location="$1"
-    echo $(readlink -f "${location}/"$(ls -t1 "$location" | head -1))
+
+    local file
+    file=$(ls -t1 "$location" | head -1)
+
+    readlink -f "${location}/${file}"
 }
 
 function assert_build()
@@ -80,20 +88,25 @@ function build_esp8266_example()
 
 function make_commonh_stat()
 {
-    local stat=$(name_size_mtime "$commonfileh")
-    test -n "$stat"
+    local stat
+    stat=$(name_size_mtime "$commonfileh")
 
+    test -n "$stat"
     echo "$stat"
 }
 
 function make_core_stat()
 {
-    local recent_core=$(most_recent_dir "$cores")
-    local recent_file=$(most_recent_file "core.a" "$recent_core")
+    local recent_core
+    recent_core=$(most_recent_dir "$cores_dir")
 
-    local stat=$(name_size_mtime "$recent_file")
+    local recent_file
+    recent_file=$(most_recent_file "core.a" "$recent_core")
+
+    local stat
+    stat=$(name_size_mtime "$recent_file")
+
     test -n "$stat"
-
     echo "$stat"
 }
 
@@ -105,7 +118,7 @@ case "${1:-}" in
 "run")
     for test in $tests ; do
         printf "Checking \"%s\"\n" "$test"
-        /usr/bin/env bash $root/tests/test_mkbuildoptglobals.sh $test
+        /usr/bin/env bash "$root"/tests/test_mkbuildoptglobals.sh "$test"
     done
     ;;
 *)

@@ -2,7 +2,7 @@ function nobuildopt_then_buildopt()
 {
     build_esp8266_example "Blink"
 
-    local last_sketch=$(most_recent_dir "$sketches")
+    local last_sketch=$(most_recent_dir "$sketches_dir")
     assert_build "Blink" "$last_sketch" 0
     assert_core 0
 
@@ -11,7 +11,7 @@ function nobuildopt_then_buildopt()
 
     build_esp8266_example "HwdtStackDump"
 
-    last_sketch=$(most_recent_dir "$sketches")
+    last_sketch=$(most_recent_dir "$sketches_dir")
     assert_build "HwdtStackDump" "$last_sketch" 1
     assert_core 1
 
