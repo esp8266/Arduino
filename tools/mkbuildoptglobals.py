@@ -584,7 +584,7 @@ def main_inspect(args: argparse.Namespace):
     try:
         extract_build_opt_from_path(buffer, args.build_opt_name, p)
     except ParsingException as e:
-        raise e from None
+        raise e
 
     logging.info(buffer.getvalue())
 
@@ -602,7 +602,7 @@ def main_synchronize(args: argparse.Namespace):
 
 def as_path(p: str) -> pathlib.Path:
     if p.startswith("{") or p.endswith("}"):
-        raise ValueError(f'"{p}" was not resolved') from None
+        raise ValueError(f'"{p}" was not resolved')
 
     return pathlib.Path(p)
 
