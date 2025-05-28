@@ -5,8 +5,9 @@ source "$root/tests/common.sh"
 
 pushd "$root"/tools
 python3 get.py -q
-
+python3 makecorever.py --git-root "$root" "$root/cores/esp8266/core_version.h"
 popd
+
 pushd "$cache_dir"
 
 gcc="$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc"\
