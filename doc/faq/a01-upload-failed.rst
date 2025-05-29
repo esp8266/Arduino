@@ -1,7 +1,5 @@
-:orphan:
-
-I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to resolve this issue?
---------------------------------------------------------------------------------------------------
+Why I am getting errors when trying to upload to my ESP?
+--------------------------------------------------------
 
 -  `Introduction <#introduction>`__
 -  `Initial Checks <#initial-checks>`__
@@ -15,14 +13,24 @@ I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to r
 Introduction
 ~~~~~~~~~~~~
 
-This message indicates issue with uploading ESP module over a serial
+Messages like
+
+* ``espcomm_sync failed``
+
+* ``esptool.FatalError: Failed to connect to ESP8266: Invalid head of packet (0xF0)``
+
+* ``esptool.FatalError: Failed to connect to ESP8266: Timed out waiting for packet header``
+
+indicate issue with with uploading ESP module over a serial
 connection. There are couple of possible causes, that depend on the type
 of module, if you use separate USB to serial converter, what parameters
 are selected for upload, etc. As result there is no single answer on the
 root cause. To find it out you may need to complete couple of
 troubleshooting steps.
 
-    Note: If you are just starting with ESP, to reduce potential issues
+.. note::
+
+    If you are just starting with ESP, to reduce potential issues
     with uploading, select ESP board with integrated USB to serial
     converter. This will considerably reduce number of user depended
     factors or configuration settings that influence upload process.
@@ -167,7 +175,93 @@ loading <../boards.rst#minimal-hardware-setup-for-bootloading-only>`__
    during: upload* and try uploading again. For successful upload this
    log should look similar to example shown below:
 
-``C:\Users\Krzysztof\AppData\Local\Arduino15\packages\esp8266\tools\esptool\0.4.8/esptool.exe -vv -cd ck -cb 115200 -cp COM3 -ca 0x00000 -cf C:\Users\KRZYSZ~1\AppData\Local\Temp\build7e44b372385012e74d64fb272d24b802.tmp/Blink.ino.bin    esptool v0.4.8 - (c) 2014 Ch. Klippel <ck@atelier-klippel.de>       setting board to ck       setting baudrate from 115200 to 115200       setting port from COM1 to COM3       setting address from 0x00000000 to 0x00000000       espcomm_upload_file       espcomm_upload_mem       setting serial port timeouts to 1000 ms   opening bootloader   resetting board   trying to connect       flush start       setting serial port timeouts to 1 ms       setting serial port timeouts to 1000 ms       flush complete       espcomm_send_command: sending command header       espcomm_send_command: sending command payload       read 0, requested 1   trying to connect       flush start       setting serial port timeouts to 1 ms       setting serial port timeouts to 1000 ms       flush complete       espcomm_send_command: sending command header       espcomm_send_command: sending command payload       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data       espcomm_send_command: receiving 2 bytes of data   Uploading 226368 bytes from to flash at 0x00000000       erasing flash       size: 037440 address: 000000       first_sector_index: 0       total_sector_count: 56       head_sector_count: 16       adjusted_sector_count: 40       erase_size: 028000       espcomm_send_command: sending command header       espcomm_send_command: sending command payload       setting serial port timeouts to 15000 ms       setting serial port timeouts to 1000 ms       espcomm_send_command: receiving 2 bytes of data       writing flash   ..............................................................................................................................................................................................................................   starting app without reboot       espcomm_send_command: sending command header       espcomm_send_command: sending command payload       espcomm_send_command: receiving 2 bytes of data   closing bootloader       flush start       setting serial port timeouts to 1 ms       setting serial port timeouts to 1000 ms       flush complete``
+   For example, uploading using esptool.py and esptool
+
+.. code-block:: console
+
+   $ esptool.py --after no_reset --chip esp8266 --baud 460800 write_flash 0x0 d1-mini-firmware.bin
+   esptool.py v4.5.1
+   Found 1 serial ports
+   Serial port /dev/ttyUSB0
+   Connecting....
+   Chip is ESP8266EX
+   Features: WiFi
+   Crystal is 26MHz
+   MAC: 11:22:33:44:55:66
+   Uploading stub...
+   Running stub...
+   Stub running...
+   Changing baud rate to 460800
+   Changed.
+   Configuring flash size...
+   Flash will be erased from 0x00000000 to 0x0004efff...
+   Compressed 321440 bytes to 221714...
+   Wrote 321440 bytes (221714 compressed) at 0x00000000 in 5.0 seconds (effective 511.4 kbit/s)...
+   Hash of data verified.
+
+   Leaving...
+   Staying in bootloader.
+
+
+.. code-block:: console
+
+    > C:\Users\Krzysztof\AppData\Local\Arduino15\packages\esp8266\tools\esptool\0.4.8/esptool.exe -vv -cd ck -cb 115200 -cp COM3 -ca 0x00000 -cf C:\Users\KRZYSZ~1\AppData\Local\Temp\build7e44b372385012e74d64fb272d24b802.tmp/Blink.ino.bin
+    esptool v0.4.8 - (c) 2014 Ch. Klippel <ck@atelier-klippel.de>
+    setting board to ck
+    setting baudrate from 115200 to 115200
+    setting port from COM1 to COM3
+    setting address from 0x00000000 to 0x00000000
+    espcomm_upload_file
+    espcomm_upload_mem
+    setting serial port timeouts to 1000 ms
+    opening bootloader
+    resetting board
+    trying to connect
+    flush start
+    setting serial port timeouts to 1 ms
+    setting serial port timeouts to 1000 ms
+    flush complete
+    espcomm_send_command: sending command header
+    espcomm_send_command: sending command payload
+    read 0, requested 1
+    trying to connect
+    flush start
+    setting serial port timeouts to 1 ms
+    setting serial port timeouts to 1000 ms
+    flush complete
+    espcomm_send_command: sending command header
+    espcomm_send_command: sending command payload
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    espcomm_send_command: receiving 2 bytes of data
+    Uploading 226368 bytes from to flash at 0x00000000
+    erasing flash
+    size: 037440 address: 000000
+    first_sector_index: 0
+    total_sector_count: 56
+    head_sector_count: 16
+    adjusted_sector_count: 40
+    erase_size: 028000
+    espcomm_send_command: sending command header
+    espcomm_send_command: sending command payload
+    setting serial port timeouts to 15000 ms
+    setting serial port timeouts to 1000 ms
+    espcomm_send_command: receiving 2 bytes of data
+    writing flash   ..............................................................................................................................................................................................................................
+    starting app without reboot
+    espcomm_send_command: sending command header
+    espcomm_send_command: sending command payload
+    espcomm_send_command: receiving 2 bytes of data
+    closing bootloader
+    flush start
+    setting serial port timeouts to 1 ms
+    setting serial port timeouts to 1000 ms
+    flush complete
 
 Upload log may be longer depending on number of connection attempts made
 by esptool. Analyze it for any anomalies to configuration you have
@@ -177,7 +271,7 @@ rate, etc. Resolve all noted differences.
 Reset Methods
 ~~~~~~~~~~~~~
 
-If you got to this point and still see ``espcomm_sync failed``, then now
+If you got to this point and still see uploading error, then now
 you need to bring in the heavy guns.
 
 Connect scope or logic analyzer to GPIO0, RST and RXD pins of the ESP to
@@ -238,13 +332,13 @@ Each retry is reported in upload log as follows:
 
     resetting board
     trying to connect
-        flush start
-        setting serial port timeouts to 1 ms
-        setting serial port timeouts to 1000 ms
-        flush complete
-        espcomm_send_command: sending command header
-        espcomm_send_command: sending command payload
-        read 0, requested 1
+    flush start
+    setting serial port timeouts to 1 ms
+    setting serial port timeouts to 1000 ms
+    flush complete
+    espcomm_send_command: sending command header
+    espcomm_send_command: sending command payload
+    read 0, requested 1
 
 Presented circuit has one important limitation when it comes to work
 with Arduino IDE. After opening Serial Monitor (Ctrl-Shift-M), both RTS
