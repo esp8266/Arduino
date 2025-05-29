@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
 # Wrapper for Arduino core / others that can call esptool.py possibly multiple times
-# Adds pyserial to sys.path automatically based on the path of the current file
-
-# First parameter is pyserial path, second is esptool path, then a series of command arguments
-# i.e. upload.py tools/pyserial tools/esptool write_flash file 0x0
+# Adds pyserial & esptool that are in the same directory as the script to sys.path
 
 import os
 import atexit
