@@ -73,6 +73,7 @@ void stack_thunk_add_ref()
     }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
+    stack_thunk_yield_save = NULL;
     stack_thunk_repaint();
   }
 }
@@ -90,6 +91,7 @@ void stack_thunk_del_ref()
     stack_thunk_ptr = NULL;
     stack_thunk_top = NULL;
     stack_thunk_save = NULL;
+    stack_thunk_yield_save = NULL;
   }
 }
 
@@ -175,15 +177,18 @@ asm(
     "movi         a2, stack_thunk_yield_save\n\t"
     "s32i.n       a1, a2, 0\n\t"
     "movi         a2, stack_thunk_save\n\t"
+/* But, only when inside of bssl stack (saved a1 != 0) */
+    "l32i.n       a3, a2, 0\n\t"
+    "beqz         a3, stack_thunk_yield_do_yield\n\t"
     "l32i.n       a1, a2, 0\n\t"
 /* optimistic_yield(10000) without extra l32r */
+"stack_thunk_yield_do_yield:\n\t"
     "movi         a2, 0x10\n\t"
     "addmi        a2, a2, 0x2700\n\t"
     "call0        optimistic_yield\n\t"
 /* Swap bearssl <-> cont stacks, again */
     "movi         a2, stack_thunk_yield_save\n\t"
     "l32i.n       a1, a2, 0\n\t"
-    "\n"
 /* Restore caller */
     "l32i.n       a0, a1, 12\n\t"
     "addi         a1, a1, 16\n\t"
