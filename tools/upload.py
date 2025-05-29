@@ -40,11 +40,11 @@ def make_erase_pair(addr: str, dest_size: int, block_size=2**16):
 
     buffer = bytearray(b"\xff" * block_size)
     while dest_size:
-        unaligned = dest_size % block_size
+        remainder = dest_size % block_size
 
-        if unaligned:
-            src = buffer[unaligned:]
-            src_size = unaligned
+        if remainder:
+            src = buffer[:remainder]
+            src_size = remainder
         else:
             src = buffer
             src_size = block_size
