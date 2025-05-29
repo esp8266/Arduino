@@ -13,14 +13,14 @@ Please feel free to contribute if you believe that some frequent issues
 are not covered below.
 
 
-I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to resolve this issue?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I am getting "espcomm\_sync failed", "esptool.FatalError", etc. How to resolve this issue?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This message indicates issue with uploading ESP module over a serial
 connection. There are couple of possible causes, that depend on the type
 of your module, if you use separate USB to serial converter.
 
-`Read more <a01-espcomm_sync-failed.rst>`__.
+`Read more <a01-upload-failed.rst>`__.
 
 Why esptool is not listed in "Programmer" menu? How do I upload ESP without it?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
