@@ -1,5 +1,3 @@
-:orphan:
-
 Why I am getting errors when trying to upload to my ESP?
 --------------------------------------------------------
 

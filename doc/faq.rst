@@ -20,7 +20,7 @@ This message indicates issue with uploading ESP module over a serial
 connection. There are couple of possible causes, that depend on the type
 of your module, if you use separate USB to serial converter.
 
-`Read more <a01-upload-failed.rst>`__.
+`Read more <faq/a01-upload-failed.rst>`__.
 
 Why esptool is not listed in "Programmer" menu? How do I upload ESP without it?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,7 @@ My ESP crashes running some code. How to troubleshoot it?
 The code may crash because of s/w bug or issue with your h/w. Before
 entering an issue report, please perform initial troubleshooting.
 
-`Read more <a02-my-esp-crashes.rst>`__.
+`Read more <faq/a02-my-esp-crashes.rst>`__.
 
 How can I get some extra KBs in flash ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,7 +50,7 @@ How can I get some extra KBs in flash ?
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
-`Read more <a05-board-generator.rst>`__.
+`Read more <faq/a05-board-generator.rst>`__.
 
 About WPS
 ~~~~~~~~~
@@ -63,7 +63,7 @@ required to enable it:
 
 ``./tools/boards.txt.py --allowWPS --boardsgen``
 
-`Read more <a05-board-generator.rst>`__.
+`Read more <faq/a05-board-generator.rst>`__.
 
 For platformIO (and maybe other build environments), you will also need to add the build flag: -D NO_EXTRA_4K_HEAP
 
@@ -77,7 +77,7 @@ This Arduino library doesn't work on ESP. How do I make it work?
 You would like to use this Arduino library with ESP8266 and it does not
 perform. It is not listed among libraries verified to work with ESP8266.
 
-`Read more <a03-library-does-not-work.rst>`__.
+`Read more <faq/a03-library-does-not-work.rst>`__.
 
 In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M FS) or 4M (3M FS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,7 +118,7 @@ This error may pop up after switching between
 `staging <https://github.com/esp8266/Arduino#staging-version->`__ and
 `stable <https://github.com/esp8266/Arduino#stable-version->`__ esp8266
 / Arduino package installations, or after upgrading the package version
-`Read more <a04-board-generic-is-unknown.rst>`__.
+`Read more <faq/a04-board-generic-is-unknown.rst>`__.
 
 
 How to clear TCP PCBs in time-wait state ?
@@ -199,4 +199,4 @@ By using a uniquely named `.h` file, macro definitions can be created and
 globally used. Additionally, compiler command-line options can be embedded in
 this file as a unique block comment.
 
-`Read more <a06-global-build-options.rst>`__.
+`Read more <faq/a06-global-build-options.rst>`__.
