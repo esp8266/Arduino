@@ -29,7 +29,7 @@ Options file is generated based on the contents of the sketch header comment blo
 and its contents are then used as gcc command-line options (``@file``)
 
     If file does not exist, or cannot be read, then the option will be treated literally, and not removed.
-    
+
     Options in file are separated by whitespace. A whitespace character may be included
     in an option by surrounding the entire option in either single or double quotes.
     Any character (including a backslash) may be included by prefixing the character
@@ -101,7 +101,7 @@ Paths are always provided as Fully Qualified File Names (FQFNs):
     mkbuildoptglobals.extra_flags=
 
 `"prebuild" hook <https://docs.arduino.cc/arduino-cli/platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165>`__ must be used,
-allowing this script to run *before* build process creates and / or copies them.  
+allowing this script to run *before* build process creates and / or copies them.
 Both Arduino IDE 1.x and 2.x generate
 `prerequisite makefiles (files with a .d suffix) <https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html>`__
 at some point in "discovery phase".
