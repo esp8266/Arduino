@@ -25,7 +25,7 @@ for m in MODULES:
 # If this fails, we can't continue and will bomb below
 try:
     import esptool
-except (ImportError, ModuleNotFoundError) as e:
+except ImportError:
     sys.stderr.write(
         "\n*** pyserial or esptool directories not found next to upload.py tool (this script) ***\n"
     )
@@ -38,16 +38,16 @@ except (ImportError, ModuleNotFoundError) as e:
 def make_erase_pair(addr: str, dest_size: int, block_size=2**16):
     dest, path = tempfile.mkstemp()
 
-    buffer = b"\xff" * block_size
+    buffer = bytearray(b"\xff" * block_size)
     while dest_size:
         unaligned = dest_size % block_size
 
-        src_size = block_size
         if unaligned:
             src = buffer[unaligned:]
             src_size = unaligned
         else:
             src = buffer
+            src_size = block_size
 
         os.write(dest, src)
         dest_size -= src_size
@@ -57,7 +57,7 @@ def make_erase_pair(addr: str, dest_size: int, block_size=2**16):
     def maybe_remove(path):
         try:
             os.remove(path)
-        except:
+        except Exception:
             pass
 
     atexit.register(maybe_remove, path)
@@ -66,9 +66,9 @@ def make_erase_pair(addr: str, dest_size: int, block_size=2**16):
 
 argv = sys.argv[1:]  # Remove executable name
 
-cmdline = []  # type: List[str]
-write_options = ["--flash_size", "detect"]  # type: List[str]
-erase_options = []
+cmdline: List[str] = []
+write_options: List[str] = ["--flash_size", "detect"]
+erase_options: List[str] = []
 
 thisarg = ""
 lastarg = ""
@@ -115,11 +115,11 @@ for opts in (write_options, erase_options):
 
 try:
     esptool.main(cmdline)
-except:
+except Exception:
     etype, evalue, _ = sys.exc_info()
     estring = "\n".join(traceback.format_exception_only(etype, value=evalue))
 
-    sys.stderr.write(f"\n*** A fatal upload.py error occurred ***\n")
+    sys.stderr.write("\n*** upload.py fatal error ***\n")
     sys.stderr.write(estring)
     sys.stderr.flush()
 
