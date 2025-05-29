@@ -6,7 +6,7 @@ root=$(git rev-parse --show-toplevel)
 source "$root/tests/env.sh"
 
 cmd=${0##*/}
-usage="
+usage=$"
 ENVIRONMENT:
   ESP8266_ARDUINO_SKETCHES - list of .ino files; defaults to **all available examples**
   ESP8266_ARDUINO_BUILDER - arduino or platformio

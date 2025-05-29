@@ -74,7 +74,7 @@ END {
     local elf_file=$2
 
     local elf_name
-    elf_name=$(basename $elf_file)
+    elf_name=$(basename "$elf_file")
     $size --format=sysv "$elf_file" | \
         awk -v sketch_name="${elf_name%.*}" "$awk_script" -
 }
@@ -251,8 +251,8 @@ function install_library()
     local url=$6
 
     fetch_and_unpack "$archive" "$hash" "$url"
-    mkdir -p "$lib_path"
-    rm -rf "$lib_path/$name"
+    mkdir -p "${lib_path:?}"
+    rm -rf "${lib_path}/${name:?}"
     mv "$extract" "$lib_path/$name"
 }
 
@@ -264,7 +264,7 @@ function install_libraries()
     mkdir -p "$core_path"/tools/dist
     pushd "$core_path"/tools/dist
 
-    source "$root/tests/dep-libraries.sh"
+    source "${root:?}"/tests/dep-libraries.sh
 
     popd
 }
@@ -279,14 +279,17 @@ function install_arduino_cli()
 
     echo "Arduino CLI ${ver}"
 
-    mkdir -p ${core_path}/dist
-    pushd ${core_path}/dist
+    mkdir -p "${core_path}"/dist
+    pushd "${core_path}"/dist
 
     source "$root/tests/dep-arduino-cli.sh"
 
-    mkdir -p $(dirname $path)
-    cp -v arduino-cli $path
-    chmod +x $path
+    local path_dir
+    path_dir=$(dirname "$path")
+
+    mkdir -p "$path_dir"
+    cp -v arduino-cli "$path"
+    chmod +x "$path"
 
     popd
 }
@@ -311,7 +314,7 @@ function install_core()
         "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
         "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
         "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
-            > ${core_path}/platform.local.txt
+            > "${core_path}"/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat platform.local.txt
     echo -e "\n----\n"
@@ -432,7 +435,7 @@ function install_platformio()
 
     local board=$1
 
-    pushd $ESP8266_ARDUINO_BUILD_DIR/tools
+    pushd "$ESP8266_ARDUINO_BUILD_DIR"/tools
     python3 get.py -q
     popd
 
@@ -446,7 +449,7 @@ function install_platformio()
     local toolchain_symlink="toolchain-xtensa @ symlink://${ESP8266_ARDUINO_BUILD_DIR}/tools/xtensa-lx106-elf/"
 
     # pre-generate config; pio-ci with multiple '-O' options replace each other instead of appending to the same named list
-    cat <<EOF > $cache_dir/platformio.ini
+    cat <<EOF > "$cache_dir"/platformio.ini
 [env:$board]
 platform = espressif8266
 board = $board
