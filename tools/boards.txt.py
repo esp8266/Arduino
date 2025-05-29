@@ -1877,7 +1877,7 @@ def package ():
     substitution += ',\n'.join(board_items)
     substitution += '\n          ],'
 
-    newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
+    newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, flags=re.MULTILINE)
 
     # To get consistent indent/formatting read the JSON and write it out programmatically
     if packagegen:

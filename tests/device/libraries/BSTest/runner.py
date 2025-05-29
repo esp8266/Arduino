@@ -1,39 +1,31 @@
 #!/usr/bin/env python3
-from __future__ import print_function
+
+import serial
+
 import pexpect
 from pexpect import EOF, TIMEOUT, fdpexpect
-import sys
-import os
-import time
-import argparse
-import serial
-import subprocess
 
-from importlib.machinery import SourceFileLoader
-
-try:
-    from configparser import ConfigParser
-except:
-    from ConfigParser import ConfigParser
-import itertools
-try:
-    from urllib.parse import urlparse, urlencode
-except ImportError:
-    from urlparse import urlparse
 from junit_xml import TestSuite, TestCase
-try:
-    from cStringIO import StringIO
-except:
-    try:
-        from StringIO import StringIO
-    except ImportError:
-        from io import StringIO
+
+import argparse
+import itertools
+import os
+import subprocess
+import sys
+import time
+
+from configparser import ConfigParser
+from importlib.machinery import SourceFileLoader
+from io import StringIO
+from urllib.parse import urlparse, urlencode
+
 import mock_decorators
 
 debug = False
-#debug = True
 
 sys.path.append(os.path.abspath(__file__))
+
+IS_WSL = len(os.environ.get("WSL_DISTRO_NAME", "")) > 0
 
 def debug_print(*args, **kwargs):
     if not debug:
@@ -235,9 +227,11 @@ class BSTestRunner(object):
 
 ser = None
 
-def spawn_port(port_name, baudrate=115200):
+def spawn_port(port_name, baudrate=115200, close=True):
     global ser
     ser = serial.serial_for_url(port_name, baudrate=baudrate)
+    if not close:
+        ser.close = lambda: None
     return fdpexpect.fdspawn(ser, 'wb', timeout=0, encoding='cp437')
 
 def spawn_exec(name):
@@ -250,30 +244,39 @@ def run_tests(spawn, name, mocks, env_vars):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='BS test runner')
-    parser.add_argument('-d', '--debug', help='Send test output to stderr', action='store_true')
-    parser.add_argument('-p', '--port', help='Talk to the test over serial')
-    parser.add_argument('-e', '--executable', help='Talk to the test executable')
-    parser.add_argument('-n', '--name', help='Test run name')
-    parser.add_argument('-o', '--output', help='Output JUnit format test report')
-    parser.add_argument('-m', '--mock', help='Set python script to use for mocking purposes')
+    parser.add_argument('--debug', help='Send test output to stderr', action='store_true')
+    parser.add_argument('--name', help='Test run name')
+    parser.add_argument('--output', help='Output JUnit format test report')
+    parser.add_argument('--mock', help='Set python script to use for mocking purposes')
     parser.add_argument('--env-file', help='File containing a list of environment variables to set', type=argparse.FileType('r'))
+
+    sub = parser.add_subparsers()
+
+    def as_spawn_port(args):
+        return spawn_port(args.port, args.baudrate, args.close)
+
+    port = sub.add_parser('port')
+    port.add_argument('port', type=str)
+    port.add_argument('--baudrate', help='Serial port baudrate', type=int, default=115200)
+    port.add_argument('--close', help='Close serial port after the test', action=argparse.BooleanOptionalAction, default=not IS_WSL)
+    port.set_defaults(func=as_spawn_port)
+
+    def as_spawn_exec(args):
+        return spawn_exec(args.executable)
+
+    exe = sub.add_parser('executable')
+    exe.add_argument('executable', help='Talk to the test executable')
+    exe.set_defaults(func=as_spawn_exec)
+
     return parser.parse_args()
 
 def main():
     args = parse_args()
-    spawn_func = None
-    spawn_arg = None
-    if args.port is not None:
-        spawn_func = spawn_port
-        spawn_arg = args.port
-    elif args.executable is not None:
-        spawn_func = spawn_exec
-        spawn_arg = args.executable
+
     name = args.name or ""
     global debug
-    if args.debug:
-        debug = True
-    if spawn_func is None:
+    debug = args.debug
+    if args.func is None:
         debug_print("Please specify port or executable", file=sys.stderr)
         return 1
     env_vars = []
@@ -287,7 +290,8 @@ def main():
     if args.mock is not None:
         mocks_mod = SourceFileLoader('mocks', args.mock).load_module()
         mocks = mock_decorators.env
-    with spawn_func(spawn_arg) as sp:
+
+    with args.func(args) as sp:
         ts = run_tests(sp, name, mocks, env_vars)
         if args.output:
             with open(args.output, "w") as f:

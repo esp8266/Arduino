@@ -1,5 +1,3 @@
-:orphan:
-
 How to specify global build defines and options
 ===============================================
 
