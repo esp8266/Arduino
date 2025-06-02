@@ -42,11 +42,14 @@ static const uint8_t D5   = 13;
 static const uint8_t D6   = 15;
 static const uint8_t D7   = 2;
 static const uint8_t D8   = 14;
-static const uint8_t D9   = 9;
 static const uint8_t D10  = 10;
 
+// I2C
 #define PIN_WIRE_SDA (2)
 #define PIN_WIRE_SCL (14)
+
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
 
 // Brushed DC Motors
 static const uint8_t MOTOR_1_DIR = D3;
@@ -54,18 +57,11 @@ static const uint8_t MOTOR_1_PWM = D1;
 static const uint8_t MOTOR_2_DIR = D4;
 static const uint8_t MOTOR_2_PWM = D2;
 
-//Servo
-static const uint8_t SERVO1 = D4;
-static const uint8_t SERVO2 = D6;
-static const uint8_t SERVO3 = D3;
-static const uint8_t SERVO4 = D5;
-
 //Ultrasonic Sensor
 static const uint8_t USST = D7;
 static const uint8_t USSE = D8;
 
-//IR
-static const uint8_t IR1 = D9;
-static const uint8_t IR2 = D10;
+//RGB LED
+static const uint8_t RGB = D10;
 
 #endif /* Pins_Arduino_h */

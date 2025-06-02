@@ -28,7 +28,7 @@
 
 #include "../generic/common.h"
 
-#define LED_BUILTIN 0
+#define LED_BUILTIN 2
 #define BUILTIN_LED LED_BUILTIN
 
 #define A0 (17)
@@ -67,5 +67,8 @@ static const uint8_t USSE = D8;
 //IR
 static const uint8_t IR1 = D9;
 static const uint8_t IR2 = D10;
+
+//RGB LED
+static const uint8_t RGB = D0;
 
 #endif /* Pins_Arduino_h */

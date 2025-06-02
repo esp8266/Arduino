@@ -274,17 +274,9 @@ ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an e
 Mercury 1.0
 -----------
 
-Mercury Development Board, with onboard motor driver and easy-connect for servo motors, designed versatile use.
+Based on ESP8266, Mercury is board developed by Ralio Technologies. Board supports on motor drivers and direct-connect feature for various endpoints.
 
-Mercury 2.0
------------
-
-Mercury Development Board, with onboard motor driver and easy-connect for servo motors, designed versatile use.
-
-Mercury 3.0
------------
-
-Mercury Development Board, with onboard motor driver and easy-connect for servo motors, designed versatile use. Now comes with 3A onboard buck converter.
+Product page: https://www.raliotech.com
 
 Phoenix 1.0
 -----------
