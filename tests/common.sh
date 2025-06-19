@@ -449,9 +449,6 @@ function install_platformio()
 
     # pre-generate config; pio-ci with multiple '-O' options replace each other instead of appending to the same named list
     cat <<EOF > $cache_dir/platformio.ini
-[platformio]
-lib_dir =
-    ${ESP8266_ARDUINO_LIBRARIES}
 [env:$board]
 platform = espressif8266
 board = $board
@@ -460,6 +457,8 @@ platform_packages =
     ${framework_symlink}
     ${toolchain_symlink}
 EOF
+
+    cat $cache_dir/platformio.ini
 
     echo $ci_end_group
 }
@@ -498,8 +497,8 @@ function build_sketches_with_platformio()
         sketchdir=$(dirname $sketch)
 
         local result
-        time pio ci \
-            --verbose \
+        env PLATFORMIO_LIB_DIR="${ESP8266_ARDUINO_LIBRARIES}" \
+            time pio ci \
             --project-conf $cache_dir/platformio.ini \
             $sketchdir >$cache_dir/build.log 2>&1 \
             && result=0 || result=1
