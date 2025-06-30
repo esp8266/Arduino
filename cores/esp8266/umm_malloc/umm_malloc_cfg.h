@@ -269,6 +269,9 @@ typedef struct UMM_STATISTICS_t {
     size_t id_realloc_zero_count;
     size_t id_free_count;
     size_t id_free_null_count;
+    #if UMM_ENABLE_MEMALIGN
+    size_t id_malloc_align_error_count;
+    #endif
     #endif
 }
 UMM_STATISTICS;
@@ -321,6 +324,13 @@ size_t ICACHE_FLASH_ATTR umm_block_size(void);
         _context->stats.tag##_zero_count += 1; \
     } while (false)
 
+#if UMM_ENABLE_MEMALIGN
+#define STATS__ALIGNMENT_ERROR(tag, s)  \
+    do { \
+        _context->stats.tag##_align_error_count += 1; \
+    } while (false)
+#endif
+
 #define STATS__NULL_FREE_REQUEST(tag)  \
     do { \
         umm_heap_context_t *_context = umm_get_current_heap(); \
@@ -345,6 +355,9 @@ size_t umm_get_realloc_count(void);
 size_t umm_get_realloc_zero_count(void);
 size_t umm_get_free_count(void);
 size_t umm_get_free_null_count(void);
+#if UMM_ENABLE_MEMALIGN
+size_t umm_get_malloc_align_error_count(void);
+#endif
 
 #else // Not UMM_STATS_FULL
 #define STATS__FREE_BLOCKS_MIN()          (void)0
@@ -353,6 +366,9 @@ size_t umm_get_free_null_count(void);
 #define STATS__ZERO_ALLOC_REQUEST(tag, s) (void)(s)
 #define STATS__NULL_FREE_REQUEST(tag)     (void)0
 #define STATS__FREE_REQUEST(tag)          (void)0
+#if UMM_ENABLE_MEMALIGN
+#define STATS__ALIGNMENT_ERROR(tag, a)    (void)(a)
+#endif
 #endif
 
 /*
@@ -543,12 +559,7 @@ extern void umm_corruption(void);
 #define INTEGRITY_CHECK() (1)
 #endif
 
-/////////////////////////////////////////////////
-
 /*
- * -D UMM_POISON_CHECK :
- * -D UMM_POISON_CHECK_LITE
- *
  * Enables heap poisoning: add predefined value (poison) before and after each
  * allocation, and check before each heap operation that no poison is
  * corrupted.
@@ -568,105 +579,30 @@ extern void umm_corruption(void);
  * NOTE: each allocated buffer is aligned by 4 bytes. But when poisoning is
  * enabled, actual pointer returned to user is shifted by
  * `(sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE)`.
+ *
  * It's your responsibility to make resulting pointers aligned appropriately.
  *
  * If poison corruption is detected, the message is printed and user-provided
  * callback is called: `UMM_HEAP_CORRUPTION_CB()`
- *
- * UMM_POISON_CHECK - does a global heap check on all active allocation at
- * every alloc API call. May exceed 10us due to critical section with IRQs
- * disabled.
- *
- * UMM_POISON_CHECK_LITE - checks the allocation presented at realloc()
- * and free(). Expands the poison check on the current allocation to
- * include its nearest allocated neighbors in the heap.
- * umm_malloc() will also checks the neighbors of the selected allocation
- * before use.
- *
- * Status: TODO?: UMM_POISON_CHECK_LITE is a new option. We could propose for
- * upstream; however, the upstream version has much of the framework for calling
- * poison check on each alloc call refactored out. Not sure how this will be
- * received.
  */
+#if 0
+// Multiple port specific changes. Handle/move this block to umm_malloc_cfgport.h
+// Issolated block kept to ease comparing with upstream for changes.
+#ifdef UMM_POISON_CHECK
+  #define UMM_POISON_SIZE_BEFORE (4)
+  #define UMM_POISON_SIZE_AFTER (4)
+  #define UMM_POISONED_BLOCK_LEN_TYPE uint16_t
 
-/*
- * Compatibility for deprecated UMM_POISON
- */
-#if defined(UMM_POISON) && !defined(UMM_POISON_CHECK)
-#define UMM_POISON_CHECK_LITE
-#endif
-
-#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_CORE)
-#if !defined(UMM_POISON_CHECK) && !defined(UMM_POISON_CHECK_LITE)
-/*
-#define UMM_POISON_CHECK
- */
- #define UMM_POISON_CHECK_LITE
-#endif
-#endif
-
-#define UMM_POISON_SIZE_BEFORE (4)
-#define UMM_POISON_SIZE_AFTER (4)
-#define UMM_POISONED_BLOCK_LEN_TYPE uint32_t
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 extern void *umm_poison_malloc(size_t size);
 extern void *umm_poison_calloc(size_t num, size_t size);
 extern void *umm_poison_realloc(void *ptr, size_t size);
 extern void  umm_poison_free(void *ptr);
 extern bool  umm_poison_check(void);
-// Local Additions to better report location in code of the caller.
-void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line);
-void  umm_poison_free_fl(void *ptr, const char *file, int line);
-#define POISON_CHECK_SET_POISON(p, s) get_poisoned(p, s)
-#define POISON_CHECK_SET_POISON_BLOCKS(p, s) \
-    do { \
-        size_t super_size = (s * sizeof(umm_block)) - (sizeof(((umm_block *)0)->header)); \
-        get_poisoned(p, super_size); \
-    } while (false)
-#define UMM_POISON_SKETCH_PTR(p) ((void *)((uintptr_t)p + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE))
-#define UMM_POISON_SKETCH_PTRSZ(p) (*(UMM_POISONED_BLOCK_LEN_TYPE *)p)
-#define UMM_POISON_MEMMOVE(t, p, s) memmove(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(p))
-#define UMM_POISON_MEMCPY(t, p, s) memcpy(UMM_POISON_SKETCH_PTR(t), UMM_POISON_SKETCH_PTR(p), UMM_POISON_SKETCH_PTRSZ(p))
 
-#if defined(UMM_POISON_CHECK_LITE)
-/*
-    * We can safely do individual poison checks at free and realloc and stay
-    * under 10us or close.
-    */
-   #define POISON_CHECK() 1
-   #define POISON_CHECK_NEIGHBORS(c) \
-    do { \
-        if (!check_poison_neighbors(_context, c)) \
-        panic(); \
-    } while (false)
+  #define POISON_CHECK() umm_poison_check()
 #else
-/* Not normally enabled. A full heap poison check may exceed 10us. */
-   #define POISON_CHECK() umm_poison_check()
-   #define POISON_CHECK_NEIGHBORS(c) do {} while (false)
+  #define POISON_CHECK() (1)
 #endif
-#else
-#define POISON_CHECK() 1
-#define POISON_CHECK_NEIGHBORS(c) do {} while (false)
-#define POISON_CHECK_SET_POISON(p, s) (p)
-#define POISON_CHECK_SET_POISON_BLOCKS(p, s)
-#define UMM_POISON_MEMMOVE(t, p, s) memmove((t), (p), (s))
-#define UMM_POISON_MEMCPY(t, p, s) memcpy((t), (p), (s))
-#endif
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
-/*
- * Overhead adjustments needed for free_blocks to express the number of bytes
- * that can actually be allocated.
- */
-#define UMM_OVERHEAD_ADJUST ( \
-    umm_block_size() / 2 + \
-    UMM_POISON_SIZE_BEFORE + \
-    UMM_POISON_SIZE_AFTER + \
-    sizeof(UMM_POISONED_BLOCK_LEN_TYPE))
-
-#else
-#define UMM_OVERHEAD_ADJUST  (umm_block_size() / 2)
 #endif
 
 
