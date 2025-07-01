@@ -57,6 +57,18 @@ if sys.version_info < VERSION_MIN:
     )
 
 
+# Some command line flags can be set through environment
+def environment_setting(name: str, default: Optional[str]) -> str:
+    return os.environ.get(f"ESP8266_ARDUINO_MKBUILDOPTGLOBALS_{name}", default or "")
+
+
+def is_true(v: str) -> bool:
+    return v.lower() in ("y", "yes", "1", "true", "on")
+
+
+DEFAULT_DEBUG = is_true(environment_setting("DEBUG", "n"))
+DEFAULT_AUDIT = is_true(environment_setting("AUDIT", "n"))
+
 # Like existing documentation methods, signature is embedded in the comment block
 # Unlike existing documentation methods, only the first line contains any metadata
 
@@ -618,10 +630,16 @@ def parse_args(args=None, namespace=None):
     parser.set_defaults(func=main_help)
 
     parser.add_argument(
-        "--debug", action="store_true", help=argparse.SUPPRESS
+        "--debug",
+        action="store_true",
+        help=argparse.SUPPRESS,
+        default=DEFAULT_DEBUG,
     )  # normal debug
     parser.add_argument(
-        "--audit", action="store_true", help=argparse.SUPPRESS
+        "--audit",
+        action="store_true",
+        help=argparse.SUPPRESS,
+        default=DEFAULT_AUDIT,
     )  # extra noisy debug
 
     parser.add_argument(

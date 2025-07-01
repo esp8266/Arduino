@@ -11,6 +11,10 @@ function step_summary()
     echo ""
 }
 
+# mkbuildoptglobals.py always in debug mode
+export ESP8266_ARDUINO_MKBUILDOPTGLOBALS_DEBUG="y"
+
+# https://arduino.github.io/arduino-cli/1.2/configuration
 export ARDUINO_BUILD_CACHE_PATH="$cache_dir"
 
 esp8266_dir="${ESP8266_ARDUINO_BUILD_DIR}"
