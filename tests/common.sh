@@ -109,10 +109,29 @@ function format_fqbn()
     local board_name=$1
     local flash_size=$2
     local lwip=$3
+    local debug=$4
 
-    echo $"esp8266com:esp8266:${board_name}:
-eesz=${flash_size},
-ip=${lwip}"
+    printf 'esp8266com:esp8266:%s:eesz=%s,ip=%s,lvl=%s' \
+        "$board_name" \
+        "$flash_size" \
+        "$lwip" \
+        "$debug"
+}
+
+function format_cli()
+{
+    local cli_path=$1
+    local warnings=$2
+    local fqbn=$3
+    local libraries=$4
+    local output_dir=$5
+
+    printf "%s compile --warnings=%s --fqbn=%s --libraries=%s --output-dir=%s" \
+        "$cli_path" \
+        "$warnings" \
+        "$fqbn" \
+        "$libraries" \
+        "$output_dir"
 }
 
 function build_sketches()
@@ -120,10 +139,11 @@ function build_sketches()
     local core_path=$1
     local cli_path=$2
     local library_path=$3
-    local lwip=$4
-    local build_mod=$5
-    local build_rem=$6
-    local build_cnt=$7
+    local debug=$4
+    local lwip=$5
+    local build_mod=$6
+    local build_rem=$7
+    local build_cnt=$8
 
     local build_dir="$cache_dir"/build
     mkdir -p "$build_dir"
@@ -132,16 +152,11 @@ function build_sketches()
     mkdir -p "$build_out"
 
     local fqbn
-    fqbn=$(format_fqbn "generic" "4M1M" "$lwip")
+    fqbn=$(format_fqbn "generic" "4M1M" "$lwip" "$debug")
     echo "FQBN: $fqbn"
 
     local build_cmd
-    build_cmd=$''"${cli_path}"'
- compile
- --warnings=all
- --fqbn '"$fqbn"'
- --libraries '"$library_path"'
- --output-dir '"$build_out"''
+    build_cmd=$(format_cli "$cli_path" "all" "$fqbn" "$library_path" "$build_out")
 
     print_size_info_header >"$cache_dir"/size.log
 
@@ -300,30 +315,19 @@ function install_core()
     local hardware_core_path=$2
     local debug=$3
 
-    pushd "${core_path}"
-
-    local debug_flags=""
-    if [ "$debug" = "debug" ]; then
-        debug_flags=$'-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM
- -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
- -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM'
-    fi
-
     # Set our custom warnings for all builds
     printf "%s\n" \
-        "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
-        "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
+        "compiler.c.extra_flags=-Wall -Wextra" \
+        "compiler.cpp.extra_flags=-Wall -Wextra" \
         "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
             > "${core_path}"/platform.local.txt
     echo -e "\n----platform.local.txt----"
-    cat platform.local.txt
+    cat "${core_path}"/platform.local.txt
     echo -e "\n----\n"
 
     # Fetch toolchain & filesystem utils
-    pushd tools
+    pushd "${core_path}"/tools
     python3 get.py -q
-
-    popd
     popd
 
     # todo: windows runners are using copied tree
@@ -341,11 +345,10 @@ function install_core()
 function install_arduino()
 {
     echo ${ci_group}Install arduino
-    local debug=$1
 
     local hardware_core_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
     test -d "$hardware_core_path" \
-        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path" "$debug"
+        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path"
 
     command -v "${ESP8266_ARDUINO_CLI}" \
         || install_arduino_cli "${ESP8266_ARDUINO_CLI}" "$hardware_core_path"
@@ -363,6 +366,9 @@ function arduino_lwip_menu_option()
         ;;
     "IPv6")
         echo "lm6f"
+        ;;
+    *)
+        echo "unknown"
         ;;
     esac
 }
@@ -415,17 +421,19 @@ function arduino_mkbuildoptglobals_cleanup()
 
 function build_sketches_with_arduino()
 {
-    local lwip
-    lwip=$(arduino_lwip_menu_option $1)
+    local debug=$1
 
-    local build_mod=$2
-    local build_rem=$3
-    local build_cnt=$4
+    local lwip
+    lwip=$(arduino_lwip_menu_option "$2")
+
+    local build_mod=$3
+    local build_rem=$4
+    local build_cnt=$5
 
     build_sketches "$ESP8266_ARDUINO_BUILD_DIR" \
         "$ESP8266_ARDUINO_CLI" \
         "$ESP8266_ARDUINO_LIBRARIES" \
-        "$lwip" "$build_mod" "$build_rem" "$build_cnt"
+        "$debug" "$lwip" "$build_mod" "$build_rem" "$build_cnt"
     step_summary "Size report" "$cache_dir/size.log"
 }
 

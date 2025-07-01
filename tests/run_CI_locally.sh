@@ -85,6 +85,8 @@ export HOME="${TMPCI}"
 export ESP8266_ARDUINO_BUILD_DIR="${TMPCI}"
 export BUILD_TYPE="$BUILD_TYPE"
 
+DEBUG_ALL="SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOMMDNSHWDT_NOEXTRA4K"
+
 if [ "$BUILD_TYPE" = "build" ]; then
     tests/build.sh
 
@@ -95,10 +97,10 @@ elif [ "$BUILD_TYPE" = "build_odd" ]; then
     tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = "debug_even" ]; then
-    env ESP8266_ARDUINO_DEBUG=debug tests/build.sh even
+    env ESP8266_ARDUINO_DEBUG="$DEBUG_ALL" tests/build.sh even
 
 elif [ "$BUILD_TYPE" = "debug_odd" ]; then
-    env ESP8266_ARDUINO_DEBUG=debug tests/build.sh odd
+    env ESP8266_ARDUINO_DEBUG="$DEBUG_ALL" tests/build.sh odd
 
 elif [ "$BUILD_TYPE" = "build6" ]; then
     env ESP8266_ARDUINO_LWIP=lm6f tests/build.sh

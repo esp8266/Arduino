@@ -14,7 +14,7 @@ ENVIRONMENT:
   For Arduino CLI:
     ESP8266_ARDUINO_HARDWARE - path to the hardware directory (usually, containing our repo)
     ESP8266_ARDUINO_LIBRATIES - path to the libraries directory (external dependencies)
-    ESP8266_ARDUINO_DEBUG - debug or nodebug
+    ESP8266_ARDUINO_DEBUG - sketch debug level, see boards.txt for exact FQBN value
     ESP8266_ARDUINO_LWIP - v4 or v6
 
 USAGE:
@@ -61,8 +61,8 @@ fi
 
 case "$ESP8266_ARDUINO_BUILDER" in
 "arduino")
-    install_arduino "$ESP8266_ARDUINO_DEBUG"
-    build_sketches_with_arduino "$ESP8266_ARDUINO_LWIP" "$mod" "$rem" "$cnt"
+    install_arduino
+    build_sketches_with_arduino "$ESP8266_ARDUINO_DEBUG" "$ESP8266_ARDUINO_LWIP" "$mod" "$rem" "$cnt"
     ;;
 "platformio")
     install_platformio nodemcuv2

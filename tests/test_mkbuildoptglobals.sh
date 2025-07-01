@@ -83,7 +83,7 @@ function build_esp8266_example()
     local name="$1"
 
     ESP8266_ARDUINO_SKETCHES="$root/libraries/esp8266/examples/${name}/${name}.ino"
-    build_sketches_with_arduino "$ESP8266_ARDUINO_LWIP" "$mod" "$rem" "$cnt"
+    build_sketches_with_arduino "$ESP8266_ARDUINO_DEBUG" "$ESP8266_ARDUINO_LWIP" "$mod" "$rem" "$cnt"
 }
 
 function make_commonh_stat()
