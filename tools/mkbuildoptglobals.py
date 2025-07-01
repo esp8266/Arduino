@@ -209,7 +209,7 @@ def extract_build_opt(name: str, dst: TextIO, src: TextIO):
     IN_SKIP_OPT = 3
 
     state = IN_RAW
-    block = []  # type: List[str]
+    block: List[str] = []
 
     for n, raw_line in enumerate(src, start=1):
         line = raw_line.strip().rstrip()
@@ -538,9 +538,7 @@ def main_build(args: argparse.Namespace):
         return
 
     # when debug port is used, allow for a different set of command line options
-    build_debug = args.build_debug or "DEBUG_SERIAL_PORT" in (
-        args.D or []
-    )  # type: bool
+    build_debug: bool = args.build_debug or "DEBUG_SERIAL_PORT" in (args.D or [])
     name = make_build_opt_name(ctx, build_debug)
 
     # options file is not written immediately, buffer its contents before commiting
@@ -578,7 +576,7 @@ def main_build(args: argparse.Namespace):
 
 
 def main_inspect(args: argparse.Namespace):
-    p = args.path  # type: pathlib.Path
+    p: pathlib.Path = args.path
 
     buffer = io.StringIO()
     try:
@@ -590,13 +588,13 @@ def main_inspect(args: argparse.Namespace):
 
 
 def main_placeholder(args: argparse.Namespace):
-    paths = args.path  # type: List[pathlib.Path]
+    paths: List[pathlib.Path] = args.path
     ensure_exists_and_empty(*paths)
 
 
 def main_synchronize(args: argparse.Namespace):
-    first = args.first  # type: pathlib.Path
-    rest = args.rest  # type: List[pathlib.Path]
+    first: pathlib.Path = args.first
+    rest: List[pathlib.Path] = args.rest
     synchronize_utime(first, *rest)
 
 
