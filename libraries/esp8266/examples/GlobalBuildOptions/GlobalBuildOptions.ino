@@ -4,11 +4,13 @@
  *
  * Example from https://arduino-esp8266.readthedocs.io/en/latest/faq/a06-global-build-options.html
  *
- * Note, we do not "#include" the special file "GlobalBuildOptions.ino.globals.h".
- * The prebuild script will make it available to all modules.
+ * It is not necessary to have `#include "GlobalBuildOptions.ino.globals.h"`.
+ * However, any code inside of the special header file would not be available,
+ * unless there is also a matching `create-file:...` directive inside of it.
  *
- * To track the new sketch name when saving this sketch to a new location and
- * name, remember to update the global .h file name.
+ * Note that when building in debug mode, `build.opt:debug` should be used instead.
+ *
+ * Remember to update the global .h file name when saving this sketch to a new location!
  */
 
 #include <umm_malloc/umm_malloc.h>  // has prototype for umm_free_heap_size_min()
