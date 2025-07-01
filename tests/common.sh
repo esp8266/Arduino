@@ -313,7 +313,6 @@ function install_core()
 {
     local core_path=$1
     local hardware_core_path=$2
-    local debug=$3
 
     # Set our custom settings for all builds
     printf "%s\n" \
