@@ -315,10 +315,10 @@ function install_core()
     local hardware_core_path=$2
     local debug=$3
 
-    # Set our custom warnings for all builds
+    # Set our custom settings for all builds
     printf "%s\n" \
-        "compiler.c.extra_flags=-Wall -Wextra" \
-        "compiler.cpp.extra_flags=-Wall -Wextra" \
+        "compiler.c.extra_flags=-Werror" \
+        "compiler.cpp.extra_flags=-Werror" \
         "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
             > "${core_path}"/platform.local.txt
     echo -e "\n----platform.local.txt----"
