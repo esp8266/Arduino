@@ -54,7 +54,7 @@ namespace experimental {
 #define PRELOAD_DST_SRC(DST,SRC)\
   __asm__ __volatile__ (\
     "mov %0, %1\n\t"\
-    : "=r"(DST)\
+    : "=a"(DST)\
     : "r"(SRC)\
     : "memory")
 
@@ -62,7 +62,7 @@ namespace experimental {
   uint32_t DST;\
   __asm__ __volatile__ (\
     "movi %0, %1\n\t"\
-    : "=r"(DST)\
+    : "=a"(DST)\
     : "i"(SRC)\
     : "memory")
 
