@@ -261,8 +261,8 @@
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/4.0.0-test1/x86_64-linux-gnu.xtensa-lx106-elf-c791b74.250702.tar.gz",
                      "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c791b74.250702.tar.gz",
-                     "checksum": "SHA-256:aace65382d7224b803dc6e5ae504619e773ac46a4bc546b058e2ba652ace88fc",
-                     "size": "76327347"
+                     "checksum": "SHA-256:bb5c07be6db8978187e8c3af74c78c818a55d564d16ecd2c8c64f1b31595b927",
+                     "size": "76324770"
                   },
                   {
                      "host": "x86_64-mingw32",
