@@ -259,10 +259,10 @@
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/4.0.0-test1/x86_64-linux-gnu.xtensa-lx106-elf-c791b74.250702.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c791b74.250702.tar.gz",
-                     "checksum": "SHA-256:6a3abbbb784961e5274f07e24fce8166132628a7e11b929f71567704f9a934ad",
-                     "size": "76326310"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/4.0.0-test1/x86_64-linux-gnu.xtensa-lx106-elf-c791b74-newlib4.5.99-250702.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c791b74-newlib4.5.99-250702.tar.gz",
+                     "checksum": "SHA-256:a1904fc82c6b1de00f8474c7b105aef4c20b597fd792026605b852bddda79c3b",
+                     "size": "76119865"
                   },
                   {
                      "host": "x86_64-mingw32",
