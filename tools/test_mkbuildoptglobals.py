@@ -5,7 +5,7 @@ import sys
 import unittest
 
 from typing import TextIO
-from mkbuildoptglobals import extract_build_opt, InvalidSignature, InvalidSyntax
+from mkbuildoptglobals import extract_build_opt, InvalidSignature, InvalidSyntax, InvalidComment
 import contextlib
 
 
@@ -280,6 +280,29 @@ line 2
                 extract_build_opt("test.opt", dst, src)
 
             self.assertFalse(dst.getvalue())
+
+    def testCommentBlock(self):
+        src = io.StringIO(
+            r"""
+/*@create-file:commented.opt@
+-ffoo /* wat? */
+-fbar
+  /*   oopsie  */
+*/
+line 1
+line 2
+"""
+        )
+        dst = io.StringIO()
+        with self.assertRaises(InvalidComment) as raises:
+            extract_build_opt("commented.opt", dst, src)
+
+        self.assertFalse(dst.getvalue())
+
+        e = raises.exception
+        self.assertFalse(e.file)
+        self.assertEqual(3, e.lineno)
+        self.assertIn("wat?", e.line)
 
 
 if __name__ == "__main__":

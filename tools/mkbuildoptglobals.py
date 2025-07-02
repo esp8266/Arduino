@@ -176,10 +176,13 @@ logging.basicConfig(level=logging.INFO, handlers=(TO_STDOUT, TO_STDERR))
 
 
 class ParsingException(Exception):
-    def __init__(self, file: Optional[str], lineno: int, line: str):
+    def __init__(self, file: Optional[str], lineno: int, line: str, start: int = 0):
         self.file = file
         self.lineno = lineno
         self.line = line
+        if start < 0:
+            start = 0
+        self.start = start
 
     def __str__(self):
         out = ""
@@ -191,7 +194,9 @@ class ParsingException(Exception):
         out += f"\n\n{lineno} {self.line}"
 
         out += f'\n{" " * len(lineno)} '
-        out += "^" * len(self.line.strip())
+        if self.start:
+            out += " " * self.start
+        out += "^" * (len(self.line.strip()) - self.start)
 
         return out
 
@@ -201,6 +206,10 @@ class InvalidSignature(ParsingException):
 
 
 class InvalidSyntax(ParsingException):
+    pass
+
+
+class InvalidComment(ParsingException):
     pass
 
 
@@ -254,11 +263,17 @@ def extract_build_opt(name: str, dst: TextIO, src: TextIO):
                 state = IN_RAW
                 continue
 
+            if not line:
+                continue
+
+            # allow standalone comments on each line
             if line.startswith(("#", "//", "*")):
                 continue
 
-            if not line:
-                continue
+            # but not nested ones. this should get caught by -Wcomment, too
+            for comment in ("/*", "*/"):
+                if comment in line:
+                    raise InvalidComment(None, n, raw_line, raw_line.index(comment))
 
             block.append(f"{line}\n")
 
