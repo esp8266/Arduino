@@ -19,8 +19,9 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
+#include <memory>
 
 // register names
 #include "esp8266_peri.h"
@@ -43,35 +44,80 @@ namespace experimental {
  * Kept in a separate function to aid with precaching
  * PRECACHE_* saves having to make the function IRAM_ATTR.
  *
- * spiIfNum needs to be volatile to keep the optimiser from
- * deciding it can be treated as a constant (due to this being a
- * static function only called with spiIfNum set to 0)
+ * PRELOAD_* allows access to consts and external values
+ * through a different name, while also forcing immediate load.
+ * (but, note that compiler only knows about DST and SRC as dependencies)
  *
  * Note: if porting to ESP32 mosi/miso bits are set in 2 registers, not 1.
  */
+
+#define PRELOAD_DST_SRC(DST,SRC)\
+  __asm__ __volatile__ (\
+    "mov %0, %1\n\t"\
+    : "=a"(DST)\
+    : "r"(SRC)\
+    : "memory")
+
+#define PRELOAD_IMMEDIATE(DST,SRC)\
+  uint32_t DST;\
+  __asm__ __volatile__ (\
+    "movi %0, %1\n\t"\
+    : "=a"(DST)\
+    : "i"(SRC)\
+    : "memory")
+
+#define PRELOAD_VAL(DST,SRC)\
+  decltype(SRC) DST;\
+  PRELOAD_DST_SRC(DST,SRC)
+
+#define PRELOAD_PTR(DST,SRC)\
+  decltype(std::addressof(SRC)) DST;\
+  PRELOAD_DST_SRC(DST,SRC)
+
 static SpiOpResult PRECACHE_ATTR
-_SPICommand(volatile uint32_t spiIfNum,
-            uint32_t spic,uint32_t spiu,uint32_t spiu1,uint32_t spiu2,
-            uint32_t *data,uint32_t writeWords,uint32_t readWords, uint32_t pre_cmd)
+_SPICommand(uint32_t spiIfNum,
+            uint32_t spic, uint32_t spiu, uint32_t spiu1, uint32_t spiu2,
+            uint32_t *data, uint32_t writeWords, uint32_t readWords, uint32_t _pre_cmd)
 {
   if (spiIfNum>1)
      return SPI_RESULT_ERR;
 
-  // force SPI register access via base+offset.
-  // Prevents loading individual address constants from flash.
-  uint32_t *spibase = (uint32_t*)(spiIfNum ? &(SPI1CMD) : &(SPI0CMD));
-  #define SPIREG(reg) (*((volatile uint32_t *)(spibase+(&(reg) - &(SPI0CMD)))))
+  // force SPI register access via base+offset by deconstructing SPI# access macros
+  // note that the function below only ever calls this one w/ spiIfNum==0
+  // in case it is *really* necessary, preload spiIfNum as well
+  #define VOLATILE_PTR(X) reinterpret_cast<volatile uint32_t *>(X)
+  #define SPIADDR(X) const_cast<uint32_t *>(std::addressof(X))
 
-  // preload any constants and functions we need into variables
-  // Everything defined here must be volatile or the optimizer can
-  // treat them as constants, resulting in the flash reads we're
-  // trying to avoid
-  SpiFlashOpResult (* volatile SPI_write_enablep)(SpiFlashChip *) = SPI_write_enable;
-  uint32_t (* volatile Wait_SPI_Idlep)(SpiFlashChip *) = Wait_SPI_Idle;
-  volatile SpiFlashChip *fchip=flashchip;
-  volatile uint32_t spicmdusr=SPICMDUSR;
+  // preload all required constants and functions into variables.
+  // when modifying code below, always double-check the asm output
 
-  uint32_t saved_ps=0;
+  PRELOAD_IMMEDIATE(spi0cmd_addr, SPIADDR(SPI0CMD));
+  PRELOAD_IMMEDIATE(spi1cmd_addr, SPIADDR(SPI1CMD));
+  uint32_t *spibase = spiIfNum
+      ? reinterpret_cast<uint32_t *>(spi1cmd_addr)
+      : reinterpret_cast<uint32_t *>(spi0cmd_addr);
+  #define SPIREG(reg) \
+      (*VOLATILE_PTR(spibase + (SPIADDR(reg) - SPIADDR(SPI0CMD))))
+
+  PRELOAD_PTR(SPI_write_enablep, SPI_write_enable);
+  PRELOAD_PTR(Wait_SPI_Idlep, Wait_SPI_Idle);
+
+  PRELOAD_VAL(fchip, flashchip);
+
+  PRELOAD_IMMEDIATE(spicmdusr, SPICMDUSR);
+  PRELOAD_IMMEDIATE(saved_ps, 0);
+
+  // also force 'pre_cmd' & 'spiu' mask constant to be loaded right now
+  // (TODO write all of the preamble in asm directly?)
+  PRELOAD_VAL(pre_cmd, _pre_cmd);
+
+  PRELOAD_IMMEDIATE(pre_cmd_spiu_mask, ~(SPIUMOSI | SPIUMISO));
+  uint32_t _pre_cmd_spiu = spiu & pre_cmd_spiu_mask;
+  PRELOAD_VAL(pre_cmd_spiu, _pre_cmd_spiu);
+
+  PRELOAD_IMMEDIATE(pre_cmd_spiu2_mask, ~0xFFFFu);
+  uint32_t _pre_cmd_spiu2 = (spiu2 & pre_cmd_spiu2_mask) | pre_cmd;
+  PRELOAD_VAL(pre_cmd_spiu2, _pre_cmd_spiu2);
 
   if (!spiIfNum) {
      // Only need to disable interrupts and precache when using SPI0
@@ -91,12 +137,11 @@ _SPICommand(volatile uint32_t spiIfNum,
   if (SPI_FLASH_CMD_WREN == pre_cmd) {
      // See SPI_write_enable comments in esp8266_undocumented.h
      SPI_write_enablep((SpiFlashChip *)fchip);
-  } else
-  if (pre_cmd) {
+  } else if (pre_cmd) {
      // Send prefix cmd w/o data - sends 8 bits. eg. Volatile SR Write Enable, 0x50
-     SPIREG(SPI0U)  = (spiu & ~(SPIUMOSI|SPIUMISO));
+     SPIREG(SPI0U)  = pre_cmd_spiu;
      SPIREG(SPI0U1) = 0;
-     SPIREG(SPI0U2) = (spiu2 & ~0xFFFFu) | pre_cmd;
+     SPIREG(SPI0U2) = pre_cmd_spiu2;
 
      SPIREG(SPI0CMD) = spicmdusr;   //Send cmd
      while ((SPIREG(SPI0CMD) & spicmdusr));
