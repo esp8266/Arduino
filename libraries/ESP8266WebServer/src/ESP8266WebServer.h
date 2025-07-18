@@ -164,6 +164,7 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = emptyString);
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
+  void sendJson(const String& json, int code = 200);
   void send(int code, const char *content_type, const char *content) {
     send_P(code, content_type, content);
   }

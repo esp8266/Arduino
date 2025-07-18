@@ -560,13 +560,21 @@ void ESP8266WebServerTemplate<ServerType>::send(int code, char* content_type, co
 }
 
 template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_type, const String& content) {
+  send(code, content_type.c_str(), content.c_str(), content.length());
+}
+
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::sendJson(const String& json, int code) {
+  send(code, "application/json", json);
+}
+
+template <typename ServerType>
 void ESP8266WebServerTemplate<ServerType>::send(int code, const char* content_type, const String& content) {
   return send(code, content_type, content.c_str(), content.length());
 }
 
 template <typename ServerType>
-void ESP8266WebServerTemplate<ServerType>::send(int code, const String& content_type, const String& content) {
-  return send(code, (const char*)content_type.c_str(), content);
 }
 
 template <typename ServerType>
