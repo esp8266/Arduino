@@ -318,9 +318,20 @@ static void  __unhandled_exception_cpp()
 }
 }
 
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
+
+static void __new_handler() {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = 0;
+    std::set_new_handler(nullptr);
+    __unhandled_exception(PSTR("OOM"));
+}
+
 void init_done() {
     system_set_os_print(1);
     gdb_init();
+    std::set_new_handler(__new_handler);
     std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
