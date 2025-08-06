@@ -24,7 +24,7 @@ if which('openssl') is None and not os.path.isfile('./openssl') and not os.path.
     raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
     
 # Mozilla's URL for the CSV file with included PEM certs
-mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
+mozurl = "https://ccadb.my.salesforce-sites.com/mozilla/IncludedCACertificateReportPEMCSV"
 
 # Load the names[] and pems[] array from the URL
 names = []
