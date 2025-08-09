@@ -108,16 +108,10 @@ preprocess=$"$gcc \
 $preprocess \
   "$root/tools/sdk/ld/eagle.app.v6.common.ld.h" \
   -o "local.eagle.app.v6.common.ld"
-step_summary \
-    "Default local.eagle.app.v6.common.ld" \
-    local.eagle.app.v6.common.ld
 
 $preprocess \
   "local.eagle.flash.ld.h" \
   -o "local.eagle.flash.ld"
-step_summary \
-    "Default local.eagle.flash.ld" \
-    local.eagle.flash.ld
 
 libs=$"-lhal -lphy -lpp -lnet80211 -llwip6-1460-feat -lwpa \
 -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig \
@@ -155,7 +149,3 @@ link=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
 nm=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-nm -C"
 
 $link -o xtensa.elf
-step_summary "CI .elf link map" xtensa.map
-
-$nm xtensa.elf > symbols.txt
-step_summary "CI .elf symbols" symbols.txt
