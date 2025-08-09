@@ -42,52 +42,71 @@ gcc=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
  $cppflags
  $cflags"
 
+function build() {
+    local f=$1
+    $gcc -c -o "$f".o "$f"
+}
+
 $gcc --verbose
 
 set -v -x
 
 cp $root/cores/esp8266/libc_replacements.cpp ./
 
-$gcc -c libc_replacements.cpp
+build libc_replacements.cpp
 
 cat << EOF > arduino.c
 #include <Arduino.h>
 EOF
 
-$gcc -c arduino.c
+build arduino.c
 
 cat << EOF > coredecls.c
 #include <coredecls.h>
 EOF
 
-$gcc -c coredecls.c
+build coredecls.c
 
 cat << EOF > features.c
 #include <core_esp8266_features.h>
 EOF
 
-$gcc -c features.c
+build features.c
 
 cat << EOF > sdk.c
 #include <version.h>
 EOF
 
-$gcc -c sdk.c
+build sdk.c
 
-cat << EOF > iostream.cpp
-#include <iostream>
-void foo() {
-  std::cout << "hello world";
+cat << EOF > cmath.cpp
+#include <cmath>
+
+bool test_remainder(float x) {
+  return fabs(std::remainder((float)15.123456, x) - (float)0.123456) < 1e-5;
+}
+
+bool test_remainder(double x) {
+  return std::fabs(std::remainder((double)10.123456, x) - (double)0.123456) < 1e-5;
 }
 EOF
 
-$gcc -c iostream.cpp
+build cmath.cpp
+
+cat << EOF > iostream.cpp
+#include <iostream>
+void test_iostream(bool val) {
+  std::cout << (val ? "hello" : "world") << '\n';
+}
+EOF
+
+build iostream.cpp
 
 cat << EOF > regex.cpp
 #include <string>
 #include <regex>
 
-bool bar(std::string v) {
+bool test_regex(std::string v) {
   std::regex r("HELLO", std::regex_constants::ECMAScript | std::regex_constants::icase);
   if (std::regex_search(v, r))
     return true;
@@ -95,7 +114,24 @@ bool bar(std::string v) {
 }
 EOF
 
-$gcc -c regex.cpp
+build regex.cpp
+
+cat << EOF > app_entry.cpp
+#include <string>
+
+bool test_remainder(float);
+bool test_remainder(double);
+bool test_regex(std::string);
+void test_iostream(bool);
+
+extern "C" void app_entry() {
+  test_iostream(test_remainder(1.23f));
+  test_iostream(test_remainder(4.56));
+  test_iostream(test_regex("hello world"));
+}
+EOF
+
+build app_entry.cpp
 
 cp "$root/tools/sdk/ld/eagle.flash.1m.ld" "local.eagle.flash.ld.h"
 preprocess=$"$gcc \
@@ -116,11 +152,11 @@ $preprocess \
 libs=$"-lhal -lphy -lpp -lnet80211 -llwip6-1460-feat -lwpa \
 -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig \
 -lairkiss -lwpa2 -lstdc++ -lm -lc -lgcc"
-objects="libc_replacements.o arduino.o coredecls.o features.o sdk.o iostream.o"
+objects=$(find . -name '*.o' -printf ' %f')
 
 link=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
  -nostdlib
- -u app_entry
+ -uapp_entry
  -mlongcalls
  -L$cache_dir
  -L$root/tools/sdk/lib/NONOSDK305
@@ -131,7 +167,6 @@ link=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
  -Wl,--no-check-sections
  -Wl,-Map,xtensa.map
  -Wl,--gc-sections
- -Wl,--defsym,app_entry=0xaaaaaaaa
  -Wl,--defsym,abort=0xfefefefe
  -Wl,--defsym,malloc=0xfefefefe
  -Wl,--defsym,free=0xfefefefe
@@ -145,7 +180,5 @@ link=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
  -Wl,--defsym,_calloc_r=0xfefefefe
  -Wl,--defsym,_fstat_r=0xfefefefe
  -Wl,--start-group $objects $libs -Wl,--end-group"
-
-nm=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-nm -C"
 
 $link -o xtensa.elf
