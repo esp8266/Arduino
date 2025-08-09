@@ -10,29 +10,45 @@ popd
 
 pushd "$cache_dir"
 
-cflags=$"
- -Os
- -g
- -free
- -fipa-pta
- -Werror=return-type
- -Wpointer-arith
- -fno-inline-functions
- -mtext-section-literals
- -mlongcalls
- -falign-functions=4
- -ffunction-sections
- -fdata-sections"
-gcc=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
- $cflags
+cppflags=$"\
+ -DARDUINO \
+ -DARDUINO_ESP8266_GENERIC \
+ -DF_CPU=80000000L \
+ -DNONOSDK305=1 \
+ -DLWIP_OPEN_SRC \
+ -DTCP_MSS=1460 \
+ -DLWIP_IPV4=1 \
+ -DLWIP_IPV6=1 \
+ -DLWIP_FEATURES=1 \
  -I$root/cores/esp8266 \
+ -I$root/tools/sdk/lwip2/include \
  -I$root/tools/sdk/include \
  -I$root/variants/generic \
  -I$root/tools/sdk/libc/xtensa-lx106-elf"
+cflags=$"\
+ -Os \
+ -g \
+ -free \
+ -fipa-pta \
+ -Werror=return-type \
+ -Wpointer-arith \
+ -fno-inline-functions \
+ -mtext-section-literals \
+ -mlongcalls \
+ -falign-functions=4 \
+ -ffunction-sections \
+ -fdata-sections"
+gcc=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
+ $cppflags
+ $cflags"
 
 $gcc --verbose
 
 set -v -x
+
+cp $root/cores/esp8266/libc_replacements.cpp ./
+
+$gcc -c libc_replacements.cpp
 
 cat << EOF > arduino.c
 #include <Arduino.h>
@@ -99,7 +115,6 @@ step_summary \
 $preprocess \
   "local.eagle.flash.ld.h" \
   -o "local.eagle.flash.ld"
-cat local.eagle.flash.ld
 step_summary \
     "Default local.eagle.flash.ld" \
     local.eagle.flash.ld
@@ -107,7 +122,7 @@ step_summary \
 libs=$"-lhal -lphy -lpp -lnet80211 -llwip6-1460-feat -lwpa \
 -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig \
 -lairkiss -lwpa2 -lstdc++ -lm -lc -lgcc"
-objects="arduino.o coredecls.o features.o sdk.o iostream.o"
+objects="libc_replacements.o arduino.o coredecls.o features.o sdk.o iostream.o"
 
 link=$"$root/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
  -nostdlib
