@@ -566,6 +566,23 @@ IPAddress ESP8266WiFiSTAClass::gatewayIP() {
 }
 
 /**
+ * Get the broadcast ip address.
+ * @return IPAddress broadcastIP
+ */
+IPAddress ESP8266WiFiSTAClass::broadcastIP() {
+    struct ip_info ip;
+    wifi_get_ip_info(STATION_IF, &ip);
+    IPAddress subnetMask(ip.netmask.addr);
+    IPAddress gatewayIP(ip.gw.addr);
+
+    IPAddress broadcastIp;
+    for (int i = 0; i < 4; i++)
+        broadcastIp[i] = ~subnetMask[i] | gatewayIP[i];
+    
+    return broadcastIp;
+}
+
+/**
  * Get the DNS ip address.
  * @param dns_no
  * @return IPAddress DNS Server IP
