@@ -9,8 +9,7 @@ permissions:
   contents: read
 
 jobs:
-
-  # Examples are built in parallel to avoid CI total job time limitation
+  # download toolchain and check whether gcc basic .c compilation works
   sanity-check:
     runs-on: ubuntu-latest
     defaults:
@@ -28,6 +27,26 @@ jobs:
       run: |
         bash ./tests/sanity_check.sh
 
+  # verify that any scripts that will or may be used by the builder are working
+  tooling-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: false
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    - run: |
+        python ./tools/test_mkbuildoptglobals.py --quiet
+    - run: |
+        bash ./tests/install_arduino.sh
+        bash ./tests/test_mkbuildoptglobals.sh run
+
+  # Examples are built in parallel to avoid CI total job time limitation
   build-linux:
     name: Linux - LwIP ${{ matrix.lwip }} (${{ matrix.chunk }})
     runs-on: ubuntu-latest
