@@ -33,28 +33,9 @@
 #include "gdb_hooks.h"
 #include "StackThunk.h"
 #include "coredecls.h"
+#include "umm_malloc/umm_malloc.h"
 
 extern "C" {
-
-// These will be pointers to PROGMEM const strings
-static const char* s_panic_file = 0;
-static int s_panic_line = 0;
-static const char* s_panic_func = 0;
-static const char* s_panic_what = 0;
-
-// Our wiring for abort() and C++ exceptions
-static bool s_abort_called = false;
-static const char* s_unhandled_exception = NULL;
-
-// Common way to notify about where the stack smashing happened
-// (but, **only** if caller uses our handler function)
-static uint32_t s_stack_chk_addr = 0;
-
-void abort() __attribute__((noreturn));
-static void uart_write_char_d(char c);
-static void uart0_write_char_d(char c);
-static void uart1_write_char_d(char c);
-static void print_stack(uint32_t start, uint32_t end);
 
 // using numbers different from "REASON_" in user_interface.h (=0..6)
 enum rst_reason_sw
@@ -63,15 +44,44 @@ enum rst_reason_sw
     REASON_USER_STACK_SMASH = 253,
     REASON_USER_SWEXCEPTION_RST = 254
 };
-static int s_user_reset_reason = REASON_DEFAULT_RST;
+
+// Confirmed on 12/17/22: s_pm is in the .bss section and is in the
+// _bss_start/end range to be zeroed by the SDK this happens after the SDK first
+// calls to Cache_Read_Enable_New.
+static struct PostmortemInfo {
+    int user_reset_reason = REASON_DEFAULT_RST;
+
+    // These will be pointers to PROGMEM const strings
+    const char* panic_file = 0;
+    int panic_line = 0;
+    const char* panic_func = 0;
+    const char* panic_what = 0;
+
+    // Our wiring for abort() and C++ exceptions
+    bool abort_called = false;
+    const char* unhandled_exception = NULL;
+
+    // Common way to notify about where the stack smashing happened
+    // (but, **only** if caller uses our handler function)
+    uint32_t stack_chk_addr = 0;
+} s_pm;
 
 // From UMM, the last caller of a malloc/realloc/calloc which failed:
-extern void *umm_last_fail_alloc_addr;
-extern int umm_last_fail_alloc_size;
+extern struct umm_last_fail_alloc {
+    const void *addr;
+    size_t size;
 #if defined(DEBUG_ESP_OOM)
-extern const char *umm_last_fail_alloc_file;
-extern int umm_last_fail_alloc_line;
+    const char *file;
+    int line;
 #endif
+} _umm_last_fail_alloc;
+
+
+void abort() __attribute__((noreturn));
+static void uart_write_char_d(char c);
+static void uart0_write_char_d(char c);
+static void uart1_write_char_d(char c);
+static void print_stack(uint32_t start, uint32_t end);
 
 static void raise_exception() __attribute__((noreturn));
 
@@ -139,7 +149,7 @@ asm(
 static void postmortem_report(uint32_t sp_dump) {
     struct rst_info rst_info;
     memset(&rst_info, 0, sizeof(rst_info));
-    if (s_user_reset_reason == REASON_DEFAULT_RST)
+    if (s_pm.user_reset_reason == REASON_DEFAULT_RST)
     {
         system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
         if (rst_info.reason != REASON_SOFT_WDT_RST &&
@@ -150,26 +160,26 @@ static void postmortem_report(uint32_t sp_dump) {
         }
     }
     else
-        rst_info.reason = s_user_reset_reason;
+        rst_info.reason = s_pm.user_reset_reason;
 
     ets_install_putc1(&uart_write_char_d);
 
     cut_here();
 
-    if (s_panic_line) {
-        ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
-        if (s_panic_what) {
-            ets_printf_P(PSTR(": Assertion '%S' failed."), s_panic_what);
+    if (s_pm.panic_line) {
+        ets_printf_P(PSTR("\nPanic %s:%d %s"), s_pm.panic_file, s_pm.panic_line, s_pm.panic_func);
+        if (s_pm.panic_what) {
+            ets_printf_P(PSTR(": Assertion '%s' failed."), s_pm.panic_what);
         }
         ets_putc('\n');
     }
-    else if (s_panic_file) {
-        ets_printf_P(PSTR("\nPanic %S\n"), s_panic_file);
+    else if (s_pm.panic_file) {
+        ets_printf_P(PSTR("\nPanic %s\n"), s_pm.panic_file);
     }
-    else if (s_unhandled_exception) {
-        ets_printf_P(PSTR("\nUnhandled C++ exception: %S\n"), s_unhandled_exception);
+    else if (s_pm.unhandled_exception) {
+        ets_printf_P(PSTR("\nUnhandled C++ exception: %s\n"), s_pm.unhandled_exception);
     }
-    else if (s_abort_called) {
+    else if (s_pm.abort_called) {
         ets_printf_P(PSTR("\nAbort called\n"));
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
@@ -199,7 +209,7 @@ static void postmortem_report(uint32_t sp_dump) {
             rst_info.exccause, /* Address executing at time of Soft WDT level-1 interrupt */ rst_info.epc1, 0, 0, 0, 0);
     }
     else if (rst_info.reason == REASON_USER_STACK_SMASH) {
-        ets_printf_P(PSTR("\nStack smashing detected at 0x%08x\n"), s_stack_chk_addr);
+        ets_printf_P(PSTR("\nStack smashing detected at 0x%08x\n"), s_pm.stack_chk_addr);
     }
     else if (rst_info.reason == REASON_USER_STACK_OVERFLOW) {
         ets_printf_P(PSTR("\nStack overflow detected\n"));
@@ -210,7 +220,7 @@ static void postmortem_report(uint32_t sp_dump) {
 
     uint32_t cont_stack_start;
     if (rst_info.reason == REASON_USER_STACK_SMASH) {
-        cont_stack_start = s_stack_chk_addr;
+        cont_stack_start = s_pm.stack_chk_addr;
     } else {
         cont_stack_start = (uint32_t) (&g_pcont->stack[0]);
     }
@@ -229,7 +239,7 @@ static void postmortem_report(uint32_t sp_dump) {
         //  16 ?unnamed? - index into a table, pull out pointer, and call if non-zero
         //     appears near near wDev_ProcessFiq
         //  32 pp_soft_wdt_feed_local - gather the specifics and call __wrap_system_restart_local
-        offset =  32 + 16 + 48 + 256;
+        offset = 32 + 16 + 48 + 256;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
         // Stack Tally
@@ -280,23 +290,32 @@ static void postmortem_report(uint32_t sp_dump) {
     ets_printf_P(PSTR("<<<stack<<<\n"));
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
-    if (umm_last_fail_alloc_addr) {
+    if (_umm_last_fail_alloc.addr) {
 #if defined(DEBUG_ESP_OOM)
-        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)@%S:%d\n"),
-            (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size,
-            umm_last_fail_alloc_file, umm_last_fail_alloc_line);
+        ets_printf_P(PSTR("\nlast failed alloc call: 0x%08X(%d), File: %s:%d\n"),
+            (uint32_t)_umm_last_fail_alloc.addr,
+            _umm_last_fail_alloc.size,
+            (_umm_last_fail_alloc.file) ? _umm_last_fail_alloc.file : PSTR("??"),
+            _umm_last_fail_alloc.line);
 #else
-        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+        ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)_umm_last_fail_alloc.addr, _umm_last_fail_alloc.size);
 #endif
     }
 
     cut_here();
 
-    if (s_unhandled_exception && umm_last_fail_alloc_addr) {
+    if (s_pm.unhandled_exception && _umm_last_fail_alloc.addr) {
         // now outside from the "cut-here" zone, print correctly the `new` caller address,
         // idf-monitor.py will be able to decode this one and show exact location in sources
-        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
+        ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)_umm_last_fail_alloc.addr);
     }
+
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+    size_t oom_count = umm_get_oom_count();
+    if (oom_count) {
+        ets_printf_P(PSTR("\nOOM Count: %u\n"), oom_count);
+    }
+#endif
 
     custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
@@ -353,7 +372,7 @@ static void raise_exception() {
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
 
-    s_user_reset_reason = REASON_USER_SWEXCEPTION_RST;
+    s_pm.user_reset_reason = REASON_USER_SWEXCEPTION_RST;
     ets_printf_P(PSTR("\nUser exception (panic/abort/assert)"));
     uint32_t sp;
     __asm__ __volatile__ ("mov %0, a1\n\t" : "=r"(sp) :: "memory");
@@ -362,37 +381,37 @@ static void raise_exception() {
 }
 
 void abort() {
-    s_abort_called = true;
+    s_pm.abort_called = true;
     raise_exception();
 }
 
 void __unhandled_exception(const char *str) {
-    s_unhandled_exception = str;
+    s_pm.unhandled_exception = str;
     raise_exception();
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
-    s_panic_file = file;
-    s_panic_line = line;
-    s_panic_func = func;
-    s_panic_what = what;
+    s_pm.panic_file = file;
+    s_pm.panic_line = line;
+    s_pm.panic_func = func;
+    s_pm.panic_what = what;
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 
 void __panic_func(const char* file, int line, const char* func) {
-    s_panic_file = file;
-    s_panic_line = line;
-    s_panic_func = func;
-    s_panic_what = 0;
+    s_pm.panic_file = file;
+    s_pm.panic_line = line;
+    s_pm.panic_func = func;
+    s_pm.panic_what = 0;
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
 
 uintptr_t __stack_chk_guard = 0x08675309 ^ RANDOM_REG32;
 void __stack_chk_fail(void) {
-    s_user_reset_reason = REASON_USER_STACK_SMASH;
-    s_stack_chk_addr = (uint32_t)__builtin_return_address(0);
+    s_pm.user_reset_reason = REASON_USER_STACK_SMASH;
+    s_pm.stack_chk_addr = (uint32_t)__builtin_return_address(0);
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
@@ -405,8 +424,8 @@ void __stack_chk_fail(void) {
 }
 
 void __stack_overflow(cont_t* cont, uint32_t* sp) {
-    s_user_reset_reason = REASON_USER_STACK_OVERFLOW;
-    s_stack_chk_addr = (uint32_t)&cont->stack[0];
+    s_pm.user_reset_reason = REASON_USER_STACK_OVERFLOW;
+    s_pm.stack_chk_addr = (uint32_t)&cont->stack[0];
 
     if (gdb_present())
         __asm__ __volatile__ ("syscall"); // triggers GDB when enabled
