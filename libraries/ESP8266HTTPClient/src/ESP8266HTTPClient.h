@@ -178,6 +178,7 @@ public:
     void setAuthorization(const char * auth);
     void setAuthorization(String auth);
     void setTimeout(uint16_t timeout);
+    void setHostHeader(const String& host);
 
     // Redirections
     void setFollowRedirects(followRedirects_t follow);
@@ -254,6 +255,7 @@ protected:
 
     /// request handling
     String _host;
+    String _hostHeader;
     uint16_t _port = 0;
     bool _reuse = true;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
