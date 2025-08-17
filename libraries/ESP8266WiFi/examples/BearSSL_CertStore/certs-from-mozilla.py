@@ -13,15 +13,9 @@ import os
 import sys
 from shutil import which
 
-from subprocess import Popen, PIPE, call
-try:
-    from urllib.request import urlopen
-except Exception:
-    from urllib2 import urlopen
-try:
-    from StringIO import StringIO
-except Exception:
-    from io import StringIO
+from io import StringIO
+from subprocess import Popen, PIPE, call, CalledProcessError
+from urllib.request import urlopen
 
 # check if ar and openssl are available
 if which('ar') is None and not os.path.isfile('./ar') and not os.path.isfile('./ar.exe'):
@@ -30,7 +24,7 @@ if which('openssl') is None and not os.path.isfile('./openssl') and not os.path.
     raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
     
 # Mozilla's URL for the CSV file with included PEM certs
-mozurl = "https://ccadb-public.secure.force.com/mozilla/IncludedCACertificateReportPEMCSV"
+mozurl = "https://ccadb.my.salesforce-sites.com/mozilla/IncludedCACertificateReportPEMCSV"
 
 # Load the names[] and pems[] array from the URL
 names = []
@@ -62,10 +56,10 @@ for i in range(0, len(pems)):
     thisPem = pems[i].replace("'", "")
     print(names[i] + " -> " + certName)
     ssl = Popen(['openssl','x509','-inform','PEM','-outform','DER','-out', certName], shell = False, stdin = PIPE)
-    pipe = ssl.stdin
-    pipe.write(thisPem.encode('utf-8'))
-    pipe.close()
-    ssl.wait()
+    ssl.communicate(thisPem.encode('utf-8'))
+    ret = ssl.wait()
+    if ret != 0:
+        raise CalledProcessError(ret, certName)
     if os.path.exists(certName):
         derFiles.append(certName)
         idx = idx + 1

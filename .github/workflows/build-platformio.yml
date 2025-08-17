@@ -18,7 +18,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
     - uses: actions/setup-python@v5
@@ -36,4 +36,4 @@ jobs:
         ESP8266_ARDUINO_BUILDER: "platformio"
       run: |
         pip install -U platformio
-        env ESP8266_ARDUINO_SKETCHES="$(find libraries/ -name '*.ino' | shuf -n 10 -)" bash ./tests/build.sh
+        env ESP8266_ARDUINO_SKETCHES="$(find libraries/ -name '*.ino' | grep -e libraries/esp8266/examples -e SoftwareSerial)" bash ./tests/build.sh

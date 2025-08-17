@@ -117,7 +117,7 @@ $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1(${ver})/g"\
 #echo "#define ARDUINO_ESP8266_GIT_DESC `git describe --tags 2>/dev/null`" >>${outdir}/cores/esp8266/core_version.h
 #echo "#define ARDUINO_ESP8266_RELEASE_${ver_define}" >>${outdir}/cores/esp8266/core_version.h
 #echo "#define ARDUINO_ESP8266_RELEASE \"${ver_define}\"" >>${outdir}/cores/esp8266/core_version.h
-python3 ${srcdir}/tools/makecorever.py -b ${outdir} -i cores/esp8266 -p ${srcdir} -v ${plain_ver} -r
+python3 ${srcdir}/tools/makecorever.py --git-root ${srcdir} --version ${plain_ver} --release ${outdir}/cores/esp8266/core_version.h
 
 # Zip the package
 pushd package/versions/${visiblever}

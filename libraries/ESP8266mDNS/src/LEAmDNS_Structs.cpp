@@ -55,8 +55,7 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt(const char* p_pcKey /*= 0*/,
                                                         const char* p_pcValue /*= 0*/,
                                                         bool        p_bTemp /*= false*/) :
-        m_pNext(0),
-        m_pcKey(0), m_pcValue(0), m_bTemp(p_bTemp)
+        m_pNext(0), m_pcKey(0), m_pcValue(0), m_bTemp(p_bTemp)
     {
         setKey(p_pcKey);
         setValue(p_pcValue);
@@ -67,8 +66,7 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt(
         const MDNSResponder::stcMDNSServiceTxt& p_Other) :
-        m_pNext(0),
-        m_pcKey(0), m_pcValue(0), m_bTemp(false)
+        m_pNext(0), m_pcKey(0), m_pcValue(0), m_bTemp(false)
     {
         operator=(p_Other);
     }
@@ -614,9 +612,8 @@ namespace MDNSImplementation
         bool p_bRA /*= false*/, unsigned char p_ucRCode /*= 0*/, uint16_t p_u16QDCount /*= 0*/,
         uint16_t p_u16ANCount /*= 0*/, uint16_t p_u16NSCount /*= 0*/,
         uint16_t p_u16ARCount /*= 0*/) :
-        m_u16ID(p_u16ID),
-        m_1bQR(p_bQR), m_4bOpcode(p_ucOpcode), m_1bAA(p_bAA), m_1bTC(p_bTC), m_1bRD(p_bRD),
-        m_1bRA(p_bRA), m_3bZ(0), m_4bRCode(p_ucRCode), m_u16QDCount(p_u16QDCount),
+        m_u16ID(p_u16ID), m_1bQR(p_bQR), m_4bOpcode(p_ucOpcode), m_1bAA(p_bAA), m_1bTC(p_bTC),
+        m_1bRD(p_bRD), m_1bRA(p_bRA), m_3bZ(0), m_4bRCode(p_ucRCode), m_u16QDCount(p_u16QDCount),
         m_u16ANCount(p_u16ANCount), m_u16NSCount(p_u16NSCount), m_u16ARCount(p_u16ARCount)
     {
     }
@@ -813,8 +810,7 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNS_RRAttributes::stcMDNS_RRAttributes(
         uint16_t p_u16Type /*= 0*/, uint16_t p_u16Class /*= 1 DNS_RRCLASS_IN Internet*/) :
-        m_u16Type(p_u16Type),
-        m_u16Class(p_u16Class)
+        m_u16Type(p_u16Type), m_u16Class(p_u16Class)
     {
     }
 
@@ -910,8 +906,7 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNS_RRAnswer::stcMDNS_RRAnswer(
         enuAnswerType p_AnswerType, const MDNSResponder::stcMDNS_RRHeader& p_Header,
         uint32_t p_u32TTL) :
-        m_pNext(0),
-        m_AnswerType(p_AnswerType), m_Header(p_Header), m_u32TTL(p_u32TTL)
+        m_pNext(0), m_AnswerType(p_AnswerType), m_Header(p_Header), m_u32TTL(p_u32TTL)
     {
         // Extract 'cache flush'-bit
         m_bCacheFlush = (m_Header.m_Attributes.m_u16Class & 0x8000);
@@ -955,8 +950,7 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNS_RRAnswerA::stcMDNS_RRAnswerA(
         const MDNSResponder::stcMDNS_RRHeader& p_Header, uint32_t p_u32TTL) :
-        stcMDNS_RRAnswer(AnswerType_A, p_Header, p_u32TTL),
-        m_IPAddress(0, 0, 0, 0)
+        stcMDNS_RRAnswer(AnswerType_A, p_Header, p_u32TTL), m_IPAddress(0, 0, 0, 0)
     {
     }
 
@@ -1094,8 +1088,8 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNS_RRAnswerSRV::stcMDNS_RRAnswerSRV(
         const MDNSResponder::stcMDNS_RRHeader& p_Header, uint32_t p_u32TTL) :
-        stcMDNS_RRAnswer(AnswerType_SRV, p_Header, p_u32TTL),
-        m_u16Priority(0), m_u16Weight(0), m_u16Port(0)
+        stcMDNS_RRAnswer(AnswerType_SRV, p_Header, p_u32TTL), m_u16Priority(0), m_u16Weight(0),
+        m_u16Port(0)
     {
     }
 
@@ -1132,8 +1126,7 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNS_RRAnswerGeneric::stcMDNS_RRAnswerGeneric(
         const stcMDNS_RRHeader& p_Header, uint32_t p_u32TTL) :
-        stcMDNS_RRAnswer(AnswerType_Generic, p_Header, p_u32TTL),
-        m_u16RDLength(0), m_pu8RDData(0)
+        stcMDNS_RRAnswer(AnswerType_Generic, p_Header, p_u32TTL), m_u16RDLength(0), m_pu8RDData(0)
     {
     }
 
@@ -1212,8 +1205,7 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSService::stcMDNSService(const char* p_pcName /*= 0*/,
                                                   const char* p_pcService /*= 0*/,
                                                   const char* p_pcProtocol /*= 0*/) :
-        m_pNext(0),
-        m_pcName(0), m_bAutoName(false), m_pcService(0), m_pcProtocol(0), m_u16Port(0),
+        m_pNext(0), m_pcName(0), m_bAutoName(false), m_pcService(0), m_pcProtocol(0), m_u16Port(0),
         m_u8ReplyMask(0), m_fnTxtCallback(0)
     {
         setName(p_pcName);
@@ -1538,9 +1530,7 @@ namespace MDNSImplementation
         MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address::stcIP4Address constructor
     */
     MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address::stcIP4Address(
-        IPAddress p_IPAddress, uint32_t p_u32TTL /*= 0*/) :
-        m_pNext(0),
-        m_IPAddress(p_IPAddress)
+        IPAddress p_IPAddress, uint32_t p_u32TTL /*= 0*/) : m_pNext(0), m_IPAddress(p_IPAddress)
     {
         m_TTL.set(p_u32TTL);
     }
@@ -1746,15 +1736,6 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(
         const IPAddress& p_IPAddress) const
     {
-        return (stcIP4Address*)(((const stcAnswer*)this)->findIP4Address(p_IPAddress));
-    }
-
-    /*
-        MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address
-    */
-    MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address*
-    MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress)
-    {
         stcIP4Address* pIP4Address = m_pIP4Addresses;
         while (pIP4Address)
         {
@@ -1765,6 +1746,16 @@ namespace MDNSImplementation
             pIP4Address = pIP4Address->m_pNext;
         }
         return pIP4Address;
+    }
+
+    /*
+        MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address
+    */
+    MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address*
+    MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress)
+    {
+        const auto& cref = static_cast<const decltype(*this)>(*this);
+        return const_cast<stcIP4Address*>(cref.findIP4Address(p_IPAddress));
     }
 
     /*
@@ -2043,7 +2034,8 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSServiceQuery::stcAnswer*
     MDNSResponder::stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index)
     {
-        return (stcAnswer*)(((const stcMDNSServiceQuery*)this)->answerAtIndex(p_u32Index));
+        const auto& cref = static_cast<const decltype(*this)>(*this);
+        return const_cast<stcAnswer*>(cref.answerAtIndex(p_u32Index));
     }
 
     /*
@@ -2172,9 +2164,8 @@ namespace MDNSImplementation
     */
     MDNSResponder::stcMDNSSendParameter::stcDomainCacheItem::stcDomainCacheItem(
         const void* p_pHostnameOrService, bool p_bAdditionalData, uint32_t p_u16Offset) :
-        m_pNext(0),
-        m_pHostnameOrService(p_pHostnameOrService), m_bAdditionalData(p_bAdditionalData),
-        m_u16Offset(p_u16Offset)
+        m_pNext(0), m_pHostnameOrService(p_pHostnameOrService),
+        m_bAdditionalData(p_bAdditionalData), m_u16Offset(p_u16Offset)
     {
     }
 

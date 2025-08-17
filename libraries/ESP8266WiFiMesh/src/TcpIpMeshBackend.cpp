@@ -451,7 +451,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, const bool sca
   if(WiFi.status() == WL_CONNECTED)
   {
     TransmissionStatusType transmissionResult = attemptDataTransfer();
-    latestTransmissionOutcomes().push_back(TransmissionOutcome(constConnectionQueue().back(), transmissionResult));
+    latestTransmissionOutcomes().emplace_back(constConnectionQueue().back(), transmissionResult);
 
     getTransmissionOutcomesUpdateHook()(*this);
   }
@@ -474,7 +474,7 @@ void TcpIpMeshBackend::attemptTransmission(const String &message, const bool sca
       {
         TransmissionStatusType transmissionResult = initiateTransmission(currentNetwork);
               
-        latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+        latestTransmissionOutcomes().emplace_back(currentNetwork, transmissionResult);
 
         if(!getTransmissionOutcomesUpdateHook()(*this))
           break;

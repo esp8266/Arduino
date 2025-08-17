@@ -27,18 +27,26 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "pgmspace.h"
+
 #include "debug.h"
 #include "StackThunk.h"
+
+#include <pgmspace.h>
 #include <ets_sys.h>
+
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>
 
 extern "C" {
 
+extern void optimistic_yield(uint32_t);
+
 uint32_t *stack_thunk_ptr = NULL;
 uint32_t *stack_thunk_top = NULL;
+
 uint32_t *stack_thunk_save = NULL;  /* Saved A1 while in BearSSL */
+uint32_t *stack_thunk_yield_save = NULL;  /* Saved A1 when yielding from within BearSSL */
+
 uint32_t stack_thunk_refcnt = 0;
 
 /* Largest stack usage seen in the wild at  6120 */
@@ -65,6 +73,7 @@ void stack_thunk_add_ref()
     }
     stack_thunk_top = stack_thunk_ptr + _stackSize - 1;
     stack_thunk_save = NULL;
+    stack_thunk_yield_save = NULL;
     stack_thunk_repaint();
   }
 }
@@ -82,6 +91,7 @@ void stack_thunk_del_ref()
     stack_thunk_ptr = NULL;
     stack_thunk_top = NULL;
     stack_thunk_save = NULL;
+    stack_thunk_yield_save = NULL;
   }
 }
 
@@ -149,5 +159,41 @@ void stack_thunk_fatal_smashing()
     ets_printf("FATAL ERROR: BSSL stack smashing detected\n");
     __stack_chk_fail();
 }
+
+/* Called within bearssl code instead of optimistic_yield(...) */
+void stack_thunk_yield();
+asm(
+    ".section     .text.stack_thunk_yield,\"ax\",@progbits\n\t"
+    ".literal_position\n\t"
+    ".align       4\n\t"
+    ".global      stack_thunk_yield\n\t"
+    ".type        stack_thunk_yield, @function\n\t"
+    "\n"
+"stack_thunk_yield:\n\t"
+/* Keep the original caller */
+    "addi         a1, a1, -16\n\t"
+    "s32i.n       a0, a1, 12\n\t"
+/* Swap bearssl <-> cont stacks */
+    "movi         a2, stack_thunk_yield_save\n\t"
+    "s32i.n       a1, a2, 0\n\t"
+    "movi         a2, stack_thunk_save\n\t"
+/* But, only when inside of bssl stack (saved a1 != 0) */
+    "l32i.n       a3, a2, 0\n\t"
+    "beqz         a3, stack_thunk_yield_do_yield\n\t"
+    "l32i.n       a1, a2, 0\n\t"
+/* optimistic_yield(10000) without extra l32r */
+"stack_thunk_yield_do_yield:\n\t"
+    "movi         a2, 0x10\n\t"
+    "addmi        a2, a2, 0x2700\n\t"
+    "call0        optimistic_yield\n\t"
+/* Swap bearssl <-> cont stacks, again */
+    "movi         a2, stack_thunk_yield_save\n\t"
+    "l32i.n       a1, a2, 0\n\t"
+/* Restore caller */
+    "l32i.n       a0, a1, 12\n\t"
+    "addi         a1, a1, 16\n\t"
+    "ret.n\n\t"
+    ".size stack_thunk_yield, .-stack_thunk_yield\n\t"
+);
 
 }

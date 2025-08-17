@@ -1,0 +1,1 @@
+../../../libraries/ESP8266WiFi/examples/BearSSL_CertStore/certs-from-mozilla.py

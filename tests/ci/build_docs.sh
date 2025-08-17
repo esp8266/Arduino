@@ -5,4 +5,4 @@
 set -ev
 
 root=$(git rev-parse --show-toplevel)
-env SPHINXOPTS="-W" make -C $root/doc html
+make SPHINXOPTS="--fail-on-warning" SPHINXBUILD="${SPHINXBUILD:?sphinx-build}" -C $root/doc html

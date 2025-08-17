@@ -17,7 +17,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: false
     - uses: actions/cache@v4
@@ -39,7 +39,7 @@ jobs:
         lwip: ["default", "IPv6"]
         chunk: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
     - uses: actions/setup-python@v5
@@ -52,7 +52,6 @@ jobs:
     - name: Build Sketches
       env:
         ESP8266_ARDUINO_BUILDER: "arduino"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_LWIP: ${{ matrix.lwip }}
       run: |
         bash ./tests/build.sh 8 ${{ matrix.chunk }}
@@ -63,7 +62,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: false
     - uses: actions/setup-python@v5
@@ -75,8 +74,6 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
     - name: Build Sketch
       env:
-        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
       run: |
         bash ./tests/build.sh
@@ -88,7 +85,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: false
     - uses: actions/setup-python@v5
@@ -100,8 +97,6 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('package/package_esp8266com_index.template.json', 'tests/common.sh', 'tests/build.sh') }}
     - name: Build Sketch
       env:
-        ESP8266_ARDUINO_HARDWARE: "${{ runner.temp }}/hardware"
-        ESP8266_ARDUINO_IDE: "${{ runner.temp }}/arduino_ide"
         ESP8266_ARDUINO_SKETCHES: "libraries/esp8266/examples/Blink/Blink.ino"
       run: |
         bash ./tests/build.sh

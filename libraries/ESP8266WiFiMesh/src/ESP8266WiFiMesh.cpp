@@ -535,7 +535,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
   if(WiFi.status() == WL_CONNECTED)
   {
     transmission_status_t transmissionResult = attemptDataTransfer();
-    latestTransmissionOutcomes.push_back(TransmissionResult(connectionQueue.back(), transmissionResult));
+    latestTransmissionOutcomes.emplace_back(connectionQueue.back(), transmissionResult);
   }
   else
   {
@@ -600,7 +600,7 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
 
       transmission_status_t transmissionResult = connectToNode(currentSSID, currentWiFiChannel, currentBSSID);
 
-      latestTransmissionOutcomes.push_back(TransmissionResult{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+      latestTransmissionOutcomes.emplace_back(currentNetwork, transmissionResult);
     }
   }
 
