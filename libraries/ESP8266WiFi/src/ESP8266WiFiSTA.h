@@ -28,6 +28,7 @@
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
 #include "LwipIntf.h"
+#include "smartconfig.h"
 
 
 class ESP8266WiFiSTAClass: public LwipIntf {
@@ -106,6 +107,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
 
         bool beginWPSConfig(void);
         bool beginSmartConfig();
+        void setSmartConfigDecryptFn(sc_pass_decrypt_fn_t scDecryptFn);
         bool stopSmartConfig();
         bool smartConfigDone();
 
@@ -115,7 +117,7 @@ class ESP8266WiFiSTAClass: public LwipIntf {
         static bool _smartConfigDone;
 
         static void _smartConfigCallback(uint32_t status, void* result);
-
+        static sc_pass_decrypt_fn_t _scDecryptFn;
 };
 
 
