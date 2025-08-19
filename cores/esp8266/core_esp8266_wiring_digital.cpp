@@ -82,8 +82,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void IRAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
-  stopWaveform(pin); // Disable any Tone or startWaveform on this pin
-  _stopPWM(pin);     // and any analogWrites (PWM)
+  stopWaveform(pin); // Disable any Tone, startWaveform, or analogWrite on this pin
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
