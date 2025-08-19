@@ -16,7 +16,21 @@ Methods documented for `Client <https://www.arduino.cc/en/Reference/WiFiClientCo
 9.  `flush() <https://www.arduino.cc/en/Reference/WiFiClientFlush>`__
 10. `stop() <https://www.arduino.cc/en/Reference/WiFIClientStop>`__
 
-Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
+Methods and properties described further down below are specific to ESP8266. Some of them behave differently from the reference `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ , or are only implemented for this Core.
+
+connected
+~~~~~~~~~
+
+Unlike the reference implementation, ``connected()`` means that the client is available for both reads and writes. It will return ``true`` when the client is ``status() == ESTABLISHED`` or ``available() == true``, but will return ``false`` when the ``status() == CLOSED``. Please use ``status()`` for the connection information, ``availableForWrite()`` to check whether it is possible to write, and ``available()`` if you mean to check whether there's unread data.
+
+When the remote side closes the connection e.g. we receive a fairly small payload through HTTP with ``Connection: close``, client will return ``connected() == false`` while the ``available() > 0``. Attempting to ``write()`` to such connection will not be possible, so it is expected from the sketch to check first for the ``availableForWrite() > 0``.
+
+This change was introduced with `#4626 <https://github.com/esp8266/Arduino/pull/4626>`__, part of the Core release `2.4.2 <https://github.com/esp8266/Arduino/releases/tag/2.4.2>`__
+
+status
+~~~~~~
+
+Current implementation returns ``0`` / ``CLOSED`` when the client is disconnected and ``4`` / ``ESTABLISHED`` when connected. At the time of writing these refer to the ``enum tcp_state`` values that can be found at the `lwip/tcpbase.h <https://github.com/esp8266/Arduino/blob/master/tools/sdk/lwip2/include/lwip/tcpbase.h>`__
 
 flush and stop
 ~~~~~~~~~~~~~~
@@ -122,7 +136,6 @@ Other Function Calls
 
 .. code:: cpp
 
-    uint8_t  status () 
     virtual size_t  write (const uint8_t *buf, size_t size) 
     size_t  write_P (PGM_P buf, size_t size) 
     size_t  write (Stream &stream) 
