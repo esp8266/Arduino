@@ -54,9 +54,11 @@ class String {
         String() __attribute__((always_inline)) { // See init()
             init();
         }
-        String(const char *cstr);
         String(const String &str);
-        String(const __FlashStringHelper *str);
+        String(const char *cstr);
+        String(const __FlashStringHelper *str) :
+            String(reinterpret_cast<const char *>(str))
+        {}
         String(String &&rval) noexcept;
 
         explicit String(char c) {
@@ -134,7 +136,9 @@ class String {
         String &operator =(const String &rhs);
         String &operator =(String &&rval) noexcept;
         String &operator =(const char *cstr);
-        String &operator =(const __FlashStringHelper *str);
+        String &operator =(const __FlashStringHelper *str) {
+            return *this = reinterpret_cast<const char *>(str);
+        }
         String &operator =(char c);
 
         String &operator =(unsigned char value) {
@@ -190,7 +194,9 @@ class String {
         bool concat(const String &str);
         bool concat(const char *cstr);
         bool concat(const char *cstr, unsigned int length);
-        bool concat(const __FlashStringHelper *str);
+        bool concat(const __FlashStringHelper *str) {
+            return concat(reinterpret_cast<const char *>(str));
+        }
         bool concat(char c);
 
         bool concat(unsigned char c);
@@ -218,14 +224,25 @@ class String {
         }
 
         int compareTo(const String &s) const;
+        int compareTo(const char *cstr) const;
+        int compareTo(const __FlashStringHelper *str) const {
+            return compareTo(reinterpret_cast<const char *>(str));
+        }
+
         bool equals(const String &s) const;
         bool equals(const char *cstr) const;
-        bool equals(const __FlashStringHelper *s) const;
+        bool equals(const __FlashStringHelper *str) const {
+            return equals(reinterpret_cast<const char *>(str));
+        }
+
         bool operator ==(const String &rhs) const {
             return equals(rhs);
         }
         bool operator ==(const char *cstr) const {
             return equals(cstr);
+        }
+        bool operator ==(const __FlashStringHelper *str) const {
+            return equals(str);
         }
         bool operator !=(const String &rhs) const {
             return !equals(rhs);
@@ -233,21 +250,56 @@ class String {
         bool operator !=(const char *cstr) const {
             return !equals(cstr);
         }
+        bool operator !=(const __FlashStringHelper *str) const {
+            return equals(str);
+        }
         bool operator <(const String &rhs) const;
+        bool operator <(const char *rhs) const;
+        bool operator <(const __FlashStringHelper *rhs) const {
+            return *this < reinterpret_cast<const char *>(rhs);
+        }
         bool operator >(const String &rhs) const;
+        bool operator >(const char *rhs) const;
+        bool operator >(const __FlashStringHelper *rhs) const {
+            return *this > reinterpret_cast<const char *>(rhs);
+        }
         bool operator <=(const String &rhs) const;
+        bool operator <=(const char *rhs) const;
+        bool operator <=(const __FlashStringHelper *rhs) const {
+            return *this <= reinterpret_cast<const char *>(rhs);
+        }
         bool operator >=(const String &rhs) const;
+        bool operator >=(const char *rhs) const;
+        bool operator >=(const __FlashStringHelper *rhs) const {
+            return *this >= reinterpret_cast<const char *>(rhs);
+        }
+
         bool equalsIgnoreCase(const String &s) const;
-        bool equalsIgnoreCase(const __FlashStringHelper *s) const;
+        bool equalsIgnoreCase(const char *s) const;
+        bool equalsIgnoreCase(const __FlashStringHelper *s) const {
+            return equalsIgnoreCase(reinterpret_cast<const char *>(s));
+        }
+
+        unsigned char equalsConstantTime(const char *cstr, size_t) const;
         unsigned char equalsConstantTime(const String &s) const;
+
         bool startsWith(const String &prefix) const;
         bool startsWith(const char *prefix) const;
-        bool startsWith(const __FlashStringHelper *prefix) const;
+        bool startsWith(const __FlashStringHelper *prefix) const {
+            return startsWith(reinterpret_cast<const char *>(prefix));
+        }
+
         bool startsWith(const String &prefix, unsigned int offset) const;
-        bool startsWith(const __FlashStringHelper *prefix, unsigned int offset) const;
+        bool startsWith(const char *prefix, unsigned int offset) const;
+        bool startsWith(const __FlashStringHelper *prefix, unsigned int offset) const {
+            return startsWith(reinterpret_cast<const char *>(prefix), offset);
+        }
+
         bool endsWith(const String &suffix) const;
         bool endsWith(const char *suffix) const;
-        bool endsWith(const __FlashStringHelper *suffix) const;
+        bool endsWith(const __FlashStringHelper *suffix) const {
+            return endsWith(reinterpret_cast<const char *>(suffix));
+        }
 
         // character access
         char charAt(unsigned int index) const {
@@ -256,10 +308,10 @@ class String {
         void setCharAt(unsigned int index, char c);
         char operator [](unsigned int index) const;
         char &operator [](unsigned int index);
-        void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0) const;
-        void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
-            getBytes((unsigned char *) buf, bufsize, index);
+        void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0) const {
+            toCharArray((char *)buf, bufsize, index);
         }
+        void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const;
         const char *c_str() const { return buffer(); }
         char *begin() { return wbuffer(); }
         char *end() { return wbuffer() + length(); }
@@ -270,15 +322,21 @@ class String {
         int indexOf(char ch, unsigned int fromIndex = 0) const;
         int indexOf(const char *str, unsigned int fromIndex = 0) const;
         int indexOf(const __FlashStringHelper *str, unsigned int fromIndex = 0) const {
-            return indexOf((const char*)str, fromIndex);
+            return indexOf(reinterpret_cast<const char*>(str), fromIndex);
         }
         int indexOf(const String &str, unsigned int fromIndex = 0) const;
         int lastIndexOf(char ch) const;
         int lastIndexOf(char ch, unsigned int fromIndex) const;
         int lastIndexOf(const String &str) const;
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
-        int lastIndexOf(const __FlashStringHelper *str) const;
-        int lastIndexOf(const __FlashStringHelper *str, unsigned int fromIndex) const;
+        int lastIndexOf(const char *str) const;
+        int lastIndexOf(const char *str, unsigned int fromIndex) const;
+        int lastIndexOf(const __FlashStringHelper *str) const {
+            return lastIndexOf(reinterpret_cast<const char *>(str));
+        }
+        int lastIndexOf(const __FlashStringHelper *str, unsigned int fromIndex) const {
+            return lastIndexOf(reinterpret_cast<const char *>(str), fromIndex);
+        }
         String substring(unsigned int beginIndex) const {
             return substring(beginIndex, len());
         }
@@ -287,11 +345,18 @@ class String {
         // modification
         void replace(char find, char replace);
         void replace(const String &find, const String &replace);
+        void replace(const String &find, const char *replace);
         void replace(const char *find, const String &replace);
-        void replace(const __FlashStringHelper *find, const String &replace);
+        void replace(const __FlashStringHelper *find, const String &replace) {
+            this->replace(reinterpret_cast<const char *>(find), replace);
+        }
         void replace(const char *find, const char *replace);
-        void replace(const __FlashStringHelper *find, const char *replace);
-        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace);
+        void replace(const __FlashStringHelper *find, const char *replace) {
+            this->replace(reinterpret_cast<const char *>(find), replace);
+        }
+        void replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
+            this->replace(reinterpret_cast<const char *>(find), reinterpret_cast<const char *>(replace));
+        }
 
         // Pass the biggest integer if the count is not specified.
         // The remove method below will take care of truncating it at the end of the string.
@@ -350,7 +415,6 @@ class String {
         friend String operator +(const char *lhs, String &&rhs);
         friend String operator +(const __FlashStringHelper *lhs, String &&rhs);
 
-    protected:
         // TODO: replace init() with a union constructor, so it's called implicitly
 
         void init(void) __attribute__((always_inline)) {
@@ -377,11 +441,23 @@ class String {
 
         // copy or insert at a specific position
         String &copy(const char *cstr, unsigned int length);
-        String &copy(const __FlashStringHelper *pstr, unsigned int length);
+        String &copy(const __FlashStringHelper *str, unsigned int length) {
+            return copy(reinterpret_cast<const char *>(str), length);
+        }
+
+        int compareTo(const char *str, size_t length) const;
+        bool equalsIgnoreCase(const char *str, size_t length) const;
+        bool startsWith(const char *str, size_t length, unsigned int offset) const;
+        bool endsWith(const char *str, size_t length) const;
+        int lastIndexOf(const char *str, size_t length, unsigned int fromIndex) const;
+
+        void replace(const char *find, size_t find_len, const char *replace, size_t replace_len);
 
         String &insert(size_t position, char);
         String &insert(size_t position, const char *);
-        String &insert(size_t position, const __FlashStringHelper *);
+        String &insert(size_t position, const __FlashStringHelper *str) {
+            return insert(position, reinterpret_cast<const char *>(str));
+        }
         String &insert(size_t position, const char *, size_t length);
         String &insert(size_t position, const String &);
 
@@ -432,11 +508,6 @@ inline String operator +(char lhs, String &&rhs) {
     return std::move(rhs.insert(0, lhs));
 }
 
-// both `char*` and `__FlashStringHelper*` are implicitly converted into `String()`, calling the `operator+(const String& ...);`
-// however, here we:
-// - do an automatic `reserve(total length)` for the resulting string
-// - possibly do rhs.insert(0, ...), when &&rhs capacity could fit both
-
 String operator +(const char *lhs, const String &rhs);
 
 inline String operator +(const char *lhs, String &&rhs) {
@@ -444,11 +515,11 @@ inline String operator +(const char *lhs, String &&rhs) {
 }
 
 inline String operator +(const __FlashStringHelper *lhs, const String &rhs) {
-    return reinterpret_cast<const char*>(lhs) + rhs;
+    return reinterpret_cast<const char *>(lhs) + rhs;
 }
 
 inline String operator +(const __FlashStringHelper *lhs, String &&rhs) {
-    return std::move(rhs.insert(0, lhs));
+    return std::move(rhs.insert(0, reinterpret_cast<const char *>(lhs)));
 }
 
 extern const String emptyString;
