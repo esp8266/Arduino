@@ -120,7 +120,7 @@ void crash_system_prepare_rst_info(rst_info *rst_info, uint32_t user_reset_reaso
     // at this point, check SDK that may have a prepared reset struct
     if (user_reset_reason == REASON_DEFAULT_RST)
     {
-        __asm__ __volatile__("memw\n\t" ::: "memory");
+        __asm__ __volatile__("memw" ::: "memory");
         memcpy(rst_info, rtc_sys, sizeof(*rst_info));
         switch (rst_info->reason) {
         case REASON_SOFT_WDT_RST:
@@ -152,7 +152,7 @@ void crash_system_prepare_rst_info(rst_info *rst_info, uint32_t user_reset_reaso
     // make sure our modifications persist on reboot
     memcpy(rtc_sys, rst_info,
         sizeof(rst_info->reason) + sizeof(rst_info->exccause));
-    __asm__ __volatile__("memw\n\t" ::: "memory");
+    __asm__ __volatile__("memw" ::: "memory");
 }
 
 } // namespace
