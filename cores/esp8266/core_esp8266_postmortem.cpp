@@ -517,9 +517,8 @@ void __unhandled_exception(const char *what) {
     raise_exception();
 }
 
-[[noreturn]]
-static inline void __panic_impl(const char *, const char *, int, const char *, const char *)
-    __attribute__((always_inline));
+static inline void __panic_impl(user_rst_reason, const char *, int, const char *, const char *)
+    __attribute__((noreturn, always_inline));
 static inline void __panic_impl(user_rst_reason reason, const char *file, int line, const char *func, const char *what) {
     s_user_reset_reason = reason;
     s_panic_file = file;
