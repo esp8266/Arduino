@@ -13,7 +13,7 @@
  all copies or substantial portions of the Software.
 */
 
-#include <catch.hpp>
+#include <ArduinoCatch.hpp>
 #include <map>
 #include <FS.h>
 #include "../common/spiffs_mock.h"
