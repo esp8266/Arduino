@@ -494,7 +494,7 @@ String operator +(const char *lhs, const String &rhs) {
 int String::compareTo(const char *cstr, unsigned int length) const {
     const auto min_len = std::min(len(), length);
     int res = strncmp_P(buffer(), cstr, min_len);
-    if (!res)
+    if (res)
         return res;
 
     if (len() < length)
