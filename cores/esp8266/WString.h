@@ -225,12 +225,14 @@ class String {
 
         int compareTo(const String &s) const;
         int compareTo(const char *cstr) const;
+        int compareTo(const char *str, unsigned int length) const;
         int compareTo(const __FlashStringHelper *str) const {
             return compareTo(reinterpret_cast<const char *>(str));
         }
 
         bool equals(const String &s) const;
         bool equals(const char *cstr) const;
+        bool equals(const char *cstr, unsigned int length) const;
         bool equals(const __FlashStringHelper *str) const {
             return equals(reinterpret_cast<const char *>(str));
         }
@@ -276,12 +278,13 @@ class String {
 
         bool equalsIgnoreCase(const String &s) const;
         bool equalsIgnoreCase(const char *s) const;
+        bool equalsIgnoreCase(const char *str, unsigned int length) const;
         bool equalsIgnoreCase(const __FlashStringHelper *s) const {
             return equalsIgnoreCase(reinterpret_cast<const char *>(s));
         }
 
-        unsigned char equalsConstantTime(const char *cstr, size_t) const;
         unsigned char equalsConstantTime(const String &s) const;
+        unsigned char equalsConstantTime(const char *cstr, unsigned int length) const;
 
         bool startsWith(const String &prefix) const;
         bool startsWith(const char *prefix) const;
@@ -291,12 +294,14 @@ class String {
 
         bool startsWith(const String &prefix, unsigned int offset) const;
         bool startsWith(const char *prefix, unsigned int offset) const;
+        bool startsWith(const char *str, unsigned int length, unsigned int offset) const;
         bool startsWith(const __FlashStringHelper *prefix, unsigned int offset) const {
             return startsWith(reinterpret_cast<const char *>(prefix), offset);
         }
 
         bool endsWith(const String &suffix) const;
         bool endsWith(const char *suffix) const;
+        bool endsWith(const char *str, unsigned int length) const;
         bool endsWith(const __FlashStringHelper *suffix) const {
             return endsWith(reinterpret_cast<const char *>(suffix));
         }
@@ -331,6 +336,8 @@ class String {
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
         int lastIndexOf(const char *str) const;
         int lastIndexOf(const char *str, unsigned int fromIndex) const;
+        int lastIndexOf(const char *str, unsigned int length, unsigned int fromIndex) const;
+
         int lastIndexOf(const __FlashStringHelper *str) const {
             return lastIndexOf(reinterpret_cast<const char *>(str));
         }
@@ -445,13 +452,7 @@ class String {
             return copy(reinterpret_cast<const char *>(str), length);
         }
 
-        int compareTo(const char *str, size_t length) const;
-        bool equalsIgnoreCase(const char *str, size_t length) const;
-        bool startsWith(const char *str, size_t length, unsigned int offset) const;
-        bool endsWith(const char *str, size_t length) const;
-        int lastIndexOf(const char *str, size_t length, unsigned int fromIndex) const;
-
-        void replace(const char *find, size_t find_len, const char *replace, size_t replace_len);
+        void replace(const char *find, unsigned int find_len, const char *replace, unsigned int replace_len);
 
         String &insert(size_t position, char);
         String &insert(size_t position, const char *);

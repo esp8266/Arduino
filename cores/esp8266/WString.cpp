@@ -491,7 +491,7 @@ String operator +(const char *lhs, const String &rhs) {
 /*  Comparison                               */
 /*********************************************/
 
-int String::compareTo(const char *cstr, size_t length) const {
+int String::compareTo(const char *cstr, unsigned int length) const {
     const auto min_len = std::min(len(), length);
     int res = strncmp_P(buffer(), cstr, min_len);
     if (!res)
@@ -521,7 +521,7 @@ bool String::equals(const char *cstr) const {
     return equals(cstr, strlen_P(cstr));
 }
 
-bool String::equals(const char *cstr, size_t length) const {
+bool String::equals(const char *cstr, unsigned int length) const {
     if (!cstr)
         return false;
 
@@ -561,7 +561,7 @@ bool String::operator>=(const char *rhs) const {
     return compareTo(rhs) >= 0;
 }
 
-bool String::equalsIgnoreCase(const char *str, size_t length) const {
+bool String::equalsIgnoreCase(const char *cstr, unsigned int length) const {
     if (len() != length)
         return false;
     if (!cstr || !length)
@@ -579,7 +579,7 @@ bool String::equalsIgnoreCase(const char *s) const {
     return equalsIgnoreCase(s, strlen_P(s));
 }
 
-unsigned char String::equalsConstantTime(const char *str, size_t length) const {
+unsigned char String::equalsConstantTime(const char *str, unsigned int length) const {
     // To avoid possible time-based attacks present function
     // compares given strings in a constant time.
     if (len() != length)
@@ -610,7 +610,7 @@ unsigned char String::equalsConstantTime(const String& s) const {
     return equalsConstantTime(s.buffer(), s.len());
 }
 
-bool String::startsWith(const char *str, size_t length, unsigned int offset) const {
+bool String::startsWith(const char *str, unsigned int length, unsigned int offset) const {
     if (!buffer() || !str)
         return false;
     if (len() < length)
@@ -636,7 +636,7 @@ bool String::startsWith(const char *prefix, unsigned int offset) const {
     return startsWith(prefix, strlen_P(prefix), offset);
 }
 
-bool String::endsWith(const char *str, size_t length) const {
+bool String::endsWith(const char *str, unsigned int length) const {
     if (!buffer() || !str)
         return false;
     if (len() < length)
@@ -728,7 +728,7 @@ int String::lastIndexOf(char ch, unsigned int fromIndex) const {
     return index;
 }
 
-int String::lastIndexOf(const char *str, size_t length, unsigned int fromIndex) const {
+int String::lastIndexOf(const char *str, unsigned int length, unsigned int fromIndex) const {
     if (!len() || !length || length > len())
         return -1;
     if (fromIndex >= len())
@@ -789,7 +789,7 @@ void String::replace(char find, char replace) {
     }
 }
 
-void String::replace(const char *find, size_t find_len, const char *replace, size_t replace_len) {
+void String::replace(const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
     if (len() == 0 || find_len == 0)
         return;
     int diff = replace_len - find_len;
