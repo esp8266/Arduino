@@ -600,7 +600,8 @@ TEST_CASE("String chaining", "[core][String]")
         String tmp(chunks[3]);
         tmp.reserve(2 * all.length());
         auto*  ptr = tmp.c_str();
-        String result("~1" + String(&chunks[0][0] + 2) + FPSTR(chunks[1]) + chunks[2] + std::move(tmp));
+        String result("~1" + String(&chunks[0][0] + 2) + FPSTR(chunks[1]) + chunks[2]
+                      + std::move(tmp));
         REQUIRE(result == all);
         REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
     }
