@@ -509,6 +509,8 @@ inline String operator +(char lhs, String &&rhs) {
     return std::move(rhs.insert(0, lhs));
 }
 
+// Similarly, allow c-strings and `F(...)` as both lhs and rhs
+
 String operator +(const char *lhs, const String &rhs);
 
 inline String operator +(const char *lhs, String &&rhs) {
@@ -520,7 +522,7 @@ inline String operator +(const __FlashStringHelper *lhs, const String &rhs) {
 }
 
 inline String operator +(const __FlashStringHelper *lhs, String &&rhs) {
-    return std::move(rhs.insert(0, reinterpret_cast<const char *>(lhs)));
+    return reinterpret_cast<const char *>(lhs) + std::move(rhs);
 }
 
 extern const String emptyString;
