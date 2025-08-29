@@ -27,6 +27,10 @@
 
 #include <limits>
 
+/*********************************************/
+/*  OOM Debugging                            */
+/*********************************************/
+
 #define OOM_STRING_BORDER_DISPLAY           10
 #define OOM_STRING_THRESHOLD_REALLOC_WARN  128
 
@@ -128,11 +132,6 @@ String::String(const char *cstr) {
 String::String(const String &value) {
     init();
     *this = value;
-}
-
-String::String(const __FlashStringHelper *pstr) {
-    init();
-    *this = pstr; // see operator =
 }
 
 String::String(String &&rval) noexcept {
@@ -281,17 +280,6 @@ String &String::copy(const char *cstr, unsigned int length) {
     return *this;
 }
 
-String &String::copy(const __FlashStringHelper *pstr, unsigned int length) {
-    if (!reserve(length)) {
-        invalidate();
-        return *this;
-    }
-    setLen(length);
-    memcpy_P(wbuffer(), (PGM_P)pstr, length); // We know wbuffer() cannot ever be in PROGMEM, so memcpy safe here
-    wbuffer()[length] = 0;
-    return *this;
-}
-
 void String::move(String &rhs) noexcept {
     invalidate();
     sso = rhs.sso;
@@ -316,15 +304,7 @@ String &String::operator =(String &&rval) noexcept {
 
 String &String::operator =(const char *cstr) {
     if (cstr)
-        copy(cstr, strlen(cstr));
-    else
-        invalidate();
-    return *this;
-}
-
-String &String::operator =(const __FlashStringHelper *pstr) {
-    if (pstr)
-        copy(pstr, strlen_P((PGM_P)pstr));
+        copy(cstr, strlen_P(cstr));
     else
         invalidate();
     return *this;
@@ -343,7 +323,7 @@ String &String::operator =(char c) {
 bool String::concat(const String &s) {
     // Special case if we're concatting ourself (s += s;) since we may end up
     // realloc'ing the buffer and moving s.buffer in the method called
-    if (&s == this) {
+    if (this == &s) {
         unsigned int newlen = 2 * len();
         if (!s.buffer())
             return false;
@@ -377,7 +357,7 @@ bool String::concat(const char *cstr, unsigned int length) {
 bool String::concat(const char *cstr) {
     if (!cstr)
         return false;
-    return concat(cstr, strlen(cstr));
+    return concat(cstr, strlen_P(cstr));
 }
 
 bool String::concat(char c) {
@@ -420,21 +400,6 @@ bool String::concat(double num) {
     return concat(String(num));
 }
 
-bool String::concat(const __FlashStringHelper *str) {
-    if (!str)
-        return false;
-    int length = strlen_P((PGM_P)str);
-    if (length == 0)
-        return true;
-    unsigned int newlen = len() + length;
-    if (!reserve(newlen))
-        return false;
-    memcpy_P(wbuffer() + len(), (PGM_P)str, length);
-    setLen(newlen);
-    wbuffer()[newlen] = 0;
-    return true;
-}
-
 /*********************************************/
 /*  Insert                                   */
 /*********************************************/
@@ -457,11 +422,6 @@ String &String::insert(size_t position, const char *other, size_t other_length) 
     wbuffer()[total] = '\0';
 
     return *this;
-}
-
-String &String::insert(size_t position, const __FlashStringHelper *other) {
-    auto *p = reinterpret_cast<const char*>(other);
-    return insert(position, p, strlen_P(p));
 }
 
 String &String::insert(size_t position, char other) {
@@ -518,9 +478,12 @@ String operator +(char lhs, const String &rhs) {
 
 String operator +(const char *lhs, const String &rhs) {
     String res;
-    res.reserve(strlen_P(lhs) + rhs.length());
-    res += lhs;
-    res += rhs;
+
+    const auto lhs_len = strlen_P(lhs);
+    res.reserve(lhs_len + rhs.length());
+    res.concat(lhs, lhs_len);
+    res.concat(rhs);
+
     return res;
 }
 
@@ -528,84 +491,109 @@ String operator +(const char *lhs, const String &rhs) {
 /*  Comparison                               */
 /*********************************************/
 
-int String::compareTo(const String &s) const {
-    if (!buffer() || !s.buffer()) {
-        if (s.buffer() && s.len() > 0)
-            return 0 - *(unsigned char *)s.buffer();
-        if (buffer() && len() > 0)
-            return *(unsigned char *)buffer();
-        return 0;
-    }
-    return strcmp(buffer(), s.buffer());
+int String::compareTo(const char *cstr, unsigned int length) const {
+    const auto min_len = std::min(len(), length);
+    int res = strncmp_P(buffer(), cstr, min_len);
+    if (res)
+        return res;
+
+    if (len() < length)
+        return -1;
+    if (len() > length)
+        return 1;
+
+    return 0;
 }
 
-bool String::equals(const String &s2) const {
-    return (len() == s2.len() && compareTo(s2) == 0);
+int String::compareTo(const String &s) const {
+    return compareTo(s.buffer(), s.len());
+}
+
+int String::compareTo(const char *cstr) const {
+    return compareTo(cstr, strlen_P(cstr));
+}
+
+bool String::equals(const String &s) const {
+    return equals(s.buffer(), s.len());
 }
 
 bool String::equals(const char *cstr) const {
-    if (len() == 0)
-        return (cstr == NULL || *cstr == 0);
-    if (cstr == NULL)
-        return buffer()[0] == 0;
-    return strcmp(buffer(), cstr) == 0;
+    return equals(cstr, strlen_P(cstr));
 }
 
-bool String::equals(const __FlashStringHelper *s) const {
-    return equals(String(s));
+bool String::equals(const char *cstr, unsigned int length) const {
+    if (!cstr)
+        return false;
+
+    const auto same_length = len() == length;
+    if (same_length && length == 0)
+        return true;
+
+    return same_length
+        && strncmp_P(buffer(), cstr, length) == 0;
 }
 
 bool String::operator<(const String &rhs) const {
+    return compareTo(rhs) < 0;
+}
+bool String::operator<(const char *rhs) const {
     return compareTo(rhs) < 0;
 }
 
 bool String::operator>(const String &rhs) const {
     return compareTo(rhs) > 0;
 }
+bool String::operator>(const char *rhs) const {
+    return compareTo(rhs) > 0;
+}
 
 bool String::operator<=(const String &rhs) const {
+    return compareTo(rhs) <= 0;
+}
+bool String::operator<=(const char *rhs) const {
     return compareTo(rhs) <= 0;
 }
 
 bool String::operator>=(const String &rhs) const {
     return compareTo(rhs) >= 0;
 }
+bool String::operator>=(const char *rhs) const {
+    return compareTo(rhs) >= 0;
+}
 
-bool String::equalsIgnoreCase(const String &s2) const {
-    if (this == &s2)
-        return true;
-    if (len() != s2.len())
+bool String::equalsIgnoreCase(const char *cstr, unsigned int length) const {
+    if (len() != length)
         return false;
-    if (len() == 0)
+    if (!cstr || !length)
         return true;
-    const char *p1 = buffer();
-    const char *p2 = s2.buffer();
-    while (*p1) {
-        if (tolower(*p1++) != tolower(*p2++))
-            return false;
-    }
-    return true;
+    return strncasecmp_P(buffer(), cstr, length) == 0;
 }
 
-bool String::equalsIgnoreCase(const __FlashStringHelper *s) const {
-    return equalsIgnoreCase(String(s));
+bool String::equalsIgnoreCase(const String &s) const {
+    if (this == &s)
+        return true;
+    return equalsIgnoreCase(s.buffer(), s.len());
 }
 
-unsigned char String::equalsConstantTime(const String &s2) const {
+bool String::equalsIgnoreCase(const char *s) const {
+    return equalsIgnoreCase(s, strlen_P(s));
+}
+
+unsigned char String::equalsConstantTime(const char *str, unsigned int length) const {
     // To avoid possible time-based attacks present function
     // compares given strings in a constant time.
-    if (len() != s2.len())
+    if (len() != length)
         return 0;
     //at this point lengths are the same
-    if (len() == 0)
+    if (length == 0)
         return 1;
     //at this point lengths are the same and non-zero
     const char *p1 = buffer();
-    const char *p2 = s2.buffer();
+    const char *p2 = str;
     unsigned int equalchars = 0;
     unsigned int diffchars = 0;
     while (*p1) {
-        if (*p1 == *p2)
+        if (*p1 == pgm_read_byte(p2))
             ++equalchars;
         else
             ++diffchars;
@@ -618,42 +606,51 @@ unsigned char String::equalsConstantTime(const String &s2) const {
     return (equalcond & diffcond); //bitwise AND
 }
 
-bool String::startsWith(const String &s2) const {
-    if (len() < s2.len())
+unsigned char String::equalsConstantTime(const String& s) const {
+    return equalsConstantTime(s.buffer(), s.len());
+}
+
+bool String::startsWith(const char *str, unsigned int length, unsigned int offset) const {
+    if (!buffer() || !str)
         return false;
-    return startsWith(s2, 0);
+    if (len() < length)
+        return false;
+    if (offset > (unsigned)(len() - length))
+        return false;
+    return strncmp_P(&buffer()[offset], str, length) == 0;
+}
+
+bool String::startsWith(const String &prefix) const {
+    return startsWith(prefix, 0);
 }
 
 bool String::startsWith(const char *prefix) const {
-    return this->startsWith(String(prefix));
-}
-bool String::startsWith(const __FlashStringHelper *prefix) const {
-    return this->startsWith(String(prefix));
+    return startsWith(prefix, 0);
 }
 
-bool String::startsWith(const String &s2, unsigned int offset) const {
-    if (offset > (unsigned)(len() - s2.len()) || !buffer() || !s2.buffer())
+bool String::startsWith(const String &prefix, unsigned int offset) const {
+    return startsWith(prefix.buffer(), prefix.len(), offset);
+}
+
+bool String::startsWith(const char *prefix, unsigned int offset) const {
+    return startsWith(prefix, strlen_P(prefix), offset);
+}
+
+bool String::endsWith(const char *str, unsigned int length) const {
+    if (!buffer() || !str)
         return false;
-    return strncmp(&buffer()[offset], s2.buffer(), s2.len()) == 0;
-}
-
-bool String::startsWith(const __FlashStringHelper *prefix, unsigned int offset) const {
-    return startsWith(String(prefix), offset);
-}
-
-bool String::endsWith(const String &s2) const {
-    if (len() < s2.len() || !buffer() || !s2.buffer())
+    if (len() < length)
         return false;
-    return strcmp(&buffer()[len() - s2.len()], s2.buffer()) == 0;
+    return strncmp_P(&buffer()[len() - length], str, length) == 0;
+}
+
+bool String::endsWith(const String &suffix) const {
+    return endsWith(suffix.buffer(), suffix.len());
 }
 
 bool String::endsWith(const char *suffix) const {
-    return this->endsWith(String(suffix));
+    return endsWith(suffix, strlen_P(suffix));
 }
-bool String::endsWith(const __FlashStringHelper *suffix) const {
-    return this->endsWith(String(suffix));
-}
-
 
 /*********************************************/
 /*  Character Access                         */
@@ -679,7 +676,7 @@ char String::operator[](unsigned int index) const {
     return buffer()[index];
 }
 
-void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index) const {
+void String::toCharArray(char *buf, unsigned int bufsize, unsigned int index) const {
     if (!bufsize || !buf)
         return;
     if (index >= len()) {
@@ -689,7 +686,7 @@ void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int ind
     unsigned int n = bufsize - 1;
     if (n > len() - index)
         n = len() - index;
-    strncpy((char *)buf, buffer() + index, n);
+    strncpy(buf, buffer() + index, n);
     buf[n] = 0;
 }
 
@@ -716,7 +713,7 @@ int String::indexOf(const char *s2, unsigned int fromIndex) const {
 }
 
 int String::indexOf(const String &s2, unsigned int fromIndex) const {
-    return indexOf(s2.c_str(), fromIndex);
+    return indexOf(s2.buffer(), fromIndex);
 }
 
 int String::lastIndexOf(char ch) const {
@@ -731,18 +728,14 @@ int String::lastIndexOf(char ch, unsigned int fromIndex) const {
     return index;
 }
 
-int String::lastIndexOf(const String &s2) const {
-    return lastIndexOf(s2, len() - s2.len());
-}
-
-int String::lastIndexOf(const String &s2, unsigned int fromIndex) const {
-    if (s2.len() == 0 || len() == 0 || s2.len() > len())
+int String::lastIndexOf(const char *str, unsigned int length, unsigned int fromIndex) const {
+    if (!len() || !length || length > len())
         return -1;
     if (fromIndex >= len())
         fromIndex = len() - 1;
     int found = -1;
     for (const char *p = buffer(); p <= buffer() + fromIndex; p++) {
-        p = strstr(p, s2.buffer());
+        p = strstr_P(p, str);
         if (!p)
             break;
         if ((unsigned int)(p - buffer()) <= fromIndex)
@@ -751,14 +744,22 @@ int String::lastIndexOf(const String &s2, unsigned int fromIndex) const {
     return found;
 }
 
-int String::lastIndexOf(const __FlashStringHelper *str) const {
-    return lastIndexOf(String(str));
+int String::lastIndexOf(const String &str) const {
+    return lastIndexOf(str, len() - str.len());
 }
 
-int String::lastIndexOf(const __FlashStringHelper *str, unsigned int fromIndex) const {
-    return lastIndexOf(String(str), fromIndex);
+int String::lastIndexOf(const String &str, unsigned int fromIndex) const {
+    return lastIndexOf(str.buffer(), str.len(), fromIndex);
 }
 
+int String::lastIndexOf(const char *str) const {
+    const auto length = strlen_P(str);
+    return lastIndexOf(str, length, len() - length);
+}
+
+int String::lastIndexOf(const char *str, unsigned int fromIndex) const {
+    return lastIndexOf(str, strlen_P(str), fromIndex);
+}
 
 String String::substring(unsigned int left, unsigned int right) const {
     if (left > right) {
@@ -788,33 +789,33 @@ void String::replace(char find, char replace) {
     }
 }
 
-void String::replace(const String &find, const String &replace) {
-    if (len() == 0 || find.len() == 0)
+void String::replace(const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
+    if (len() == 0 || find_len == 0)
         return;
-    int diff = replace.len() - find.len();
-    char *readFrom = wbuffer();
-    char *foundAt;
+    int diff = replace_len - find_len;
+    const char *readFrom = buffer();
+    const char *foundAt;
     if (diff == 0) {
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            memmove_P(foundAt, replace.buffer(), replace.len());
-            readFrom = foundAt + replace.len();
+        while ((foundAt = strstr_P(readFrom, find)) != NULL) {
+            memmove_P(const_cast<char *>(foundAt), replace, replace_len);
+            readFrom = foundAt + replace_len;
         }
     } else if (diff < 0) {
         char *writeTo = wbuffer();
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
+        while ((foundAt = strstr_P(readFrom, find)) != NULL) {
             unsigned int n = foundAt - readFrom;
             memmove_P(writeTo, readFrom, n);
             writeTo += n;
-            memmove_P(writeTo, replace.buffer(), replace.len());
-            writeTo += replace.len();
-            readFrom = foundAt + find.len();
+            memmove_P(writeTo, replace, replace_len);
+            writeTo += replace_len;
+            readFrom = foundAt + find_len;
             setLen(len() + diff);
         }
         memmove_P(writeTo, readFrom, strlen(readFrom) + 1);
     } else {
         unsigned int size = len(); // compute size needed for result
-        while ((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            readFrom = foundAt + find.len();
+        while ((foundAt = strstr_P(readFrom, find)) != NULL) {
+            readFrom = foundAt + find_len;
             size += diff;
         }
         if (size == len())
@@ -823,10 +824,10 @@ void String::replace(const String &find, const String &replace) {
             return;
         int index = len() - 1;
         while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
-            readFrom = wbuffer() + index + find.len();
-            memmove_P(readFrom + diff, readFrom, len() - (readFrom - buffer()));
+            readFrom = wbuffer() + index + find_len;
+            memmove_P(const_cast<char *>(readFrom) + diff, readFrom, len() - (readFrom - buffer()));
             int newLen = len() + diff;
-            memmove_P(wbuffer() + index, replace.buffer(), replace.len());
+            memmove_P(wbuffer() + index, replace, replace_len);
             setLen(newLen);
             wbuffer()[newLen] = 0;
             index--;
@@ -834,23 +835,18 @@ void String::replace(const String &find, const String &replace) {
     }
 }
 
-
-void String::replace(const char *find, const String &replace) {
-    this->replace(String(find), replace);
+void String::replace(const String &find, const String &replace) {
+    this->replace(find.buffer(), find.len(), replace.buffer(), replace.len());
 }
-void String::replace(const __FlashStringHelper *find, const String &replace) {
-    this->replace(String(find), replace);
+void String::replace(const String& find, const char *replace) {
+    this->replace(find.buffer(), find.len(), replace, strlen_P(replace));
+}
+void String::replace(const char *find, const String &replace) {
+    this->replace(find, strlen_P(find), replace.buffer(), replace.len());
 }
 void String::replace(const char *find, const char *replace) {
-    this->replace(String(find), String(replace));
+    this->replace(find, strlen_P(find), replace, strlen_P(replace));
 }
-void String::replace(const __FlashStringHelper *find, const char *replace) {
-    this->replace(String(find), String(replace));
-}
-void String::replace(const __FlashStringHelper *find, const __FlashStringHelper *replace) {
-    this->replace(String(find), String(replace));
-}
-
 
 void String::remove(unsigned int index, unsigned int count) {
     if (index >= len()) {
