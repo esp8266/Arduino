@@ -187,11 +187,14 @@ TEST_CASE("String concantenation", "[core][String]")
 TEST_CASE("String comparison", "[core][String]")
 {
     String alpha("I like fish!");
-    REQUIRE(alpha < "I like tacos!");
-    REQUIRE(alpha > "I like bacon!");
+    REQUIRE(alpha < "I like tacos!"); // compareTo()
+    REQUIRE(alpha > "I like cod!");
+    REQUIRE(alpha >= "I like beef!");
+    REQUIRE(alpha <= "I like soup!");
     REQUIRE(alpha.equalsIgnoreCase("i LiKe FiSh!"));
+    REQUIRE(!alpha.equalsIgnoreCase("i LiKe FiSh! And ChIPs!"));
     REQUIRE(alpha.equalsConstantTime("I like fish!"));
-    REQUIRE(alpha != "I like fish?");
+    REQUIRE(alpha != "I like fish?"); // equals()
     REQUIRE(alpha.startsWith("I like"));
     REQUIRE(!alpha.startsWith("I lick"));
     REQUIRE(alpha.startsWith("fish", 7));
