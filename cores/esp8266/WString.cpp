@@ -492,15 +492,17 @@ String operator +(const char *lhs, const String &rhs) {
 /*********************************************/
 
 int String::compareTo(const char *cstr, size_t length) const {
-    if (!buffer() || !cstr) {
-        if (cstr && length > 0)
-            return 0 - static_cast<int>(pgm_read_byte(cstr));
-        if (buffer() && len() > 0)
-            return static_cast<int>(buffer()[0]);
-        return 0;
-    }
+    const auto min_len = std::min(len(), length);
+    int res = strncmp_P(buffer(), cstr, min_len);
+    if (!res)
+        return res;
 
-    return strncmp_P(buffer(), cstr, len());
+    if (len() < length)
+        return -1;
+    if (len() > length)
+        return 1;
+
+    return 0;
 }
 
 int String::compareTo(const String &s) const {
@@ -512,15 +514,23 @@ int String::compareTo(const char *cstr) const {
 }
 
 bool String::equals(const String &s) const {
-    return (len() == s.len() && compareTo(s) == 0);
+    return equals(s.buffer(), s.len());
 }
 
 bool String::equals(const char *cstr) const {
-    if (len() == 0)
-        return (cstr == NULL || pgm_read_byte(cstr) == 0);
-    if (cstr == NULL)
-        return buffer()[0] == 0;
-    return strncmp_P(buffer(), cstr, len()) == 0;
+    return equals(cstr, strlen_P(cstr));
+}
+
+bool String::equals(const char *cstr, size_t length) const {
+    if (!cstr)
+        return false;
+
+    const auto same_length = len() == length;
+    if (same_length && length == 0)
+        return true;
+
+    return same_length
+        && strncmp_P(buffer(), cstr, length) == 0;
 }
 
 bool String::operator<(const String &rhs) const {
@@ -554,9 +564,9 @@ bool String::operator>=(const char *rhs) const {
 bool String::equalsIgnoreCase(const char *str, size_t length) const {
     if (len() != length)
         return false;
-    if (length == 0)
+    if (!cstr || !length)
         return true;
-    return strncasecmp_P(buffer(), str, length) == 0;
+    return strncasecmp_P(buffer(), cstr, length) == 0;
 }
 
 bool String::equalsIgnoreCase(const String &s) const {
