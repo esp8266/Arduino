@@ -75,18 +75,33 @@ extern int umm_last_fail_alloc_line;
 
 static void raise_exception() __attribute__((noreturn));
 
-extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
+extern void __custom_crash_callback(struct rst_info * rst_info, uint32_t stack, uint32_t stack_end) {
     (void) rst_info;
     (void) stack;
     (void) stack_end;
 }
 
-extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
+extern void __custom_panic_callback(const char* panic_file, int panic_line, const char* panic_func, const char* panic_what) {
+    (void) panic_file;
+    (void) panic_line;
+    (void) panic_func;
+    (void) panic_what;
+}
 
+extern void __ets_uart_putc1(char c) {
+    ets_uart_putc1(c);
+}
+
+extern void custom_crash_callback(struct rst_info * rst_info, uint32_t stack, uint32_t stack_end) __attribute__ ((weak, alias("__custom_crash_callback")));
+
+extern void custom_panic_callback(const char* panic_file, int panic_line, const char* panic_func, const char* panic_what) __attribute__ ((weak, alias("__custom_panic_callback")));
+
+extern void crash_ets_uart_putc1(char c) __attribute__((weak, alias("__ets_uart_putc1")));
 
 // Prints need to use our library function to allow for file and function
 // to be safely accessed from flash. This function encapsulates snprintf()
-// [which by definition will 0-terminate] and dumping to the UART
+// [which by definition will 0-terminate] and dumping to the UART, or the
+// user-specified function.
 static void ets_printf_P(const char *str, ...) {
     char destStr[160];
     char *c = destStr;
@@ -95,22 +110,28 @@ static void ets_printf_P(const char *str, ...) {
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c) {
-        ets_uart_putc1(*(c++));
+        crash_ets_uart_putc1(*(c++));
     }
 }
 
+static inline void ets_println() { ets_printf_P(PSTR("\n")); }
+
 static void cut_here() {
+#ifdef NO_CUT_HERE
+    return;
+#endif
+
     // https://tinyurl.com/8266dcdr => https://arduino-esp8266.readthedocs.io/en/latest/faq/a02-my-esp-crashes.html#exception
     ets_printf_P(PSTR("\nTo make this dump useful, DECODE IT - https://tinyurl.com/8266dcdr\n"));
 
     for (auto i = 0; i < 15; i++ ) {
-        ets_putc('-');
+        crash_ets_uart_putc1('-');
     }
     ets_printf_P(PSTR(" CUT HERE FOR EXCEPTION DECODER "));
     for (auto i = 0; i < 15; i++ ) {
-        ets_putc('-');
+        crash_ets_uart_putc1('-');
     }
-    ets_putc('\n');
+    ets_println();
 }
 
 static inline bool is_pc_valid(uint32_t pc) {
@@ -152,6 +173,7 @@ static void postmortem_report(uint32_t sp_dump) {
     else
         rst_info.reason = s_user_reset_reason;
 
+    // redirect the output to both UARTs
     ets_install_putc1(&uart_write_char_d);
 
     cut_here();
@@ -161,7 +183,7 @@ static void postmortem_report(uint32_t sp_dump) {
         if (s_panic_what) {
             ets_printf_P(PSTR(": Assertion '%S' failed."), s_panic_what);
         }
-        ets_putc('\n');
+        ets_println();
     }
     else if (s_panic_file) {
         ets_printf_P(PSTR("\nPanic %S\n"), s_panic_file);
@@ -176,16 +198,15 @@ static void postmortem_report(uint32_t sp_dump) {
         // The GCC divide routine in ROM jumps to the address below and executes ILL (00 00 00) on div-by-zero
         // In that case, print the exception as (6) which is IntegerDivZero
         uint32_t epc1 = rst_info.epc1;
-        uint32_t exccause = rst_info.exccause;
-        bool div_zero = (exccause == 0) && (epc1 == 0x4000dce5u);
+        const bool div_zero = (rst_info.exccause == 0) && (epc1 == 0x4000dce5u);
         if (div_zero) {
-            exccause = 6;
+            rst_info.exccause = 6;
             // In place of the detached 'ILL' instruction., redirect attention
             // back to the code that called the ROM divide function.
             __asm__ __volatile__("rsr.excsave1 %0\n\t" : "=r"(epc1) :: "memory");
         }
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
-            exccause, epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
+            rst_info.exccause, epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
         ets_printf_P(PSTR("\nSoft WDT reset"));
@@ -194,7 +215,7 @@ static void postmortem_report(uint32_t sp_dump) {
             // The SDK is riddled with these. They are usually preceded by an ets_printf.
             ets_printf_P(PSTR(" - deliberate infinite loop detected"));
         }
-        ets_putc('\n');
+        ets_println();
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
             rst_info.exccause, /* Address executing at time of Soft WDT level-1 interrupt */ rst_info.epc1, 0, 0, 0, 0);
     }
@@ -229,7 +250,7 @@ static void postmortem_report(uint32_t sp_dump) {
         //  16 ?unnamed? - index into a table, pull out pointer, and call if non-zero
         //     appears near near wDev_ProcessFiq
         //  32 pp_soft_wdt_feed_local - gather the specifics and call __wrap_system_restart_local
-        offset =  32 + 16 + 48 + 256;
+        offset = 32 + 16 + 48 + 256;
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
         // Stack Tally
@@ -298,7 +319,11 @@ static void postmortem_report(uint32_t sp_dump) {
         ets_printf_P(PSTR("\nlast failed alloc caller: 0x%08x\n"), (uint32_t)umm_last_fail_alloc_addr);
     }
 
-    custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
+    if (s_panic_line || s_panic_func || s_panic_file || s_panic_what) {
+        custom_panic_callback(s_panic_file, s_panic_line, s_panic_func, s_panic_what);
+    }
+
+    custom_crash_callback(&rst_info, sp_dump + offset, stack_end);
 
     ets_delay_us(10000);
     __real_system_restart_local();
@@ -309,6 +334,7 @@ static void print_stack(uint32_t start, uint32_t end) {
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
+#ifdef CONT_STACKGUARD
         // avoid printing irrelevant data
         if ((values[0] == CONT_STACKGUARD)
          && (values[0] == values[1])
@@ -317,6 +343,7 @@ static void print_stack(uint32_t start, uint32_t end) {
         {
             continue;
         }
+#endif
 
         // rough indicator: stack frames usually have SP saved as the second word
         const bool looksLikeStackFrame = (values[2] == pos + 0x10);
