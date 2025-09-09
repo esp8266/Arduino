@@ -187,11 +187,14 @@ TEST_CASE("String concantenation", "[core][String]")
 TEST_CASE("String comparison", "[core][String]")
 {
     String alpha("I like fish!");
-    REQUIRE(alpha < "I like tacos!");
-    REQUIRE(alpha > "I like bacon!");
+    REQUIRE(alpha < "I like tacos!"); // compareTo()
+    REQUIRE(alpha > "I like cod!");
+    REQUIRE(alpha >= "I like beef!");
+    REQUIRE(alpha <= "I like soup!");
     REQUIRE(alpha.equalsIgnoreCase("i LiKe FiSh!"));
+    REQUIRE(!alpha.equalsIgnoreCase("i LiKe FiSh! And ChIPs!"));
     REQUIRE(alpha.equalsConstantTime("I like fish!"));
-    REQUIRE(alpha != "I like fish?");
+    REQUIRE(alpha != "I like fish?"); // equals()
     REQUIRE(alpha.startsWith("I like"));
     REQUIRE(!alpha.startsWith("I lick"));
     REQUIRE(alpha.startsWith("fish", 7));
@@ -581,11 +584,11 @@ TEST_CASE("String chaining", "[core][String]")
 
     // make sure we can chain a combination of things to form a String
     REQUIRE((String(chunks[0]) + String(chunks[1]) + String(chunks[2]) + String(chunks[3])) == all);
-    REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
-    REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
-    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3]))
+    REQUIRE((chunks[0] + String(chunks[1]) + FPSTR(chunks[2]) + chunks[3]) == all);
+    REQUIRE((String(chunks[0]) + FPSTR(chunks[1]) + FPSTR(chunks[2]) + String(chunks[3])) == all);
+    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + FPSTR(chunks[3]))
             == all);
-    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3]))
+    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + FPSTR(chunks[3]))
             == all);
 
     // these are still invalid (and also cannot compile at all):
@@ -600,7 +603,8 @@ TEST_CASE("String chaining", "[core][String]")
         String tmp(chunks[3]);
         tmp.reserve(2 * all.length());
         auto*  ptr = tmp.c_str();
-        String result("~1" + String(&chunks[0][0] + 2) + F(chunks[1]) + chunks[2] + std::move(tmp));
+        String result("~1" + String(&chunks[0][0] + 2) + FPSTR(chunks[1]) + chunks[2]
+                      + std::move(tmp));
         REQUIRE(result == all);
         REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
     }
