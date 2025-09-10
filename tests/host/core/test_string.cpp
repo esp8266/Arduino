@@ -44,12 +44,24 @@ TEST_CASE("String::trim", "[core][String]")
 
 TEST_CASE("String::replace", "[core][String]")
 {
-    String str;
-    str            = "The quick brown fox jumped over the lazy dog.";
-    String find    = "fox";
-    String replace = "vulpes vulpes";
-    str.replace(find, replace);
+    const char data[] = "The quick brown fox jumped over the lazy dog.";
+    String str = data;
+    str.replace("fox", "vulpes vulpes");
     REQUIRE(str == "The quick brown vulpes vulpes jumped over the lazy dog.");
+    str.replace("vulpes", "lis lis");
+    REQUIRE(str == "The quick brown lis lis lis lis jumped over the lazy dog.");
+    str.replace("lazy dog.", "canis piger");
+    REQUIRE(str == "The quick brown lis lis lis lis jumped over the canis piger");
+    str.replace("brown lis lis", "lis");
+    REQUIRE(str == "The quick lis lis lis jumped over the canis piger");
+    str.replace("lis lis", "fox");
+    REQUIRE(str == "The quick fox lis jumped over the canis piger");
+    str.replace("fox lis jumped", "brown fox");
+    REQUIRE(str == "The quick brown fox over the canis piger");
+    str.replace(" over ", " jumped over ");
+    str.replace("canis piger", "lazy dog");
+    str.replace("dog", "dog.");
+    REQUIRE(str == data);
 }
 
 TEST_CASE("String(value, base)", "[core][String]")
