@@ -193,7 +193,7 @@ class String {
         // concatenation is considered unsuccessful.
         bool concat(const String &str);
         bool concat(const char *cstr);
-        bool concat(const char *cstr, unsigned int length);
+        bool concat(const char *str, unsigned int length);
         bool concat(const __FlashStringHelper *str) {
             return concat(reinterpret_cast<const char *>(str));
         }
@@ -232,7 +232,7 @@ class String {
 
         bool equals(const String &s) const;
         bool equals(const char *cstr) const;
-        bool equals(const char *cstr, unsigned int length) const;
+        bool equals(const char *str, unsigned int length) const;
         bool equals(const __FlashStringHelper *str) const {
             return equals(reinterpret_cast<const char *>(str));
         }
@@ -284,7 +284,7 @@ class String {
         }
 
         unsigned char equalsConstantTime(const String &s) const;
-        unsigned char equalsConstantTime(const char *cstr, unsigned int length) const;
+        unsigned char equalsConstantTime(const char *str, unsigned int length) const;
 
         bool startsWith(const String &prefix) const;
         bool startsWith(const char *prefix) const;
@@ -353,11 +353,17 @@ class String {
         void replace(char find, char replace);
         void replace(const String &find, const String &replace);
         void replace(const String &find, const char *replace);
+        void replace(const String &find, const __FlashStringHelper *replace) {
+            this->replace(find, reinterpret_cast<const char *>(replace));
+        }
         void replace(const char *find, const String &replace);
         void replace(const __FlashStringHelper *find, const String &replace) {
             this->replace(reinterpret_cast<const char *>(find), replace);
         }
         void replace(const char *find, const char *replace);
+        void replace(const char *find, const __FlashStringHelper *replace) {
+            this->replace(find, reinterpret_cast<const char *>(replace));
+        }
         void replace(const __FlashStringHelper *find, const char *replace) {
             this->replace(reinterpret_cast<const char *>(find), replace);
         }
@@ -447,7 +453,7 @@ class String {
         bool changeBuffer(unsigned int maxStrLen);
 
         // copy or insert at a specific position
-        String &copy(const char *cstr, unsigned int length);
+        String &copy(const char *str, unsigned int length);
         String &copy(const __FlashStringHelper *str, unsigned int length) {
             return copy(reinterpret_cast<const char *>(str), length);
         }
@@ -464,6 +470,23 @@ class String {
 
         // rvalue helper
         void move(String &rhs) noexcept;
+
+        // attempt to optimize internal implementations for either RAM of Flash
+        using internal_strncasecmp_t = int (*)(const char *, const char *, size_t);
+        using internal_strncmp_t = int (*)(const char *, const char *, size_t);
+        using internal_strstr_t = char *(*)(const char *, const char *);
+
+        int compareToImpl(internal_strncmp_t, const char *str, unsigned int length) const;
+        bool equalsImpl(internal_strncmp_t, const char *str, unsigned int length) const;
+        bool equalsIgnoreCaseImpl(internal_strncasecmp_t, const char *str, unsigned int length) const;
+        bool startsWithImpl(internal_strncmp_t, const char *str, unsigned int length, unsigned int offset) const;
+        bool endsWithImpl(internal_strncmp_t, const char *str, unsigned int length) const;
+
+        int indexOfImpl(internal_strstr_t, const char *str, unsigned int length, unsigned int fromIndex) const;
+        int lastIndexOfImpl(internal_strstr_t, const char *str, unsigned int length, unsigned int fromIndex) const;
+        void replaceImpl(internal_strstr_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len);
+
+        friend struct __StringImpl;
 };
 
 // concatenation (note that it's done using non-method operators to handle both possible type refs)
