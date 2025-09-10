@@ -334,8 +334,8 @@ class String {
         int lastIndexOf(char ch, unsigned int fromIndex) const;
         int lastIndexOf(const String &str) const;
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
-        int lastIndexOf(const char *str) const;
-        int lastIndexOf(const char *str, unsigned int fromIndex) const;
+        int lastIndexOf(const char *cstr) const;
+        int lastIndexOf(const char *cstr, unsigned int fromIndex) const;
         int lastIndexOf(const char *str, unsigned int length, unsigned int fromIndex) const;
 
         int lastIndexOf(const __FlashStringHelper *str) const {
@@ -461,12 +461,12 @@ class String {
         void replace(const char *find, unsigned int find_len, const char *replace, unsigned int replace_len);
 
         String &insert(size_t position, char);
-        String &insert(size_t position, const char *);
+        String &insert(size_t position, const char * str);
         String &insert(size_t position, const __FlashStringHelper *str) {
             return insert(position, reinterpret_cast<const char *>(str));
         }
-        String &insert(size_t position, const char *, size_t length);
-        String &insert(size_t position, const String &);
+        String &insert(size_t position, const char * str, unsigned int length);
+        String &insert(size_t position, const String &str);
 
         // rvalue helper
         void move(String &rhs) noexcept;
