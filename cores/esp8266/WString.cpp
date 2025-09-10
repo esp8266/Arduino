@@ -904,7 +904,7 @@ void String::replaceImpl(internal_strstr_t impl, const char *find, unsigned int 
             readFrom = foundAt + find_len;
 
             unsigned int currentLen = len();
-            remainingLen = currentLen - n - find_len + 1;
+            remainingLen = currentLen - n - find_len + 1; // avoid strlen(), ref. #5949
             setLen(currentLen + diff);
         }
         memmove_P(writeTo, readFrom, remainingLen);
