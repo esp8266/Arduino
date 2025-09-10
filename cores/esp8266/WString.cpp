@@ -32,8 +32,7 @@
 /*********************************************/
 
 struct __StringImpl {
-    // XXX since we are always building w/ C++ headers, these cannot be resolved through the type alone
-    // don't depend on glibc quirks alone, just try to reduce number of overloads by explicitly requesting them
+    // XXX String methods accepting `internal_strstr_t` should be able to properly select overloads
     // ref. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51785
 
     using internal_strstr_t = String::internal_strstr_t;
@@ -65,7 +64,7 @@ struct __StringImpl {
     inline static internal_strstr_t __attribute__((always_inline))
     select_strstr(const char *str) {
         return __pgm_expected(str)
-            ? strstr_P
+            ? overloaded_strstr(strstr_P)
             : overloaded_strstr(strstr);
     }
 
