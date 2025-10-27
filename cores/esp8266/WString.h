@@ -471,20 +471,23 @@ class String {
         // rvalue helper
         void move(String &rhs) noexcept;
 
-        // attempt to optimize internal implementations for either RAM of Flash
-        using internal_strncasecmp_t = int (*)(const char *, const char *, size_t);
-        using internal_strncmp_t = int (*)(const char *, const char *, size_t);
-        using internal_strstr_t = char *(*)(const char *, const char *);
+        // internal implementations rely on func wrappers
+        using internal_memcmp_t = int (*)(const void *, const void *, size_t);
 
-        int compareToImpl(internal_strncmp_t, const char *str, unsigned int length) const;
-        bool equalsImpl(internal_strncmp_t, const char *str, unsigned int length) const;
-        bool equalsIgnoreCaseImpl(internal_strncasecmp_t, const char *str, unsigned int length) const;
-        bool startsWithImpl(internal_strncmp_t, const char *str, unsigned int length, unsigned int offset) const;
-        bool endsWithImpl(internal_strncmp_t, const char *str, unsigned int length) const;
+        int compareToImpl(internal_memcmp_t, const char *str, unsigned int length) const;
+        bool equalsImpl(internal_memcmp_t, const char *str, unsigned int length) const;
+        bool startsWithImpl(internal_memcmp_t, const char *str, unsigned int length, unsigned int offset) const;
+        bool endsWithImpl(internal_memcmp_t, const char *str, unsigned int length) const;
 
-        int indexOfImpl(internal_strstr_t, const char *str, unsigned int length, unsigned int fromIndex) const;
-        int lastIndexOfImpl(internal_strstr_t, const char *str, unsigned int length, unsigned int fromIndex) const;
-        void replaceImpl(internal_strstr_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len);
+        using internal_memcasecmp_t = int (*)(const void *, const void *, size_t);
+
+        bool equalsIgnoreCaseImpl(internal_memcasecmp_t, const char *str, unsigned int length) const;
+
+        using internal_memmem_t = void *(*)(const void *, size_t, const void *, size_t);
+
+        int indexOfImpl(internal_memmem_t, const char *str, unsigned int length, unsigned int fromIndex) const;
+        int lastIndexOfImpl(internal_memmem_t, const char *str, unsigned int length, unsigned int fromIndex) const;
+        void replaceImpl(internal_memmem_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len);
 
         friend struct __StringImpl;
 };

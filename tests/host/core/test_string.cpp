@@ -54,13 +54,23 @@ TEST_CASE("String::replace", "[core][String]")
     REQUIRE(str == "The quick brown lis lis lis lis jumped over the canis piger");
     str.replace("brown lis lis", "lis");
     REQUIRE(str == "The quick lis lis lis jumped over the canis piger");
-    str.replace("lis lis", "fox");
-    REQUIRE(str == "The quick fox lis jumped over the canis piger");
-    str.replace("fox lis jumped", "brown fox");
-    REQUIRE(str == "The quick brown fox over the canis piger");
+    str.replace("lis", "fox");
+    REQUIRE(str == "The quick fox fox fox jumped over the canis piger");
+    str.replace("fox fox", "kot");
+    REQUIRE(str == "The quick kot fox jumped over the canis piger");
+    str.replace("fox jumped", "red felis");
+    REQUIRE(str == "The quick kot red felis over the canis piger");
     str.replace(" over ", " jumped over ");
+    REQUIRE(str == "The quick kot red felis jumped over the canis piger");
     str.replace("canis piger", "lazy dog");
+    REQUIRE(str == "The quick kot red felis jumped over the lazy dog");
     str.replace("dog", "dog.");
+    REQUIRE(str == "The quick kot red felis jumped over the lazy dog.");
+    str.replace(" kot", "");
+    REQUIRE(str == "The quick red felis jumped over the lazy dog.");
+    str.replace("red", "brown");
+    REQUIRE(str == "The quick brown felis jumped over the lazy dog.");
+    str.replace("felis", "fox");
     REQUIRE(str == data);
 }
 
@@ -198,10 +208,10 @@ TEST_CASE("String concantenation", "[core][String]")
 
 TEST_CASE("String comparison", "[core][String]")
 {
-    REQUIRE(String("a") < String("b")); // compareTo() reference comparisons
+    REQUIRE(String("a") < String("b"));  // compareTo() reference comparisons
     REQUIRE(String("1") < String("2"));
     REQUIRE(String("999") > String("1000"));
-    String alpha("I like fish!"); // compareTo()
+    String alpha("I like fish!");  // compareTo()
     REQUIRE(alpha < "I like tacos!");
     REQUIRE(alpha > "I like bacon!");
     REQUIRE(alpha > "I like cod!");

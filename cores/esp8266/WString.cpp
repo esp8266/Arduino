@@ -32,24 +32,6 @@
 /*********************************************/
 
 struct __StringImpl {
-    // XXX String methods accepting `internal_strstr_t` should be able to properly select overloads
-    // ref. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51785
-
-    using internal_strstr_t = String::internal_strstr_t;
-
-    using const_char_strstr_t = const char *(*)(const char *, const char *);
-    using char_strstr_t = char *(*)(char *, const char *);
-
-    inline static internal_strstr_t __attribute__((always_inline))
-    overloaded_strstr(const_char_strstr_t func) {
-        return reinterpret_cast<internal_strstr_t>(func);
-    }
-
-    inline static internal_strstr_t __attribute__((always_inline))
-    overloaded_strstr(internal_strstr_t func) {
-        return func;
-    }
-
     // XCHAL_INSTROM0_VADDR (0x40200000) for flash contents
     // XCHAL_INSTRAM0_VADDR (0x40000000) for instram, aka 1 << 30
     static inline bool __attribute__((always_inline, const))
@@ -58,34 +40,78 @@ struct __StringImpl {
         return ((uintptr_t)p & (uintptr_t)((1 << 31) | (1 << 30))) > 0;
     }
 
+    // prefer string.h funcs w/ length argument
+    // avoid string.h cstring funcs, ref. #5949
+
     // jump to specific func depending on the src address
-    // (similar logic is done in libc, e.g. memmove_P)
+    // note that similar logic happens in libc too,
+    // e.g. memmove_P dealing with iram addresses
 
-    inline static internal_strstr_t __attribute__((always_inline))
-    select_strstr(const char *str) {
+    inline static String::internal_memmem_t __attribute__((always_inline))
+    select_memmem(const char *str) {
         return __pgm_expected(str)
-            ? overloaded_strstr(strstr_P)
-            : overloaded_strstr(strstr);
+            ? memmem_P
+            : memmem;
     }
 
-    using internal_strncmp_t = String::internal_strncmp_t;
-
-    inline static internal_strncmp_t __attribute__((always_inline))
-    select_strncmp(const char *str) {
+    inline static String::internal_memcmp_t __attribute__((always_inline))
+    select_memcmp(const char *str) {
         return __pgm_expected(str)
-            ? strncmp_P
-            : strncmp;
+            ? memcmp_P
+            : memcmp;
     }
 
-    using internal_strncasecmp_t = String::internal_strncasecmp_t;
-
-    inline static internal_strncasecmp_t __attribute__((always_inline))
-    select_strncasecmp(const char *str) {
+    inline static String::internal_memcasecmp_t __attribute__((always_inline))
+    select_memcasecmp(const char *str) {
         return __pgm_expected(str)
-            ? strncasecmp_P
-            : strncasecmp;
+            ? memcasecmp_P
+            : memcasecmp;
     }
+
+    static int memcasecmp_P(const void *p1, const void *p2, size_t size);
+    static int memcasecmp(const void *p1, const void *p2, size_t size);
 };
+
+static inline int tolower_inline(const unsigned char *p) {
+    return tolower(*p);
+}
+
+static inline int tolower_P(const unsigned char *p) {
+    return tolower(pgm_read_byte(p));
+}
+
+// missing from libc
+// c/p strncasecmp, without '\0' check
+template <typename T>
+static inline int
+memcasecmp_impl(T&&, const void *, const void *, size_t)
+__attribute__((always_inline));
+
+template <typename T>
+static inline int memcasecmp_impl(T&& impl, const void *p1, const void *p2, size_t size) {
+    int diff = 0;
+
+    const auto *c1 = static_cast<const unsigned char *>(p1);
+    const auto *c2 = static_cast<const unsigned char *>(p2);
+
+    for (; size != 0; --size) {
+        const int i1 = impl(c1++);
+        const int i2 = impl(c2++);
+        if ((diff = i1 - i2) != 0) {
+            break;
+        }
+    }
+
+    return diff;
+}
+
+int __StringImpl::memcasecmp_P(const void *p1, const void *p2, size_t size) {
+    return memcasecmp_impl(tolower_inline, p1, p2, size);
+}
+
+int __StringImpl::memcasecmp(const void *p1, const void *p2, size_t size) {
+    return memcasecmp_impl(tolower_P, p1, p2, size);
+}
 
 /*********************************************/
 /*  OOM Debugging                            */
@@ -548,35 +574,29 @@ String operator +(const char *lhs, const String &rhs) {
 /*  Comparison                               */
 /*********************************************/
 
-int String::compareToImpl(internal_strncmp_t impl, const char *str, unsigned int length) const {
+int String::compareToImpl(internal_memcmp_t impl, const char *str, unsigned int length) const {
     const auto min_len = std::min(len(), length);
     int res = impl(buffer(), str, min_len);
-    if (res)
-        return res;
-
-    if (len() < length)
-        return -1;
-    if (len() > length)
-        return 1;
-
-    return 0;
+    if (!res)
+        res = static_cast<int>(len()) - static_cast<int>(length);
+    return res;
 }
 
 int String::compareTo(const String &s) const {
-    return compareToImpl(strncmp, s.buffer(), s.len());
+    return compareToImpl(memcmp, s.buffer(), s.len());
 }
 
 int String::compareTo(const char *cstr) const {
     if (!cstr)
         return 1;
-    return compareToImpl(__StringImpl::select_strncmp(cstr), cstr, strlen_P(cstr));
+    return compareToImpl(__StringImpl::select_memcmp(cstr), cstr, strlen_P(cstr));
 }
 
 int String::compareTo(const char *str, unsigned int length) const {
-    return compareToImpl(__StringImpl::select_strncmp(str), str, length);
+    return compareToImpl(__StringImpl::select_memcmp(str), str, length);
 }
 
-bool String::equalsImpl(internal_strncmp_t impl, const char *str, unsigned int length) const {
+bool String::equalsImpl(internal_memcmp_t impl, const char *str, unsigned int length) const {
     const auto same_length = len() == length;
     if (same_length && length == 0)
         return true;
@@ -586,15 +606,15 @@ bool String::equalsImpl(internal_strncmp_t impl, const char *str, unsigned int l
 }
 
 bool String::equals(const String &s) const {
-    return equalsImpl(strncmp, s.buffer(), s.len());
+    return equalsImpl(memcmp, s.buffer(), s.len());
 }
 
 bool String::equals(const char *cstr) const {
-    return equalsImpl(__StringImpl::select_strncmp(cstr), cstr, cstr ? strlen_P(cstr) : 0);
+    return equalsImpl(__StringImpl::select_memcmp(cstr), cstr, cstr ? strlen_P(cstr) : 0);
 }
 
 bool String::equals(const char *str, unsigned int length) const {
-    return equalsImpl(__StringImpl::select_strncmp(str), str, length);
+    return equalsImpl(__StringImpl::select_memcmp(str), str, length);
 }
 
 bool String::operator<(const String &rhs) const {
@@ -625,7 +645,7 @@ bool String::operator>=(const char *rhs) const {
     return compareTo(rhs) >= 0;
 }
 
-bool String::equalsIgnoreCaseImpl(internal_strncasecmp_t impl, const char *str, unsigned int length) const {
+bool String::equalsIgnoreCaseImpl(internal_memcasecmp_t impl, const char *str, unsigned int length) const {
     if (len() != length)
         return false;
     if (!length)
@@ -636,15 +656,20 @@ bool String::equalsIgnoreCaseImpl(internal_strncasecmp_t impl, const char *str, 
 bool String::equalsIgnoreCase(const String &s) const {
     if (this == &s)
         return true;
-    return equalsIgnoreCaseImpl(strncasecmp, s.buffer(), s.len());
+    return equalsIgnoreCaseImpl(__StringImpl::memcasecmp, s.buffer(), s.len());
 }
 
 bool String::equalsIgnoreCase(const char *cstr) const {
-    return equalsIgnoreCaseImpl(__StringImpl::select_strncasecmp(cstr), cstr, cstr ? strlen_P(cstr) : 0);
+    size_t length;
+    if (cstr)
+        length = strlen_P(cstr);
+    else
+        length = 0;
+    return equalsIgnoreCase(cstr, length);
 }
 
 bool String::equalsIgnoreCase(const char *str, unsigned int length) const {
-    return equalsIgnoreCaseImpl(__StringImpl::select_strncasecmp(str), str, length);
+    return equalsIgnoreCaseImpl(__StringImpl::select_memcasecmp(str), str, length);
 }
 
 unsigned char String::equalsConstantTime(const char *str, unsigned int length) const {
@@ -678,7 +703,7 @@ unsigned char String::equalsConstantTime(const String& s) const {
     return equalsConstantTime(s.buffer(), s.len());
 }
 
-bool String::startsWithImpl(internal_strncmp_t impl, const char *str, unsigned int length, unsigned int offset) const {
+bool String::startsWithImpl(internal_memcmp_t impl, const char *str, unsigned int length, unsigned int offset) const {
     if (len() < length)
         return false;
     if (offset > (unsigned)(len() - length))
@@ -687,7 +712,7 @@ bool String::startsWithImpl(internal_strncmp_t impl, const char *str, unsigned i
 }
 
 bool String::startsWith(const char *str, unsigned int length, unsigned int offset) const {
-    return startsWithImpl(__StringImpl::select_strncmp(str), str, length, offset);
+    return startsWithImpl(__StringImpl::select_memcmp(str), str, length, offset);
 }
 
 bool String::startsWith(const String &prefix) const {
@@ -701,33 +726,33 @@ bool String::startsWith(const char *prefix) const {
 }
 
 bool String::startsWith(const String &prefix, unsigned int offset) const {
-    return startsWithImpl(strncmp, prefix.buffer(), prefix.len(), offset);
+    return startsWithImpl(memcmp, prefix.buffer(), prefix.len(), offset);
 }
 
 bool String::startsWith(const char *prefix, unsigned int offset) const {
     if (!prefix)
         return false;
-    return startsWithImpl(__StringImpl::select_strncmp(prefix), prefix, strlen_P(prefix), offset);
+    return startsWithImpl(__StringImpl::select_memcmp(prefix), prefix, strlen_P(prefix), offset);
 }
 
-bool String::endsWithImpl(internal_strncmp_t impl, const char *str, unsigned int length) const {
+bool String::endsWithImpl(internal_memcmp_t impl, const char *str, unsigned int length) const {
     if (len() < length)
         return false;
     return impl(&buffer()[len() - length], str, length) == 0;
 }
 
 bool String::endsWith(const char *suffix, unsigned int length) const {
-    return endsWithImpl(__StringImpl::select_strncmp(suffix), suffix, length);
+    return endsWithImpl(__StringImpl::select_memcmp(suffix), suffix, length);
 }
 
 bool String::endsWith(const String &suffix) const {
-    return endsWithImpl(strncmp, suffix.buffer(), suffix.len());
+    return endsWithImpl(memcmp, suffix.buffer(), suffix.len());
 }
 
 bool String::endsWith(const char *suffix) const {
     if (!suffix)
         return false;
-    return endsWithImpl(__StringImpl::select_strncmp(suffix), suffix, strlen_P(suffix));
+    return endsWith(suffix, strlen_P(suffix));
 }
 
 /*********************************************/
@@ -764,7 +789,7 @@ void String::toCharArray(char *buf, unsigned int bufsize, unsigned int index) co
     unsigned int n = bufsize - 1;
     if (n > len() - index)
         n = len() - index;
-    strncpy(buf, buffer() + index, n);
+    memcpy(buf, buffer() + index, n);
     buf[n] = 0;
 }
 
@@ -775,31 +800,31 @@ void String::toCharArray(char *buf, unsigned int bufsize, unsigned int index) co
 int String::indexOf(char ch, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
-    const char *temp = strchr(buffer() + fromIndex, ch);
-    if (temp == NULL)
+    const auto *temp = memchr(buffer() + fromIndex, ch, len() - fromIndex);
+    if (temp == nullptr)
         return -1;
-    return temp - buffer();
+    return static_cast<const char *>(temp) - buffer();
 }
 
-int String::indexOfImpl(internal_strstr_t impl, const char *str, unsigned int length, unsigned int fromIndex) const {
+int String::indexOfImpl(internal_memmem_t impl, const char *str, unsigned int length, unsigned int fromIndex) const {
     if (fromIndex >= len())
         return -1;
     if (length > len())
         return -1;
-    const char *found = impl(buffer() + fromIndex, str);
+    const void *found = impl(buffer() + fromIndex, length - fromIndex, str, length);
     if (found == NULL)
         return -1;
-    return found - buffer();
+    return static_cast<const char *>(found) - buffer();
 }
 
 int String::indexOf(const char *cstr, unsigned int fromIndex) const {
     if (!cstr)
         return -1;
-    return indexOfImpl(__StringImpl::select_strstr(cstr), cstr, strlen_P(cstr), fromIndex);
+    return indexOfImpl(memmem_P, cstr, strlen_P(cstr), fromIndex);
 }
 
 int String::indexOf(const String &str, unsigned int fromIndex) const {
-    return indexOfImpl(__StringImpl::overloaded_strstr(strstr), str.buffer(), str.len(), fromIndex);
+    return indexOfImpl(memmem, str.buffer(), str.len(), fromIndex);
 }
 
 int String::lastIndexOf(char ch) const {
@@ -814,28 +839,32 @@ int String::lastIndexOf(char ch, unsigned int fromIndex) const {
     return index;
 }
 
-int String::lastIndexOfImpl(internal_strstr_t impl, const char *str, unsigned int length, unsigned int fromIndex) const {
-    if (!len() || !length || length > len())
+int String::lastIndexOfImpl(internal_memmem_t impl, const char *str, unsigned int length, unsigned int fromIndex) const {
+    const auto this_len = len();
+    if (!this_len || !length || length > this_len)
         return -1;
-    if (fromIndex >= len())
-        fromIndex = len() - 1;
+    if (fromIndex >= this_len)
+        fromIndex = this_len - 1;
     int found = -1;
-    for (const char *p = buffer(); p <= buffer() + fromIndex; p++) {
-        p = impl(p, str);
+    const char *buf = buffer();
+    unsigned int left = len();
+    for (const char *p = buf; p <= buf + fromIndex; p++) {
+        p = static_cast<const char *>(impl(p, left, str, length));
         if (!p)
             break;
-        if ((unsigned int)(p - buffer()) <= fromIndex)
-            found = p - buffer();
+        left = static_cast<unsigned int>(p - buf);
+        if (left <= fromIndex)
+            found = p - buf;
     }
     return found;
 }
 
 int String::lastIndexOf(const char *str, unsigned int length, unsigned int fromIndex) const {
-    return lastIndexOfImpl(__StringImpl::select_strstr(str), str, length, fromIndex);
+    return lastIndexOfImpl(__StringImpl::select_memmem(str), str, length, fromIndex);
 }
 
 int String::lastIndexOf(const String &str) const {
-    return lastIndexOfImpl(__StringImpl::overloaded_strstr(strstr), str.buffer(), str.len(), len() - str.len());
+    return lastIndexOfImpl(memmem, str.buffer(), str.len(), len() - str.len());
 }
 
 int String::lastIndexOf(const String &str, unsigned int fromIndex) const {
@@ -880,43 +909,55 @@ void String::replace(char find, char replace) {
     }
 }
 
-void String::replaceImpl(internal_strstr_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
-    if (len() == 0 || find_len == 0)
-        return;
-    int diff = replace_len - find_len;
+void String::replaceImpl(internal_memmem_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
     const char *readFrom = buffer();
+    const char *const readEnd = readFrom + len();
+    if ((readFrom == readEnd) || find_len == 0)
+        return;
+
+    int diff = replace_len - find_len;
     const char *foundAt;
+
+    auto next_foundAt = [&]() {
+        foundAt = static_cast<const char *>(impl(readFrom, readEnd - readFrom, find, find_len));
+        return foundAt != nullptr;
+    };
+
+    auto next_readFrom = [&]() {
+        readFrom = foundAt + find_len;
+    };
+
     if (diff == 0) {
-        while ((foundAt = const_cast<const char *>(impl(readFrom, find))) != NULL) {
+        while (next_foundAt()) {
             memmove_P(const_cast<char *>(foundAt), replace, replace_len);
-            readFrom = foundAt + replace_len;
+            next_readFrom();
         }
     } else if (diff < 0) {
-        unsigned int remainingLen = len() + 1;
         char *writeTo = wbuffer();
-        while ((foundAt = const_cast<const char *>(impl(readFrom, find))) != NULL) {
+        while (next_foundAt()) {
             unsigned int n = foundAt - readFrom;
             memmove_P(writeTo, readFrom, n);
 
             writeTo += n;
+
             if (replace_len)
                 memmove_P(writeTo, replace, replace_len);
 
             writeTo += replace_len;
-            readFrom = foundAt + find_len;
+            setLen(len() + diff);
 
-            unsigned int currentLen = len();
-            remainingLen = currentLen - n - find_len + 1; // avoid strlen(), ref. #5949
-            setLen(currentLen + diff);
+            next_readFrom();
         }
-        memmove_P(writeTo, readFrom, remainingLen);
+        memmove_P(writeTo, readFrom, readEnd - readFrom);
+        *(writeTo + (readEnd - readFrom)) = 0;
     } else {
-        unsigned int size = len(); // compute size needed for result
-        while ((foundAt = const_cast<const char *>(impl(readFrom, find))) != NULL) {
-            readFrom = foundAt + find_len;
+        unsigned int tmp = readEnd - readFrom;
+        unsigned int size = tmp; // precompute size needed for result
+        while (next_foundAt()) {
+            next_readFrom();
             size += diff;
         }
-        if (size == len())
+        if (size == tmp)
             return;
         if (size > capacity() && !changeBuffer(size))
             return;
@@ -934,27 +975,37 @@ void String::replaceImpl(internal_strstr_t impl, const char *find, unsigned int 
 }
 
 void String::replace(const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
-    this->replaceImpl(__StringImpl::select_strstr(find), find, find_len, replace, replace_len);
+    this->replaceImpl(__StringImpl::select_memmem(find), find, find_len, replace, replace_len);
 }
+
 void String::replace(const String &find, const String &replace) {
-    this->replaceImpl(__StringImpl::overloaded_strstr(strstr),
+    this->replaceImpl(memmem,
                       find.buffer(), find.len(),
                       replace.buffer(), replace.len());
 }
+
 void String::replace(const String& find, const char *replace) {
-    this->replaceImpl(__StringImpl::overloaded_strstr(strstr),
+    if (!replace)
+        return;
+    this->replaceImpl(memmem,
                       find.buffer(), find.len(),
-                      replace, replace ? strlen_P(replace) : 0);
+                      replace, strlen_P(replace));
 }
+
 void String::replace(const char *find, const String &replace) {
-    this->replaceImpl(__StringImpl::select_strstr(find),
-                      find, find ? strlen_P(find) : 0,
+    if (!find)
+        return;
+    this->replaceImpl(__StringImpl::select_memmem(find),
+                      find, strlen_P(find),
                       replace.buffer(), replace.len());
 }
+
 void String::replace(const char *find, const char *replace) {
-    this->replaceImpl(__StringImpl::select_strstr(find),
-                      find, find ? strlen_P(find) : 0,
-                      replace, replace ? strlen_P(replace) : 0);
+    if (!find || !replace)
+        return;
+    this->replaceImpl(__StringImpl::select_memmem(find),
+                      find, strlen_P(find),
+                      replace, strlen_P(replace));
 }
 
 void String::remove(unsigned int index, unsigned int count) {
