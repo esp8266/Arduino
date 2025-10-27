@@ -198,8 +198,12 @@ TEST_CASE("String concantenation", "[core][String]")
 
 TEST_CASE("String comparison", "[core][String]")
 {
-    String alpha("I like fish!");
-    REQUIRE(alpha < "I like tacos!");  // compareTo()
+    REQUIRE(String("a") < String("b")); // compareTo() reference comparisons
+    REQUIRE(String("1") < String("2"));
+    REQUIRE(String("999") > String("1000"));
+    String alpha("I like fish!"); // compareTo()
+    REQUIRE(alpha < "I like tacos!");
+    REQUIRE(alpha > "I like bacon!");
     REQUIRE(alpha > "I like cod!");
     REQUIRE(alpha >= "I like beef!");
     REQUIRE(alpha <= "I like soup!");
