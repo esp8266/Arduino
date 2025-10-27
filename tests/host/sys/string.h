@@ -1,11 +1,9 @@
 #pragma once
 
-#include <stdio.h>
-#include <string.h>
-
 #define memccpy_P memccpy
 #define memcmp_P memcmp
 #define memcpy_P memcpy
+#define memmem_P memmem
 #define memmove_P memmove
 #define snprintf_P snprintf
 #define sprintf_P sprintf
