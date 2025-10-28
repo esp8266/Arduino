@@ -911,7 +911,7 @@ void String::replace(char find, char replace) {
 
 void String::replaceImpl(internal_memmem_t impl, const char *find, unsigned int find_len, const char *replace, unsigned int replace_len) {
     const char *readFrom = buffer();
-    const char *const readEnd = readFrom + len();
+    const char *readEnd = readFrom + len();
     if ((readFrom == readEnd) || find_len == 0)
         return;
 
@@ -961,16 +961,46 @@ void String::replaceImpl(internal_memmem_t impl, const char *find, unsigned int 
             return;
         if (size > capacity() && !changeBuffer(size))
             return;
-        int index = len() - 1;
-        while (index >= 0 && (index = lastIndexOf(find, find_len, index)) >= 0) {
-            readFrom = wbuffer() + index + find_len;
-            memmove_P(const_cast<char *>(readFrom) + diff, readFrom, len() - (readFrom - buffer()));
-            int newLen = len() + diff;
-            memmove_P(wbuffer() + index, replace, replace_len);
-            setLen(newLen);
-            wbuffer()[newLen] = 0;
-            index--;
+
+        readFrom = buffer();
+        readEnd = readFrom + len();
+
+        const char *foundFrom = readFrom;
+        const char *foundEnd = readEnd;
+
+        auto last_found = [impl](const char *hs, size_t hs_len, const char *needle, size_t needle_len) {
+            const char *last = nullptr;
+
+            const char *current = hs;
+            const char *end = hs + hs_len;
+            for (;;) {
+                current = static_cast<const char *>(impl(current, end - current, needle, needle_len));
+                if (!current)
+                    break;
+
+                last = current;
+                current += needle_len;
+            }
+
+            return last;
+        };
+
+        for (;;) {
+            foundAt = last_found(foundFrom, foundEnd - foundFrom, find, find_len);
+            if (!foundAt)
+                break;
+
+            readFrom = foundAt + find_len;
+            memmove_P(const_cast<char *>(readFrom) + diff, readFrom, readEnd - readFrom);
+            memmove_P(const_cast<char *>(foundAt), replace, replace_len);
+
+            foundEnd = foundAt;
+            readEnd += diff;
         }
+
+        auto newLen = readEnd - buffer();
+        setLen(newLen);
+        wbuffer()[newLen] = 0;
     }
 }
 
