@@ -840,22 +840,23 @@ int String::lastIndexOf(char ch, unsigned int fromIndex) const {
 }
 
 int String::lastIndexOfImpl(internal_memmem_t impl, const char *str, unsigned int length, unsigned int fromIndex) const {
-    const auto this_len = len();
+    const char *buf = buffer();
+    const char *const bufEnd = buf + len();
+
+    const auto this_len = bufEnd - buf;
     if (!this_len || !length || length > this_len)
         return -1;
     if (fromIndex >= this_len)
         fromIndex = this_len - 1;
+
     int found = -1;
-    const char *buf = buffer();
-    unsigned int left = len();
-    for (const char *p = buf; p <= buf + fromIndex; p++) {
-        p = static_cast<const char *>(impl(p, left, str, length));
+    for (const char *p = buf + fromIndex; p && p < bufEnd; p += length) {
+        p = static_cast<const char *>(impl(p, bufEnd - p, str, length));
         if (!p)
             break;
-        left = static_cast<unsigned int>(p - buf);
-        if (left <= fromIndex)
-            found = p - buf;
+        found = p - buf;
     }
+
     return found;
 }
 
