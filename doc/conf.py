@@ -34,7 +34,9 @@ import sys
 extensions = [
     'nbsphinx',
     'sphinx.ext.mathjax',
+    'sphinx_rtd_theme',
 ]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -49,8 +51,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ESP8266 Arduino Core'
-copyright = u'2017, Ivan Grokhotkov'
+slug = re.sub(r'\W+', '-', project.lower())
 author = u'Ivan Grokhotkov'
+copyright = author
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -71,7 +74,13 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [
+    '_readthedocs',
+    '_venv',
+    '_build',
+    'Thumbs.db',
+    '.DS_Store',
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -85,7 +94,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -98,12 +107,12 @@ html_theme = 'default'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'ESP8266ArduinoCoredoc'
+html_show_sourcelink = True
 
+# Output file base name for HTML help builder.
+htmlhelp_basename = slug
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -129,8 +138,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ESP8266ArduinoCore.tex', u'ESP8266 Arduino Core Documentation',
-     u'Ivan Grokhotkov', 'manual'),
+    (master_doc, f'{slug}.tex', f'{project} Documentation', author, 'manual'),
 ]
 
 
@@ -139,8 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'esp8266arduinocore', u'ESP8266 Arduino Core Documentation',
-     [author], 1)
+    (master_doc, slug, f'{project} Documentation', [author], 1)
 ]
 
 
@@ -150,23 +157,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ESP8266ArduinoCore', u'ESP8266 Arduino Core Documentation',
-     author, 'ESP8266ArduinoCore', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, slug, f'{project} Documentation', author, slug, project, 'Miscellaneous'),
 ]
 
 linkcheck_anchors_ignore = ["/#!"]
-
-# -- Use sphinx_rtd_theme for local builds --------------------------------
-# ref. https://github.com/snide/sphinx_rtd_theme#using-this-theme-locally-then-building-on-read-the-docs
-#
-# on_rtd is whether we are on readthedocs.org
-env_readthedocs = os.environ.get('READTHEDOCS', None)
-print(env_readthedocs)
-
-if not env_readthedocs:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-

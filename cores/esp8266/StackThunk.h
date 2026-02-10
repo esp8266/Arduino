@@ -27,6 +27,8 @@
 #ifndef _STACKTHUNK_H
 #define _STACKTHUNK_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -80,9 +82,11 @@ thunk_"#fcnToThunk":\n\
   call0 stack_thunk_fatal_smashing\n\
 .L1"#fcnToThunk":\n\
   movi a15, stack_thunk_save  /* Restore A1(SP) */\n\
-  l32i.n a1, a15, 0\n\
-  l32i.n a15, a1, 8     /* Restore the saved registers */\n\
-  l32i.n a0, a1, 12\n\
+  l32i.n a1, a15, 0/* Restore A1(SP) */\n\
+  movi a0, 0 /* Purge temporary storage */\n\
+  s32i.n a0, a15, 0\n\
+  l32i.n a15, a1, 8/* Restore A15 */\n\
+  l32i.n a0, a1, 12/* Restore A0 */\n\
   addi a1, a1, 16       /* Free up stack and return to caller */\n\
   ret\n\
 .size thunk_"#fcnToThunk", . - thunk_"#fcnToThunk"\n");

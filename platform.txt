@@ -93,7 +93,7 @@ compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lhal -lphy -lpp -lnet80211 {build.lwip_lib} -lwpa -lcrypto -lmain -lwps -lbearssl -lespnow -lsmartconfig -lairkiss -lwpa2 {build.stdcpp_lib} -lm -lc -lgcc
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c "{compiler.warning_flags}-cppflags" {build.stacksmash_flags} -g -free -fipa-pta -Werror=return-type -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags} {build.iramfloat}
+compiler.cpp.flags=-c "{compiler.warning_flags}-cxxflags" {build.stacksmash_flags} -g -free -fipa-pta -Werror=return-type -mlongcalls -mtext-section-literals -fno-rtti -falign-functions=4 {build.stdcpp_level} -MMD -ffunction-sections -fdata-sections {build.exception_flags} {build.sslflags} {build.mmuflags} {build.non32xferflags} {build.iramfloat}
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -121,7 +121,7 @@ compiler.elf2hex.extra_flags=
 ## needs git
 recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
-recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "{version}"
+recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --git-root "{runtime.platform.path}" --version "{version}" "{build.path}/core/core_version.h"
 
 # Handle processing sketch global options
 recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}

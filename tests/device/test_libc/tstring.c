@@ -13,6 +13,7 @@
 #define MAX_1 50
 #define memcmp memcmp_P
 #define memcpy memcpy_P
+#define memmove memmove_P
 #define memmem memmem_P
 #define memchr memchr_P
 #define strcat strcat_P
@@ -86,6 +87,8 @@ void tstring_main(void)
     tmp2[0] = 'Z';
     tmp2[1] = '\0';
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
     if (memset(target, 'X', 0) != target || memcpy(target, "Y", 0) != target
         || memmove(target, "K", 0) != target || strncpy(tmp2, "4", 0) != tmp2
         || strncat(tmp2, "123", 0) != tmp2 || strcat(target, "") != target)
@@ -93,6 +96,7 @@ void tstring_main(void)
         eprintf(__LINE__, target, "A", 0);
         test_failed = 1;
     }
+#pragma GCC diagnostic pop
 
     if (strcmp(target, "A") || strlen(target) != 1 || memchr(target, 'A', 0) != NULL
         || memcmp(target, "J", 0) || strncmp(target, "A", 1) || strncmp(target, "J", 0)

@@ -1736,15 +1736,6 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(
         const IPAddress& p_IPAddress) const
     {
-        return (stcIP4Address*)(((const stcAnswer*)this)->findIP4Address(p_IPAddress));
-    }
-
-    /*
-        MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address
-    */
-    MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address*
-    MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress)
-    {
         stcIP4Address* pIP4Address = m_pIP4Addresses;
         while (pIP4Address)
         {
@@ -1755,6 +1746,16 @@ namespace MDNSImplementation
             pIP4Address = pIP4Address->m_pNext;
         }
         return pIP4Address;
+    }
+
+    /*
+        MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address
+    */
+    MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address*
+    MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress)
+    {
+        const auto& cref = static_cast<const decltype(*this)>(*this);
+        return const_cast<stcIP4Address*>(cref.findIP4Address(p_IPAddress));
     }
 
     /*
@@ -2033,7 +2034,8 @@ namespace MDNSImplementation
     MDNSResponder::stcMDNSServiceQuery::stcAnswer*
     MDNSResponder::stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index)
     {
-        return (stcAnswer*)(((const stcMDNSServiceQuery*)this)->answerAtIndex(p_u32Index));
+        const auto& cref = static_cast<const decltype(*this)>(*this);
+        return const_cast<stcAnswer*>(cref.answerAtIndex(p_u32Index));
     }
 
     /*

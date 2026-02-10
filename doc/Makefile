@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    = -W --keep-going -n
+SPHINXOPTS    = --fail-on-warning --nitpicky
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = ESP8266ArduinoCore
 SOURCEDIR     = .

@@ -826,7 +826,7 @@ void EspnowMeshBackend::attemptTransmission(const String &message, const bool sc
     {
       TransmissionStatusType transmissionResult = initiateTransmission(getMessage(), currentNetwork);
   
-      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+      latestTransmissionOutcomes().emplace_back(currentNetwork, transmissionResult);
   
       if(!getTransmissionOutcomesUpdateHook()(*this))
         break;
@@ -897,7 +897,7 @@ void EspnowMeshBackend::attemptAutoEncryptingTransmission(const String &message,
   
       TransmissionStatusType transmissionResult = initiateAutoEncryptingTransmission(getMessage(), currentBSSID, connectionStatus);
   
-      latestTransmissionOutcomes().push_back(TransmissionOutcome{.origin = currentNetwork, .transmissionStatus = transmissionResult});
+      latestTransmissionOutcomes().emplace_back(currentNetwork, transmissionResult);
   
       _encryptionBroker.finalizeAutoEncryptingConnection(currentBSSID, existingEncryptedConnection, requestPermanentConnections);
   

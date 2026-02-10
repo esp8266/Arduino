@@ -20,9 +20,10 @@
 
 #include <Arduino.h>
 #include <user_interface.h>
-#include <core_version.h>
 #include <lwipopts.h>       // LWIP_HASH_STR (lwip2)
 #include <bearssl/bearssl_git.h>  // BEARSSL_GIT short hash
+
+#include <core_version.h>
 
 #define STRHELPER(x) #x
 #define STR(x) STRHELPER(x) // stringifier

@@ -1,24 +1,32 @@
 .DS_Store
+
+*.orig
+
+*.gch
+*.pyc
+
+*.gcda
+*.gcno
+*.gcov
+*.a
+*.o
+
+#created by user/scripts
+cores/esp8266/CommonHFile.h
+tests/host/lcov/
+tools/sdk/ld/backup/
+*.local.txt
+.cache
+compile_commands.json
+
+#dist
 tools/dist/
-tools/xtensa-lx106-elf/
-tools/mkspiffs/
 tools/mklittlefs/
+tools/mkspiffs/
 tools/python3/
+tools/xtensa-lx106-elf/
 package/versions/
 exclude.txt
-
-tests/hosts/lcov/
-
-*.pyc
-*.gch
-
-boards.local.txt
-
-*.gcov
-*.gcno
-*.gcda
-*.o
-*.a
 
 #Ignore files built by Visual Studio/Visual Micro
 [Dd]ebug*/

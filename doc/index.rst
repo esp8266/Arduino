@@ -1,9 +1,11 @@
 Welcome to ESP8266 Arduino Core's documentation!
 ================================================
 
+Using ESP8266 Core
+==================
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    Installing <installing>
    Arduino IDE options <ideoptions>
@@ -15,11 +17,26 @@ Welcome to ESP8266 Arduino Core's documentation!
    PROGMEM <PROGMEM>
    Using GDB to debug <gdb>
    MMU <mmu>
-
    Boards <boards>
-   FAQ <faq/readme>
 
+Troubleshooting
+===============
+.. toctree::
+   :caption: Troubleshooting
+   :maxdepth: 2
+
+   FAQ <faq>
    Exception causes <exception_causes>
    Debugging <Troubleshooting/debugging>
    Stack Dump <Troubleshooting/stack_dump>
    Using with Eclipse <eclipse/eclipse>
+
+FAQ
+===
+.. toctree::
+   :caption: FAQ
+   :maxdepth: 2
+   :titlesonly:
+   :glob:
+
+   faq/*

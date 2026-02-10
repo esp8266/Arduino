@@ -31,18 +31,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define memcmp memcmp_P
 #define memcpy memcpy_P
-#define memmem memmem_P
-#define memchr memchr_P
-#define strcat strcat_P
-#define strncat strncat_P
-#define strcpy strcpy_P
-#define strncpy strncpy_P
-#define strlen strlen_P
-#define strnlen strnlen_P
 #define strcmp strcmp_P
-#define strncmp strncmp_P
 
 #define BUFF_SIZE 256
 

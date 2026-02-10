@@ -1,74 +1,126 @@
 #!/usr/bin/env python3
 
 # Wrapper for Arduino core / others that can call esptool.py possibly multiple times
-# Adds pyserial to sys.path automatically based on the path of the current file
-
-# First parameter is pyserial path, second is esptool path, then a series of command arguments
-# i.e. upload.py tools/pyserial tools/esptool write_flash file 0x0
+# Adds pyserial & esptool that are in the same directory as the script to sys.path
 
 import os
+import atexit
+import pathlib
 import sys
 import tempfile
+import traceback
 
-sys.argv.pop(0) # Remove executable name
-toolspath = os.path.dirname(os.path.realpath(__file__))
+from typing import List
+
+# Add neighbouring pyserial & esptool to search path
+MODULES = [
+    "pyserial",
+    "esptool",
+]
+
+PWD = pathlib.Path(__file__).resolve().parent
+for m in MODULES:
+    sys.path.insert(0, (PWD / m).as_posix())
+
+# If this fails, we can't continue and will bomb below
 try:
-    sys.path.insert(0, os.path.join(toolspath, "pyserial")) # Add pyserial dir to search path
-    sys.path.insert(0, os.path.join(toolspath, "esptool")) # Add esptool dir to search path
-    import esptool # If this fails, we can't continue and will bomb below
+    import esptool
 except ImportError:
-    sys.stderr.write("pyserial or esptool directories not found next to this upload.py tool.\n")
+    sys.stderr.write(
+        "\n*** pyserial or esptool directories not found next to upload.py tool (this script) ***\n"
+    )
+    traceback.print_exc(file=sys.stderr)
+    sys.stderr.flush()
+
     sys.exit(1)
 
-cmdline = []
-write_option = ''
-write_addr = '0x0'
-erase_addr = ''
-erase_len = ''
 
-while sys.argv:
-    thisarg = sys.argv.pop(0)
+def make_erase_pair(addr: str, dest_size: int, block_size=2**16):
+    dest, path = tempfile.mkstemp()
 
-    # We silently replace the 921kbaud setting with 460k to enable backward
+    buffer = bytearray(b"\xff" * block_size)
+    while dest_size:
+        remainder = dest_size % block_size
+
+        if remainder:
+            src = buffer[:remainder]
+            src_size = remainder
+        else:
+            src = buffer
+            src_size = block_size
+
+        os.write(dest, src)
+        dest_size -= src_size
+
+    os.close(dest)
+
+    def maybe_remove(path):
+        try:
+            os.remove(path)
+        except Exception:
+            pass
+
+    atexit.register(maybe_remove, path)
+    return [addr, path]
+
+
+argv = sys.argv[1:]  # Remove executable name
+
+cmdline: List[str] = []
+write_options: List[str] = ["--flash_size", "detect"]
+erase_options: List[str] = []
+
+thisarg = ""
+lastarg = ""
+while argv:
+    lastarg = thisarg
+    thisarg = argv.pop(0)
+
+    # We silently replace the high-speed setting with 460k to enable backward
     # compatibility with the old esptool-ck.exe.  Esptool.py doesn't seem
-    # work reliably at 921k, but is still significantly faster at 460kbaud.
-    if thisarg == "921600":
+    # work reliably, but 460kbaud is still plenty fast.
+    if lastarg == "--baud" and thisarg in ("921600", "3000000"):
         thisarg = "460800"
 
     # 'erase_flash' command is translated to the write_flash --erase-all option
     # https://github.com/esp8266/Arduino/issues/6755#issuecomment-553208688
     if thisarg == "erase_flash":
-        write_option = '--erase-all'
-    elif thisarg == 'erase_region':
-        erase_addr = sys.argv.pop(0)
-        erase_len = sys.argv.pop(0)
-    elif thisarg == 'write_flash':
-        write_addr = sys.argv.pop(0)
-        binary = sys.argv.pop(0)
+        write_options.append("--erase-all")
+
+    # instead of providing esptool with separate targets,
+    # everything below becomes 'write_flash' [<addr> <path>] pairs
+
+    # 'erase_region' becomes a temporary file filled with 0xff
+    # this pair is appended *after* 'write_flash' pairs
+    elif thisarg == "erase_region":
+        addr = argv.pop(0)
+        size = int(argv.pop(0), 0)
+        erase_options.extend(make_erase_pair(addr, size))
+
+    # 'write_flash' pair taken in order it was specified
+    elif thisarg == "write_flash":
+        addr = argv.pop(0)
+        path = argv.pop(0)
+        write_options.extend([addr, path])
+
+    # everything else is used as-is
     elif thisarg:
-        cmdline = cmdline + [thisarg]
+        cmdline.append(thisarg)
 
-cmdline = cmdline + ['write_flash']
-if write_option:
-    cmdline = cmdline + [write_option]
-cmdline = cmdline + ['--flash_size', 'detect']
-cmdline = cmdline + [write_addr, binary]
 
-erase_file = ''
-if erase_addr:
-    # Generate temporary empty (0xff) file
-    eraser = tempfile.mkstemp()
-    erase_file = eraser[1]
-    os.write(eraser[0], bytearray([0xff] * int(erase_len, 0)))
-    os.close(eraser[0])
-    cmdline = cmdline + [erase_addr, erase_file]
+cmdline.append("write_flash")
+for opts in (write_options, erase_options):
+    if opts:
+        cmdline.extend(opts)
 
 try:
     esptool.main(cmdline)
-except Exception as e:
-    sys.stderr.write('\nA fatal esptool.py error occurred: %s' % e)
-finally:
-    if erase_file:
-        os.remove(erase_file)
-    if any(sys.exc_info()):
-        sys.exit(2)
+except Exception:
+    etype, evalue, _ = sys.exc_info()
+    estring = "\n".join(traceback.format_exception_only(etype, value=evalue))
+
+    sys.stderr.write("\n*** upload.py fatal error ***\n")
+    sys.stderr.write(estring)
+    sys.stderr.flush()
+
+    sys.exit(2)

@@ -12,7 +12,7 @@
 #include <LittleFS.h>
 
 // more and possibly updated information can be found at:
-// https://arduinojson.org/v6/example/config/
+// https://arduinojson.org/v7/example/config/
 
 bool loadConfig() {
   File configFile = LittleFS.open("/config.json", "r");
@@ -21,7 +21,7 @@ bool loadConfig() {
     return false;
   }
 
-  StaticJsonDocument<200> doc;
+  JsonDocument doc;
   auto error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println("Failed to parse config file");
@@ -42,7 +42,7 @@ bool loadConfig() {
 }
 
 bool saveConfig() {
-  StaticJsonDocument<200> doc;
+  JsonDocument doc;
   doc["serverName"] = "api.example.com";
   doc["accessToken"] = "128du9as8du12eoue8da98h123ueh9h98";
 

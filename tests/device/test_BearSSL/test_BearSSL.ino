@@ -1,7 +1,7 @@
 // Stress test the BearSSL connection options to determine
 // maximum memory use for different SSL connections and
-// SPIFFS certstore usage.  Before running you need to run
-// certs-from-mozilla.py and upload the generated SPIFFS file.
+// filesystem certstore usage.  Before running the test you need to
+// update them with certs-from-mozilla.py and upload the generated file.
 //
 // For more info on CertStores, see the BearSSL_CertStore example
 //
@@ -12,7 +12,7 @@
 #include <BSTest.h>
 #include <ESP8266WiFi.h>
 #include <CertStoreBearSSL.h>
-#include <FS.h>
+#include <LittleFS.h>
 #include <time.h>
 #include <StackThunk.h>
 
@@ -45,11 +45,11 @@ bool pretest()
         delay(500);
     }
     setClock();
-    SPIFFS.begin();
-    int numCerts = certStore.initCertStore(SPIFFS, "/certs.idx", "/certs.ar");
+    LittleFS.begin();
+    int numCerts = certStore.initCertStore(LittleFS, "/certs.idx", "/certs.ar");
     Serial.printf("Number of CA certs read: %d\n", numCerts);
     if (numCerts == 0) {
-        Serial.printf("No certs found. Did you run certs-from-mozill.py and upload the SPIFFS directory before running?\n");
+        Serial.printf("No certs found. Did you run upload script?\n");
         return false;
     }
     return true;

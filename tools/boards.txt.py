@@ -445,11 +445,11 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.', ]
     }),
-( 'mercury1', {
-        'name': 'Mercury 1.0',
+    ( 'mercury', {
+        'name': 'Mercury',
         'opts': {
             '.build.board': 'mercury',
-            '.build.variant': 'mercury_v1',
+            '.build.variant': 'mercury',
             },
         'macro': [
             'resetmethod_nodemcu',
@@ -457,8 +457,8 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-        'desc': [ 'Based on ESP8266, Mercury is board developed by Ralio Technologies. Board supports on motor drivers and direct-connect feature for various endpoints.',
-                  '',
+        'desc': [ 'ESP8266 based development board supercharged with onboard motor driver, RGB LED, support for servo motors and etc.',
+                  'Git: https://github.com/raliotech/products/tree/master',
                   'Product page: https://www.raliotech.com',
                   ],
     }),
@@ -1877,7 +1877,7 @@ def package ():
     substitution += ',\n'.join(board_items)
     substitution += '\n          ],'
 
-    newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
+    newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, flags=re.MULTILINE)
 
     # To get consistent indent/formatting read the JSON and write it out programmatically
     if packagegen:

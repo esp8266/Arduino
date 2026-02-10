@@ -1,5 +1,5 @@
 #include <ESP8266WiFi.h>
-#include "FS.h"
+#include <LittleFS.h>
 #include <BSTest.h>
 
 BS_ENV_DECLARE();
@@ -18,17 +18,17 @@ bool pretest()
 
 TEST_CASE("read-write test","[fs]")
 {
-    REQUIRE(SPIFFS.begin());
+    REQUIRE(LittleFS.begin());
 
     String text = "write test";
     {
-        File out = SPIFFS.open("/tmp.txt", "w");
+        File out = LittleFS.open("/tmp.txt", "w");
         REQUIRE(out);
         out.print(text);
     }
 
     {
-        File in = SPIFFS.open("/tmp.txt", "r");
+        File in = LittleFS.open("/tmp.txt", "r");
         REQUIRE(in);
         CHECK(in.size() == text.length());
         in.setTimeout(0);
@@ -39,14 +39,14 @@ TEST_CASE("read-write test","[fs]")
 
 TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
 {
-    REQUIRE(SPIFFS.begin());
+    REQUIRE(LittleFS.begin());
     const int n = 10;
     int found[n] = {0};
 
     {
-        Dir root = SPIFFS.openDir("");
+        Dir root = LittleFS.openDir("");
         while (root.next()) {
-            CHECK(SPIFFS.remove(root.fileName()));
+            CHECK(LittleFS.remove(root.fileName()));
         }
     }
 
@@ -55,14 +55,14 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
         name += i;
         name += ".txt";
 
-        File out = SPIFFS.open(name, "w");
+        File out = LittleFS.open(name, "w");
         REQUIRE(out);
 
         out.println(i);
     }
 
     {
-        Dir root = SPIFFS.openDir("/");
+        Dir root = LittleFS.openDir("/");
         while (root.next()) {
             String fileName = root.fileName();
             CHECK(fileName.indexOf("/seq_") == 0);
@@ -77,35 +77,35 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
     }
 
     {
-        Dir root = SPIFFS.openDir("/");
+        Dir root = LittleFS.openDir("/");
         while (root.next()) {
             String fileName = root.fileName();
-            CHECK(SPIFFS.remove(fileName));
+            CHECK(LittleFS.remove(fileName));
         }
     }
 }
 
 TEST_CASE("files can be renamed", "[fs]")
 {
-    REQUIRE(SPIFFS.begin());
+    REQUIRE(LittleFS.begin());
     {
-        File tmp = SPIFFS.open("/tmp1.txt", "w");
+        File tmp = LittleFS.open("/tmp1.txt", "w");
         tmp.println("rename test");
     }
 
     {
-        CHECK(SPIFFS.rename("/tmp1.txt", "/tmp2.txt"));
+        CHECK(LittleFS.rename("/tmp1.txt", "/tmp2.txt"));
 
-        File tmp2 = SPIFFS.open("/tmp2.txt", "r");
+        File tmp2 = LittleFS.open("/tmp2.txt", "r");
         CHECK(tmp2);
     }
 }
 
 TEST_CASE("FS::info works","[fs]")
 {
-    REQUIRE(SPIFFS.begin());
+    REQUIRE(LittleFS.begin());
     FSInfo info;
-    CHECK(SPIFFS.info(info));
+    CHECK(LittleFS.info(info));
 
     Serial.printf("Total: %u\nUsed: %u\nBlock: %u\nPage: %u\nMax open files: %u\nMax path len: %u\n",
                   info.totalBytes,
@@ -119,10 +119,10 @@ TEST_CASE("FS::info works","[fs]")
 
 TEST_CASE("FS is empty after format","[fs]")
 {
-    REQUIRE(SPIFFS.begin());
-    REQUIRE(SPIFFS.format());
+    REQUIRE(LittleFS.begin());
+    REQUIRE(LittleFS.format());
 
-    Dir root = SPIFFS.openDir("/");
+    Dir root = LittleFS.openDir("/");
     int count = 0;
     while (root.next()) {
         ++count;
@@ -132,12 +132,12 @@ TEST_CASE("FS is empty after format","[fs]")
 
 TEST_CASE("Can reopen empty file","[fs]")
 {
-    REQUIRE(SPIFFS.begin());
+    REQUIRE(LittleFS.begin());
     {
-        File tmp = SPIFFS.open("/tmp.txt", "w");
+        File tmp = LittleFS.open("/tmp.txt", "w");
     }
     {
-        File tmp = SPIFFS.open("/tmp.txt", "w");
+        File tmp = LittleFS.open("/tmp.txt", "w");
         CHECK(tmp);
     }
 }
