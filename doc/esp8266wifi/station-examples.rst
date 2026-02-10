@@ -14,7 +14,7 @@ Table of Contents
 -  `Prepare Access Points <#prepare-access-points>`__
 -  `Try it Out <#try-it-out>`__
 -  `Can we Make it Simpler? <#can-we-make-it-simpler>`__
--  `Per-SSID configuration`__
+-  `Per-SSID configuration <#per-ssid-configuration>`__
 -  `Conclusion <#conclusion>`__
 
 Introduction
@@ -198,7 +198,7 @@ After uploading the sketch and opening the serial monitor, the messages will loo
 
 
 Per-SSID configuration
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Whenever network SSID is selected by the 'ESP8266WiFiMulti', it can be instructed to call a user function before connection is attempted.
 
