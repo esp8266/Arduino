@@ -14,6 +14,7 @@ Table of Contents
 -  `Prepare Access Points <#prepare-access-points>`__
 -  `Try it Out <#try-it-out>`__
 -  `Can we Make it Simpler? <#can-we-make-it-simpler>`__
+-  `Per-SSID configuration`__
 -  `Conclusion <#conclusion>`__
 
 Introduction
@@ -194,6 +195,36 @@ After uploading the sketch and opening the serial monitor, the messages will loo
     connected with sensor-net-1, channel 6
     dhcp client start...
     ip:192.168.1.10,mask:255.255.255.0,gw:192.168.1.9
+
+
+Per-SSID configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Whenever network SSID is selected by the 'ESP8266WiFiMulti', it can be instructed to call a user function before connection is attempted.
+
+For example, to allow static IP configuration, declare the following function
+
+.. code:: cpp
+
+    void onSSIDSelected(const char *ssid) {
+      if (strcmp(ssid, "sensor-net-2") == 0) {
+        IPAddress ip(10, 0, 0, 2);
+        IPAddress gw(10, 0, 0, 1);
+        IPAddress subnet(255, 255, 255, 0);
+        WiFi.config(ip, gw, subnet);
+        return;
+      }
+
+      // revert to DHCP configuration
+      WiFi.config(0U, 0U, 0U);
+    }
+
+Then, register it after ``addAP(...)`` lines
+
+.. code:: cpp
+
+   wifiMulti.onSSIDSelected(onSSIDSelected);
+
 
 Conclusion
 ~~~~~~~~~~
