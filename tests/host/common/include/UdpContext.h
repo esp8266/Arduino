@@ -44,7 +44,10 @@ public:
         _sock = mockUDPSocket();
     }
 
-    ~UdpContext() { disconnect(); }
+    ~UdpContext()
+    {
+        disconnect();
+    }
 
     void ref()
     {
