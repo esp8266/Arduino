@@ -8,6 +8,7 @@
     - Connect to WiFi with strongest signal (RSSI)
     - Fall back to connect to next WiFi when a connection failed or lost
     - Fall back to connect to hidden SSID's which are not reported by WiFi scan
+    - Connect to WiFi using a static IP configuration
 
     To enable debugging output, select in the Arduino iDE:
     - Tools | Debug Port: Serial
@@ -35,7 +36,25 @@ void setup() {
   wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
   wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
   wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
-  // More is possible
+
+  // Register custom SSID callback
+  wifiMulti.onSSIDSelected(onSSIDSelected);
+
+  // Insert more sketch code
+}
+
+void onSSIDSelected(const char *ssid) {
+  // Before connecting to the second AP, assign static IP using config(...).
+  if (strcmp(ssid, "ssid_from_AP_2") == 0) {
+    IPAddress ip2(192, 168, 1, 123);
+    IPAddress gw2(192, 168, 1, 1);
+    IPAddress subnet2(255, 255, 255, 0);
+    WiFi.config(ip2, gw2, subnet2);
+    return;
+  }
+
+  // Make sure that DHCP is used for other networks.
+  WiFi.config(0U, 0U, 0U);
 }
 
 void loop() {
