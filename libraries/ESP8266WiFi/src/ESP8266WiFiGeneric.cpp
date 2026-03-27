@@ -240,6 +240,7 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
 
     if (event->event == EVENT_STAMODE_AUTHMODE_CHANGE) {
         auto& src = event->event_info.auth_change;
+        WiFi.authMode = src.new_mode;
         if ((src.old_mode != AUTH_OPEN) && (src.new_mode == AUTH_OPEN)) {
             // CVE-2020-12638 workaround.  When we get a change to AUTH_OPEN from any other mode, drop the WiFi link because it's a downgrade attack
             // TODO - When upgrading to 3.x.x with fix, remove this code
