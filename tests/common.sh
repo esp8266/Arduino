@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -u -e -E -o pipefail
+set -u -e -E -o pipefail -o errtrace
 
 cache_dir=$(mktemp -d)
 trap 'trap_exit' EXIT
@@ -9,8 +9,14 @@ function trap_exit()
 {
     # workaround for macOS shipping with broken bash
     local exit_code=$?
+
+    # ^ $cache_dir is temporary, prune when exiting
     if [ -z "${ESP8266_ARDUINO_PRESERVE_CACHE-}" ]; then
         rm -rf "$cache_dir"
+    fi
+
+    if [ "$exit_code" != 0 ] ; then
+        echo "*** exit_code=$exit_code ***"
     fi
 
     exit $exit_code
@@ -34,7 +40,7 @@ function step_summary()
     # ref. https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
     if [ -n "${GITHUB_STEP_SUMMARY-}" ]; then
         { echo "# $header"; echo '```console'; cat "$contents"; echo '```'; } \
-            >> $GITHUB_STEP_SUMMARY
+            >> "$GITHUB_STEP_SUMMARY"
     else
         echo "# $header"
         cat "$contents"
@@ -49,7 +55,7 @@ function print_size_info_header()
 
 function print_size_info()
 {
-    local awk_script='
+    local awk_script=$'
 /^\.data/ || /^\.rodata/ || /^\.bss/ || /^\.text/ || /^\.irom0\.text/{
     size[$1] = $2
 }
@@ -58,7 +64,7 @@ END {
     total_ram = size[".data"] + size[".rodata"] + size[".bss"]
     total_flash = size[".data"] + size[".rodata"] + size[".text"] + size[".irom0.text"]
 
-    printf "%-28s %-8d %-8d %-8d %-8d %-10d %-8d %-8d\n",
+    printf "%-28s %-8d %-8d %-8d %-8d %-10d %-8d %-8d\\n",
             sketch_name,
             size[".data"], size[".rodata"], size[".bss"], size[".text"], size[".irom0.text"],
             total_ram, total_flash
@@ -68,7 +74,7 @@ END {
     local elf_file=$2
 
     local elf_name
-    elf_name=$(basename $elf_file)
+    elf_name=$(basename "$elf_file")
     $size --format=sysv "$elf_file" | \
         awk -v sketch_name="${elf_name%.*}" "$awk_script" -
 }
@@ -103,10 +109,29 @@ function format_fqbn()
     local board_name=$1
     local flash_size=$2
     local lwip=$3
+    local debug=$4
 
-    echo "esp8266com:esp8266:${board_name}:"\
-"eesz=${flash_size},"\
-"ip=${lwip}"
+    printf 'esp8266com:esp8266:%s:eesz=%s,ip=%s,lvl=%s' \
+        "$board_name" \
+        "$flash_size" \
+        "$lwip" \
+        "$debug"
+}
+
+function format_cli()
+{
+    local cli_path=$1
+    local warnings=$2
+    local fqbn=$3
+    local libraries=$4
+    local output_dir=$5
+
+    printf "%s compile --warnings=%s --fqbn=%s --libraries=%s --output-dir=%s" \
+        "$cli_path" \
+        "$warnings" \
+        "$fqbn" \
+        "$libraries" \
+        "$output_dir"
 }
 
 function build_sketches()
@@ -114,10 +139,11 @@ function build_sketches()
     local core_path=$1
     local cli_path=$2
     local library_path=$3
-    local lwip=$4
-    local build_mod=$5
-    local build_rem=$6
-    local build_cnt=$7
+    local debug=$4
+    local lwip=$5
+    local build_mod=$6
+    local build_rem=$7
+    local build_cnt=$8
 
     local build_dir="$cache_dir"/build
     mkdir -p "$build_dir"
@@ -125,21 +151,15 @@ function build_sketches()
     local build_out="$cache_dir"/out
     mkdir -p "$build_out"
 
-    local fqbn=$(format_fqbn "generic" "4M1M" "$lwip")
+    local fqbn
+    fqbn=$(format_fqbn "generic" "4M1M" "$lwip" "$debug")
     echo "FQBN: $fqbn"
 
     local build_cmd
-    build_cmd+=${cli_path}
-    build_cmd+=" compile"\
-" --warnings=all"\
-" --build-path $build_dir"\
-" --fqbn $fqbn"\
-" --libraries $library_path"\
-" --output-dir $build_out"
+    build_cmd=$(format_cli "$cli_path" "all" "$fqbn" "$library_path" "$build_out")
 
     print_size_info_header >"$cache_dir"/size.log
 
-    local clean_core=1
     local testcnt=0
     local cnt=0
 
@@ -164,17 +184,11 @@ function build_sketches()
             build_cnt=0
         fi
 
-        # Do we need a clean core build? $build_dir/core/* cannot be shared
-        # between sketches when global options are present.
-        clean_core=$(arduino_mkbuildoptglobals_cleanup "$clean_core" "$build_dir" "$sketch")
-
-        # Clear out the last built sketch, map, elf, bin files, but leave the compiled
-        # objects in the core and libraries available for use so we don't need to rebuild
-        # them each sketch.
-        rm -rf "$build_dir"/sketch \
-            "$build_dir"/*.bin \
-            "$build_dir"/*.map \
-            "$build_dir"/*.elf
+        # Clear out the latest map, elf, bin files
+        rm -rf \
+            "$build_out"/*.bin \
+            "$build_out"/*.map \
+            "$build_out"/*.elf
 
         echo ${ci_group}Building $cnt $sketch
         echo "$build_cmd $sketch"
@@ -194,7 +208,7 @@ function build_sketches()
         fi
 
         print_size_info "$core_path"/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-size \
-            $build_dir/*.elf >>$cache_dir/size.log
+            $build_out/*.elf >>$cache_dir/size.log
 
         echo $ci_end_group
     done
@@ -252,8 +266,8 @@ function install_library()
     local url=$6
 
     fetch_and_unpack "$archive" "$hash" "$url"
-    mkdir -p "$lib_path"
-    rm -rf "$lib_path/$name"
+    mkdir -p "${lib_path:?}"
+    rm -rf "${lib_path}/${name:?}"
     mv "$extract" "$lib_path/$name"
 }
 
@@ -265,7 +279,7 @@ function install_libraries()
     mkdir -p "$core_path"/tools/dist
     pushd "$core_path"/tools/dist
 
-    source "$root/tests/dep-libraries.sh"
+    source "${root:?}"/tests/dep-libraries.sh
 
     popd
 }
@@ -280,14 +294,17 @@ function install_arduino_cli()
 
     echo "Arduino CLI ${ver}"
 
-    mkdir -p ${core_path}/dist
-    pushd ${core_path}/dist
+    mkdir -p "${core_path}"/dist
+    pushd "${core_path}"/dist
 
     source "$root/tests/dep-arduino-cli.sh"
 
-    mkdir -p $(dirname $path)
-    cp -v arduino-cli $path
-    chmod +x $path
+    local path_dir
+    path_dir=$(dirname "$path")
+
+    mkdir -p "$path_dir"
+    cp -v arduino-cli "$path"
+    chmod +x "$path"
 
     popd
 }
@@ -296,33 +313,20 @@ function install_core()
 {
     local core_path=$1
     local hardware_core_path=$2
-    local debug=$3
 
-    pushd "${core_path}"
-
-    local debug_flags=""
-    if [ "$debug" = "debug" ]; then
-        debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM"\
-" -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI"\
-" -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
-    fi
-
-    # Set our custom warnings for all builds
+    # Set our custom settings for all builds
     printf "%s\n" \
-        "compiler.c.extra_flags=-Wall -Wextra $debug_flags" \
-        "compiler.cpp.extra_flags=-Wall -Wextra $debug_flags" \
-        "mkbuildoptglobals.extra_flags=--ci --cache_core" \
+        "compiler.c.extra_flags=-Werror" \
+        "compiler.cpp.extra_flags=-Werror" \
         "recipe.hooks.prebuild.1.pattern=\"{runtime.tools.python3.path}/python3\" -I \"{runtime.tools.makecorever}\" --git-root \"{runtime.platform.path}\" --version \"{version}\" \"{runtime.platform.path}/cores/esp8266/core_version.h\"" \
-            > ${core_path}/platform.local.txt
+            > "${core_path}"/platform.local.txt
     echo -e "\n----platform.local.txt----"
-    cat platform.local.txt
+    cat "${core_path}"/platform.local.txt
     echo -e "\n----\n"
 
     # Fetch toolchain & filesystem utils
-    pushd tools
+    pushd "${core_path}"/tools
     python3 get.py -q
-
-    popd
     popd
 
     # todo: windows runners are using copied tree
@@ -340,11 +344,10 @@ function install_core()
 function install_arduino()
 {
     echo ${ci_group}Install arduino
-    local debug=$1
 
     local hardware_core_path="$ESP8266_ARDUINO_HARDWARE/esp8266com/esp8266"
     test -d "$hardware_core_path" \
-        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path" "$debug"
+        || install_core "$ESP8266_ARDUINO_BUILD_DIR" "$hardware_core_path"
 
     command -v "${ESP8266_ARDUINO_CLI}" \
         || install_arduino_cli "${ESP8266_ARDUINO_CLI}" "$hardware_core_path"
@@ -362,6 +365,9 @@ function arduino_lwip_menu_option()
         ;;
     "IPv6")
         echo "lm6f"
+        ;;
+    *)
+        echo "unknown"
         ;;
     esac
 }
@@ -414,17 +420,19 @@ function arduino_mkbuildoptglobals_cleanup()
 
 function build_sketches_with_arduino()
 {
-    local lwip
-    lwip=$(arduino_lwip_menu_option $1)
+    local debug=$1
 
-    local build_mod=$2
-    local build_rem=$3
-    local build_cnt=$4
+    local lwip
+    lwip=$(arduino_lwip_menu_option "$2")
+
+    local build_mod=$3
+    local build_rem=$4
+    local build_cnt=$5
 
     build_sketches "$ESP8266_ARDUINO_BUILD_DIR" \
         "$ESP8266_ARDUINO_CLI" \
         "$ESP8266_ARDUINO_LIBRARIES" \
-        "$lwip" "$build_mod" "$build_rem" "$build_cnt"
+        "$debug" "$lwip" "$build_mod" "$build_rem" "$build_cnt"
     step_summary "Size report" "$cache_dir/size.log"
 }
 
@@ -434,7 +442,7 @@ function install_platformio()
 
     local board=$1
 
-    pushd $ESP8266_ARDUINO_BUILD_DIR/tools
+    pushd "$ESP8266_ARDUINO_BUILD_DIR"/tools
     python3 get.py -q
     popd
 
@@ -448,7 +456,7 @@ function install_platformio()
     local toolchain_symlink="toolchain-xtensa @ symlink://${ESP8266_ARDUINO_BUILD_DIR}/tools/xtensa-lx106-elf/"
 
     # pre-generate config; pio-ci with multiple '-O' options replace each other instead of appending to the same named list
-    cat <<EOF > $cache_dir/platformio.ini
+    cat <<EOF > "$cache_dir"/platformio.ini
 [env:$board]
 platform = espressif8266
 board = $board
