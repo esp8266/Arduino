@@ -63,6 +63,12 @@ public:
     boolean begin(const uint8_t* address);
 
     /**
+        Shut down the Ethernet controller
+        Stops the reception of Ethernet frames until the next ::begin()
+    */
+    void end();
+
+    /**
         Send an Ethernet frame
         @param data a pointer to the data to send
         @param datalen the length of the data in the packet

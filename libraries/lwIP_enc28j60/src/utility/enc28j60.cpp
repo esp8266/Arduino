@@ -546,6 +546,14 @@ boolean ENC28J60::begin(const uint8_t* address)
 
 /*---------------------------------------------------------------------------*/
 
+void ENC28J60::end()
+{
+    // stop reception. ECON1 is mirrored into every bank, so no bank switch is needed
+    clearregbitfield(ECON1, ECON1_RXEN);
+}
+
+/*---------------------------------------------------------------------------*/
+
 uint16_t ENC28J60::sendFrame(const uint8_t* data, uint16_t datalen)
 {
     uint16_t dataend;
