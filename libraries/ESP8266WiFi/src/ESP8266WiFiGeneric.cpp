@@ -59,29 +59,23 @@ extern "C" char* wifi_station_hostname; // sdk's hostname location
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-struct WiFiEventHandlerOpaque
+
+WiFiEventHandlerOpaque::WiFiEventHandlerOpaque(WiFiEvent_t event, std::function<void(System_Event_t*)> handler)
+: mEvent(event), mHandler(handler)
 {
-    WiFiEventHandlerOpaque(WiFiEvent_t event, std::function<void(System_Event_t*)> handler)
-    : mEvent(event), mHandler(handler)
-    {
-    }
+}
 
-    void operator()(System_Event_t* e)
-    {
-        if (static_cast<WiFiEvent>(e->event) == mEvent || mEvent == WIFI_EVENT_ANY) {
-            mHandler(e);
-        }
+void WiFiEventHandlerOpaque::operator()(System_Event_t* e)
+{
+    if (static_cast<WiFiEvent>(e->event) == mEvent || mEvent == WIFI_EVENT_ANY) {
+        mHandler(e);
     }
+}
 
-    bool canExpire()
-    {
-        return mCanExpire;
-    }
-
-    WiFiEvent_t mEvent;
-    std::function<void(System_Event_t*)> mHandler;
-    bool mCanExpire = true; /* stopgap solution to handle deprecated void onEvent(cb, evt) case */
-};
+bool WiFiEventHandlerOpaque::canExpire()
+{
+    return mCanExpire;
+}
 
 static std::list<WiFiEventHandler> sCbEventList;
 
