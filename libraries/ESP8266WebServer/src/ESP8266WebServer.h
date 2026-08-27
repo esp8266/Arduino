@@ -27,8 +27,11 @@
 #include <functional>
 #include <memory>
 #include <functional>
+#include <list>
+
 #include <ESP8266WiFi.h>
 #include <FS.h>
+#include <StreamDev.h>
 #include "detail/mimetable.h"
 #include "Uri.h"
 
@@ -182,7 +185,13 @@ public:
   }
 
   void setContentLength(const size_t contentLength);
-  void sendHeader(const String& name, const String& value, bool first = false);
+
+  template <typename S1, typename S2>
+  void sendHeader(S1&& name, S2&& value, bool first = false)
+  {
+    _storeHeader(std::make_pair(String(std::forward<S1>(name)), String(std::forward<S2>(value))), first);
+  }
+
   void sendContent(const String& content);
   void sendContent(String& content) {
     sendContent((const String&)content);
@@ -322,7 +331,7 @@ protected:
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
   int _uploadReadByte(ClientType& client);
-  void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
+  bool _sendHeader(int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
 
   void _streamFileCore(const size_t fileSize, const String & fileName, const String & contentType);
@@ -330,6 +339,13 @@ protected:
   static String _getRandomHexString();
   // for extracting Auth parameters
   String _extractParam(String& authReq,const String& param,const char delimit = '"') const;
+
+  bool _streamIt (const String& s) { StreamConstPtr c(s.c_str(), s.length()); return _streamIt(c); }
+  bool _streamItC (StreamConstPtr&& s) { return _streamIt(s); }
+  bool _streamIt (Stream& s);
+  template <typename K, typename V>
+  bool _streamHeader (K name, V value);
+  void _storeHeader(std::pair<String, String>&& nameValue, bool first);
 
   struct RequestArgument {
     String key;
@@ -359,7 +375,7 @@ protected:
   RequestArgument* _currentHeaders = nullptr;
 
   size_t           _contentLength = 0;
-  String           _responseHeaders;
+  std::list<std::pair<String,String>> _userHeaders;
 
   String           _hostHeader;
   bool             _chunked = false;
