@@ -62,6 +62,7 @@ class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTACl
         using ESP8266WiFiGenericClass::channel;
 
         using ESP8266WiFiSTAClass::SSID;
+        using ESP8266WiFiSTAClass::encryptionType;
         using ESP8266WiFiSTAClass::RSSI;
         using ESP8266WiFiSTAClass::BSSID;
         using ESP8266WiFiSTAClass::BSSIDstr;
