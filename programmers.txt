@@ -1,0 +1,16 @@
+
+
+# example OTA 'programmer' configuration
+espOtaMyProject.name=Arduino OTA (My Project)
+espOtaMyProject.program.tool=espOtaProgrammer
+espOtaMyProject.ip=192.168.1.177
+espOtaMyProject.port=8266
+espOtaMyProject.auth=
+
+# OTA 'programmer' for default SoftAP IP
+espOtaAP.name=Arduino OTA AP (192.168.4.1)
+espOtaAP.program.tool=espOtaProgrammer
+espOtaAP.ip=192.168.4.1
+espOtaAP.port=8266
+espOtaAP.auth=
+
