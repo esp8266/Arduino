@@ -81,23 +81,19 @@ static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur) {
 
     return true;
 }
-#endif
-
-#if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
 
 /* ------------------------------------------------------------------------ */
 
-static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int line) {
+static void *get_unpoisoned_check_neighbors(const void *vptr, const char *file, int line, const void *caller) {
     uintptr_t ptr = (uintptr_t)vptr;
 
     if (ptr != 0) {
 
         ptr -= (sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
 
-        #if defined(UMM_POISON_CHECK_LITE)
         UMM_CRITICAL_DECL(id_poison);
         uint16_t c;
-        bool poison = false;
+        bool poison = true;
         umm_heap_context_t *_context = _umm_get_ptr_context((void *)ptr);
         if (_context) {
 
@@ -105,29 +101,28 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
             c = (ptr - (uintptr_t)(&(_context->heap[0]))) / sizeof(umm_block);
 
             UMM_CRITICAL_ENTRY(id_poison);
-            poison =
-                check_poison_block(&UMM_BLOCK(c)) &&
-                check_poison_neighbors(_context, c);
+            if (!check_poison_block(&UMM_BLOCK(c))) {
+                DBGLOG_ERROR("Allocation address %p\n", vptr);
+                poison = false;
+            } else
+            if (!check_poison_neighbors(_context, c)) {
+                DBGLOG_ERROR("This bad block is in a neighbor allocation near: %p\n", vptr);
+                poison = false;
+            }
             UMM_CRITICAL_EXIT(id_poison);
         } else {
             DBGLOG_ERROR("\nPointer %p is not a Heap address.\n", vptr);
+            poison = false;
         }
 
         if (!poison) {
+            DBGLOG_ERROR("Caller near %p\n", caller);
             if (file) {
                 __panic_func(file, line, "");
             } else {
                 abort();
             }
         }
-        #else
-        /*
-         *  No need to check poison here. POISON_CHECK() has already done a
-         *  full heap check.
-         */
-        (void)file;
-        (void)line;
-        #endif
     }
 
     return (void *)ptr;
@@ -135,10 +130,10 @@ static void *get_unpoisoned_check_neighbors(void *vptr, const char *file, int li
 
 /* ------------------------------------------------------------------------ */
 
-void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) {
+void *umm_poison_realloc_flc(void *ptr, size_t size, const char *file, int line, const void *caller) {
     void *ret;
 
-    ptr = get_unpoisoned_check_neighbors(ptr, file, line);
+    ptr = get_unpoisoned_check_neighbors(ptr, file, line, caller);
 
     add_poison_size(&size);
     ret = umm_realloc(ptr, size);
@@ -153,9 +148,9 @@ void *umm_poison_realloc_fl(void *ptr, size_t size, const char *file, int line) 
 
 /* ------------------------------------------------------------------------ */
 
-void umm_poison_free_fl(void *ptr, const char *file, int line) {
+void umm_poison_free_flc(void *ptr, const char *file, int line, const void *caller) {
 
-    ptr = get_unpoisoned_check_neighbors(ptr, file, line);
+    ptr = get_unpoisoned_check_neighbors(ptr, file, line, caller);
 
     umm_free(ptr);
 }
@@ -362,6 +357,13 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
     umm_heap_context_t *_context = umm_get_current_heap();
     return _context->stats.id_free_null_count;
 }
+
+#if UMM_ENABLE_MEMALIGN
+size_t ICACHE_FLASH_ATTR umm_get_malloc_align_error_count(void) {
+    umm_heap_context_t *_context = umm_get_current_heap();
+    return _context->stats.id_malloc_align_error_count;
+}
+#endif
 #endif // UMM_STATS_FULL
 
 #if defined(UMM_POISON_CHECK) || defined(UMM_POISON_CHECK_LITE)
@@ -369,7 +371,7 @@ size_t ICACHE_FLASH_ATTR umm_get_free_null_count(void) {
  * Saturated unsigned add
  * Poison added to allocation size requires overflow protection.
  */
-static size_t umm_uadd_sat(const size_t a, const size_t b) {
+size_t umm_uadd_sat(const size_t a, const size_t b) {
     size_t r = a + b;
     if (r < a) {
         return SIZE_MAX;
@@ -390,6 +392,5 @@ size_t umm_umul_sat(const size_t a, const size_t b) {
     }
     return r;
 }
-
 
 #endif // BUILD_UMM_MALLOC_C
