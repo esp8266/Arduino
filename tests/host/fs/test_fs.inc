@@ -21,7 +21,7 @@ static std::set<String> listDir (const char* path)
     std::set<String> result;
     Dir dir = FSTYPE.openDir(path);
     while (dir.next()) {
-        REQUIRE(result.find(dir.fileName()) == std::end(result));
+        REQUIRE(!result.count(dir.fileName()));
         result.insert(dir.fileName());
     }
     return result;
