@@ -199,4 +199,4 @@ By using a uniquely named `.h` file, macro definitions can be created and
 globally used. Additionally, compiler command-line options can be embedded in
 this file as a unique block comment.
 
-`Read more <faq/a06-global-build-options.rst>`__.
+`Read more <../global_build_options.rst>`__.

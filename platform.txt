@@ -66,9 +66,10 @@ build.spiffs_blocksize=
 build.iramfloat=-DFP_IN_IROM
 
 # Fully qualified file names for processing sketch global options
-globals.h.source.fqfn={build.source.path}/{build.project_name}.globals.h
-commonhfile.fqfn={build.core.path}/CommonHFile.h
-build.opt.fqfn={build.path}/core/build.opt
+globals.h.build.source.fqfn={build.source.path}/{build.project_name}.globals.h
+globals.h.build.fqfn={build.path}/{build.project_name}.globals.h
+common.h.fqfn={build.core.path}/CommonHFile.h
+build.opt.fqfn={build.path}/sketch/build.opt
 build.opt.flags="@{build.opt.fqfn}"
 mkbuildoptglobals.extra_flags=
 
@@ -76,7 +77,8 @@ compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 
 compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 {build.debug_optim} {build.opt.flags} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
+compiler.cpreprocessor.extra_flags=
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -D_GNU_SOURCE -DESP8266 {build.debug_optim} {build.opt.flags} "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core" {compiler.cpreprocessor.extra_flags}
 
 # support precompiled libraries in IDE v1.8.6+
 compiler.libraries.ldflags=
@@ -123,8 +125,8 @@ recipe.hooks.sketch.prebuild.pattern="{runtime.tools.python3.path}/python3" -I "
 # This is quite a working hack. This form of prebuild hook, while intuitive, is not explicitly documented.
 recipe.hooks.prebuild.1.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.makecorever}" --git-root "{runtime.platform.path}" --version "{version}" "{build.path}/core/core_version.h"
 
-# Handle processing sketch global options
-recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkbuildoptglobals}" "{runtime.ide.path}" {runtime.ide.version} "{build.path}" "{build.opt.fqfn}" "{globals.h.source.fqfn}" "{commonhfile.fqfn}" {mkbuildoptglobals.extra_flags}
+# Handle core & sketch global options
+recipe.hooks.prebuild.2.pattern="{runtime.tools.python3.path}/python3" -I "{runtime.tools.mkbuildoptglobals}" {mkbuildoptglobals.extra_flags} build --build-opt "{build.opt.fqfn}" --source-sketch-header "{globals.h.build.source.fqfn}" --build-sketch-header "{globals.h.build.fqfn}" --common-header "{common.h.fqfn}"
 
 
 ## Build the app.ld linker file

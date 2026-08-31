@@ -8,11 +8,17 @@
  * this line is ignored
   *@create-file:build.opt@
   # this line is ignored
-  -Og
-  // -fanalyzer
-  -DUMM_STATS_FULL=1
 */
 
+/*@create-file:build.opt:debug@
+ // Another embedded build.opt, with a different set of flags
+  -DMYTITLE1="\"Debugging on \""
+  -Og
+  -DUMM_STATS_FULL=1
+  // -fanalyzer
+*/
+
+// Following *raw* contents are also included
 #ifndef GLOBALBUILDOPTIONS_INO_GLOBALS_H
 #define GLOBALBUILDOPTIONS_INO_GLOBALS_H
 
