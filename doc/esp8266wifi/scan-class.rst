@@ -27,7 +27,7 @@ There is on `overload <https://en.wikipedia.org/wiki/Function_overloading>`__ of
 
     WiFi.scanNetworks(async, show_hidden) 
 
-Both function parameters are of ``boolean`` type. They provide the flowing functionality: \* ``asysnc`` - if set to ``true`` then scanning will start in background and function will exit without waiting for result. To check for result use separate function ``scanComplete`` that is described below. \* ``show_hidden`` - set it to ``true`` to include in scan result networks with hidden SSID.
+Both function parameters are of ``boolean`` type. They provide the following functionality: \* ``async`` - if set to ``true`` then scanning will start in background and function will exit without waiting for result. To check for result use separate function ``scanComplete`` that is described below. \* ``show_hidden`` - set it to ``true`` to include in scan result networks with hidden SSID.
 
 scanComplete
 ^^^^^^^^^^^^
