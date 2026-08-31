@@ -50,6 +50,7 @@ bool        ignore_sigint     = false;
 bool        restore_tty       = false;
 bool        mockdebug         = false;
 int         mock_port_shifter = MOCK_PORT_SHIFTER;
+int         hostBaudRate      = 9600;
 const char* fspath            = nullptr;
 
 #define STDIN STDIN_FILENO
@@ -115,14 +116,8 @@ static int mock_stop_uart(void)
 
 static uint8_t mock_read_uart(void)
 {
-    uint8_t ch  = 0;
-    int     ret = read(STDIN, &ch, 1);
-    if (ret == -1)
-    {
-        perror("read(STDIN,1)");
-        return 0;
-    }
-    return (ret == 1) ? ch : 0;
+    uint8_t ch = 0;
+    return (read(STDIN, &ch, 1) == 1) ? ch : 0;
 }
 
 void help(const char* argv0, int exitcode)
@@ -137,6 +132,8 @@ void help(const char* argv0, int exitcode)
            "\tterminal:\n"
            "\t-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
            "\t-T             - show timestamp on output\n"
+           "\t-U </dev/uart> - bind Serial0 to host uart port\n"
+           "\t-B <baudrate>   - host uart port baudrate (default: %d)\n"
            "\tFS:\n"
            "\t-P             - path for fs-persistent files (default: %s-)\n"
            "\t-S             - spiffs size in KBytes (default: %zd)\n"
@@ -147,7 +144,7 @@ void help(const char* argv0, int exitcode)
            "\t-f             - no throttle (possibly 100%%CPU)\n"
            "\t-1             - run loop once then exit (for host testing)\n"
            "\t-v             - verbose\n",
-           argv0, MOCK_PORT_SHIFTER, argv0, spiffs_kb, littlefs_kb);
+           argv0, MOCK_PORT_SHIFTER, hostBaudrate, argv0, spiffs_kb, littlefs_kb);
     exit(exitcode);
 }
 
@@ -164,6 +161,8 @@ static struct option options[] = {
     { "spiffskb", required_argument, NULL, 'S' },
     { "littlefskb", required_argument, NULL, 'L' },
     { "portshifter", required_argument, NULL, 's' },
+    { "hostuart", required_argument, NULL, 'U' },
+    { "baudrate", required_argument, NULL, 'B' },
     { "once", no_argument, NULL, '1' },
 };
 
@@ -207,8 +206,9 @@ void control_c(int sig)
 
 int main(int argc, char* const argv[])
 {
-    bool fast     = false;
-    blocking_uart = false;  // global
+    bool fast            = false;
+    blocking_uart        = false;  // global
+    const char* hostUart = nullptr;
 
     signal(SIGINT, control_c);
     signal(SIGTERM, control_c);
@@ -219,7 +219,7 @@ int main(int argc, char* const argv[])
 
     for (;;)
     {
-        int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1", options, NULL);
+        int n = getopt_long(argc, argv, "hlcfbvTi:S:s:L:P:1B:U:", options, NULL);
         if (n < 0)
             break;
         switch (n)
@@ -263,6 +263,12 @@ int main(int argc, char* const argv[])
         case '1':
             run_once = true;
             break;
+        case 'B':
+            hostBaudrate = atoi(optarg);
+            break;
+        case 'U':
+            hostUart = optarg;
+            break;
         default:
             help(argv[0], EXIT_FAILURE);
         }
@@ -302,18 +308,34 @@ int main(int argc, char* const argv[])
     // install exit handler in case Esp.restart() is called
     atexit(cleanup);
 
+    if (hostUart && hostBaudrate)
+    {
+        hostsp_open(hostUart, hostBaudrate);
+        fprintf(stderr, "Host serial port '%s':%d/8n1 is now replacing mock-uart0 (stdin/stdout)\n",
+                hostUart, hostBaudrate);
+    }
+    else
+        hostBaudrate = 0;
+
     // first call to millis(): now is millis() and micros() beginning
     millis();
 
     setup();
     while (!user_exit)
     {
-        uint8_t data = mock_read_uart();
-
-        if (data)
-            uart_new_data(UART0, data);
+        if (hostBaudrate)
+        {
+            if (hostsp_available())
+                uart_new_data(UART0, hostsp_read());
+        }
+        else
+        {
+            uint8_t data = mock_read_uart();
+            if (data)
+                uart_new_data(UART0, data);
+        }
         if (!fast)
-            usleep(1000);  // not 100% cpu, ~1000 loops per second
+            usleep(1000);  // not 100% cpu, max 1000 loops per second
         loop();
         loop_end();
         check_incoming_udp();
