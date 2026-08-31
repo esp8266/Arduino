@@ -289,7 +289,12 @@ uint8_t EspClass::getFlashChipVendorId(void)
 
 uint32_t EspClass::getFlashChipRealSize(void)
 {
-    return (1 << ((spi_flash_get_id() >> 16) & 0xFF));
+    uint32_t id = spi_flash_get_id();
+    if ((id & 0xFF) == SPI_FLASH_VENDOR_ATMEL) {
+        return (0x8000 << ((id >> 8) & 0x1F));
+    } else {
+        return (1 << ((id >> 16) & 0xFF));
+    }
 }
 
 uint32_t EspClass::getFlashChipSize(void)
