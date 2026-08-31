@@ -46,7 +46,7 @@ def printData(data, showPub = True):
 
     if showPub:
 
-        fingerprint = xcert.fingerprint(hashes.SHA1()).hex(':')
+        fingerprint = xcert.fingerprint(hashes.SHA1()).hex()
         print('const char fingerprint_{} [] PROGMEM = "{}";'.format(name, fingerprint))
 
         pem = xcert.public_key().public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo).decode('utf-8')
