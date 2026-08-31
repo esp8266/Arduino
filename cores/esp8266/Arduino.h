@@ -275,6 +275,8 @@ void setTZ(const char* tz);
 void configTime(const char* tz, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
 
+void attachInterrupt(uint8_t pin, std::function<void()> userFunc, int mode);
+
 // configures with approximated TZ value. part of the old api, prefer configTime with TZ variable
 void configTime(int timezone, int daylightOffset_sec, const char* server1,
     const char* server2 = nullptr, const char* server3 = nullptr);
