@@ -110,11 +110,10 @@ int stopWaveform(uint8_t pin);
 // Make sure the CB function has the IRAM_ATTR decorator.
 void setTimer1Callback(uint32_t (*fn)());
 
-
 // Internal-only calls, not for applications
-extern void _setPWMFreq(uint32_t freq);
-extern bool _stopPWM(uint8_t pin);
-extern bool _setPWM(int pin, uint32_t val, uint32_t range);
+void _setPWMFreq(uint32_t freq);
+bool _stopPWM(uint8_t pin);
+bool _setPWM(uint8_t pin, uint32_t val, uint32_t range);
 
 #ifdef __cplusplus
 }
