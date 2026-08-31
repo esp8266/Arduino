@@ -118,6 +118,13 @@ void EspClass::wdtFeed(void)
 
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
+    if (time_us > deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
+    {
+       time_us = deepSleepMax();
+       #ifdef DEBUG_SERIAL
+          DEBUG_SERIAL.println("Warning: max sleeptime (possibly) exceeded; risking esp8266 never waking from deepsleep; sleeptime has been adjusted to safest max possible sleeptime!");
+       #endif
+    }
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_suspend();
@@ -134,9 +141,25 @@ void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
 //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
 uint64_t EspClass::deepSleepMax()
 {
+  //This calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
+  //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t. 
   //cali*(2^31-1)/(2^12)
-  return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
-
+  //return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+  //
+  //At this moment using time_us >= (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000) can result in the esp8266
+  //never waking up from deepsleep.
+  //This issue seems to be a problem in the Espressif api and has been mentioned at git espressif/ESP8266_NONOS_SDK under #157.
+  //
+  //A safe calculation of max deepsleep has been derived:
+  //(time_in_us / cali) << 12 < 2^31 - 1 (api reference)
+  //time_in_us < (cali << (31-12))
+  //time_in_us < (cali<<19)
+  //time_in_s * 1000000 < cali * 524288
+  //time_in_s < cali * 0.524288
+  //assured by time_in_s < cali/2
+  //Theoretical max sleeptime is around 3.5 to 4 hours. Safe max sleeptime shortens theoretical max sleeptime by approximately
+  //10 minutes.
+  return ((uint64_t)system_rtc_clock_cali_proc()/2*(0xF4240ULL)-1);
 }
 
 /*
