@@ -216,6 +216,10 @@ class Stream: public Print {
         size_t sendSize (Stream& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
         size_t sendSize (Stream&& to, const ssize_t maxLen, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires) { return sendSize(&to, maxLen, timeoutMs); }
 
+        String readStreamString (const ssize_t maxLen = -1 ,const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires);
+        String readStreamStringUntil (const int readUntilChar, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires);
+        String readStreamStringUntil (const char* terminatorString, uint32_t untilTotalNumberOfOccurrences = 1, const oneShotMs::timeType timeoutMs = oneShotMs::neverExpires);
+
         // remaining size (-1 by default = unknown)
         virtual ssize_t streamRemaining () { return -1; }
 

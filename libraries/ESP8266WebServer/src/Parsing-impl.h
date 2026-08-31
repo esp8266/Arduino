@@ -44,9 +44,8 @@ static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t
 template <typename ServerType>
 typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
-  String req = client.readStringUntil('\r');
+  String req = client.readStreamStringUntil("\r\n");
   DBGWS("request: %s\n", req.c_str());
-  client.readStringUntil('\n');
   //reset header value
   for (int i = 0; i < _headerKeysCount; ++i) {
     _currentHeaders[i].value.clear();
@@ -122,8 +121,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
     uint32_t contentLength = 0;
     //parse headers
     while(1){
-      req = client.readStringUntil('\r');
-      client.readStringUntil('\n');
+      req = client.readStreamStringUntil("\r\n");
       if (req.isEmpty()) break; //no more headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
@@ -198,8 +196,7 @@ typename ESP8266WebServerTemplate<ServerType>::ClientFuture ESP8266WebServerTemp
     String headerValue;
     //parse headers
     while(1){
-      req = client.readStringUntil('\r');
-      client.readStringUntil('\n');
+      req = client.readStreamStringUntil("\r\n");
       if (req.isEmpty()) break;//no moar headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
@@ -351,11 +348,10 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
   String line;
   int retry = 0;
   do {
-    line = client.readStringUntil('\r');
+    line = client.readStreamStringUntil("\r\n");
     ++retry;
   } while (line.length() == 0 && retry < 3);
 
-  client.readStringUntil('\n');
   //start reading the form
   if (line == ("--"+boundary)){
     std::unique_ptr<RequestArgument[]> postArgs(new RequestArgument[WEBSERVER_MAX_POST_ARGS]);
@@ -367,8 +363,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
       String argFilename;
       bool argIsFile = false;
 
-      line = client.readStringUntil('\r');
-      client.readStringUntil('\n');
+      line = client.readStreamStringUntil("\r\n");
       if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase(F("Content-Disposition"))){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
@@ -388,19 +383,16 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
           DBGWS("PostArg Name: %s\n", argName.c_str());
           using namespace mime;
           argType = FPSTR(mimeTable[txt].mimeType);
-          line = client.readStringUntil('\r');
-          client.readStringUntil('\n');
+          line = client.readStreamStringUntil("\r\n");
           if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase(FPSTR(Content_Type))){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
-            client.readStringUntil('\r');
-            client.readStringUntil('\n');
+            client.readStringUntil("\r\n");
           }
           DBGWS("PostArg Type: %s\n", argType.c_str());
           if (!argIsFile){
             while(1){
-              line = client.readStringUntil('\r');
-              client.readStringUntil('\n');
+              line = client.readStreamStringUntil("\r\n");
               if (line.startsWith("--"+boundary)) break;
               if (argValue.length() > 0) argValue += '\n';
               argValue += line;
@@ -474,8 +466,7 @@ bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const 
                 _currentUpload->type.c_str(),
                 (int)_currentUpload->totalSize);
             if (!client.connected()) return _parseFormUploadAborted();
-            line = client.readStringUntil('\r');
-            client.readStringUntil('\n');
+            line = client.readStreamStringUntil("\r\n");
             if (line == "--") {     // extra two dashes mean we reached the end of all form fields
                 DBGWS("Done Parsing POST\n");
                 break;
@@ -514,6 +505,7 @@ String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
   char temp[] = "0x00";
   unsigned int len = text.length();
   unsigned int i = 0;
+  decoded.reserve(len - (std::count(text.begin(), text.end(), '%') * 2));
   while (i < len)
   {
     char decodedChar;
