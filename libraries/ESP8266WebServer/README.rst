@@ -16,10 +16,10 @@ Class Constructor
 
 Creates the ESP8266WebServer class object.
 
-*Parameters:* 
+*Parameters:*
 
 host IP address: ``IPaddress addr`` (optional)
-  
+
 host port number: ``int port`` (default is the standard HTTP port 80)
 
 Basic Operations
@@ -61,7 +61,7 @@ Client request handlers
   void onNotFound();
   void onFileUpload();	
 
-*Example:* 
+*Example:*
 
 .. code:: cpp
 
@@ -75,7 +75,7 @@ Client request filters
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: cpp
-  
+
   RequestHandler<ServerType>& setFilter();
 
 *Example:*
@@ -110,10 +110,10 @@ Getting information about request arguments
 
 .. code:: cpp
 
-  const String & arg();
-  const String & argName();
+  const String & arg(int);
+  const String & argName(int);
   int args();
-  bool hasArg();
+  bool hasArg(const String&);
 
 ``arg`` - get request argument value, use ``arg("plain")`` to get POST body
 	
@@ -133,14 +133,14 @@ Getting information about request headers
   const String & hostHeader();
   int headers();
   bool hasHeader();
-  
+
 
 ``header`` - get request header value
 
 ``headerName`` - get request header name
 
 ``hostHeader`` - get request host header if available, else empty string
-  
+
 ``headers`` - get header count
 	
 ``hasHeader`` - check if header exist
@@ -165,6 +165,18 @@ Authentication
     server.requestAuthentication();
   }
 
+Getting information about request path arguments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: cpp
+
+  const String & pathArg(int) const;
+  int pathArgs() const;
+
+``pathArg`` - get request path argument by index (starting with 0)
+	
+``pathArgs`` - get path arguments count, make sure to check it before accessing ``pathArg`` value
+	
 
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
@@ -172,13 +184,13 @@ Other Function Calls
 .. code:: cpp
 
   const String & uri(); // get the current uri
-  HTTPMethod  method(); // get the current method 
+  HTTPMethod  method(); // get the current method
   WiFiClient & client(); // get the current client
   HTTPUpload & upload(); // get the current upload
   void setContentLength(); // set content length
   void sendHeader(); // send HTTP header
   void sendContent(); // send content
-  void sendContent_P(); 
+  void sendContent_P();
   void collectHeaders(); // set the request headers to collect
   void serveStatic();
   size_t streamFile();

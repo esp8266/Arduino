@@ -16,6 +16,15 @@ const char *password = STAPSK;
 
 ESP8266WebServer server(80);
 
+bool checkPathArgs(int number) {
+  if (server.pathArgs() == number) {
+    return true;
+  }
+
+  server.send(500, "text/plain", "request handler received unexpected number of path arguments");
+  return false;
+}
+
 void setup(void) {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
@@ -40,11 +49,19 @@ void setup(void) {
   });
 
   server.on(UriBraces("/users/{}"), []() {
+    if (!checkPathArgs(1)) {
+      return;
+    }
+
     String user = server.pathArg(0);
     server.send(200, "text/plain", "User: '" + user + "'");
   });
 
   server.on(UriRegex("^\\/users\\/([0-9]+)\\/devices\\/([0-9]+)$"), []() {
+    if (!checkPathArgs(2)) {
+      return;
+    }
+
     String user = server.pathArg(0);
     String device = server.pathArg(1);
     server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");
