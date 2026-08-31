@@ -32,13 +32,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
 
-  // This next line will cause the code to use the Phase-Locked waveform generator
-  // instead of the default PWM-Locked one.  Comment it out to try the default version.
-  // For more information on choosing between the two options, see the following pull requests:
-  // Phase-Locked generator: https://github.com/esp8266/Arduino/pull/7022
-  // PWM-Locked generator:   https://github.com/esp8266/Arduino/pull/7231
-  enablePhaseLockedWaveform();
-
   pinMode(LED_BUILTIN, OUTPUT);  // Initialize the LED_BUILTIN pin as an output
   analogWriteRange(1000);
 
