@@ -671,6 +671,85 @@ namespace MDNSImplementation
         return addDynamicServiceTxt(p_hService, p_pcKey, acBuffer);
     }
 
+#ifdef MDNS_IP4_SUPPORT
+    /*
+        MDNSResponder::queryHost
+        Perform a blocking mDNS A query for a host.
+    */
+    IPAddress
+    MDNSResponder::queryHost(const char* p_pcHostname,
+                             const uint32_t p_u32Timeout /*= MDNS_QUERYHOST_WAIT_TIME*/)
+    {
+        if (0 == m_pUDPContext)
+        {
+            // safeguard against misuse
+            return IPAddress();
+        }
+
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
+            PSTR("[MDNSResponder] queryHost '%s'\n"), (p_pcHostname ?: "-")););
+
+        IPAddress result;
+
+        stcMDNSServiceQuery* pServiceQuery = 0;
+        stcMDNS_RRDomain hostDomain;
+
+        if ((p_pcHostname) && (os_strlen(p_pcHostname)) && (p_u32Timeout)
+            && (_removeLegacyServiceQuery())
+            && (_buildDomainForHost(p_pcHostname, hostDomain))
+            && ((pServiceQuery = _allocServiceQuery())))
+        {
+            pServiceQuery->m_bLegacyQuery = true;
+
+            stcMDNSServiceQuery::stcAnswer* pAnswer =
+                new stcMDNSServiceQuery::stcAnswer;
+
+            if (pAnswer)
+            {
+                pAnswer->m_HostDomain = hostDomain;
+
+                if ((pServiceQuery->addAnswer(pAnswer))
+                    && (_sendMDNSQuery(hostDomain, DNS_RRTYPE_A)))
+                {
+                    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
+                        PSTR("[MDNSResponder] queryHost: Waiting up to %lu ms for answer...\n"),
+                        p_u32Timeout););
+
+                    const uint32_t start = millis();
+
+                    do
+                    {
+                        delay(1);
+
+                        const stcMDNSServiceQuery::stcAnswer::stcIP4Address* pIP4Address =
+                            pAnswer->IP4AddressAtIndex(0);
+
+                        if (pIP4Address)
+                        {
+                            result = pIP4Address->m_IPAddress;
+                            break;
+                        }
+                    }
+                    while ((millis() - start) < p_u32Timeout);
+                }
+            }
+
+            pServiceQuery->m_bAwaitingAnswers = false;
+            _removeServiceQuery(pServiceQuery);
+        }
+        else
+        {
+            if (pServiceQuery)
+                _removeServiceQuery(pServiceQuery);
+
+            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(
+                PSTR("[MDNSResponder] queryHost: INVALID input data!\n")););
+        }
+
+        return result;
+    }
+#endif
+
     /**
         STATIC SERVICE QUERY (LEGACY)
     */

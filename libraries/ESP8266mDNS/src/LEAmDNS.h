@@ -167,6 +167,10 @@ namespace MDNSImplementation
     Default timeout for static service queries
 */
 #define MDNS_QUERYSERVICES_WAIT_TIME 1000
+/*
+    Default timeout for static host queries
+*/
+#define MDNS_QUERYHOST_WAIT_TIME 2000
 
 /*
     Timeout for udpContext->sendtimeout()
@@ -311,6 +315,19 @@ namespace MDNSImplementation
                                       int16_t p_i16Value);
         hMDNSTxt addDynamicServiceTxt(hMDNSService p_hService, const char* p_pcKey,
                                       int8_t p_i8Value);
+
+#ifdef MDNS_IP4_SUPPORT
+        // Resolve a host name using an mDNS A query.
+        // The ".local" suffix is appended automatically.
+        IPAddress queryHost(const char* p_pcHostname,
+                            const uint32_t p_u32Timeout = MDNS_QUERYHOST_WAIT_TIME);
+
+        IPAddress queryHost(const String& p_strHostname,
+                            const uint32_t p_u32Timeout = MDNS_QUERYHOST_WAIT_TIME)
+        {
+            return queryHost(p_strHostname.c_str(), p_u32Timeout);
+        }
+#endif
 
         // Perform a (static) service query. The function returns after p_u16Timeout milliseconds
         // The answers (the number of received answers is returned) can be retrieved by calling
