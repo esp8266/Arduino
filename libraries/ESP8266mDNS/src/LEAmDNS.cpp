@@ -676,9 +676,8 @@ namespace MDNSImplementation
         MDNSResponder::queryHost
         Perform a blocking mDNS A query for a host.
     */
-    IPAddress
-    MDNSResponder::queryHost(const char* p_pcHostname,
-                             const uint32_t p_u32Timeout /*= MDNS_QUERYHOST_WAIT_TIME*/)
+    IPAddress MDNSResponder::queryHost(const char*    p_pcHostname,
+                                       const uint32_t p_u32Timeout /*= MDNS_QUERYHOST_WAIT_TIME*/)
     {
         if (0 == m_pUDPContext)
         {
@@ -686,23 +685,21 @@ namespace MDNSImplementation
             return IPAddress();
         }
 
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(
-            PSTR("[MDNSResponder] queryHost '%s'\n"), (p_pcHostname ?: "-")););
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryHost '%s'\n"),
+                                            (p_pcHostname ?: "-")););
 
         IPAddress result;
 
         stcMDNSServiceQuery* pServiceQuery = 0;
-        stcMDNS_RRDomain hostDomain;
+        stcMDNS_RRDomain     hostDomain;
 
         if ((p_pcHostname) && (os_strlen(p_pcHostname)) && (p_u32Timeout)
-            && (_removeLegacyServiceQuery())
-            && (_buildDomainForHost(p_pcHostname, hostDomain))
+            && (_removeLegacyServiceQuery()) && (_buildDomainForHost(p_pcHostname, hostDomain))
             && ((pServiceQuery = _allocServiceQuery())))
         {
             pServiceQuery->m_bLegacyQuery = true;
 
-            stcMDNSServiceQuery::stcAnswer* pAnswer =
-                new stcMDNSServiceQuery::stcAnswer;
+            stcMDNSServiceQuery::stcAnswer* pAnswer = new stcMDNSServiceQuery::stcAnswer;
 
             if (pAnswer)
             {
@@ -721,16 +718,15 @@ namespace MDNSImplementation
                     {
                         delay(1);
 
-                        const stcMDNSServiceQuery::stcAnswer::stcIP4Address* pIP4Address =
-                            pAnswer->IP4AddressAtIndex(0);
+                        const stcMDNSServiceQuery::stcAnswer::stcIP4Address* pIP4Address
+                            = pAnswer->IP4AddressAtIndex(0);
 
                         if (pIP4Address)
                         {
                             result = pIP4Address->m_IPAddress;
                             break;
                         }
-                    }
-                    while ((millis() - start) < p_u32Timeout);
+                    } while ((millis() - start) < p_u32Timeout);
                 }
             }
 
@@ -742,8 +738,8 @@ namespace MDNSImplementation
             if (pServiceQuery)
                 _removeServiceQuery(pServiceQuery);
 
-            DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(
-                PSTR("[MDNSResponder] queryHost: INVALID input data!\n")););
+            DEBUG_EX_ERR(
+                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] queryHost: INVALID input data!\n")););
         }
 
         return result;
