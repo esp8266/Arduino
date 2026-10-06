@@ -29,6 +29,29 @@ Default input value 0 means that effective value is left at the discretion of th
 
 ``stop()`` returns ``false`` in case of an issue when closing the client (for instance a timed-out ``flush``). Depending on implementation, its parameter can be passed to ``flush()``.
 
+Receive-buffer ownership after stop
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``stop()`` closes the TCP connection, but the ``WiFiClient`` can still own a
+``ClientContext`` and unread received data. This is separate from the TCP
+``TIME_WAIT`` state described below. If an application keeps clients in members
+or globals, merely calling ``stop()`` does not release that receive-buffer
+ownership. A heap threshold checked before reconnecting can then prevent the
+next connection indefinitely.
+
+If the application has finished with the connection and does not need its
+unread data, release its client reference after closing it:
+
+.. code:: cpp
+
+   client.stop(20);         // Close with a bounded flush wait.
+   client = WiFiClient();  // Release this reference, including unread RX data.
+
+Copies of a ``WiFiClient`` share the context. The receive buffers and context
+are released only after the final reference is released. A local client also
+releases its reference when it goes out of scope. ``abort()`` frees the TCP PCB,
+but it does not by itself release the client's context or unread receive data.
+
 abort
 ~~~~~
 
