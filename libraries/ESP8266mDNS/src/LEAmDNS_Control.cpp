@@ -86,6 +86,16 @@ namespace MDNSImplementation
         {
             bResult = _updateProbeStatus() &&     // Probing
                       _checkServiceQueryCache();  // Service query cache check
+#ifdef MDNS_IP6_RESPONDER
+            // IP6 addresses (SLAAC) usually come after the IP4 one, announce them once they do
+            const uint8_t u8IP6Count = _ip6AddressCount(0);
+            if ((ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus)
+                && (u8IP6Count != m_u8IP6AddressCount))
+            {
+                m_u8IP6AddressCount = u8IP6Count;
+                _announce(true, true);  // Services too, in an IP6 only net nothing went out yet
+            }
+#endif
         }
         return bResult;
     }
@@ -1778,6 +1788,9 @@ namespace MDNSImplementation
             sendParameter.m_u8HostReplyMask |= ContentFlag_A;        // A answer
             sendParameter.m_u8HostReplyMask |= ContentFlag_PTR_IP4;  // PTR_IP4 answer
 #endif
+#ifdef MDNS_IP6_RESPONDER
+            sendParameter.m_u8HostReplyMask |= ContentFlag_AAAA;  // AAAA answer
+#endif
 #ifdef MDNS_IP6_SUPPORT
             sendParameter.m_u8HostReplyMask |= ContentFlag_AAAA;     // AAAA answer
             sendParameter.m_u8HostReplyMask |= ContentFlag_PTR_IP6;  // PTR_IP6 answer
@@ -2258,7 +2271,7 @@ namespace MDNSImplementation
                     u8ReplyMask |= ContentFlag_A;
                 }
 #endif
-#ifdef MDNS_IP6_SUPPORT
+#if defined(MDNS_IP6_SUPPORT) || defined(MDNS_IP6_RESPONDER)
                 if ((DNS_RRTYPE_AAAA == p_RRHeader.m_Attributes.m_u16Type)
                     || (DNS_RRTYPE_ANY == p_RRHeader.m_Attributes.m_u16Type))
                 {

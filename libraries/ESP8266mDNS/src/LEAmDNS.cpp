@@ -29,6 +29,9 @@
 #include "LEAmDNS_Priv.h"
 #include <LwipIntf.h>
 #include <lwip/igmp.h>
+#if LWIP_IPV6
+#include <lwip/mld6.h>
+#endif
 #include <lwip/prot/dns.h>
 
 // should be defined at build time
@@ -1298,9 +1301,13 @@ namespace MDNSImplementation
         // Join multicast group(s)
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         {
-            if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
+            if (!netif_is_up(pNetIf))
             {
+                continue;
+            }
 #ifdef MDNS_IP4_SUPPORT
+            if (IPAddress(pNetIf->ip_addr).isSet())
+            {
                 ip_addr_t multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
                 if (!(pNetIf->flags & NETIF_FLAG_IGMP))
                 {
@@ -1326,21 +1333,22 @@ namespace MDNSImplementation
                              ": %s) FAILED!\n"),
                         NETIFID_VAL(pNetIf), IPAddress(multicast_addr_V4).toString().c_str()););
                 }
-#endif
-
-#ifdef MDNS_IPV6_SUPPORT
-                ip_addr_t multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
-                bResult
-                    = ((bResult)
-                       && (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6))));
-                DEBUG_EX_ERR_IF(
-                    !bResult,
-                    DEBUG_OUTPUT.printf_P(
-                        PSTR("[MDNSResponder] _createHost: mld6_joingroup_netif (" NETIFID_STR
-                             ") FAILED!\n"),
-                        NETIFID_VAL(pNetIf)));
-#endif
             }
+#endif
+#if defined(MDNS_IP6_SUPPORT) || defined(MDNS_IP6_RESPONDER)
+            ip_addr_t multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
+            if (ERR_OK == mld6_joingroup_netif(pNetIf, ip_2_ip6(&multicast_addr_V6)))
+            {
+                bResult = true;
+            }
+            else
+            {
+                DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(
+                    PSTR("[MDNSResponder] _createHost: mld6_joingroup_netif (" NETIFID_STR
+                         ") FAILED!\n"),
+                    NETIFID_VAL(pNetIf)););
+            }
+#endif
         }
         return bResult;
     }
@@ -1354,19 +1362,20 @@ namespace MDNSImplementation
 
         for (netif* pNetIf = netif_list; pNetIf; pNetIf = pNetIf->next)
         {
-            if (netif_is_up(pNetIf) && IPAddress(pNetIf->ip_addr).isSet())
+            if (netif_is_up(pNetIf))
             {
                 bResult = true;
 
                 // Leave multicast group(s)
 #ifdef MDNS_IP4_SUPPORT
                 ip_addr_t multicast_addr_V4 = DNS_MQUERY_IPV4_GROUP_INIT;
-                if (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4)))
+                if ((IPAddress(pNetIf->ip_addr).isSet())
+                    && (ERR_OK != igmp_leavegroup_netif(pNetIf, ip_2_ip4(&multicast_addr_V4))))
                 {
                     DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR("\n")););
                 }
 #endif
-#ifdef MDNS_IPV6_SUPPORT
+#if defined(MDNS_IP6_SUPPORT) || defined(MDNS_IP6_RESPONDER)
                 ip_addr_t multicast_addr_V6 = DNS_MQUERY_IPV6_GROUP_INIT;
                 if (ERR_OK
                     != mld6_leavegroup_netif(
