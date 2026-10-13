@@ -135,12 +135,14 @@ namespace MDNSImplementation
 #define MDNS_IP4_SUPPORT
 #if LWIP_IPV6
 //#define MDNS_IP6_SUPPORT
+// Answer AAAA questions and announce the IPv6 addresses (over the IPv4 transport)
+#define MDNS_IP6_RESPONDER
 #endif
 
 #ifdef MDNS_IP4_SUPPORT
 #define MDNS_IP4_SIZE 4
 #endif
-#ifdef MDNS_IP6_SUPPORT
+#if defined(MDNS_IP6_SUPPORT) || defined(MDNS_IP6_RESPONDER)
 #define MDNS_IP6_SIZE 16
 #endif
 /*
@@ -1173,8 +1175,11 @@ namespace MDNSImplementation
         stcMDNSServiceQuery*              m_pServiceQueries;
         MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
         stcProbeInformation               m_HostProbeInformation;
-        bool                              m_bLwipCb;
-        bool                              m_bRestarting;
+#ifdef MDNS_IP6_RESPONDER
+        uint8_t m_u8IP6AddressCount = 0;  // re-announce when it changes (SLAAC comes after DHCP)
+#endif
+        bool m_bLwipCb;
+        bool m_bRestarting;
 
         /** CONTROL **/
         /* MAINTENANCE */
@@ -1220,7 +1225,7 @@ namespace MDNSImplementation
         /* SENDING */
         bool _sendMDNSMessage(stcMDNSSendParameter& p_SendParameter);
         bool _sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParameter& p_rSendParameter);
-        bool _prepareMDNSMessage(stcMDNSSendParameter& p_SendParameter, IPAddress p_IPAddress);
+        bool _prepareMDNSMessage(stcMDNSSendParameter& p_SendParameter, const netif* p_pNetIf);
         bool _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
         bool _sendMDNSQuery(const stcMDNS_RRDomain& p_QueryDomain, uint16_t p_u16QueryType,
                             stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
@@ -1316,8 +1321,11 @@ namespace MDNSImplementation
                                        stcMDNSSendParameter& p_rSendParameter);
         bool _writeMDNSAnswer_TXT(stcMDNSService&       p_rService,
                                   stcMDNSSendParameter& p_rSendParameter);
+#if defined(MDNS_IP6_SUPPORT) || defined(MDNS_IP6_RESPONDER)
+        static uint8_t _ip6AddressCount(const netif* p_pNetIf);
+        bool _writeMDNSAnswer_AAAA(const netif* p_pNetIf, stcMDNSSendParameter& p_rSendParameter);
+#endif
 #ifdef MDNS_IP6_SUPPORT
-        bool _writeMDNSAnswer_AAAA(IPAddress p_IPAddress, stcMDNSSendParameter& p_rSendParameter);
         bool _writeMDNSAnswer_PTR_IP6(IPAddress             p_IPAddress,
                                       stcMDNSSendParameter& p_rSendParameter);
 #endif
