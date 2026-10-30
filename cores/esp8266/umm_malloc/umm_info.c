@@ -25,6 +25,7 @@
 
 // UMM_HEAP_INFO ummHeapInfo;
 
+void *umm_info(void *ptr, bool force) ICACHE_FLASH_ATTR;
 void *umm_info(void *ptr, bool force) {
     UMM_CRITICAL_DECL(id_info);
 
@@ -170,6 +171,11 @@ void *umm_info(void *ptr, bool force) {
 
 /* ------------------------------------------------------------------------ */
 
+#if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+size_t umm_free_heap_size_core(umm_heap_context_t *_context) ICACHE_FLASH_ATTR;
+size_t umm_free_heap_size(void) ICACHE_FLASH_ATTR;
+#endif
+
 size_t umm_free_heap_size_core(umm_heap_context_t *_context) {
     return (size_t)_context->info.freeBlocks * sizeof(umm_block);
 }
@@ -194,10 +200,12 @@ size_t umm_free_heap_size(void) {
 // C umm_max_free_block_size() keeping old function name for (dot) releases.
 // C TODO: update at next major release.
 // C size_t umm_max_free_block_size( void ) {
+size_t umm_max_block_size_core(umm_heap_context_t *_context) ICACHE_FLASH_ATTR;
 size_t umm_max_block_size_core(umm_heap_context_t *_context) {
     return _context->info.maxFreeContiguousBlocks * sizeof(umm_block);
 }
 
+size_t umm_max_block_size(void) ICACHE_FLASH_ATTR;
 size_t umm_max_block_size(void) {
     umm_info(NULL, false);
     return umm_max_block_size_core(umm_get_current_heap());
@@ -208,6 +216,7 @@ size_t umm_max_block_size(void) {
   umm_fragmentation_metric() must to be preceded by a call to umm_info(NULL, false)
   for updated results.
 */
+int umm_usage_metric_core(umm_heap_context_t *_context) ICACHE_FLASH_ATTR;
 int umm_usage_metric_core(umm_heap_context_t *_context) {
 // C Note, umm_metrics also appears in the upstrean w/o definition. I suspect it is suppose to be ummHeapInfo.
     // DBGLOG_DEBUG( "usedBlocks %d totalBlocks %d\n", umm_metrics.usedBlocks, ummHeapInfo.totalBlocks);
@@ -219,6 +228,7 @@ int umm_usage_metric_core(umm_heap_context_t *_context) {
     return -1; // no freeBlocks
 }
 
+int umm_usage_metric(void) ICACHE_FLASH_ATTR;
 int umm_usage_metric(void) {
     #ifndef UMM_INLINE_METRICS
     umm_info(NULL, false);
@@ -228,6 +238,7 @@ int umm_usage_metric(void) {
 }
 uint32_t sqrt32(uint32_t n);
 
+int umm_fragmentation_metric_core(umm_heap_context_t *_context) ICACHE_FLASH_ATTR;
 int umm_fragmentation_metric_core(umm_heap_context_t *_context) {
     // DBGLOG_DEBUG( "freeBlocks %d freeBlocksSquared %d\n", umm_metrics.freeBlocks, ummHeapInfo.freeBlocksSquared);
     DBGLOG_DEBUG("freeBlocks %d freeBlocksSquared %d\n", _context->info.freeBlocks, _context->info.freeBlocksSquared);
@@ -239,6 +250,7 @@ int umm_fragmentation_metric_core(umm_heap_context_t *_context) {
     }
 }
 
+int umm_fragmentation_metric(void) ICACHE_FLASH_ATTR;
 int umm_fragmentation_metric(void) {
     #ifndef UMM_INLINE_METRICS
     umm_info(NULL, false);
