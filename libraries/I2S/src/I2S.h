@@ -22,7 +22,8 @@
 #ifndef _I2S_H_INCLUDED
 #define _I2S_H_INCLUDED
 
-#include <Arduino.h>
+#include <Print.h>
+#include <Stream.h>
 #include <core_esp8266_i2s.h>
 
 typedef enum {
@@ -42,34 +43,47 @@ public:
   void end();
 
   // from Stream
-  virtual int available();
-  virtual int read(); // Blocking, will wait for incoming data
-  virtual int peek(); // Blocking, will wait for incoming data   
-  virtual void flush();
+  using Stream::read;
+
+  int available() override;
+
+  int peek() override; // Blocking, will wait for incoming data
+  int read() override; // Blocking, will wait for incoming data
+
+  int read(uint8_t* buffer, size_t size) override;
 
   // from Print (see notes on write() methods below)
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buffer, size_t size);
-  virtual int availableForWrite();
+  using Print::write;
+
+  size_t write(uint8_t s) override;
+  size_t write(const uint8_t *buffer, size_t size) override;
+
+  int availableForWrite() override;
+  void flush() override;
+
+  // Methods below are only available for I2SClass instance
+  // Everything else goes through Stream / Print methods
 
   // Read up to size samples from the I2S device.  Non-blocking, will read
   // from 0...size samples and return the count read.  Be sure your app handles
   // the partial read case (i.e. yield()ing and trying to read more).
   int read(void* buffer, size_t size);
 
-  // Write a single sample to the I2S device.  Blocking until write succeeds
-  size_t write(int32_t);
   // Write up to size samples to the I2S device.  Non-blocking, will write
   // from 0...size samples and return that count.  Be sure your app handles
   // partial writes (i.e. by yield()ing and then retrying to write the
   // remaining data.
-  size_t write(const void *buffer, size_t size);
+  size_t write(const void* buffer, size_t size);
+
+  // Write a single sample to the I2S device.  Blocking until write succeeds
+  size_t write(int32_t);
 
   // Note that these callback are called from **INTERRUPT CONTEXT** and hence
   // must be both stored in IRAM and not perform anything that's not legal in
   // an interrupt
-  void onTransmit(void(*)(void));
-  void onReceive(void(*)(void));
+  using i2s_callback_type = void (*)();
+  void onTransmit(i2s_callback_type);
+  void onReceive(i2s_callback_type);
 
 private:
   int _bps;
