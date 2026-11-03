@@ -17,6 +17,7 @@ Using ESP8266 Core
    PROGMEM <PROGMEM>
    Using GDB to debug <gdb>
    MMU <mmu>
+   Global build options <global_build_options>
    Boards <boards>
 
 Troubleshooting

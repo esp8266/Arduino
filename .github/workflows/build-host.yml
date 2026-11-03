@@ -1,5 +1,5 @@
 # Run host test suite under valgrind for runtime checking of code.
-# Also, a quick test that the mocking builds work at all
+# Also, a quick test that the mock builds are actually working
 
 name: Build on host OS
 
