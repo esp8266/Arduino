@@ -537,7 +537,7 @@ uart_write(uart_t* uart, const char* buf, size_t size)
 
     if(gdbstub_has_uart_isr_control() && uart->uart_nr == UART0) {
         gdbstub_write(buf, size);
-        return 0;
+        return size;
     }
 
     size_t ret = size;
