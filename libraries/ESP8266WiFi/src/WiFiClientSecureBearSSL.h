@@ -51,11 +51,15 @@ class WiFiClientSecureCtx : public WiFiClient {
     int connect(const char* name, uint16_t port) override;
 
     uint8_t connected() override;
+
+    size_t write(uint8_t) override;
     size_t write(const uint8_t *buf, size_t size) override;
-    size_t write_P(PGM_P buf, size_t size) override;
-    size_t write(Stream& stream); // Note this is not virtual
+
+    size_t write_P(const char* buf, size_t size) override;
+
     int read(uint8_t *buf, size_t size) override;
     int read(char *buf, size_t size) { return read((uint8_t*)buf, size); }
+
     int available() override;
     int read() override;
     int peek() override;
@@ -268,24 +272,36 @@ class WiFiClientSecure : public WiFiClient {
     int connect(const char* name, uint16_t port) override { return _ctx->connect(name, port); }
 
     uint8_t connected() override { return _ctx->connected(); }
+
+    using WiFiClient::write;
+
+    size_t write(uint8_t c) override { return _ctx->write(c); }
     size_t write(const uint8_t *buf, size_t size) override { return _ctx->write(buf, size); }
+    size_t write(const char *buf) { return _ctx->write((const uint8_t*)buf, strlen(buf)); }
+
+    [[deprecated("3.x.x: replace with ::sendAll(...)")]]
+    size_t write(Stream& other) { return _ctx->sendAll(other); }
+
     size_t write_P(PGM_P buf, size_t size) override { return _ctx->write_P(buf, size); }
-    size_t write(const char *buf) { return write((const uint8_t*)buf, strlen(buf)); }
-    size_t write_P(const char *buf) { return write_P((PGM_P)buf, strlen_P(buf)); }
-    size_t write(Stream& stream) /* Note this is not virtual */ { return _ctx->write(stream); }
+
     int read(uint8_t *buf, size_t size) override { return _ctx->read(buf, size); }
+    int read() override { return _ctx->read(); }
+
     int available() override { return _ctx->available(); }
     int availableForWrite() override { return _ctx->availableForWrite(); }
-    int read() override { return _ctx->read(); }
+
     int peek() override { return _ctx->peek(); }
     size_t peekBytes(uint8_t *buffer, size_t length) override { return _ctx->peekBytes(buffer, length); }
+
     bool flush(unsigned int maxWaitMs) { return _ctx->flush(maxWaitMs); }
-    bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
     void flush() override { (void)flush(0); }
+
+    bool stop(unsigned int maxWaitMs) { return _ctx->stop(maxWaitMs); }
     void stop() override { (void)stop(0); }
 
     IPAddress remoteIP() override { return _ctx->remoteIP(); }
     uint16_t  remotePort() override { return _ctx->remotePort(); }
+
     IPAddress localIP() override { return _ctx->localIP(); }
     uint16_t  localPort() override { return _ctx->localPort(); }
 
