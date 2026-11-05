@@ -300,7 +300,7 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 static bool spoof_init_data = false;
 
 extern int __real_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
-extern int IRAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
+extern int __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
 extern int __get_adc_mode();
 
 /*
@@ -376,4 +376,4 @@ void user_rf_pre_init()
 
 void IRAM_ATTR user_spi_flash_dio_to_qio_pre_init() {}
 
-};
+}  // extern "C"

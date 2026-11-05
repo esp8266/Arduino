@@ -34,8 +34,6 @@
 extern "C" {
 #endif
 
-typedef void (*voidFuncPtr)(void);
-
 void initPins();
 void resetPins();
 

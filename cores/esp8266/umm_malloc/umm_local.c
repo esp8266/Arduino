@@ -168,7 +168,7 @@ void umm_poison_free_fl(void *ptr, const char *file, int line) {
   For internal, mainly used by UMM_STATS_FULL; exported so external components
   can perform Heap related calculations.
 */
-size_t umm_block_size(void) {
+size_t ICACHE_FLASH_ATTR umm_block_size(void) {
     return sizeof(umm_block);
 }
 #endif
@@ -256,6 +256,7 @@ size_t xPortGetFreeHeapSize(void) {
 #endif
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
+void umm_print_stats(int force) ICACHE_FLASH_ATTR;
 void umm_print_stats(int force) {
     umm_heap_context_t *_context = umm_get_current_heap();
 

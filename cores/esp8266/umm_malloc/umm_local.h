@@ -50,12 +50,11 @@ static bool check_poison_neighbors(umm_heap_context_t *_context, uint16_t cur);
 
 
 #if defined(UMM_STATS) || defined(UMM_STATS_FULL)
-void ICACHE_FLASH_ATTR umm_print_stats(int force);
+void umm_print_stats(int force);
 #endif
 
 
-
-int ICACHE_FLASH_ATTR umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+int umm_info_safe_printf_P(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 #define UMM_INFO_PRINTF(fmt, ...) umm_info_safe_printf_P(PSTR(fmt),##__VA_ARGS__)
 
 
