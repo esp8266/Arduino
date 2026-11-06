@@ -13,12 +13,15 @@ extern "C" {
 namespace esp8266::FunctionalInterrupt {
 namespace {
 
+struct FunctionInfo {
+    Function reqFunction;
+    ScheduledFunction reqScheduledFunction;
+};
+
 struct ArgStructure {
 	InterruptInfo* interruptInfo;
 	FunctionInfo* functionInfo;
 };
-
-}
 
 void IRAM_ATTR updateArg(void* varg, uint8_t i, uint8_t value, uint32_t micro) {
   ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
@@ -40,6 +43,8 @@ void IRAM_ATTR dispatchScheduled(void* varg)
 {
   ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
   schedule_function(std::bind(arg->functionInfo->reqScheduledFunction, InterruptInfo(*(arg->interruptInfo))));
+}
+
 }
 
 // see core_esp8266_wiring_digital.cpp, these are referenced there

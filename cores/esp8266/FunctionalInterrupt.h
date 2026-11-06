@@ -23,11 +23,6 @@ struct InterruptInfo {
 
 using ScheduledFunction = std::function<void(InterruptInfo)>;
 
-struct FunctionInfo {
-    Function reqFunction;
-	ScheduledFunction reqScheduledFunction;
-};
-
 }  // namespace esp8266::FunctionalInterrupt
 
 void attachInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::Function, int mode);
