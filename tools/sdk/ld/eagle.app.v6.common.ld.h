@@ -143,6 +143,7 @@ SECTIONS
     /* functional interrupt placed in IRAM */
     *(.text._ZNKSt8functionIFvN7esp826619FunctionalInterrupt3TagEE*)
     *(.text._ZNSt17_Function_handlerIFvN7esp826619FunctionalInterrupt3TagEE*_M_invoke*)
+    *(.text._ZNSt17_Function_handlerIFvN7esp826619FunctionalInterrupt3TagEE*_M_manager*)
 
 #ifdef FP_IN_IRAM
     *libgcc.a:*f2.o(.literal .text)

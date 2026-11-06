@@ -43,7 +43,7 @@ void IRAM_ATTR dispatchScheduled(void* varg)
 }
 
 // see core_esp8266_wiring_digital.cpp, these are referenced there
-void cleanup(void* varg)
+void IRAM_ATTR cleanup(void* varg)
 {
   ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
   delete (FunctionInfo*)arg->functionInfo;
