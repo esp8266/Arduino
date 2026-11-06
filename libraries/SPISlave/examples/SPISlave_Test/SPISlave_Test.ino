@@ -13,6 +13,9 @@
     the ESP8266 WILL FAIL to boot!
     See SPISlave_SafeMaster example for possible workaround
 
+    Warning! sketch unsafely executes SPISlave callbacks in ISR context
+    For real application, make sure to place these functions into IRAM
+
 */
 
 #include "SPISlave.h"

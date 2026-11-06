@@ -21,20 +21,21 @@
 #ifndef _SPISLAVE_H_INCLUDED
 #define _SPISLAVE_H_INCLUDED
 
-#include "Arduino.h"
-#include <functional>
+#include <Arduino.h>
+#include <cstdint>
+#include <cstddef>
 
-typedef std::function<void(uint8_t *data, size_t len)> SpiSlaveDataHandler;
-typedef std::function<void(uint32_t status)> SpiSlaveStatusHandler;
-typedef std::function<void(void)> SpiSlaveSentHandler;
+using SpiSlaveDataHandler = void(*)(uint8_t *, size_t );
+using SpiSlaveStatusHandler = void(*)(uint32_t status);
+using SpiSlaveSentHandler = void(*)();
 
 class SPISlaveClass
 {
 protected:
-    SpiSlaveDataHandler _data_cb;
-    SpiSlaveStatusHandler _status_cb;
-    SpiSlaveSentHandler _data_sent_cb;
-    SpiSlaveSentHandler _status_sent_cb;
+    SpiSlaveDataHandler _data_cb = nullptr;
+    SpiSlaveStatusHandler _status_cb = nullptr;
+    SpiSlaveSentHandler _data_sent_cb = nullptr;
+    SpiSlaveSentHandler _status_sent_cb = nullptr;
     void _data_rx(uint8_t * data, uint8_t len);
     void _status_rx(uint32_t data);
     void _data_tx(void);
@@ -44,21 +45,14 @@ protected:
     static void _s_data_tx(void *arg);
     static void _s_status_tx(void *arg);
 public:
-    SPISlaveClass()
-        : _data_cb(NULL)
-        , _status_cb(NULL)
-        , _data_sent_cb(NULL)
-        , _status_sent_cb(NULL)
-    {}
-    ~SPISlaveClass() {}
+    SPISlaveClass() = default;
+    ~SPISlaveClass() = default;
+
     void begin();
     void begin(uint8_t statusLength);
     void end();
     void setData(uint8_t * data, size_t len);
-    void setData(const char * data)
-    {
-        setData((uint8_t *)data, strlen(data));
-    }
+    void setData(const char * data);
     void setStatus(uint32_t status);
     void onData(SpiSlaveDataHandler cb);
     void onDataSent(SpiSlaveSentHandler cb);

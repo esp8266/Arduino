@@ -90,6 +90,10 @@ void SPISlaveClass::setData(uint8_t * data, size_t len)
     }
     hspi_slave_setData(data, len);
 }
+void SPISlaveClass::setData(const char* data)
+{
+    setData((uint8_t *)data, strlen(data));
+}
 void SPISlaveClass::setStatus(uint32_t status)
 {
     hspi_slave_setStatus(status);
