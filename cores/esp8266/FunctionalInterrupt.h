@@ -1,35 +1,29 @@
-#ifndef FUNCTIONALINTERRUPT_H
-#define FUNCTIONALINTERRUPT_H
+// core_esp8266_wiring_digital helper for std::function<...> dispatch
 
-#include <stddef.h>
-#include <stdint.h>
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 
-extern "C" {
-#include "c_types.h"
-#include "ets_sys.h"
-}
+namespace esp8266::FunctionalInterrupt {
 
-// Structures for communication
+using Function = std::function<void()>;
 
 struct InterruptInfo {
-	uint8_t pin = 0;
-	uint8_t value = 0;
-	uint32_t micro = 0;
+	uint8_t pin;
+	uint8_t value;
+	uint32_t micro;
 };
+
+using ScheduledFunction = std::function<void(InterruptInfo)>;
 
 struct FunctionInfo {
-    std::function<void(void)> reqFunction = nullptr;
-	std::function<void(InterruptInfo)> reqScheduledFunction = nullptr;
+    Function reqFunction;
+	ScheduledFunction reqScheduledFunction;
 };
 
-struct ArgStructure {
-	InterruptInfo* interruptInfo = nullptr;
-	FunctionInfo* functionInfo = nullptr;
-};
+}  // namespace esp8266::FunctionalInterrupt
 
-void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode);
-void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode);
-
-
-#endif //INTERRUPTS_H
+void attachInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::Function, int mode);
+void attachScheduledInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::ScheduledFunction, int mode);

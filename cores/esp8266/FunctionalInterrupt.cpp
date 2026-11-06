@@ -1,65 +1,104 @@
-#include <FunctionalInterrupt.h>
-#include <Schedule.h>
+// core_esp8266_wiring_digital helper for std::function<...> dispatch
+
 #include "Arduino.h"
+#include "Schedule.h"
 
-// Duplicate typedefs from core_esp8266_wiring_digital_c
-typedef void (*voidFuncPtr)(void);
-typedef void (*voidFuncPtrArg)(void*);
+#include "FunctionalInterrupt.h"
 
-// Helper functions for Functional interrupt routines
-extern "C" void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtr userFunc, void*fp, int mode, bool functional);
-
-
-void IRAM_ATTR interruptFunctional(void* arg)
-{
-    ArgStructure* localArg = (ArgStructure*)arg;
-	if (localArg->functionInfo->reqScheduledFunction)
-	{
-		schedule_function(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))));
-	}
-	if (localArg->functionInfo->reqFunction)
-	{
-	  localArg->functionInfo->reqFunction();
-	}
+extern "C" {
+#include "c_types.h"
+#include "ets_sys.h"
 }
 
-extern "C"
-{
-   void cleanupFunctional(void* arg)
-   {
-	 ArgStructure* localArg = (ArgStructure*)arg;
-	 delete (FunctionInfo*)localArg->functionInfo;
-     delete (InterruptInfo*)localArg->interruptInfo;
-	 delete localArg;
-   }
+namespace esp8266::FunctionalInterrupt {
+namespace {
+
+struct ArgStructure {
+	InterruptInfo* interruptInfo;
+	FunctionInfo* functionInfo;
+};
+
 }
 
-void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
-{
-	// use the local interrupt routine which takes the ArgStructure as argument
+void IRAM_ATTR updateArg(void* varg, uint8_t i, uint8_t value, uint32_t micro) {
+  ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
+  if (arg && arg->interruptInfo)
+  {
+    arg->interruptInfo->pin = i;
+    arg->interruptInfo->value = value;
+    arg->interruptInfo->micro = micro;
+  }
+}
 
+void IRAM_ATTR dispatchFunction(void* varg)
+{
+  ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
+  arg->functionInfo->reqFunction();
+}
+
+void IRAM_ATTR dispatchScheduled(void* varg)
+{
+  ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
+  schedule_function(std::bind(arg->functionInfo->reqScheduledFunction, InterruptInfo(*(arg->interruptInfo))));
+}
+
+// see core_esp8266_wiring_digital.cpp, these are referenced there
+void cleanup(void* varg)
+{
+  ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
+  delete (FunctionInfo*)arg->functionInfo;
+  delete (InterruptInfo*)arg->interruptInfo;
+  delete arg;
+}
+
+// these would be used by the the local interrupt routine which takes the ArgStructure as argument
+
+void prepareFunction(void** funcPtr, void** argPtr, Function intRoutine)
+{
 	InterruptInfo* ii = nullptr;
 
 	FunctionInfo* fi = new FunctionInfo;
-	fi->reqFunction = intRoutine;
+	fi->reqFunction = std::move(intRoutine);
 
 	ArgStructure* as = new ArgStructure;
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+    (*funcPtr) = (void*)&dispatchFunction;
+    (*argPtr) = as;
 }
 
-void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
+void prepareScheduledFunction(void** funcPtr, void** argPtr, ScheduledFunction intRoutine)
 {
 	InterruptInfo* ii = new InterruptInfo;
 
 	FunctionInfo* fi = new FunctionInfo;
-	fi->reqScheduledFunction = scheduledIntRoutine;
+	fi->reqScheduledFunction = std::move(intRoutine);
 
 	ArgStructure* as = new ArgStructure;
 	as->interruptInfo = ii;
 	as->functionInfo = fi;
 
-	__attachInterruptFunctionalArg(pin, (voidFuncPtr)interruptFunctional, as, mode, true);
+    (*funcPtr) = (void*)&dispatchScheduled;
+    (*argPtr) = as;
+}
+
+}  // namespace esp8266::FunctionalInterrupt
+
+extern "C" void __attachInterruptFunctionalArg(uint8_t, void (*)(void*), void*, int, bool functional);
+
+void attachInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::Function intRoutine, int mode)
+{
+  void* func;
+  void* arg;
+  esp8266::FunctionalInterrupt::prepareFunction(&func, &arg, std::move(intRoutine));
+  __attachInterruptFunctionalArg(pin, reinterpret_cast<void(*)(void*)>(func), arg, mode, true);
+}
+
+void attachScheduledInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::ScheduledFunction intRoutine, int mode)
+{
+  void* func;
+  void* arg;
+  esp8266::FunctionalInterrupt::prepareScheduledFunction(&func, &arg, std::move(intRoutine));
+  __attachInterruptFunctionalArg(pin, reinterpret_cast<void(*)(void*)>(func), arg, mode, true);
 }
