@@ -33,7 +33,7 @@ void IRAM_ATTR updateArg(void* varg, uint8_t i, uint8_t value, uint32_t micro) {
 void IRAM_ATTR dispatchFunction(void* varg)
 {
   ArgStructure* arg = reinterpret_cast<ArgStructure*>(varg);
-  arg->functionInfo->reqFunction();
+  arg->functionInfo->reqFunction(Tag{});
 }
 
 void IRAM_ATTR dispatchScheduled(void* varg)

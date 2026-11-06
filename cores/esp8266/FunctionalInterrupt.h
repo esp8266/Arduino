@@ -8,7 +8,12 @@
 
 namespace esp8266::FunctionalInterrupt {
 
-using Function = std::function<void()>;
+using PlainFunction = std::function<void()>;
+
+struct Tag {
+};
+
+using Function = std::function<void(Tag)>;
 
 struct InterruptInfo {
 	uint8_t pin;
@@ -27,3 +32,8 @@ struct FunctionInfo {
 
 void attachInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::Function, int mode);
 void attachScheduledInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::ScheduledFunction, int mode);
+
+[[deprecated("3.2.x: use function type w/ ::Tag as argument")]]
+inline void attachInterrupt(uint8_t pin, esp8266::FunctionalInterrupt::PlainFunction func, int mode) {
+  attachInterrupt(pin, [func = std::move(func)](auto) { func(); }, mode);
+}
