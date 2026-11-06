@@ -140,10 +140,12 @@ SECTIONS
 
     *(.text.gdbstub* .text.gdb_init)    /* Any GDB hooks */
 
-    /* functional interrupt placed in IRAM */
+    /* functional interrupt & related funcs placed in IRAM */
     *(.text._ZNKSt8functionIFvN7esp826619FunctionalInterrupt3TagEE*)
     *(.text._ZNSt17_Function_handlerIFvN7esp826619FunctionalInterrupt3TagEE*_M_invoke*)
     *(.text._ZNSt17_Function_handlerIFvN7esp826619FunctionalInterrupt3TagEE*_M_manager*)
+
+    *(.text._ZNSt14_Function_baseD2Ev) /* std::function dtor */
 
 #ifdef FP_IN_IRAM
     *libgcc.a:*f2.o(.literal .text)

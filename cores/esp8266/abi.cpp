@@ -21,6 +21,8 @@
 #include <Arduino.h>
 #include <cxxabi.h>
 
+#include <c_types.h>
+
 using __cxxabiv1::__guard;
 
 // Debugging helper, last allocation which returned NULL
@@ -33,7 +35,7 @@ extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 #if !defined(__cpp_exceptions)
 
-// overwrite weak operators new/new[] definitions
+// overwrite weak operators new/new[]
 
 void* operator new(size_t size)
 {
@@ -78,6 +80,22 @@ void* operator new[] (size_t size, const std::nothrow_t&)
 }
 
 #endif // !defined(__cpp_exceptions)
+
+// overwrite weak operators delete/sized delete/delete[]
+// todo: current implementation simply links std::free
+// todo: functionalinterrupt needs this to be in iram
+
+void IRAM_ATTR operator delete(void* ptr) noexcept
+{
+    free(ptr);
+}
+
+void IRAM_ATTR operator delete(void* ptr, size_t) noexcept
+{
+    ::delete(ptr);
+}
+
+// pure virtual functions
 
 void __cxa_pure_virtual(void)
 {
