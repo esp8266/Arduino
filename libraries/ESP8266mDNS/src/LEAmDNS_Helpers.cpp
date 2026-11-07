@@ -180,7 +180,11 @@ namespace MDNSImplementation
         m_pUDPContext = new UdpContext;
         m_pUDPContext->ref();
 
+#ifdef MDNS_IP6_RESPONDER
+        if (m_pUDPContext->listen(IP_ANY_TYPE, DNS_MQUERY_PORT))  // IP4 and IP6
+#else
         if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT))
+#endif
         {
             m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
             m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));
