@@ -25,6 +25,7 @@
 #include <ArduinoOTA.h>
 #include <FSTools.h>
 #include <LittleFS.h>
+#include <SPIFFS.h>
 
 
 #define TARGET_FS_LAYOUT FST::layout_4m3m

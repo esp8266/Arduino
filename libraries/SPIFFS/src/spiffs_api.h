@@ -24,18 +24,35 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include <limits>
-#include "FS.h"
-#include "FSImpl.h"
-extern "C" {
-    #include "spiffs/spiffs.h"
-    #include "spiffs/spiffs_nucleus.h"
-};
-#include "debug.h"
-#include "flash_utils.h"
-#include "flash_hal.h"
 
-using namespace fs;
+#include <limits>
+#include <FS.h>
+#include <FSImpl.h>
+extern "C" {
+    #include "../lib/spiffs/spiffs.h"
+    #include "../lib/spiffs/spiffs_nucleus.h"
+};
+#include <debug.h>
+#include <flash_utils.h>
+#include <flash_hal.h>
+
+namespace fs {
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    static constexpr uint32_t FSId = 0x53504946;
+    SPIFFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
+
+    // Inherit _type and _autoFormat
+    // nothing yet, enableTime TBD when SPIFFS has metadate
+};
+
+}  // namespace fs
+
+using fs::SPIFFSConfig;
+
+using namespace fs;  // ?
 
 // The following are deprecated symbols and functions, to be removed at the next major release.
 // They are provided only for backwards compatibility and to give libs a chance to update.
@@ -600,6 +617,6 @@ protected:
     bool _valid;
 };
 
-}; // namespace
+}  // namespace spiffs_impl
 
 #endif //spiffs_api_h

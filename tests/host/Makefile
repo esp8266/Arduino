@@ -101,15 +101,8 @@ CORE_CPP_FILES := \
 		Print.cpp \
 		stdlib_noniso.cpp \
 		FS.cpp \
-		spiffs_api.cpp \
 		MD5Builder.cpp \
-		../../libraries/LittleFS/src/LittleFS.cpp \
 		core_esp8266_noniso.cpp \
-		spiffs/spiffs_cache.cpp \
-		spiffs/spiffs_check.cpp \
-		spiffs/spiffs_gc.cpp \
-		spiffs/spiffs_hydrogen.cpp \
-		spiffs/spiffs_nucleus.cpp \
 		libb64/cencode.cpp \
 		libb64/cdecode.cpp \
 		Schedule.cpp \
@@ -117,6 +110,15 @@ CORE_CPP_FILES := \
 		crc32.cpp \
 		Updater.cpp \
 		time.cpp \
+	) \
+	$(addprefix $(abspath $(LIBRARIES_PATH))/, \
+		LittleFS/src/LittleFS.cpp \
+		SPIFFS/src/spiffs_api.cpp \
+		SPIFFS/lib/spiffs/spiffs_cache.cpp \
+		SPIFFS/lib/spiffs/spiffs_check.cpp \
+		SPIFFS/lib/spiffs/spiffs_gc.cpp \
+		SPIFFS/lib/spiffs/spiffs_hydrogen.cpp \
+		SPIFFS/lib/spiffs/spiffs_nucleus.cpp \
 	) \
 	$(addprefix $(abspath $(LIBRARIES_PATH)/ESP8266SdFat/src)/, \
 		FatLib/FatFile.cpp \
@@ -139,9 +141,9 @@ CORE_CPP_FILES := \
 	$(abspath $(LIBRARIES_PATH)/SD/src/SD.cpp) \
 
 CORE_C_FILES := \
-	$(addprefix $(abspath $(CORE_PATH))/,\
-		../../libraries/LittleFS/src/lfs.c \
-		../../libraries/LittleFS/src/lfs_util.c \
+	$(addprefix $(abspath $(LIBRARIES_PATH))/,\
+		LittleFS/src/lfs.c \
+		LittleFS/src/lfs_util.c \
 	)
 
 MOCK_CPP_FILES_COMMON := \
