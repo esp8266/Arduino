@@ -36,7 +36,23 @@ extern "C" {
 #include <flash_utils.h>
 #include <flash_hal.h>
 
-using namespace fs;
+namespace fs {
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    static constexpr uint32_t FSId = 0x53504946;
+    SPIFFSConfig(bool autoFormat = true) : FSConfig(FSId, autoFormat) { }
+
+    // Inherit _type and _autoFormat
+    // nothing yet, enableTime TBD when SPIFFS has metadate
+};
+
+}  // namespace fs
+
+using fs::SPIFFSConfig;
+
+using namespace fs;  // ?
 
 // The following are deprecated symbols and functions, to be removed at the next major release.
 // They are provided only for backwards compatibility and to give libs a chance to update.
