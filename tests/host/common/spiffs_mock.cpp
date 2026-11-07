@@ -14,12 +14,12 @@
 */
 
 #include "spiffs_mock.h"
-#include "spiffs/spiffs.h"
+#include "lib/spiffs/spiffs.h"
 #include "debug.h"
 #include <flash_utils.h>
 #include <stdlib.h>
 
-#include <spiffs_api.h>
+#include <SPIFFS.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>

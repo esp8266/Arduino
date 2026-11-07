@@ -24,16 +24,17 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 #include <limits>
-#include "FS.h"
-#include "FSImpl.h"
+#include <FS.h>
+#include <FSImpl.h>
 extern "C" {
-    #include "spiffs/spiffs.h"
-    #include "spiffs/spiffs_nucleus.h"
+    #include "../lib/spiffs/spiffs.h"
+    #include "../lib/spiffs/spiffs_nucleus.h"
 };
-#include "debug.h"
-#include "flash_utils.h"
-#include "flash_hal.h"
+#include <debug.h>
+#include <flash_utils.h>
+#include <flash_hal.h>
 
 using namespace fs;
 
@@ -600,6 +601,6 @@ protected:
     bool _valid;
 };
 
-}; // namespace
+}  // namespace spiffs_impl
 
 #endif //spiffs_api_h
