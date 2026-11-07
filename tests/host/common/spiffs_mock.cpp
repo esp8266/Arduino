@@ -14,7 +14,6 @@
 */
 
 #include "spiffs_mock.h"
-#include "lib/spiffs/spiffs.h"
 #include "debug.h"
 #include <flash_utils.h>
 #include <stdlib.h>
