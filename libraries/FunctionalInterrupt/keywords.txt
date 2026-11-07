@@ -1,0 +1,11 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+InterruptInfo	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+attachScheduledInterrupt	KEYWORD2
