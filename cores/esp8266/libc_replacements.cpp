@@ -95,7 +95,7 @@ int IRAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     return len;
 }
 
-int IRAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
+int _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
 
 int IRAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
     (void) r;
@@ -133,4 +133,4 @@ int atexit(void (*func)()) {
     return 0;
 }
 
-};
+}  // extern "C"

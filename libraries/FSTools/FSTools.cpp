@@ -1,6 +1,7 @@
 #include "FSTools.h"
-#include "LittleFS.h"
-#include <spiffs_api.h>
+
+#include <LittleFS.h>
+#include <SPIFFS.h>
 #include <Esp.h>
 
 

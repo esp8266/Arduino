@@ -117,7 +117,7 @@ private:
     uint8_t      twi_rxBuffer[TWI_BUFFER_LENGTH];
     volatile int twi_rxBufferIndex = 0;
 
-    void (*twi_onSlaveTransmit)(void);
+    void (*twi_onSlaveTransmit)();
     void (*twi_onSlaveReceive)(uint8_t*, size_t);
 
     // ETS queue/timer interfaces
@@ -136,23 +136,23 @@ private:
     ETSTimer timer;
 
     // Event/IRQ callbacks, so they can't use "this" and need to be static
-    static void IRAM_ATTR onSclChange(void);
-    static void IRAM_ATTR onSdaChange(void);
-    static void           eventTask(ETSEvent* e);
-    static void IRAM_ATTR onTimer(void* unused);
+    static void onSclChange();
+    static void onSdaChange();
+    static void eventTask(ETSEvent* e);
+    static void onTimer(void*);
 
     // Allow not linking in the slave code if there is no call to setAddress
     bool _slaveEnabled = false;
 
     // Internal use functions
-    void IRAM_ATTR busywait(unsigned int v);
-    bool           write_start(void);
-    bool           write_stop(void);
-    bool           write_bit(bool bit);
-    bool           read_bit(void);
-    bool           write_byte(unsigned char byte);
-    unsigned char  read_byte(bool nack);
-    void IRAM_ATTR onTwipEvent(uint8_t status);
+    void          busywait(unsigned int v);
+    bool          write_start();
+    bool          write_stop();
+    bool          write_bit(bool bit);
+    bool          read_bit();
+    bool          write_byte(unsigned char byte);
+    unsigned char read_byte(bool nack);
+    void          onTwipEvent(uint8_t status);
 
     // Handle the case where a slave needs to stretch the clock with a time-limited busy wait
     inline void WAIT_CLOCK_STRETCH()
@@ -170,24 +170,24 @@ private:
     }
 
     // Generate a clock "valley" (at the end of a segment, just before a repeated start)
-    void twi_scl_valley(void);
+    void twi_scl_valley();
 
 public:
-    void           setClock(unsigned int freq);
-    void           setClockStretchLimit(uint32_t limit);
-    void           init(unsigned char sda, unsigned char scl);
-    void           setAddress(uint8_t address);
-    unsigned char  writeTo(unsigned char address, unsigned char* buf, unsigned int len,
+    void          setClock(unsigned int freq);
+    void          setClockStretchLimit(uint32_t limit);
+    void          init(unsigned char sda, unsigned char scl);
+    void          setAddress(uint8_t address);
+    unsigned char writeTo(unsigned char address, unsigned char* buf, unsigned int len,
+                          unsigned char sendStop);
+    unsigned char readFrom(unsigned char address, unsigned char* buf, unsigned int len,
                            unsigned char sendStop);
-    unsigned char  readFrom(unsigned char address, unsigned char* buf, unsigned int len,
-                            unsigned char sendStop);
-    uint8_t        status();
-    uint8_t        transmit(const uint8_t* data, uint8_t length);
-    void           attachSlaveRxEvent(void (*function)(uint8_t*, size_t));
-    void           attachSlaveTxEvent(void (*function)(void));
-    void IRAM_ATTR reply(uint8_t ack);
-    void IRAM_ATTR releaseBus(void);
-    void           enableSlave();
+    uint8_t       status();
+    uint8_t       transmit(const uint8_t* data, uint8_t length);
+    void          attachSlaveRxEvent(void (*function)(uint8_t*, size_t));
+    void          attachSlaveTxEvent(void (*function)());
+    void          reply(uint8_t ack);
+    void          releaseBus();
+    void          enableSlave();
 };
 
 static Twi twi;
@@ -275,7 +275,7 @@ void IRAM_ATTR Twi::busywait(unsigned int v)
     }
 }
 
-bool Twi::write_start(void)
+bool Twi::write_start()
 {
     SCL_HIGH(twi_scl);
     SDA_HIGH(twi_sda);
@@ -294,7 +294,7 @@ bool Twi::write_start(void)
     return true;
 }
 
-bool Twi::write_stop(void)
+bool Twi::write_stop()
 {
     SCL_LOW(twi_scl);
     SDA_LOW(twi_sda);
@@ -326,7 +326,7 @@ bool Twi::write_bit(bool bit)
     return true;
 }
 
-bool Twi::read_bit(void)
+bool Twi::read_bit()
 {
     SCL_LOW(twi_scl);
     SDA_HIGH(twi_sda);
@@ -447,7 +447,7 @@ unsigned char Twi::readFrom(unsigned char address, unsigned char* buf, unsigned 
     return 0;
 }
 
-void Twi::twi_scl_valley(void)
+void Twi::twi_scl_valley()
 {
     SCL_LOW(twi_scl);
     busywait(twi_dcount);
@@ -510,14 +510,14 @@ uint8_t Twi::transmit(const uint8_t* data, uint8_t length)
     return 0;
 }
 
-void Twi::attachSlaveRxEvent(void (*function)(uint8_t*, size_t))
+void Twi::attachSlaveRxEvent(void (*cb)(uint8_t*, size_t))
 {
-    twi_onSlaveReceive = function;
+    twi_onSlaveReceive = cb;
 }
 
-void Twi::attachSlaveTxEvent(void (*function)(void))
+void Twi::attachSlaveTxEvent(void (*cb)())
 {
-    twi_onSlaveTransmit = function;
+    twi_onSlaveTransmit = cb;
 }
 
 // DO NOT INLINE, inlining reply() in combination with compiler optimizations causes function
@@ -541,7 +541,7 @@ void IRAM_ATTR Twi::reply(uint8_t ack)
     }
 }
 
-void IRAM_ATTR Twi::releaseBus(void)
+void IRAM_ATTR Twi::releaseBus()
 {
     // release bus
     // TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
@@ -660,9 +660,8 @@ void IRAM_ATTR Twi::onTwipEvent(uint8_t status)
     }
 }
 
-void IRAM_ATTR Twi::onTimer(void* unused)
+void IRAM_ATTR Twi::onTimer(void*)
 {
-    (void)unused;
     twi.releaseBus();
     twi.onTwipEvent(TW_BUS_ERROR);
     twi.twip_mode  = TWIPM_WAIT;
@@ -709,7 +708,7 @@ void Twi::eventTask(ETSEvent* e)
 // Shorthand for if the state is any of the or'd bitmask x
 #define IFSTATE(x) if (twip_state_mask & (x))
 
-void IRAM_ATTR Twi::onSclChange(void)
+void IRAM_ATTR Twi::onSclChange()
 {
     unsigned int sda;
     unsigned int scl;
@@ -907,7 +906,7 @@ void IRAM_ATTR Twi::onSclChange(void)
     }
 }
 
-void IRAM_ATTR Twi::onSdaChange(void)
+void IRAM_ATTR Twi::onSdaChange()
 {
     unsigned int sda;
     unsigned int scl;
@@ -1054,7 +1053,7 @@ extern "C"
         twi.attachSlaveRxEvent(cb);
     }
 
-    void twi_attachSlaveTxEvent(void (*cb)(void))
+    void twi_attachSlaveTxEvent(void (*cb)())
     {
         twi.attachSlaveTxEvent(cb);
     }
@@ -1064,12 +1063,12 @@ extern "C"
         twi.reply(r);
     }
 
-    void twi_releaseBus(void)
+    void twi_releaseBus()
     {
         twi.releaseBus();
     }
 
-    void twi_enableSlaveMode(void)
+    void twi_enableSlaveMode()
     {
         twi.enableSlave();
     }

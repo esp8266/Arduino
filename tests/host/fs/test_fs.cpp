@@ -19,7 +19,7 @@
 #include "../common/spiffs_mock.h"
 #include "../common/littlefs_mock.h"
 #include "../common/sdfs_mock.h"
-#include <spiffs/spiffs.h>
+#include <SPIFFS.h>
 #include <LittleFS.h>
 #include "../../../libraries/SDFS/src/SDFS.h"
 #include "../../../libraries/SD/src/SD.h"
