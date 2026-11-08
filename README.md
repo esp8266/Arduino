@@ -111,6 +111,8 @@ Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), a
 
 ESP8266 core files are licensed under LGPL.
 
+ESP8266 core includes a copy of [redistributable Python](https://github.com/astral-sh/python-build-standalone) released by [Astral](https://github.com/astral-sh), which is licensed under Mozilla Public License Version 2.0. [Python](https://docs.python.org/3/license.html) is licensed under the Python Software Foundation License Version 2.
+
 [SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under the MIT license.
 
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under the MIT license.
