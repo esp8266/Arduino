@@ -62,13 +62,13 @@ TEST_CASE("Updater fails when writes overflow requested size", "[core][Updater]"
 // this one operator is enough. Everything else is passed to malloc().
 namespace
 {
-    constexpr size_t maxLog = 16;
-    size_t           allocLog[maxLog];
-    size_t           allocCount = 0;
-    size_t           refuseA    = 0;  // 0: refuse nothing
-    size_t           refuseB    = 0;
-    bool             logging    = false;
-}
+constexpr size_t maxLog = 16;
+size_t           allocLog[maxLog];
+size_t           allocCount = 0;
+size_t           refuseA    = 0;  // 0: refuse nothing
+size_t           refuseB    = 0;
+bool             logging    = false;
+}  // namespace
 
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept
 {
@@ -87,48 +87,49 @@ extern uint32_t mockFreeHeap;
 
 namespace
 {
-    // Run begin() with logging on. Sizes refuseA/refuseB are refused,
-    // heap is the mocked free heap.
-    bool beginWith(UpdaterClass& u, size_t a, size_t b, uint32_t heap)
-    {
-        allocCount   = 0;
-        refuseA      = a;
-        refuseB      = b;
-        mockFreeHeap = heap;
-        logging      = true;
-        const bool ok = u.begin(6000);
-        logging      = false;
-        refuseA      = 0;
-        refuseB      = 0;
-        mockFreeHeap = 30000;
-        return ok;
-    }
-
-    // Under valgrind, operator new is replaced by valgrind's own, whatever the
-    // test binary defines, so the hook above is never called. Check that
-    // once, and let the tests that need the hook skip themselves in that case.
-    bool allocHookWorks()
-    {
-        static const bool works = []() {
-            allocCount = 0;
-            logging    = true;
-            // volatile: the compiler may not drop the new/delete pair
-            volatile uint8_t* probe = new (std::nothrow) uint8_t[1];
-            logging                 = false;
-            if (probe)
-            {
-                *probe = 1;
-            }
-            delete[] probe;
-            return allocCount == 1;
-        }();
-        if (!works)
-        {
-            WARN("operator new[] cannot be replaced here (valgrind?), test skipped");
-        }
-        return works;
-    }
+// Run begin() with logging on. Sizes refuseA/refuseB are refused,
+// heap is the mocked free heap.
+bool beginWith(UpdaterClass& u, size_t a, size_t b, uint32_t heap)
+{
+    allocCount    = 0;
+    refuseA       = a;
+    refuseB       = b;
+    mockFreeHeap  = heap;
+    logging       = true;
+    const bool ok = u.begin(6000);
+    logging       = false;
+    refuseA       = 0;
+    refuseB       = 0;
+    mockFreeHeap  = 30000;
+    return ok;
 }
+
+// Under valgrind, operator new is replaced by valgrind's own, whatever the
+// test binary defines, so the hook above is never called. Check that
+// once, and let the tests that need the hook skip themselves in that case.
+bool allocHookWorks()
+{
+    static const bool works = []()
+    {
+        allocCount = 0;
+        logging    = true;
+        // volatile: the compiler may not drop the new/delete pair
+        volatile uint8_t* probe = new (std::nothrow) uint8_t[1];
+        logging                 = false;
+        if (probe)
+        {
+            *probe = 1;
+        }
+        delete[] probe;
+        return allocCount == 1;
+    }();
+    if (!works)
+    {
+        WARN("operator new[] cannot be replaced here (valgrind?), test skipped");
+    }
+    return works;
+}
+}  // namespace
 
 TEST_CASE("Updater uses a sector sized buffer when there is room", "[core][Updater]")
 {
@@ -143,7 +144,8 @@ TEST_CASE("Updater uses a sector sized buffer when there is room", "[core][Updat
     u.end(true);  // no data written: fails, and frees the buffer
 }
 
-TEST_CASE("Updater falls back to a small buffer when the big one cannot be allocated", "[core][Updater]")
+TEST_CASE("Updater falls back to a small buffer when the big one cannot be allocated",
+          "[core][Updater]")
 {
     if (!allocHookWorks())
     {
