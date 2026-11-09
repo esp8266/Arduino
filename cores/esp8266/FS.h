@@ -79,6 +79,7 @@ public:
     operator bool() const;
     const char* name() const;
     const char* fullName() const; // Includes path
+    const char* path() const { return fullName(); } // esp32 compat
     bool truncate(uint32_t size);
 
     bool isFile() const;
@@ -215,6 +216,7 @@ public:
 
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
+    File open(const String& path) { return open(path, "r"); } // esp32 compat
 
     bool exists(const char* path);
     bool exists(const String& path);
