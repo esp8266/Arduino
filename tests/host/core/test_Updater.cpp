@@ -103,10 +103,39 @@ namespace
         mockFreeHeap = 30000;
         return ok;
     }
+
+    // Under valgrind, operator new is replaced by valgrind's own, whatever the
+    // test binary defines, so the hook above is never called. Check that
+    // once, and let the tests that need the hook skip themselves in that case.
+    bool allocHookWorks()
+    {
+        static const bool works = []() {
+            allocCount = 0;
+            logging    = true;
+            // volatile: the compiler may not drop the new/delete pair
+            volatile uint8_t* probe = new (std::nothrow) uint8_t[1];
+            logging                 = false;
+            if (probe)
+            {
+                *probe = 1;
+            }
+            delete[] probe;
+            return allocCount == 1;
+        }();
+        if (!works)
+        {
+            WARN("operator new[] cannot be replaced here (valgrind?), test skipped");
+        }
+        return works;
+    }
 }
 
 TEST_CASE("Updater uses a sector sized buffer when there is room", "[core][Updater]")
 {
+    if (!allocHookWorks())
+    {
+        return;
+    }
     UpdaterClass u;
     REQUIRE(beginWith(u, 0, 0, 30000));
     REQUIRE(allocCount == 1);
@@ -116,6 +145,10 @@ TEST_CASE("Updater uses a sector sized buffer when there is room", "[core][Updat
 
 TEST_CASE("Updater falls back to a small buffer when the big one cannot be allocated", "[core][Updater]")
 {
+    if (!allocHookWorks())
+    {
+        return;
+    }
     UpdaterClass u;
     uint8_t      buff[6000];
     memset(buff, 0, sizeof(buff));
@@ -128,10 +161,15 @@ TEST_CASE("Updater falls back to a small buffer when the big one cannot be alloc
     REQUIRE(u.write(buff, 6000));
     REQUIRE(u.remaining() == 0);
     REQUIRE(!u.hasError());
+    u.end(true);  // frees the buffer
 }
 
 TEST_CASE("Updater starts with the small buffer when the heap is low", "[core][Updater]")
 {
+    if (!allocHookWorks())
+    {
+        return;
+    }
     UpdaterClass u;
     REQUIRE(beginWith(u, 0, 0, 2 * FLASH_SECTOR_SIZE));
     REQUIRE(allocCount == 1);
@@ -141,6 +179,10 @@ TEST_CASE("Updater starts with the small buffer when the heap is low", "[core][U
 
 TEST_CASE("Updater reports OOM when no buffer can be allocated", "[core][Updater]")
 {
+    if (!allocHookWorks())
+    {
+        return;
+    }
     UpdaterClass u;
     // Low heap: only the small buffer is tried.
     REQUIRE(!beginWith(u, 256, 0, 2 * FLASH_SECTOR_SIZE));
