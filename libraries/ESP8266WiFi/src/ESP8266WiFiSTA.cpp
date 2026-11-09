@@ -637,6 +637,27 @@ String ESP8266WiFiSTAClass::psk() const {
 }
 
 /**
+ * Return the encryption type of the network
+ * @return  encryption type (enum wl_enc_type)
+ */
+uint8_t ESP8266WiFiSTAClass::encryptionType() {
+  switch(authMode) {
+      case AUTH_OPEN:
+          return ENC_TYPE_NONE;
+      case AUTH_WEP:
+          return ENC_TYPE_WEP;
+      case AUTH_WPA_PSK:
+          return ENC_TYPE_TKIP;
+      case AUTH_WPA2_PSK:
+          return ENC_TYPE_CCMP;
+      case AUTH_WPA_WPA2_PSK:
+          return ENC_TYPE_AUTO;
+      default:
+          return -1;
+  }
+}
+
+/**
  * Return the current bssid / mac associated with the network if configured
  * @return bssid uint8_t *
  */
