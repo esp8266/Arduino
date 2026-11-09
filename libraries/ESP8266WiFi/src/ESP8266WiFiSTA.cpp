@@ -686,10 +686,13 @@ int8_t ESP8266WiFiSTAClass::RSSI(void) {
 
 bool ESP8266WiFiSTAClass::_smartConfigStarted = false;
 bool ESP8266WiFiSTAClass::_smartConfigDone = false;
+sc_pass_decrypt_fn_t ESP8266WiFiSTAClass::_scDecryptFn;
 
 /**
  * Start SmartConfig
+ * @return smart config start success
  */
+
 bool ESP8266WiFiSTAClass::beginSmartConfig() {
     if(_smartConfigStarted) {
         return false;
@@ -723,6 +726,12 @@ bool ESP8266WiFiSTAClass::stopSmartConfig() {
     }
     return false;
 }
+/**
+ *  Set Smart Config Password Decrypt Function
+ */ 
+void ESP8266WiFiSTAClass::setSmartConfigDecryptFn(sc_pass_decrypt_fn_t scDecryptFn){
+    _scDecryptFn = scDecryptFn;
+}
 
 /**
  * Query SmartConfig status, to decide when stop config
@@ -746,11 +755,18 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
     sc_status status = (sc_status) st;
     if(status == SC_STATUS_LINK) {
         station_config* sta_conf = reinterpret_cast<station_config*>(result);
-
-        wifi_station_set_config(sta_conf);
+        if(_scDecryptFn) {
+            char decryptedPass[64] = "";
+            _scDecryptFn(decryptedPass, (const char *)sta_conf->password);
+            memcpy(sta_conf->password,decryptedPass, 64);   
+        }
+        if(WiFi._persistent) {
+            wifi_station_set_config(sta_conf);
+        } else {
+            wifi_station_set_config_current(sta_conf);
+        }
         wifi_station_disconnect();
         wifi_station_connect();
-
         _smartConfigDone = true;
     } else if(status == SC_STATUS_LINK_OVER) {
         WiFi.stopSmartConfig();
