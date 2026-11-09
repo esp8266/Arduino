@@ -66,3 +66,62 @@ For a troubleshooting example using the Exception Decoder Tool, read `FAQ: My ES
    :alt: ESP Exception Decoder
 
    ESP Exception Decoder
+
+Command-Line Decoder
+^^^^^^^^^^^^^^^^^^^^
+
+Since core 3.2.0 a command-line Python script is also provided in
+``tools/decoder.py``. It decodes the same stack-dump format but can be
+run directly from a terminal or integrated into CI pipelines.
+
+Requirements
+""""""""""""
+
+* Python 3
+* The firmware ``.elf`` file produced by the build (located next to the
+  ``.bin`` in the build directory)
+* ``xtensa-lx106-elf-addr2line`` (part of the ESP8266 toolchain) on
+  ``PATH``, or ``xtensa-lx106-elf-gdb`` if you prefer GDB output
+
+Usage
+"""""
+
+Save the serial monitor output that contains the stack dump to a file,
+then run the decoder with the matching ``.elf`` file:
+
+.. code:: bash
+
+    python3 tools/decoder.py /path/to/my_sketch.elf < stack_dump.txt
+
+If the Xtensa tools are not on ``PATH`` (for example on Windows or when
+using a custom toolchain location), use ``--toolchain-path``:
+
+.. code:: bash
+
+    python3 tools/decoder.py --toolchain-path /opt/xtensa-lx106-elf/bin /path/to/my_sketch.elf < stack_dump.txt
+
+By default ``addr2line`` is used. To switch to ``gdb`` output instead:
+
+.. code:: bash
+
+    python3 tools/decoder.py --tool gdb /path/to/my_sketch.elf < stack_dump.txt
+
+What it decodes
+"""""""""""""""
+
+The script automatically recognises and translates the following parts
+of a crash log:
+
+* **Exception cause** - the numeric exception code is expanded to its
+  human-readable name (e.g. ``Exception (28)`` -> ``LoadProhibited``).
+* ``epc1=`` and ``excvaddr=`` - the faulting program-counter and
+  accessed address are resolved to source file and line number.
+* **Stack contents** - every hexadecimal address inside the
+  ``>>>stack>>> ... <<<stack<<<`` block is decoded; addresses are
+  grouped by context (``ctx: cont``, ``ctx: sys``, etc.).
+* **Memory-error lines** - lines such as
+  ``last failed alloc call: 0x4021f774(0)[@...]`` are decoded in place.
+
+Any line that does not contain a decodable address is printed unchanged,
+so the output preserves the overall structure of the original log while
+replacing raw hex values with useful source locations.
