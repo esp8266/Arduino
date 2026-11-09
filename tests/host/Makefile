@@ -196,6 +196,7 @@ INC_PATHS += \
 		../../tools/sdk/lwip2/include \
 	)
 
+TEST_WRAPPER ?=
 TEST_ARGS ?=
 
 TEST_CPP_FILES := \
@@ -260,7 +261,7 @@ CI:					# run CI
 doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)			# run host test for CI
-	$(OUTPUT_BINARY) $(TEST_ARGS)
+	$(TEST_WRAPPER) $(OUTPUT_BINARY) $(TEST_ARGS)
 
 .PHONY: clean
 clean: clean-lcov clean-objects
