@@ -195,3 +195,8 @@ tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
 tools.mklittlefs.cmd=mklittlefs
 tools.mklittlefs.cmd.windows=mklittlefs.exe
 tools.mklittlefs.path={runtime.platform.path}/tools/mklittlefs
+
+tools.espOtaProgrammer.cmd={runtime.tools.python3.path}/python3
+tools.espOtaProgrammer.program.params.verbose=
+tools.espOtaProgrammer.program.params.quiet=
+tools.espOtaProgrammer.program.pattern="{cmd}" -I "{runtime.platform.path}/tools/espota.py" -i "{ip}" -p {port} "--auth={auth}" -f "{build.path}/{build.project_name}.bin"
