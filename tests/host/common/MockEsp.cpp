@@ -115,12 +115,9 @@ uint32_t EspClass::getSketchSize()
     return 400000;
 }
 
-// Tests can change this to simulate a low heap.
-uint32_t mockFreeHeap = 30000;
-
 uint32_t EspClass::getFreeHeap()
 {
-    return mockFreeHeap;
+    return 30000;
 }
 
 uint32_t EspClass::getMaxFreeBlockSize()
