@@ -171,56 +171,56 @@
                      "host": "aarch64-linux-gnu",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/aarch64-linux-gnu.python-via-env.tar.gz",
                      "archiveFileName": "aarch64-linux-gnu.python-via-env.tar.gz",
-                     "checksum": "SHA-256:e647a3cd3a31cce801dc7d53add316dbc0d0ce5037007a6f26d9518c768b8f0a",
-                     "size": "361"
+                     "checksum": "SHA-256:156274f8fc4dc57ae1ab1ddb04017e8d4fa2d6e917d94f841ef24edb9ebb2c5f",
+                     "size": "362"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/arm-linux-gnueabihf.python-via-env.tar.gz",
                      "archiveFileName": "arm-linux-gnueabihf.python-via-env.tar.gz",
-                     "checksum": "SHA-256:e647a3cd3a31cce801dc7d53add316dbc0d0ce5037007a6f26d9518c768b8f0a",
-                     "size": "361"
+                     "checksum": "SHA-256:156274f8fc4dc57ae1ab1ddb04017e8d4fa2d6e917d94f841ef24edb9ebb2c5f",
+                     "size": "362"
                   },
                   {
                      "host": "arm64-apple-darwin",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/arm64-apple-darwin.python-3.14.10+20261026.tar.gz",
                      "archiveFileName": "arm64-apple-darwin.python-3.14.10+20261026.tar.gz",
-                     "checksum": "SHA-256:93dd1a0d8f176fd4915bd7a3ee88588462eac9e1f6ebf8f7ac63b2634c752d58",
-                     "size": "24767258"
+                     "checksum": "SHA-256:1da1ffd1c3bca096730e2ff766ebf299d9e22624fb83e6cea9b2e6e6540c5591",
+                     "size": "24767005"
                   },
                   {
                      "host": "i686-mingw32",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/i686-mingw32.python-3.14.10+20261026.zip",
                      "archiveFileName": "i686-mingw32.python-3.14.10+20261026.zip",
-                     "checksum": "SHA-256:52844f873123e968ca06bd0d91914afd0c6e1c65749b5707a01e09acb41b0afd",
-                     "size": "15984290"
+                     "checksum": "SHA-256:e7ddc2dfe2bc122ee9398138b5e3d3355edcc38c4c80ae5df1093734c81d81ae",
+                     "size": "15984659"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/i686-pc-linux-gnu.python-via-env.tar.gz",
                      "archiveFileName": "i686-pc-linux-gnu.python-via-env.tar.gz",
-                     "checksum": "SHA-256:e647a3cd3a31cce801dc7d53add316dbc0d0ce5037007a6f26d9518c768b8f0a",
-                     "size": "361"
+                     "checksum": "SHA-256:156274f8fc4dc57ae1ab1ddb04017e8d4fa2d6e917d94f841ef24edb9ebb2c5f",
+                     "size": "362"
                   },
                   {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/x86_64-apple-darwin.python-3.14.10+20261026.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin.python-3.14.10+20261026.tar.gz",
-                     "checksum": "SHA-256:9f94aa8418a6d38d095fe2271df78b1f12dc722adf3441774b63d2e1060478bb",
-                     "size": "25079182"
+                     "checksum": "SHA-256:0fcd9e454f8ab7163a1e08fdda38025c1e1dbcf13563a2967a222938cd6e38e9",
+                     "size": "25073366"
                   },
                   {
                      "host": "x86_64-mingw32",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/x86_64-mingw32.python-3.14.10+20261026.zip",
                      "archiveFileName": "x86_64-mingw32.python-3.14.10+20261026.zip",
-                     "checksum": "SHA-256:874627e6fc738e77a98e01fec8d092389896d3a50f5fb2e2166da2a3850a0284",
-                     "size": "17341145"
+                     "checksum": "SHA-256:34d89386c6824d2716ad74dbeb2b5270ffe280c00262fa47fa2e243cc7dc361d",
+                     "size": "17341320"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
                      "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-python3/x86_64-pc-linux-gnu.python-via-env.tar.gz",
                      "archiveFileName": "x86_64-pc-linux-gnu.python-via-env.tar.gz",
-                     "checksum": "SHA-256:c6010464d0ac4d181df86e2deac285e2b66b91c7743b927e6c6f962860c6ddcd",
+                     "checksum": "SHA-256:156274f8fc4dc57ae1ab1ddb04017e8d4fa2d6e917d94f841ef24edb9ebb2c5f",
                      "size": "362"
                   }
                ]
