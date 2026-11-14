@@ -171,12 +171,14 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
-  if (ESP.getFreeHeap() > 2 * FLASH_SECTOR_SIZE) {
-    _bufferSize = FLASH_SECTOR_SIZE;
-  } else {
-    _bufferSize = 256;
+  // Try the big buffer first, then the small one. The big one is skipped
+  // when free heap is low, and it can also fail on a fragmented heap.
+  static constexpr size_t bufferSizes[] { FLASH_SECTOR_SIZE, 256 };
+  size_t first = (ESP.getFreeHeap() > 2 * FLASH_SECTOR_SIZE) ? 0 : 1;
+  for (size_t i = first; !_buffer && i < sizeof(bufferSizes) / sizeof(bufferSizes[0]); ++i) {
+    _bufferSize = bufferSizes[i];
+    _buffer = new (std::nothrow) uint8_t[_bufferSize];
   }
-  _buffer = new (std::nothrow) uint8_t[_bufferSize];
   if (!_buffer) {
     _setError(UPDATE_ERROR_OOM);
     _reset(false);
