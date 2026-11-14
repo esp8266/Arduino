@@ -269,7 +269,7 @@ namespace MDNSImplementation
     bool MDNSResponder::removeService(const MDNSResponder::hMDNSService p_hService)
     {
         stcMDNSService* pService = 0;
-        bool            bResult  = (((pService = _findService(p_hService)))
+        bool bResult = (((pService = _findService(p_hService)))
                         && (_announceService(*pService, false)) && (_releaseService(pService)));
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] removeService: FAILED!\n"));
@@ -979,7 +979,7 @@ namespace MDNSImplementation
     {
         stcMDNSServiceQuery* pServiceQuery = 0;
         bool                 bResult       = (((pServiceQuery = _findServiceQuery(p_hServiceQuery)))
-                        && (_removeServiceQuery(pServiceQuery)));
+                                              && (_removeServiceQuery(pServiceQuery)));
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] removeServiceQuery: FAILED!\n"));
         });

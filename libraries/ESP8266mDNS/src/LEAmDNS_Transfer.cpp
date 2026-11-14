@@ -605,8 +605,8 @@ namespace MDNSImplementation
     {
         uint32_t u32IP4Address;
         bool     bResult = ((MDNS_IP4_SIZE == p_u16RDLength)
-                        && (_udpReadBuffer((unsigned char*)&u32IP4Address, MDNS_IP4_SIZE))
-                        && ((p_rRRAnswerA.m_IPAddress = IPAddress(u32IP4Address))));
+                            && (_udpReadBuffer((unsigned char*)&u32IP4Address, MDNS_IP4_SIZE))
+                            && ((p_rRRAnswerA.m_IPAddress = IPAddress(u32IP4Address))));
         DEBUG_EX_ERR(if (!bResult)
                          DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswerA: FAILED!\n")););
         return bResult;
@@ -1358,11 +1358,11 @@ namespace MDNSImplementation
         uint8_t u8B2((p_MsgHeader.m_1bRA << 7) | (p_MsgHeader.m_3bZ << 4)
                      | (p_MsgHeader.m_4bRCode));
         bool    bResult = ((_write16(p_MsgHeader.m_u16ID, p_rSendParameter))
-                        && (_write8(u8B1, p_rSendParameter)) && (_write8(u8B2, p_rSendParameter))
-                        && (_write16(p_MsgHeader.m_u16QDCount, p_rSendParameter))
-                        && (_write16(p_MsgHeader.m_u16ANCount, p_rSendParameter))
-                        && (_write16(p_MsgHeader.m_u16NSCount, p_rSendParameter))
-                        && (_write16(p_MsgHeader.m_u16ARCount, p_rSendParameter)));
+                           && (_write8(u8B1, p_rSendParameter)) && (_write8(u8B2, p_rSendParameter))
+                           && (_write16(p_MsgHeader.m_u16QDCount, p_rSendParameter))
+                           && (_write16(p_MsgHeader.m_u16ANCount, p_rSendParameter))
+                           && (_write16(p_MsgHeader.m_u16NSCount, p_rSendParameter))
+                           && (_write16(p_MsgHeader.m_u16ARCount, p_rSendParameter)));
 
         DEBUG_EX_ERR(if (!bResult) {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSMsgHeader: FAILED!\n"));
