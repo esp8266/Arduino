@@ -38,7 +38,7 @@ public:
     };
 
     PacketType();
-    PacketType(PType pt) : ptype(pt) {};
+    PacketType(PType pt) : ptype(pt) { };
 
     operator PType() const
     {
