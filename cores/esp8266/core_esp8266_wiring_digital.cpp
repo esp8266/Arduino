@@ -28,6 +28,20 @@
 #include "core_esp8266_waveform.h"
 #include "interrupts.h"
 
+namespace esp8266::FunctionalInterrupt {
+
+// in-place stubs, in case functional interrupts arent used
+
+void updateArg(void*, uint8_t, uint8_t, uint32_t) __attribute__((weak));
+void IRAM_ATTR updateArg(void*, uint8_t, uint8_t, uint32_t) {
+}
+
+void cleanup(void*) __attribute__((weak));
+void IRAM_ATTR cleanup(void*) {
+}
+
+} // namespace esp8266::FunctionalInterrupt
+
 extern "C" {
 
 volatile uint32_t* const esp8266_gpioToFn[16] PROGMEM = { &GPF0, &GPF1, &GPF2, &GPF3, &GPF4, &GPF5, &GPF6, &GPF7, &GPF8, &GPF9, &GPF10, &GPF11, &GPF12, &GPF13, &GPF14, &GPF15 };
@@ -106,27 +120,15 @@ extern int IRAM_ATTR __digitalRead(uint8_t pin) {
   GPIO INTERRUPTS
 */
 
-typedef void (*voidFuncPtr)(void);
-typedef void (*voidFuncPtrArg)(void*);
+using voidFuncPtr = void(*)();
+using voidFuncPtrArg = void(*)(void*);
 
-typedef struct {
+struct interrupt_handler_t {
   uint8_t mode;
   voidFuncPtr fn;
-  void * arg;
+  void* arg;
   bool functional;
-} interrupt_handler_t;
-
-//duplicate from functionalInterrupt.h keep in sync
-typedef struct InterruptInfo {
-	uint8_t pin;
-	uint8_t value;
-	uint32_t micro;
-} InterruptInfo;
-
-typedef struct {
-	InterruptInfo* interruptInfo;
-	void* functionInfo;
-} ArgStructure;
+};
 
 static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
 static uint32_t interrupt_reg = 0;
@@ -154,13 +156,8 @@ void IRAM_ATTR interrupt_handler(void *arg, void *frame)
           esp8266::InterruptLock irqLock; // stop other interrupts
           if (handler->functional)
           {
-              ArgStructure* localArg = (ArgStructure*)handler->arg;
-              if (localArg && localArg->interruptInfo)
-              {
-                  localArg->interruptInfo->pin = i;
-                  localArg->interruptInfo->value = __digitalRead(i);
-                  localArg->interruptInfo->micro = micros();
-              }
+            esp8266::FunctionalInterrupt::updateArg(
+              handler->arg, i, __digitalRead(i), micros());
           }
           if (handler->arg)
           {
@@ -175,16 +172,14 @@ void IRAM_ATTR interrupt_handler(void *arg, void *frame)
   ETS_GPIO_INTR_ENABLE();
 }
 
-extern void cleanupFunctional(void* arg);
-
-static void set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
+static void IRAM_ATTR set_interrupt_handlers(uint8_t pin, voidFuncPtr userFunc, void* arg, uint8_t mode, bool functional)
 {
   interrupt_handler_t* handler = &interrupt_handlers[pin];
   handler->mode = mode;
   handler->fn = userFunc;
   if (handler->functional && handler->arg)  // Clean when new attach without detach
   {
-    cleanupFunctional(handler->arg);
+    esp8266::FunctionalInterrupt::cleanup(handler->arg);
   }
   handler->arg = arg;
   handler->functional = functional;
@@ -225,7 +220,7 @@ extern void IRAM_ATTR __detachInterrupt(uint8_t pin) {
         GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
         GPIEC = (1 << pin); //Clear Interrupt for this pin
         interrupt_reg &= ~(1 << pin);
-		set_interrupt_handlers(pin, nullptr, nullptr, 0, false);
+        set_interrupt_handlers(pin, nullptr, nullptr, 0, false);
         if (interrupt_reg)
         {
             ETS_GPIO_INTR_ENABLE();
@@ -256,10 +251,12 @@ extern void initPins() {
 
 extern void resetPins() __attribute__ ((weak, alias("__resetPins")));
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));
+
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead"), nothrow));
+
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
 extern void attachInterruptArg(uint8_t pin, voidFuncPtrArg handler, void* arg, int mode) __attribute__((weak, alias("__attachInterruptArg")));
 extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
 
-};
+}  // extern "C"
