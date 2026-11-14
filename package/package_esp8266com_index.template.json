@@ -138,7 +138,7 @@
                "toolsDependencies": [
                   {
                      "packager": "esp8266",
-                     "version": "3.2.0-gcc10.3-c791b74",
+                     "version": "3.2.0-gcc10.3-261114-v2",
                      "name": "xtensa-lx106-elf-gcc"
                   },
                   {
@@ -219,57 +219,57 @@
                ]
             },
             {
-               "version": "3.2.0-gcc10.3-c791b74",
+               "version": "3.2.0-gcc10.3-261114-v2",
                "name": "xtensa-lx106-elf-gcc",
                "systems": [
                   {
                      "host": "aarch64-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/aarch64-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "archiveFileName": "aarch64-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "checksum": "SHA-256:c8833744f1419eed60a3b7bc0e06b72eb94e4ab2cb13daa1a011d5e5663ea04f",
-                     "size": "72905094"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/aarch64-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "archiveFileName": "aarch64-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "checksum": "SHA-256:a21222b4f71a4b9528d1ee54b8d2e31abd279917e23a5dbfef65a038b9893874",
+                     "size": "73019460"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/arm-linux-gnueabihf.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "archiveFileName": "arm-linux-gnueabihf.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "checksum": "SHA-256:d378d91c63200d4007d1af9e0f4f622b60f5d1c67dd81e63e3c20ddfb14bc3d0",
-                     "size": "68111989"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/arm-linux-gnueabihf.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "archiveFileName": "arm-linux-gnueabihf.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "checksum": "SHA-256:913f8e5d884b8ea53a4705a9e06bce09c234e210f5ca61fb9b3912dde2992b63",
+                     "size": "68206354"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/i686-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "archiveFileName": "i686-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "checksum": "SHA-256:26fc73e2047c6e1d563db5ba56318b0e099cec5824d17744aac6f9031f104802",
-                     "size": "76912811"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/i686-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "checksum": "SHA-256:00395acfaa139879e087509ae01efd0c0ec5ae6da69a0531642ad8b8395c4cd6",
+                     "size": "77009709"
                   },
                   {
                      "host": "i686-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/i686-w64-mingw32.xtensa-lx106-elf-c791b74.230224.zip",
-                     "archiveFileName": "i686-w64-mingw32.xtensa-lx106-elf-c791b74.230224.zip",
-                     "checksum": "SHA-256:0b4199eff915f33498413c8a852038f6c50bb87adf22579920fa4972a2cc15f0",
-                     "size": "73750173"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/i686-w64-mingw32.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.zip",
+                     "archiveFileName": "i686-w64-mingw32.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.zip",
+                     "checksum": "SHA-256:5dc96afe95b9948c999c061e6c84bdb1577cd96d218fbf1a49d57c323cc48c73",
+                     "size": "73509488"
                   },
                   {
                      "host": "x86_64-apple-darwin",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/x86_64-apple-darwin14.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "checksum": "SHA-256:59c9890ac51cfdd687e072e310f86e3aa2da549a02fa4d1dcda7f9bc2dffb0fe",
-                     "size": "77742495"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/x86_64-apple-darwin14.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "checksum": "SHA-256:111cc4e40d9ac60f8db92a3ea3cdd81f39b639663709776e138361389cabe3f8",
+                     "size": "77844436"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/x86_64-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-c791b74.230224.tar.gz",
-                     "checksum": "SHA-256:8ddcb9935dfdc88f9742bc3319c6dc01eb17618a785bb3474f0e52f00adf49cc",
-                     "size": "76312800"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/x86_64-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.tar.gz",
+                     "checksum": "SHA-256:2c3dae9b80c4c8815c1e341492d5c32c679abe1e0269bc48ec89a02877d7aa63",
+                     "size": "76407536"
                   },
                   {
                      "host": "x86_64-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/x86_64-w64-mingw32.xtensa-lx106-elf-c791b74.230224.zip",
-                     "archiveFileName": "x86_64-w64-mingw32.xtensa-lx106-elf-c791b74.230224.zip",
-                     "checksum": "SHA-256:41f0198b25a99aeeb410d5b978453295a46e2d844a60d5a9d245590a095e4ce4",
-                     "size": "76928412"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/3.2.0-gcc10.3-261114-v2/x86_64-w64-mingw32.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.zip",
+                     "archiveFileName": "x86_64-w64-mingw32.xtensa-lx106-elf-gcc10.3-eqt3.2.0-24c4a47.zip",
+                     "checksum": "SHA-256:9f2f30135d345accf4ca215f19090f2475beaf5089d596574aef7248fcaa6856",
+                     "size": "76688353"
                   }
                ]
             },
