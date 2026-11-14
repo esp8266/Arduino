@@ -153,7 +153,7 @@
                   },
                   {
                      "packager": "esp8266",
-                     "version": "3.7.2-post2",
+                     "version": "python3.14.10_20261110_v1",
                      "name": "python3"
                   }
                ],
@@ -164,57 +164,64 @@
          ],
          "tools": [
             {
-               "version": "3.7.2-post2",
+               "version": "python3.14.10_20261110_v1",
                "name": "python3",
                "systems": [
                   {
-                     "host": "x86_64-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-3.7.2.post1-embed-win32v2a.zip",
-                     "archiveFileName": "python3-3.7.2.post1-embed-win32v2a.zip",
-                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
-                     "size": "6428926"
-                  },
-                  {
-                     "host": "i686-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-3.7.2.post1-embed-win32v2a.zip",
-                     "archiveFileName": "python3-3.7.2.post1-embed-win32v2a.zip",
-                     "checksum": "SHA-256:f57cb2daf86176d2929e7c58990c2ac32554e3219d454dcac10e464ddda35bf2",
-                     "size": "6428926"
-                  },
-                  {
                      "host": "aarch64-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-via-env.tar.gz",
-                     "archiveFileName": "python3-via-env.tar.gz",
-                     "checksum": "SHA-256:a7a9905887703a0c862356918b7a9b9ca6968a696d53a15a7cdb7f1655cecf3f",
-                     "size": "331"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/aarch64-linux-gnu.python-via-env.tar.gz",
+                     "archiveFileName": "aarch64-linux-gnu.python-via-env.tar.gz",
+                     "checksum": "SHA-256:94ac1395d2d44ec9e8126eec6e8de9857c6210c6af1a7d05754dfd70bf15f327",
+                     "size": "362"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-via-env.tar.gz",
-                     "archiveFileName": "python3-via-env.tar.gz",
-                     "checksum": "SHA-256:a7a9905887703a0c862356918b7a9b9ca6968a696d53a15a7cdb7f1655cecf3f",
-                     "size": "331"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/arm-linux-gnueabihf.python-via-env.tar.gz",
+                     "archiveFileName": "arm-linux-gnueabihf.python-via-env.tar.gz",
+                     "checksum": "SHA-256:94ac1395d2d44ec9e8126eec6e8de9857c6210c6af1a7d05754dfd70bf15f327",
+                     "size": "362"
+                  },
+                  {
+                     "host": "arm64-apple-darwin",
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/arm64-apple-darwin.python-3.14.10+20261110.tar.gz",
+                     "archiveFileName": "arm64-apple-darwin.python-3.14.10+20261110.tar.gz",
+                     "checksum": "SHA-256:4c5142fdfac479dde365068fbece71600a01278788171edfe02f5372f75c9c6d",
+                     "size": "24793740"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/i686-mingw32.python-3.14.10+20261110.zip",
+                     "archiveFileName": "i686-mingw32.python-3.14.10+20261110.zip",
+                     "checksum": "SHA-256:e6c7cece5716474acf90f5e1050e0802cfa974ae69c698b67e623ada3a1ffcb3",
+                     "size": "15985672"
                   },
                   {
                      "host": "i686-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-via-env.tar.gz",
-                     "archiveFileName": "python3-via-env.tar.gz",
-                     "checksum": "SHA-256:a7a9905887703a0c862356918b7a9b9ca6968a696d53a15a7cdb7f1655cecf3f",
-                     "size": "331"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/i686-pc-linux-gnu.python-via-env.tar.gz",
+                     "archiveFileName": "i686-pc-linux-gnu.python-via-env.tar.gz",
+                     "checksum": "SHA-256:94ac1395d2d44ec9e8126eec6e8de9857c6210c6af1a7d05754dfd70bf15f327",
+                     "size": "362"
                   },
                   {
                      "host": "x86_64-apple-darwin",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-macosx-portable.tar.gz",
-                     "archiveFileName": "python3-macosx-portable.tar.gz",
-                     "checksum": "SHA-256:01a5bf1fa264c6f04cfaadf4c6e9f6caaacb6833ef40104dfbe953fcdb9bca1c",
-                     "size": "25494144"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/x86_64-apple-darwin.python-3.14.10+20261110.tar.gz",
+                     "archiveFileName": "x86_64-apple-darwin.python-3.14.10+20261110.tar.gz",
+                     "checksum": "SHA-256:0f1068b60f66aec170c54deb0023a333cbf7d55230c7330b1ba88951574320b6",
+                     "size": "25081304"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/x86_64-mingw32.python-3.14.10+20261110.zip",
+                     "archiveFileName": "x86_64-mingw32.python-3.14.10+20261110.zip",
+                     "checksum": "SHA-256:c85e40244db2fdd6c4bbd0fc63a08c79347336e1fd4874d23ffe1eab55d57ccd",
+                     "size": "17340855"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/3.2.0-gcc10.3/python3-via-env.tar.gz",
-                     "archiveFileName": "python3-via-env.tar.gz",
-                     "checksum": "SHA-256:a7a9905887703a0c862356918b7a9b9ca6968a696d53a15a7cdb7f1655cecf3f",
-                     "size": "331"
+                     "url": "https://github.com/mcspr/esp-quick-toolchain/releases/download/python3.14.10_20261110_v1/x86_64-pc-linux-gnu.python-via-env.tar.gz",
+                     "archiveFileName": "x86_64-pc-linux-gnu.python-via-env.tar.gz",
+                     "checksum": "SHA-256:94ac1395d2d44ec9e8126eec6e8de9857c6210c6af1a7d05754dfd70bf15f327",
+                     "size": "362"
                   }
                ]
             },
