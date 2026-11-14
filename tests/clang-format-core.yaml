@@ -5,6 +5,7 @@ ColumnLimit: 100
 KeepEmptyLinesAtTheStartOfBlocks: false
 SpaceAfterTemplateKeyword: false
 SpaceBeforeInheritanceColon: false
+SpaceInEmptyBraces: Block
 SpacesBeforeTrailingComments: 2
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: Empty
