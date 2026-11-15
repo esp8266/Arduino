@@ -82,7 +82,7 @@ _ssize_t IRAM_ATTR _write_r(struct _reent* unused, int file, const void* vptr, s
 {
     (void)unused;
     int         pos = len;
-    const char* ptr = reinterpret_cast<const char*>(ptr);
+    const char* ptr = reinterpret_cast<const char*>(vptr);
     if (file == STDOUT_FILENO)
     {
         while (pos--)
