@@ -125,7 +125,9 @@ ESP8266 core files are licensed under LGPL.
 
 ### Other useful links ###
 
-[Toolchain repo](https://github.com/earlephilhower/esp-quick-toolchain)
+[Toolchain repo](https://github.com/mcspr/esp-quick-toolchain)
+
+[Newlib repo](https://github.com/mcspr/newlib-xtensa)
 
 [Lwip link layer repo](https://github.com/d-a-v/esp82xx-nonos-linklayer)
 

@@ -24,50 +24,44 @@
  */
 
 #include <stddef.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <limits.h>
-#include <errno.h>
-#include <string.h>
-#include <../include/time.h> // See issue #6714
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/reent.h>
+#include <stdio.h>      // FILE
+#include <stdlib.h>     // abort()
+#include <sys/stat.h>   // struct stat
+#include <unistd.h>     // ..._FILENO
+#include <sys/reent.h>  // struct _reent
 
-#include "ets_sys.h"
-#include "os_type.h"
-#include "osapi.h"
-#include "mem.h"
-#include "user_interface.h"
-#include "debug.h"
+#include "ets_sys.h"  // ets_...
+#include "c_types.h"  // IRAM_ATTR
 
-extern "C" {
+extern "C"
+{
 
-int IRAM_ATTR _open_r (struct _reent* unused, const char *ptr, int mode) {
+int IRAM_ATTR _open_r(struct _reent* unused, const char* ptr, int flags, int mode)
+{
     (void)unused;
     (void)ptr;
+    (void)flags;
     (void)mode;
     return 0;
 }
 
-int IRAM_ATTR _close_r(struct _reent* unused, int file) {
+int IRAM_ATTR _close_r(struct _reent* unused, int file)
+{
     (void)unused;
     (void)file;
     return 0;
 }
 
-int IRAM_ATTR _fstat_r(struct _reent* unused, int file, struct stat *st) {
+int IRAM_ATTR _fstat_r(struct _reent* unused, int file, struct stat* st)
+{
     (void)unused;
     (void)file;
     st->st_mode = S_IFCHR;
     return 0;
 }
 
-int IRAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
+_off_t IRAM_ATTR _lseek_r(struct _reent* unused, int file, _off_t ptr, int dir)
+{
     (void)unused;
     (void)file;
     (void)ptr;
@@ -75,7 +69,8 @@ int IRAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
     return 0;
 }
 
-int IRAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len) {
+_ssize_t IRAM_ATTR _read_r(struct _reent* unused, int file, void* ptr, size_t len)
+{
     (void)unused;
     (void)file;
     (void)ptr;
@@ -83,11 +78,15 @@ int IRAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len) {
     return 0;
 }
 
-int IRAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
-    (void) r;
-    int pos = len;
-    if (file == STDOUT_FILENO) {
-        while(pos--) {
+_ssize_t IRAM_ATTR _write_r(struct _reent* unused, int file, const void* vptr, size_t len)
+{
+    (void)unused;
+    int         pos = len;
+    const char* ptr = reinterpret_cast<const char*>(vptr);
+    if (file == STDOUT_FILENO)
+    {
+        while (pos--)
+        {
             ets_putc(*ptr);
             ++ptr;
         }
@@ -95,20 +94,23 @@ int IRAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     return len;
 }
 
-int _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
-
-int IRAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
-    (void) r;
-    if (file->_file == STDOUT_FILENO) {
-      ets_putc(c);
-      return c;
+int           _putc_r(struct _reent* unused, int c, FILE* file) __attribute__((weak));
+int IRAM_ATTR _putc_r(struct _reent* unused, int c, FILE* file)
+{
+    (void)unused;
+    if (file->_file == STDOUT_FILENO)
+    {
+        ets_putc(c);
+        return c;
     }
     return EOF;
 }
 
-int IRAM_ATTR puts(const char * str) {
+int IRAM_ATTR puts(const char* str)
+{
     char c;
-    while((c = *str) != 0) {
+    while ((c = *str) != 0)
+    {
         ets_putc(c);
         ++str;
     }
@@ -116,20 +118,26 @@ int IRAM_ATTR puts(const char * str) {
     return true;
 }
 
+// macro in stdio.h, usually redirected to _putc_r
+// in case its not, make sure to have a stub
 #undef putchar
-int IRAM_ATTR putchar(int c) {
+
+int IRAM_ATTR putchar(int c)
+{
     ets_putc(c);
     return c;
 }
 
-void _exit(int status) {
-    (void) status;
+void _exit(int status)
+{
+    (void)status;
     abort();
 }
 
 int atexit(void (*func)()) __attribute__((weak));
-int atexit(void (*func)()) {
-    (void) func;
+int atexit(void (*func)())
+{
+    (void)func;
     return 0;
 }
 

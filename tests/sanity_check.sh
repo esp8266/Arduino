@@ -30,7 +30,9 @@ cflags=$"\
  -g \
  -free \
  -fipa-pta \
- -Werror=return-type \
+ -Wall \
+ -Wextra \
+ -Werror \
  -Wpointer-arith \
  -fno-inline-functions \
  -mtext-section-literals \
