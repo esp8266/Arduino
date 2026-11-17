@@ -105,6 +105,8 @@ Arduino IDE is developed and maintained by the Arduino team. The IDE is licensed
 
 ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
+ESP8266 core for Windows and macOS bundle a modified distribution of Python provided by the [python-build-standalone project](https://github.com/astral-sh/python-build-standalone), which is licensed under the Mozilla Public License 2.0 (MPL-2.0). [CPython](https://github.com/python/cpython) is licensed under the [Python Software Foundation License Version 2 (PSF-2.0)](https://docs.python.org/3/license.html). The bundled Python runtime and its statically linked libraries are distributed under the permissive open-source licenses, see the python-build-standalone project.
+
 Esptool.py was initially created by Fredrik Ahlberg (@themadinventor, @kongo), and is currently maintained by Angus Gratton (@projectgus) under GPL 2.0 license.
 
 [Espressif's NONOS SDK](https://github.com/espressif/ESP8266_NONOS_SDK) included in this build is under Espressif MIT License.
