@@ -78,8 +78,7 @@ private:
         TWIPM_IDLE,
         TWIPM_ADDRESSED,
         TWIPM_WAIT
-    } twip_mode
-        = TWIPM_IDLE;
+    } twip_mode = TWIPM_IDLE;
     volatile enum {
         TWIP_UNKNOWN = 0,
         TWIP_IDLE,
@@ -97,8 +96,7 @@ private:
         TWIP_RWAIT_ACK,
         TWIP_WRITE,
         TWIP_BUS_ERR
-    } twip_state
-        = TWIP_IDLE;
+    } twip_state             = TWIP_IDLE;
     volatile int twip_status = TW_NO_INFO;
     volatile int bitCount    = 0;
 

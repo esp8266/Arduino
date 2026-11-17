@@ -138,8 +138,8 @@ private:
                                            << 10; /* Length of Tx buffer in bytes */
     static const uint16_t RxBufferLength = (1 << RxBufferSize)
                                            << 10; /* Length of Rx buffer in bytes */
-    static const uint16_t TxBufferMask = TxBufferLength - 1;
-    static const uint16_t RxBufferMask = RxBufferLength - 1;
+    static const uint16_t TxBufferMask   = TxBufferLength - 1;
+    static const uint16_t RxBufferMask   = RxBufferLength - 1;
 
     SPIClass& _spi;
     int8_t    _cs;
