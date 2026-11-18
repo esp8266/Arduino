@@ -57,12 +57,12 @@ void I2SClass::end() {
   _running = false;
 }
 
-void I2SClass::onTransmit(void(*fcn)(void)) {
+void I2SClass::onTransmit(i2s_callback_type fcn) {
   i2s_set_callback(fcn);
   _onTransmit = fcn;
 }
 
-void I2SClass::onReceive(void(*fcn)(void)) {
+void I2SClass::onReceive(i2s_callback_type fcn) {
   i2s_rx_set_callback(fcn);
   _onReceive = fcn;
 }
@@ -122,6 +122,10 @@ int I2SClass::peek() {
   }
 }
 
+int I2SClass::read(uint8_t* buffer, size_t size) {
+  return read(reinterpret_cast<void *>(buffer), size);
+}
+
 int I2SClass::read(void *buffer, size_t size) {
   if (!_running) return -1;
   int cnt = 0;
@@ -170,12 +174,7 @@ int I2SClass::read(void *buffer, size_t size) {
 }
 
 size_t I2SClass::write(uint8_t s) {
-  if (!_running) return 0;
-  return write((int32_t)s);
-}
-
-size_t I2SClass::write(const uint8_t *buffer, size_t size) {
-  return write((const void *)buffer, size);
+  return write(static_cast<int32_t>(s));
 }
 
 size_t I2SClass::write(int32_t s) {
@@ -194,14 +193,18 @@ size_t I2SClass::write(int32_t s) {
       return 1;
     }
   } else {
-    return i2s_write_sample((uint32_t)s) ? 1 : 0;
+    return i2s_write_sample(static_cast<uint32_t>(s)) ? 1 : 0;
   }
+}
+
+size_t I2SClass::write(const uint8_t *buffer, size_t size) {
+  return write(reinterpret_cast<const void *>(buffer), size);
 }
 
 // SAMD core has this as non-blocking
 size_t I2SClass::write(const void *buffer, size_t size) {
   if (!_running) return 0;
-  return i2s_write_buffer_nb((int16_t *)buffer, size / 2);
+  return i2s_write_buffer_nb(reinterpret_cast<const int16_t *>(buffer), size / 2);
 }
 
 

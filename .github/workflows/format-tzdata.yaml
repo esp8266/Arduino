@@ -1,0 +1,53 @@
+name: Update TZ.h
+
+on:
+  workflow_dispatch:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Refresh TZ.h
+        shell: bash
+        run: |
+          pushd tools
+
+          uv python install
+          uv lock --refresh --upgrade --script format_tzdata.py
+          uv run format_tzdata.py ../cores/esp8266/TZ.h
+
+          popd
+
+      - name: Check updates
+        id: check
+        shell: bash
+        run: |
+          git add -u tools/format_tzdata.py.lock
+          git add cores/esp8266/TZ.h
+
+          if ! git diff --cached --exit-code; then
+            commit=1
+          else
+            commit=0
+          fi
+
+          echo "commit=${commit}" >> $GITHUB_OUTPUT
+
+      - name: Commit updates
+        if: steps.check.outputs.commit == '1'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          branch=$(date -Im | tr '[:punct:]' '_')
+          git commit -m 'Core - update timezone data'
+
+          git push origin HEAD:tzdata/update-${branch}

@@ -18,7 +18,6 @@
 #include <FS.h>
 #include <LittleFS.h>
 #include "../common/littlefs_mock.h"
-#include <spiffs/spiffs.h>
 
 // Use a LittleFS file because we can't instantiate a virtual class like Print
 TEST_CASE("Print::write overrides all compile properly", "[core][Print]")

@@ -76,7 +76,7 @@ namespace MDNSImplementation
                     char acIndexBuffer[16];
                     sprintf(acIndexBuffer, "%lu", (++ulIndex));
                     size_t stLength     = ((pFoundDivider - p_rpcDomain + strlen(pcDivider))
-                                       + strlen(acIndexBuffer) + 1);
+                                           + strlen(acIndexBuffer) + 1);
                     char*  pNewHostname = new char[stLength];
                     if (pNewHostname)
                     {
@@ -105,9 +105,9 @@ namespace MDNSImplementation
             if (!pFoundDivider)  // not yet extended (or failed to increment extension) -> start
                                  // indexing
             {
-                size_t stLength = strlen(p_rpcDomain)
-                                  + (strlen(pcDivider) + 1 + 1);  // Name + Divider + '2' + '\0'
-                char* pNewHostname = new char[stLength];
+                size_t stLength     = strlen(p_rpcDomain)
+                                      + (strlen(pcDivider) + 1 + 1);  // Name + Divider + '2' + '\0'
+                char*  pNewHostname = new char[stLength];
                 if (pNewHostname)
                 {
                     sprintf(pNewHostname, "%s%s2", p_rpcDomain, pcDivider);

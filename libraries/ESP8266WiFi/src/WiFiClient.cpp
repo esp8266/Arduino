@@ -220,18 +220,6 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write((const char*)buf, size);
 }
 
-size_t WiFiClient::write(Stream& stream)
-{
-    // (this method is deprecated)
-
-    if (!_client || !stream.available())
-    {
-        return 0;
-    }
-    // core up to 2.7.4 was equivalent to this
-    return stream.sendAll(this);
-}
-
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
 {
     if (!_client || !size)

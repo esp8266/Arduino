@@ -279,16 +279,23 @@ static void loop_task(os_event_t *events) {
     ESP.setDramHeap();
 }
 
+#if __cpp_exceptions
 extern "C" {
 struct object { long placeholder[ 10 ]; };
 void __register_frame_info (const void *begin, struct object *ob);
 extern char __eh_frame[];
 }
 
-static void do_global_ctors(void) {
+static void do_register_frame_info() {
     static struct object ob;
     __register_frame_info( __eh_frame, &ob );
+}
+#else
+static void do_register_frame_info() {
+}
+#endif
 
+static void do_global_ctors(void) {
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
@@ -322,6 +329,7 @@ void init_done() {
     system_set_os_print(1);
     gdb_init();
     std::set_terminate(__unhandled_exception_cpp);
+    do_register_frame_info();
     do_global_ctors();
     esp_schedule();
     ESP.setDramHeap();

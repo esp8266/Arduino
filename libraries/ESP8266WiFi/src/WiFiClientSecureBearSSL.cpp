@@ -335,21 +335,16 @@ size_t WiFiClientSecureCtx::_write(const uint8_t *buf, size_t size, bool pmem) {
   return sent_bytes;
 }
 
+size_t WiFiClientSecureCtx::write(uint8_t c) {
+  return _write(&c, 1, false);
+}
+
 size_t WiFiClientSecureCtx::write(const uint8_t *buf, size_t size) {
   return _write(buf, size, false);
 }
 
 size_t WiFiClientSecureCtx::write_P(PGM_P buf, size_t size) {
   return _write((const uint8_t *)buf, size, true);
-}
-
-size_t WiFiClientSecureCtx::write(Stream& stream) {
-  if (!_engineConnected()) {
-    DEBUG_BSSL("write: no br_ssl engine to work with\n");
-    return 0;
-  }
-
-  return stream.sendAll(this);
 }
 
 int WiFiClientSecureCtx::read(uint8_t *buf, size_t size) {

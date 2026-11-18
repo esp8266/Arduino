@@ -109,7 +109,7 @@ DBG_MMU_FLUSH(0)
  * in IROM, review printing method and comments in hwdt_app_entry.cpp.
  *
  */
-void IRAM_ATTR mmu_wrap_irom_fn(void (*fn)(void));
+void mmu_wrap_irom_fn(void (*fn)(void));
 
 static inline __attribute__((always_inline))
 bool mmu_is_iram(const void *addr) {

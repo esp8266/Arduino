@@ -45,8 +45,9 @@
 #include "ets_sys.h"
 #include <atomic>
 
+extern "C" {
 
-extern "C" void enablePhaseLockedWaveform (void)
+void enablePhaseLockedWaveform ()
 {
    // Does nothing, added to app to enable linking these versions
    // of the waveform functions instead of the default.
@@ -54,10 +55,11 @@ extern "C" void enablePhaseLockedWaveform (void)
 }
 
 // No-op calls to override the PWM implementation
-extern "C" void _setPWMFreq_weak(uint32_t freq) { (void) freq; }
-extern "C" IRAM_ATTR bool _stopPWM_weak(int pin) { (void) pin; return false; }
-extern "C" bool _setPWM_weak(int pin, uint32_t val, uint32_t range) { (void) pin; (void) val; (void) range; return false; }
+void _setPWMFreq_weak(uint32_t) {}
+bool IRAM_ATTR _stopPWM_weak(int) { return false; }
+bool _setPWM_weak(int, uint32_t, uint32_t) { return false; }
 
+}  // extern "C"
 
 // Timer is 80MHz fixed. 160MHz CPU frequency need scaling.
 constexpr bool ISCPUFREQ160MHZ = clockCyclesPerMicrosecond() == 160;
@@ -111,7 +113,7 @@ namespace {
 }
 
 // Interrupt on/off control
-static IRAM_ATTR void timer1Interrupt();
+static void timer1Interrupt();
 
 // Non-speed critical bits
 #pragma GCC optimize ("Os")
@@ -218,7 +220,7 @@ int startWaveformClockCycles_weak(uint8_t pin, uint32_t highCcys, uint32_t lowCc
 }
 
 // Stops a waveform on a pin
-IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
+int IRAM_ATTR stopWaveform_weak(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!waveform.timer1Running) {
     return false;
@@ -252,7 +254,7 @@ IRAM_ATTR int stopWaveform_weak(uint8_t pin) {
 
 // For dynamic CPU clock frequency switch in loop the scaling logic would have to be adapted.
 // Using constexpr makes sure that the CPU clock frequency is compile-time fixed.
-static inline IRAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X) {
+static inline int32_t IRAM_ATTR scaleCcys(const int32_t ccys, const bool isCPU2X) {
   if (ISCPUFREQ160MHZ) {
     return isCPU2X ? ccys : (ccys >> 1);
   }
@@ -261,7 +263,7 @@ static inline IRAM_ATTR int32_t scaleCcys(const int32_t ccys, const bool isCPU2X
   }
 }
 
-static IRAM_ATTR void timer1Interrupt() {
+static void IRAM_ATTR timer1Interrupt() {
   const uint32_t isrStartCcy = ESP.getCycleCount();
   int32_t clockDrift = isrStartCcy - waveform.nextEventCcy;
   const bool isCPU2X = CPU2X & 1;

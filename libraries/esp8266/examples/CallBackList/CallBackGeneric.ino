@@ -6,7 +6,7 @@ using namespace experimental::CBListImplentation;
 
 class exampleClass {
 public:
-  exampleClass(){};
+  exampleClass() {};
 
   using exCallBack = std::function<void(int)>;
   using exHandler = CallBackList<exCallBack>::CallBackHandler;
