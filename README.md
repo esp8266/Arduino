@@ -18,6 +18,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
   - [Using Boards Manager](#installing-with-boards-manager)
   - [Using git version](#using-git-version)
   - [Using PlatformIO](#using-platformio)
+  - [Using Visual Micro](#using-visual-micro)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
 - [Issues and support](#issues-and-support)
@@ -60,6 +61,20 @@ Linux 32/64, and Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 - [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=arduino-esp8266) -
   Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
 - [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=arduino-esp8266#examples)
+
+### Using Visual Micro
+
+[Visual Micro](https://www.visualmicro.com/page/Quickstart-Arduino-Users.aspx) is a
+third-party Arduino extension for Microsoft Visual Studio on Windows, with its
+own licensing and support.
+
+1. Open **vMicro > Visual Micro Explorer > Board Manager**.
+2. Add the stable ESP8266 package index:
+   [https://arduino.esp8266.com/stable/package_esp8266com_index.json](https://arduino.esp8266.com/stable/package_esp8266com_index.json),
+   then install the **esp8266** package.
+3. Select the installed board and its flash/upload options for the active sketch.
+
+Support for the Visual Studio integration is provided by Visual Micro.
 
 ### Building with make
 
