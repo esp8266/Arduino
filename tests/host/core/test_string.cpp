@@ -44,12 +44,34 @@ TEST_CASE("String::trim", "[core][String]")
 
 TEST_CASE("String::replace", "[core][String]")
 {
-    String str;
-    str            = "The quick brown fox jumped over the lazy dog.";
-    String find    = "fox";
-    String replace = "vulpes vulpes";
-    str.replace(find, replace);
+    const char data[] = "The quick brown fox jumped over the lazy dog.";
+    String     str    = data;
+    str.replace("fox", "vulpes vulpes");
     REQUIRE(str == "The quick brown vulpes vulpes jumped over the lazy dog.");
+    str.replace("vulpes", "lis lis");
+    REQUIRE(str == "The quick brown lis lis lis lis jumped over the lazy dog.");
+    str.replace("lazy dog.", "canis piger");
+    REQUIRE(str == "The quick brown lis lis lis lis jumped over the canis piger");
+    str.replace("brown lis lis", "lis");
+    REQUIRE(str == "The quick lis lis lis jumped over the canis piger");
+    str.replace("lis", "fox");
+    REQUIRE(str == "The quick fox fox fox jumped over the canis piger");
+    str.replace("fox fox", "kot");
+    REQUIRE(str == "The quick kot fox jumped over the canis piger");
+    str.replace("fox jumped", "red felis");
+    REQUIRE(str == "The quick kot red felis over the canis piger");
+    str.replace(" over ", " jumped over ");
+    REQUIRE(str == "The quick kot red felis jumped over the canis piger");
+    str.replace("canis piger", "lazy dog");
+    REQUIRE(str == "The quick kot red felis jumped over the lazy dog");
+    str.replace("dog", "dog.");
+    REQUIRE(str == "The quick kot red felis jumped over the lazy dog.");
+    str.replace(" kot", "");
+    REQUIRE(str == "The quick red felis jumped over the lazy dog.");
+    str.replace("red", "brown");
+    REQUIRE(str == "The quick brown felis jumped over the lazy dog.");
+    str.replace("felis", "fox");
+    REQUIRE(str == data);
 }
 
 TEST_CASE("String(value, base)", "[core][String]")
@@ -186,12 +208,19 @@ TEST_CASE("String concantenation", "[core][String]")
 
 TEST_CASE("String comparison", "[core][String]")
 {
-    String alpha("I like fish!");
+    REQUIRE(String("a") < String("b"));  // compareTo() reference comparisons
+    REQUIRE(String("1") < String("2"));
+    REQUIRE(String("999") > String("1000"));
+    String alpha("I like fish!");  // compareTo()
     REQUIRE(alpha < "I like tacos!");
     REQUIRE(alpha > "I like bacon!");
+    REQUIRE(alpha > "I like cod!");
+    REQUIRE(alpha >= "I like beef!");
+    REQUIRE(alpha <= "I like soup!");
     REQUIRE(alpha.equalsIgnoreCase("i LiKe FiSh!"));
+    REQUIRE(!alpha.equalsIgnoreCase("i LiKe FiSh! And ChIPs!"));
     REQUIRE(alpha.equalsConstantTime("I like fish!"));
-    REQUIRE(alpha != "I like fish?");
+    REQUIRE(alpha != "I like fish?");  // equals()
     REQUIRE(alpha.startsWith("I like"));
     REQUIRE(!alpha.startsWith("I lick"));
     REQUIRE(alpha.startsWith("fish", 7));
@@ -581,11 +610,11 @@ TEST_CASE("String chaining", "[core][String]")
 
     // make sure we can chain a combination of things to form a String
     REQUIRE((String(chunks[0]) + String(chunks[1]) + String(chunks[2]) + String(chunks[3])) == all);
-    REQUIRE((chunks[0] + String(chunks[1]) + F(chunks[2]) + chunks[3]) == all);
-    REQUIRE((String(chunks[0]) + F(chunks[1]) + F(chunks[2]) + String(chunks[3])) == all);
-    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + F(chunks[3]))
+    REQUIRE((chunks[0] + String(chunks[1]) + FPSTR(chunks[2]) + chunks[3]) == all);
+    REQUIRE((String(chunks[0]) + FPSTR(chunks[1]) + FPSTR(chunks[2]) + String(chunks[3])) == all);
+    REQUIRE(('~' + String(&chunks[0][0] + 1) + chunks[1] + String(chunks[2]) + FPSTR(chunks[3]))
             == all);
-    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + F(chunks[3]))
+    REQUIRE((String(chunks[0]) + '6' + (&chunks[1][0] + 1) + String(chunks[2]) + FPSTR(chunks[3]))
             == all);
 
     // these are still invalid (and also cannot compile at all):
@@ -600,7 +629,8 @@ TEST_CASE("String chaining", "[core][String]")
         String tmp(chunks[3]);
         tmp.reserve(2 * all.length());
         auto*  ptr = tmp.c_str();
-        String result("~1" + String(&chunks[0][0] + 2) + F(chunks[1]) + chunks[2] + std::move(tmp));
+        String result("~1" + String(&chunks[0][0] + 2) + FPSTR(chunks[1]) + chunks[2]
+                      + std::move(tmp));
         REQUIRE(result == all);
         REQUIRE(static_cast<const void*>(result.c_str()) == static_cast<const void*>(ptr));
     }
