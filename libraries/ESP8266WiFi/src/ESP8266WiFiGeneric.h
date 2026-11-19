@@ -41,7 +41,15 @@
 #define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
-struct WiFiEventHandlerOpaque;
+struct WiFiEventHandlerOpaque {
+    WiFiEventHandlerOpaque(WiFiEvent_t event, std::function<void(System_Event_t*)> handler);
+    void operator()(System_Event_t* e);    
+    bool canExpire();
+
+    WiFiEvent_t mEvent;
+    std::function<void(System_Event_t*)> mHandler;
+    bool mCanExpire = true; /* stopgap solution to handle deprecated void onEvent(cb, evt) case */
+};
 typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
 typedef void (*WiFiEventCb)(WiFiEvent_t);
