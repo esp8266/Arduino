@@ -239,7 +239,7 @@ Erase Flash
    Filesystem is preserved.
 
 -  ``Sketch + WiFi settings``: persistent WiFi settings are not
-   preserved accross flashings. Filesystem is preserved.
+   preserved across flashings. Filesystem is preserved.
 
 -  ``All Flash``: WiFi settings and Filesystems are erased.
 
